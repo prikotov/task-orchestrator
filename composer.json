@@ -23,9 +23,9 @@
         "psalm/plugin-symfony": "^5.3"
     },
     "repositories": [
-        {"type": "path", "url": "../coding-standard"},
-        {"type": "path", "url": "../todo-md"},
-        {"type": "path", "url": "../git-workflow"}
+        {"type": "vcs", "url": "https://github.com/prikotov/coding-standard"},
+        {"type": "vcs", "url": "https://github.com/prikotov/todo-md"},
+        {"type": "vcs", "url": "https://github.com/prikotov/git-workflow"}
     ],
     "autoload": {
         "psr-4": {
