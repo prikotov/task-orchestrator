@@ -1,0 +1,30 @@
+{
+    "name": "prikotov/task-orchestrator",
+    "description": "TasK Agent Orchestrator — chain-based AI agent orchestration with retry, circuit breaker, quality gates, dynamic loops",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.4",
+        "psr/event-dispatcher": "^1.0 || ^2.0",
+        "psr/log": "^2.0 || ^3.0",
+        "symfony/process": "^7.3 || 8.0.*",
+        "symfony/yaml": "^7.3 || 8.0.*",
+        "symfony/dependency-injection": "^7.3 || 8.0.*",
+        "symfony/http-kernel": "^7.3 || 8.0.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "TasK\\Orchestrator\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TasK\\Orchestrator\\Tests\\": "tests/"
+        }
+    }
+}
