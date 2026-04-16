@@ -14,13 +14,10 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 # Роль
 
-* Перед выполнением запроса пользователя выбери и загрузи в себя роль и personality из подходящего файла:
-    - [`Архитектор`](docs/architecture.md) — проектирует/проверяет архитектуру бандла, границы слоёв и интеграции.
-    - [`Бэкендер`](vendor/prikotov/coding-standard/doc/AGENTS.md) — реализует серверную логику (DDD, Application/Domain/Infrastructure, PHP).
-    - [`Ревьювер`](vendor/prikotov/coding-standard/doc/AGENTS.md) — ревьюит PHP/DDD/архитектуру, стиль, тесты, безопасность.
-    - [`Тестировщик`](vendor/prikotov/coding-standard/doc/testing/index.md) — проверяет use cases, тест-планы, unit-тесты.
+* Перед выполнением запроса пользователя загрузи роль и personality из:
+    - [`Конвенции бэкендера`](vendor/prikotov/coding-standard/doc/AGENTS.md) — DDD, Application/Domain/Infrastructure, PHP, тесты.
 
-* Если сомневаешься — загружай `vendor/prikotov/coding-standard/doc/AGENTS.md` (роль `Бэкендер`).
+* Для проектной документации см. `docs/` (архитектура, chains, observability, reliability).
 
 ---
 
