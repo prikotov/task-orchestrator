@@ -95,7 +95,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 * `Infrastructure` → `Domain` (interfaces only), `Application`.
 * `Domain` не зависит ни от кого.
 
-Для детальных архитектурных правил используй `docs/architecture.md`.
+Для детальных архитектурных правил используй `docs/guide/architecture.md`.
 
 ---
 

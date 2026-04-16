@@ -1,26 +1,22 @@
-# TasK Orchestrator — AI Agent Orchestration Library
+# TasK Orchestrator — Документация
 
 > Part of **TasK Orchestrator** documentation. See [README](../README.md) for installation and usage.
 
 TasK Orchestrator — PHP-оркестратор AI-агентов, который позволяет автоматически запускать цепочки ролей (pi, Codex CLI и другие) для анализа, проектирования, реализации и ревью кода.
 
 Поддерживает два типа цепочек:
-- **Static** — фиксированные шаги, линейное выполнение **с поддержкой итерационных циклов** (retry-группы).
+- **Static** — фиксированные шаги, линейное выполнение с поддержкой итерационных циклов (retry-группы).
 - **Dynamic** — фасилитатор решает в рантайме, кому дать слово (brainstorm, итеративное ревью).
 
-## Содержание
+## Разделы
 
-- [Архитектура](architecture.md) — структура модуля, DDD-слои, зависимости, CQRS, мультидвижковая архитектура
-- [Диаграммы](diagrams.md) — Mermaid-диаграммы: component-обзор слоёв, class-диаграмма Domain, sequence (static/dynamic), flowchart PiAgentRunner
-- [Цепочки](chains.md) — static/dynamic цепочки, fix_iterations, quality gates, cross-model verification, кастомные цепочки
-- [Роли](roles.md) — конфигурация ролей, маппинг на `.md` файлы
-- [Наблюдаемость](observability.md) — Audit Trail (JSONL), Budget (ограничение стоимости), Reports
-- [Надёжность](reliability.md) — Retry Policy, Circuit Breaker, Fallback, Sessions/Resume
-- [Troubleshooting](troubleshooting.md) — типичные проблемы, симптомы, причины, решения, отладочные команды
-- [Расширение](extension.md) — пошаговые гайды: добавление runner'а, цепочки, роли с примерами кода, YAML и тестами
-- [Исследование: Bernstein](research/agent-bernstein-comparison.md) — сравнение с Bernstein AI Agent Governance Framework
-- [Исследование: AI-Agents-Orchestrator](research/agent-orchestrator-comparison.md) — сравнение с AI-Agents-Orchestrator (Python)
-- [Исследование: Superpowers Brainstorming](research/superpowers-brainstorming-comparison.md) — сравнение с Superpowers Brainstorming Skill (checklist vs adaptive loop)
+| Раздел | Описание |
+|---|---|
+| [Руководства](guide/index.md) | Архитектура, цепочки, роли, надёжность, расширение |
+| [Конвенции](conventions/index.md) | DDD, паттерны, слои, тестирование, стиль кода |
+| [Git Workflow](git-workflow/index.md) | Ветки, коммиты, PR, релизы, code review |
+| [Исследования](research/) | Сравнение с аналогами |
+| [Агенты](agents/roles/team/) | Роли AI-агентов |
 
 ### CLI Integration
 

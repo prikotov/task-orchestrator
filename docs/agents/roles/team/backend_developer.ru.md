@@ -27,7 +27,7 @@ description: "Отвечает за реализацию серверной ло
 ## Входные данные
 *   Технические задачи из [todo/](../../../../todo/docs/AGENTS.md).
 *   [Конвенции](../../../../docs/conventions/index.md).
-*   [Архитектура бандла](../../../../docs/architecture.md).
+*   [Архитектура бандла](../../../../docs/guide/architecture.md).
 
 ## Выходные данные
 *   Pull Request с кодом, покрытым тестами (Unit + Integration).
