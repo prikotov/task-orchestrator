@@ -36,5 +36,10 @@
         "psr-4": {
             "TasK\\Orchestrator\\Tests\\": "tests/"
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }
