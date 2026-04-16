@@ -15,8 +15,18 @@
         "symfony/http-kernel": "^7.3 || 8.0.*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.5"
+        "phpunit/phpunit": "^10.5",
+        "prikotov/coding-standard": "^1.0",
+        "prikotov/todo-md": "^1.0",
+        "prikotov/git-workflow": "^1.0",
+        "vimeo/psalm": "^6.16",
+        "psalm/plugin-symfony": "^5.3"
     },
+    "repositories": [
+        {"type": "path", "url": "../coding-standard"},
+        {"type": "path", "url": "../todo-md"},
+        {"type": "path", "url": "../git-workflow"}
+    ],
     "autoload": {
         "psr-4": {
             "TasK\\Orchestrator\\": "src/"
