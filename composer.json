@@ -16,9 +16,9 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5",
-        "prikotov/coding-standard": "^1.0",
-        "prikotov/todo-md": "^1.0",
-        "prikotov/git-workflow": "^1.0",
+        "prikotov/coding-standard": "^0.0",
+        "prikotov/todo-md": "^0.0",
+        "prikotov/git-workflow": "^0.0",
         "vimeo/psalm": "^6.16",
         "psalm/plugin-symfony": "^5.3"
     },
