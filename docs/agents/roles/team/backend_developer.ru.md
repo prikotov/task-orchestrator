@@ -25,8 +25,8 @@ description: "Отвечает за реализацию серверной ло
 4.  **Тестирование:** Написание Unit-тестов (бизнес-правила) и Integration-тестов (проверка работоспособности фичи).
 
 ## Входные данные
-*   Технические задачи из [todo/](../../../../vendor/prikotov/todo-md/doc/AGENTS.md).
-*   [Конвенции](../../../../vendor/prikotov/coding-standard/doc/index.md).
+*   Технические задачи из [todo/](../../../../vendor/prikotov/todo-md/docs/AGENTS.md).
+*   [Конвенции](../../../../vendor/prikotov/coding-standard/docs/index.md).
 *   [Архитектура бандла](../../../../docs/architecture.md).
 
 ## Выходные данные
