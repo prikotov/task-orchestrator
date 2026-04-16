@@ -8,7 +8,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 # Терминология
 
-**`Конвенции`** — формализованные соглашения и правила, регулирующие именование, структуру кода, паттерны проектирования, стиль документирования, взаимодействие между слоями: [`vendor/prikotov/coding-standard/docs/index.md`](vendor/prikotov/coding-standard/docs/index.md).
+**`Конвенции`** — формализованные соглашения и правила, регулирующие именование, структуру кода, паттерны проектирования, стиль документирования, взаимодействие между слоями: [`docs/conventions/index.md`](docs/conventions/index.md).
 
 ---
 
@@ -125,7 +125,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 * Если задача выполнена, но не отмечена — согласуй фиксацию с пользователем.
 * После апрува — переведи задачу в `done`, перенеси файл в `todo/done/`, актуализируй ссылки в Epic/зависимых задачах. Всё это — **в ветке PR до merge**. Прямые коммиты в `master` запрещены.
 * Не удаляй и не меняй формулировки задач без запроса.
-* Регламент работы с задачами: [`vendor/prikotov/todo-md/docs/AGENTS.md`](vendor/prikotov/todo-md/docs/AGENTS.md).
+* Регламент работы с задачами: [`todo/docs/AGENTS.md`](todo/docs/AGENTS.md).
 
 ## Временные решения
 
@@ -181,9 +181,9 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 * Публикация изменений в `master` и `release/*` — только через Pull Requests.
 * Merge выполняй только через `gh pr merge`.
-* ❗ **ВАЖНО:** Установка метки (Label) AI-агента обязательна. Порядок установки и выбор метки смотри в [Pull Requests](vendor/prikotov/git-workflow/docs/pull-request.md).
+* ❗ **ВАЖНО:** Установка метки (Label) AI-агента обязательна. Порядок установки и выбор метки смотри в [Pull Requests](docs/git-workflow/pull-request.md).
 
-Подробные правила работы с PR (проверки, создание, назначение меток, действия после апрува и мержа) смотри в инструкции [Pull Requests](vendor/prikotov/git-workflow/docs/pull-request.md).
+Подробные правила работы с PR (проверки, создание, назначение меток, действия после апрува и мержа) смотри в инструкции [Pull Requests](docs/git-workflow/pull-request.md).
 
 ---
 
@@ -192,7 +192,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 * Проект использует стандарт [Conventional Commits](https://www.conventionalcommits.org/).
 * Формат: `<type>(<scope>): <subject>`
 
-Подробные правила создания коммитов и примеры смотри в инструкции [Коммиты (Commits)](vendor/prikotov/git-workflow/docs/commits.md)
+Подробные правила создания коммитов и примеры смотри в инструкции [Коммиты (Commits)](docs/git-workflow/commits.md)
 
 ---
 
@@ -231,7 +231,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 * [ ] Один PR содержит одну логически завершённую задачу.
 * [ ] Документация/комментарии к публичным API обновлены.
 * [ ] Временные решения помечены и описаны.
-* [ ] Коммиты — только Conventional Commits (см. [`vendor/prikotov/git-workflow/docs/commits.md`](vendor/prikotov/git-workflow/docs/commits.md)).
+* [ ] Коммиты — только Conventional Commits (см. [`docs/git-workflow/commits.md`](docs/git-workflow/commits.md)).
 * [ ] PHPUnit и Psalm выполнены успешно (или обоснованно пропущены по исключениям).
 * [ ] Коммит и push выполнены по явному запросу пользователя, а не автоматически.
 * [ ] Для завершённой задачи: `Статус` переведён в `done`, файл перенесён в `todo/done/`, поле `PR` заполнено.
