@@ -7,8 +7,8 @@ priority: P2
 depends_on:
 author: Архитектор (Гэндальф)
 assignee:
-branch:
-pr:
+branch: task/arch-orchestrator-module-decomposition
+pr: https://github.com/prikotov/task-orchestrator/pull/3
 status: todo
 ---
 
