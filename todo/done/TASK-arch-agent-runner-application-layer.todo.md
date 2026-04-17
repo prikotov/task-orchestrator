@@ -9,8 +9,8 @@ epic: ""
 author: Архитектор (Гэндальф)
 assignee: Бэкендер
 branch: task/arch-agent-runner-application-layer
-pr:
-status: in_progress
+pr: '#14'
+status: done
 ---
 
 # TASK-arch-agent-runner-application-layer: Application-слой AgentRunner и Integration-слой Orchestrator для соблюдения конвенции межмодульного взаимодействия
@@ -175,39 +175,6 @@ vendor/bin/psalm
 Ключевой принцип: **Infrastructure не знает о других модулях**. Межмодульное взаимодействие — через Integration → Application. AgentRunner получает Application-слой с публичным контрактом (use cases + DTO), а Orchestrator Integration играет роль ACL (Anti-Corruption Layer), маппя Orchestrator VO в AgentRunner DTO.
 
 Вопрос для реализации: `CreateRetryableRunnerCommandHandler` — нужен ли отдельный use case, или retry инкапсулируется внутри `RunAgentCommandHandler`? Зависит от того, должен ли Orchestrator управлять retry-policy самостоятельно (через Port) или это внутренняя деталь AgentRunner.
-
-## Инструкции для сабагента
-
-**Роль:** docs/agents/roles/team/backend_developer.ru.md
-**Ветка:** task/arch-agent-runner-application-layer (уже создана и активна)
-**PR:** draft #14 из task/arch-agent-runner-application-layer в task/arch-orchestrator-module-decomposition
-
-### Порядок действий
-1. Переключись в ветку `task/arch-agent-runner-application-layer`: `git checkout task/arch-agent-runner-application-layer`
-2. Реализуй задачу согласно описанию и критериям выше.
-3. Следуй AGENTS.md и Конвенциям проекта.
-4. Делай коммиты по Conventional Commits.
-5. Делай промежуточные коммиты после каждого логического этапа (обновил `src/` → коммит, обновил `tests/` → коммит). Это сохранит прогресс при таймауте сабагента.
-6. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` — оба должны пройти.
-7. Запуш: `git push`.
-
-**НЕ создавай новый PR.**
-**НЕ меняй base Branch.**
-
-### Ключевые архитектурные правила
-
-1. **Infrastructure → изолирован от других модулей.** Ни один файл в `Orchestrator/Infrastructure/` не должен `use` что-либо из `AgentRunner`.
-2. **Межмодульное взаимодействие:** `Orchestrator/Integration/` → `AgentRunner/Application/`. Это единственный разрешённый путь.
-3. **AgentRunner/Application/** — публичный контракт модуля. Use cases + DTO. Domain VO не должны утекать наружу — маппинг внутри Application.
-4. **Orchestrator/Integration/Adapter/** — ACL (Anti-Corruption Layer). Маппит Orchestrator VO → AgentRunner Application DTO, вызывает AgentRunner Application use cases.
-
-### Порядок реализации (рекомендуемый)
-
-1. Сначала создай AgentRunner Application (DTO + use cases) — можно тестировать изолированно.
-2. Затем создай Orchestrator Integration (перенос Adapter из Infrastructure) — обнови маппинг на DTO.
-3. Убедись что Orchestrator Infrastructure больше не зависит от AgentRunner.
-4. Обнови DI (`config/services.yaml`).
-5. Обнови тесты.
 
 ## Change History (История изменений)
 
