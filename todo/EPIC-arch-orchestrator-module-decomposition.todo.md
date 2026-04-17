@@ -6,10 +6,10 @@ complexity: C5
 priority: P2
 depends_on:
 author: Архитектор (Гэндальф)
-assignee:
-branch:
+assignee: Тимлид
+branch: task/arch-orchestrator-module-decomposition
 pr:
-status: todo
+status: in_progress
 ---
 
 # EPIC-arch-orchestrator-module-decomposition: Декомпозиция модуля Orchestrator
