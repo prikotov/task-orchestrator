@@ -1,0 +1,59 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use TaskOrchestrator\DependencyInjection\TaskOrchestratorExtension;
+
+if (!is_file(dirname(__DIR__) . '/vendor/autoload.php')) {
+    throw new LogicException('Dependencies are missing. Try running "composer install".');
+}
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+$projectDir = dirname(__DIR__);
+
+$container = new ContainerBuilder();
+$container->setParameter('kernel.project_dir', $projectDir);
+
+$version = class_exists(\Composer\InstalledVersions::class)
+    ? \Composer\InstalledVersions::getRootPackage()['version']
+    : '0.1.0';
+$container->setParameter('app.version', ltrim($version, 'v'));
+
+// Load bundle services (Domain, Application, Infrastructure)
+$extension = new TaskOrchestratorExtension();
+$extension->load([
+    [
+        'roles_dir' => $projectDir . '/docs/agents/roles/team',
+        'base_path' => $projectDir,
+        'chains_yaml' => $projectDir . '/config/chains.yaml',
+        'audit_log_path' => $projectDir . '/var/log/audit.jsonl',
+        'chains_session_dir' => $projectDir . '/var/sessions',
+    ],
+], $container);
+
+// Load console presentation services
+$loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../config'));
+$loader->load('console_services.yaml');
+
+$container->compile();
+
+/** @var Application $application */
+$application = $container->get('console.application');
+
+// Register tagged console commands
+$commands = [];
+foreach ($container->findTaggedServiceIds('console.command') as $id => $tags) {
+    $service = $container->get($id);
+    if ($service instanceof \Symfony\Component\Console\Command\Command) {
+        $commands[] = $service;
+    }
+}
+$application->addCommands($commands);
+
+$application->run();

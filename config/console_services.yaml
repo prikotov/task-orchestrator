@@ -1,0 +1,36 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  # --- Console Application ---
+  console.application:
+    class: Symfony\Component\Console\Application
+    arguments:
+      $name: 'Task Orchestrator'
+      $version: '%app.version%'
+    public: true
+
+  # --- PSR Event Dispatcher ---
+  Psr\EventDispatcher\EventDispatcherInterface:
+    alias: Symfony\Component\EventDispatcher\EventDispatcher
+
+  Symfony\Component\EventDispatcher\EventDispatcher: ~
+
+  # --- Console Commands ---
+  Console\Module\Orchestrator\Command\:
+    resource: '%kernel.project_dir%/apps/console/src/Module/Orchestrator/Command/*'
+    public: true
+    tags: ['console.command']
+
+  # --- Event Subscribers ---
+  Console\Module\Orchestrator\EventSubscriber\:
+    resource: '%kernel.project_dir%/apps/console/src/Module/Orchestrator/EventSubscriber/*'
+    public: true
+
+  # --- Symfony Lock (uses local filesystem) ---
+  Symfony\Component\Lock\LockFactory:
+    arguments:
+      $store: '@Symfony\Component\Lock\Store\FlockStore'
+
+  Symfony\Component\Lock\Store\FlockStore: ~
