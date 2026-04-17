@@ -9,8 +9,8 @@ epic:
 author: Бэкендер (Левша)
 assignee: Бэкендер (Левша)
 branch: task/fix-dynamic-relative-prompt-paths
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/1
+status: review
 ---
 
 # TASK-fix-dynamic-relative-prompt-paths: Dynamic chain использует относительные пути к prompt-файлам
