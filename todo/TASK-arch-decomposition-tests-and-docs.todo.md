@@ -8,10 +8,10 @@ depends_on:
   - TASK-arch-orchestrator-ports-and-adapters
 epic: EPIC-arch-orchestrator-module-decomposition
 author: Архитектор (Гэндальф)
-assignee:
-branch:
+assignee: Технический писатель
+branch: task/arch-decomposition-tests-and-docs
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-arch-decomposition-tests-and-docs: Обновление тестов и документации после декомпозиции
@@ -84,6 +84,24 @@ php vendor/prikotov/coding-standard/bin/run-sniff-tests.php
 
 ## 9. Comments (Комментарии)
 Заключительная задача эпика. Эпик можно закрывать после выполнения всех 4 задач.
+
+## Инструкции для сабагента
+
+**Роль:** docs/agents/roles/team/technical_writer.ru.md
+**Ветка:** `task/arch-decomposition-tests-and-docs` (уже создана и активна)
+**PR:** уже создан (draft) из `task/arch-decomposition-tests-and-docs` в `task/arch-orchestrator-module-decomposition`
+
+### Порядок действий
+1. Переключись в ветку `task/arch-decomposition-tests-and-docs`: `git checkout task/arch-decomposition-tests-and-docs`
+2. Реализуй задачу согласно описанию и критериям выше.
+3. Следуй AGENTS.md и Конвенциям проекта.
+4. Делай коммиты по Conventional Commits.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` — оба должны пройти.
+6. Запуш: `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`. Эта команда снимает флаг draft — PR становится готовым к мержу.
+
+**НЕ создавай новый PR** — он уже существует.
+**НЕ меняй base branch** — он уже указывает на `task/arch-orchestrator-module-decomposition`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
