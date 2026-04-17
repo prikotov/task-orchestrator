@@ -117,7 +117,7 @@ vendor/bin/psalm
 
 **Роль:** docs/agents/roles/team/backend_developer.ru.md
 **Ветка:** `task/arch-agent-runner-module-extract` (уже создана и активна)
-**PR:** уже создан (draft) из `task/arch-agent-runner-module-extract` в `task/arch-orchestrator-module-decomposition`
+**PR:** draft #9 из `task/arch-agent-runner-module-extract` в `task/arch-orchestrator-module-decomposition`
 
 ### Порядок действий
 1. Переключись в ветку `task/arch-agent-runner-module-extract`: `git checkout task/arch-agent-runner-module-extract`
@@ -126,7 +126,7 @@ vendor/bin/psalm
 4. Делай коммиты по Conventional Commits.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` — оба должны пройти.
 6. Запуш: `git push`.
-7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`. Эта команда снимает флаг draft — PR становится готовым к мержу.
+7. Переведи PR из draft в ready: `gh pr ready 9`. Эта команда снимает флаг draft — PR становится готовым к мержу.
 
 **НЕ создавай новый PR** — он уже существует.
 **НЕ меняй base branch** — он уже указывает на `task/arch-orchestrator-module-decomposition`.
