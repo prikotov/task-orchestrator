@@ -13,6 +13,7 @@ final readonly class AgentRunRequestVo
 {
     /**
      * @param list<string> $command полная CLI-команда из role config (пусто = runner default)
+     * @param list<string> $runnerArgs доп. аргументы runner'а (напр. --append-system-prompt <path>)
      */
     public function __construct(
         private string $role,
@@ -26,6 +27,8 @@ final readonly class AgentRunRequestVo
         private int $maxContextLength = 50000,
         /** @var list<string> */
         private array $command = [],
+        /** @var list<string> */
+        private array $runnerArgs = [],
     ) {
     }
 
@@ -83,6 +86,14 @@ final readonly class AgentRunRequestVo
     }
 
     /**
+     * @return list<string> доп. аргументы runner'а (напр. --append-system-prompt <path>).
+     */
+    public function getRunnerArgs(): array
+    {
+        return $this->runnerArgs;
+    }
+
+    /**
      * Возвращает новый VO с обрезанным previousContext по maxContextLength.
      * Обрезка происходит с конца (оставляются самые свежие данные).
      */
@@ -103,6 +114,7 @@ final readonly class AgentRunRequestVo
             timeout: $this->timeout,
             maxContextLength: $this->maxContextLength,
             command: $this->command,
+            runnerArgs: $this->runnerArgs,
         );
     }
 }
