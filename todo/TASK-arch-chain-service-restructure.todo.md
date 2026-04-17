@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic: EPIC-arch-orchestrator-module-decomposition
 author: Архитектор (Гэндальф)
-assignee:
-branch:
+assignee: Бэкендер
+branch: task/arch-chain-service-restructure
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-arch-chain-service-restructure: Реорганизация Domain/Service/Chain/ на субдиректории
@@ -79,6 +79,24 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 Фаза 1 эпика EPIC-arch-orchestrator-module-decomposition. Не добавляет новый функционал, только улучшает навигацию.
+
+## Инструкции для сабагента
+
+**Роль:** docs/agents/roles/team/backend_developer.ru.md
+**Ветка:** `task/arch-chain-service-restructure` (уже создана и активна)
+**PR:** уже создан (draft) из `task/arch-chain-service-restructure` в `task/arch-orchestrator-module-decomposition`
+
+### Порядок действий
+1. Переключись в ветку `task/arch-chain-service-restructure`: `git checkout task/arch-chain-service-restructure`
+2. Реализуй задачу согласно описанию и критериям выше.
+3. Следуй AGENTS.md и Конвенциям проекта.
+4. Делай коммиты по Conventional Commits.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` — оба должны пройти.
+6. Запуш: `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`. Эта команда снимает флаг draft — PR становится готовым к мержу.
+
+**НЕ создавай новый PR** — он уже существует.
+**НЕ меняй base branch** — он уже указывает на `task/arch-orchestrator-module-decomposition`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
