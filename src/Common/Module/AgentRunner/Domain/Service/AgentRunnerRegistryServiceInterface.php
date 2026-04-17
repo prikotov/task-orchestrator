@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner;
-
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
+namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\Service;
 
 /**
  * Интерфейс реестра движков AI-агентов.
@@ -14,14 +12,14 @@ interface AgentRunnerRegistryServiceInterface
     /**
      * Возвращает движок по имени.
      *
-     * @throws \TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RunnerNotFoundException
+     * @throws \TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\RunnerNotFoundException
      */
     public function get(string $name): AgentRunnerInterface;
 
     /**
      * Возвращает движок по умолчанию (первый зарегистрированный).
      *
-     * @throws \TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RunnerNotFoundException
+     * @throws \TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\RunnerNotFoundException
      */
     public function getDefault(): AgentRunnerInterface;
 

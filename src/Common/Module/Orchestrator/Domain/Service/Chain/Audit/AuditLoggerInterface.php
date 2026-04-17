@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentResultVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 
 /**
  * Интерфейс JSONL audit-логгера оркестратора AI-агентов.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception;
+namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception;
 
 /**
  * Базовый exception модуля Agent.

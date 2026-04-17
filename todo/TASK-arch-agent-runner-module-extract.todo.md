@@ -8,10 +8,10 @@ depends_on:
   - TASK-arch-chain-service-restructure
 epic: EPIC-arch-orchestrator-module-decomposition
 author: Архитектор (Гэндальф)
-assignee:
-branch:
+assignee: Бэкендер
+branch: task/arch-agent-runner-module-extract
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-arch-agent-runner-module-extract: Выделение модуля AgentRunner
@@ -112,6 +112,24 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 На этом этапе Orchestrator **напрямую** depends on AgentRunner (через `use`). Это допустимо как промежуточное состояние. Изоляция через порты — следующая задача.
+
+## Инструкции для сабагента
+
+**Роль:** docs/agents/roles/team/backend_developer.ru.md
+**Ветка:** `task/arch-agent-runner-module-extract` (уже создана и активна)
+**PR:** draft #9 из `task/arch-agent-runner-module-extract` в `task/arch-orchestrator-module-decomposition`
+
+### Порядок действий
+1. Переключись в ветку `task/arch-agent-runner-module-extract`: `git checkout task/arch-agent-runner-module-extract`
+2. Реализуй задачу согласно описанию и критериям выше.
+3. Следуй AGENTS.md и Конвенциям проекта.
+4. Делай коммиты по Conventional Commits.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` — оба должны пройти.
+6. Запуш: `git push`.
+7. Переведи PR из draft в ready: `gh pr ready 9`. Эта команда снимает флаг draft — PR становится готовым к мержу.
+
+**НЕ создавай новый PR** — он уже существует.
+**НЕ меняй base branch** — он уже указывает на `task/arch-orchestrator-module-decomposition`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

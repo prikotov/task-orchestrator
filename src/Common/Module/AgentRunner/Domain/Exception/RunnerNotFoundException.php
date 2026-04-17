@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception;
+namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\AgentException;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\NotFoundExceptionInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\AgentException;
 
 final class RunnerNotFoundException extends AgentException implements NotFoundExceptionInterface
 {

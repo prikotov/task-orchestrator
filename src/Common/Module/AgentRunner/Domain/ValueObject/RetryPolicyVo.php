@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject;
+namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject;
 
 use InvalidArgumentException;
 

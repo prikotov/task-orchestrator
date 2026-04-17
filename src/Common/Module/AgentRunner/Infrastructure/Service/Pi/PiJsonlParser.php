@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\AgentRunner\Pi;
+namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi;
 
 /**
  * Парсер JSONL-потока вывода pi (JSON mode).

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum;
+namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\Enum;
 
 /**
  * Состояния Circuit Breaker для Agent Runner.

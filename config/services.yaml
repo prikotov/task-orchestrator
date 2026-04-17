@@ -5,7 +5,7 @@ services:
 
   # --- Тегирование всех AgentRunnerInterface реализаций ---
   _instanceof:
-    TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface:
+    TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
       tags: ['agent.runner']
 
   # --- Auto-discovery (Application + Infrastructure, Domain исключён) ---
@@ -13,14 +13,15 @@ services:
     resource: '../src/*'
     exclude:
       - '../src/Common/Module/Orchestrator/Domain/'
+      - '../src/Common/Module/AgentRunner/Domain/'
       - '../src/DependencyInjection/'
       - '../src/Infrastructure/Symfony/'
-      - '../src/Common/Module/Orchestrator/Infrastructure/Service/AgentRunner/RetryingAgentRunner.php'
-      - '../src/Common/Module/Orchestrator/Infrastructure/Service/AgentRunner/CircuitBreakerAgentRunner.php'
+      - '../src/Common/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php'
+      - '../src/Common/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
 
   # --- Явные alias: Interface → Implementation (по конвенции service.md) ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\AgentRunner\Pi\PiAgentRunner
+  TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunner
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader
@@ -119,15 +120,15 @@ services:
         text: '@TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ReportTextMapper'
         json: '@TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ReportJsonMapper'
 
-  # --- Domain Service alias ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryService
+  # --- AgentRunner module services ---
+  TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\RetryableRunnerFactoryInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\AgentRunner\RetryableRunnerFactory
+  TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\RetryableRunnerFactory
 
   # --- Registry с tagged iterator ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryService:
+  TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService:
     arguments:
       $runners: !tagged_iterator agent.runner
 
