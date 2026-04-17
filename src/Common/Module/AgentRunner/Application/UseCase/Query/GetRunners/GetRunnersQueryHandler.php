@@ -9,9 +9,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistr
 /**
  * UseCase получения списка доступных движков AI-агентов.
  *
- * Возвращает список RunnerDto (примитивы) через Application-слой.
- *
- * @return list<RunnerDto>
+ * Возвращает GetRunnersResultDto через Application-слой.
  */
 final readonly class GetRunnersQueryHandler
 {
@@ -21,22 +19,30 @@ final readonly class GetRunnersQueryHandler
     }
 
     /**
-     * @return list<RunnerDto>
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * Вызывает handler через __invoke (MessageHandler pattern).
      */
-    public function __invoke(GetRunnersQuery $_query): array
+    public function __invoke(GetRunnersQuery $query): GetRunnersResultDto
     {
-        $runners = $this->registry->list();
-        $result = [];
+        return $this->handle($query);
+    }
 
-        foreach ($runners as $name => $runner) {
-            $result[] = new RunnerDto(
-                name: $name,
+    /**
+     * Возвращает список доступных runner'ов.
+     */
+    public function handle(GetRunnersQuery $query): GetRunnersResultDto
+    {
+        $runners = [];
+        foreach ($this->registry->list() as $name => $runner) {
+            if ($query->filterName !== null && $name !== $query->filterName) {
+                continue;
+            }
+
+            $runners[] = new RunnerDto(
+                name: $runner->getName(),
                 isAvailable: $runner->isAvailable(),
             );
         }
 
-        return $result;
+        return new GetRunnersResultDto($runners);
     }
 }

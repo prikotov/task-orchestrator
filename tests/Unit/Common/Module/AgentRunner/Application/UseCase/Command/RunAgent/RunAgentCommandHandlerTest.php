@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommand;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
@@ -19,21 +20,24 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
 #[CoversClass(RunAgentCommandHandler::class)]
 final class RunAgentCommandHandlerTest extends TestCase
 {
+    private AgentRunnerRegistryServiceInterface&MockObject $registry;
     private AgentRunnerInterface&MockObject $runner;
     private RetryableRunnerFactoryInterface&MockObject $retryFactory;
     private RunAgentCommandHandler $handler;
 
     protected function setUp(): void
     {
+        $this->registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
         $this->runner = $this->createMock(AgentRunnerInterface::class);
         $this->retryFactory = $this->createMock(RetryableRunnerFactoryInterface::class);
-        $this->handler = new RunAgentCommandHandler($this->runner, $this->retryFactory);
+        $this->handler = new RunAgentCommandHandler($this->registry, $this->retryFactory);
     }
 
     #[Test]
-    public function handleRunsWithoutRetry(): void
+    public function invokeRunsWithoutRetry(): void
     {
         $command = new RunAgentCommand(
+            runnerName: 'pi',
             role: 'dev',
             task: 'Write code',
             systemPrompt: 'Be helpful',
@@ -41,6 +45,9 @@ final class RunAgentCommandHandlerTest extends TestCase
             timeout: 600,
         );
 
+        $this->registry->expects(self::once())->method('get')
+            ->with('pi')
+            ->willReturn($this->runner);
         $this->retryFactory->expects(self::never())->method('createRetryableRunner');
         $this->runner->expects(self::once())->method('run')
             ->willReturnCallback(function (AgentRunRequestVo $req): AgentResultVo {
@@ -60,7 +67,7 @@ final class RunAgentCommandHandlerTest extends TestCase
                 );
             });
 
-        $result = $this->handler->handle($command);
+        $result = ($this->handler)($command);
 
         self::assertFalse($result->isError);
         self::assertSame('Code written', $result->outputText);
@@ -74,9 +81,30 @@ final class RunAgentCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function handleWrapsRunnerWithRetryWhenRetryEnabled(): void
+    public function invokeResolvesDefaultWhenRunnerNameIsEmpty(): void
     {
         $command = new RunAgentCommand(
+            runnerName: '',
+            role: 'dev',
+            task: 'Write code',
+        );
+
+        $this->registry->expects(self::never())->method('get');
+        $this->registry->expects(self::once())->method('getDefault')
+            ->willReturn($this->runner);
+        $this->runner->method('run')
+            ->willReturn(AgentResultVo::createFromSuccess(outputText: 'OK'));
+
+        $result = ($this->handler)($command);
+
+        self::assertFalse($result->isError);
+    }
+
+    #[Test]
+    public function invokeWrapsRunnerWithRetryWhenEnabled(): void
+    {
+        $command = new RunAgentCommand(
+            runnerName: 'pi',
             role: 'dev',
             task: 'Write code',
             retryMaxRetries: 3,
@@ -87,6 +115,7 @@ final class RunAgentCommandHandlerTest extends TestCase
 
         $retryRunner = $this->createMock(AgentRunnerInterface::class);
 
+        $this->registry->method('get')->with('pi')->willReturn($this->runner);
         $this->retryFactory->expects(self::once())->method('createRetryableRunner')
             ->willReturnCallback(function (
                 AgentRunnerInterface $r,
@@ -104,55 +133,60 @@ final class RunAgentCommandHandlerTest extends TestCase
         $retryRunner->expects(self::once())->method('run')
             ->willReturn(AgentResultVo::createFromSuccess(outputText: 'Retried OK'));
 
-        $result = $this->handler->handle($command);
+        $result = ($this->handler)($command);
 
         self::assertFalse($result->isError);
         self::assertSame('Retried OK', $result->outputText);
     }
 
     #[Test]
-    public function handleDoesNotWrapWhenRetryMaxRetriesIsNull(): void
+    public function invokeDoesNotWrapWhenRetryMaxRetriesIsNull(): void
     {
         $command = new RunAgentCommand(
+            runnerName: 'pi',
             role: 'dev',
             task: 'Write code',
             retryMaxRetries: null,
         );
 
+        $this->registry->method('get')->willReturn($this->runner);
         $this->retryFactory->expects(self::never())->method('createRetryableRunner');
         $this->runner->method('run')->willReturn(AgentResultVo::createFromSuccess(outputText: 'OK'));
 
-        $result = $this->handler->handle($command);
+        $result = ($this->handler)($command);
 
         self::assertFalse($result->isError);
     }
 
     #[Test]
-    public function handleDoesNotWrapWhenRetryMaxRetriesIsZero(): void
+    public function invokeDoesNotWrapWhenRetryMaxRetriesIsZero(): void
     {
         $command = new RunAgentCommand(
+            runnerName: 'pi',
             role: 'dev',
             task: 'Write code',
             retryMaxRetries: 0,
         );
 
+        $this->registry->method('get')->willReturn($this->runner);
         $this->retryFactory->expects(self::never())->method('createRetryableRunner');
         $this->runner->method('run')->willReturn(AgentResultVo::createFromSuccess(outputText: 'OK'));
 
-        $result = $this->handler->handle($command);
+        $result = ($this->handler)($command);
 
         self::assertFalse($result->isError);
     }
 
     #[Test]
-    public function handleMapsErrorResult(): void
+    public function invokeMapsErrorResult(): void
     {
-        $command = new RunAgentCommand(role: 'dev', task: 'Write code');
+        $command = new RunAgentCommand(runnerName: 'pi', role: 'dev', task: 'Write code');
 
+        $this->registry->method('get')->willReturn($this->runner);
         $this->runner->method('run')
             ->willReturn(AgentResultVo::createFromError(errorMessage: 'Timeout', exitCode: 124));
 
-        $result = $this->handler->handle($command);
+        $result = ($this->handler)($command);
 
         self::assertTrue($result->isError);
         self::assertSame('Timeout', $result->errorMessage);
@@ -161,9 +195,10 @@ final class RunAgentCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function handleMapsAllRequestFields(): void
+    public function invokeMapsAllRequestFields(): void
     {
         $command = new RunAgentCommand(
+            runnerName: 'pi',
             role: 'analyst',
             task: 'Analyze data',
             systemPrompt: 'Be precise',
@@ -177,6 +212,7 @@ final class RunAgentCommandHandlerTest extends TestCase
             runnerArgs: ['--append-system-prompt', '/path/to/prompt.md'],
         );
 
+        $this->registry->method('get')->willReturn($this->runner);
         $this->runner->expects(self::once())->method('run')
             ->willReturnCallback(function (AgentRunRequestVo $req): AgentResultVo {
                 self::assertSame('analyst', $req->getRole());
@@ -194,7 +230,7 @@ final class RunAgentCommandHandlerTest extends TestCase
                 return AgentResultVo::createFromSuccess(outputText: 'Analysis done');
             });
 
-        $result = $this->handler->handle($command);
+        $result = ($this->handler)($command);
 
         self::assertFalse($result->isError);
         self::assertSame('Analysis done', $result->outputText);

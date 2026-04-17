@@ -51,6 +51,21 @@ final class GetRunnersQueryHandlerTest extends TestCase
     }
 
     #[Test]
+    public function invokeDelegatesToHandle(): void
+    {
+        $piRunner = $this->createMock(AgentRunnerInterface::class);
+        $piRunner->method('getName')->willReturn('pi');
+        $piRunner->method('isAvailable')->willReturn(true);
+
+        $this->registry->method('list')->willReturn(['pi' => $piRunner]);
+
+        $result = ($this->handler)(new GetRunnersQuery());
+
+        self::assertCount(1, $result->runners);
+        self::assertSame('pi', $result->runners[0]->name);
+    }
+
+    #[Test]
     public function handleFiltersByName(): void
     {
         $piRunner = $this->createMock(AgentRunnerInterface::class);

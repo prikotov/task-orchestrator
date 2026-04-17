@@ -6,7 +6,6 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Integration\Adapter;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommand;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
-use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
@@ -44,8 +43,8 @@ final readonly class AgentRunnerAdapter implements AgentRunnerPortInterface
     #[Override]
     public function run(ChainRunRequestVo $request, ?ChainRetryPolicyVo $retryPolicy = null): ChainRunResultVo
     {
-        $command = $this->mapper->mapToRunAgentCommand($request, $retryPolicy);
-        $resultDto = $this->runAgentHandler->handle($command, $this->runnerName);
+        $command = $this->mapper->mapToRunAgentCommand($request, $this->runnerName, $retryPolicy);
+        $resultDto = ($this->runAgentHandler)($command);
 
         return $this->mapper->mapFromRunAgentResultDto($resultDto);
     }

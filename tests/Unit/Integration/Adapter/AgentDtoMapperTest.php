@@ -7,6 +7,7 @@ namespace TaskOrchestrator\Tests\Unit\Integration\Adapter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
@@ -41,8 +42,9 @@ final class AgentDtoMapperTest extends TestCase
             runnerArgs: ['--append-system-prompt', '/path/to/prompt.md'],
         );
 
-        $result = $this->mapper->mapToRunAgentCommand($vo);
+        $result = $this->mapper->mapToRunAgentCommand($vo, 'pi');
 
+        self::assertSame('pi', $result->runnerName);
         self::assertSame('analyst', $result->role);
         self::assertSame('Analyze data', $result->task);
         self::assertSame('Be precise', $result->systemPrompt);
@@ -62,8 +64,9 @@ final class AgentDtoMapperTest extends TestCase
     {
         $vo = new ChainRunRequestVo(role: 'dev', task: 'Fix bug');
 
-        $result = $this->mapper->mapToRunAgentCommand($vo);
+        $result = $this->mapper->mapToRunAgentCommand($vo, 'codex');
 
+        self::assertSame('codex', $result->runnerName);
         self::assertSame('dev', $result->role);
         self::assertSame('Fix bug', $result->task);
         self::assertNull($result->systemPrompt);
@@ -79,6 +82,16 @@ final class AgentDtoMapperTest extends TestCase
     }
 
     #[Test]
+    public function mapToRunAgentCommandDefaultsRunnerNameToEmpty(): void
+    {
+        $vo = new ChainRunRequestVo(role: 'dev', task: 'Fix bug');
+
+        $result = $this->mapper->mapToRunAgentCommand($vo);
+
+        self::assertSame('', $result->runnerName);
+    }
+
+    #[Test]
     public function mapToRunAgentCommandWithEnabledRetryPolicy(): void
     {
         $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code');
@@ -89,7 +102,7 @@ final class AgentDtoMapperTest extends TestCase
             multiplier: 3.0,
         );
 
-        $result = $this->mapper->mapToRunAgentCommand($vo, $retryPolicy);
+        $result = $this->mapper->mapToRunAgentCommand($vo, 'pi', $retryPolicy);
 
         self::assertSame(5, $result->retryMaxRetries);
         self::assertSame(500, $result->retryInitialDelayMs);
@@ -103,7 +116,7 @@ final class AgentDtoMapperTest extends TestCase
         $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code');
         $retryPolicy = ChainRetryPolicyVo::disabled();
 
-        $result = $this->mapper->mapToRunAgentCommand($vo, $retryPolicy);
+        $result = $this->mapper->mapToRunAgentCommand($vo, 'pi', $retryPolicy);
 
         self::assertNull($result->retryMaxRetries);
     }
@@ -113,7 +126,7 @@ final class AgentDtoMapperTest extends TestCase
     {
         $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code');
 
-        $result = $this->mapper->mapToRunAgentCommand($vo, null);
+        $result = $this->mapper->mapToRunAgentCommand($vo, 'pi', null);
 
         self::assertNull($result->retryMaxRetries);
     }
@@ -123,7 +136,7 @@ final class AgentDtoMapperTest extends TestCase
     #[Test]
     public function mapFromRunAgentResultDtoMapsSuccessResult(): void
     {
-        $dto = new \TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentResultDto(
+        $dto = new RunAgentResultDto(
             outputText: 'Hello world',
             inputTokens: 100,
             outputTokens: 50,
@@ -156,7 +169,7 @@ final class AgentDtoMapperTest extends TestCase
     #[Test]
     public function mapFromRunAgentResultDtoMapsErrorResult(): void
     {
-        $dto = new \TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentResultDto(
+        $dto = new RunAgentResultDto(
             outputText: '',
             inputTokens: 0,
             outputTokens: 0,
