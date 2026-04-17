@@ -8,8 +8,8 @@ depends_on:
 epic: EPIC-arch-orchestrator-module-decomposition
 author: Архитектор (Гэндальф)
 assignee:
-branch: task/arch-orchestrator-module-decomposition
-pr: https://github.com/prikotov/task-orchestrator/pull/3
+branch:
+pr:
 status: todo
 ---
 
