@@ -6,8 +6,6 @@ namespace TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\G
 
 /**
  * DTO результата запроса списка runner'ов.
- *
- * @var RunnerDto[] $runners
  */
 final readonly class GetRunnersResultDto
 {
