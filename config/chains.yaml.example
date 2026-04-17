@@ -1,0 +1,126 @@
+# chains.yaml.example — пример конфигурации цепочек оркестрации
+#
+# Скопируйте в config/chains.yaml и адаптируйте под свой проект.
+#
+# cp config/chains.yaml.example config/chains.yaml
+#
+# Полная документация: docs/guide/chains.md
+
+chains:
+
+  # ─── Static-цепочка: линейная последовательность шагов ────────────
+  #
+  # Каждый шаг — вызов агента (type: agent) или проверка (type: quality_gate).
+  # Шаги выполняются последовательно. При ошибке — цепочка прерывается
+  # (если не заданы fix_iterations или retry_policy).
+
+  implement:
+    description: "Полный цикл реализации фичи: анализ → разработка → ревью → фикс"
+
+    steps:
+      - type: agent
+        role: system_analyst       # Роль — имя .md-файла из roles_dir без расширения
+        runner: pi                  # Движок запуска агента (по умолчанию: pi)
+        name: analyze               # Имя шага (для fix_iterations и логов)
+
+      - type: agent
+        role: backend_developer
+        runner: pi
+        name: implement
+
+      - type: quality_gate          # Проверка — произвольная shell-команда
+        command: "make check"       # Команда, которая должна вернуть exit code 0
+        label: "Static analysis & tests"
+        timeout_seconds: 300
+
+      - type: agent
+        role: code_reviewer_backend
+        runner: pi
+        name: review
+
+      - type: agent
+        role: backend_developer
+        runner: pi
+        name: fix
+
+    # Retry на уровне цепочки — применяется ко всем шагам без собственного retry_policy
+    retry_policy:
+      max_retries: 2
+      initial_delay_ms: 1000
+      max_delay_ms: 10000
+      multiplier: 2.0
+
+    # Бюджет — ограничение стоимости цепочки
+    budget:
+      max_cost_total: 5.00          # Макс. $ за всю цепочку
+      max_cost_per_step: 1.50       # Макс. $ за один шаг
+
+    # Fix iterations — циклический перезапуск группы шагов (до max_iterations)
+    # Пока quality_gate не пройдёт или лимит не исчерпан.
+    fix_iterations:
+      - group: fix_cycle
+        steps: [fix, review]        # Имена шагов (поле name)
+        max_iterations: 3
+
+  # ─── Минимальная static-цепочка ────────────────────────────────────
+
+  analyze:
+    description: "Только анализ — один агент"
+    steps:
+      - { type: agent, role: system_analyst }
+
+  # ─── Static с per-role конфигурацией и fallback ────────────────────
+  #
+  # fallback — запасной runner/команда, если основной не справился.
+  # timeout — переопределение таймаута для конкретной роли.
+
+  review:
+    description: "Ревью с fallback на codex"
+    steps:
+      - { type: agent, role: code_reviewer_backend, name: review }
+
+  # ─── Dynamic-цепочка: фасилитатор + участники ─────────────────────
+  #
+  # Фасилитатор управляет ходом дискуссии, участники отвечают по очереди.
+  # Циклы продолжаются пока фасилитатор не скажет «done» или не исчерпан max_rounds.
+  #
+  # Промпты — inline-строки (могут быть путями к .txt-файлам).
+
+  brainstorm:
+    type: dynamic
+    description: "Фасилитированный брейншторм"
+    facilitator: system_analyst
+    participants: [architect, backend_developer, marketer]
+    max_rounds: 10
+
+    prompts:
+      brainstorm_system: "You are a brainstorming facilitator."
+      facilitator_append: "Facilitating discussion on: %s"
+      facilitator_start: "Start brainstorming on topic: %s"
+      facilitator_continue: "Topic: %s\nJournal: %s\nHistory: %s"
+      facilitator_finalize: "Topic: %s\nHistory: %s\nProvide synthesis."
+      participant_append: "Role: %s"
+      participant_user: "Topic: %s\nDiscussion so far: %s"
+
+    budget:
+      max_cost_total: 10.00
+
+# ─── Per-role конфигурация (общая для всех цепочек) ─────────────────
+#
+# command:   переопределение команды запуска агента (массив аргументов)
+# timeout:   таймаут в секундах для конкретной роли
+# prompt_file: путь к кастомному промпту (относительно base_path)
+# fallback:  запасная команда, если основная не справилась
+
+roles:
+  backend_developer:
+    timeout: 1800
+    fallback:
+      command:
+        - codex
+        - --model
+        - gpt-4o
+
+  code_reviewer_backend:
+    prompt_file: "docs/agents/roles/team/code_reviewer_backend.ru.md"
+    timeout: 1200
