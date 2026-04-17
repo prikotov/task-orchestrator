@@ -180,7 +180,7 @@ vendor/bin/psalm
 
 **Роль:** docs/agents/roles/team/backend_developer.ru.md
 **Ветка:** task/arch-agent-runner-application-layer (уже создана и активна)
-**PR:** уже создан (draft) из task/arch-agent-runner-application-layer в main
+**PR:** уже создан (draft #13) из task/arch-agent-runner-application-layer в main
 
 ### Порядок действий
 1. Переключись в ветку `task/arch-agent-runner-application-layer`: `git checkout task/arch-agent-runner-application-layer`
