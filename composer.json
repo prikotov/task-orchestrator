@@ -29,12 +29,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "TasK\\Orchestrator\\": "src/"
+            "TaskOrchestrator\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "TasK\\Orchestrator\\Tests\\": "tests/"
+            "TaskOrchestrator\\Tests\\": "tests/"
         }
     },
     "config": {

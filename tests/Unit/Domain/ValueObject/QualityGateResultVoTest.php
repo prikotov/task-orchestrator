@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Domain\ValueObject;
+namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
-use TasK\Orchestrator\Domain\ValueObject\QualityGateResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateResultVo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Application\UseCase\Query\GetRunners;
+namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Query\GetRunners;
 
-use TasK\Orchestrator\Application\UseCase\Query\GetRunners\GetRunnersQuery;
-use TasK\Orchestrator\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
-use TasK\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
-use TasK\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GetRunners\GetRunnersQuery;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

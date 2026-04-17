@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Application\UseCase\Query\GenerateReport;
+namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Query\GenerateReport;
 
-use TasK\Orchestrator\Application\Enum\ReportFormatEnum;
-use TasK\Orchestrator\Application\Mapper\ReportFormatMapperInterface;
-use TasK\Orchestrator\Application\Mapper\ReportJsonMapper;
-use TasK\Orchestrator\Application\Mapper\ReportTextMapper;
-use TasK\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TasK\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
-use TasK\Orchestrator\Application\UseCase\Query\GenerateReport\ReportResultFactory;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ReportFormatMapperInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ReportJsonMapper;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ReportTextMapper;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\ReportResultFactory;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 

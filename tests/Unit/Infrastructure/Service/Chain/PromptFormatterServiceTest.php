@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Infrastructure\Service\Chain;
+namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
-use TasK\Orchestrator\Domain\ValueObject\AgentRunRequestVo;
-use TasK\Orchestrator\Infrastructure\Service\Chain\PromptFormatterService;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\PromptFormatterService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

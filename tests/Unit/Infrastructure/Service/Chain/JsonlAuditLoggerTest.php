@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Infrastructure\Service\Chain;
+namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
-use TasK\Orchestrator\Domain\Dto\ChainResultAuditDto;
-use TasK\Orchestrator\Domain\Dto\StepAuditStatusDto;
-use TasK\Orchestrator\Domain\ValueObject\AgentResultVo;
-use TasK\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLogger;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\StepAuditStatusDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

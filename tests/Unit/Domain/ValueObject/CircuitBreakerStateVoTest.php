@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Domain\ValueObject;
+namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
-use TasK\Orchestrator\Domain\Enum\CircuitStateEnum;
-use TasK\Orchestrator\Domain\ValueObject\CircuitBreakerStateVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\CircuitStateEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\CircuitBreakerStateVo;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;

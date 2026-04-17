@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Domain\Enum;
+namespace TaskOrchestrator\Tests\Unit\Domain\Enum;
 
-use TasK\Orchestrator\Domain\Enum\ChainTypeEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

@@ -74,7 +74,7 @@ Add to your `config/bundles.php`:
 ```php
 return [
     // ...
-    TasK\Orchestrator\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
+    TaskOrchestrator\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
 ];
 ```
 
@@ -237,8 +237,8 @@ roles:
 All handlers are registered as services by the Bundle. Inject them via Symfony DI:
 
 ```php
-use TasK\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TasK\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 
 // $handler is injected via Symfony DI (autowired)
 $command = new OrchestrateChainCommand(
@@ -258,8 +258,8 @@ foreach ($result->stepResults as $step) {
 ### Run a single agent
 
 ```php
-use TasK\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommand;
-use TasK\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommand;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
 
 $command = new RunAgentCommand(
     role: 'analyst',
@@ -275,9 +275,9 @@ echo $result->cost;
 ### Generate a report
 
 ```php
-use TasK\Orchestrator\Application\Enum\ReportFormatEnum;
-use TasK\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
-use TasK\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 
 $query = new GenerateReportQuery(
     result: $chainResult,              // OrchestrateChainResultDto from chain execution

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Infrastructure\Service\Chain;
+namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
-use TasK\Orchestrator\Domain\Enum\ChainTypeEnum;
-use TasK\Orchestrator\Domain\Exception\ChainNotFoundException;
-use TasK\Orchestrator\Domain\ValueObject\BudgetVo;
-use TasK\Orchestrator\Domain\ValueObject\FallbackConfigVo;
-use TasK\Orchestrator\Domain\ValueObject\RetryPolicyVo;
-use TasK\Orchestrator\Domain\ValueObject\RoleConfigVo;
-use TasK\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfigVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

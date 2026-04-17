@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Application\UseCase\Command\OrchestrateChain;
+namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Command\OrchestrateChain;
 
-use TasK\Orchestrator\Application\Service\Chain\ExecuteStaticChainServiceInterface;
-use TasK\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TasK\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
-use TasK\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TasK\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
-use TasK\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
-use TasK\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface;
-use TasK\Orchestrator\Domain\Service\Chain\AuditLoggerFactoryInterface;
-use TasK\Orchestrator\Domain\Service\Chain\AuditLoggerInterface;
-use TasK\Orchestrator\Domain\Service\Chain\BuildDynamicContextService;
-use TasK\Orchestrator\Domain\Service\Chain\ChainLoaderInterface;
-use TasK\Orchestrator\Domain\Service\Chain\ChainSessionLoggerInterface;
-use TasK\Orchestrator\Domain\Service\Chain\RunDynamicLoopServiceInterface;
-use TasK\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
-use TasK\Orchestrator\Domain\ValueObject\ChainSessionStateVo;
-use TasK\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TasK\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
-use TasK\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
-use TasK\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\AuditLoggerFactoryInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\BuildDynamicContextService;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\RunDynamicLoopServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainSessionStateVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;

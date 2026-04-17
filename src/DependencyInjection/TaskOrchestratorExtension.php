@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\DependencyInjection;
+namespace TaskOrchestrator\DependencyInjection;
 
 use Override;
 use Symfony\Component\Config\FileLocator;

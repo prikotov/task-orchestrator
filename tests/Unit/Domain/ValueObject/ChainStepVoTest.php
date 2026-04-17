@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Domain\ValueObject;
+namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
-use TasK\Orchestrator\Domain\Enum\ChainStepTypeEnum;
-use TasK\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TasK\Orchestrator\Domain\ValueObject\QualityGateVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateVo;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;

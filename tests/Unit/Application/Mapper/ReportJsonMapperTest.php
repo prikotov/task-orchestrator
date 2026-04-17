@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Application\Mapper;
+namespace TaskOrchestrator\Tests\Unit\Application\Mapper;
 
-use TasK\Orchestrator\Application\Mapper\ReportJsonMapper;
-use TasK\Orchestrator\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;
-use TasK\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TasK\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ReportJsonMapper;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

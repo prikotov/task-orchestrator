@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Infrastructure\Service\AgentRunner;
+namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner;
 
-use TasK\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
-use TasK\Orchestrator\Domain\ValueObject\AgentResultVo;
-use TasK\Orchestrator\Domain\ValueObject\AgentRunRequestVo;
-use TasK\Orchestrator\Domain\ValueObject\RetryPolicyVo;
-use TasK\Orchestrator\Infrastructure\Service\AgentRunner\RetryingAgentRunner;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\AgentRunner\RetryingAgentRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;

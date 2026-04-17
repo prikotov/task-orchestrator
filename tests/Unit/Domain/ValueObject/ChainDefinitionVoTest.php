@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Domain\ValueObject;
+namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
-use TasK\Orchestrator\Domain\Enum\ChainTypeEnum;
-use TasK\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
-use TasK\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TasK\Orchestrator\Domain\ValueObject\RetryPolicyVo;
-use TasK\Orchestrator\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

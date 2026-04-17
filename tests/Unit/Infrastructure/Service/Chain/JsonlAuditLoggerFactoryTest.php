@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Infrastructure\Service\Chain;
+namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
-use TasK\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLogger;
-use TasK\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLoggerFactory;
+use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLogger;
+use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLoggerFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

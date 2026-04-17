@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Application\UseCase\Command\RunAgent;
+namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Command\RunAgent;
 
-use TasK\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommand;
-use TasK\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
-use TasK\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
-use TasK\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface;
-use TasK\Orchestrator\Domain\Service\Prompt\PromptProviderInterface;
-use TasK\Orchestrator\Domain\ValueObject\AgentResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommand;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Prompt\PromptProviderInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentResultVo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

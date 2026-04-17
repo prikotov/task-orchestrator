@@ -207,7 +207,7 @@ CommandHandler может возвращать DTO — это допустимо
 // apps/console/config/bundles.php
 return [
     // ...
-    \TasK\Orchestrator\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
+    \TaskOrchestrator\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
 ];
 ```
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Infrastructure\Service\Chain;
+namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
-use TasK\Orchestrator\Infrastructure\Service\Chain\FacilitatorResponseParserService;
+use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\FacilitatorResponseParserService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;

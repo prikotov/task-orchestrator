@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Domain\ValueObject;
+namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
-use TasK\Orchestrator\Domain\ValueObject\RetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RetryPolicyVo;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;

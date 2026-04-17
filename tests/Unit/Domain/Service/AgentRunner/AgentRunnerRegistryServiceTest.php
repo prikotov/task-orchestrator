@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TasK\Orchestrator\Tests\Unit\Domain\Service\AgentRunner;
+namespace TaskOrchestrator\Tests\Unit\Domain\Service\AgentRunner;
 
-use TasK\Orchestrator\Domain\Exception\RunnerNotFoundException;
-use TasK\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
-use TasK\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryService;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RunnerNotFoundException;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

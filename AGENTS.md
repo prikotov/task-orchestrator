@@ -61,7 +61,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 # Архитектура проекта
 
 * Symfony Bundle (`prikotov/task-orchestrator`), PHP 8.4, DDD.
-* Автозагрузка PSR-4 (`composer.json`): `TasK\Orchestrator\` → `src/`.
+* Автозагрузка PSR-4 (`composer.json`): `TaskOrchestrator\` → `src/`.
 * Сущности бандла: chain-based AI agent orchestration, retry, circuit breaker, quality gates, dynamic loops.
 
 ## Структура проекта
