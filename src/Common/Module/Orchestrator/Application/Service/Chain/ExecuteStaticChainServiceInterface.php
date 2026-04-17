@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 
@@ -19,7 +19,7 @@ interface ExecuteStaticChainServiceInterface
      */
     public function execute(
         ChainDefinitionVo $chain,
-        AgentRunnerInterface $runner,
+        AgentRunnerPortInterface $runner,
         string $runnerName,
         string $task,
         ?string $model = null,

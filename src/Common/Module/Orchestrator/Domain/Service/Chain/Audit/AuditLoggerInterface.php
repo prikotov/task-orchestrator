@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 
 /**
  * Интерфейс JSONL audit-логгера оркестратора AI-агентов.
@@ -30,15 +30,15 @@ interface AuditLoggerInterface
     /**
      * Логирует результат шага (после вызова runner'а).
      *
-     * Для agent-шагов передаётся реальный AgentResultVo.
-     * Для quality_gate-шагов — синтетический AgentResultVo (isError=false, tokens=0, cost=0).
+     * Для agent-шагов передаётся реальный ChainRunResultVo.
+     * Для quality_gate-шагов — синтетический ChainRunResultVo (isError=false, tokens=0, cost=0).
      */
     public function logStepResult(
         string $chainName,
         int $stepNumber,
         string $role,
         string $runner,
-        AgentResultVo $result,
+        ChainRunResultVo $result,
         float $durationMs,
     ): void;
 

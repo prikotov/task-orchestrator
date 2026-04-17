@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\QualityGateRunnerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ResolveChainRunnerServiceInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackAttemptVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
@@ -38,7 +38,7 @@ final readonly class ExecuteStaticStepService
 
     public function runAgentStep(
         ChainStepVo $step,
-        AgentRunnerInterface $runner,
+        AgentRunnerPortInterface $runner,
         string $runnerName,
         string $task,
         ?string $model,
@@ -57,7 +57,7 @@ final readonly class ExecuteStaticStepService
             )
             : null;
 
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: $role,
             task: $task,
             systemPrompt: null,
@@ -69,13 +69,9 @@ final readonly class ExecuteStaticStepService
             command: $roleConfig?->getCommand() ?? [],
         );
 
-        $effectiveRunner = $this->runnerHelper->createRunnerWithRetry(
-            $runner,
-            $step->getRetryPolicy(),
-        );
-
+        $effectiveRunner = $runner;
         $start = microtime(true);
-        $result = $effectiveRunner->run($request->withTruncatedContext());
+        $result = $effectiveRunner->run($request->withTruncatedContext(), $step->getRetryPolicy());
         $duration = microtime(true) - $start;
 
         $fallbackRunnerUsed = null;
@@ -93,8 +89,8 @@ final readonly class ExecuteStaticStepService
             $fallbackRunnerUsed = $fallbackResult->fallbackRunnerName;
             if ($fallbackResult->fallbackRunnerName !== null) {
                 $result = $fallbackResult->isError
-                    ? AgentResultVo::createFromError($fallbackResult->errorMessage ?? 'unknown')
-                    : AgentResultVo::createFromSuccess(
+                    ? ChainRunResultVo::createFromError($fallbackResult->errorMessage ?? 'unknown')
+                    : ChainRunResultVo::createFromSuccess(
                         $fallbackResult->outputText,
                         $fallbackResult->inputTokens,
                         $fallbackResult->outputTokens,
@@ -167,14 +163,14 @@ final readonly class ExecuteStaticStepService
 
     public function createAgentResultFromStep(
         StaticStepResultVo $stepResult,
-    ): AgentResultVo {
+    ): ChainRunResultVo {
         if ($stepResult->isError) {
-            return AgentResultVo::createFromError(
+            return ChainRunResultVo::createFromError(
                 $stepResult->errorMessage ?? 'unknown',
             );
         }
 
-        return AgentResultVo::createFromSuccess(
+        return ChainRunResultVo::createFromSuccess(
             $stepResult->outputText,
             $stepResult->inputTokens,
             $stepResult->outputTokens,
@@ -187,7 +183,7 @@ final readonly class ExecuteStaticStepService
         string $role,
         string $runnerName,
         ChainStepVo $step,
-        AgentRunRequestVo $request,
+        ChainRunRequestVo $request,
         ?string $promptFile,
     ): FallbackAttemptVo {
         $fallbackStart = microtime(true);

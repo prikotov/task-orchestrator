@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerRegistryPortInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ResolveChainRunnerServiceInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfigVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use Override;
 use Psr\Log\LoggerInterface;
 
 /**
- * Резолвит эффективный runner: retry-декоратор и fallback при ошибке.
+ * Резолвит fallback runner при ошибке основного.
  *
  * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  * @todo Разбить tryFallbackRunner на buildFallbackRequest + executeFallback — TASK-agent-orchestrator-decompose-step2.
@@ -25,26 +24,10 @@ use Psr\Log\LoggerInterface;
 final readonly class ResolveChainRunnerService implements ResolveChainRunnerServiceInterface
 {
     public function __construct(
-        private AgentRunnerRegistryServiceInterface $runnerRegistry,
-        private RetryableRunnerFactoryInterface $retryableRunnerFactory,
+        private AgentRunnerRegistryPortInterface $runnerRegistry,
         private PromptFormatterInterface $formatter,
         private ?LoggerInterface $logger = null,
     ) {
-    }
-
-    #[Override]
-    public function createRunnerWithRetry(
-        AgentRunnerInterface $runner,
-        ?RetryPolicyVo $retryPolicy,
-    ): AgentRunnerInterface {
-        if ($retryPolicy === null || !$retryPolicy->isEnabled()) {
-            return $runner;
-        }
-
-        return $this->retryableRunnerFactory->createRetryableRunner(
-            $runner,
-            $retryPolicy,
-        );
     }
 
     #[Override]
@@ -52,10 +35,10 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
         FallbackConfigVo $fallbackConfig,
         string $role,
         string $primaryRunnerName,
-        ?RetryPolicyVo $retryPolicy,
-        AgentRunRequestVo $primaryRequest,
+        ?ChainRetryPolicyVo $retryPolicy,
+        ChainRunRequestVo $primaryRequest,
         ?string $promptFile = null,
-    ): ?AgentResultVo {
+    ): ?ChainRunResultVo {
         $fallbackRunnerName = $fallbackConfig->getRunnerName();
         if ($fallbackRunnerName === null) {
             return null;
@@ -90,7 +73,7 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
             );
         }
 
-        $fallbackRequest = new AgentRunRequestVo(
+        $fallbackRequest = new ChainRunRequestVo(
             role: $primaryRequest->getRole(),
             task: $primaryRequest->getTask(),
             systemPrompt: $primaryRequest->getSystemPrompt(),
@@ -102,10 +85,8 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
             command: $fallbackCommand,
         );
 
-        $effectiveFallbackRunner = $this->createRunnerWithRetry($fallbackRunner, $retryPolicy);
-
         try {
-            $result = $effectiveFallbackRunner->run($fallbackRequest->withTruncatedContext());
+            $result = $fallbackRunner->run($fallbackRequest->withTruncatedContext(), $retryPolicy);
 
             if ($result->isError()) {
                 $this->logger?->error(sprintf(

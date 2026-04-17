@@ -19,6 +19,10 @@ services:
       - '../src/Common/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php'
       - '../src/Common/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
 
+  # --- Port → Adapter alias ---
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerRegistryPortInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Adapter\AgentRunnerRegistryAdapter
+
   # --- Явные alias: Interface → Implementation (по конвенции service.md) ---
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunner

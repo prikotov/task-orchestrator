@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use LogicException;
 use Override;
 
@@ -105,7 +105,7 @@ final readonly class PromptFormatterService implements PromptFormatterInterface
 
     #[Override]
     public function buildAgentInvocation(
-        AgentRunRequestVo $request,
+        ChainRunRequestVo $request,
         string $userPromptFile,
     ): string {
         $command = $request->getCommand();

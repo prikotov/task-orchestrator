@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum;
 use InvalidArgumentException;
 use LogicException;
@@ -24,7 +24,7 @@ final readonly class ChainStepVo
      * @param string $runner имя runner'а (только для agent)
      * @param string|null $tools инструменты агента (только для agent)
      * @param string|null $model модель для переопределения (только для agent)
-     * @param RetryPolicyVo|null $retryPolicy политика retry для шага
+     * @param ChainRetryPolicyVo|null $retryPolicy политика retry для шага
      * @param string|null $name опциональное имя шага для ссылок из fix_iterations
      * @param string $command shell-команда (обязательно для quality_gate, пустая строка для agent)
      * @param string $label человекочитаемое название (обязательно для quality_gate, пустая строка для agent)
@@ -36,7 +36,7 @@ final readonly class ChainStepVo
         private string $runner = 'pi',
         private ?string $tools = null,
         private ?string $model = null,
-        private ?RetryPolicyVo $retryPolicy = null,
+        private ?ChainRetryPolicyVo $retryPolicy = null,
         private ?string $name = null,
         private string $command = '',
         private string $label = '',
@@ -65,7 +65,7 @@ final readonly class ChainStepVo
         string $runner = 'pi',
         ?string $tools = null,
         ?string $model = null,
-        ?RetryPolicyVo $retryPolicy = null,
+        ?ChainRetryPolicyVo $retryPolicy = null,
         ?string $name = null,
     ): self {
         return new self(
@@ -122,7 +122,7 @@ final readonly class ChainStepVo
         return $this->model;
     }
 
-    public function getRetryPolicy(): ?RetryPolicyVo
+    public function getRetryPolicy(): ?ChainRetryPolicyVo
     {
         return $this->retryPolicy;
     }
