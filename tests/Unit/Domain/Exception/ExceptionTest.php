@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Domain\Exception;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\AgentException;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\AgentException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\NotFoundExceptionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RunnerNotFoundException;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\RunnerNotFoundException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

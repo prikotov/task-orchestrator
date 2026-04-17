@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner;
+namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\Service;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RetryPolicyVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
 
 /**
  * Фабрика для создания retry-декоратора поверх AgentRunnerInterface.
