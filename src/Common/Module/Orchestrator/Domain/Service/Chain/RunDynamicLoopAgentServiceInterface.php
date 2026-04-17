@@ -16,7 +16,7 @@ interface RunDynamicLoopAgentServiceInterface
     /**
      * Запускает фасилитатора и парсит его ответ.
      *
-     * @param array<string> $command
+     * @param list<string> $command
      *
      * @return array{AgentTurnResultVo, FacilitatorResponseVo}
      */
@@ -41,7 +41,7 @@ interface RunDynamicLoopAgentServiceInterface
     /**
      * Запускает участника динамической цепочки.
      *
-     * @param array<string> $command
+     * @param list<string> $command
      */
     public function runParticipant(
         int $step,
@@ -65,7 +65,7 @@ interface RunDynamicLoopAgentServiceInterface
     /**
      * Запускает фасилитатора для финализации (без JSON-парсинга).
      *
-     * @param array<string> $command
+     * @param list<string> $command
      */
     public function runFacilitatorFinalize(
         int $step,

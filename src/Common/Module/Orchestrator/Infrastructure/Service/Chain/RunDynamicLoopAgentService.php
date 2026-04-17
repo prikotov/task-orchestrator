@@ -19,6 +19,11 @@ use Override;
  *
  * Инкапсулирует построение AgentRunRequest, запуск агента через runner
  * и парсинг ответа фасилитатора.
+ *
+ * Prompt-файлы (system + append) передаются через VO-поля:
+ * - systemPrompt → --system-prompt <path> (добавляется PiAgentRunner)
+ * - runnerArgs → --append-system-prompt <path> (добавляется PiAgentRunner)
+ * - command → полная CLI-команда из role config (пусто = runner default)
  */
 final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentServiceInterface
 {
@@ -70,19 +75,18 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             $facilitatorAppendPrompt,
             '_1b_append.md',
         );
-        $command = $this->formatter->resolveSlot($command, '@system-prompt', $systemPromptFile, '--system-prompt');
-        $command = $this->formatter->resolveSlot($command, '@append-system-prompt', $appendPromptFile, '--append-system-prompt');
 
         $request = new AgentRunRequestVo(
             role: $facilitatorRole,
             task: $topic,
-            systemPrompt: null,
+            systemPrompt: $systemPromptFile,
             previousContext: $ctx,
             model: $model,
             tools: null,
             workingDir: $workingDir,
             timeout: $timeout,
             command: $command,
+            runnerArgs: ['--append-system-prompt', $appendPromptFile],
         );
 
         $start = microtime(true);
@@ -148,18 +152,17 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             $appendPromptContent,
             '_1b_append.md',
         );
-        $command = $this->formatter->resolveSlot($command, '@system-prompt', $systemPromptFile, '--system-prompt');
-        $command = $this->formatter->resolveSlot($command, '@append-system-prompt', $appendPromptFile, '--append-system-prompt');
 
         $request = new AgentRunRequestVo(
             role: $role,
             task: $topic,
-            systemPrompt: null,
+            systemPrompt: $systemPromptFile,
             previousContext: $userPrompt,
             model: $model,
             workingDir: $workingDir,
             timeout: $timeout,
             command: $command,
+            runnerArgs: ['--append-system-prompt', $appendPromptFile],
         );
 
         $start = microtime(true);
@@ -214,19 +217,18 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             $facilitatorAppendPrompt,
             '_1b_append.md',
         );
-        $command = $this->formatter->resolveSlot($command, '@system-prompt', $systemPromptFile, '--system-prompt');
-        $command = $this->formatter->resolveSlot($command, '@append-system-prompt', $appendPromptFile, '--append-system-prompt');
 
         $request = new AgentRunRequestVo(
             role: $facilitatorRole,
             task: $topic,
-            systemPrompt: null,
+            systemPrompt: $systemPromptFile,
             previousContext: $ctx,
             model: $model,
             tools: null,
             workingDir: $workingDir,
             timeout: $timeout,
             command: $command,
+            runnerArgs: ['--append-system-prompt', $appendPromptFile],
         );
 
         $start = microtime(true);
