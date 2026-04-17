@@ -11,7 +11,7 @@ author: Архитектор (Гэндальф)
 assignee:
 branch: task/arch-orchestrator-module-decomposition
 pr: https://github.com/prikotov/task-orchestrator/pull/3
-status: todo
+status: done
 ---
 
 # TASK-arch-orchestrator-ports-and-adapters: Изоляция Orchestrator от AgentRunner через порты и маппинг VO
