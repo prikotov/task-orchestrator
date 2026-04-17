@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\Service;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\RunnerNotFoundException;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
 use Override;
 
 /**
- * Реестр движков AI-агентов (Application Service).
+ * Реестр движков AI-агентов (Domain Service).
  *
  * Координирует name → AgentRunnerInterface. Заполняется через tagged iterator.
  */

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\Service;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
-
 /**
  * Интерфейс реестра движков AI-агентов.
  */
