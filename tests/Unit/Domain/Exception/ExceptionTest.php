@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Domain\Exception;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\AgentException;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\NotFoundExceptionInterface as AgentRunnerNotFoundExceptionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\NotFoundExceptionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
@@ -24,7 +25,7 @@ final class ExceptionTest extends TestCase
     {
         $exception = new RunnerNotFoundException('codex');
 
-        self::assertInstanceOf(NotFoundExceptionInterface::class, $exception);
+        self::assertInstanceOf(AgentRunnerNotFoundExceptionInterface::class, $exception);
         self::assertStringContainsString('codex', $exception->getMessage());
     }
 

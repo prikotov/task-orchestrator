@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\AgentException;
 
-final class RunnerNotFoundException extends AgentException
+final class RunnerNotFoundException extends AgentException implements NotFoundExceptionInterface
 {
     public function __construct(string $runnerName, ?\Throwable $previous = null)
     {
