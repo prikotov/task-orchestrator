@@ -52,7 +52,7 @@ status: in_progress
 
 ### Фаза 2: Декомпозиция на 2 модуля (Вариант C-light)
 - [x] [TASK-arch-agent-runner-module-extract](done/TASK-arch-agent-runner-module-extract.todo.md)
-- [ ] [TASK-arch-orchestrator-ports-and-adapters](TASK-arch-orchestrator-ports-and-adapters.todo.md)
+- [x] [TASK-arch-orchestrator-ports-and-adapters](done/TASK-arch-orchestrator-ports-and-adapters.todo.md)
 - [ ] [TASK-arch-decomposition-tests-and-docs](TASK-arch-decomposition-tests-and-docs.todo.md)
 
 ## Definition of Done (DoD)
