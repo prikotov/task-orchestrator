@@ -17,17 +17,16 @@ use Override;
  *
  * Каждый AgentRunnerInterface оборачивается в AgentRunnerAdapter.
  */
-final readonly class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterface
+final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterface
 {
     /** @var array<string, AgentRunnerPortInterface> */
-    private array $portCache;
+    private array $portCache = [];
 
     public function __construct(
-        private AgentRunnerRegistryServiceInterface $registry,
-        private RetryableRunnerFactoryInterface $retryableRunnerFactory,
-        private AgentVoMapper $mapper,
+        private readonly AgentRunnerRegistryServiceInterface $registry,
+        private readonly RetryableRunnerFactoryInterface $retryableRunnerFactory,
+        private readonly AgentVoMapper $mapper,
     ) {
-        $this->portCache = [];
     }
 
     #[Override]
