@@ -7,8 +7,8 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Cha
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\RetryableRunnerFactoryInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\PromptFormatterInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ResolveChainRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfigVo;

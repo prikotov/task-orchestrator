@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain;
+namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\StepAuditStatusDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Budget\CheckDynamicBudgetServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicBudgetCheckVo;

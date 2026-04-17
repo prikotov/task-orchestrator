@@ -31,31 +31,36 @@ packages/TaskOrchestrator/src/
 │   │   ├── Budget/
 │   │   │   └── CheckDynamicBudgetServiceInterface.php
 │   │   ├── Chain/
-│   │   │   ├── AuditLoggerInterface.php                # logChainStart/StepStart/StepResult/ChainResult
-│   │   │   ├── AuditLoggerFactoryInterface.php         # create(filePath): AuditLoggerInterface
-│   │   │   ├── BuildDynamicContextServiceInterface.php  # сбор контекста dynamic-раунда
-│   │   │   ├── BuildDynamicContextService.php
-│   │   │   ├── ChainLoaderInterface.php
-│   │   │   ├── ChainSessionLoggerInterface.php         # логирование сессии (JSONL)
-│   │   │   ├── ChainSessionReaderInterface.php         # чтение сессии (resume)
-│   │   │   ├── ChainSessionWriterInterface.php         # запись сессии
-│   │   │   ├── CheckStaticBudgetServiceInterface.php   # проверка бюджета static-цепочки
-│   │   │   ├── CheckStaticBudgetService.php
-│   │   │   ├── ExecuteDynamicTurnService.php           # выполнение одного хода dynamic-цепочки
-│   │   │   ├── ExecuteStaticStepService.php            # выполнение одного agent-шага
-│   │   │   ├── FacilitatorResponseParserInterface.php  # парсинг ответа фасилитатора
-│   │   │   ├── FormatDynamicJournalServiceInterface.php
-│   │   │   ├── FormatDynamicJournalService.php
-│   │   │   ├── PromptFormatterInterface.php            # форматирование промпта шага
-│   │   │   ├── QualityGateRunnerInterface.php          # run(QualityGateVo): QualityGateResultVo
-│   │   │   ├── RecordDynamicRoundServiceInterface.php  # запись раунда dynamic-цепочки
-│   │   │   ├── RecordDynamicRoundService.php
-│   │   │   ├── ResolveChainRunnerServiceInterface.php  # резолв runner для шага (fallback)
-│   │   │   ├── RoundCompletedNotifierInterface.php     # уведомление о завершении раунда
-│   │   │   ├── RunDynamicLoopServiceInterface.php      # цикл dynamic-цепочки
-│   │   │   ├── RunDynamicLoopService.php
-│   │   │   ├── RunDynamicLoopAgentServiceInterface.php  # интерфейс запуска агента в dynamic-цикле
-│   │   │   └── RunStaticChainService.php               # выполнение static-цепочки
+│   │   │   ├── Audit/
+│   │   │   │   ├── AuditLoggerInterface.php                # logChainStart/StepStart/StepResult/ChainResult
+│   │   │   │   └── AuditLoggerFactoryInterface.php         # create(filePath): AuditLoggerInterface
+│   │   │   ├── Dynamic/
+│   │   │   │   ├── BuildDynamicContextServiceInterface.php  # сбор контекста dynamic-раунда
+│   │   │   │   ├── BuildDynamicContextService.php
+│   │   │   │   ├── ExecuteDynamicTurnService.php           # выполнение одного хода dynamic-цепочки
+│   │   │   │   ├── FormatDynamicJournalServiceInterface.php
+│   │   │   │   ├── FormatDynamicJournalService.php
+│   │   │   │   ├── RecordDynamicRoundServiceInterface.php  # запись раунда dynamic-цепочки
+│   │   │   │   ├── RecordDynamicRoundService.php
+│   │   │   │   ├── RunDynamicLoopAgentServiceInterface.php  # интерфейс запуска агента в dynamic-цикле
+│   │   │   │   ├── RunDynamicLoopServiceInterface.php      # цикл dynamic-цепочки
+│   │   │   │   └── RunDynamicLoopService.php
+│   │   │   ├── Session/
+│   │   │   │   ├── ChainSessionLoggerInterface.php         # логирование сессии (JSONL)
+│   │   │   │   ├── ChainSessionReaderInterface.php         # чтение сессии (resume)
+│   │   │   │   └── ChainSessionWriterInterface.php         # запись сессии
+│   │   │   ├── Shared/
+│   │   │   │   ├── ChainLoaderInterface.php
+│   │   │   │   ├── FacilitatorResponseParserInterface.php  # парсинг ответа фасилитатора
+│   │   │   │   ├── PromptFormatterInterface.php            # форматирование промпта шага
+│   │   │   │   ├── QualityGateRunnerInterface.php          # run(QualityGateVo): QualityGateResultVo
+│   │   │   │   ├── ResolveChainRunnerServiceInterface.php  # резолв runner для шага (fallback)
+│   │   │   │   └── RoundCompletedNotifierInterface.php     # уведомление о завершении раунда
+│   │   │   └── Static/
+│   │   │       ├── CheckStaticBudgetServiceInterface.php   # проверка бюджета static-цепочки
+│   │   │       ├── CheckStaticBudgetService.php
+│   │   │       ├── ExecuteStaticStepService.php            # выполнение одного agent-шага
+│   │   │       └── RunStaticChainService.php               # выполнение static-цепочки
 │   │   └── Prompt/
 │   │       └── PromptProviderInterface.php
 │   ├── Entity/

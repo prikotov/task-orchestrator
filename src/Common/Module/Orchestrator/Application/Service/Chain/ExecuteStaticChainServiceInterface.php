@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 
 /**
