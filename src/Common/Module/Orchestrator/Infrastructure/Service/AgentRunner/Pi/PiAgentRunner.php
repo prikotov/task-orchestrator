@@ -49,6 +49,17 @@ final readonly class PiAgentRunner implements AgentRunnerInterface
 
         if ($command === []) {
             $command = ['pi', '--mode', 'json', '-p', '--no-session'];
+        } elseif ($command[0] !== 'pi' && !str_contains($command[0] ?? '', 'pi')) {
+            throw new \InvalidArgumentException(sprintf(
+                'AgentRunRequestVo::$command must be either empty (runner default) or a full CLI command starting with an executable. '
+                . 'Got: %s',
+                implode(' ', $command),
+            ));
+        }
+
+        // Доп. аргументы runner'а (prompt-файлы от dynamic loop)
+        foreach ($request->getRunnerArgs() as $arg) {
+            $command[] = $arg;
         }
 
         // Разрешение @file → содержимое файла

@@ -85,7 +85,8 @@ final class ChainSessionLogger implements ChainSessionLoggerInterface
         $sessionDir = sprintf('%s/%s/%s', $this->chainsSessionDir, $chainName, $dirName);
 
         $this->createDirectory($sessionDir);
-        $this->currentSessionDir = $sessionDir;
+        $realSessionDir = realpath($sessionDir);
+        $this->currentSessionDir = $realSessionDir !== false ? $realSessionDir : $sessionDir;
 
         $this->writeTopic($topic);
         $this->writeContextFile('discussion_history.md', '');
@@ -238,8 +239,9 @@ final class ChainSessionLogger implements ChainSessionLoggerInterface
             throw new RuntimeException(sprintf('Session directory not found: %s', $sessionDir));
         }
 
-        $this->currentSessionDir = $sessionDir;
-        $data = json_decode($this->readFile($sessionDir . '/session.json'), true);
+        $realSessionDir = realpath($sessionDir);
+        $this->currentSessionDir = $realSessionDir !== false ? $realSessionDir : $sessionDir;
+        $data = json_decode($this->readFile($this->currentSessionDir . '/session.json'), true);
         if ($data === null) {
             throw new RuntimeException(sprintf('Invalid session.json in %s', $sessionDir));
         }
