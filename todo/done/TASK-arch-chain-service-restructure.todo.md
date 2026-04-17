@@ -10,7 +10,7 @@ author: Архитектор (Гэндальф)
 assignee:
 branch: task/arch-orchestrator-module-decomposition
 pr: https://github.com/prikotov/task-orchestrator/pull/3
-status: todo
+status: done
 ---
 
 # TASK-arch-chain-service-restructure: Реорганизация Domain/Service/Chain/ на субдиректории
