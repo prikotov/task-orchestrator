@@ -51,7 +51,7 @@ status: in_progress
 - [x] [TASK-arch-chain-service-restructure](done/TASK-arch-chain-service-restructure.todo.md)
 
 ### Фаза 2: Декомпозиция на 2 модуля (Вариант C-light)
-- [ ] [TASK-arch-agent-runner-module-extract](TASK-arch-agent-runner-module-extract.todo.md)
+- [x] [TASK-arch-agent-runner-module-extract](done/TASK-arch-agent-runner-module-extract.todo.md)
 - [ ] [TASK-arch-orchestrator-ports-and-adapters](TASK-arch-orchestrator-ports-and-adapters.todo.md)
 - [ ] [TASK-arch-decomposition-tests-and-docs](TASK-arch-decomposition-tests-and-docs.todo.md)
 
