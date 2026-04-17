@@ -10,8 +10,8 @@ epic: EPIC-arch-orchestrator-module-decomposition
 author: Архитектор (Гэндальф)
 assignee: Бэкендер
 branch: task/arch-orchestrator-ports-and-adapters
-pr:
-status: in_progress
+pr: '#10'
+status: done
 ---
 
 # TASK-arch-orchestrator-ports-and-adapters: Изоляция Orchestrator от AgentRunner через порты и маппинг VO
@@ -127,24 +127,6 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 Ключевой момент: `ResolveChainRunnerService` сейчас создаёт retry-обёртку через `RetryableRunnerFactoryInterface`. После внедрения Port'а retry должен быть инкапсулирован внутри AgentRunner (Port не знает о retry). `ResolveChainRunnerService` вызывает `port->run()`, retry происходит прозрачно внутри AgentRunner.
-
-## Инструкции для сабагента
-
-**Роль:** docs/agents/roles/team/backend_developer.ru.md
-**Ветка:** `task/arch-orchestrator-ports-and-adapters` (уже создана и активна)
-**PR:** draft #10 из `task/arch-orchestrator-ports-and-adapters` в `task/arch-orchestrator-module-decomposition`
-
-### Порядок действий
-1. Переключись в ветку `task/arch-orchestrator-ports-and-adapters`: `git checkout task/arch-orchestrator-ports-and-adapters`
-2. Реализуй задачу согласно описанию и критериям выше.
-3. Следуй AGENTS.md и Конвенциям проекта.
-4. Делай коммиты по Conventional Commits.
-5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` — оба должны пройти.
-6. Запуш: `git push`.
-7. Переведи PR из draft в ready: `gh pr ready 10`. Эта команда снимает флаг draft — PR становится готовым к мержу.
-
-**НЕ создавай новый PR** — он уже существует.
-**НЕ меняй base branch** — он уже указывает на `task/arch-orchestrator-module-decomposition`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
