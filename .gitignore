@@ -6,3 +6,6 @@
 /.vscode/
 *.swp
 *.swo
+
+/var/
+/config/chains.yaml
