@@ -11,4 +11,5 @@
 - [Наблюдаемость](observability.md) — Audit Trail (JSONL), Budget (ограничение стоимости), Reports
 - [Надёжность](reliability.md) — Retry Policy, Circuit Breaker, Fallback, Sessions/Resume
 - [Troubleshooting](troubleshooting.md) — типичные проблемы, симптомы, причины, решения
+- [CLI-команды](cli.md) — консольные команды: оркестрация, запуск агента, список движков
 - [Расширение](extension.md) — пошаговые гайды: добавление runner'а, цепочки, роли
