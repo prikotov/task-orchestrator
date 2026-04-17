@@ -12,7 +12,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResul
  * Port-интерфейс движка AI-агента для Orchestrator Domain.
  *
  * Инкапсулирует вызов агента и retry-политику.
- * Реализация (Adapter) маппит VO и делегирует в AgentRunnerInterface.
+ * Реализация маппит VO и делегирует в конкретный движок AI-агента.
  */
 interface AgentRunnerPortInterface
 {

@@ -48,7 +48,7 @@ final readonly class AgentRunnerAdapter implements AgentRunnerPortInterface
             ? $this->retryableRunnerFactory->createRetryableRunner($this->runner, $retryPolicyVo)
             : $this->runner;
 
-        $agentResult = $effectiveRunner->run($agentRequest->withTruncatedContext());
+        $agentResult = $effectiveRunner->run($agentRequest);
 
         return $this->mapper->mapFromAgentResult($agentResult);
     }

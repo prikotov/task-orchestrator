@@ -56,12 +56,17 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
     public function getDefault(): AgentRunnerPortInterface
     {
         $runner = $this->registry->getDefault();
+        $name = $runner->getName();
 
-        return new AgentRunnerAdapter(
-            $runner,
-            $this->retryableRunnerFactory,
-            $this->mapper,
-        );
+        if (!isset($this->portCache[$name])) {
+            $this->portCache[$name] = new AgentRunnerAdapter(
+                $runner,
+                $this->retryableRunnerFactory,
+                $this->mapper,
+            );
+        }
+
+        return $this->portCache[$name];
     }
 
     #[Override]
@@ -69,11 +74,14 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
     {
         $result = [];
         foreach ($this->registry->list() as $name => $runner) {
-            $result[$name] = new AgentRunnerAdapter(
-                $runner,
-                $this->retryableRunnerFactory,
-                $this->mapper,
-            );
+            if (!isset($this->portCache[$name])) {
+                $this->portCache[$name] = new AgentRunnerAdapter(
+                    $runner,
+                    $this->retryableRunnerFactory,
+                    $this->mapper,
+                );
+            }
+            $result[$name] = $this->portCache[$name];
         }
 
         return $result;

@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port;
 /**
  * Port-интерфейс реестра движков AI-агентов для Orchestrator Domain.
  *
- * Реализация (Adapter) делегирует в AgentRunnerRegistryServiceInterface.
+ * Реализация маппит VO и делегирует в конкретный движок AI-агента.
  */
 interface AgentRunnerRegistryPortInterface
 {
