@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentTurnResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainTurnResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
@@ -38,11 +38,11 @@ final readonly class ExecuteDynamicTurnService
     }
 
     /**
-     * @return array{AgentTurnResultVo, FacilitatorResponseVo}
+     * @return array{ChainTurnResultVo, FacilitatorResponseVo}
      */
     public function runFacilitatorStep(
         ChainDefinitionVo $chain,
-        AgentRunnerInterface $runner,
+        AgentRunnerPortInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
@@ -67,7 +67,7 @@ final readonly class ExecuteDynamicTurnService
             $context->runnerName,
         );
 
-        /** @var array{AgentTurnResultVo, FacilitatorResponseVo} $facRun */
+        /** @var array{ChainTurnResultVo, FacilitatorResponseVo} $facRun */
         $facRun = $this->agentRunner->runFacilitator(
             $execution->getStep(),
             $execution->getRound(),
@@ -134,13 +134,13 @@ final readonly class ExecuteDynamicTurnService
 
     public function runParticipantStep(
         ChainDefinitionVo $chain,
-        AgentRunnerInterface $runner,
+        AgentRunnerPortInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
         string $nextRole,
         ?string $challenge,
-    ): AgentTurnResultVo {
+    ): ChainTurnResultVo {
         $prevResponsePaths = $this->sessionLogger->getResponseFilePaths(
             $execution->getStep() - 1,
         );
@@ -202,11 +202,11 @@ final readonly class ExecuteDynamicTurnService
 
     public function runFinalizeStep(
         ChainDefinitionVo $chain,
-        AgentRunnerInterface $runner,
+        AgentRunnerPortInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
-    ): AgentTurnResultVo {
+    ): ChainTurnResultVo {
         $facResponsePaths = $this->sessionLogger->getResponseFilePaths(
             $execution->getStep() - 1,
         );
@@ -267,7 +267,7 @@ final readonly class ExecuteDynamicTurnService
     }
 
     private function toRoundResultVo(
-        AgentTurnResultVo $turn,
+        ChainTurnResultVo $turn,
         int $step,
         string $role,
         bool $isFacilitator,

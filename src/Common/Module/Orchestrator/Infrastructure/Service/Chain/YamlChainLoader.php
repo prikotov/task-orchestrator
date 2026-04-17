@@ -13,7 +13,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefiniti
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfigVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
 use InvalidArgumentException;
 use Override;
@@ -220,13 +220,13 @@ final class YamlChainLoader implements ChainLoaderInterface
      *
      * @param array{max_retries?: int, initial_delay_ms?: int, max_delay_ms?: int, multiplier?: float}|null $raw
      */
-    private function parseRetryPolicy(?array $raw): ?RetryPolicyVo
+    private function parseRetryPolicy(?array $raw): ?ChainRetryPolicyVo
     {
         if ($raw === null || $raw === []) {
             return null;
         }
 
-        return RetryPolicyVo::fromArray($raw);
+        return ChainRetryPolicyVo::fromArray($raw);
     }
 
     /**

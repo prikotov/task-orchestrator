@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 
 /**
  * Форматирует промпты и собирает артефакты запуска агентов в цепочке.
@@ -71,7 +71,7 @@ interface PromptFormatterInterface
      * Формирует строку команды pi для записи в session.json.
      */
     public function buildAgentInvocation(
-        AgentRunRequestVo $request,
+        ChainRunRequestVo $request,
         string $userPromptFile,
     ): string;
 

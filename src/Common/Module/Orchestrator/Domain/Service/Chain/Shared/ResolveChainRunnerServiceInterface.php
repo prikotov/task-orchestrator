@@ -4,25 +4,18 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfigVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
 
 /**
- * Резолвит эффективный runner: retry-декоратор и fallback при ошибке.
+ * Резолвит fallback runner при ошибке основного.
+ *
+ * Retry инкапсулирован в AgentRunnerPortInterface — отдельный метод createRunnerWithRetry не нужен.
  */
 interface ResolveChainRunnerServiceInterface
 {
-    /**
-     * Создаёт runner с retry-декоратором, если политика retry задана и включена.
-     */
-    public function createRunnerWithRetry(
-        AgentRunnerInterface $runner,
-        ?RetryPolicyVo $retryPolicy,
-    ): AgentRunnerInterface;
-
     /**
      * Пытается выполнить шаг через fallback runner при ошибке основного.
      *
@@ -32,8 +25,8 @@ interface ResolveChainRunnerServiceInterface
         FallbackConfigVo $fallbackConfig,
         string $role,
         string $primaryRunnerName,
-        ?RetryPolicyVo $retryPolicy,
-        AgentRunRequestVo $primaryRequest,
+        ?ChainRetryPolicyVo $retryPolicy,
+        ChainRunRequestVo $primaryRequest,
         ?string $promptFile = null,
-    ): ?AgentResultVo;
+    ): ?ChainRunResultVo;
 }

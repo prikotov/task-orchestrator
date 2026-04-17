@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerRegistryPortInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Prompt\PromptProviderInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 
 /**
  * UseCase запуска одного AI-агента.
@@ -16,7 +16,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunReques
 final readonly class RunAgentCommandHandler
 {
     public function __construct(
-        private AgentRunnerRegistryServiceInterface $runnerRegistry,
+        private AgentRunnerRegistryPortInterface $runnerRegistry,
         private PromptProviderInterface $promptProvider,
     ) {
     }
@@ -30,7 +30,7 @@ final readonly class RunAgentCommandHandler
         $runner = $this->runnerRegistry->get($runnerName);
         $systemPrompt = $this->promptProvider->getPrompt($command->role);
 
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: $command->role,
             task: $command->task,
             systemPrompt: $systemPrompt,

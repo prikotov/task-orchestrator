@@ -8,6 +8,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\AgentException;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\NotFoundExceptionInterface as AgentRunnerNotFoundExceptionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\NotFoundExceptionInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\OrchestratorException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\RunnerNotFoundException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -17,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(RunnerNotFoundException::class)]
 #[CoversClass(RoleNotFoundException::class)]
 #[CoversClass(ChainNotFoundException::class)]
-#[CoversClass(AgentException::class)]
+#[CoversClass(OrchestratorException::class)]
 final class ExceptionTest extends TestCase
 {
     #[Test]
@@ -49,11 +50,16 @@ final class ExceptionTest extends TestCase
     }
 
     #[Test]
-    public function exceptionsExtendAgentException(): void
+    public function runnerNotFoundExceptionExtendsAgentException(): void
     {
         self::assertInstanceOf(AgentException::class, new RunnerNotFoundException('test'));
-        self::assertInstanceOf(AgentException::class, new RoleNotFoundException('test'));
-        self::assertInstanceOf(AgentException::class, new ChainNotFoundException('test'));
+    }
+
+    #[Test]
+    public function orchestratorExceptionsExtendOrchestratorException(): void
+    {
+        self::assertInstanceOf(OrchestratorException::class, new RoleNotFoundException('test'));
+        self::assertInstanceOf(OrchestratorException::class, new ChainNotFoundException('test'));
     }
 
     #[Test]

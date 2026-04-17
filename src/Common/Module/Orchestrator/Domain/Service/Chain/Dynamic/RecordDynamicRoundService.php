@@ -8,7 +8,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecuti
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\RoundCompletedNotifierInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
 use Override;
 
@@ -82,13 +82,13 @@ final readonly class RecordDynamicRoundService implements RecordDynamicRoundServ
         $this->sessionLogger->updateSessionState($step);
     }
 
-    private function createDynamicAgentResult(DynamicRoundResultVo $roundResult): AgentResultVo
+    private function createDynamicAgentResult(DynamicRoundResultVo $roundResult): ChainRunResultVo
     {
         if ($roundResult->isError) {
-            return AgentResultVo::createFromError($roundResult->errorMessage ?? 'unknown');
+            return ChainRunResultVo::createFromError($roundResult->errorMessage ?? 'unknown');
         }
 
-        return AgentResultVo::createFromSuccess(
+        return ChainRunResultVo::createFromSuccess(
             $roundResult->outputText,
             $roundResult->inputTokens,
             $roundResult->outputTokens,

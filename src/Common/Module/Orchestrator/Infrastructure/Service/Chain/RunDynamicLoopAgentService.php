@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\FacilitatorResponseParserInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Prompt\PromptProviderInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentTurnResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainTurnResultVo;
 use Override;
 
 /**
@@ -39,7 +39,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
     public function runFacilitator(
         int $step,
         int $round,
-        AgentRunnerInterface $runner,
+        AgentRunnerPortInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,
@@ -76,7 +76,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             '_1b_append.md',
         );
 
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: $facilitatorRole,
             task: $topic,
             systemPrompt: $systemPromptFile,
@@ -94,7 +94,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         $duration = microtime(true) - $start;
 
         $facilitatorResponse = $this->responseParser->parse($result->getOutputText());
-        $turnResult = new AgentTurnResultVo(
+        $turnResult = new ChainTurnResultVo(
             agentResult: $result,
             duration: $duration,
             userPrompt: $ctx,
@@ -112,7 +112,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
     public function runParticipant(
         int $step,
         int $round,
-        AgentRunnerInterface $runner,
+        AgentRunnerPortInterface $runner,
         string $role,
         string $topic,
         string $brainstormSystemPrompt,
@@ -126,7 +126,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         bool $hasPreviousResponses = true,
         ?string $challenge = null,
         ?string $promptFile = null,
-    ): AgentTurnResultVo {
+    ): ChainTurnResultVo {
         $roleFilePath = $promptFile ?? $this->promptProvider->getPromptFilePath($role);
         $appendPromptContent = sprintf($participantAppendPrompt, $roleFilePath);
 
@@ -153,7 +153,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             '_1b_append.md',
         );
 
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: $role,
             task: $topic,
             systemPrompt: $systemPromptFile,
@@ -169,7 +169,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         $result = $runner->run($request->withTruncatedContext());
         $duration = microtime(true) - $start;
 
-        return new AgentTurnResultVo(
+        return new ChainTurnResultVo(
             agentResult: $result,
             duration: $duration,
             userPrompt: $userPrompt,
@@ -185,7 +185,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
     public function runFacilitatorFinalize(
         int $step,
         int $round,
-        AgentRunnerInterface $runner,
+        AgentRunnerPortInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,
@@ -196,7 +196,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         string $responseFilesList,
         int $timeout,
         array $command = [],
-    ): AgentTurnResultVo {
+    ): ChainTurnResultVo {
         $ctx = $this->formatter->buildFinalizeContext(
             $facilitatorFinalizePrompt,
             $topic,
@@ -218,7 +218,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             '_1b_append.md',
         );
 
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: $facilitatorRole,
             task: $topic,
             systemPrompt: $systemPromptFile,
@@ -235,7 +235,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         $result = $runner->run($request->withTruncatedContext());
         $duration = microtime(true) - $start;
 
-        return new AgentTurnResultVo(
+        return new ChainTurnResultVo(
             agentResult: $result,
             duration: $duration,
             userPrompt: $ctx,

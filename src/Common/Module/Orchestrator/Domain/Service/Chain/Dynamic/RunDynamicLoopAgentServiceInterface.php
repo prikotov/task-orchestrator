@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentTurnResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainTurnResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorResponseVo;
 
 /**
@@ -18,12 +18,12 @@ interface RunDynamicLoopAgentServiceInterface
      *
      * @param list<string> $command
      *
-     * @return array{AgentTurnResultVo, FacilitatorResponseVo}
+     * @return array{ChainTurnResultVo, FacilitatorResponseVo}
      */
     public function runFacilitator(
         int $step,
         int $round,
-        AgentRunnerInterface $runner,
+        AgentRunnerPortInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,
@@ -46,7 +46,7 @@ interface RunDynamicLoopAgentServiceInterface
     public function runParticipant(
         int $step,
         int $round,
-        AgentRunnerInterface $runner,
+        AgentRunnerPortInterface $runner,
         string $role,
         string $topic,
         string $brainstormSystemPrompt,
@@ -60,7 +60,7 @@ interface RunDynamicLoopAgentServiceInterface
         bool $hasPreviousResponses = true,
         ?string $challenge = null,
         ?string $promptFile = null,
-    ): AgentTurnResultVo;
+    ): ChainTurnResultVo;
 
     /**
      * Запускает фасилитатора для финализации (без JSON-парсинга).
@@ -70,7 +70,7 @@ interface RunDynamicLoopAgentServiceInterface
     public function runFacilitatorFinalize(
         int $step,
         int $round,
-        AgentRunnerInterface $runner,
+        AgentRunnerPortInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,
@@ -81,5 +81,5 @@ interface RunDynamicLoopAgentServiceInterface
         string $responseFilesList,
         int $timeout,
         array $command = [],
-    ): AgentTurnResultVo;
+    ): ChainTurnResultVo;
 }
