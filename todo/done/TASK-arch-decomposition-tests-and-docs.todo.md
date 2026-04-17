@@ -10,7 +10,7 @@ epic: EPIC-arch-orchestrator-module-decomposition
 author: Архитектор (Гэндальф)
 assignee: Технический писатель
 branch: task/arch-decomposition-tests-and-docs
-pr:
+pr: '#11'
 status: done
 ---
 
@@ -60,10 +60,10 @@ status: done
 8. [x] Финальная проверка: PHPUnit + Psalm + PHPCS
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] `grep -r "Orchestrator\\\\Domain\\\\Service\\\\AgentRunner" src/ tests/` → 0 результатов
-- [ ] PHPUnit green
-- [ ] Psalm green
-- [ ] `docs/guide/architecture.md` отражает 2 модуля + Port/Adapter
+- [x] `grep -r "Orchestrator\\\\Domain\\\\Service\\\\AgentRunner" src/ tests/` → 0 результатов
+- [x] PHPUnit green
+- [x] Psalm green
+- [x] `docs/guide/architecture.md` отражает 2 модуля + Port/Adapter
 
 ## 6. Verification (Самопроверка)
 ```bash

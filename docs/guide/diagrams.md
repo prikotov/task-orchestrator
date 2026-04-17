@@ -281,6 +281,7 @@ classDiagram
         +timeout: int
         +command: list~string~
         +runnerArgs: list~string~
+        +maxContextLength: ?int
     }
 
     class ChainRunResultVo {
@@ -291,6 +292,10 @@ classDiagram
         +exitCode: int
         +model: ?string
         +isError: bool
+        +cacheReadTokens: int
+        +cacheWriteTokens: int
+        +turns: int
+        +errorMessage: ?string
         +createFromSuccess(...)$ ChainRunResultVo
         +createFromError(...)$ ChainRunResultVo
     }
@@ -560,9 +565,9 @@ sequenceDiagram
     alt retryPolicy !== null
         ADAPTER->>FACTORY: createRetryableRunner(runner, retryPolicyVo)
         FACTORY-->>ADAPTER: RetryingAgentRunner
-        ADAPTER->>RUNNING: [RetryingAgentRunner] run(AgentRunRequestVo)
+        ADAPTER->>RUNNER: [RetryingAgentRunner] run(AgentRunRequestVo)
     else retryPolicy === null
-        ADAPTER->>RUNNING: [AgentRunnerInterface] run(AgentRunRequestVo)
+        ADAPTER->>RUNNER: [AgentRunnerInterface] run(AgentRunRequestVo)
     end
 
     RUNNER-->>ADAPTER: AgentResultVo
