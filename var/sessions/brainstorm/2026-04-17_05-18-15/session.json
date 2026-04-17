@@ -1,0 +1,49 @@
+{
+    "chain": "brainstorm",
+    "topic_file": "topic.md",
+    "facilitator": "system_architect",
+    "participants": [
+        "backend_developer",
+        "technical_writer"
+    ],
+    "max_rounds": 3,
+    "completed_steps": 0,
+    "completed_rounds": 1,
+    "discussion_history_file": "discussion_history.md",
+    "facilitator_journal_file": "facilitator_journal.md",
+    "rounds": [
+        {
+            "step": 1,
+            "round": 1,
+            "role": "system_architect",
+            "is_facilitator": true,
+            "system_prompt_file": "step_001_round_001_system_architect_1_system.md",
+            "user_prompt_file": "step_001_round_001_system_architect_2_user.md",
+            "response_file": "step_001_round_001_system_architect_3_response.md",
+            "duration": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost": 0,
+            "invocation": "--system-prompt step_001_round_001_system_architect_1_system.md --append-system-prompt step_001_round_001_system_architect_1b_append.md step_001_round_001_system_architect_2_user.md # cwd: \/home\/dp\/MyProjects\/task-orchestrator"
+        }
+    ],
+    "invocation": {
+        "command": "bin\/console app:agent:orchestrate",
+        "chain": "brainstorm",
+        "task": "Придумай 3 названия для пакета оркестрации AI-агентов",
+        "topic": "Придумай 3 названия для пакета оркестрации AI-агентов",
+        "facilitator": "system_architect",
+        "participants": [
+            "backend_developer",
+            "technical_writer"
+        ],
+        "max_rounds": 3,
+        "timeout": 1800,
+        "working_dir": "\/home\/dp\/MyProjects\/task-orchestrator"
+    },
+    "budget": null,
+    "status": "interrupted",
+    "completion_reason": "agent_error",
+    "started_at": "2026-04-17T05:18:15+00:00",
+    "updated_at": "2026-04-17T05:18:15+00:00"
+}

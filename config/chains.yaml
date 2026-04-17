@@ -1,0 +1,15 @@
+chains:
+  brainstorm:
+    type: dynamic
+    description: "Фасилитированный брейншторм"
+    facilitator: system_architect
+    participants: [backend_developer, technical_writer]
+    max_rounds: 3
+    prompts:
+      brainstorm_system: "You are a brainstorming facilitator. Keep responses concise."
+      facilitator_append: "Facilitating discussion on: %s"
+      facilitator_start: "Start brainstorming on topic: %s"
+      facilitator_continue: "Topic: %s\nJournal: %s\nHistory: %s"
+      facilitator_finalize: "Topic: %s\nHistory: %s\nProvide synthesis."
+      participant_append: "Role: %s"
+      participant_user: "Topic: %s\nDiscussion so far: %s"
