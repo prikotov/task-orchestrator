@@ -89,7 +89,7 @@ php vendor/prikotov/coding-standard/bin/run-sniff-tests.php
 
 **Роль:** docs/agents/roles/team/technical_writer.ru.md
 **Ветка:** `task/arch-decomposition-tests-and-docs` (уже создана и активна)
-**PR:** уже создан (draft) из `task/arch-decomposition-tests-and-docs` в `task/arch-orchestrator-module-decomposition`
+**PR:** draft #11 из `task/arch-decomposition-tests-and-docs` в `task/arch-orchestrator-module-decomposition`
 
 ### Порядок действий
 1. Переключись в ветку `task/arch-decomposition-tests-and-docs`: `git checkout task/arch-decomposition-tests-and-docs`
@@ -98,7 +98,7 @@ php vendor/prikotov/coding-standard/bin/run-sniff-tests.php
 4. Делай коммиты по Conventional Commits.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` — оба должны пройти.
 6. Запуш: `git push`.
-7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`. Эта команда снимает флаг draft — PR становится готовым к мержу.
+7. Переведи PR из draft в ready: `gh pr ready 11`. Эта команда снимает флаг draft — PR становится готовым к мержу.
 
 **НЕ создавай новый PR** — он уже существует.
 **НЕ меняй base branch** — он уже указывает на `task/arch-orchestrator-module-decomposition`.
