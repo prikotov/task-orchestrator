@@ -7,10 +7,10 @@ priority: P0
 depends_on:
 epic:
 author: Бэкендер (Левша)
-assignee:
-branch:
+assignee: Бэкендер (Левша)
+branch: task/fix-dynamic-relative-prompt-paths
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-fix-dynamic-relative-prompt-paths: Dynamic chain использует относительные пути к prompt-файлам

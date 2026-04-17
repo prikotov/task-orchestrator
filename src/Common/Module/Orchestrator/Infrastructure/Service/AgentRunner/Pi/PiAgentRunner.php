@@ -49,6 +49,9 @@ final readonly class PiAgentRunner implements AgentRunnerInterface
 
         if ($command === []) {
             $command = ['pi', '--mode', 'json', '-p', '--no-session'];
+        } elseif (!in_array('pi', $command, true) && !in_array('--mode', $command, true)) {
+            // Dynamic loop passes args without executable — prepend pi
+            array_unshift($command, 'pi', '--mode', 'json', '-p', '--no-session');
         }
 
         // Разрешение @file → содержимое файла
