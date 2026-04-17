@@ -9,7 +9,7 @@ author: Архитектор (Гэндальф)
 assignee:
 branch: task/arch-orchestrator-module-decomposition
 pr: https://github.com/prikotov/task-orchestrator/pull/3
-status: done
+status: todo
 ---
 
 # EPIC-arch-orchestrator-module-decomposition: Декомпозиция модуля Orchestrator
@@ -48,12 +48,12 @@ status: done
 ## Plan (План реализации)
 
 ### Фаза 1: Внутренняя реорганизация (Вариант А)
-- [ ] [TASK-arch-chain-service-restructure](done/TASK-arch-chain-service-restructure.todo.md)
+- [ ] [TASK-arch-chain-service-restructure](TASK-arch-chain-service-restructure.todo.md)
 
 ### Фаза 2: Декомпозиция на 2 модуля (Вариант C-light)
-- [ ] [TASK-arch-agent-runner-module-extract](done/TASK-arch-agent-runner-module-extract.todo.md)
-- [ ] [TASK-arch-orchestrator-ports-and-adapters](done/TASK-arch-orchestrator-ports-and-adapters.todo.md)
-- [ ] [TASK-arch-decomposition-tests-and-docs](done/TASK-arch-decomposition-tests-and-docs.todo.md)
+- [ ] [TASK-arch-agent-runner-module-extract](TASK-arch-agent-runner-module-extract.todo.md)
+- [ ] [TASK-arch-orchestrator-ports-and-adapters](TASK-arch-orchestrator-ports-and-adapters.todo.md)
+- [ ] [TASK-arch-decomposition-tests-and-docs](TASK-arch-decomposition-tests-and-docs.todo.md)
 
 ## Definition of Done (DoD)
 
