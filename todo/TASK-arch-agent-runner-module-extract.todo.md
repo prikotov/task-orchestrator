@@ -11,7 +11,7 @@ author: Архитектор (Гэндальф)
 assignee:
 branch: task/arch-orchestrator-module-decomposition
 pr: https://github.com/prikotov/task-orchestrator/pull/3
-status: done
+status: todo
 ---
 
 # TASK-arch-agent-runner-module-extract: Выделение модуля AgentRunner
