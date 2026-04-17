@@ -48,7 +48,7 @@ status: in_progress
 ## Plan (План реализации)
 
 ### Фаза 1: Внутренняя реорганизация (Вариант А)
-- [ ] [TASK-arch-chain-service-restructure](TASK-arch-chain-service-restructure.todo.md)
+- [x] [TASK-arch-chain-service-restructure](done/TASK-arch-chain-service-restructure.todo.md)
 
 ### Фаза 2: Декомпозиция на 2 модуля (Вариант C-light)
 - [ ] [TASK-arch-agent-runner-module-extract](TASK-arch-agent-runner-module-extract.todo.md)
