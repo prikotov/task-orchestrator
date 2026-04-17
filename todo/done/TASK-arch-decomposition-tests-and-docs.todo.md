@@ -11,7 +11,7 @@ author: Архитектор (Гэндальф)
 assignee: Технический писатель
 branch: task/arch-decomposition-tests-and-docs
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-arch-decomposition-tests-and-docs: Обновление тестов и документации после декомпозиции
@@ -32,32 +32,32 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] `docs/guide/architecture.md` полностью переписана: 2 модуля, Port/Adapter, VO mapping
-- [ ] Все тесты в `tests/Unit/Infrastructure/Service/AgentRunner/` обновлены на namespace `AgentRunner\`
-- [ ] Все тесты в `tests/Unit/Domain/Service/AgentRunner/` обновлены
-- [ ] Все тесты в `tests/Unit/Application/` обновлены (если нужно)
-- [ ] Нет orphan-ссылок на старые namespace `Orchestrator\Domain\Service\AgentRunner\`
-- [ ] PHPUnit green (все тесты)
-- [ ] Psalm green
-- [ ] PHPCS sniff green
+- [x] `docs/guide/architecture.md` полностью переписана: 2 модуля, Port/Adapter, VO mapping
+- [x] Все тесты в `tests/Unit/Infrastructure/Service/AgentRunner/` обновлены на namespace `AgentRunner\`
+- [x] Все тесты в `tests/Unit/Domain/Service/AgentRunner/` обновлены
+- [x] Все тесты в `tests/Unit/Application/` обновлены (если нужно)
+- [x] Нет orphan-ссылок на старые namespace `Orchestrator\Domain\Service\AgentRunner\`
+- [x] PHPUnit green (все тесты)
+- [x] Psalm green
+- [x] PHPCS sniff green
 
 ### 🟡 Should Have (Желательно)
-- [ ] ADR (Architecture Decision Record) в `docs/adr/` с обоснованием декомпозиции
-- [ ] `docs/conventions/modules/index.md` дополнен примером двухмодульного бандла
+- [x] ADR (Architecture Decision Record) в `docs/adr/` с обоснованием декомпозиции
+- [x] `docs/conventions/modules/index.md` дополнен примером двухмодульного бандла
 
 ### 🟢 Could Have (Опционально)
 ### ⚫ Won't Have (Не будем делать)
 - Реструктуризация тестов (перенос тестов AgentRunner в отдельный каталог) — это можно сделать позже
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Запустить PHPUnit — убедиться что всё green после предыдущих задач
-2. [ ] Запустить Psalm — убедиться что 0 errors
-3. [ ] Проверить `grep -r "Orchestrator\\\\Domain\\\\Service\\\\AgentRunner" tests/` — если есть, обновить
-4. [ ] Переписать `docs/guide/architecture.md`: структура 2 модулей, Port/Adapter, зависимости
-5. [ ] Обновить `docs/guide/reliability.md` если упоминает AgentRunner
-6. [ ] Создать `docs/adr/001-module-decomposition.md` — обоснование
-7. [ ] Обновить `docs/conventions/modules/index.md` — пример двухмодульного бандла
-8. [ ] Финальная проверка: PHPUnit + Psalm + PHPCS
+1. [x] Запустить PHPUnit — убедиться что всё green после предыдущих задач
+2. [x] Запустить Psalm — убедиться что 0 errors
+3. [x] Проверить `grep -r "Orchestrator\\\\Domain\\\\Service\\\\AgentRunner" tests/` — 0 результатов
+4. [x] Переписать `docs/guide/architecture.md`: структура 2 модулей, Port/Adapter, зависимости
+5. [x] Обновить `docs/guide/reliability.md` если упоминает AgentRunner
+6. [x] Создать `docs/adr/001-module-decomposition.md` — обоснование
+7. [x] Обновить `docs/conventions/modules/index.md` — пример двухмодульного бандла
+8. [x] Финальная проверка: PHPUnit + Psalm + PHPCS
 
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] `grep -r "Orchestrator\\\\Domain\\\\Service\\\\AgentRunner" src/ tests/` → 0 результатов
@@ -107,3 +107,4 @@ php vendor/prikotov/coding-standard/bin/run-sniff-tests.php
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-17 | Архитектор (Гэндальф) | Создание задачи |
+| 2026-04-17 | Технический писатель (Гермиона) | Задача выполнена: docs переписаны, ADR создан |
