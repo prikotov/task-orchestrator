@@ -2,18 +2,22 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Adapter;
+namespace TaskOrchestrator\Common\Module\Orchestrator\Integration\Adapter;
 
+use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommand;
+use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
+use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentResultDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQuery;
+use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\RunnerNotFoundException;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\OrchestratorException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerRegistryPortInterface;
 use Override;
 
 /**
- * Adapter: оборачивает AgentRunnerRegistryServiceInterface, возвращает AgentRunnerPortInterface.
+ * ACL-адаптер реестра runner'ов: делегирует через AgentRunner Application use cases.
  *
  * Каждый AgentRunnerInterface оборачивается в AgentRunnerAdapter.
  */
@@ -23,9 +27,10 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
     private array $portCache = [];
 
     public function __construct(
+        private readonly GetRunnersQueryHandler $getRunnersHandler,
+        private readonly RunAgentCommandHandler $runAgentHandler,
+        private readonly AgentDtoMapper $mapper,
         private readonly AgentRunnerRegistryServiceInterface $registry,
-        private readonly RetryableRunnerFactoryInterface $retryableRunnerFactory,
-        private readonly AgentVoMapper $mapper,
     ) {
     }
 
@@ -43,9 +48,10 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
                 );
             }
             $this->portCache[$name] = new AgentRunnerAdapter(
-                $runner,
-                $this->retryableRunnerFactory,
+                $this->runAgentHandler,
                 $this->mapper,
+                $runner->getName(),
+                $runner->isAvailable(),
             );
         }
 
@@ -60,9 +66,10 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
 
         if (!isset($this->portCache[$name])) {
             $this->portCache[$name] = new AgentRunnerAdapter(
-                $runner,
-                $this->retryableRunnerFactory,
+                $this->runAgentHandler,
                 $this->mapper,
+                $runner->getName(),
+                $runner->isAvailable(),
             );
         }
 
@@ -73,15 +80,18 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
     public function list(): array
     {
         $result = [];
-        foreach ($this->registry->list() as $name => $runner) {
-            if (!isset($this->portCache[$name])) {
-                $this->portCache[$name] = new AgentRunnerAdapter(
-                    $runner,
-                    $this->retryableRunnerFactory,
+        $runnersResult = $this->getRunnersHandler->handle(new GetRunnersQuery());
+
+        foreach ($runnersResult->runners as $runnerDto) {
+            if (!isset($this->portCache[$runnerDto->name])) {
+                $this->portCache[$runnerDto->name] = new AgentRunnerAdapter(
+                    $this->runAgentHandler,
                     $this->mapper,
+                    $runnerDto->name,
+                    $runnerDto->isAvailable,
                 );
             }
-            $result[$name] = $this->portCache[$name];
+            $result[$runnerDto->name] = $this->portCache[$runnerDto->name];
         }
 
         return $result;
