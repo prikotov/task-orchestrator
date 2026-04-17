@@ -2,9 +2,9 @@
 
 Mermaid-диаграммы Orchestrator. Рендерятся нативно в GitHub markdown preview.
 
-## Component-диаграмма слоёв
+## Component-диаграмма: два модуля
 
-Обзор DDD-слоёв и их связи. Сплошные стрелки — прямые зависимости, пунктирные — реализация интерфейса.
+Обзор модулей AgentRunner и Orchestrator, их DDD-слоёв и связей через Port/Adapter.
 
 ```mermaid
 graph TB
@@ -14,7 +14,7 @@ graph TB
         RNC["RunnersCommand"]
     end
 
-    subgraph Application["Application"]
+    subgraph OrchApp["Orchestrator · Application"]
         CH["OrchestrateChainCommandHandler"]
         SCH["RunAgentCommandHandler"]
         GRH["GetRunnersQueryHandler"]
@@ -22,26 +22,118 @@ graph TB
         ESC["ExecuteStaticChainService"]
     end
 
-    subgraph Domain["Domain"]
+    subgraph OrchDomain["Orchestrator · Domain"]
         direction TB
+        PORT["AgentRunnerPortInterface"]
+        REG_PORT["AgentRunnerRegistryPortInterface"]
         CL["ChainLoaderInterface"]
-        AR["AgentRunnerInterface"]
-        REG["AgentRunnerRegistryServiceInterface"]
         PP["PromptProviderInterface"]
         QGI["QualityGateRunnerInterface"]
         RSC["RunStaticChainService"]
         RDLI["RunDynamicLoopServiceInterface"]
-        VO["Value Objects"]
+        VO_ORCH["Chain*-VOs"]
     end
 
-    subgraph Infrastructure["Infrastructure"]
+    subgraph OrchInfra["Orchestrator · Infrastructure"]
+        ADAPTER["AgentRunnerAdapter"]
+        REG_ADAPTER["AgentRunnerRegistryAdapter"]
+        MAPPER["AgentVoMapper"]
         YCL["YamlChainLoader"]
+        QG["QualityGateRunner"]
+        RPB["RolePromptBuilder"]
+        RDLS["RunDynamicLoopAgentService"]
+    end
+
+    subgraph ARDomain["AgentRunner · Domain"]
+        AR["AgentRunnerInterface"]
+        REG_AR["AgentRunnerRegistryServiceInterface"]
+        RETRY_F["RetryableRunnerFactoryInterface"]
+        VO_AR["Agent*-VOs"]
+    end
+
+    subgraph ARInfra["AgentRunner · Infrastructure"]
         PI["PiAgentRunner"]
         RET["RetryingAgentRunner"]
         CB["CircuitBreakerAgentRunner"]
+        RETRY_FI["RetryableRunnerFactory"]
+    end
+
+    OC -->|uses| CH
+    RC -->|uses| SCH
+    RNC -->|uses| GRH
+
+    CH --> ESC
+    CH --> CL
+    CH --> REG_PORT
+    CH --> RDLI
+    ESC --> RSC
+    RSC --> PORT
+    RSC --> QGI
+
+    PORT -.->|impl| ADAPTER
+    REG_PORT -.->|impl| REG_ADAPTER
+    ADAPTER --> MAPPER
+    ADAPTER --> AR
+    ADAPTER --> RETRY_F
+    REG_ADAPTER --> REG_AR
+    MAPPER --> VO_AR
+
+    AR -.->|impl| PI
+    AR -.->|impl| RET
+    AR -.->|impl| CB
+    RETRY_F -.->|impl| RETRY_FI
+    CL -.->|impl| YCL
+    PP -.->|impl| RPB
+    QGI -.->|impl| QG
+    RDLI -.->|impl| RDLS
+
+    style Presentation fill:#e3f2fd,stroke:#1565c0
+    style OrchApp fill:#fff3e0,stroke:#e65100
+    style OrchDomain fill:#e8f5e9,stroke:#2e7d32
+    style OrchInfra fill:#fce4ec,stroke:#c62828
+    style ARDomain fill:#e8f5e9,stroke:#1b5e20
+    style ARInfra fill:#fce4ec,stroke:#b71c1c
+```
+
+## Component-диаграмма слоёв (детализация)
+
+Детальный обзор DDD-слоёв внутри каждого модуля. Сплошные стрелки — прямые зависимости, пунктирные — реализация интерфейса.
+
+```mermaid
+graph TB
+    subgraph Presentation["Presentation (host app)"]
+        OC["OrchestrateCommand"]
+        RC["RunCommand"]
+        RNC["RunnersCommand"]
+    end
+
+    subgraph Application["Orchestrator · Application"]
+        CH["OrchestrateChainCommandHandler"]
+        SCH["RunAgentCommandHandler"]
+        GRH["GetRunnersQueryHandler"]
+        RP["GenerateReportQueryHandler"]
+        ESC["ExecuteStaticChainService"]
+    end
+
+    subgraph Domain["Orchestrator · Domain"]
+        direction TB
+        PORT["AgentRunnerPortInterface"]
+        REG_PORT["AgentRunnerRegistryPortInterface"]
+        CL["ChainLoaderInterface"]
+        PP["PromptProviderInterface"]
+        QGI["QualityGateRunnerInterface"]
+        RSC["RunStaticChainService"]
+        RDLI["RunDynamicLoopServiceInterface"]
+        VO["Chain*-Value Objects"]
+    end
+
+    subgraph Infrastructure["Orchestrator · Infrastructure"]
+        ADAPTER["AgentRunnerAdapter"]
+        REG_ADAPTER["AgentRunnerRegistryAdapter"]
+        YCL["YamlChainLoader"]
         QG["QualityGateRunner"]
         RPB["RolePromptBuilder"]
-        RDLS["RunDynamicLoopService"]
+        RDLS["RunDynamicLoopAgentService"]
     end
 
     OC -->|uses| CH
@@ -49,15 +141,14 @@ graph TB
     RNC -->|uses| GRH
     CH --> ESC
     CH --> CL
-    CH --> REG
+    CH --> REG_PORT
     CH --> RDLI
     ESC --> RSC
-    RSC --> AR
+    RSC --> PORT
     RSC --> QGI
-    REG -.->|resolves| AR
-    AR -.->|impl| PI
-    AR -.->|impl| RET
-    AR -.->|impl| CB
+    REG_PORT -.->|resolves| PORT
+    PORT -.->|impl| ADAPTER
+    REG_PORT -.->|impl| REG_ADAPTER
     CL -.->|impl| YCL
     PP -.->|impl| RPB
     QGI -.->|impl| QG
@@ -69,13 +160,53 @@ graph TB
     style Infrastructure fill:#fce4ec,stroke:#c62828
 ```
 
-## Class-диаграмма Domain-слоя
+## Class-диаграмма: Port/Adapter
 
-Интерфейсы, Value Objects и исключения Domain-слоя.
+Механизм Port/Adapter между Orchestrator и AgentRunner.
 
 ```mermaid
 classDiagram
     direction LR
+
+    class AgentRunnerPortInterface {
+        <<interface>>
+        +getName() string
+        +isAvailable() bool
+        +run(ChainRunRequestVo, ChainRetryPolicyVo) ChainRunResultVo
+    }
+
+    class AgentRunnerRegistryPortInterface {
+        <<interface>>
+        +get(string name) AgentRunnerPortInterface
+        +getDefault() AgentRunnerPortInterface
+        +list() array
+    }
+
+    class AgentRunnerAdapter {
+        -AgentRunnerInterface runner
+        -RetryableRunnerFactoryInterface factory
+        -AgentVoMapper mapper
+        +getName() string
+        +isAvailable() bool
+        +run(ChainRunRequestVo, ChainRetryPolicyVo) ChainRunResultVo
+    }
+
+    class AgentRunnerRegistryAdapter {
+        -AgentRunnerRegistryServiceInterface registry
+        -RetryableRunnerFactoryInterface factory
+        -AgentVoMapper mapper
+        -array portCache
+        +get(string) AgentRunnerPortInterface
+        +getDefault() AgentRunnerPortInterface
+        +list() array
+    }
+
+    class AgentVoMapper {
+        +mapToAgentRequest(ChainRunRequestVo) AgentRunRequestVo
+        +mapFromAgentResult(AgentResultVo) ChainRunResultVo
+        +mapFromAgentTurnResult(AgentTurnResultVo) ChainTurnResultVo
+        +mapToAgentRetryPolicy(ChainRetryPolicyVo) RetryPolicyVo
+    }
 
     class AgentRunnerInterface {
         <<interface>>
@@ -88,6 +219,40 @@ classDiagram
         <<interface>>
         +get(string name) AgentRunnerInterface
         +getDefault() AgentRunnerInterface
+        +list() array
+    }
+
+    AgentRunnerPortInterface <|.. AgentRunnerAdapter : implements
+    AgentRunnerRegistryPortInterface <|.. AgentRunnerRegistryAdapter : implements
+    AgentRunnerAdapter --> AgentVoMapper : uses
+    AgentRunnerAdapter --> AgentRunnerInterface : delegates to
+    AgentRunnerAdapter --> RetryableRunnerFactoryInterface : uses
+    AgentRunnerRegistryAdapter --> AgentVoMapper : uses
+    AgentRunnerRegistryAdapter --> AgentRunnerRegistryServiceInterface : delegates to
+
+    note for AgentRunnerAdapter "Маппит Chain*-VO ↔ Agent*-VO\nИнкапсулирует retry через RetryableRunnerFactory"
+    note for AgentVoMapper "Stateless маппер\nChain*-VO ↔ Agent*-VO"
+```
+
+## Class-диаграмма Domain-слоя Orchestrator
+
+Интерфейсы, Value Objects и исключения Orchestrator Domain.
+
+```mermaid
+classDiagram
+    direction LR
+
+    class AgentRunnerPortInterface {
+        <<interface>>
+        +getName() string
+        +isAvailable() bool
+        +run(ChainRunRequestVo, ChainRetryPolicyVo) ChainRunResultVo
+    }
+
+    class AgentRunnerRegistryPortInterface {
+        <<interface>>
+        +get(string name) AgentRunnerPortInterface
+        +getDefault() AgentRunnerPortInterface
         +list() array
     }
 
@@ -105,7 +270,7 @@ classDiagram
         +getAvailableRoles() array
     }
 
-    class AgentRunRequestVo {
+    class ChainRunRequestVo {
         +role: string
         +task: string
         +systemPrompt: ?string
@@ -115,10 +280,10 @@ classDiagram
         +workingDir: ?string
         +timeout: int
         +command: list~string~
-        +withTruncatedContext() self
+        +runnerArgs: list~string~
     }
 
-    class AgentResultVo {
+    class ChainRunResultVo {
         +outputText: string
         +inputTokens: int
         +outputTokens: int
@@ -126,8 +291,8 @@ classDiagram
         +exitCode: int
         +model: ?string
         +isError: bool
-        +createFromSuccess(...)$ self
-        +createFromError(...)$ self
+        +createFromSuccess(...)$ ChainRunResultVo
+        +createFromError(...)$ ChainRunResultVo
     }
 
     class ChainDefinitionVo {
@@ -162,6 +327,94 @@ classDiagram
     class RoleNotFoundException {
         +__construct(string role)
     }
+    class OrchestratorException {
+        <<base exception>>
+    }
+
+    AgentRunnerPortInterface --> ChainRunRequestVo : takes
+    AgentRunnerPortInterface --> ChainRunResultVo : returns
+    AgentRunnerRegistryPortInterface --> AgentRunnerPortInterface : manages
+    ChainLoaderInterface --> ChainDefinitionVo : loads
+    ChainDefinitionVo --> ChainStepVo : contains
+
+    note for ChainNotFoundException "extends OrchestratorException\nimplements NotFoundExceptionInterface"
+    note for RoleNotFoundException "extends OrchestratorException\nimplements NotFoundExceptionInterface"
+```
+
+## Class-диаграмма Domain-слоя AgentRunner
+
+Интерфейсы и Value Objects модуля AgentRunner.
+
+```mermaid
+classDiagram
+    direction LR
+
+    class AgentRunnerInterface {
+        <<interface>>
+        +getName() string
+        +isAvailable() bool
+        +run(AgentRunRequestVo) AgentResultVo
+    }
+
+    class AgentRunnerRegistryServiceInterface {
+        <<interface>>
+        +get(string name) AgentRunnerInterface
+        +getDefault() AgentRunnerInterface
+        +list() array
+    }
+
+    class RetryableRunnerFactoryInterface {
+        <<interface>>
+        +createRetryableRunner(AgentRunnerInterface, RetryPolicyVo) AgentRunnerInterface
+    }
+
+    class AgentRunRequestVo {
+        +role: string
+        +task: string
+        +systemPrompt: ?string
+        +previousContext: ?string
+        +model: ?string
+        +tools: ?string
+        +workingDir: ?string
+        +timeout: int
+        +command: list~string~
+        +runnerArgs: list~string~
+        +withTruncatedContext() self
+    }
+
+    class AgentResultVo {
+        +outputText: string
+        +inputTokens: int
+        +outputTokens: int
+        +cost: float
+        +exitCode: int
+        +model: ?string
+        +isError: bool
+        +createFromSuccess(...)$ self
+        +createFromError(...)$ self
+    }
+
+    class AgentTurnResultVo {
+        +agentResult: AgentResultVo
+        +duration: float
+        +userPrompt: ?string
+        +systemPrompt: ?string
+        +invocation: ?string
+    }
+
+    class RetryPolicyVo {
+        +maxRetries: int
+        +initialDelayMs: int
+        +maxDelayMs: int
+        +multiplier: float
+    }
+
+    class CircuitBreakerStateVo {
+        +state: CircuitStateEnum
+        +failureCount: int
+        +lastFailureTime: ?float
+    }
+
     class RunnerNotFoundException {
         +__construct(string runnerName)
     }
@@ -169,11 +422,9 @@ classDiagram
     AgentRunnerInterface --> AgentRunRequestVo : takes
     AgentRunnerInterface --> AgentResultVo : returns
     AgentRunnerRegistryServiceInterface --> AgentRunnerInterface : manages
-    ChainLoaderInterface --> ChainDefinitionVo : loads
-    ChainDefinitionVo --> ChainStepVo : contains
+    AgentTurnResultVo --> AgentResultVo : contains
+    RetryableRunnerFactoryInterface --> AgentRunnerInterface : creates
 
-    note for ChainNotFoundException "extends AgentException\nimplements NotFoundExceptionInterface"
-    note for RoleNotFoundException "extends AgentException\nimplements NotFoundExceptionInterface"
     note for RunnerNotFoundException "extends AgentException\nimplements NotFoundExceptionInterface"
 ```
 
@@ -187,26 +438,26 @@ sequenceDiagram
     participant CLI as OrchestrateCommand
     participant H as OrchestrateChainCommandHandler
     participant CL as ChainLoaderInterface
-    participant REG as AgentRunnerRegistryService
+    participant REG as AgentRunnerRegistryPortInterface
     participant ESC as ExecuteStaticChainService
     participant RSC as RunStaticChainService
     participant STEP as ExecuteStaticStepService
-    participant RUN as AgentRunnerInterface
+    participant PORT as AgentRunnerPortInterface
     participant QG as QualityGateRunnerInterface
 
     CLI->>H: __invoke(command)
     H->>CL: load(chainName)
     CL-->>H: ChainDefinitionVo (type=static)
     H->>REG: get(runnerName)
-    REG-->>H: AgentRunnerInterface
+    REG-->>H: AgentRunnerPortInterface
     H->>ESC: execute(chain, runner, ...)
     ESC->>RSC: execute(chain, runner, ...)
 
     loop Для каждого ChainStepVo
         alt step.isAgent()
             RSC->>STEP: execute(step, runner, previousContext)
-            STEP->>RUN: run(AgentRunRequestVo)
-            RUN-->>STEP: AgentResultVo
+            STEP->>PORT: run(ChainRunRequestVo, retryPolicy)
+            PORT-->>STEP: ChainRunResultVo
             STEP-->>RSC: StaticStepResultVo
         else step.isQualityGate()
             RSC->>QG: run(QualityGateVo)
@@ -232,12 +483,12 @@ sequenceDiagram
     participant CLI as OrchestrateCommand
     participant H as OrchestrateChainCommandHandler
     participant CL as ChainLoaderInterface
-    participant REG as AgentRunnerRegistryService
+    participant REG as AgentRunnerRegistryPortInterface
     participant CBC as BuildDynamicContextService
     participant DLR as RunDynamicLoopService
     participant EDT as ExecuteDynamicTurnService
-    participant DTA as RunDynamicLoopAgentService
-    participant RUN as AgentRunnerInterface
+    participant DTA as RunDynamicLoopAgentServiceInterface
+    participant PORT as AgentRunnerPortInterface
     participant FPAR as FacilitatorResponseParser
     participant SL as ChainSessionLogger
 
@@ -248,26 +499,26 @@ sequenceDiagram
     H->>CBC: buildContext(chain, ...)
     CBC-->>H: DynamicChainContextVo
     H->>REG: get(runnerName)
-    REG-->>H: AgentRunnerInterface
+    REG-->>H: AgentRunnerPortInterface
     H->>DLR: execute(chain, runner, context, ...)
 
     loop round = 1..maxRounds
         alt Фасилитатор
             DLR->>EDT: runFacilitatorStep(chain, runner, execution, ...)
             EDT->>DTA: runFacilitator(step, round, runner, ...)
-            DTA->>RUN: run(AgentRunRequestVo)
-            RUN-->>DTA: AgentResultVo
+            DTA->>PORT: run(ChainRunRequestVo, retryPolicy)
+            PORT-->>DTA: ChainRunResultVo
             DTA->>FPAR: parse(outputText)
             FPAR-->>DTA: FacilitatorResponseVo
-            DTA-->>EDT: [AgentTurnResultVo, FacilitatorResponseVo]
-            EDT-->>DLR: [AgentTurnResultVo, FacilitatorResponseVo]
+            DTA-->>EDT: [ChainTurnResultVo, FacilitatorResponseVo]
+            EDT-->>DLR: [ChainTurnResultVo, FacilitatorResponseVo]
         else Участник (next_role)
             DLR->>EDT: runParticipantStep(chain, runner, execution, nextRole, ...)
             EDT->>DTA: runParticipant(step, round, runner, role, ...)
-            DTA->>RUN: run(AgentRunRequestVo)
-            RUN-->>DTA: AgentTurnResultVo
-            DTA-->>EDT: AgentTurnResultVo
-            EDT-->>DLR: AgentTurnResultVo
+            DTA->>PORT: run(ChainRunRequestVo, retryPolicy)
+            PORT-->>DTA: ChainTurnResultVo
+            DTA-->>EDT: ChainTurnResultVo
+            EDT-->>DLR: ChainTurnResultVo
         end
         Note over DLR: Проверка budget (CheckDynamicBudgetService), запись раунда (RecordDynamicRoundService)
         alt FacilitatorResponse.done = true
@@ -283,6 +534,42 @@ sequenceDiagram
     H->>SL: completeSession(synthesis, metrics, ...)
     H->>H: dispatchCompletedEvent()
     H-->>CLI: OrchestrateChainResultDto
+```
+
+## Sequence: Port → Adapter → AgentRunner
+
+Детализация вызова через Port/Adapter при `AgentRunnerPortInterface::run()`.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant RSC as RunStaticChainService
+    participant PORT as AgentRunnerPortInterface
+    participant ADAPTER as AgentRunnerAdapter
+    participant MAPPER as AgentVoMapper
+    participant FACTORY as RetryableRunnerFactoryInterface
+    participant RUNNER as AgentRunnerInterface
+
+    RSC->>PORT: run(ChainRunRequestVo, ChainRetryPolicyVo)
+    PORT->>ADAPTER: run(ChainRunRequestVo, ChainRetryPolicyVo)
+    ADAPTER->>MAPPER: mapToAgentRequest(ChainRunRequestVo)
+    MAPPER-->>ADAPTER: AgentRunRequestVo
+    ADAPTER->>MAPPER: mapToAgentRetryPolicy(ChainRetryPolicyVo)
+    MAPPER-->>ADAPTER: RetryPolicyVo or null
+
+    alt retryPolicy !== null
+        ADAPTER->>FACTORY: createRetryableRunner(runner, retryPolicyVo)
+        FACTORY-->>ADAPTER: RetryingAgentRunner
+        ADAPTER->>RUNNING: [RetryingAgentRunner] run(AgentRunRequestVo)
+    else retryPolicy === null
+        ADAPTER->>RUNNING: [AgentRunnerInterface] run(AgentRunRequestVo)
+    end
+
+    RUNNER-->>ADAPTER: AgentResultVo
+    ADAPTER->>MAPPER: mapFromAgentResult(AgentResultVo)
+    MAPPER-->>ADAPTER: ChainRunResultVo
+    ADAPTER-->>PORT: ChainRunResultVo
+    PORT-->>RSC: ChainRunResultVo
 ```
 
 ## Flowchart: PiAgentRunner
