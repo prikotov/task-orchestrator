@@ -15,6 +15,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 # Роль
 
 * Перед выполнением запроса пользователя выбери и загрузи в себя роль и personality из одного из этих файлов:
+    - [`Тимлид`](docs/agents/roles/team/team_lead.ru.md) — оркестрирует эпики, координирует сабагентов, контролирует цикл задача → реализация → ревью → доработка.
     - [`Архитектор`](docs/agents/roles/team/system_architect.ru.md) — проектирует/проверяет архитектуру бандла, границы слоёв и интеграции.
     - [`Бэкендер`](docs/agents/roles/team/backend_developer.ru.md) — реализует серверную логику (DDD, Application/Domain/Infrastructure, PHP).
     - [`Ревьювер Бэка`](docs/agents/roles/team/code_reviewer_backend.ru.md) — ревьюит PHP/DDD/архитектуру, стиль, тесты, безопасность.
