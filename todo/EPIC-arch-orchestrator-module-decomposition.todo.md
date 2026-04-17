@@ -8,8 +8,8 @@ depends_on:
 author: Архитектор (Гэндальф)
 assignee: Тимлид
 branch: task/arch-orchestrator-module-decomposition
-pr:
-status: in_progress
+pr: '#12'
+status: done
 ---
 
 # EPIC-arch-orchestrator-module-decomposition: Декомпозиция модуля Orchestrator
