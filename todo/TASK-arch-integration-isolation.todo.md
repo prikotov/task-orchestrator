@@ -8,10 +8,10 @@ depends_on:
   - TASK-arch-integration-naming-convention
 epic: EPIC-arch-orchestrator-module-decomposition
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Бэкендер
+branch: task/arch-integration-isolation
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-arch-integration-isolation: Устранить нарушение изоляции между Integration-сервисами Orchestrator
@@ -95,6 +95,149 @@ status: todo
 4. Integration-слой Orchestrator не возвращает интерфейсы других Integration-сервисов
 5. `vendor/bin/phpunit` — зелёные
 6. `vendor/bin/psalm` — 0 ошибок
+
+## Инструкции для сабагента
+
+**Роль:** docs/agents/roles/team/backend_developer.ru.md
+**Ветка:** task/arch-integration-isolation (уже создана и активна)
+**PR:** draft #16 из task/arch-integration-isolation в task/arch-orchestrator-module-decomposition
+
+### Порядок действий
+1. Переключись в ветку: `git checkout task/arch-integration-isolation`
+2. Следуй AGENTS.md и Конвенциям.
+3. Делай коммиты по Conventional Commits.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Запуш: `git push`.
+7. Переведи PR из draft в ready: `gh pr ready 16`.
+
+**НЕ создавай новый PR** — он уже существует.
+**НЕ меняй base Branch**.
+
+### Ключевая идея
+`RunAgentService` должен быть stateless (final readonly, без per-instance данных). Имя runner'а передаётся через `ChainRunRequestVo.runnerName`, а не через конструктор. Фабрика (`ResolveAgentRunnerService`) удаляется.
+
+### ЭТАП 1: ChainRunRequestVo — добавить поле runnerName
+
+В `src/Common/Module/Orchestrator/Domain/ValueObject/ChainRunRequestVo.php`:
+- Добавить параметр конструктора `private ?string $runnerName = null` (после `$runnerArgs`)
+- Добавить геттер `getRunnerName(): ?string`
+- Обновить `withTruncatedContext()`: передавать `runnerName` в `new self(...)`
+
+### ЭТАП 2: RunAgentServiceInterface — упростить до stateless
+
+В `src/Common/Module/Orchestrator/Domain/Service/Integration/RunAgentServiceInterface.php`:
+- Удалить методы `getName(): string` и `isAvailable(): bool`
+- Оставить только `run(ChainRunRequestVo $request, ?ChainRetryPolicyVo $retryPolicy = null): ChainRunResultVo`
+
+### ЭТАП 3: RunAgentService — stateless реализация
+
+В `src/Common/Module/Orchestrator/Integration/Service/AgentRunner/RunAgentService.php`:
+- Убрать из конструктора `string $runnerName` и `bool $runnerAvailable`
+- Конструктор: только `RunAgentCommandHandler $runAgentHandler` и `AgentDtoMapper $mapper`
+- Удалить методы `getName()` и `isAvailable()`
+- В `run()`: получать `runnerName` из `$request->getRunnerName() ?? ''`
+- Обновить вызов mapper: `$this->mapper->mapToRunAgentCommand($request)` (runnerName берётся из VO)
+
+### ЭТАП 4: AgentDtoMapper — runnerName из VO
+
+В `src/Common/Module/Orchestrator/Integration/Service/AgentRunner/AgentDtoMapper.php`:
+- Изменить `mapToRunAgentCommand()`: убрать параметр `string $runnerName = ''`
+- Вместо него: `$runnerName = $vo->getRunnerName() ?? ''`
+
+### ЭТАП 5: Удалить Resolve-сервисы
+
+Удалить файлы:
+- `src/Common/Module/Orchestrator/Domain/Service/Integration/ResolveAgentRunnerServiceInterface.php`
+- `src/Common/Module/Orchestrator/Integration/Service/AgentRunner/ResolveAgentRunnerService.php`
+
+### ЭТАП 6: Обновить потребителей — inject вместо registry
+
+**OrchestrateChainCommandHandler** (`Application/UseCase/Command/OrchestrateChain/`):
+- Заменить `ResolveAgentRunnerServiceInterface $runnerRegistry` → `RunAgentServiceInterface $agentRunner` в конструкторе
+- Удалить `$runner = $this->runnerRegistry->get($runnerName)` из `executeStatic()` и `runDynamicLoop()`
+- В `executeStatic()`: не передавать `$runner` в `$this->staticChainExecutor->execute()`, передать только `$runnerName`
+- В `runDynamicLoop()`: не передавать `$runner` в `$this->dynamicLoopRunner->execute()`
+
+**ExecuteStaticChainServiceInterface** (`Application/Service/Chain/`):
+- Убрать `RunAgentServiceInterface $runner` из `execute()`
+- Сигнатура: `execute(ChainDefinitionVo $chain, string $runnerName, string $task, ...)`
+
+**ExecuteStaticChainService** (`Application/Service/Chain/`):
+- Добавить `RunAgentServiceInterface $agentRunner` в конструктор
+- Убрать `RunAgentServiceInterface $runner` из `execute()`
+- Пробросить `$this->agentRunner` вместо `$runner` в `RunStaticChainService::execute()`
+
+**RunStaticChainService** (`Domain/Service/Chain/Static/`):
+- Добавить `RunAgentServiceInterface $agentRunner` в конструктор
+- Убрать `RunAgentServiceInterface $runner` из `execute()` и всех приватных методов
+- Везде где используется `$runner->run(...)` → `$this->agentRunner->run(...)`
+- `string $runnerName` остаётся параметром (нужен для audit и StepResultVo)
+
+**ExecuteStaticStepService** (`Domain/Service/Chain/Static/`):
+- Добавить `RunAgentServiceInterface $agentRunner` в конструктор
+- Убрать `RunAgentServiceInterface $runner` из `runAgentStep()`
+- В `runAgentStep()`: `$this->agentRunner->run(...)` вместо `$runner->run(...)`
+- Важно: `$request = new ChainRunRequestVo(...)` → добавить `runnerName: $runnerName` в конструктор VO
+
+**RunDynamicLoopServiceInterface** (`Domain/Service/Chain/Dynamic/`):
+- Убрать `RunAgentServiceInterface $runner` из `execute()`
+
+**RunDynamicLoopService** (`Domain/Service/Chain/Dynamic/`):
+- Добавить `RunAgentServiceInterface $agentRunner` в конструктор
+- Убрать `RunAgentServiceInterface $runner` из `execute()` и всех приватных методов (`initExecution`, `runRound`, `executeFacilitator`, `executeParticipant`, `executeFinalize`, `checkBudget`)
+- Везде `$runner` → `$this->agentRunner`
+
+**ExecuteDynamicTurnService** (`Domain/Service/Chain/Dynamic/`):
+- Добавить `RunAgentServiceInterface $agentRunner` в конструктор
+- Убрать `RunAgentServiceInterface $runner` из всех публичных методов (`runFacilitatorStep`, `runParticipantStep`, `runFacilitatorFinalizeStep`)
+- Везде `$runner` → `$this->agentRunner`
+
+**RunDynamicLoopAgentServiceInterface** (`Domain/Service/Chain/Dynamic/`):
+- Убрать `RunAgentServiceInterface $runner` из `runFacilitator()`, `runParticipant()`, `runFacilitatorFinalize()`
+
+**RunDynamicLoopAgentService** (`Infrastructure/Service/Chain/`):
+- Убрать `RunAgentServiceInterface $runner` из `runFacilitator()`, `runParticipant()`, `runFacilitatorFinalize()`
+- Эти методы уже не принимают `$runner` — вместо этого сервис получает его через конструктор родительского класса или注入. НО этот класс не имеет `RunAgentServiceInterface` в конструкторе!
+- Решение: добавить `RunAgentServiceInterface $agentRunner` в конструктор `RunDynamicLoopAgentService`
+
+**ResolveChainRunnerService** (`Infrastructure/Service/Chain/`):
+- Заменить `ResolveAgentRunnerServiceInterface $runnerRegistry` на `RunAgentServiceInterface $agentRunner`
+- Вместо `$this->runnerRegistry->get($fallbackRunnerName)` → создать `$fallbackRequest` с `runnerName: $fallbackRunnerName` и вызвать `$this->agentRunner->run($fallbackRequest, $retryPolicy)`
+
+**RunAgentCommandHandler** (Orchestrator `Application/UseCase/Command/RunAgent/`):
+- Заменить `ResolveAgentRunnerServiceInterface $runnerRegistry` → `RunAgentServiceInterface $agentRunner`
+- Заменить `$this->runnerRegistry->get($runnerName)->run($request)` → добавить `runnerName` в ChainRunRequestVo и `$this->agentRunner->run($request)`
+
+**GetRunnersQueryHandler** (Orchestrator `Application/UseCase/Query/GetRunners/`):
+- Заменить `ResolveAgentRunnerServiceInterface $runnerRegistry` → `AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler` (inject AgentRunner Application QueryHandler directly)
+- В `__invoke()`: вызвать `($this->getRunnersHandler)(new AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQuery())` → map `RunnerDto[]` from AgentRunner to `RunnerDto[]` in Orchestrator
+- Оба DTO имеют одинаковые поля (`name`, `isAvailable`), поэтому маппинг простой
+
+### ЭТАП 7: DI — config/services.yaml
+
+- Удалить alias для `ResolveAgentRunnerServiceInterface`
+- Добавить alias: `RunAgentServiceInterface` → `RunAgentService` (Integration)
+
+### ЭТАП 8: Тесты
+
+**Удалить тесты:**
+- `tests/Unit/Integration/Service/AgentRunner/RunAgentServiceTest.php` — тесты `getName()` и `isAvailable()` удалены, а `run()` нужно переписать (runnerName через VO)
+
+**Обновить тесты:**
+- `tests/Unit/Integration/Service/AgentRunner/RunAgentServiceTest.php` — переписать: `new RunAgentService($handler, $mapper)` без runnerName/runnerAvailable. `ChainRunRequestVo` с `runnerName: 'pi'`
+- `tests/Unit/Integration/Service/AgentRunner/AgentDtoMapperTest.php` — `mapToRunAgentCommand()` без второго параметра `$runnerName`
+- `tests/Unit/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandlerTest.php` — заменить mock `ResolveAgentRunnerServiceInterface` на mock `RunAgentServiceInterface`
+- `tests/Unit/Application/UseCase/Command/RunAgent/RunAgentCommandHandlerTest.php` — заменить mock `ResolveAgentRunnerServiceInterface` на mock `RunAgentServiceInterface`
+- `tests/Unit/Application/UseCase/Query/GetRunners/GetRunnersQueryHandlerTest.php` — заменить mock `ResolveAgentRunnerServiceInterface` на mock AgentRunner `GetRunnersQueryHandler`
+
+**Поиск по тестам:** `grep -rn "ResolveAgentRunnerServiceInterface\|->get(\|->list(\|getName()\|isAvailable()" tests/` — убедиться что 0 совпадений по старым именам.
+
+### Проверка
+- `vendor/bin/phpunit` — 0 failures
+- `vendor/bin/psalm` — 0 errors
+- `grep -rn "ResolveAgentRunnerService" src/ tests/` — 0 совпадений
+- `grep -rn "runnerRegistry" src/ tests/` — 0 совпадений
 
 ## Change History (История изменений)
 
