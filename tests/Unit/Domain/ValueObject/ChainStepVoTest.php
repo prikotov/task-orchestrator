@@ -32,6 +32,7 @@ final class ChainStepVoTest extends TestCase
         self::assertNull($step->getModel());
         self::assertNull($step->getRetryPolicy());
         self::assertNull($step->getName());
+        self::assertFalse($step->getNoContextFiles());
         self::assertTrue($step->isAgent());
         self::assertFalse($step->isQualityGate());
     }
@@ -72,6 +73,25 @@ final class ChainStepVoTest extends TestCase
         self::assertTrue($step->isAgent());
     }
 
+    #[Test]
+    public function agentFactoryCreatesAgentStepWithNoContextFiles(): void
+    {
+        $step = ChainStepVo::agent(
+            role: 'backend_developer',
+            noContextFiles: true,
+        );
+
+        self::assertTrue($step->getNoContextFiles());
+    }
+
+    #[Test]
+    public function agentFactoryDefaultsNoContextFilesToFalse(): void
+    {
+        $step = ChainStepVo::agent(role: 'developer');
+
+        self::assertFalse($step->getNoContextFiles());
+    }
+
     // ── Quality gate step: constructor ───────────────────────────────────────
 
     #[Test]
@@ -89,6 +109,7 @@ final class ChainStepVoTest extends TestCase
         self::assertSame('make lint-php', $step->getCommand());
         self::assertSame('Lint', $step->getLabel());
         self::assertSame(60, $step->getTimeoutSeconds());
+        self::assertFalse($step->getNoContextFiles());
         self::assertTrue($step->isQualityGate());
         self::assertFalse($step->isAgent());
     }

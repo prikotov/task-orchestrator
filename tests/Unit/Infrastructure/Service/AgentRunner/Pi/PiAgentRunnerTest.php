@@ -46,4 +46,27 @@ final class PiAgentRunnerTest extends TestCase
         self::assertSame('You are a system analyst.', $request->getSystemPrompt());
         self::assertSame('Previous step output', $request->getPreviousContext());
     }
+
+    #[Test]
+    public function requestAcceptsNoContextFiles(): void
+    {
+        $request = new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            noContextFiles: true,
+        );
+
+        self::assertTrue($request->getNoContextFiles());
+    }
+
+    #[Test]
+    public function requestDefaultsNoContextFilesToFalse(): void
+    {
+        $request = new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+        );
+
+        self::assertFalse($request->getNoContextFiles());
+    }
 }
