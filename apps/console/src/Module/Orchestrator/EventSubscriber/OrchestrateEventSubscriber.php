@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Console\Module\Orchestrator\EventSubscriber;
+namespace TaskOrchestrator\Console\Module\Orchestrator\EventSubscriber;
 
 use Override;
 use Symfony\Component\Console\ConsoleEvents;

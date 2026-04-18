@@ -30,7 +30,7 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 
-* **Где делаем:** `src/Common/Module/Orchestrator/Domain/Service/Integration/`, `src/Common/Module/Orchestrator/Integration/Service/AgentRunner/`
+* **Где делаем:** `src/Module/Orchestrator/Domain/Service/Integration/`, `src/Module/Orchestrator/Integration/Service/AgentRunner/`
 * **Текущее поведение:**
   - `RunAgentService` (Integration) принимает `string $runnerName` через **конструктор** — каждый экземпляр привязан к одному runner'у
   - `ResolveAgentRunnerService` (Integration) — фабрика, создающая `RunAgentService` через `new`, с mutable-кэшем

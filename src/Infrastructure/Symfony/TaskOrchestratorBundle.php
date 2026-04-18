@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Infrastructure\Symfony;
+namespace TaskOrchestrator\Common\Infrastructure\Symfony;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use TaskOrchestrator\DependencyInjection\TaskOrchestratorExtension;
+use TaskOrchestrator\Common\DependencyInjection\TaskOrchestratorExtension;
 
 /**
  * Symfony Bundle для TaskOrchestrator.
@@ -13,8 +13,8 @@ use TaskOrchestrator\DependencyInjection\TaskOrchestratorExtension;
  * Загружает config/services.yaml и обрабатывает параметры конфигурации
  * (roles_dir, chains_yaml, audit_log_path, chains_session_dir, base_path).
  *
- * Extension расположен в TaskOrchestrator\DependencyInjection\,
- * а Bundle — в TaskOrchestrator\Infrastructure\Symfony\.
+ * Extension расположен в TaskOrchestrator\Common\DependencyInjection\,
+ * а Bundle — в TaskOrchestrator\Common\Infrastructure\Symfony\.
  * Метод getContainerExtensionClass() переопределён для корректного разрешения.
  */
 class TaskOrchestratorBundle extends Bundle

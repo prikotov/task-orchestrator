@@ -283,7 +283,7 @@ The service "TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\
    ```php
    // apps/console/config/bundles.php
    return [
-       \TaskOrchestrator\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
+       \TaskOrchestrator\Common\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
    ];
    ```
 

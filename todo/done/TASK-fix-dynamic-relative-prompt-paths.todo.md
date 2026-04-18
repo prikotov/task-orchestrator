@@ -23,7 +23,7 @@ status: done
 Исправить ChainSessionLogger::writePromptFile() — должен возвращать абсолютные пути к файлам. Сейчас возвращает относительные, pi не находит файлы и мгновенно падает.
 
 ## 2. Context and Scope (Контекст и Границы)
-*   **Где делаем:** `src/Common/Module/Orchestrator/Infrastructure/Service/Chain/ChainSessionLogger.php`
+*   **Где делаем:** `src/Module/Orchestrator/Infrastructure/Service/Chain/ChainSessionLogger.php`
 *   **Текущее поведение:** `writePromptFile()` возвращает `$this->currentSessionDir . '/' . $fileName` — относительный путь (например `var/sessions/brainstorm/2026-04-17_05-15-41/step_001_round_001_system_architect_1_system.md`). Pi запускается из CWD, не находит файл, возвращает пустой вывод (0 tokens, 0s).
 *   **Границы (Out of Scope):** Static chain, app:agent:run — работают корректно
 

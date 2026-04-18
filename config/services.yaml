@@ -9,15 +9,15 @@ services:
       tags: ['agent.runner']
 
   # --- Auto-discovery (Application + Infrastructure, Domain исключён) ---
-  TaskOrchestrator\:
+  TaskOrchestrator\Common\:
     resource: '../src/*'
     exclude:
-      - '../src/Common/Module/Orchestrator/Domain/'
-      - '../src/Common/Module/AgentRunner/Domain/'
+      - '../src/Module/Orchestrator/Domain/'
+      - '../src/Module/AgentRunner/Domain/'
       - '../src/DependencyInjection/'
       - '../src/Infrastructure/Symfony/'
-      - '../src/Common/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php'
-      - '../src/Common/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
+      - '../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php'
+      - '../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
 
   # --- Integration Service alias (Interface → Implementation by convention service.md) ---
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface:

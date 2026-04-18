@@ -21,10 +21,10 @@ status: done
 Когда я добавляю новый движок AI-агента (например, Codex CLI), я хочу работать в отдельном модуле `AgentRunner` с 20 файлами, а не искать нужные файлы среди 70 файлов Orchestrator.
 
 ### Goal (Цель по SMART)
-Создать модуль `src/Common/Module/AgentRunner/` с Domain- и Infrastructure-слоями. Перенести контракты запуска агентов, retry-, circuit-breaker-обёртки, PI-runner. Orchestrator пока **напрямую** зависит от нового модуля (адаптеры — следующая задача).
+Создать модуль `src/Module/AgentRunner/` с Domain- и Infrastructure-слоями. Перенести контракты запуска агентов, retry-, circuit-breaker-обёртки, PI-runner. Orchestrator пока **напрямую** зависит от нового модуля (адаптеры — следующая задача).
 
 ## 2. Context and Scope (Контекст и Границы)
-*   **Где делаем:** `src/Common/Module/AgentRunner/` — новый модуль
+*   **Где делаем:** `src/Module/AgentRunner/` — новый модуль
 *   **Что переносим (Domain):**
 
 | Файл | Текущий путь | Новый путь |
@@ -59,7 +59,7 @@ status: done
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Модуль `src/Common/Module/AgentRunner/` создан с Domain/ и Infrastructure/ слоями
+- [ ] Модуль `src/Module/AgentRunner/` создан с Domain/ и Infrastructure/ слоями
 - [ ] Все перечисленные файлы перенесены, namespace обновлён
 - [ ] Все `use`-statements в `Orchestrator/` обновлены на новые namespace
 - [ ] Все `use`-statements в `tests/` обновлены
@@ -76,10 +76,10 @@ status: done
 - Разделение DI-конфигурации на отдельные files per module
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Создать структуру каталогов `src/Common/Module/AgentRunner/{Domain,Infrastructure}/`
+1. [ ] Создать структуру каталогов `src/Module/AgentRunner/{Domain,Infrastructure}/`
 2. [ ] Перенести Domain-файлы (интерфейсы, VO, Enum, Exception), обновить namespace → `TaskOrchestrator\Common\Module\AgentRunner\*`
 3. [ ] Перенести Infrastructure-файлы, обновить namespace → `TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\*`
-4. [ ] Обновить все `use`-statements в `src/Common/Module/Orchestrator/` (Domain, Application, Infrastructure)
+4. [ ] Обновить все `use`-statements в `src/Module/Orchestrator/` (Domain, Application, Infrastructure)
 5. [ ] Обновить все `use`-statements в `tests/`
 6. [ ] Обновить `config/services.yaml` — подключить AgentRunner module resource
 7. [ ] `composer dump-autoload`
@@ -87,16 +87,16 @@ status: done
 9. [ ] Обновить `docs/guide/architecture.md`
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] `src/Common/Module/AgentRunner/` содержит Domain/ и Infrastructure/
-- [ ] `src/Common/Module/Orchestrator/Domain/Service/AgentRunner/` — пуст или удалён
+- [ ] `src/Module/AgentRunner/` содержит Domain/ и Infrastructure/
+- [ ] `src/Module/Orchestrator/Domain/Service/AgentRunner/` — пуст или удалён
 - [ ] VO `AgentResultVo`, `AgentRunRequestVo` и др. определены в `AgentRunner/Domain/ValueObject/`
 - [ ] PHPUnit green
 - [ ] Psalm green
 
 ## 6. Verification (Самопроверка)
 ```bash
-find src/Common/Module/AgentRunner -type f -name "*.php" | wc -l   # ~20
-find src/Common/Module/Orchestrator/Domain/Service/AgentRunner -type f | wc -l  # 0
+find src/Module/AgentRunner -type f -name "*.php" | wc -l   # ~20
+find src/Module/Orchestrator/Domain/Service/AgentRunner -type f | wc -l  # 0
 vendor/bin/phpunit
 vendor/bin/psalm
 ```
