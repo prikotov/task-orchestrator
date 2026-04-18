@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use DateTimeImmutable;
 use DateTimeZone;
 use Override;
@@ -65,7 +65,7 @@ final readonly class JsonlAuditLogger implements AuditLoggerInterface
         int $stepNumber,
         string $role,
         string $runner,
-        AgentResultVo $result,
+        ChainRunResultVo $result,
         float $durationMs,
     ): void {
         $record = [

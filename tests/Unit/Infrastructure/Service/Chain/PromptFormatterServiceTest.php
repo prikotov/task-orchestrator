@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\PromptFormatterService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -161,7 +161,7 @@ final class PromptFormatterServiceTest extends TestCase
     #[Test]
     public function buildAgentInvocationWithCommand(): void
     {
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: 'analyst',
             task: 'Test',
             command: ['pi', '--mode', 'json', '-p'],
@@ -177,7 +177,7 @@ final class PromptFormatterServiceTest extends TestCase
     #[Test]
     public function buildAgentInvocationWithEmptyCommandUsesDefault(): void
     {
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: 'analyst',
             task: 'Test',
             command: [],
@@ -194,7 +194,7 @@ final class PromptFormatterServiceTest extends TestCase
     #[Test]
     public function buildAgentInvocationAddsModel(): void
     {
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: 'analyst',
             task: 'Test',
             model: 'gpt-4o',
@@ -210,7 +210,7 @@ final class PromptFormatterServiceTest extends TestCase
     #[Test]
     public function buildAgentInvocationAddsNoToolsWhenToolsEmpty(): void
     {
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: 'analyst',
             task: 'Test',
             tools: '',
@@ -225,7 +225,7 @@ final class PromptFormatterServiceTest extends TestCase
     #[Test]
     public function buildAgentInvocationAddsToolsWhenSet(): void
     {
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: 'analyst',
             task: 'Test',
             tools: 'tool1,tool2',
@@ -241,7 +241,7 @@ final class PromptFormatterServiceTest extends TestCase
     #[Test]
     public function buildAgentInvocationAddsWorkingDirComment(): void
     {
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: 'analyst',
             task: 'Test',
             workingDir: '/tmp/work',
