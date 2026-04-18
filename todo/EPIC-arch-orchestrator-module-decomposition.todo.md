@@ -55,13 +55,16 @@ status: done
 - [x] [TASK-arch-orchestrator-ports-and-adapters](done/TASK-arch-orchestrator-ports-and-adapters.todo.md)
 - [x] [TASK-arch-decomposition-tests-and-docs](done/TASK-arch-decomposition-tests-and-docs.todo.md)
 
+### Фаза 3: Приведение к конвенциям
+- [ ] [TASK-arch-integration-naming-convention](TASK-arch-integration-naming-convention.todo.md)
+
 ## Definition of Done (DoD)
 
-- [ ] `AgentRunner` — standalone модуль, 0 входящих зависимостей
-- [ ] `Orchestrator` Domain не импортирует ничего из `AgentRunner`
-- [ ] Связь только через `Orchestrator/Infrastructure/Adapter/`
-- [ ] Каждый модуль < 80 файлов
-- [ ] PHPUnit + Psalm green
+- [x] `AgentRunner` — standalone модуль, 0 входящих зависимостей
+- [x] `Orchestrator` Domain не импортирует ничего из `AgentRunner`
+- [ ] Связь через `Orchestrator/Integration/Service/` с именованием по конвенции `service.md`
+- [x] Каждый модуль < 80 файлов
+- [x] PHPUnit + Psalm green
 - [ ] Архитектурная документация актуальна
 
 ## Risks and Dependencies

@@ -5,7 +5,7 @@ value: V3
 complexity: C3
 priority: P2
 depends_on: []
-epic: ""
+epic: EPIC-arch-orchestrator-module-decomposition
 author: Архитектор (Гэндальф)
 assignee:
 branch:
