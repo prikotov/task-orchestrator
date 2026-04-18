@@ -7,7 +7,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use TaskOrchestrator\DependencyInjection\TaskOrchestratorExtension;
+use TaskOrchestrator\Common\DependencyInjection\TaskOrchestratorExtension;
 
 if (!is_file(dirname(__DIR__) . '/vendor/autoload.php')) {
     throw new LogicException('Dependencies are missing. Try running "composer install".');

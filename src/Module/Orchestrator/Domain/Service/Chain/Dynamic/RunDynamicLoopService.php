@@ -7,6 +7,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynam
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\StepAuditStatusDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\FacilitatorResponseParserInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Budget\CheckDynamicBudgetServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
@@ -42,6 +43,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         private CheckDynamicBudgetServiceInterface $budgetChecker,
         private FormatDynamicJournalServiceInterface $journal,
         private ChainSessionLoggerInterface $sessionLogger,
+        private FacilitatorResponseParserInterface $facParser,
         private ?LoggerInterface $logger = null,
     ) {
     }
@@ -335,7 +337,9 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
             $execution->getFacilitatorJournal(),
         );
 
-        $execution->setSynthesis($turnResult->agentResult->getOutputText());
+        $raw = $turnResult->agentResult->getOutputText();
+        $parsed = $this->facParser->parse($raw);
+        $execution->setSynthesis($parsed->getSynthesis() ?? $raw);
     }
 
     // ─── State management ──────────────────────────────────────────────
