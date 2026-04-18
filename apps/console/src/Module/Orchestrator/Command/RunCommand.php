@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Console\Module\Orchestrator\Command;
+namespace TaskOrchestrator\Console\Module\Orchestrator\Command;
 
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;

@@ -20,10 +20,10 @@ status: done
 Когда я открываю `Domain/Service/Chain/` и вижу 26 файлов, я хочу видеть логические группы (Static, Dynamic, Session, Audit, Shared), чтобы быстрее находить нужный файл и понимать зону ответственности.
 
 ### Goal (Цель по SMART)
-Реорганизовать `src/Common/Module/Orchestrator/Domain/Service/Chain/` на 5 субдиректорий. Namespace меняется, поведение кода — нет. Все тесты проходят.
+Реорганизовать `src/Module/Orchestrator/Domain/Service/Chain/` на 5 субдиректорий. Namespace меняется, поведение кода — нет. Все тесты проходят.
 
 ## 2. Context and Scope (Контекст и Границы)
-*   **Где делаем:** `src/Common/Module/Orchestrator/Domain/Service/Chain/`
+*   **Где делаем:** `src/Module/Orchestrator/Domain/Service/Chain/`
 *   **Текущее состояние:** 26 файлов в одной директории, смешаны static/dynamic/session/audit/shared
 *   **Границы (Out of Scope):**
     *   Infrastructure/Service/Chain/ — не трогаем (останется плоской)
@@ -52,7 +52,7 @@ status: done
 ## 4. Implementation Plan (План реализации)
 1. [x] Создать субдиректории: `Static/`, `Dynamic/`, `Session/`, `Audit/`, `Shared/`
 2. [x] Переместить файлы по группам, обновить `namespace` в каждом файле
-3. [x] Обновить `use`-statements в `src/Common/Module/Orchestrator/` (Domain, Application, Infrastructure)
+3. [x] Обновить `use`-statements в `src/Module/Orchestrator/` (Domain, Application, Infrastructure)
 4. [x] Обновить `use`-statements в `tests/`
 5. [x] Обновить `docs/guide/architecture.md` — отразить новую структуру
 6. [x] Запустить PHPUnit + Psalm
@@ -65,7 +65,7 @@ status: done
 
 ## 6. Verification (Самопроверка)
 ```bash
-find src/Common/Module/Orchestrator/Domain/Service/Chain/ -maxdepth 1 -name "*.php" | wc -l  # → 0
+find src/Module/Orchestrator/Domain/Service/Chain/ -maxdepth 1 -name "*.php" | wc -l  # → 0
 vendor/bin/phpunit
 vendor/bin/psalm
 ```

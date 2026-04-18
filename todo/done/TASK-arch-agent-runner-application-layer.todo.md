@@ -29,7 +29,7 @@ status: done
 - `AgentRunner/Application/` содержит use cases + DTO для внешних потребителей.
 - `Orchestrator/Integration/` содержит Adapter'ы (ACL), вызывающие `AgentRunner\Application`.
 - `Orchestrator/Infrastructure/Adapter/` — удалён, адаптеры перенесены в Integration.
-- `grep -r "AgentRunner" src/Common/Module/Orchestrator/Infrastructure/ --include="*.php"` → 0 результатов.
+- `grep -r "AgentRunner" src/Module/Orchestrator/Infrastructure/ --include="*.php"` → 0 результатов.
 
 ## 2. Context and Scope (Контекст и Границы)
 
@@ -95,8 +95,8 @@ Integration (Adapter/ACL) ──────────→  Application
 
 - [ ] **Verifiable constraint:**
   ```bash
-  grep -r "AgentRunner" src/Common/Module/Orchestrator/Infrastructure/ --include="*.php" | wc -l  # → 0
-  grep -r "AgentRunner" src/Common/Module/Orchestrator/Domain/ --include="*.php" | wc -l  # → 0 (только Port-имена)
+  grep -r "AgentRunner" src/Module/Orchestrator/Infrastructure/ --include="*.php" | wc -l  # → 0
+  grep -r "AgentRunner" src/Module/Orchestrator/Domain/ --include="*.php" | wc -l  # → 0 (только Port-имена)
   ```
 
 ### 🟡 Should Have (Желательно)
@@ -131,11 +131,11 @@ Integration (Adapter/ACL) ──────────→  Application
 
 ## 5. Definition of Done (Критерии приёмки)
 
-- [ ] `grep -r "AgentRunner" src/Common/Module/Orchestrator/Infrastructure/ --include="*.php"` → 0 результатов
-- [ ] `grep -r "AgentRunner" src/Common/Module/Orchestrator/Domain/ --include="*.php"` → только Port-имена (`AgentRunnerPortInterface`, `AgentRunnerRegistryPortInterface`)
-- [ ] `find src/Common/Module/Orchestrator/Infrastructure/Adapter -type f` → directory not found
-- [ ] `find src/Common/Module/Orchestrator/Integration/Adapter -type f` → 3 файла (Adapter, RegistryAdapter, VoMapper)
-- [ ] `find src/Common/Module/AgentRunner/Application -type f -name "*.php" | wc -l` → ≥ 4
+- [ ] `grep -r "AgentRunner" src/Module/Orchestrator/Infrastructure/ --include="*.php"` → 0 результатов
+- [ ] `grep -r "AgentRunner" src/Module/Orchestrator/Domain/ --include="*.php"` → только Port-имена (`AgentRunnerPortInterface`, `AgentRunnerRegistryPortInterface`)
+- [ ] `find src/Module/Orchestrator/Infrastructure/Adapter -type f` → directory not found
+- [ ] `find src/Module/Orchestrator/Integration/Adapter -type f` → 3 файла (Adapter, RegistryAdapter, VoMapper)
+- [ ] `find src/Module/AgentRunner/Application -type f -name "*.php" | wc -l` → ≥ 4
 - [ ] PHPUnit green
 - [ ] Psalm green
 
@@ -143,13 +143,13 @@ Integration (Adapter/ACL) ──────────→  Application
 
 ```bash
 # Infrastructure не зависит от AgentRunner
-grep -r "AgentRunner" src/Common/Module/Orchestrator/Infrastructure/ --include="*.php" | wc -l  # → 0
+grep -r "AgentRunner" src/Module/Orchestrator/Infrastructure/ --include="*.php" | wc -l  # → 0
 # Domain — только Port-имена
-grep -r "AgentRunner" src/Common/Module/Orchestrator/Domain/ --include="*.php"
+grep -r "AgentRunner" src/Module/Orchestrator/Domain/ --include="*.php"
 # Integration — содержит адаптеры
-find src/Common/Module/Orchestrator/Integration/ -type f -name "*.php"
+find src/Module/Orchestrator/Integration/ -type f -name "*.php"
 # AgentRunner Application — создан
-find src/Common/Module/AgentRunner/Application/ -type f -name "*.php"
+find src/Module/AgentRunner/Application/ -type f -name "*.php"
 # Проверки
 vendor/bin/phpunit
 vendor/bin/psalm
