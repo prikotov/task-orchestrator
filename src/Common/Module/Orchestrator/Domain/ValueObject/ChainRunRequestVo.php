@@ -32,6 +32,7 @@ final readonly class ChainRunRequestVo
         private array $command = [],
         /** @var list<string> */
         private array $runnerArgs = [],
+        private ?string $runnerName = null,
     ) {
     }
 
@@ -97,6 +98,15 @@ final readonly class ChainRunRequestVo
     }
 
     /**
+     * Возвращает имя runner'а (напр. 'pi', 'codex').
+     * null означает «runner по умолчанию».
+     */
+    public function getRunnerName(): ?string
+    {
+        return $this->runnerName;
+    }
+
+    /**
      * Возвращает новый VO с обрезанным previousContext по maxContextLength.
      * Обрезка происходит с конца (оставляются самые свежие данные).
      */
@@ -118,6 +128,7 @@ final readonly class ChainRunRequestVo
             maxContextLength: $this->maxContextLength,
             command: $this->command,
             runnerArgs: $this->runnerArgs,
+            runnerName: $this->runnerName,
         );
     }
 }
