@@ -32,13 +32,13 @@
     "autoload": {
         "psr-4": {
             "TaskOrchestrator\\Common\\": "src/",
-            "Console\\": "apps/console/src/"
+            "TaskOrchestrator\\Console\\": "apps/console/src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "TaskOrchestrator\\Tests\\": "tests/",
-            "Console\\Tests\\": "apps/console/tests/"
+            "TaskOrchestrator\\Console\\Tests\\": "apps/console/tests/"
         }
     },
     "config": {
