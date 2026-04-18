@@ -47,7 +47,6 @@ final readonly class AgentDtoMapper
             retryInitialDelayMs: $retryPolicy?->getInitialDelayMs() ?? 1000,
             retryMaxDelayMs: $retryPolicy?->getMaxDelayMs() ?? 30000,
             retryMultiplier: $retryPolicy?->getMultiplier() ?? 2.0,
-            noContextFiles: $vo->getNoContextFiles(),
         );
     }
 

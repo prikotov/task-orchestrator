@@ -7,10 +7,10 @@ priority: P1
 depends_on:
 epic:
 author: Бэкендер (Левша)
-assignee: Бэкендер
-branch: task/feat-runner-no-context-files
-pr: 'https://github.com/prikotov/task-orchestrator/pull/20'
-status: in_progress
+assignee:
+branch:
+pr:
+status: todo
 ---
 
 # TASK-feat-runner-no-context-files: Поддержка -no-context-files флага в pi-runner
@@ -73,25 +73,6 @@ php bin/console app:agent:run --help
 
 ## 9. Comments (Комментарии)
 Это ключевая фича для универсальности оркестратора: без неё агент привязан к контексту конкретного проекта. С ней можно запускать чистых агентов для любых задач — от генерации документации до анализа данных.
-
-## Инструкции для сабагента
-
-**Роль:** docs/agents/roles/team/backend_developer.ru.md
-**Ветка:** task/feat-runner-no-context-files (уже создана и активна)
-**PR:** #20 (draft) из task/feat-runner-no-context-files в main
-
-### Порядок действий
-1. Переключись в ветку `task/feat-runner-no-context-files`: `git checkout task/feat-runner-no-context-files`
-2. Реализуй задачу согласно описанию и критериям выше.
-3. Следуй AGENTS.md и Конвенциям проекта.
-4. Делай коммиты по Conventional Commits.
-5. Делай промежуточные коммиты после каждого логического этапа (обновил `src/` → коммит, обновил `tests/` → коммит). Это сохранит прогресс при таймауте сабагента.
-6. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` — оба должны пройти.
-7. Запуш: `git push`.
-8. Переведи PR из draft в ready: `gh pr ready 20`. Эта команда снимает флаг draft — PR становится готовым к мержу.
-
-**НЕ создавай новый PR** — он уже существует.
-**НЕ меняй base branch** — он уже указывает на main.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

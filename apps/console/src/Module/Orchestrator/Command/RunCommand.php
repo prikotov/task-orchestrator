@@ -27,7 +27,6 @@ final class RunCommand extends Command
     private const string OPT_MODEL = 'model';
     private const string OPT_TOOLS = 'tools';
     private const string OPT_WORKING_DIR = 'working-dir';
-    private const string OPT_NO_CONTEXT_FILES = 'no-context-files';
 
     public function __construct(
         private readonly RunAgentCommandHandler $agentHandler,
@@ -44,8 +43,7 @@ final class RunCommand extends Command
             ->addOption(self::OPT_RUNNER, null, InputOption::VALUE_OPTIONAL, 'Движок (по умолчанию: pi)', 'pi')
             ->addOption(self::OPT_MODEL, 'm', InputOption::VALUE_OPTIONAL, 'Модель LLM')
             ->addOption(self::OPT_TOOLS, null, InputOption::VALUE_OPTIONAL, 'Список инструментов')
-            ->addOption(self::OPT_WORKING_DIR, 'd', InputOption::VALUE_OPTIONAL, 'Рабочая директория')
-            ->addOption(self::OPT_NO_CONTEXT_FILES, null, InputOption::VALUE_NONE, 'Отключить автоматическую загрузку контекстных файлов (AGENTS.md, CLAUDE.md)');
+            ->addOption(self::OPT_WORKING_DIR, 'd', InputOption::VALUE_OPTIONAL, 'Рабочая директория');
     }
 
     #[Override]
@@ -61,7 +59,6 @@ final class RunCommand extends Command
         $model = $input->getOption(self::OPT_MODEL);
         $tools = $input->getOption(self::OPT_TOOLS);
         $workingDir = $input->getOption(self::OPT_WORKING_DIR);
-        $noContextFiles = (bool) $input->getOption(self::OPT_NO_CONTEXT_FILES);
 
         $io->text(sprintf('🤖 Running agent: %s @ %s', $role, $runner ?? 'pi'));
 
@@ -74,7 +71,6 @@ final class RunCommand extends Command
                 model: $model !== null && $model !== '' ? $model : null,
                 tools: $tools !== null && $tools !== '' ? $tools : null,
                 workingDir: $workingDir !== null && $workingDir !== '' ? $workingDir : null,
-                noContextFiles: $noContextFiles,
             ));
         } catch (\Throwable $e) {
             $io->error($e->getMessage());

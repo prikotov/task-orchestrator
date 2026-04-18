@@ -57,7 +57,6 @@ final class AgentDtoMapperTest extends TestCase
         self::assertSame(80000, $result->maxContextLength);
         self::assertSame(['run', '--verbose'], $result->command);
         self::assertSame(['--append-system-prompt', '/path/to/prompt.md'], $result->runnerArgs);
-        self::assertFalse($result->noContextFiles);
         self::assertNull($result->retryMaxRetries);
     }
 
@@ -80,7 +79,6 @@ final class AgentDtoMapperTest extends TestCase
         self::assertSame(50000, $result->maxContextLength);
         self::assertSame([], $result->command);
         self::assertSame([], $result->runnerArgs);
-        self::assertFalse($result->noContextFiles);
         self::assertNull($result->retryMaxRetries);
     }
 
@@ -122,21 +120,6 @@ final class AgentDtoMapperTest extends TestCase
         $result = $this->mapper->mapToRunAgentCommand($vo, $retryPolicy);
 
         self::assertNull($result->retryMaxRetries);
-    }
-
-    #[Test]
-    public function mapToRunAgentCommandWithNoContextFilesTrue(): void
-    {
-        $vo = new ChainRunRequestVo(
-            role: 'writer',
-            task: 'Generate text',
-            runnerName: 'pi',
-            noContextFiles: true,
-        );
-
-        $result = $this->mapper->mapToRunAgentCommand($vo);
-
-        self::assertTrue($result->noContextFiles);
     }
 
     #[Test]

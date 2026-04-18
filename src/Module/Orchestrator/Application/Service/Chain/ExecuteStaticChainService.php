@@ -33,7 +33,6 @@ final readonly class ExecuteStaticChainService implements ExecuteStaticChainServ
         ?string $workingDir = null,
         int $timeout = 300,
         ?AuditLoggerInterface $auditLogger = null,
-        bool $noContextFiles = false,
     ): OrchestrateChainResultDto {
         $result = $this->staticChainRunner->execute(
             $chain,
@@ -43,7 +42,6 @@ final readonly class ExecuteStaticChainService implements ExecuteStaticChainServ
             $workingDir,
             $timeout,
             $auditLogger,
-            $noContextFiles,
         );
 
         return $this->toResultDto($result);

@@ -29,7 +29,6 @@ final readonly class ChainStepVo
      * @param string $command shell-команда (обязательно для quality_gate, пустая строка для agent)
      * @param string $label человекочитаемое название (обязательно для quality_gate, пустая строка для agent)
      * @param int $timeoutSeconds таймаут выполнения в секундах (default 120 для quality_gate)
-     * @param bool $noContextFiles отключить автоматическую загрузку контекстных файлов проекта (AGENTS.md, CLAUDE.md)
      */
     public function __construct(
         private ChainStepTypeEnum $type,
@@ -42,7 +41,6 @@ final readonly class ChainStepVo
         private string $command = '',
         private string $label = '',
         private int $timeoutSeconds = 120,
-        private bool $noContextFiles = false,
     ) {
         if ($type === ChainStepTypeEnum::agent && ($role === null || $role === '')) {
             throw new InvalidArgumentException('Agent step must have a role.');
@@ -69,7 +67,6 @@ final readonly class ChainStepVo
         ?string $model = null,
         ?ChainRetryPolicyVo $retryPolicy = null,
         ?string $name = null,
-        bool $noContextFiles = false,
     ): self {
         return new self(
             type: ChainStepTypeEnum::agent,
@@ -79,7 +76,6 @@ final readonly class ChainStepVo
             model: $model,
             retryPolicy: $retryPolicy,
             name: $name,
-            noContextFiles: $noContextFiles,
         );
     }
 
@@ -149,14 +145,6 @@ final readonly class ChainStepVo
     public function getTimeoutSeconds(): int
     {
         return $this->timeoutSeconds;
-    }
-
-    /**
-     * Отключена ли автоматическая загрузка контекстных файлов проекта.
-     */
-    public function getNoContextFiles(): bool
-    {
-        return $this->noContextFiles;
     }
 
     /**

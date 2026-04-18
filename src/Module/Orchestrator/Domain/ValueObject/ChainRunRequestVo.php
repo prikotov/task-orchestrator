@@ -17,7 +17,6 @@ final readonly class ChainRunRequestVo
     /**
      * @param list<string> $command полная CLI-команда из role config (пусто = runner default)
      * @param list<string> $runnerArgs доп. аргументы runner'а (напр. --append-system-prompt <path>)
-     * @param bool $noContextFiles отключить автоматическую загрузку контекстных файлов проекта
      */
     public function __construct(
         private string $role,
@@ -34,7 +33,6 @@ final readonly class ChainRunRequestVo
         /** @var list<string> */
         private array $runnerArgs = [],
         private ?string $runnerName = null,
-        private bool $noContextFiles = false,
     ) {
     }
 
@@ -109,14 +107,6 @@ final readonly class ChainRunRequestVo
     }
 
     /**
-     * Отключена ли автоматическая загрузка контекстных файлов проекта.
-     */
-    public function getNoContextFiles(): bool
-    {
-        return $this->noContextFiles;
-    }
-
-    /**
      * Возвращает новый VO с обрезанным previousContext по maxContextLength.
      * Обрезка происходит с конца (оставляются самые свежие данные).
      */
@@ -139,7 +129,6 @@ final readonly class ChainRunRequestVo
             command: $this->command,
             runnerArgs: $this->runnerArgs,
             runnerName: $this->runnerName,
-            noContextFiles: $this->noContextFiles,
         );
     }
 }

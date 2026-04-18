@@ -29,7 +29,6 @@ final readonly class RunAgentCommand
      * @param int $retryInitialDelayMs начальная задержка retry (мс)
      * @param int $retryMaxDelayMs макс. задержка retry (мс)
      * @param float $retryMultiplier множитель exponential backoff
-     * @param bool $noContextFiles отключить загрузку контекстных файлов проекта
      */
     public function __construct(
         public string $runnerName,
@@ -48,7 +47,6 @@ final readonly class RunAgentCommand
         public int $retryInitialDelayMs = 1000,
         public int $retryMaxDelayMs = 30000,
         public float $retryMultiplier = 2.0,
-        public bool $noContextFiles = false,
     ) {
     }
 }
