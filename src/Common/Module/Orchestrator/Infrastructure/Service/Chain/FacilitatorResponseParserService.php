@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\FacilitatorResponseParserInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\FacilitatorResponseParserInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorResponseVo;
 use Override;
 

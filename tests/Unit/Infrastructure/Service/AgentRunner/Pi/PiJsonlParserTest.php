@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Pi;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiJsonlParser;
+use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\AgentRunner\Pi\PiJsonlParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

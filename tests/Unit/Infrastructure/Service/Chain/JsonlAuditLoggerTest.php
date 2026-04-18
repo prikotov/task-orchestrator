@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\StepAuditStatusDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -72,7 +72,7 @@ final class JsonlAuditLoggerTest extends TestCase
     #[Test]
     public function logStepResultWritesSuccessRecord(): void
     {
-        $result = ChainRunResultVo::createFromSuccess(
+        $result = AgentResultVo::createFromSuccess(
             outputText: 'Done',
             inputTokens: 1500,
             outputTokens: 800,
@@ -100,7 +100,7 @@ final class JsonlAuditLoggerTest extends TestCase
     #[Test]
     public function logStepResultWritesErrorRecord(): void
     {
-        $result = ChainRunResultVo::createFromError(
+        $result = AgentResultVo::createFromError(
             errorMessage: 'Timeout exceeded',
             exitCode: 124,
         );
@@ -167,7 +167,7 @@ final class JsonlAuditLoggerTest extends TestCase
     {
         $this->logger->logChainStart('implement', 'Task A');
         $this->logger->logStepStart('implement', 1, 'analyst', 'pi');
-        $result = ChainRunResultVo::createFromSuccess('Done', 100, 50, 0, 0, 0.01);
+        $result = AgentResultVo::createFromSuccess('Done', 100, 50, 0, 0, 0.01);
         $this->logger->logStepResult('implement', 1, 'analyst', 'pi', $result, 5000.0);
 
         $content = file_get_contents($this->logFile);

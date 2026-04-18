@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Query\GetRunners;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQuery as AgentRunnerGetRunnersQuery;
-use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler as AgentRunnerGetRunnersQueryHandler;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GetRunners\GetRunnersQuery;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -21,15 +19,13 @@ final class GetRunnersQueryHandlerTest extends TestCase
     #[Test]
     public function invokeReturnsRunnerDtos(): void
     {
-        $piRunner = $this->createMock(AgentRunnerInterface::class);
-        $piRunner->method('getName')->willReturn('pi');
-        $piRunner->method('isAvailable')->willReturn(true);
+        $runner = $this->createMock(AgentRunnerInterface::class);
+        $runner->method('isAvailable')->willReturn(true);
 
         $registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
-        $registry->method('list')->willReturn(['pi' => $piRunner]);
+        $registry->method('list')->willReturn(['pi' => $runner]);
 
-        $agentRunnerHandler = new AgentRunnerGetRunnersQueryHandler($registry);
-        $handler = new GetRunnersQueryHandler($agentRunnerHandler);
+        $handler = new GetRunnersQueryHandler($registry);
         $result = ($handler)(new GetRunnersQuery());
 
         self::assertCount(1, $result);
@@ -43,8 +39,7 @@ final class GetRunnersQueryHandlerTest extends TestCase
         $registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
         $registry->method('list')->willReturn([]);
 
-        $agentRunnerHandler = new AgentRunnerGetRunnersQueryHandler($registry);
-        $handler = new GetRunnersQueryHandler($agentRunnerHandler);
+        $handler = new GetRunnersQueryHandler($registry);
         $result = ($handler)(new GetRunnersQuery());
 
         self::assertEmpty($result);
@@ -54,11 +49,9 @@ final class GetRunnersQueryHandlerTest extends TestCase
     public function invokeReturnsMultipleRunnersWithAvailability(): void
     {
         $piRunner = $this->createMock(AgentRunnerInterface::class);
-        $piRunner->method('getName')->willReturn('pi');
         $piRunner->method('isAvailable')->willReturn(true);
 
         $codexRunner = $this->createMock(AgentRunnerInterface::class);
-        $codexRunner->method('getName')->willReturn('codex');
         $codexRunner->method('isAvailable')->willReturn(false);
 
         $registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
@@ -67,8 +60,7 @@ final class GetRunnersQueryHandlerTest extends TestCase
             'codex' => $codexRunner,
         ]);
 
-        $agentRunnerHandler = new AgentRunnerGetRunnersQueryHandler($registry);
-        $handler = new GetRunnersQueryHandler($agentRunnerHandler);
+        $handler = new GetRunnersQueryHandler($registry);
         $result = ($handler)(new GetRunnersQuery());
 
         self::assertCount(2, $result);

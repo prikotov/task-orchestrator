@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GetRunners;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQuery as AgentRunnerGetRunnersQuery;
-use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler as AgentRunnerGetRunnersQueryHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GetRunners\RunnerDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface;
 
 /**
  * UseCase получения списка доступных движков AI-агентов.
@@ -13,7 +13,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunn
 final readonly class GetRunnersQueryHandler
 {
     public function __construct(
-        private AgentRunnerGetRunnersQueryHandler $getRunnersHandler,
+        private AgentRunnerRegistryServiceInterface $runnerRegistry,
     ) {
     }
 
@@ -23,14 +23,16 @@ final readonly class GetRunnersQueryHandler
      */
     public function __invoke(GetRunnersQuery $_query): array
     {
-        $agentRunnerResult = ($this->getRunnersHandler)(new AgentRunnerGetRunnersQuery());
+        $runners = $this->runnerRegistry->list();
+        $result = [];
 
-        return array_values(array_map(
-            static fn(\TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\RunnerDto $dto): RunnerDto => new RunnerDto(
-                name: $dto->name,
-                isAvailable: $dto->isAvailable,
-            ),
-            $agentRunnerResult->runners,
-        ));
+        foreach ($runners as $name => $runner) {
+            $result[] = new RunnerDto(
+                name: $name,
+                isAvailable: $runner->isAvailable(),
+            );
+        }
+
+        return $result;
     }
 }
