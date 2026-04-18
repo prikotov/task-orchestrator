@@ -7,7 +7,6 @@ namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Command\RunAgent;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\ResolveAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Prompt\PromptProviderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -18,21 +17,17 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(RunAgentCommand::class)]
 final class RunAgentCommandHandlerTest extends TestCase
 {
-    private ResolveAgentRunnerServiceInterface $registry;
+    private RunAgentServiceInterface $agentRunner;
     private PromptProviderInterface $promptProvider;
     private RunAgentCommandHandler $handler;
-    private RunAgentServiceInterface $runner;
 
     protected function setUp(): void
     {
-        $this->runner = $this->createMock(RunAgentServiceInterface::class);
-        $this->runner->method('getName')->willReturn('pi');
-
-        $this->registry = $this->createMock(ResolveAgentRunnerServiceInterface::class);
+        $this->agentRunner = $this->createMock(RunAgentServiceInterface::class);
         $this->promptProvider = $this->createMock(PromptProviderInterface::class);
 
         $this->handler = new RunAgentCommandHandler(
-            $this->registry,
+            $this->agentRunner,
             $this->promptProvider,
         );
     }
@@ -45,24 +40,19 @@ final class RunAgentCommandHandlerTest extends TestCase
             inputTokens: 100,
         );
 
-        $this->registry
-            ->expects(self::once())
-            ->method('get')
-            ->with('pi')
-            ->willReturn($this->runner);
-
         $this->promptProvider
             ->expects(self::once())
             ->method('getPrompt')
             ->with('system_analyst')
             ->willReturn('You are a system analyst.');
 
-        $this->runner
+        $this->agentRunner
             ->expects(self::once())
             ->method('run')
             ->willReturnCallback(function ($request) use ($expectedResult) {
                 self::assertSame('You are a system analyst.', $request->getSystemPrompt());
                 self::assertSame('system_analyst', $request->getRole());
+                self::assertSame('pi', $request->getRunnerName());
 
                 return $expectedResult;
             });
@@ -82,10 +72,9 @@ final class RunAgentCommandHandlerTest extends TestCase
     {
         $expectedResult = ChainRunResultVo::createFromSuccess(outputText: 'ok');
 
-        $this->registry->method('get')->willReturn($this->runner);
         $this->promptProvider->method('getPrompt')->willReturn('prompt');
 
-        $this->runner
+        $this->agentRunner
             ->expects(self::once())
             ->method('run')
             ->willReturnCallback(function ($request) use ($expectedResult) {
@@ -110,17 +99,18 @@ final class RunAgentCommandHandlerTest extends TestCase
     #[Test]
     public function invokeUsesCustomRunner(): void
     {
-        $codexRunner = $this->createMock(RunAgentServiceInterface::class);
         $expectedResult = ChainRunResultVo::createFromSuccess(outputText: 'codex result');
 
-        $this->registry
-            ->expects(self::once())
-            ->method('get')
-            ->with('codex')
-            ->willReturn($codexRunner);
-
         $this->promptProvider->method('getPrompt')->willReturn('prompt');
-        $codexRunner->method('run')->willReturn($expectedResult);
+
+        $this->agentRunner
+            ->expects(self::once())
+            ->method('run')
+            ->willReturnCallback(function ($request) use ($expectedResult) {
+                self::assertSame('codex', $request->getRunnerName());
+
+                return $expectedResult;
+            });
 
         $result = ($this->handler)(new RunAgentCommand(
             role: 'test',
@@ -136,9 +126,8 @@ final class RunAgentCommandHandlerTest extends TestCase
     {
         $expectedResult = ChainRunResultVo::createFromError('Agent crashed', 1);
 
-        $this->registry->method('get')->willReturn($this->runner);
         $this->promptProvider->method('getPrompt')->willReturn('prompt');
-        $this->runner->method('run')->willReturn($expectedResult);
+        $this->agentRunner->method('run')->willReturn($expectedResult);
 
         $result = ($this->handler)(new RunAgentCommand(
             role: 'test',

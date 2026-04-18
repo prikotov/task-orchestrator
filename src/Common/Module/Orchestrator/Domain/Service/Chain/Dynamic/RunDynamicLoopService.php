@@ -316,7 +316,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
         $turnResult = $this->turnExecution->runFinalizeStep(
             $chain,
-            $this->agentRunner,
             $context,
             $execution,
             $auditLogger,

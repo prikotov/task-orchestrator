@@ -25,12 +25,12 @@ final readonly class GetRunnersQueryHandler
     {
         $agentRunnerResult = ($this->getRunnersHandler)(new AgentRunnerGetRunnersQuery());
 
-        return array_map(
+        return array_values(array_map(
             static fn(\TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\RunnerDto $dto): RunnerDto => new RunnerDto(
                 name: $dto->name,
                 isAvailable: $dto->isAvailable,
             ),
             $agentRunnerResult->runners,
-        );
+        ));
     }
 }

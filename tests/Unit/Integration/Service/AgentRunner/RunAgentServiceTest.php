@@ -27,7 +27,7 @@ final class RunAgentServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->request = new ChainRunRequestVo(role: 'dev', task: 'Write code');
+        $this->request = new ChainRunRequestVo(role: 'dev', task: 'Write code', runnerName: 'pi');
     }
 
     #[Test]
@@ -50,7 +50,7 @@ final class RunAgentServiceTest extends TestCase
         $handler = new RunAgentCommandHandler($registry, $retryFactory);
         $mapper = new AgentDtoMapper();
 
-        $service = new RunAgentService($handler, $mapper, 'pi', true);
+        $service = new RunAgentService($handler, $mapper);
         $result = $service->run($this->request);
 
         self::assertFalse($result->isError());
@@ -77,7 +77,7 @@ final class RunAgentServiceTest extends TestCase
         $handler = new RunAgentCommandHandler($registry, $retryFactory);
         $mapper = new AgentDtoMapper();
 
-        $service = new RunAgentService($handler, $mapper, 'pi', true);
+        $service = new RunAgentService($handler, $mapper);
         $result = $service->run($this->request, $retryPolicy);
 
         self::assertFalse($result->isError());
@@ -100,7 +100,7 @@ final class RunAgentServiceTest extends TestCase
         $handler = new RunAgentCommandHandler($registry, $retryFactory);
         $mapper = new AgentDtoMapper();
 
-        $service = new RunAgentService($handler, $mapper, 'pi', true);
+        $service = new RunAgentService($handler, $mapper);
         $result = $service->run($this->request);
 
         self::assertTrue($result->isError());
@@ -109,41 +109,28 @@ final class RunAgentServiceTest extends TestCase
     }
 
     #[Test]
-    public function getNameReturnsRunnerName(): void
+    public function runUsesRunnerNameFromVo(): void
     {
+        $runner = $this->createMock(AgentRunnerInterface::class);
+        $runner->method('run')->willReturn(AgentResultVo::createFromSuccess(outputText: 'OK'));
+
+        $capturedRunnerName = null;
         $registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
+        $registry->method('get')
+            ->willReturnCallback(function (string $name) use ($runner, &$capturedRunnerName): AgentRunnerInterface {
+                $capturedRunnerName = $name;
+
+                return $runner;
+            });
+
         $retryFactory = $this->createMock(RetryableRunnerFactoryInterface::class);
         $handler = new RunAgentCommandHandler($registry, $retryFactory);
         $mapper = new AgentDtoMapper();
 
-        $service = new RunAgentService($handler, $mapper, 'pi', true);
+        $request = new ChainRunRequestVo(role: 'dev', task: 'Test', runnerName: 'codex');
+        $service = new RunAgentService($handler, $mapper);
+        $service->run($request);
 
-        self::assertSame('pi', $service->getName());
-    }
-
-    #[Test]
-    public function isAvailableReturnsTrueWhenRunnerAvailable(): void
-    {
-        $registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
-        $retryFactory = $this->createMock(RetryableRunnerFactoryInterface::class);
-        $handler = new RunAgentCommandHandler($registry, $retryFactory);
-        $mapper = new AgentDtoMapper();
-
-        $service = new RunAgentService($handler, $mapper, 'pi', true);
-
-        self::assertTrue($service->isAvailable());
-    }
-
-    #[Test]
-    public function isAvailableReturnsFalseWhenRunnerUnavailable(): void
-    {
-        $registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
-        $retryFactory = $this->createMock(RetryableRunnerFactoryInterface::class);
-        $handler = new RunAgentCommandHandler($registry, $retryFactory);
-        $mapper = new AgentDtoMapper();
-
-        $service = new RunAgentService($handler, $mapper, 'pi', false);
-
-        self::assertFalse($service->isAvailable());
+        self::assertSame('codex', $capturedRunnerName);
     }
 }
