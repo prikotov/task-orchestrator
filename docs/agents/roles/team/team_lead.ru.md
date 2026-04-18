@@ -302,21 +302,15 @@ PROMPT
 
 #### Как оформить
 
-Создай или обнови запись в [`team_lead_improvements.md`](team_lead_improvements.md) (рядом с файлом роли). Формат:
+Создай файл рефлексии в `docs/agents/team-reflections/team-lead/`. Формат имени:
 
-```markdown
-## <YYYY-MM-DD> — <краткое название эпика или задачи>
-
-### Что прошло хорошо
-- <конкретные факты>
-
-### Проблемы
-- <описание> → **решение:** <что изменили или предлагаете изменить>
-
-### Принятые улучшения
-- [x] <улучшение 1> — внедрено в <файл>
-- [ ] <улучшение 2> — TODO, требует обсуждения
 ```
+<YYYY-MM-DD_HH-MM-SS>-<короткий-слаг>.md
+```
+
+Пример: `2026-04-17_12-00-00-orchestrator-decomposition.md`
+
+Шаблон файла — в [`_template.md`](../../../agents/team-reflections/team-lead/_template.md).
 
 #### Куда вносить изменения
 
@@ -487,7 +481,7 @@ git branch -d task/arch-chain-service-restructure
 * [Конвенции](../../../../docs/conventions/index.md).
 * [Архитектура](../../../../docs/guide/architecture.md).
 * [Git workflow](../../../../docs/git-workflow/pull-request.md).
-* [Улучшения процесса](team_lead_improvements.md) — история рефлексий и предложенных изменений.
+* [Рефлексии](../../../agents/team-reflections/team-lead/) — история ретроспектив.
 
 ## Выходные данные
 
