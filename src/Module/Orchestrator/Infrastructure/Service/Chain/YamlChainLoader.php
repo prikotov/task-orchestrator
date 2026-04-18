@@ -112,9 +112,10 @@ final class YamlChainLoader implements ChainLoaderInterface
         $stepsData = $raw['steps'] ?? [];
         $chainRetryPolicy = $this->parseRetryPolicy($raw['retry_policy'] ?? null);
         $budget = $this->parseBudget($raw['budget'] ?? null);
+        $chainNoContextFiles = (bool) ($raw['no_context_files'] ?? false);
 
         $steps = array_values(array_map(
-            function (array $step) use ($name, $chainRetryPolicy): ChainStepVo {
+            function (array $step) use ($name, $chainRetryPolicy, $chainNoContextFiles): ChainStepVo {
                 $stepType = ChainStepTypeEnum::tryFrom($step['type'] ?? '') ?? throw new InvalidArgumentException(
                     sprintf('Step "type" is required in chain "%s" (expected: agent or quality_gate).', $name),
                 );
@@ -145,6 +146,7 @@ final class YamlChainLoader implements ChainLoaderInterface
 
                 // Agent step
                 $stepRetryPolicy = $this->parseRetryPolicy($step['retry_policy'] ?? null);
+                $stepNoContextFiles = (bool) ($step['no_context_files'] ?? $chainNoContextFiles);
 
                 return ChainStepVo::agent(
                     role: $step['role'] ?? throw new InvalidArgumentException(
@@ -155,6 +157,7 @@ final class YamlChainLoader implements ChainLoaderInterface
                     model: $step['model'] ?? null,
                     retryPolicy: $stepRetryPolicy ?? $chainRetryPolicy,
                     name: $step['name'] ?? null,
+                    noContextFiles: $stepNoContextFiles,
                 );
             },
             $stepsData,

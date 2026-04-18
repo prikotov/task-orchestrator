@@ -112,4 +112,27 @@ final class AgentRunRequestVoTest extends TestCase
 
         self::assertSame('System prompt', $result->getSystemPrompt());
     }
+
+    #[Test]
+    public function itDefaultsNoContextFilesToFalse(): void
+    {
+        $vo = new AgentRunRequestVo(role: 'test', task: 'test');
+
+        self::assertFalse($vo->getNoContextFiles());
+    }
+
+    #[Test]
+    public function itPreservesNoContextFilesInTruncatedContext(): void
+    {
+        $vo = new AgentRunRequestVo(
+            role: 'test',
+            task: 'test',
+            previousContext: str_repeat('x', 1000),
+            maxContextLength: 500,
+            noContextFiles: true,
+        );
+        $result = $vo->withTruncatedContext();
+
+        self::assertTrue($result->getNoContextFiles());
+    }
 }
