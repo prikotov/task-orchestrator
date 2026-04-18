@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ResolveChainRunnerServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\RetryableRunnerFactoryInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\PromptFormatterInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ResolveChainRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfigVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RetryPolicyVo;
 use Override;
 use Psr\Log\LoggerInterface;
 
 /**
- * Резолвит fallback runner при ошибке основного.
+ * Резолвит эффективный runner: retry-декоратор и fallback при ошибке.
  *
  * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  * @todo Разбить tryFallbackRunner на buildFallbackRequest + executeFallback — TASK-agent-orchestrator-decompose-step2.
@@ -23,10 +25,26 @@ use Psr\Log\LoggerInterface;
 final readonly class ResolveChainRunnerService implements ResolveChainRunnerServiceInterface
 {
     public function __construct(
-        private RunAgentServiceInterface $agentRunner,
+        private AgentRunnerRegistryServiceInterface $runnerRegistry,
+        private RetryableRunnerFactoryInterface $retryableRunnerFactory,
         private PromptFormatterInterface $formatter,
         private ?LoggerInterface $logger = null,
     ) {
+    }
+
+    #[Override]
+    public function createRunnerWithRetry(
+        AgentRunnerInterface $runner,
+        ?RetryPolicyVo $retryPolicy,
+    ): AgentRunnerInterface {
+        if ($retryPolicy === null || !$retryPolicy->isEnabled()) {
+            return $runner;
+        }
+
+        return $this->retryableRunnerFactory->createRetryableRunner(
+            $runner,
+            $retryPolicy,
+        );
     }
 
     #[Override]
@@ -34,10 +52,10 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
         FallbackConfigVo $fallbackConfig,
         string $role,
         string $primaryRunnerName,
-        ?ChainRetryPolicyVo $retryPolicy,
-        ChainRunRequestVo $primaryRequest,
+        ?RetryPolicyVo $retryPolicy,
+        AgentRunRequestVo $primaryRequest,
         ?string $promptFile = null,
-    ): ?ChainRunResultVo {
+    ): ?AgentResultVo {
         $fallbackRunnerName = $fallbackConfig->getRunnerName();
         if ($fallbackRunnerName === null) {
             return null;
@@ -50,6 +68,18 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
             $fallbackRunnerName,
         ));
 
+        try {
+            $fallbackRunner = $this->runnerRegistry->get($fallbackRunnerName);
+        } catch (\Throwable $e) {
+            $this->logger?->error(sprintf(
+                '[ResolveChainRunnerService] Fallback runner "%s" not found: %s',
+                $fallbackRunnerName,
+                $e->getMessage(),
+            ));
+
+            return null;
+        }
+
         $fallbackCommand = $fallbackConfig->getCommand();
         if ($promptFile !== null) {
             $fallbackCommand = $this->formatter->resolveSlot(
@@ -60,7 +90,7 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
             );
         }
 
-        $fallbackRequest = new ChainRunRequestVo(
+        $fallbackRequest = new AgentRunRequestVo(
             role: $primaryRequest->getRole(),
             task: $primaryRequest->getTask(),
             systemPrompt: $primaryRequest->getSystemPrompt(),
@@ -70,11 +100,12 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
             workingDir: $primaryRequest->getWorkingDir(),
             timeout: $primaryRequest->getTimeout(),
             command: $fallbackCommand,
-            runnerName: $fallbackRunnerName,
         );
 
+        $effectiveFallbackRunner = $this->createRunnerWithRetry($fallbackRunner, $retryPolicy);
+
         try {
-            $result = $this->agentRunner->run($fallbackRequest->withTruncatedContext(), $retryPolicy);
+            $result = $effectiveFallbackRunner->run($fallbackRequest->withTruncatedContext());
 
             if ($result->isError()) {
                 $this->logger?->error(sprintf(

@@ -8,7 +8,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfigVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(BudgetVo::class)]
 #[CoversClass(RoleConfigVo::class)]
 #[CoversClass(FallbackConfigVo::class)]
-#[CoversClass(ChainRetryPolicyVo::class)]
+#[CoversClass(RetryPolicyVo::class)]
 final class YamlChainLoaderTest extends TestCase
 {
     private string $fixtureDir;

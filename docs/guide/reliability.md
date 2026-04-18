@@ -19,21 +19,16 @@ chains:
           max_retries: 5
 ```
 
-**Поля ChainRetryPolicyVo** (Orchestrator Domain):
+**Поля RetryPolicyVo:**
 
 | Поле | Тип | Описание |
 |---|---|---|
-| `maxRetries` | `int` | Максимум повторных попыток |
-| `initialDelayMs` | `int` | Начальная задержка в мс |
-| `maxDelayMs` | `int` | Верхняя граница задержки в мс |
+| `max_retries` | `int` | Максимум повторных попыток |
+| `initial_delay_ms` | `int` | Начальная задержка в мс |
+| `max_delay_ms` | `int` | Верхняя граница задержки в мс |
 | `multiplier` | `float` | Множитель экспоненциальной задержки |
 
-**Архитектура retry:** Retry инкапсулирован внутри `AgentRunnerAdapter`. Последовательность:
-
-1. Orchestrator Domain вызывает `AgentRunnerPortInterface::run(ChainRunRequestVo, ChainRetryPolicyVo)`
-2. `AgentRunnerAdapter` маппит VO через `AgentVoMapper` в AgentRunner-типы (`AgentRunRequestVo`, `RetryPolicyVo`)
-3. Если retryPolicy задана — оборачивает runner через `RetryableRunnerFactory`, иначе вызывает напрямую
-4. `RetryingAgentRunner` (модуль AgentRunner) выполняет повторные попытки с экспоненциальной задержкой
+**Архитектура:** `RetryingAgentRunner` оборачивает `AgentRunnerInterface`, при ошибке — повтор с задержкой.
 
 ## Circuit Breaker
 
@@ -41,7 +36,7 @@ chains:
 
 **Состояния:** `closed` (норма) → `open` (заблокирован) → `half_open` (пробный запрос).
 
-**Архитектура:** `CircuitBreakerAgentRunner` (модуль AgentRunner, Infrastructure) оборачивает `AgentRunnerInterface`,
+**Архитектура:** `CircuitBreakerAgentRunner` оборачивает `AgentRunnerInterface`,
 состояние хранится в `CircuitBreakerStateVo` (`CircuitStateEnum`).
 
 ## Fallback
@@ -57,7 +52,7 @@ roles:
       command: [codex, --model, gpt-4o, ...]
 ```
 
-**Архитектура:** `ResolveChainRunnerService` (Orchestrator Infrastructure) пытается выполнить шаг через основной runner,
+**Архитектура:** `ResolveChainRunnerService` пытается выполнить шаг через основной runner,
 при ошибке — через fallback. Результат: `StepResultDto::fallbackRunnerUsed`.
 
 ## Сессии и Resume

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\QualityGateRunnerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\QualityGateRunnerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateVo;
 use Override;
