@@ -23,7 +23,6 @@ interface RunDynamicLoopAgentServiceInterface
     public function runFacilitator(
         int $step,
         int $round,
-        RunAgentServiceInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,
@@ -46,7 +45,6 @@ interface RunDynamicLoopAgentServiceInterface
     public function runParticipant(
         int $step,
         int $round,
-        RunAgentServiceInterface $runner,
         string $role,
         string $topic,
         string $brainstormSystemPrompt,
@@ -70,7 +68,6 @@ interface RunDynamicLoopAgentServiceInterface
     public function runFacilitatorFinalize(
         int $step,
         int $round,
-        RunAgentServiceInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,

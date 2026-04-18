@@ -20,7 +20,6 @@ interface RunDynamicLoopServiceInterface
      */
     public function execute(
         ChainDefinitionVo $chain,
-        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         int $startRound = 0,
         string $initialDiscussionHistory = '',

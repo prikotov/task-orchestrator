@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\ResolveAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
@@ -24,7 +23,7 @@ use Psr\Log\LoggerInterface;
 final readonly class ResolveChainRunnerService implements ResolveChainRunnerServiceInterface
 {
     public function __construct(
-        private ResolveAgentRunnerServiceInterface $runnerRegistry,
+        private RunAgentServiceInterface $agentRunner,
         private PromptFormatterInterface $formatter,
         private ?LoggerInterface $logger = null,
     ) {
@@ -52,7 +51,7 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
         ));
 
         try {
-            $fallbackRunner = $this->runnerRegistry->get($fallbackRunnerName);
+            $fallbackRunner = $this->agentRunner;
         } catch (\Throwable $e) {
             $this->logger?->error(sprintf(
                 '[ResolveChainRunnerService] Fallback runner "%s" not found: %s',
@@ -83,6 +82,7 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
             workingDir: $primaryRequest->getWorkingDir(),
             timeout: $primaryRequest->getTimeout(),
             command: $fallbackCommand,
+            runnerName: $fallbackRunnerName,
         );
 
         try {
