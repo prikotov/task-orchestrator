@@ -57,6 +57,7 @@ status: done
 
 ### Фаза 3: Приведение к конвенциям
 - [x] [TASK-arch-integration-naming-convention](done/TASK-arch-integration-naming-convention.todo.md)
+- [ ] [TASK-arch-integration-isolation](TASK-arch-integration-isolation.todo.md)
 
 ## Definition of Done (DoD)
 
