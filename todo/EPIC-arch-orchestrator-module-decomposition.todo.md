@@ -56,7 +56,7 @@ status: done
 - [x] [TASK-arch-decomposition-tests-and-docs](done/TASK-arch-decomposition-tests-and-docs.todo.md)
 
 ### Фаза 3: Приведение к конвенциям
-- [ ] [TASK-arch-integration-naming-convention](TASK-arch-integration-naming-convention.todo.md)
+- [x] [TASK-arch-integration-naming-convention](done/TASK-arch-integration-naming-convention.todo.md)
 
 ## Definition of Done (DoD)
 

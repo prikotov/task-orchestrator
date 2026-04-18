@@ -19,7 +19,7 @@ services:
       - '../src/Common/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php'
       - '../src/Common/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
 
-  # --- Integration Service alias (Port → Service by convention service.md) ---
+  # --- Integration Service alias (Interface → Implementation by convention service.md) ---
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\ResolveAgentRunnerServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Integration\Service\AgentRunner\ResolveAgentRunnerService
 
