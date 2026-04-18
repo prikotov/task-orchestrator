@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainTurnResultVo;
@@ -42,7 +41,6 @@ final readonly class ExecuteDynamicTurnService
      */
     public function runFacilitatorStep(
         ChainDefinitionVo $chain,
-        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
@@ -71,7 +69,6 @@ final readonly class ExecuteDynamicTurnService
         $facRun = $this->agentRunner->runFacilitator(
             $execution->getStep(),
             $execution->getRound(),
-            $runner,
             $context->facilitatorRole,
             $context->topic,
             $context->brainstormSystemPrompt,
@@ -134,7 +131,6 @@ final readonly class ExecuteDynamicTurnService
 
     public function runParticipantStep(
         ChainDefinitionVo $chain,
-        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
@@ -164,7 +160,6 @@ final readonly class ExecuteDynamicTurnService
         $turnResult = $this->agentRunner->runParticipant(
             $execution->getStep(),
             $execution->getRound(),
-            $runner,
             $nextRole,
             $context->topic,
             $context->brainstormSystemPrompt,
@@ -202,7 +197,6 @@ final readonly class ExecuteDynamicTurnService
 
     public function runFinalizeStep(
         ChainDefinitionVo $chain,
-        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
@@ -230,7 +224,6 @@ final readonly class ExecuteDynamicTurnService
         $turnResult = $this->agentRunner->runFacilitatorFinalize(
             step: $execution->getStep(),
             round: $execution->getRound(),
-            runner: $runner,
             facilitatorRole: $context->facilitatorRole,
             topic: $context->topic,
             brainstormSystemPrompt: $context->brainstormSystemPrompt,

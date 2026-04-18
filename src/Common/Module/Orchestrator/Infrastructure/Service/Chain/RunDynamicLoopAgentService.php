@@ -28,6 +28,7 @@ use Override;
 final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentServiceInterface
 {
     public function __construct(
+        private RunAgentServiceInterface $agentRunner,
         private ChainSessionLoggerInterface $sessionLogger,
         private FacilitatorResponseParserInterface $responseParser,
         private PromptProviderInterface $promptProvider,
@@ -39,7 +40,6 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
     public function runFacilitator(
         int $step,
         int $round,
-        RunAgentServiceInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,
@@ -90,7 +90,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         );
 
         $start = microtime(true);
-        $result = $runner->run($request->withTruncatedContext());
+        $result = $this->agentRunner->run($request->withTruncatedContext());
         $duration = microtime(true) - $start;
 
         $facilitatorResponse = $this->responseParser->parse($result->getOutputText());
@@ -112,7 +112,6 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
     public function runParticipant(
         int $step,
         int $round,
-        RunAgentServiceInterface $runner,
         string $role,
         string $topic,
         string $brainstormSystemPrompt,
@@ -166,7 +165,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         );
 
         $start = microtime(true);
-        $result = $runner->run($request->withTruncatedContext());
+        $result = $this->agentRunner->run($request->withTruncatedContext());
         $duration = microtime(true) - $start;
 
         return new ChainTurnResultVo(
@@ -185,7 +184,6 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
     public function runFacilitatorFinalize(
         int $step,
         int $round,
-        RunAgentServiceInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,
@@ -232,7 +230,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         );
 
         $start = microtime(true);
-        $result = $runner->run($request->withTruncatedContext());
+        $result = $this->agentRunner->run($request->withTruncatedContext());
         $duration = microtime(true) - $start;
 
         return new ChainTurnResultVo(

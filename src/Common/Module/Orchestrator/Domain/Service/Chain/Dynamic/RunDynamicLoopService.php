@@ -37,6 +37,7 @@ use function str_contains;
 final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInterface
 {
     public function __construct(
+        private RunAgentServiceInterface $agentRunner,
         private ExecuteDynamicTurnService $turnExecution,
         private CheckDynamicBudgetServiceInterface $budgetChecker,
         private FormatDynamicJournalServiceInterface $journal,
@@ -48,7 +49,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
     #[Override]
     public function execute(
         ChainDefinitionVo $chain,
-        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         int $startRound = 0,
         string $initialDiscussionHistory = '',
@@ -71,7 +71,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
             $facResult = $this->executeFacilitatorTurn(
                 $chain,
-                $runner,
                 $context,
                 $execution,
                 $budget,
@@ -88,7 +87,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
             $partResult = $this->executeParticipantTurn(
                 $chain,
-                $runner,
                 $context,
                 $execution,
                 $budget,
@@ -110,7 +108,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         if ($execution->isMaxRoundsReached() && $execution->getSynthesis() === null) {
             $this->executeFinalizeTurn(
                 $chain,
-                $runner,
                 $context,
                 $execution,
                 $auditLogger,
@@ -145,7 +142,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
     private function executeFacilitatorTurn(
         ChainDefinitionVo $chain,
-        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?BudgetVo $budget,
@@ -153,7 +149,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
     ): DynamicTurnResultVo {
         [$turnResult, $facResponse] = $this->turnExecution->runFacilitatorStep(
             $chain,
-            $runner,
             $context,
             $execution,
             $auditLogger,
@@ -221,7 +216,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
     private function executeParticipantTurn(
         ChainDefinitionVo $chain,
-        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?BudgetVo $budget,
@@ -246,7 +240,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
         $turnResult = $this->turnExecution->runParticipantStep(
             $chain,
-            $runner,
             $context,
             $execution,
             $auditLogger,
@@ -314,7 +307,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
     private function executeFinalizeTurn(
         ChainDefinitionVo $chain,
-        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
@@ -324,7 +316,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
         $turnResult = $this->turnExecution->runFinalizeStep(
             $chain,
-            $runner,
             $context,
             $execution,
             $auditLogger,

@@ -57,16 +57,16 @@ status: done
 
 ### Фаза 3: Приведение к конвенциям
 - [x] [TASK-arch-integration-naming-convention](done/TASK-arch-integration-naming-convention.todo.md)
-- [ ] [TASK-arch-integration-isolation](TASK-arch-integration-isolation.todo.md)
+- [x] [TASK-arch-integration-isolation](done/TASK-arch-integration-isolation.todo.md)
 
 ## Definition of Done (DoD)
 
 - [x] `AgentRunner` — standalone модуль, 0 входящих зависимостей
 - [x] `Orchestrator` Domain не импортирует ничего из `AgentRunner`
-- [ ] Связь через `Orchestrator/Integration/Service/` с именованием по конвенции `service.md`
+- [x] Связь через `Orchestrator/Integration/Service/` с именованием по конвенции `service.md`
 - [x] Каждый модуль < 80 файлов
 - [x] PHPUnit + Psalm green
-- [ ] Архитектурная документация актуальна
+- [x] Архитектурная документация актуальна
 
 ## Risks and Dependencies
 

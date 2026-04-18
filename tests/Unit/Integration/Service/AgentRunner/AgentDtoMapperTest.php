@@ -40,9 +40,10 @@ final class AgentDtoMapperTest extends TestCase
             maxContextLength: 80000,
             command: ['run', '--verbose'],
             runnerArgs: ['--append-system-prompt', '/path/to/prompt.md'],
+            runnerName: 'pi',
         );
 
-        $result = $this->mapper->mapToRunAgentCommand($vo, 'pi');
+        $result = $this->mapper->mapToRunAgentCommand($vo);
 
         self::assertSame('pi', $result->runnerName);
         self::assertSame('analyst', $result->role);
@@ -62,9 +63,9 @@ final class AgentDtoMapperTest extends TestCase
     #[Test]
     public function mapToRunAgentCommandWithMinimalFields(): void
     {
-        $vo = new ChainRunRequestVo(role: 'dev', task: 'Fix bug');
+        $vo = new ChainRunRequestVo(role: 'dev', task: 'Fix bug', runnerName: 'codex');
 
-        $result = $this->mapper->mapToRunAgentCommand($vo, 'codex');
+        $result = $this->mapper->mapToRunAgentCommand($vo);
 
         self::assertSame('codex', $result->runnerName);
         self::assertSame('dev', $result->role);
@@ -82,7 +83,7 @@ final class AgentDtoMapperTest extends TestCase
     }
 
     #[Test]
-    public function mapToRunAgentCommandDefaultsRunnerNameToEmpty(): void
+    public function mapToRunAgentCommandDefaultsRunnerNameToEmptyWhenNull(): void
     {
         $vo = new ChainRunRequestVo(role: 'dev', task: 'Fix bug');
 
@@ -94,7 +95,7 @@ final class AgentDtoMapperTest extends TestCase
     #[Test]
     public function mapToRunAgentCommandWithEnabledRetryPolicy(): void
     {
-        $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code');
+        $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code', runnerName: 'pi');
         $retryPolicy = new ChainRetryPolicyVo(
             maxRetries: 5,
             initialDelayMs: 500,
@@ -102,7 +103,7 @@ final class AgentDtoMapperTest extends TestCase
             multiplier: 3.0,
         );
 
-        $result = $this->mapper->mapToRunAgentCommand($vo, 'pi', $retryPolicy);
+        $result = $this->mapper->mapToRunAgentCommand($vo, $retryPolicy);
 
         self::assertSame(5, $result->retryMaxRetries);
         self::assertSame(500, $result->retryInitialDelayMs);
@@ -113,10 +114,10 @@ final class AgentDtoMapperTest extends TestCase
     #[Test]
     public function mapToRunAgentCommandWithDisabledRetryPolicy(): void
     {
-        $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code');
+        $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code', runnerName: 'pi');
         $retryPolicy = ChainRetryPolicyVo::disabled();
 
-        $result = $this->mapper->mapToRunAgentCommand($vo, 'pi', $retryPolicy);
+        $result = $this->mapper->mapToRunAgentCommand($vo, $retryPolicy);
 
         self::assertNull($result->retryMaxRetries);
     }
@@ -124,9 +125,9 @@ final class AgentDtoMapperTest extends TestCase
     #[Test]
     public function mapToRunAgentCommandWithNullRetryPolicy(): void
     {
-        $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code');
+        $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code', runnerName: 'pi');
 
-        $result = $this->mapper->mapToRunAgentCommand($vo, 'pi', null);
+        $result = $this->mapper->mapToRunAgentCommand($vo, null);
 
         self::assertNull($result->retryMaxRetries);
     }

@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Comman
 
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Event\OrchestrateChain\OrchestrateSessionCompletedEvent;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\ResolveAgentRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface;
@@ -31,7 +31,7 @@ final readonly class OrchestrateChainCommandHandler
 {
     public function __construct(
         private ChainLoaderInterface $chainLoader,
-        private ResolveAgentRunnerServiceInterface $runnerRegistry,
+        private RunAgentServiceInterface $agentRunner,
         private ExecuteStaticChainServiceInterface $staticChainExecutor,
         private RunDynamicLoopServiceInterface $dynamicLoopRunner,
         private BuildDynamicContextServiceInterface $contextBuilder,
@@ -65,12 +65,11 @@ final readonly class OrchestrateChainCommandHandler
         OrchestrateChainCommand $command,
     ): OrchestrateChainResultDto {
         $auditLogger = $this->resolveAuditLogger($command->auditLogPath, $command->noAuditLog);
-        $runner = $this->runnerRegistry->get($command->runner ?? 'pi');
+        $runnerName = $command->runner ?? 'pi';
 
         return $this->staticChainExecutor->execute(
             $chain,
-            $runner,
-            $command->runner ?? 'pi',
+            $runnerName,
             $command->task,
             $command->model,
             $command->workingDir,
@@ -200,11 +199,8 @@ final readonly class OrchestrateChainCommandHandler
         string $initialFacilitatorJournal = '',
         ?AuditLoggerInterface $auditLogger = null,
     ): DynamicLoopResultVo {
-        $runner = $this->runnerRegistry->get($runnerName);
-
         return $this->dynamicLoopRunner->execute(
             $chain,
-            $runner,
             $context,
             $startRound,
             $initialDiscussionHistory,

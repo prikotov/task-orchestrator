@@ -29,6 +29,7 @@ final readonly class ExecuteStaticStepService
     private const string QUALITY_GATE_RUNNER_NAME = 'shell';
 
     public function __construct(
+        private RunAgentServiceInterface $agentRunner,
         private ResolveChainRunnerServiceInterface $runnerHelper,
         private PromptFormatterInterface $formatter,
         private ?QualityGateRunnerInterface $qualityGateRunner = null,
@@ -38,7 +39,6 @@ final readonly class ExecuteStaticStepService
 
     public function runAgentStep(
         ChainStepVo $step,
-        RunAgentServiceInterface $runner,
         string $runnerName,
         string $task,
         ?string $model,
@@ -67,11 +67,11 @@ final readonly class ExecuteStaticStepService
             workingDir: $workingDir,
             timeout: $roleConfig?->getTimeout() ?? $timeout,
             command: $roleConfig?->getCommand() ?? [],
+            runnerName: $runnerName,
         );
 
-        $effectiveRunner = $runner;
         $start = microtime(true);
-        $result = $effectiveRunner->run($request->withTruncatedContext(), $step->getRetryPolicy());
+        $result = $this->agentRunner->run($request->withTruncatedContext(), $step->getRetryPolicy());
         $duration = microtime(true) - $start;
 
         $fallbackRunnerUsed = null;

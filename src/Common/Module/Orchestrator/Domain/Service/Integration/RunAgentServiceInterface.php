@@ -17,18 +17,9 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResul
 interface RunAgentServiceInterface
 {
     /**
-     * Уникальное имя движка (например, 'pi', 'codex').
-     */
-    public function getName(): string;
-
-    /**
-     * Проверяет доступность движка в текущем окружении.
-     */
-    public function isAvailable(): bool;
-
-    /**
      * Запускает агент с заданным запросом и опциональной retry-политикой.
      *
+     * Runner name передаётся через ChainRunRequestVo::getRunnerName().
      * Retry инкапсулирован внутри реализации: вызывающая сторона
      * не знает о RetryableRunnerFactory.
      */

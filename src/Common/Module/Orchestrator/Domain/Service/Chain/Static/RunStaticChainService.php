@@ -29,6 +29,7 @@ use function sprintf;
 final readonly class RunStaticChainService
 {
     public function __construct(
+        private RunAgentServiceInterface $agentRunner,
         private ExecuteStaticStepService $stepExecution,
         private CheckStaticBudgetServiceInterface $budgetService,
         private ?LoggerInterface $logger = null,
@@ -40,7 +41,6 @@ final readonly class RunStaticChainService
      */
     public function execute(
         ChainDefinitionVo $chain,
-        RunAgentServiceInterface $runner,
         string $runnerName,
         string $task,
         ?string $model = null,
@@ -64,7 +64,6 @@ final readonly class RunStaticChainService
         while (!$execution->isComplete(count($steps))) {
             $stepResult = $this->processStep(
                 $chain,
-                $runner,
                 $runnerName,
                 $task,
                 $model,
@@ -112,7 +111,6 @@ final readonly class RunStaticChainService
      */
     private function processStep(
         ChainDefinitionVo $chain,
-        RunAgentServiceInterface $runner,
         string $runnerName,
         string $task,
         ?string $model,
@@ -138,7 +136,6 @@ final readonly class RunStaticChainService
         $stepResult = $this->executeStep(
             $step,
             $chain,
-            $runner,
             $runnerName,
             $task,
             $model,
@@ -226,7 +223,6 @@ final readonly class RunStaticChainService
     private function executeStep(
         ChainStepVo $step,
         ChainDefinitionVo $chain,
-        RunAgentServiceInterface $runner,
         string $runnerName,
         string $task,
         ?string $model,
@@ -273,7 +269,6 @@ final readonly class RunStaticChainService
 
         $stepResult = $this->stepExecution->runAgentStep(
             $step,
-            $runner,
             $runnerName,
             $task,
             $model,

@@ -20,8 +20,8 @@ services:
       - '../src/Common/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
 
   # --- Integration Service alias (Interface → Implementation by convention service.md) ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\ResolveAgentRunnerServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Integration\Service\AgentRunner\ResolveAgentRunnerService
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Integration\Service\AgentRunner\RunAgentService
 
   # --- Явные alias: Interface → Implementation (по конвенции service.md) ---
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
