@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainTurnResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorResponseVo;
 

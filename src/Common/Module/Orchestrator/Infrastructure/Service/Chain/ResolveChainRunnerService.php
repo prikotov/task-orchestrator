@@ -50,18 +50,6 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
             $fallbackRunnerName,
         ));
 
-        try {
-            $fallbackRunner = $this->agentRunner;
-        } catch (\Throwable $e) {
-            $this->logger?->error(sprintf(
-                '[ResolveChainRunnerService] Fallback runner "%s" not found: %s',
-                $fallbackRunnerName,
-                $e->getMessage(),
-            ));
-
-            return null;
-        }
-
         $fallbackCommand = $fallbackConfig->getCommand();
         if ($promptFile !== null) {
             $fallbackCommand = $this->formatter->resolveSlot(
@@ -86,7 +74,7 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
         );
 
         try {
-            $result = $fallbackRunner->run($fallbackRequest->withTruncatedContext(), $retryPolicy);
+            $result = $this->agentRunner->run($fallbackRequest->withTruncatedContext(), $retryPolicy);
 
             if ($result->isError()) {
                 $this->logger?->error(sprintf(
