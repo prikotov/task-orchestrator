@@ -26,9 +26,10 @@ final readonly class AgentDtoMapper
      */
     public function mapToRunAgentCommand(
         ChainRunRequestVo $vo,
-        string $runnerName = '',
         ?ChainRetryPolicyVo $retryPolicy = null,
     ): RunAgentCommand {
+        $runnerName = $vo->getRunnerName() ?? '';
+
         return new RunAgentCommand(
             runnerName: $runnerName,
             role: $vo->getRole(),
