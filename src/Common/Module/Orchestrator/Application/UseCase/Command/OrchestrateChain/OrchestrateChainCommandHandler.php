@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Comman
 
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Event\OrchestrateChain\OrchestrateSessionCompletedEvent;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerRegistryPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\ResolveAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface;
@@ -31,7 +31,7 @@ final readonly class OrchestrateChainCommandHandler
 {
     public function __construct(
         private ChainLoaderInterface $chainLoader,
-        private AgentRunnerRegistryPortInterface $runnerRegistry,
+        private ResolveAgentRunnerServiceInterface $runnerRegistry,
         private ExecuteStaticChainServiceInterface $staticChainExecutor,
         private RunDynamicLoopServiceInterface $dynamicLoopRunner,
         private BuildDynamicContextServiceInterface $contextBuilder,

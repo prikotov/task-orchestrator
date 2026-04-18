@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port;
+namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 
 /**
- * Port-интерфейс движка AI-агента для Orchestrator Domain.
+ * Интеграционный сервис запуска AI-агента для Orchestrator Domain.
  *
  * Инкапсулирует вызов агента и retry-политику.
  * Реализация маппит VO и делегирует в конкретный движок AI-агента.
  */
-interface AgentRunnerPortInterface
+interface RunAgentServiceInterface
 {
     /**
      * Уникальное имя движка (например, 'pi', 'codex').

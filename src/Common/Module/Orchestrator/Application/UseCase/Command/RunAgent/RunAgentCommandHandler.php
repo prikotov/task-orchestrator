@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerRegistryPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\ResolveAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Prompt\PromptProviderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 
@@ -16,7 +16,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunReque
 final readonly class RunAgentCommandHandler
 {
     public function __construct(
-        private AgentRunnerRegistryPortInterface $runnerRegistry,
+        private ResolveAgentRunnerServiceInterface $runnerRegistry,
         private PromptProviderInterface $promptProvider,
     ) {
     }

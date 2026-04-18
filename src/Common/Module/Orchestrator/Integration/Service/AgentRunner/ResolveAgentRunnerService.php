@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Integration\Adapter;
+namespace TaskOrchestrator\Common\Module\Orchestrator\Integration\Service\AgentRunner;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunnerByName\GetRunnerByNameQuery;
@@ -10,20 +10,20 @@ use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunn
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQuery;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\OrchestratorException;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerRegistryPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\ResolveAgentRunnerServiceInterface;
 use Override;
 
 /**
- * ACL-адаптер реестра runner'ов: делегирует через AgentRunner Application use cases.
+ * Интеграционный сервис реестра runner'ов: делегирует через AgentRunner Application use cases.
  *
- * Каждый runner оборачивается в AgentRunnerAdapter.
+ * Каждый runner оборачивается в RunAgentService.
  * Обращение к AgentRunner Domain идёт исключительно через Application-слой.
  */
-final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterface
+final class ResolveAgentRunnerService implements ResolveAgentRunnerServiceInterface
 {
-    /** @var array<string, AgentRunnerPortInterface> */
-    private array $portCache = [];
+    /** @var array<string, RunAgentServiceInterface> */
+    private array $serviceCache = [];
 
     public function __construct(
         private readonly GetRunnerByNameQueryHandler $getRunnerByNameHandler,
@@ -34,9 +34,9 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
     }
 
     #[Override]
-    public function get(string $name): AgentRunnerPortInterface
+    public function get(string $name): RunAgentServiceInterface
     {
-        if (!isset($this->portCache[$name])) {
+        if (!isset($this->serviceCache[$name])) {
             $runnerDto = $this->getRunnerByNameHandler->handle(
                 new GetRunnerByNameQuery(name: $name),
             );
@@ -47,7 +47,7 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
                 );
             }
 
-            $this->portCache[$name] = new AgentRunnerAdapter(
+            $this->serviceCache[$name] = new RunAgentService(
                 $this->runAgentHandler,
                 $this->mapper,
                 $runnerDto->name,
@@ -55,11 +55,11 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
             );
         }
 
-        return $this->portCache[$name];
+        return $this->serviceCache[$name];
     }
 
     #[Override]
-    public function getDefault(): AgentRunnerPortInterface
+    public function getDefault(): RunAgentServiceInterface
     {
         $runnerDto = $this->getRunnerByNameHandler->handle(
             new GetRunnerByNameQuery(name: null),
@@ -70,8 +70,8 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
         }
 
         $name = $runnerDto->name;
-        if (!isset($this->portCache[$name])) {
-            $this->portCache[$name] = new AgentRunnerAdapter(
+        if (!isset($this->serviceCache[$name])) {
+            $this->serviceCache[$name] = new RunAgentService(
                 $this->runAgentHandler,
                 $this->mapper,
                 $runnerDto->name,
@@ -79,7 +79,7 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
             );
         }
 
-        return $this->portCache[$name];
+        return $this->serviceCache[$name];
     }
 
     #[Override]
@@ -89,15 +89,15 @@ final class AgentRunnerRegistryAdapter implements AgentRunnerRegistryPortInterfa
         $runnersResult = $this->getRunnersHandler->handle(new GetRunnersQuery());
 
         foreach ($runnersResult->runners as $runnerDto) {
-            if (!isset($this->portCache[$runnerDto->name])) {
-                $this->portCache[$runnerDto->name] = new AgentRunnerAdapter(
+            if (!isset($this->serviceCache[$runnerDto->name])) {
+                $this->serviceCache[$runnerDto->name] = new RunAgentService(
                     $this->runAgentHandler,
                     $this->mapper,
                     $runnerDto->name,
                     $runnerDto->isAvailable,
                 );
             }
-            $result[$runnerDto->name] = $this->portCache[$runnerDto->name];
+            $result[$runnerDto->name] = $this->serviceCache[$runnerDto->name];
         }
 
         return $result;

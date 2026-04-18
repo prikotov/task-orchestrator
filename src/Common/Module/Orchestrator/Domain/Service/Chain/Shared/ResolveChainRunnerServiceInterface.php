@@ -12,7 +12,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfi
 /**
  * Резолвит fallback runner при ошибке основного.
  *
- * Retry инкапсулирован в AgentRunnerPortInterface — отдельный метод createRunnerWithRetry не нужен.
+ * Retry инкапсулирован в RunAgentServiceInterface — отдельный метод createRunnerWithRetry не нужен.
  */
 interface ResolveChainRunnerServiceInterface
 {
