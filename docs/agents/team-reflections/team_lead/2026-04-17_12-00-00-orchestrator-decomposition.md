@@ -44,6 +44,6 @@
 - [ ] Проверка `git log <epic-branch> --oneline -5` перед созданием подветки — в Шаг 2
 - [ ] Отдельная роль «Архитектурный ревьювер» для рефакторинг-задач
 
-## Архитектурные находки
+## Важные комментарии
 
 - Обнаружено нарушение конвенций: Infrastructure Orchestrator ходил напрямую в AgentRunner Domain вместо Integration → Application. Создана задача `TASK-arch-agent-runner-application-layer` и выполнена.
