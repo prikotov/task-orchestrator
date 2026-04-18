@@ -44,6 +44,7 @@ final class OrchestrateCommand extends Command
     private const string OPT_NO_AUDIT_LOG = 'no-audit-log';
     private const string OPT_REPORT_FORMAT = 'report-format';
     private const string OPT_REPORT_FILE = 'report-file';
+    private const string OPT_NO_CONTEXT_FILES = 'no-context-files';
 
     public const string LOCK_RESOURCE = 'command:agent:orchestrate';
 
@@ -75,7 +76,8 @@ final class OrchestrateCommand extends Command
             ->addOption(self::OPT_AUDIT_LOG, null, InputOption::VALUE_OPTIONAL, 'Путь к JSONL audit-логу (переопределяет путь по умолчанию)')
             ->addOption(self::OPT_NO_AUDIT_LOG, null, InputOption::VALUE_NONE, 'Отключить audit-логирование')
             ->addOption(self::OPT_REPORT_FORMAT, null, InputOption::VALUE_OPTIONAL, 'Формат отчёта: text|json (none — отключить)', 'text')
-            ->addOption(self::OPT_REPORT_FILE, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу для записи отчёта');
+            ->addOption(self::OPT_REPORT_FILE, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу для записи отчёта')
+            ->addOption(self::OPT_NO_CONTEXT_FILES, null, InputOption::VALUE_NONE, 'Отключить автоматическую загрузку контекстных файлов (AGENTS.md, CLAUDE.md)');
     }
 
     #[Override]
@@ -124,6 +126,7 @@ final class OrchestrateCommand extends Command
             /** @var bool $noAuditLog */
             $noAuditLog = $input->getOption(self::OPT_NO_AUDIT_LOG);
             $auditLog = ($auditLogPath !== null && $auditLogPath !== '') ? $auditLogPath : null;
+            $noContextFiles = (bool) $input->getOption(self::OPT_NO_CONTEXT_FILES);
 
             if ($resumeDir !== null && $resumeDir !== '') {
                 $io->section(sprintf('🔄 Resuming session: %s', $resumeDir));
@@ -139,6 +142,7 @@ final class OrchestrateCommand extends Command
                     resumeDir: $resumeDir,
                     auditLogPath: $auditLog,
                     noAuditLog: $noAuditLog,
+                    noContextFiles: $noContextFiles,
                 ));
 
                 return $this->renderDynamicResult($io, $result);
@@ -170,6 +174,7 @@ final class OrchestrateCommand extends Command
                 resumeDir: null,
                 auditLogPath: $auditLog,
                 noAuditLog: $noAuditLog,
+                noContextFiles: $noContextFiles,
             ));
 
             // Генерация отчёта (если задан формат)
