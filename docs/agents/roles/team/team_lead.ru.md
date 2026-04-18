@@ -302,7 +302,7 @@ PROMPT
 
 #### Как оформить
 
-Создай файл рефлексии в `docs/agents/team-reflections/team-lead/`. Формат имени:
+Создай файл рефлексии в `docs/agents/team-reflections/team_lead/` (имя каталога = значение `role` из front matter файла роли). Формат имени:
 
 ```
 <YYYY-MM-DD_HH-MM-SS>-<короткий-слаг>.md
@@ -310,7 +310,7 @@ PROMPT
 
 Пример: `2026-04-17_12-00-00-orchestrator-decomposition.md`
 
-Шаблон файла — в [`_template.md`](../../../agents/team-reflections/team-lead/_template.md).
+Шаблон файла — в [`_template.md`](../../../agents/team-reflections/team_lead/_template.md).
 
 #### Куда вносить изменения
 
@@ -481,7 +481,7 @@ git branch -d task/arch-chain-service-restructure
 * [Конвенции](../../../../docs/conventions/index.md).
 * [Архитектура](../../../../docs/guide/architecture.md).
 * [Git workflow](../../../../docs/git-workflow/pull-request.md).
-* [Рефлексии](../../../agents/team-reflections/team-lead/) — история ретроспектив.
+* [Рефлексии](../../../agents/team-reflections/team_lead/) — история ретроспектив.
 
 ## Выходные данные
 
