@@ -24,5 +24,6 @@ interface ExecuteStaticChainServiceInterface
         ?string $workingDir = null,
         int $timeout = 300,
         ?AuditLoggerInterface $auditLogger = null,
+        bool $noContextFiles = false,
     ): OrchestrateChainResultDto;
 }
