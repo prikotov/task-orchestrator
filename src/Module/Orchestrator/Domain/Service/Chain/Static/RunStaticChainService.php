@@ -47,6 +47,7 @@ final readonly class RunStaticChainService
         ?string $workingDir = null,
         int $timeout = 300,
         ?AuditLoggerInterface $auditLogger = null,
+        bool $noContextFiles = false,
     ): StaticChainResultVo {
         $steps = $chain->getSteps();
         $fixIterations = $chain->getFixIterations();
@@ -76,6 +77,7 @@ final readonly class RunStaticChainService
                 $nameToIndexMap,
                 $results, // @psalm-suppress ArgumentTypeCoercion loop reassignment widens type
                 $auditLogger,
+                $noContextFiles,
             );
             if ($stepResult === null) {
                 break;
@@ -123,6 +125,7 @@ final readonly class RunStaticChainService
         array $nameToIndexMap,
         array $results,
         ?AuditLoggerInterface $auditLogger,
+        bool $noContextFiles = false,
     ): ?StaticProcessResultVo {
         $step = $steps[$execution->getStepIndex()];
         $budgetRole = ($step->isAgent() ? $step->getRole() : null) ?? 'quality_gate';
@@ -146,6 +149,7 @@ final readonly class RunStaticChainService
             $auditLogger,
             $stepIndex1,
             $role,
+            $noContextFiles,
         );
 
         $results[] = $stepResult;
@@ -233,6 +237,7 @@ final readonly class RunStaticChainService
         ?AuditLoggerInterface $auditLogger,
         int $stepIndex1,
         string $role,
+        bool $noContextFiles = false,
     ): StaticStepResultVo {
         if ($step->isQualityGate()) {
             $auditLogger?->logStepStart(
@@ -277,6 +282,7 @@ final readonly class RunStaticChainService
             $execution->getPreviousContext(),
             $iterationNumber,
             $roleConfig,
+            $noContextFiles,
         );
         $auditLogger?->logStepResult(
             $chain->getName(),
