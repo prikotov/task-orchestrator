@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\AuditLoggerFactoryInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use Override;
 
 /**

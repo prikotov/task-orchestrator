@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ChainStepVo::class)]
 #[CoversClass(ChainTypeEnum::class)]
 #[CoversClass(RoleConfigVo::class)]
-#[CoversClass(RetryPolicyVo::class)]
+#[CoversClass(ChainRetryPolicyVo::class)]
 final class ChainDefinitionVoTest extends TestCase
 {
     #[Test]
@@ -215,7 +215,7 @@ final class ChainDefinitionVoTest extends TestCase
     #[Test]
     public function createFromStepsWithDefaultRetryPolicy(): void
     {
-        $retryPolicy = new RetryPolicyVo(maxRetries: 5, initialDelayMs: 500);
+        $retryPolicy = new ChainRetryPolicyVo(maxRetries: 5, initialDelayMs: 500);
 
         $vo = ChainDefinitionVo::createFromSteps(
             name: 'retry_chain',
@@ -244,7 +244,7 @@ final class ChainDefinitionVoTest extends TestCase
     #[Test]
     public function createFromDynamicWithDefaultRetryPolicy(): void
     {
-        $retryPolicy = new RetryPolicyVo(maxRetries: 2, initialDelayMs: 200);
+        $retryPolicy = new ChainRetryPolicyVo(maxRetries: 2, initialDelayMs: 200);
 
         $vo = ChainDefinitionVo::createFromDynamic(
             name: 'dyn_retry',
@@ -291,7 +291,7 @@ final class ChainDefinitionVoTest extends TestCase
     #[Test]
     public function chainStepVoHoldsRetryPolicy(): void
     {
-        $stepPolicy = new RetryPolicyVo(maxRetries: 1);
+        $stepPolicy = new ChainRetryPolicyVo(maxRetries: 1);
 
         $step = ChainStepVo::agent(
             role: 'retry_role',

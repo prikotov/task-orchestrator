@@ -6,10 +6,10 @@ complexity: C5
 priority: P2
 depends_on:
 author: Архитектор (Гэндальф)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Тимлид
+branch: task/arch-orchestrator-module-decomposition
+pr: '#12'
+status: done
 ---
 
 # EPIC-arch-orchestrator-module-decomposition: Декомпозиция модуля Orchestrator
@@ -48,21 +48,25 @@ status: todo
 ## Plan (План реализации)
 
 ### Фаза 1: Внутренняя реорганизация (Вариант А)
-- [ ] [TASK-arch-chain-service-restructure](TASK-arch-chain-service-restructure.todo.md)
+- [x] [TASK-arch-chain-service-restructure](done/TASK-arch-chain-service-restructure.todo.md)
 
 ### Фаза 2: Декомпозиция на 2 модуля (Вариант C-light)
-- [ ] [TASK-arch-agent-runner-module-extract](TASK-arch-agent-runner-module-extract.todo.md)
-- [ ] [TASK-arch-orchestrator-ports-and-adapters](TASK-arch-orchestrator-ports-and-adapters.todo.md)
-- [ ] [TASK-arch-decomposition-tests-and-docs](TASK-arch-decomposition-tests-and-docs.todo.md)
+- [x] [TASK-arch-agent-runner-module-extract](done/TASK-arch-agent-runner-module-extract.todo.md)
+- [x] [TASK-arch-orchestrator-ports-and-adapters](done/TASK-arch-orchestrator-ports-and-adapters.todo.md)
+- [x] [TASK-arch-decomposition-tests-and-docs](done/TASK-arch-decomposition-tests-and-docs.todo.md)
+
+### Фаза 3: Приведение к конвенциям
+- [x] [TASK-arch-integration-naming-convention](done/TASK-arch-integration-naming-convention.todo.md)
+- [x] [TASK-arch-integration-isolation](done/TASK-arch-integration-isolation.todo.md)
 
 ## Definition of Done (DoD)
 
-- [ ] `AgentRunner` — standalone модуль, 0 входящих зависимостей
-- [ ] `Orchestrator` Domain не импортирует ничего из `AgentRunner`
-- [ ] Связь только через `Orchestrator/Infrastructure/Adapter/`
-- [ ] Каждый модуль < 80 файлов
-- [ ] PHPUnit + Psalm green
-- [ ] Архитектурная документация актуальна
+- [x] `AgentRunner` — standalone модуль, 0 входящих зависимостей
+- [x] `Orchestrator` Domain не импортирует ничего из `AgentRunner`
+- [x] Связь через `Orchestrator/Integration/Service/` с именованием по конвенции `service.md`
+- [x] Каждый модуль < 80 файлов
+- [x] PHPUnit + Psalm green
+- [x] Архитектурная документация актуальна
 
 ## Risks and Dependencies
 

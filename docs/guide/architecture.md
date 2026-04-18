@@ -2,125 +2,267 @@
 
 Библиотека следует DDD-слоям: Domain → Application → Infrastructure. Presentation — в приложении-хосте (например, `apps/console/` в TasK).
 
-Визуальный обзор слоёв и взаимодействий — в [Диаграммы](diagrams.md).
+Визуальный обзор слоёв, модулей и взаимодействий — в [Диаграммы](diagrams.md).
 
-## Структура модуля
+## Двухмодульная структура
+
+Бандл состоит из двух модулей, каждый со своими DDD-слоями:
 
 ```
-packages/TaskOrchestrator/src/
+src/Common/Module/
+├── AgentRunner/                 # Модуль движка AI-агента
+│   ├── Domain/                  # Контракт движка: AgentRunnerInterface, VO, Registry
+│   └── Infrastructure/          # Реализации: PiAgentRunner, Retry, Circuit Breaker
+└── Orchestrator/                # Модуль оркестрации цепочек
+    ├── Domain/                  # Бизнес-логика: Chain, Budget, Dynamic, Static, Port
+    ├── Application/             # Use cases, DTO, мапперы
+    └── Infrastructure/          # Адаптеры к AgentRunner, YAML-загрузка, JSONL-лог
+```
+
+### Модуль AgentRunner
+
+Отвечает за запуск AI-агента через конкретный CLI-инструмент. Не знает об оркестрации и цепочках.
+
+**Domain-слой:**
+- `AgentRunnerInterface` — контракт движка: `run()`, `getName()`, `isAvailable()`
+- `AgentRunnerRegistryService` — реестр name → AgentRunnerInterface
+- `AgentRunnerRegistryServiceInterface` — интерфейс реестра
+- `RetryableRunnerFactoryInterface` — фабрика retryable-обёртки
+- VO: `AgentResultVo`, `AgentRunRequestVo`, `AgentTurnResultVo`, `RetryPolicyVo`, `CircuitBreakerStateVo`
+- Enum: `CircuitStateEnum` (closed | half_open | open)
+- Exception: `AgentException`, `RunnerNotFoundException`, `NotFoundExceptionInterface`
+
+**Infrastructure-слой:**
+- `PiAgentRunner` — реализация для pi CLI
+- `PiJsonlParser` — парсер JSONL-вывода pi
+- `RetryingAgentRunner` — обёртка с retry-policy (экспоненциальная задержка)
+- `CircuitBreakerAgentRunner` — обёртка Circuit Breaker (closed → open → half_open)
+- `RetryableRunnerFactory` — фабрика для создания retrying-обёртки
+
+### Модуль Orchestrator
+
+Отвечает за оркестрацию цепочек агентов (static/dynamic). Не зависит от конкретного движка — общается с AgentRunner через Port/Adapter.
+
+**Domain-слой:**
+- `Port/AgentRunnerPortInterface` — порт движка AI-агента (инкапсулирует retry)
+- `Port/AgentRunnerRegistryPortInterface` — порт реестра движков
+- Сервисы Chain: Audit, Dynamic, Session, Shared, Static, Budget, Prompt
+- Entity: `DynamicLoopExecution`, `StaticChainExecution`
+- VO: `ChainRunRequestVo`, `ChainRunResultVo`, `ChainRetryPolicyVo`, `ChainTurnResultVo`, `ChainDefinitionVo`, и др.
+- Enum: `ChainStepTypeEnum`, `ChainTypeEnum`
+- Exception: `OrchestratorException`, `ChainNotFoundException`, `RoleNotFoundException`
+
+**Application-слой:**
+- Use cases: `OrchestrateChainCommandHandler`, `RunAgentCommandHandler`, `GetRunnersQueryHandler`, `GenerateReportQueryHandler`
+- DTO: команды и результаты
+- Service: `ExecuteStaticChainService`, `DispatchRoundEventService`
+- Mapper: `ReportFormatMapperInterface`, `ReportJsonMapper`, `ReportTextMapper`
+
+**Infrastructure-слой:**
+- **Adapter/** — адаптеры к AgentRunner:
+  - `AgentRunnerAdapter` — реализует `AgentRunnerPortInterface`, маппит VO и делегирует в `AgentRunnerInterface`
+  - `AgentRunnerRegistryAdapter` — реализует `AgentRunnerRegistryPortInterface`, оборачивает реестр
+  - `AgentVoMapper` — маппер VO между Orchestrator Domain и AgentRunner Domain
+- Сервисы Chain: `YamlChainLoader`, `ChainSessionLogger`, `QualityGateRunner`, и др.
+
+## Port/Adapter между модулями
+
+Модули связаны через паттерн **Port/Adapter** (Hexagonal Architecture). Orchestrator Domain определяет **Port**-интерфейсы, Infrastructure реализует **Adapter**'ы, которые делегируют в AgentRunner.
+
+```
+Orchestrator Domain                    Infrastructure Adapter              AgentRunner Domain
+─────────────────────                  ──────────────────────              ─────────────────────
+AgentRunnerPortInterface  ←─────────   AgentRunnerAdapter    ──────────>  AgentRunnerInterface
+AgentRunnerRegistryPortInterface ←───  AgentRunnerRegistryAdapter ──────> AgentRunnerRegistryServiceInterface
+(ChainRunRequestVo, ChainRunResultVo)   AgentVoMapper         ──────────> (AgentRunRequestVo, AgentResultVo)
+```
+
+### VO-маппинг на границе модулей
+
+Каждый модуль имеет собственные VO. Маппинг выполняется в `AgentVoMapper` (Infrastructure):
+
+| Orchestrator VO (Domain)          | AgentRunner VO (Domain)     |
+|-----------------------------------|-----------------------------|
+| `ChainRunRequestVo`               | `AgentRunRequestVo`         |
+| `ChainRunResultVo`                | `AgentResultVo`             |
+| `ChainTurnResultVo`               | `AgentTurnResultVo`         |
+| `ChainRetryPolicyVo`              | `RetryPolicyVo`             |
+
+**Принцип:** Orchestrator Domain не зависит от AgentRunner Domain. VO дублированы намеренно — каждый модуль владеет своими типами.
+
+## Зависимости модулей и слоёв
+
+| Откуда | Куда | Примечание |
+|---|---|---|
+| **Orchestrator** Domain | — | Только PHP std + `Psr\Log\LoggerInterface` |
+| **Orchestrator** Application | **Orchestrator** Domain | Через интерфейсы и VOs |
+| **Orchestrator** Infrastructure | **Orchestrator** Domain (interfaces) | Реализует Port-интерфейсы через Adapter |
+| **Orchestrator** Infrastructure | **AgentRunner** Domain (interfaces + VO) | Adapter маппит VO и делегирует |
+| **AgentRunner** Domain | — | Только PHP std + `Psr\Log\LoggerInterface` |
+| **AgentRunner** Infrastructure | **AgentRunner** Domain (interfaces) | Реализует AgentRunnerInterface |
+| Presentation | Application only | Внедряет use case handler'ы напрямую или через Bus |
+
+### Правило: Domain не зависит ни от кого
+
+Оба модуля следуют принципу: Domain-слой не содержит зависимостей на другие слои или сторонние библиотеки (кроме `Psr\Log\LoggerInterface`).
+
+### Почему CommandHandler для оркестрации
+
+Оркестрация запускает AI-агентов (side effects: выполнение shell-команд, запись файлов, трата токенов).
+Поэтому `OrchestrateChainCommandHandler` и `RunAgentCommandHandler` используют Command pattern.
+CommandHandler может возвращать DTO — это допустимо для CQRS с side effects.
+
+### Почему QueryHandler для runners и reports
+
+`GetRunnersQueryHandler` и `GenerateReportQueryHandler` — readonly-операции без side effects.
+Они используют Query pattern.
+
+## Структура каталогов
+
+### AgentRunner
+
+```
+src/Common/Module/AgentRunner/
 ├── Domain/
-│   ├── Dto/
-│   │   ├── ChainResultAuditDto.php                      # параметры logChainResult (stepsCount, totalCost, …)
-│   │   └── StepAuditStatusDto.php                        # isError-статус шага для chain_result-записи
 │   ├── Enum/
-│   │   ├── ChainStepTypeEnum.php                         # agent | quality_gate
-│   │   ├── ChainTypeEnum.php                             # static | dynamic
-│   │   └── CircuitStateEnum.php                          # closed | half_open | open
+│   │   └── CircuitStateEnum.php                         # closed | half_open | open
 │   ├── Exception/
-│   │   ├── AgentException.php                            # базовый exception библиотеки
-│   │   ├── ChainNotFoundException.php
-│   │   ├── NotFoundExceptionInterface.php                # маркерный интерфейс
-│   │   ├── RoleNotFoundException.php
+│   │   ├── AgentException.php                           # базовый exception
+│   │   ├── NotFoundExceptionInterface.php               # маркерный интерфейс
 │   │   └── RunnerNotFoundException.php
 │   ├── Service/
-│   │   ├── AgentRunner/
-│   │   │   ├── AgentRunnerInterface.php                  # run(), getName(), isAvailable()
-│   │   │   ├── AgentRunnerRegistryService.php            # name → AgentRunnerInterface
-│   │   │   ├── AgentRunnerRegistryServiceInterface.php
-│   │   │   └── RetryableRunnerFactoryInterface.php       # фабрика retryable-обёртки
-│   │   ├── Budget/
-│   │   │   └── CheckDynamicBudgetServiceInterface.php
-│   │   ├── Chain/
-│   │   │   ├── AuditLoggerInterface.php                # logChainStart/StepStart/StepResult/ChainResult
-│   │   │   ├── AuditLoggerFactoryInterface.php         # create(filePath): AuditLoggerInterface
-│   │   │   ├── BuildDynamicContextServiceInterface.php  # сбор контекста dynamic-раунда
-│   │   │   ├── BuildDynamicContextService.php
-│   │   │   ├── ChainLoaderInterface.php
-│   │   │   ├── ChainSessionLoggerInterface.php         # логирование сессии (JSONL)
-│   │   │   ├── ChainSessionReaderInterface.php         # чтение сессии (resume)
-│   │   │   ├── ChainSessionWriterInterface.php         # запись сессии
-│   │   │   ├── CheckStaticBudgetServiceInterface.php   # проверка бюджета static-цепочки
-│   │   │   ├── CheckStaticBudgetService.php
-│   │   │   ├── ExecuteDynamicTurnService.php           # выполнение одного хода dynamic-цепочки
-│   │   │   ├── ExecuteStaticStepService.php            # выполнение одного agent-шага
-│   │   │   ├── FacilitatorResponseParserInterface.php  # парсинг ответа фасилитатора
-│   │   │   ├── FormatDynamicJournalServiceInterface.php
-│   │   │   ├── FormatDynamicJournalService.php
-│   │   │   ├── PromptFormatterInterface.php            # форматирование промпта шага
-│   │   │   ├── QualityGateRunnerInterface.php          # run(QualityGateVo): QualityGateResultVo
-│   │   │   ├── RecordDynamicRoundServiceInterface.php  # запись раунда dynamic-цепочки
-│   │   │   ├── RecordDynamicRoundService.php
-│   │   │   ├── ResolveChainRunnerServiceInterface.php  # резолв runner для шага (fallback)
-│   │   │   ├── RoundCompletedNotifierInterface.php     # уведомление о завершении раунда
-│   │   │   ├── RunDynamicLoopServiceInterface.php      # цикл dynamic-цепочки
-│   │   │   ├── RunDynamicLoopService.php
-│   │   │   ├── RunDynamicLoopAgentServiceInterface.php  # интерфейс запуска агента в dynamic-цикле
-│   │   │   └── RunStaticChainService.php               # выполнение static-цепочки
-│   │   └── Prompt/
-│   │       └── PromptProviderInterface.php
-│   ├── Entity/
-│   │   ├── DynamicLoopExecution.php                     # in-memory сущность dynamic-цикла
-│   │   └── StaticChainExecution.php                     # in-memory сущность static-цепочки
+│   │   ├── AgentRunnerInterface.php                     # run(), getName(), isAvailable()
+│   │   ├── AgentRunnerRegistryService.php               # name → AgentRunnerInterface
+│   │   ├── AgentRunnerRegistryServiceInterface.php
+│   │   └── RetryableRunnerFactoryInterface.php          # фабрика retryable-обёртки
 │   └── ValueObject/
 │       ├── AgentResultVo.php
 │       ├── AgentRunRequestVo.php
-│       ├── AgentTurnResultVo.php                        # результат одного хода агента
-│       ├── BudgetVo.php                                 # maxCostTotal, maxCostPerStep, perRole
-│       ├── ChainDefinitionVo.php                        # type, facilitator, participants, maxRounds, fixIterations
-│       ├── ChainSessionStateVo.php                      # состояние сессии для resume
-│       ├── ChainStepVo.php                              # type (agent/quality_gate), name, role | command
-│       ├── CircuitBreakerStateVo.php                    # state, failureCount, lastFailureTime
-│       ├── DynamicBudgetCheckVo.php                     # результат проверки бюджета dynamic
-│       ├── DynamicChainContextVo.php                     # контекст dynamic-раунда
-│       ├── DynamicLoopResultVo.php                      # результат dynamic-цикла (Domain)
-│       ├── DynamicRoundResultVo.php                     # метрики dynamic-раунда (Domain)
-│       ├── DynamicTurnResultVo.php                      # результат dynamic-хода (Domain)
-│       ├── FacilitatorResponseVo.php                    # next_role | done + synthesis
-│       ├── FacilitatorTurnResultVo.php                  # результат хода фасилитатора (Domain)
-│       ├── FallbackAttemptVo.php                        # runner, model, result fallback-попытки
-│       ├── FallbackConfigVo.php                         # fallback command для роли
-│       ├── FixIterationGroupVo.php                      # group, stepNames, maxIterations
-│       ├── QualityGateVo.php                            # command, label, timeoutSeconds
-│       ├── QualityGateResultVo.php                      # label, passed, exitCode, output, durationMs
-│       ├── RetryPolicyVo.php                            # maxRetries, initialDelayMs, multiplier
-│       ├── RoleConfigVo.php                             # promptFile, command, fallback
-│       ├── StaticChainResultVo.php                      # результат static-цепочки (Domain)
-│       ├── StaticProcessResultVo.php                    # результат процесса (Domain)
-│       └── StaticStepResultVo.php                       # результат шага static-цепочки (Domain)
+│       ├── AgentTurnResultVo.php
+│       ├── CircuitBreakerStateVo.php
+│       └── RetryPolicyVo.php
+└── Infrastructure/
+    └── Service/
+        ├── CircuitBreakerAgentRunner.php                # обёртка Circuit Breaker
+        ├── Pi/
+        │   ├── PiAgentRunner.php
+        │   └── PiJsonlParser.php
+        ├── RetryableRunnerFactory.php                   # фабрика RetryingAgentRunner
+        └── RetryingAgentRunner.php                      # обёртка с retry-policy
+```
+
+### Orchestrator
+
+```
+src/Common/Module/Orchestrator/
+├── Domain/
+│   ├── Dto/
+│   │   ├── ChainResultAuditDto.php                      # параметры logChainResult
+│   │   └── StepAuditStatusDto.php                       # isError-статус шага
+│   ├── Entity/
+│   │   ├── DynamicLoopExecution.php                     # in-memory сущность dynamic-цикла
+│   │   └── StaticChainExecution.php                     # in-memory сущность static-цепочки
+│   ├── Enum/
+│   │   ├── ChainStepTypeEnum.php                        # agent | quality_gate
+│   │   └── ChainTypeEnum.php                            # static | dynamic
+│   ├── Exception/
+│   │   ├── ChainNotFoundException.php
+│   │   ├── NotFoundExceptionInterface.php               # маркерный интерфейс
+│   │   ├── OrchestratorException.php                    # базовый exception модуля
+│   │   └── RoleNotFoundException.php
+│   ├── Service/
+│   │   ├── Budget/
+│   │   │   └── CheckDynamicBudgetServiceInterface.php
+│   │   ├── Chain/
+│   │   │   ├── Audit/
+│   │   │   │   ├── AuditLoggerInterface.php
+│   │   │   │   └── AuditLoggerFactoryInterface.php
+│   │   │   ├── Dynamic/
+│   │   │   │   ├── BuildDynamicContextServiceInterface.php
+│   │   │   │   ├── BuildDynamicContextService.php
+│   │   │   │   ├── ExecuteDynamicTurnService.php
+│   │   │   │   ├── FormatDynamicJournalServiceInterface.php
+│   │   │   │   ├── FormatDynamicJournalService.php
+│   │   │   │   ├── RecordDynamicRoundServiceInterface.php
+│   │   │   │   ├── RecordDynamicRoundService.php
+│   │   │   │   ├── RunDynamicLoopAgentServiceInterface.php
+│   │   │   │   ├── RunDynamicLoopServiceInterface.php
+│   │   │   │   └── RunDynamicLoopService.php
+│   │   │   ├── Session/
+│   │   │   │   ├── ChainSessionLoggerInterface.php
+│   │   │   │   ├── ChainSessionReaderInterface.php
+│   │   │   │   └── ChainSessionWriterInterface.php
+│   │   │   ├── Shared/
+│   │   │   │   ├── ChainLoaderInterface.php
+│   │   │   │   ├── FacilitatorResponseParserInterface.php
+│   │   │   │   ├── PromptFormatterInterface.php
+│   │   │   │   ├── QualityGateRunnerInterface.php
+│   │   │   │   ├── ResolveChainRunnerServiceInterface.php
+│   │   │   │   └── RoundCompletedNotifierInterface.php
+│   │   │   └── Static/
+│   │   │       ├── CheckStaticBudgetServiceInterface.php
+│   │   │       ├── CheckStaticBudgetService.php
+│   │   │       ├── ExecuteStaticStepService.php
+│   │   │       └── RunStaticChainService.php
+│   │   ├── Port/
+│   │   │   ├── AgentRunnerPortInterface.php             # порт движка AI-агента
+│   │   │   └── AgentRunnerRegistryPortInterface.php     # порт реестра движков
+│   │   └── Prompt/
+│   │       └── PromptProviderInterface.php
+│   └── ValueObject/
+│       ├── BudgetVo.php
+│       ├── ChainDefinitionVo.php
+│       ├── ChainRetryPolicyVo.php
+│       ├── ChainRunRequestVo.php
+│       ├── ChainRunResultVo.php
+│       ├── ChainSessionStateVo.php
+│       ├── ChainStepVo.php
+│       ├── ChainTurnResultVo.php
+│       ├── DynamicBudgetCheckVo.php
+│       ├── DynamicChainContextVo.php
+│       ├── DynamicLoopResultVo.php
+│       ├── DynamicRoundResultVo.php
+│       ├── DynamicTurnResultVo.php
+│       ├── FacilitatorResponseVo.php
+│       ├── FacilitatorTurnResultVo.php
+│       ├── FallbackAttemptVo.php
+│       ├── FallbackConfigVo.php
+│       ├── FixIterationGroupVo.php
+│       ├── QualityGateResultVo.php
+│       ├── QualityGateVo.php
+│       ├── RoleConfigVo.php
+│       ├── StaticChainResultVo.php
+│       ├── StaticProcessResultVo.php
+│       └── StaticStepResultVo.php
 ├── Application/
-│   ├── Command/
-│   │   └── CommandInterface.php                         # маркерный интерфейс
-│   ├── Query/
-│   │   └── QueryInterface.php                           # маркерный интерфейс
 │   ├── Enum/
 │   │   └── ReportFormatEnum.php                         # text | json
 │   ├── Event/OrchestrateChain/
-│   │   ├── OrchestrateRoundCompletedEvent.php           # событие: раунд dynamic завершён
-│   │   └── OrchestrateSessionCompletedEvent.php         # событие: сессия завершена
+│   │   ├── OrchestrateRoundCompletedEvent.php
+│   │   └── OrchestrateSessionCompletedEvent.php
 │   ├── Mapper/
-│   │   ├── ReportFormatMapperInterface.php              # маппинг DTO → формат отчёта
+│   │   ├── ReportFormatMapperInterface.php
 │   │   ├── ReportJsonMapper.php
 │   │   └── ReportTextMapper.php
-│   ├── Service/
-│   │   └── Chain/
-│   │       ├── ExecuteStaticChainService.php            # оркестрация static-цепочки
-│   │       ├── ExecuteStaticChainServiceInterface.php
-│   │       ├── DispatchRoundEventService.php            # диспетчеризация событий раунда
+│   ├── Service/Chain/
+│   │   ├── ExecuteStaticChainService.php
+│   │   ├── ExecuteStaticChainServiceInterface.php
+│   │   └── DispatchRoundEventService.php
 │   └── UseCase/
-│       ├── Command/                                     # Commands (изменение state / side effects)
+│       ├── Command/
 │       │   ├── OrchestrateChain/
-│       │   │   ├── DynamicLoopResultDto.php              # результат цикла dynamic-цепочки
-│       │   │   ├── DynamicRoundResultDto.php             # метрики одного раунда
-│       │   │   ├── FacilitatorTurnResultDto.php          # результат хода фасилитатора
+│       │   │   ├── DynamicLoopResultDto.php
+│       │   │   ├── DynamicRoundResultDto.php
+│       │   │   ├── FacilitatorTurnResultDto.php
 │       │   │   ├── OrchestrateChainCommand.php
-│       │   │   ├── OrchestrateChainCommandHandler.php    # static + dynamic маршрутизация
+│       │   │   ├── OrchestrateChainCommandHandler.php
 │       │   │   ├── OrchestrateChainResultDto.php
-│       │   │   └── StepResultDto.php                    # iterationNumber, iterationWarning, passed, exitCode, label
+│       │   │   └── StepResultDto.php
 │       │   └── RunAgent/
 │       │       ├── RunAgentCommand.php
 │       │       ├── RunAgentCommandHandler.php
 │       │       └── RunAgentResultDto.php
-│       └── Query/                                       # Queries (чтение / без side effects)
+│       └── Query/
 │           ├── GenerateReport/
 │           │   ├── GenerateReportQuery.php
 │           │   ├── GenerateReportQueryHandler.php
@@ -130,33 +272,36 @@ packages/TaskOrchestrator/src/
 │               ├── GetRunnersQuery.php
 │               ├── GetRunnersQueryHandler.php
 │               └── RunnerDto.php
-├── Infrastructure/
-│   ├── Service/
-│   │   ├── AgentRunner/
-│   │   │   ├── CircuitBreakerAgentRunner.php            # обёртка Circuit Breaker
-│   │   │   ├── Pi/
-│   │   │   │   ├── PiAgentRunner.php
-│   │   │   │   └── PiJsonlParser.php
-│   │   │   ├── RetryableRunnerFactory.php               # фабрика RetryingAgentRunner
-│   │   │   └── RetryingAgentRunner.php                  # обёртка с retry-policy
-│   │   ├── Chain/
-│   │   │   ├── ChainSessionLogger.php                  # логирование сессии
-│   │   │   ├── CheckDynamicBudgetService.php            # проверка бюджета dynamic
-│   │   │   ├── FacilitatorResponseParserService.php     # парсинг ответа фасилитатора
-│   │   │   ├── JsonlAuditLogger.php                    # JSONL audit trail (FILE_APPEND | LOCK_EX)
-│   │   │   ├── JsonlAuditLoggerFactory.php             # фабрика AuditLoggerInterface
-│   │   │   ├── PromptFormatterService.php               # форматирование промптов
-│   │   │   ├── QualityGateRunner.php                   # Symfony Process, выполнение shell-команд
-│   │   │   ├── ResolveChainRunnerService.php            # резолв runner + fallback
-│   │   │   ├── RunDynamicLoopAgentService.php           # запуск агента в dynamic-цикле
-│   │   │   └── YamlChainLoader.php
-│   │   └── Prompt/
-│   │       └── RolePromptBuilder.php
-│   └── Symfony/
-│       └── TaskOrchestratorBundle.php                   # Symfony Bundle для интеграции
+└── Infrastructure/
+    ├── Adapter/                                          # Port → AgentRunner
+    │   ├── AgentRunnerAdapter.php                        # реализует AgentRunnerPortInterface
+    │   ├── AgentRunnerRegistryAdapter.php                # реализует AgentRunnerRegistryPortInterface
+    │   └── AgentVoMapper.php                             # маппер VO Orchestrator ↔ AgentRunner
+    └── Service/
+        ├── Chain/
+        │   ├── ChainSessionLogger.php
+        │   ├── CheckDynamicBudgetService.php
+        │   ├── FacilitatorResponseParserService.php
+        │   ├── JsonlAuditLogger.php
+        │   ├── JsonlAuditLoggerFactory.php
+        │   ├── PromptFormatterService.php
+        │   ├── QualityGateRunner.php
+        │   ├── ResolveChainRunnerService.php
+        │   ├── RunDynamicLoopAgentService.php
+        │   └── YamlChainLoader.php
+        └── Prompt/
+            └── RolePromptBuilder.php
+```
+
+### Bundle Infrastructure
+
+```
+src/
 ├── DependencyInjection/
 │   ├── TaskOrchestratorExtension.php                    # Extension для параметров bundle
 │   └── Configuration.php                               # TreeBuilder-валидация
+├── Infrastructure/Symfony/
+│   └── TaskOrchestratorBundle.php                       # Symfony Bundle
 config/
 └── services.yaml                                       # DI-конфигурация
 ```
@@ -177,27 +322,6 @@ apps/console/src/Module/Agent/
 
 apps/console/config/agent_chains.yaml
 ```
-
-## Зависимости слоёв
-
-| Откуда | Куда | Примечание |
-|---|---|---|
-| Domain | — | Только PHP std + `Psr\Log\LoggerInterface` |
-| Application | Domain | Через интерфейсы и VOs |
-| Infrastructure | Domain (interfaces only) | Реализует интерфейсы Domain |
-| Presentation | Application only | Внедряет use case handler'ы напрямую или через Bus |
-| Integration | — | Пуст (пока нет межмодульного взаимодействия) |
-
-### Почему CommandHandler для оркестрации
-
-Оркестрация запускает AI-агентов (side effects: выполнение shell-команд, запись файлов, трата токенов).
-Поэтому `OrchestrateChainCommandHandler` и `RunAgentCommandHandler` используют Command pattern.
-CommandHandler может возвращать DTO — это допустимо для CQRS с side effects.
-
-### Почему QueryHandler для runners и reports
-
-`GetRunnersQueryHandler` и `GenerateReportQueryHandler` — readonly-операции без side effects.
-Они используют Query pattern.
 
 ## Symfony Bundle
 
@@ -241,6 +365,6 @@ task_orchestrator:
 - `RetryingAgentRunner` — обёртка с retry-policy (экспоненциальная задержка)
 - `CircuitBreakerAgentRunner` — обёртка Circuit Breaker (closed → open → half_open)
 - `RetryableRunnerFactory` — фабрика для создания retrying-обёртки
-- Новый движок: создать класс, реализующий `AgentRunnerInterface`, зарегистрировать в `config/services.yaml`
+- Новый движок: создать класс, реализующий `AgentRunnerInterface`, зарегистрировать в `config/services.yaml` с тегом `agent.runner`
 
 Подробнее о retry и circuit breaker — в [Надёжность](reliability.md).

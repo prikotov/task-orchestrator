@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerRegistryServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Prompt\PromptProviderInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 
 /**
  * UseCase запуска одного AI-агента.
@@ -16,7 +16,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentRunReque
 final readonly class RunAgentCommandHandler
 {
     public function __construct(
-        private AgentRunnerRegistryServiceInterface $runnerRegistry,
+        private RunAgentServiceInterface $agentRunner,
         private PromptProviderInterface $promptProvider,
     ) {
     }
@@ -26,11 +26,9 @@ final readonly class RunAgentCommandHandler
      */
     public function __invoke(RunAgentCommand $command): RunAgentResultDto
     {
-        $runnerName = $command->runner ?? 'pi';
-        $runner = $this->runnerRegistry->get($runnerName);
         $systemPrompt = $this->promptProvider->getPrompt($command->role);
 
-        $request = new AgentRunRequestVo(
+        $request = new ChainRunRequestVo(
             role: $command->role,
             task: $command->task,
             systemPrompt: $systemPrompt,
@@ -38,9 +36,10 @@ final readonly class RunAgentCommandHandler
             tools: $command->tools,
             workingDir: $command->workingDir,
             timeout: $command->timeout,
+            runnerName: $command->runner ?? 'pi',
         );
 
-        $result = $runner->run($request->withTruncatedContext());
+        $result = $this->agentRunner->run($request->withTruncatedContext());
 
         return new RunAgentResultDto(
             outputText: $result->getOutputText(),
