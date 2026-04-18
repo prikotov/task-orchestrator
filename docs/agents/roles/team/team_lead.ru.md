@@ -310,7 +310,7 @@ PROMPT
 
 Пример: `2026-04-17_12-00-00-orchestrator-decomposition.md`
 
-Шаблон файла — в [`_template.md`](../../../agents/team-reflections/team_lead/_template.md).
+Шаблон файла — в [`_epic_retrospective.md`](../../../agents/team-reflections/_epic_retrospective.md).
 
 **Обязательная секция:** `## Предложенные шаги для улучшения` — 1–3 конкретных действия с указанием файлов/процессов. Если процесс отработал без проблем — укажи «Без предложений».
 
