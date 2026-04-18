@@ -6,8 +6,8 @@ namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Command\RunAgent;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerRegistryPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\ResolveAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Prompt\PromptProviderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -18,17 +18,17 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(RunAgentCommand::class)]
 final class RunAgentCommandHandlerTest extends TestCase
 {
-    private AgentRunnerRegistryPortInterface $registry;
+    private ResolveAgentRunnerServiceInterface $registry;
     private PromptProviderInterface $promptProvider;
     private RunAgentCommandHandler $handler;
-    private AgentRunnerPortInterface $runner;
+    private RunAgentServiceInterface $runner;
 
     protected function setUp(): void
     {
-        $this->runner = $this->createMock(AgentRunnerPortInterface::class);
+        $this->runner = $this->createMock(RunAgentServiceInterface::class);
         $this->runner->method('getName')->willReturn('pi');
 
-        $this->registry = $this->createMock(AgentRunnerRegistryPortInterface::class);
+        $this->registry = $this->createMock(ResolveAgentRunnerServiceInterface::class);
         $this->promptProvider = $this->createMock(PromptProviderInterface::class);
 
         $this->handler = new RunAgentCommandHandler(
@@ -110,7 +110,7 @@ final class RunAgentCommandHandlerTest extends TestCase
     #[Test]
     public function invokeUsesCustomRunner(): void
     {
-        $codexRunner = $this->createMock(AgentRunnerPortInterface::class);
+        $codexRunner = $this->createMock(RunAgentServiceInterface::class);
         $expectedResult = ChainRunResultVo::createFromSuccess(outputText: 'codex result');
 
         $this->registry

@@ -7,10 +7,9 @@ priority: P2
 depends_on: []
 epic: EPIC-arch-orchestrator-module-decomposition
 author: Архитектор (Гэндальф)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер
+branch: task/arch-integration-naming-convention
+status: in_progress
 ---
 
 # TASK-arch-integration-naming-convention: Привести интеграционный слой Orchestrator к конвенции service.md
@@ -109,6 +108,49 @@ status: todo
 5. `vendor/bin/phpunit` — зелёные
 6. `vendor/bin/psalm` — 0 ошибок
 7. Каталоги `Domain/Service/Port/` и `Integration/Adapter/` не существуют
+
+## Инструкции для сабагента
+
+**Роль:** docs/agents/roles/team/backend_developer.ru.md
+**Ветка:** task/arch-integration-naming-convention (уже создана и активна)
+**PR:** уже создан (draft #15) из task/arch-integration-naming-convention в task/arch-orchestrator-module-decomposition
+
+### Порядок действий
+1. Переключись в ветку `task/arch-integration-naming-convention`: `git checkout task/arch-integration-naming-convention`
+2. Реализуй задачу согласно описанию и критериям выше.
+3. Следуй AGENTS.md и Конвенциям проекта.
+4. Делай коммиты по Conventional Commits.
+5. Делай промежуточные коммиты после каждого логического этапа (обновил `src/` → коммит, обновил `tests/` → коммит). Это сохранит прогресс при таймауте сабагента.
+6. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` — оба должны пройти.
+7. Запуш: `git push`.
+8. Переведи PR из draft в ready: `gh pr ready 15`. Эта команда снимает флаг draft — PR становится готовым к мержу.
+
+**НЕ создавай новый PR** — он уже существует.
+**НЕ меняй base Branch** — он уже указывает на task/arch-orchestrator-module-decomposition.
+
+### Ключевые архитектурные правила
+
+1. **Переименование файлов и классов — по конвенции `docs/conventions/core_patterns/service.md`** (раздел «Интеграционный сервис»):
+   - Интерфейс: `Domain/Service/Integration/{Action}{Target}ServiceInterface`
+   - Реализация: `Integration/Service/{Context?}/{Action}{Target}Service`
+   - Именование: `{Action}` = глагол (Run, Resolve), `{Target}` = предмет
+2. **Конкретные переименования:**
+   - `Domain/Service/Port/AgentRunnerPortInterface` → `Domain/Service/Integration/RunAgentServiceInterface`
+   - `Domain/Service/Port/AgentRunnerRegistryPortInterface` → `Domain/Service/Integration/ResolveAgentRunnerServiceInterface`
+   - `Integration/Adapter/AgentRunnerAdapter` → `Integration/Service/AgentRunner/RunAgentService`
+   - `Integration/Adapter/AgentRunnerRegistryAdapter` → `Integration/Service/AgentRunner/ResolveAgentRunnerService`
+   - `Integration/Adapter/AgentDtoMapper` → `Integration/Service/AgentRunner/AgentDtoMapper`
+3. **Обновить ВСЕ `use`-директивы** в `src/` и `tests/`. После завершения `grep -r "PortInterface\|AgentRunnerAdapter\|AgentRunnerRegistryAdapter" src/` → 0 совпадений.
+4. **Обновить DI:** `config/services.yaml` — alias на новые имена.
+5. **Удалить пустые каталоги:** `Domain/Service/Port/` и `Integration/Adapter/`.
+
+### Рекомендуемый порядок
+1. Переименуй интерфейсы в Domain/Service/Integration/ (новый каталог) — обнови use во всех файлах.
+2. Переименуй реализации в Integration/Service/AgentRunner/ — обнови use.
+3. Обнови DI (config/services.yaml).
+4. Обнови тесты (переименование файлов + use).
+5. Запусти phpunit + psalm.
+6. Удали пустые старые каталоги.
 
 ## Change History (История изменений)
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\FacilitatorResponseParserInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
@@ -39,7 +39,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
     public function runFacilitator(
         int $step,
         int $round,
-        AgentRunnerPortInterface $runner,
+        RunAgentServiceInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,
@@ -112,7 +112,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
     public function runParticipant(
         int $step,
         int $round,
-        AgentRunnerPortInterface $runner,
+        RunAgentServiceInterface $runner,
         string $role,
         string $topic,
         string $brainstormSystemPrompt,
@@ -185,7 +185,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
     public function runFacilitatorFinalize(
         int $step,
         int $round,
-        AgentRunnerPortInterface $runner,
+        RunAgentServiceInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,

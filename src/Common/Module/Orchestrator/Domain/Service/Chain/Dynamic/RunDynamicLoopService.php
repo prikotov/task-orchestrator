@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynam
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\StepAuditStatusDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Budget\CheckDynamicBudgetServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
@@ -48,7 +48,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
     #[Override]
     public function execute(
         ChainDefinitionVo $chain,
-        AgentRunnerPortInterface $runner,
+        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         int $startRound = 0,
         string $initialDiscussionHistory = '',
@@ -145,7 +145,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
     private function executeFacilitatorTurn(
         ChainDefinitionVo $chain,
-        AgentRunnerPortInterface $runner,
+        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?BudgetVo $budget,
@@ -221,7 +221,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
     private function executeParticipantTurn(
         ChainDefinitionVo $chain,
-        AgentRunnerPortInterface $runner,
+        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?BudgetVo $budget,
@@ -314,7 +314,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
     private function executeFinalizeTurn(
         ChainDefinitionVo $chain,
-        AgentRunnerPortInterface $runner,
+        RunAgentServiceInterface $runner,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,

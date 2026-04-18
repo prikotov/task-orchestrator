@@ -10,7 +10,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject;
  * Определяет полную CLI-команду для запуска fallback-агента,
  * которая используется при ошибке основного runner'а.
  *
- * Первый элемент command — имя runner'а (регистрируется в AgentRunnerRegistryPortInterface).
+ * Первый элемент command — имя runner'а (регистрируется в ResolveAgentRunnerServiceInterface).
  * Остальные элементы — CLI-параметры (--model, --system-prompt, и т.д.).
  *
  * Пример YAML:

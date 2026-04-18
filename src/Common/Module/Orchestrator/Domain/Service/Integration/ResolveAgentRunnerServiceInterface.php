@@ -2,33 +2,33 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port;
+namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration;
 
 /**
- * Port-интерфейс реестра движков AI-агентов для Orchestrator Domain.
+ * Интеграционный сервис реестра движков AI-агентов для Orchestrator Domain.
  *
  * Реализация маппит VO и делегирует в конкретный движок AI-агента.
  */
-interface AgentRunnerRegistryPortInterface
+interface ResolveAgentRunnerServiceInterface
 {
     /**
      * Возвращает движок по имени.
      *
      * @throws \TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\OrchestratorException
      */
-    public function get(string $name): AgentRunnerPortInterface;
+    public function get(string $name): RunAgentServiceInterface;
 
     /**
      * Возвращает движок по умолчанию (первый зарегистрированный).
      *
      * @throws \TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\OrchestratorException
      */
-    public function getDefault(): AgentRunnerPortInterface;
+    public function getDefault(): RunAgentServiceInterface;
 
     /**
      * Возвращает список всех зарегистрированных движков.
      *
-     * @return array<string, AgentRunnerPortInterface>
+     * @return array<string, RunAgentServiceInterface>
      */
     public function list(): array;
 }

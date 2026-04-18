@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainTurnResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorResponseVo;
 
@@ -23,7 +23,7 @@ interface RunDynamicLoopAgentServiceInterface
     public function runFacilitator(
         int $step,
         int $round,
-        AgentRunnerPortInterface $runner,
+        RunAgentServiceInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,
@@ -46,7 +46,7 @@ interface RunDynamicLoopAgentServiceInterface
     public function runParticipant(
         int $step,
         int $round,
-        AgentRunnerPortInterface $runner,
+        RunAgentServiceInterface $runner,
         string $role,
         string $topic,
         string $brainstormSystemPrompt,
@@ -70,7 +70,7 @@ interface RunDynamicLoopAgentServiceInterface
     public function runFacilitatorFinalize(
         int $step,
         int $round,
-        AgentRunnerPortInterface $runner,
+        RunAgentServiceInterface $runner,
         string $facilitatorRole,
         string $topic,
         string $brainstormSystemPrompt,

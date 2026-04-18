@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Tests\Unit\Integration\Adapter;
+namespace TaskOrchestrator\Tests\Unit\Integration\Service\AgentRunner;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -17,11 +17,11 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Integration\Adapter\AgentDtoMapper;
-use TaskOrchestrator\Common\Module\Orchestrator\Integration\Adapter\AgentRunnerAdapter;
+use TaskOrchestrator\Common\Module\Orchestrator\Integration\Service\AgentRunner\AgentDtoMapper;
+use TaskOrchestrator\Common\Module\Orchestrator\Integration\Service\AgentRunner\RunAgentService;
 
-#[CoversClass(AgentRunnerAdapter::class)]
-final class AgentRunnerAdapterTest extends TestCase
+#[CoversClass(RunAgentService::class)]
+final class RunAgentServiceTest extends TestCase
 {
     private ChainRunRequestVo $request;
 
@@ -50,8 +50,8 @@ final class AgentRunnerAdapterTest extends TestCase
         $handler = new RunAgentCommandHandler($registry, $retryFactory);
         $mapper = new AgentDtoMapper();
 
-        $adapter = new AgentRunnerAdapter($handler, $mapper, 'pi', true);
-        $result = $adapter->run($this->request);
+        $service = new RunAgentService($handler, $mapper, 'pi', true);
+        $result = $service->run($this->request);
 
         self::assertFalse($result->isError());
         self::assertSame('Code written', $result->getOutputText());
@@ -77,8 +77,8 @@ final class AgentRunnerAdapterTest extends TestCase
         $handler = new RunAgentCommandHandler($registry, $retryFactory);
         $mapper = new AgentDtoMapper();
 
-        $adapter = new AgentRunnerAdapter($handler, $mapper, 'pi', true);
-        $result = $adapter->run($this->request, $retryPolicy);
+        $service = new RunAgentService($handler, $mapper, 'pi', true);
+        $result = $service->run($this->request, $retryPolicy);
 
         self::assertFalse($result->isError());
         self::assertSame('Retried OK', $result->getOutputText());
@@ -100,8 +100,8 @@ final class AgentRunnerAdapterTest extends TestCase
         $handler = new RunAgentCommandHandler($registry, $retryFactory);
         $mapper = new AgentDtoMapper();
 
-        $adapter = new AgentRunnerAdapter($handler, $mapper, 'pi', true);
-        $result = $adapter->run($this->request);
+        $service = new RunAgentService($handler, $mapper, 'pi', true);
+        $result = $service->run($this->request);
 
         self::assertTrue($result->isError());
         self::assertSame('Timeout', $result->getErrorMessage());
@@ -116,9 +116,9 @@ final class AgentRunnerAdapterTest extends TestCase
         $handler = new RunAgentCommandHandler($registry, $retryFactory);
         $mapper = new AgentDtoMapper();
 
-        $adapter = new AgentRunnerAdapter($handler, $mapper, 'pi', true);
+        $service = new RunAgentService($handler, $mapper, 'pi', true);
 
-        self::assertSame('pi', $adapter->getName());
+        self::assertSame('pi', $service->getName());
     }
 
     #[Test]
@@ -129,9 +129,9 @@ final class AgentRunnerAdapterTest extends TestCase
         $handler = new RunAgentCommandHandler($registry, $retryFactory);
         $mapper = new AgentDtoMapper();
 
-        $adapter = new AgentRunnerAdapter($handler, $mapper, 'pi', true);
+        $service = new RunAgentService($handler, $mapper, 'pi', true);
 
-        self::assertTrue($adapter->isAvailable());
+        self::assertTrue($service->isAvailable());
     }
 
     #[Test]
@@ -142,8 +142,8 @@ final class AgentRunnerAdapterTest extends TestCase
         $handler = new RunAgentCommandHandler($registry, $retryFactory);
         $mapper = new AgentDtoMapper();
 
-        $adapter = new AgentRunnerAdapter($handler, $mapper, 'pi', false);
+        $service = new RunAgentService($handler, $mapper, 'pi', false);
 
-        self::assertFalse($adapter->isAvailable());
+        self::assertFalse($service->isAvailable());
     }
 }

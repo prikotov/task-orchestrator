@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GetRunners;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GetRunners\RunnerDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerRegistryPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\ResolveAgentRunnerServiceInterface;
 
 /**
  * UseCase получения списка доступных движков AI-агентов.
@@ -13,7 +13,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerR
 final readonly class GetRunnersQueryHandler
 {
     public function __construct(
-        private AgentRunnerRegistryPortInterface $runnerRegistry,
+        private ResolveAgentRunnerServiceInterface $runnerRegistry,
     ) {
     }
 

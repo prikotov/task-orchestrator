@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Integration\Adapter;
+namespace TaskOrchestrator\Common\Module\Orchestrator\Integration\Service\AgentRunner;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use Override;
 
 /**
- * ACL-адаптер: делегирует вызовы через AgentRunner Application use cases.
+ * Интеграционный сервис: делегирует вызовы через AgentRunner Application use cases.
  *
  * Маппит Orchestrator Domain VO → AgentRunner Application DTO
  * и обратно. Retry инкапсулирован внутри AgentRunner Application.
  */
-final readonly class AgentRunnerAdapter implements AgentRunnerPortInterface
+final readonly class RunAgentService implements RunAgentServiceInterface
 {
     public function __construct(
         private RunAgentCommandHandler $runAgentHandler,
