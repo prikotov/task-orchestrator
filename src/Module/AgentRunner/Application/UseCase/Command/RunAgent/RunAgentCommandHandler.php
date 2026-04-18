@@ -88,6 +88,7 @@ final readonly class RunAgentCommandHandler
             maxContextLength: $command->maxContextLength,
             command: $command->command,
             runnerArgs: $command->runnerArgs,
+            noContextFiles: $command->noContextFiles,
         );
     }
 }
