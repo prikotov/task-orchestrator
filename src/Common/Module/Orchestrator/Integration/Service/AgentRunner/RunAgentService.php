@@ -14,6 +14,7 @@ use Override;
 /**
  * Интеграционный сервис: делегирует вызовы через AgentRunner Application use cases.
  *
+ * Stateless: runner name берётся из ChainRunRequestVo::getRunnerName().
  * Маппит Orchestrator Domain VO → AgentRunner Application DTO
  * и обратно. Retry инкапсулирован внутри AgentRunner Application.
  */
@@ -22,27 +23,13 @@ final readonly class RunAgentService implements RunAgentServiceInterface
     public function __construct(
         private RunAgentCommandHandler $runAgentHandler,
         private AgentDtoMapper $mapper,
-        private string $runnerName,
-        private bool $runnerAvailable,
     ) {
-    }
-
-    #[Override]
-    public function getName(): string
-    {
-        return $this->runnerName;
-    }
-
-    #[Override]
-    public function isAvailable(): bool
-    {
-        return $this->runnerAvailable;
     }
 
     #[Override]
     public function run(ChainRunRequestVo $request, ?ChainRetryPolicyVo $retryPolicy = null): ChainRunResultVo
     {
-        $command = $this->mapper->mapToRunAgentCommand($request, $this->runnerName, $retryPolicy);
+        $command = $this->mapper->mapToRunAgentCommand($request, $retryPolicy);
         $resultDto = ($this->runAgentHandler)($command);
 
         return $this->mapper->mapFromRunAgentResultDto($resultDto);
