@@ -75,7 +75,6 @@ final readonly class OrchestrateChainCommandHandler
             $command->workingDir,
             $command->timeout,
             $auditLogger,
-            $command->noContextFiles,
         );
     }
 

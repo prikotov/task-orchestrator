@@ -47,7 +47,6 @@ final readonly class ExecuteStaticStepService
         ?string $previousContext,
         ?int $iterationNumber,
         ?RoleConfigVo $roleConfig,
-        bool $noContextFiles = false,
     ): StaticStepResultVo {
         $role = $step->getRole() ?? '';
         $context = $previousContext !== null
@@ -69,7 +68,6 @@ final readonly class ExecuteStaticStepService
             timeout: $roleConfig?->getTimeout() ?? $timeout,
             command: $roleConfig?->getCommand() ?? [],
             runnerName: $runnerName,
-            noContextFiles: $noContextFiles || $step->getNoContextFiles(),
         );
 
         $start = microtime(true);

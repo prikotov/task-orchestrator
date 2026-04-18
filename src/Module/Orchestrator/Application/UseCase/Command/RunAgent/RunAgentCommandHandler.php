@@ -37,7 +37,6 @@ final readonly class RunAgentCommandHandler
             workingDir: $command->workingDir,
             timeout: $command->timeout,
             runnerName: $command->runner ?? 'pi',
-            noContextFiles: $command->noContextFiles,
         );
 
         $result = $this->agentRunner->run($request->withTruncatedContext());
