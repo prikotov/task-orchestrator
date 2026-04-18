@@ -31,7 +31,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "TaskOrchestrator\\": "src/",
+            "TaskOrchestrator\\Common\\": "src/",
             "Console\\": "apps/console/src/"
         }
     },

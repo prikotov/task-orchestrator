@@ -35,7 +35,7 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 
-* **Где делаем:** `src/Common/Module/Orchestrator/Domain/Service/Port/`, `src/Common/Module/Orchestrator/Integration/Adapter/`
+* **Где делаем:** `src/Module/Orchestrator/Domain/Service/Port/`, `src/Module/Orchestrator/Integration/Adapter/`
 * **Текущее поведение:**
   - `Domain/Service/Port/AgentRunnerPortInterface` — интерфейс без глагола-действия, нестандартный суффикс
   - `Domain/Service/Port/AgentRunnerRegistryPortInterface` — аналогично

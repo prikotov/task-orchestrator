@@ -74,7 +74,7 @@ Add to your `config/bundles.php`:
 ```php
 return [
     // ...
-    TaskOrchestrator\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
+    TaskOrchestrator\Common\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
 ];
 ```
 

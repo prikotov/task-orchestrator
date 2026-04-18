@@ -9,7 +9,7 @@
 Бандл состоит из двух модулей, каждый со своими DDD-слоями:
 
 ```
-src/Common/Module/
+src/Module/
 ├── AgentRunner/                 # Модуль движка AI-агента
 │   ├── Domain/                  # Контракт движка: AgentRunnerInterface, VO, Registry
 │   └── Infrastructure/          # Реализации: PiAgentRunner, Retry, Circuit Breaker
@@ -122,7 +122,7 @@ CommandHandler может возвращать DTO — это допустимо
 ### AgentRunner
 
 ```
-src/Common/Module/AgentRunner/
+src/Module/AgentRunner/
 ├── Domain/
 │   ├── Enum/
 │   │   └── CircuitStateEnum.php                         # closed | half_open | open
@@ -154,7 +154,7 @@ src/Common/Module/AgentRunner/
 ### Orchestrator
 
 ```
-src/Common/Module/Orchestrator/
+src/Module/Orchestrator/
 ├── Domain/
 │   ├── Dto/
 │   │   ├── ChainResultAuditDto.php                      # параметры logChainResult
@@ -331,7 +331,7 @@ apps/console/config/agent_chains.yaml
 // apps/console/config/bundles.php
 return [
     // ...
-    \TaskOrchestrator\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
+    \TaskOrchestrator\Common\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
 ];
 ```
 

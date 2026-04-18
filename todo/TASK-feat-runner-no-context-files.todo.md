@@ -24,8 +24,8 @@ status: todo
 
 ## 2. Context and Scope (Контекст и Границы)
 *   **Где делаем:**
-  - `src/Common/Module/Orchestrator/Infrastructure/Service/AgentRunner/` — pi-runner команда
-  - `src/Common/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php` — модель шага
+  - `src/Module/Orchestrator/Infrastructure/Service/AgentRunner/` — pi-runner команда
+  - `src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php` — модель шага
   - `config/chains.yaml.example` — пример конфигурации
   - `apps/console/src/Module/Orchestrator/Command/RunCommand.php` — CLI
 *   **Текущее поведение:** pi-runner всегда загружает AGENTS.md / CLAUDE.md из рабочего директории

@@ -24,7 +24,7 @@ status: done
 Внедрить Port/Adapter между Orchestrator Domain и AgentRunner. Orchestrator Domain определяет свои VO (`ChainRunRequestVo`, `ChainRunResultVo`, `ChainTurnResultVo`, `ChainRetryPolicyVo`) и Port-интерфейсы. Маппинг реализован в `Orchestrator/Infrastructure/Adapter/`. После задачи: `grep -r "AgentRunner" Orchestrator/Domain/` → 0 совпадений.
 
 ## 2. Context and Scope (Контекст и Границы)
-*   **Где делаем:** `src/Common/Module/Orchestrator/`
+*   **Где делаем:** `src/Module/Orchestrator/`
 *   **Текущее состояние (после TASK-arch-agent-runner-module-extract):**
     *   Orchestrator Domain напрямую `use`-ает `AgentRunner\AgentRunnerInterface`, `AgentRunner\AgentRunnerRegistryServiceInterface`, `AgentRunner\RetryableRunnerFactoryInterface`
     *   Orchestrator Domain напрямую `use`-ает `AgentRunner\AgentResultVo`, `AgentRunRequestVo`, `AgentTurnResultVo`, `RetryPolicyVo`
@@ -69,7 +69,7 @@ status: done
 - [ ] **DI-конфигурация:**
   - `config/services.yaml`: связывает адаптеры с AgentRunner-сервисами через autowiring
 
-- [ ] **Verifiable constraint:** `grep -r "AgentRunner" src/Common/Module/Orchestrator/Domain/` → 0 результатов
+- [ ] **Verifiable constraint:** `grep -r "AgentRunner" src/Module/Orchestrator/Domain/` → 0 результатов
 
 ### 🟡 Should Have (Желательно)
 - [ ] Unit-тест на `AgentVoMapper` (покрытие маппинга всех 4 VO)
@@ -101,16 +101,16 @@ status: done
 18. [ ] PHPUnit + Psalm
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] `grep -r "AgentRunner" src/Common/Module/Orchestrator/Domain/` → 0 результатов
-- [ ] `grep -r "AgentRunner" src/Common/Module/Orchestrator/Application/` → 0 результатов (кроме Port/Adapter wiring через DI)
+- [ ] `grep -r "AgentRunner" src/Module/Orchestrator/Domain/` → 0 результатов
+- [ ] `grep -r "AgentRunner" src/Module/Orchestrator/Application/` → 0 результатов (кроме Port/Adapter wiring через DI)
 - [ ] PHPUnit green
 - [ ] Psalm green
 - [ ] Unit-тесты на AgentVoMapper и AgentRunnerAdapter проходят
 
 ## 6. Verification (Самопроверка)
 ```bash
-grep -r "AgentRunner" src/Common/Module/Orchestrator/Domain/ --include="*.php" | wc -l  # → 0
-grep -r "AgentRunner" src/Common/Module/Orchestrator/Application/ --include="*.php" | wc -l  # → 0
+grep -r "AgentRunner" src/Module/Orchestrator/Domain/ --include="*.php" | wc -l  # → 0
+grep -r "AgentRunner" src/Module/Orchestrator/Application/ --include="*.php" | wc -l  # → 0
 vendor/bin/phpunit
 vendor/bin/psalm
 ```
