@@ -9,7 +9,7 @@ epic:
 author: Бэкендер (Левша)
 assignee: Бэкендер
 branch: task/feat-runner-no-context-files-v2
-pr:
+pr: 'https://github.com/prikotov/task-orchestrator/pull/21'
 status: in_progress
 ---
 
@@ -78,7 +78,7 @@ php bin/console app:agent:run --help
 
 **Роль:** docs/agents/roles/team/backend_developer.ru.md
 **Ветка:** task/feat-runner-no-context-files-v2 (уже создана и активна)
-**PR:** #21 (draft) из task/feat-runner-no-context-files-v2 в main
+**PR:** #21 (ready) из task/feat-runner-no-context-files-v2 в main
 
 ### Порядок действий
 1. Переключись в ветку `task/feat-runner-no-context-files-v2`: `git checkout task/feat-runner-no-context-files-v2`
