@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject;
 
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo as FixIterationGroupVo;
 use InvalidArgumentException;
@@ -33,7 +34,7 @@ final readonly class ChainDefinitionVo
      * @param string|null $participantAppendPrompt промпт участника для --append-system-prompt (%s → role_file)
      * @param string|null $participantUserPrompt пользовательский промпт участника (%s → topic, %s → history)
      * @param array<string, RoleConfigVo> $roles per-role конфигурация (key = role name)
-     * @param RetryPolicyVo|null $defaultRetryPolicy политика retry по умолчанию для шагов цепочки
+     * @param ChainRetryPolicyVo|null $defaultRetryPolicy политика retry по умолчанию для шагов цепочки
      * @param BudgetVo|null $budget бюджетные ограничения цепочки (null = безлимит)
      */
     private function __construct(
@@ -53,7 +54,7 @@ final readonly class ChainDefinitionVo
         private ?string $participantAppendPrompt,
         private ?string $participantUserPrompt,
         private array $roles = [],
-        private ?RetryPolicyVo $defaultRetryPolicy = null,
+        private ?ChainRetryPolicyVo $defaultRetryPolicy = null,
         private ?BudgetVo $budget = null,
     ) {
     }
@@ -71,7 +72,7 @@ final readonly class ChainDefinitionVo
         array $steps,
         array $fixIterations = [],
         array $roles = [],
-        ?RetryPolicyVo $defaultRetryPolicy = null,
+        ?ChainRetryPolicyVo $defaultRetryPolicy = null,
         ?BudgetVo $budget = null,
     ): self {
         if (count($steps) === 0) {
@@ -124,7 +125,7 @@ final readonly class ChainDefinitionVo
         string $participantAppendPrompt,
         string $participantUserPrompt,
         array $roles = [],
-        ?RetryPolicyVo $defaultRetryPolicy = null,
+        ?ChainRetryPolicyVo $defaultRetryPolicy = null,
         ?BudgetVo $budget = null,
     ): self {
         if ($facilitator === '') {
@@ -288,7 +289,7 @@ final readonly class ChainDefinitionVo
     /**
      * Возвращает политику retry по умолчанию для цепочки.
      */
-    public function getDefaultRetryPolicy(): ?RetryPolicyVo
+    public function getDefaultRetryPolicy(): ?ChainRetryPolicyVo
     {
         return $this->defaultRetryPolicy;
     }

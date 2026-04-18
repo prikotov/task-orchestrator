@@ -6,9 +6,8 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\RunStaticChainService;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\RunStaticChainService;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticStepResultVo;
@@ -28,7 +27,6 @@ final readonly class ExecuteStaticChainService implements ExecuteStaticChainServ
     #[Override]
     public function execute(
         ChainDefinitionVo $chain,
-        AgentRunnerInterface $runner,
         string $runnerName,
         string $task,
         ?string $model = null,
@@ -38,7 +36,6 @@ final readonly class ExecuteStaticChainService implements ExecuteStaticChainServ
     ): OrchestrateChainResultDto {
         $result = $this->staticChainRunner->execute(
             $chain,
-            $runner,
             $runnerName,
             $task,
             $model,
