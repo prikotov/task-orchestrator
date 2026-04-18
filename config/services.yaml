@@ -12,8 +12,11 @@ services:
   TaskOrchestrator\Common\:
     resource: '../src/*'
     exclude:
-      - '../src/Module/Orchestrator/Domain/'
-      - '../src/Module/AgentRunner/Domain/'
+      - '../src/Module/*/Domain/Dto/'
+      - '../src/Module/*/Domain/Entity/'
+      - '../src/Module/*/Domain/Enum/'
+      - '../src/Module/*/Domain/Exception/'
+      - '../src/Module/*/Domain/ValueObject/'
       - '../src/DependencyInjection/'
       - '../src/Infrastructure/Symfony/'
       - '../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php'
@@ -74,45 +77,21 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\PromptFormatterService
 
-  # --- Domain Service alias (explicit registration, Domain excluded from auto-discovery) ---
+  # --- Domain Service alias (auto-discovery covers Domain/Service/) ---
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopService:
-    autowire: true
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RecordDynamicRoundServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RecordDynamicRoundService
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RecordDynamicRoundService:
-    autowire: true
-
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FormatDynamicJournalServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FormatDynamicJournalService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FormatDynamicJournalService:
-    autowire: true
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService:
-    autowire: true
-
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\CheckStaticBudgetServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\CheckStaticBudgetService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\CheckStaticBudgetService
-    autowire: true
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\RunStaticChainService:
-    autowire: true
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\ExecuteStaticStepService:
-    autowire: true
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\ExecuteDynamicTurnService:
-    autowire: true
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\RoundCompletedNotifierInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\DispatchRoundEventService
