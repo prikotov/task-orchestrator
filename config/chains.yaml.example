@@ -17,11 +17,14 @@ chains:
   implement:
     description: "Полный цикл реализации фичи: анализ → разработка → ревью → фикс"
 
+    # no_context_files: true         # (опционально) отключить загрузку AGENTS.md / CLAUDE.md для всех шагов цепочки
+
     steps:
       - type: agent
         role: system_analyst       # Роль — имя .md-файла из roles_dir без расширения
         runner: pi                  # Движок запуска агента (по умолчанию: pi)
         name: analyze               # Имя шага (для fix_iterations и логов)
+        # no_context_files: true    # (опционально) отключить загрузку AGENTS.md / CLAUDE.md для этого шага
 
       - type: agent
         role: backend_developer

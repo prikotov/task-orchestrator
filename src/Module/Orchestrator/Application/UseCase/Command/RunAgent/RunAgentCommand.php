@@ -17,6 +17,7 @@ final readonly class RunAgentCommand
         public ?string $tools = null,
         public ?string $workingDir = null,
         public int $timeout = 300,
+        public bool $noContextFiles = false,
     ) {
     }
 }

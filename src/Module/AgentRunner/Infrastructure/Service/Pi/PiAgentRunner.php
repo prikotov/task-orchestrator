@@ -85,6 +85,11 @@ final readonly class PiAgentRunner implements AgentRunnerInterface
             $command[] = $request->getSystemPrompt();
         }
 
+        // No context files — отключить загрузку AGENTS.md / CLAUDE.md
+        if ($request->getNoContextFiles() && !in_array('-nc', $command, true) && !in_array('-no-context-files', $command, true)) {
+            $command[] = '-nc';
+        }
+
         // User prompt: previous context + task
         $prompt = $this->buildUserPrompt($request);
         $command[] = $prompt;
