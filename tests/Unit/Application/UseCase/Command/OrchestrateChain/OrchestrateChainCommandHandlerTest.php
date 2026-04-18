@@ -9,8 +9,8 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\Orch
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerPortInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Port\AgentRunnerRegistryPortInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\ResolveAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService;
@@ -33,7 +33,7 @@ use PHPUnit\Framework\TestCase;
 final class OrchestrateChainCommandHandlerTest extends TestCase
 {
     private ChainLoaderInterface $chainLoader;
-    private AgentRunnerRegistryPortInterface $runnerRegistry;
+    private ResolveAgentRunnerServiceInterface $runnerRegistry;
     private ExecuteStaticChainServiceInterface $staticChainExecutor;
     private RunDynamicLoopServiceInterface $dynamicLoopRunner;
     private ChainSessionLoggerInterface $sessionLogger;
@@ -44,7 +44,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->chainLoader = $this->createMock(ChainLoaderInterface::class);
-        $this->runnerRegistry = $this->createMock(AgentRunnerRegistryPortInterface::class);
+        $this->runnerRegistry = $this->createMock(ResolveAgentRunnerServiceInterface::class);
         $this->staticChainExecutor = $this->createMock(ExecuteStaticChainServiceInterface::class);
         $this->dynamicLoopRunner = $this->createMock(RunDynamicLoopServiceInterface::class);
         $this->sessionLogger = $this->createMock(ChainSessionLoggerInterface::class);
@@ -56,7 +56,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         $this->sessionLogger->method('completeSession');
         $this->sessionLogger->method('interruptSession');
 
-        $mockRunner = $this->createMock(AgentRunnerPortInterface::class);
+        $mockRunner = $this->createMock(RunAgentServiceInterface::class);
         $this->runnerRegistry->method('get')->willReturn($mockRunner);
 
         $this->handler = $this->createHandler();
@@ -138,7 +138,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         $staticResult = new OrchestrateChainResultDto();
         $capturedRunner = null;
         $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, AgentRunnerPortInterface $r, string $runnerName) use (&$capturedRunner, $staticResult): OrchestrateChainResultDto {
+            ->willReturnCallback(function (ChainDefinitionVo $c, RunAgentServiceInterface $r, string $runnerName) use (&$capturedRunner, $staticResult): OrchestrateChainResultDto {
                 $capturedRunner = $runnerName;
 
                 return $staticResult;
@@ -166,7 +166,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
 
         $capturedRunner = null;
         $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, AgentRunnerPortInterface $r, string $runnerName) use (&$capturedRunner): OrchestrateChainResultDto {
+            ->willReturnCallback(function (ChainDefinitionVo $c, RunAgentServiceInterface $r, string $runnerName) use (&$capturedRunner): OrchestrateChainResultDto {
                 $capturedRunner = $runnerName;
 
                 return new OrchestrateChainResultDto();
@@ -248,7 +248,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
                 ChainDefinitionVo $chain,
-                AgentRunnerPortInterface $runner,
+                RunAgentServiceInterface $runner,
                 DynamicChainContextVo $context,
             ) use (
                 &$capturedContext,
@@ -297,7 +297,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
                 ChainDefinitionVo $chain,
-                AgentRunnerPortInterface $runner,
+                RunAgentServiceInterface $runner,
                 DynamicChainContextVo $context,
             ) use (
                 &$capturedTopic,
@@ -497,7 +497,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
                 ChainDefinitionVo $c,
-                AgentRunnerPortInterface $runner,
+                RunAgentServiceInterface $runner,
                 DynamicChainContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
@@ -548,7 +548,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
 
         $capturedLogger = null;
         $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, AgentRunnerPortInterface $runner, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
+            ->willReturnCallback(function (ChainDefinitionVo $c, RunAgentServiceInterface $runner, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
                 $capturedLogger = $logger;
 
                 return new OrchestrateChainResultDto();
@@ -583,7 +583,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
 
         $capturedLogger = null;
         $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, AgentRunnerPortInterface $runner, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
+            ->willReturnCallback(function (ChainDefinitionVo $c, RunAgentServiceInterface $runner, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
                 $capturedLogger = $logger;
 
                 return new OrchestrateChainResultDto();
@@ -615,7 +615,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
 
         $capturedLogger = null;
         $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, AgentRunnerPortInterface $runner, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
+            ->willReturnCallback(function (ChainDefinitionVo $c, RunAgentServiceInterface $runner, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
                 $capturedLogger = $logger;
 
                 return new OrchestrateChainResultDto();
@@ -646,7 +646,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
 
         $capturedLogger = null;
         $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, AgentRunnerPortInterface $runner, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
+            ->willReturnCallback(function (ChainDefinitionVo $c, RunAgentServiceInterface $runner, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
                 $capturedLogger = $logger;
 
                 return new OrchestrateChainResultDto();

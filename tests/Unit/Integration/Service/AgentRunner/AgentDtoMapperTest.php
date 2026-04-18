@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Tests\Unit\Integration\Adapter;
+namespace TaskOrchestrator\Tests\Unit\Integration\Service\AgentRunner;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -11,7 +11,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAg
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Integration\Adapter\AgentDtoMapper;
+use TaskOrchestrator\Common\Module\Orchestrator\Integration\Service\AgentRunner\AgentDtoMapper;
 
 #[CoversClass(AgentDtoMapper::class)]
 final class AgentDtoMapperTest extends TestCase
