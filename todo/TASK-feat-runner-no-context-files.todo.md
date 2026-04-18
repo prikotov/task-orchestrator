@@ -9,7 +9,7 @@ epic:
 author: Бэкендер (Левша)
 assignee: Бэкендер
 branch: task/feat-runner-no-context-files
-pr:
+pr: 'https://github.com/prikotov/task-orchestrator/pull/20'
 status: in_progress
 ---
 
@@ -78,7 +78,7 @@ php bin/console app:agent:run --help
 
 **Роль:** docs/agents/roles/team/backend_developer.ru.md
 **Ветка:** task/feat-runner-no-context-files (уже создана и активна)
-**PR:** уже создан (draft) из task/feat-runner-no-context-files в main
+**PR:** #20 (draft) из task/feat-runner-no-context-files в main
 
 ### Порядок действий
 1. Переключись в ветку `task/feat-runner-no-context-files`: `git checkout task/feat-runner-no-context-files`
@@ -88,7 +88,7 @@ php bin/console app:agent:run --help
 5. Делай промежуточные коммиты после каждого логического этапа (обновил `src/` → коммит, обновил `tests/` → коммит). Это сохранит прогресс при таймауте сабагента.
 6. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` — оба должны пройти.
 7. Запуш: `git push`.
-8. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`. Эта команда снимает флаг draft — PR становится готовым к мержу.
+8. Переведи PR из draft в ready: `gh pr ready 20`. Эта команда снимает флаг draft — PR становится готовым к мержу.
 
 **НЕ создавай новый PR** — он уже существует.
 **НЕ меняй base branch** — он уже указывает на main.
