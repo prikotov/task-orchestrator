@@ -39,7 +39,6 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     private BuildDynamicContextServiceInterface $contextBuilder;
     private ChainSessionLoggerInterface $sessionLogger;
     private AuditLoggerFactoryInterface $auditLoggerFactory;
-    private ?AuditLoggerInterface $defaultAuditLogger;
     private OrchestrateChainCommandHandler $handler;
 
     protected function setUp(): void
@@ -51,7 +50,6 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         $this->contextBuilder = new BuildDynamicContextService();
         $this->sessionLogger = $this->createMock(ChainSessionLoggerInterface::class);
         $this->auditLoggerFactory = $this->createMock(AuditLoggerFactoryInterface::class);
-        $this->defaultAuditLogger = null;
 
         $this->sessionLogger->method('startSession')->willReturn('/tmp/test-session');
         $this->sessionLogger->method('logInvocation');
@@ -71,7 +69,6 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             $this->contextBuilder,
             $this->sessionLogger,
             $this->auditLoggerFactory,
-            $this->defaultAuditLogger,
         );
     }
 
@@ -528,21 +525,17 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     // --- Audit logger DI tests ---
 
     #[Test]
-    public function auditUsesDefaultLoggerWhenNoPathProvided(): void
+    public function staticChainPassesNullAuditLogger(): void
     {
-        $defaultLogger = $this->createMock(AuditLoggerInterface::class);
-        $this->defaultAuditLogger = $defaultLogger;
-        $this->handler = $this->createHandler();
-
         $chain = ChainDefinitionVo::createFromSteps(
-            name: 'audit-default',
+            name: 'audit-static',
             description: '',
             steps: [ChainStepVo::agent(role: 'step1', runner: 'pi')],
         );
 
         $this->chainLoader->method('load')->willReturn($chain);
 
-        $capturedLogger = null;
+        $capturedLogger = 'not-null';
         $this->staticChainExecutor->method('execute')
             ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
                 $capturedLogger = $logger;
@@ -551,70 +544,93 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             });
 
         ($this->handler)(new OrchestrateChainCommand(
-            chainName: 'audit-default',
+            chainName: 'audit-static',
             task: 'Test',
         ));
 
-        self::assertSame($defaultLogger, $capturedLogger);
+        self::assertNull($capturedLogger);
     }
 
     #[Test]
-    public function auditOverrideUsesFactoryWhenPathProvided(): void
+    public function dynamicChainCreatesAuditLoggerFromSessionDir(): void
     {
-        $defaultLogger = $this->createMock(AuditLoggerInterface::class);
-        $customLogger = $this->createMock(AuditLoggerInterface::class);
-        $this->defaultAuditLogger = $defaultLogger;
+        $sessionDir = '/tmp/test-session';
+        $auditLogger = $this->createMock(AuditLoggerInterface::class);
+
+        $chain = $this->createDynamicChain(
+            name: 'audit-dynamic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $this->sessionLogger->method('startSession')->willReturn($sessionDir);
         $this->auditLoggerFactory->method('create')
-            ->with('/custom/audit.jsonl')
-            ->willReturn($customLogger);
-        $this->handler = $this->createHandler();
-
-        $chain = ChainDefinitionVo::createFromSteps(
-            name: 'audit-override',
-            description: '',
-            steps: [ChainStepVo::agent(role: 'step1', runner: 'pi')],
-        );
-
-        $this->chainLoader->method('load')->willReturn($chain);
+            ->with($sessionDir . '/audit.jsonl')
+            ->willReturn($auditLogger);
 
         $capturedLogger = null;
-        $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?AuditLoggerInterface $logger = null,
+            ) use (&$capturedLogger): DynamicLoopResultVo {
                 $capturedLogger = $logger;
 
-                return new OrchestrateChainResultDto();
+                return new DynamicLoopResultVo(
+                    roundResults: [],
+                    totalTime: 0.0,
+                    totalInputTokens: 0,
+                    totalOutputTokens: 0,
+                    totalCost: 0.0,
+                    synthesis: 'Done',
+                    maxRoundsReached: false,
+                );
             });
 
         ($this->handler)(new OrchestrateChainCommand(
-            chainName: 'audit-override',
+            chainName: 'audit-dynamic',
             task: 'Test',
-            auditLogPath: '/custom/audit.jsonl',
         ));
 
-        self::assertSame($customLogger, $capturedLogger);
+        self::assertSame($auditLogger, $capturedLogger);
     }
 
     #[Test]
-    public function auditDisabledWithNoAuditLogFlag(): void
+    public function dynamicChainWithNoAuditLogPassesNull(): void
     {
-        $defaultLogger = $this->createMock(AuditLoggerInterface::class);
-        $this->defaultAuditLogger = $defaultLogger;
-        $this->handler = $this->createHandler();
-
-        $chain = ChainDefinitionVo::createFromSteps(
+        $chain = $this->createDynamicChain(
             name: 'audit-disabled',
-            description: '',
-            steps: [ChainStepVo::agent(role: 'step1', runner: 'pi')],
+            facilitator: 'facilitator',
+            participants: ['participant'],
         );
-
         $this->chainLoader->method('load')->willReturn($chain);
 
-        $capturedLogger = null;
-        $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
+        $capturedLogger = 'not-null';
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?AuditLoggerInterface $logger = null,
+            ) use (&$capturedLogger): DynamicLoopResultVo {
                 $capturedLogger = $logger;
 
-                return new OrchestrateChainResultDto();
+                return new DynamicLoopResultVo(
+                    roundResults: [],
+                    totalTime: 0.0,
+                    totalInputTokens: 0,
+                    totalOutputTokens: 0,
+                    totalCost: 0.0,
+                    synthesis: 'Done',
+                    maxRoundsReached: false,
+                );
             });
 
         ($this->handler)(new OrchestrateChainCommand(
@@ -627,33 +643,63 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function auditNoDefaultLoggerReturnsNullWhenNotProvided(): void
+    public function resumeCreatesAuditLoggerFromResumeDir(): void
     {
-        $this->defaultAuditLogger = null;
-        $this->handler = $this->createHandler();
-
-        $chain = ChainDefinitionVo::createFromSteps(
-            name: 'audit-no-default',
-            description: '',
-            steps: [ChainStepVo::agent(role: 'step1', runner: 'pi')],
-        );
-
+        $chain = $this->createDynamicChain('brainstorm', 'facilitator', ['participant'], 5);
         $this->chainLoader->method('load')->willReturn($chain);
 
+        $state = new ChainSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 3,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $auditLogger = $this->createMock(AuditLoggerInterface::class);
+        $this->auditLoggerFactory->method('create')
+            ->with('/tmp/resume-dir/audit.jsonl')
+            ->willReturn($auditLogger);
+
         $capturedLogger = null;
-        $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed result',
+            maxRoundsReached: false,
+        );
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?AuditLoggerInterface $logger = null,
+            ) use (
+                &$capturedLogger,
+                $loopResult
+): DynamicLoopResultVo {
                 $capturedLogger = $logger;
 
-                return new OrchestrateChainResultDto();
+                return $loopResult;
             });
 
         ($this->handler)(new OrchestrateChainCommand(
-            chainName: 'audit-no-default',
+            chainName: 'brainstorm',
             task: 'Test',
+            resumeDir: '/tmp/resume-dir',
         ));
 
-        self::assertNull($capturedLogger);
+        self::assertSame($auditLogger, $capturedLogger);
     }
 
     // --- Helpers ---

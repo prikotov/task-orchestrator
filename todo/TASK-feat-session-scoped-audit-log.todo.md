@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic:
 author: Бэкендер (Левша)
-assignee:
-branch:
+assignee: Бэкендер (Левша)
+branch: task/feat-session-scoped-audit-log
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-session-scoped-audit-log: Audit log как артефакт сессии
