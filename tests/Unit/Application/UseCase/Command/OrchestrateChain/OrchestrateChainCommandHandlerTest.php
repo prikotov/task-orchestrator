@@ -438,6 +438,138 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         self::assertSame(1, $logCapture['max_rounds']);
     }
 
+    #[Test]
+    public function invokeDynamicUsesChainTimeoutWhenNoCliOverride(): void
+    {
+        $chain = $this->createDynamicChainWithTimeout(
+            name: 'timed_chain',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            timeout: 600,
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 0.0,
+            totalInputTokens: 0,
+            totalOutputTokens: 0,
+            totalCost: 0.0,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')->willReturnCallback(
+            function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $context,
+            ) use (
+                &$capturedTimeout,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $context->timeout;
+
+                return $loopResult;
+            },
+        );
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'timed_chain',
+            task: 'Test',
+        ));
+
+        self::assertSame(600, $capturedTimeout);
+    }
+
+    #[Test]
+    public function invokeDynamicCliTimeoutOverridesChain(): void
+    {
+        $chain = $this->createDynamicChainWithTimeout(
+            name: 'timed_chain',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            timeout: 600,
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 0.0,
+            totalInputTokens: 0,
+            totalOutputTokens: 0,
+            totalCost: 0.0,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')->willReturnCallback(
+            function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $context,
+            ) use (
+                &$capturedTimeout,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $context->timeout;
+
+                return $loopResult;
+            },
+        );
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'timed_chain',
+            task: 'Test',
+            timeout: 300,
+        ));
+
+        self::assertSame(300, $capturedTimeout);
+    }
+
+    #[Test]
+    public function invokeDynamicDefaultsTo1800WhenNoTimeoutAnyWhere(): void
+    {
+        $chain = $this->createDynamicChain(
+            name: 'no_timeout',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 0.0,
+            totalInputTokens: 0,
+            totalOutputTokens: 0,
+            totalCost: 0.0,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')->willReturnCallback(
+            function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $context,
+            ) use (
+                &$capturedTimeout,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $context->timeout;
+
+                return $loopResult;
+            },
+        );
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'no_timeout',
+            task: 'Test',
+        ));
+
+        self::assertSame(1800, $capturedTimeout);
+    }
+
     // --- Resume tests ---
 
     #[Test]
@@ -726,6 +858,33 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             facilitatorFinalizePrompt: 'Final %s %s',
             participantAppendPrompt: 'Part append %s',
             participantUserPrompt: 'Ctx %s %s',
+        );
+    }
+
+    /**
+     * @param list<string> $participants
+     */
+    private function createDynamicChainWithTimeout(
+        string $name,
+        string $facilitator,
+        array $participants,
+        int $timeout,
+        int $maxRounds = 10,
+    ): ChainDefinitionVo {
+        return ChainDefinitionVo::createFromDynamic(
+            name: $name,
+            description: '',
+            facilitator: $facilitator,
+            participants: $participants,
+            maxRounds: $maxRounds,
+            brainstormSystemPrompt: 'Base system prompt',
+            facilitatorAppendPrompt: 'Fac append %s',
+            facilitatorStartPrompt: 'Start %s',
+            facilitatorContinuePrompt: 'Cont %s %s %s',
+            facilitatorFinalizePrompt: 'Final %s %s',
+            participantAppendPrompt: 'Part append %s',
+            participantUserPrompt: 'Ctx %s %s',
+            timeout: $timeout,
         );
     }
 
