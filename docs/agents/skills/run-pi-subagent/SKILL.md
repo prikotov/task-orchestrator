@@ -14,10 +14,12 @@ description: Запуск сабагента через pi для автоном
 ## Как использовать
 
 ```bash
-./scripts/watch-subagent.sh -s <soft-timeout> [options] <<'PROMPT'
+scripts/watch-subagent.sh -s <soft-timeout> [options] <<'PROMPT'
 <prompt>
 PROMPT
 ```
+
+Скрипт `watch-subagent.sh` лежит рядом с этим SKILL.md в папке `scripts/`.
 
 Параметры:
 
@@ -50,7 +52,7 @@ PROMPT
 
 ```bash
 # Полный поток событий
-./scripts/watch-subagent.sh -s 600 <<'PROMPT'
+scripts/watch-subagent.sh -s 600 <<'PROMPT'
 Загрузи роль из docs/agents/roles/team/backend_developer.ru.md и выполни задачу: todo/TASK-feat-example.todo.md.
 Следуй инструкциям из секции 'Инструкции для сабагента' в файле задачи и AGENTS.md.
 PROMPT
@@ -58,12 +60,12 @@ PROMPT
 
 ```bash
 # Только финальный ответ
-./scripts/watch-subagent.sh -s 600 -o text "Скажи hello"
+scripts/watch-subagent.sh -s 600 -o text "Скажи hello"
 ```
 
 ```bash
 # Ответ + какие файлы менялись
-./scripts/watch-subagent.sh -s 600 -o text,files <<'PROMPT'
+scripts/watch-subagent.sh -s 600 -o text,files <<'PROMPT'
 Реализуй фичу X в src/Domain/...
 PROMPT
 ```
