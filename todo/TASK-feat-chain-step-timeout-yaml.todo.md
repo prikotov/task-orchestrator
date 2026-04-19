@@ -9,7 +9,7 @@ epic: EPIC-arch-orchestrator-module-decomposition
 author: Бэкендер
 assignee: Бэкендер (Левша)
 branch: task/feat-chain-step-timeout-yaml
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/31
 status: in_progress
 ---
 
@@ -79,6 +79,21 @@ vendor/bin/psalm --no-cache
 
 ## 9. Comments (Комментарии)
 `RoleConfigVo` уже имеет `?int $timeout` — для dynamic chains нужно пробросить fallback через chain-level default.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/backend_developer.ru.md
+**Ветка:** task/feat-chain-step-timeout-yaml (уже создана и активна)
+**PR:** уже создан (draft) из task/feat-chain-step-timeout-yaml в main — [PR #31](https://github.com/prikotov/task-orchestrator/pull/31)
+
+### Порядок действий
+1. Переключись в ветку `task/feat-chain-step-timeout-yaml`: `git checkout task/feat-chain-step-timeout-yaml`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready 31`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
