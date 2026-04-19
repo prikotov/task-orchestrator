@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic:
 author: Бэкендер (Левша)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер (Левша)
+branch: task/feat-session-scoped-audit-log
+pr: https://github.com/prikotov/task-orchestrator/pull/30
+status: review
 ---
 
 # TASK-feat-session-scoped-audit-log: Audit log как артефакт сессии
