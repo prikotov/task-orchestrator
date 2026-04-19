@@ -6,8 +6,8 @@ complexity: C2
 priority: P2
 author: Тимлид (Алекс)
 assignee: Тимлид (Алекс)
-branch:
-pr:
+branch: task/docs-architecture-sync-and-delegation
+pr: "#25"
 status: done
 assignee: Тимлид (Алекс)
 branch: task/docs-architecture-sync-and-delegation

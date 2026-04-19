@@ -5,9 +5,9 @@ value: V4
 complexity: C1
 priority: P2
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
+assignee: Технический писатель
+branch: task/docs-architecture-sync-and-delegation
+pr: "#25"
 status: done
 assignee: Технический писатель
 branch: task/docs-architecture-sync-and-delegation
