@@ -14,7 +14,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * Определяет схему параметров bundle:
  * - roles_dir: путь к .md файлам ролей
  * - chains_yaml: путь к YAML-конфигурации цепочек
- * - audit_log_path: путь к JSONL audit log
  * - chains_session_dir: путь к каталогу сессий оркестрации
  * - base_path: корень проекта для path relativization
  */
@@ -35,10 +34,6 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('chains_yaml')
                     ->isRequired()
                     ->info('Path to chains YAML configuration (e.g. %%kernel.project_dir%%/apps/console/config/agent_chains.yaml)')
-                ->end()
-                ->scalarNode('audit_log_path')
-                    ->isRequired()
-                    ->info('Path to JSONL audit log (e.g. %%kernel.project_dir%%/var/log/agent_audit.jsonl)')
                 ->end()
                 ->scalarNode('chains_session_dir')
                     ->isRequired()

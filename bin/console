@@ -32,7 +32,6 @@ $extension->load([
         'roles_dir' => $projectDir . '/docs/agents/roles/team',
         'base_path' => $projectDir,
         'chains_yaml' => $projectDir . '/config/chains.yaml',
-        'audit_log_path' => $projectDir . '/var/log/audit.jsonl',
         'chains_session_dir' => $projectDir . '/var/sessions',
     ],
 ], $container);

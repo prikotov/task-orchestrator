@@ -11,7 +11,7 @@ use TaskOrchestrator\Common\DependencyInjection\TaskOrchestratorExtension;
  * Symfony Bundle для TaskOrchestrator.
  *
  * Загружает config/services.yaml и обрабатывает параметры конфигурации
- * (roles_dir, chains_yaml, audit_log_path, chains_session_dir, base_path).
+ * (roles_dir, chains_yaml, chains_session_dir, base_path).
  *
  * Extension расположен в TaskOrchestrator\Common\DependencyInjection\,
  * а Bundle — в TaskOrchestrator\Common\Infrastructure\Symfony\.

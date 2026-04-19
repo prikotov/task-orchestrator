@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  * Extension для TaskOrchestratorBundle.
  *
  * Загружает config/services.yaml и регистрирует параметры конфигурации
- * (roles_dir, chains_yaml, audit_log_path, chains_session_dir, base_path).
+ * (roles_dir, chains_yaml, chains_session_dir, base_path).
  */
 class TaskOrchestratorExtension extends Extension
 {
@@ -31,7 +31,6 @@ class TaskOrchestratorExtension extends Extension
 
         $container->setParameter('task_orchestrator.roles_dir', $config['roles_dir']);
         $container->setParameter('task_orchestrator.chains_yaml', $config['chains_yaml']);
-        $container->setParameter('task_orchestrator.audit_log_path', $config['audit_log_path']);
         $container->setParameter('task_orchestrator.chains_session_dir', $config['chains_session_dir']);
         $container->setParameter('task_orchestrator.base_path', $config['base_path']);
 
