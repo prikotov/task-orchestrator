@@ -40,7 +40,6 @@ final class OrchestrateCommand extends Command
     private const string OPT_FACILITATOR = 'facilitator';
     private const string OPT_PARTICIPANTS = 'participants';
     private const string OPT_RESUME = 'resume';
-    private const string OPT_AUDIT_LOG = 'audit-log';
     private const string OPT_NO_AUDIT_LOG = 'no-audit-log';
     private const string OPT_REPORT_FORMAT = 'report-format';
     private const string OPT_REPORT_FILE = 'report-file';
@@ -73,7 +72,6 @@ final class OrchestrateCommand extends Command
             ->addOption(self::OPT_FACILITATOR, null, InputOption::VALUE_OPTIONAL, 'Роль фасилитатора (dynamic)')
             ->addOption(self::OPT_PARTICIPANTS, null, InputOption::VALUE_OPTIONAL, 'Участники через запятую (dynamic)')
             ->addOption(self::OPT_RESUME, null, InputOption::VALUE_OPTIONAL, 'Путь к директории сессии для resume')
-            ->addOption(self::OPT_AUDIT_LOG, null, InputOption::VALUE_OPTIONAL, 'Путь к JSONL audit-логу (переопределяет путь по умолчанию)')
             ->addOption(self::OPT_NO_AUDIT_LOG, null, InputOption::VALUE_NONE, 'Отключить audit-логирование')
             ->addOption(self::OPT_REPORT_FORMAT, null, InputOption::VALUE_OPTIONAL, 'Формат отчёта: text|json (none — отключить)', 'text')
             ->addOption(self::OPT_REPORT_FILE, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу для записи отчёта')
@@ -121,11 +119,8 @@ final class OrchestrateCommand extends Command
             $participants = $participantsStr !== null ? array_map('trim', explode(',', $participantsStr)) : null;
             /** @var string|null $resumeDir */
             $resumeDir = $input->getOption(self::OPT_RESUME);
-            /** @var string|null $auditLogPath */
-            $auditLogPath = $input->getOption(self::OPT_AUDIT_LOG);
             /** @var bool $noAuditLog */
             $noAuditLog = $input->getOption(self::OPT_NO_AUDIT_LOG);
-            $auditLog = ($auditLogPath !== null && $auditLogPath !== '') ? $auditLogPath : null;
             $noContextFiles = (bool) $input->getOption(self::OPT_NO_CONTEXT_FILES);
 
             if ($resumeDir !== null && $resumeDir !== '') {
@@ -140,7 +135,6 @@ final class OrchestrateCommand extends Command
                     workingDir: $workingDir !== null && $workingDir !== '' ? $workingDir : null,
                     timeout: $timeout,
                     resumeDir: $resumeDir,
-                    auditLogPath: $auditLog,
                     noAuditLog: $noAuditLog,
                     noContextFiles: $noContextFiles,
                 ));
@@ -172,7 +166,6 @@ final class OrchestrateCommand extends Command
                 facilitator: $facilitator !== null && $facilitator !== '' ? $facilitator : null,
                 participants: $participants,
                 resumeDir: null,
-                auditLogPath: $auditLog,
                 noAuditLog: $noAuditLog,
                 noContextFiles: $noContextFiles,
             ));

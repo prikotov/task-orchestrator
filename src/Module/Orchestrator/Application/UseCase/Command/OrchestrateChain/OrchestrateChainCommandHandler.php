@@ -37,7 +37,6 @@ final readonly class OrchestrateChainCommandHandler
         private BuildDynamicContextServiceInterface $contextBuilder,
         private ChainSessionLoggerInterface $sessionLogger,
         private AuditLoggerFactoryInterface $auditLoggerFactory,
-        private ?AuditLoggerInterface $defaultAuditLogger = null,
         private ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
@@ -64,7 +63,6 @@ final readonly class OrchestrateChainCommandHandler
         ChainDefinitionVo $chain,
         OrchestrateChainCommand $command,
     ): OrchestrateChainResultDto {
-        $auditLogger = $this->resolveAuditLogger($command->auditLogPath, $command->noAuditLog);
         $runnerName = $command->runner ?? 'pi';
 
         return $this->staticChainExecutor->execute(
@@ -74,7 +72,7 @@ final readonly class OrchestrateChainCommandHandler
             $command->model,
             $command->workingDir,
             $command->timeout,
-            $auditLogger,
+            null, // static chains have no session-scoped audit log
             $command->noContextFiles,
         );
     }
@@ -85,7 +83,6 @@ final readonly class OrchestrateChainCommandHandler
         ChainDefinitionVo $chain,
         OrchestrateChainCommand $command,
     ): OrchestrateChainResultDto {
-        $auditLogger = $this->resolveAuditLogger($command->auditLogPath, $command->noAuditLog);
         $facilitatorRole = $command->facilitator ?? $chain->getFacilitator() ?? 'team_lead';
         $participants = $command->participants ?? $chain->getParticipants();
         $maxRounds = $command->maxRounds ?? $chain->getMaxRounds();
@@ -99,6 +96,7 @@ final readonly class OrchestrateChainCommandHandler
             $participants,
             $maxRounds,
         );
+        $auditLogger = $this->resolveAuditLogger($sessionDir, $command->noAuditLog);
         $this->sessionLogger->setBudget($chain->getBudget());
         $this->sessionLogger->logInvocation(
             $this->contextBuilder->buildInvocation(
@@ -135,9 +133,9 @@ final readonly class OrchestrateChainCommandHandler
 
     private function resumeDynamic(OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        $auditLogger = $this->resolveAuditLogger($command->auditLogPath, $command->noAuditLog);
         $resumeDir = $command->resumeDir;
         assert($resumeDir !== null);
+        $auditLogger = $this->resolveAuditLogger($resumeDir, $command->noAuditLog);
         $this->sessionLogger->resumeSession($resumeDir);
         $state = $this->sessionLogger->getResumedState();
 
@@ -239,17 +237,16 @@ final readonly class OrchestrateChainCommandHandler
         $this->dispatchCompletedEvent($loopResult, $sessionDir, $reason);
     }
 
-    private function resolveAuditLogger(?string $auditLogPath, bool $noAuditLog = false): ?AuditLoggerInterface
+    /**
+     * @param string|null $sessionDir Директория сессии для audit.jsonl
+     */
+    private function resolveAuditLogger(?string $sessionDir, bool $noAuditLog = false): ?AuditLoggerInterface
     {
-        if ($noAuditLog) {
+        if ($noAuditLog || $sessionDir === null) {
             return null;
         }
 
-        if ($auditLogPath !== null && $auditLogPath !== '') {
-            return $this->auditLoggerFactory->create($auditLogPath);
-        }
-
-        return $this->defaultAuditLogger;
+        return $this->auditLoggerFactory->create($sessionDir . '/audit.jsonl');
     }
 
     private function dispatchCompletedEvent(DynamicLoopResultVo $loopResult, ?string $sessionDir, string $reason): void
