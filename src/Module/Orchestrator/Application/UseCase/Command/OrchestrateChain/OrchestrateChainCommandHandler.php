@@ -71,7 +71,7 @@ final readonly class OrchestrateChainCommandHandler
             $command->task,
             $command->model,
             $command->workingDir,
-            $command->timeout,
+            $command->timeout ?? 300,
             null, // static chains have no session-scoped audit log
             $command->noContextFiles,
         );
@@ -88,6 +88,7 @@ final readonly class OrchestrateChainCommandHandler
         $maxRounds = $command->maxRounds ?? $chain->getMaxRounds();
         $topic = $command->topic ?? $command->task;
         $runnerName = $command->runner ?? 'pi';
+        $timeout = $command->timeout ?? $chain->getTimeout() ?? 1800;
 
         $sessionDir = $this->sessionLogger->startSession(
             $chain->getName(),
@@ -103,7 +104,7 @@ final readonly class OrchestrateChainCommandHandler
                 $chain,
                 $command->task,
                 $command->model,
-                $command->timeout,
+                $timeout,
                 $command->workingDir,
                 $command->resumeDir,
                 $facilitatorRole,
@@ -122,7 +123,7 @@ final readonly class OrchestrateChainCommandHandler
             $runnerName,
             $command->model,
             $command->workingDir,
-            $command->timeout,
+            $timeout,
         );
 
         $loopResult = $this->runDynamicLoop($chain, $context, $runnerName, auditLogger: $auditLogger);
@@ -145,12 +146,13 @@ final readonly class OrchestrateChainCommandHandler
 
         $chain = $this->chainLoader->load($command->chainName);
         $this->sessionLogger->setBudget($chain->getBudget());
+        $resumeTimeout = $command->timeout ?? $chain->getTimeout() ?? 1800;
 
         $invocation = $this->contextBuilder->buildInvocation(
             $chain,
             $command->task,
             $command->model,
-            $command->timeout,
+            $resumeTimeout,
             $command->workingDir,
             $command->resumeDir,
             $state->getFacilitator(),
@@ -170,7 +172,7 @@ final readonly class OrchestrateChainCommandHandler
             $command->runner ?? 'pi',
             $command->model,
             $command->workingDir,
-            $command->timeout,
+            $resumeTimeout,
         );
 
         $loopResult = $this->runDynamicLoop(

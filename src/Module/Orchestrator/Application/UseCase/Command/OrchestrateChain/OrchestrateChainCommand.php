@@ -15,7 +15,7 @@ final readonly class OrchestrateChainCommand
         public ?string $runner = null,
         public ?string $model = null,
         public ?string $workingDir = null,
-        public int $timeout = 300,
+        public ?int $timeout = null,
         public ?string $topic = null,
         public ?int $maxRounds = null,
         public ?string $facilitator = null,
