@@ -1,6 +1,6 @@
 # Архитектура
 
-Библиотека следует DDD-слоям: Domain → Application → Infrastructure. Presentation — в приложении-хосте (например, `apps/console/` в TasK).
+Библиотека следует Clean Architecture (луковичная архитектура): Domain → Application → Infrastructure/Integration. Presentation — в приложении-хосте (например, `apps/console/` в TasK).
 
 Визуальный обзор слоёв, модулей и взаимодействий — в [Диаграммы](diagrams.md).
 
@@ -12,11 +12,13 @@
 src/Module/
 ├── AgentRunner/                 # Модуль движка AI-агента
 │   ├── Domain/                  # Контракт движка: AgentRunnerInterface, VO, Registry
+│   ├── Application/             # Use cases: RunAgentCommandHandler, GetRunners
 │   └── Infrastructure/          # Реализации: PiAgentRunner, Retry, Circuit Breaker
 └── Orchestrator/                # Модуль оркестрации цепочек
-    ├── Domain/                  # Бизнес-логика: Chain, Budget, Dynamic, Static, Port
+    ├── Domain/                  # Бизнес-логика: Chain, Budget, Dynamic, Static
     ├── Application/             # Use cases, DTO, мапперы
-    └── Infrastructure/          # Адаптеры к AgentRunner, YAML-загрузка, JSONL-лог
+    ├── Integration/             # ACL к AgentRunner: RunAgentService, AgentDtoMapper
+    └── Infrastructure/          # YAML-загрузка, JSONL-лог, Session, Prompt
 ```
 
 ### Модуль AgentRunner
@@ -32,6 +34,12 @@ src/Module/
 - Enum: `CircuitStateEnum` (closed | half_open | open)
 - Exception: `AgentException`, `RunnerNotFoundException`, `NotFoundExceptionInterface`
 
+**Application-слой:**
+- `RunAgentCommandHandler` — запуск агента с retry, выбор runner по имени из реестра
+- `GetRunnersQueryHandler` — список доступных runner'ов
+- `GetRunnerByNameQueryHandler` — получение runner по имени
+- DTO: `RunAgentCommand`, `RunAgentResultDto`, `GetRunnersQuery`, `GetRunnersResultDto`
+
 **Infrastructure-слой:**
 - `PiAgentRunner` — реализация для pi CLI
 - `PiJsonlParser` — парсер JSONL-вывода pi
@@ -41,11 +49,10 @@ src/Module/
 
 ### Модуль Orchestrator
 
-Отвечает за оркестрацию цепочек агентов (static/dynamic). Не зависит от конкретного движка — общается с AgentRunner через Port/Adapter.
+Отвечает за оркестрацию цепочек агентов (static/dynamic). Не зависит от конкретного движка — общается с AgentRunner через Integration-слой (ACL).
 
 **Domain-слой:**
-- `Port/AgentRunnerPortInterface` — порт движка AI-агента (инкапсулирует retry)
-- `Port/AgentRunnerRegistryPortInterface` — порт реестра движков
+- `RunAgentServiceInterface` — интеграционный интерфейс запуска AI-агента (инкапсулирует retry)
 - Сервисы Chain: Audit, Dynamic, Session, Shared, Static, Budget, Prompt
 - Entity: `DynamicLoopExecution`, `StaticChainExecution`
 - VO: `ChainRunRequestVo`, `ChainRunResultVo`, `ChainRetryPolicyVo`, `ChainTurnResultVo`, `ChainDefinitionVo`, и др.
@@ -58,37 +65,35 @@ src/Module/
 - Service: `ExecuteStaticChainService`, `DispatchRoundEventService`
 - Mapper: `ReportFormatMapperInterface`, `ReportJsonMapper`, `ReportTextMapper`
 
+**Integration-слой (ACL к AgentRunner):**
+- `RunAgentService` — реализует `RunAgentServiceInterface`, делегирует в AgentRunner Application
+- `AgentDtoMapper` — маппер VO между Orchestrator Domain и AgentRunner Application DTO
+
 **Infrastructure-слой:**
-- **Adapter/** — адаптеры к AgentRunner:
-  - `AgentRunnerAdapter` — реализует `AgentRunnerPortInterface`, маппит VO и делегирует в `AgentRunnerInterface`
-  - `AgentRunnerRegistryAdapter` — реализует `AgentRunnerRegistryPortInterface`, оборачивает реестр
-  - `AgentVoMapper` — маппер VO между Orchestrator Domain и AgentRunner Domain
 - Сервисы Chain: `YamlChainLoader`, `ChainSessionLogger`, `QualityGateRunner`, и др.
 
-## Port/Adapter между модулями
+## Integration-слой между модулями
 
-Модули связаны через паттерн **Port/Adapter** (Hexagonal Architecture). Orchestrator Domain определяет **Port**-интерфейсы, Infrastructure реализует **Adapter**'ы, которые делегируют в AgentRunner.
+Модули связаны через **Integration-слой** Orchestrator (Clean Architecture). Orchestrator Domain определяет интерфейс `RunAgentServiceInterface` в `Domain/Service/Integration/`. Integration-слой реализует `RunAgentService`, который делегирует в AgentRunner Application.
 
 ```
-Orchestrator Domain                    Infrastructure Adapter              AgentRunner Domain
-─────────────────────                  ──────────────────────              ─────────────────────
-AgentRunnerPortInterface  ←─────────   AgentRunnerAdapter    ──────────>  AgentRunnerInterface
-AgentRunnerRegistryPortInterface ←───  AgentRunnerRegistryAdapter ──────> AgentRunnerRegistryServiceInterface
-(ChainRunRequestVo, ChainRunResultVo)   AgentVoMapper         ──────────> (AgentRunRequestVo, AgentResultVo)
+Orchestrator Domain                     Integration Layer                     AgentRunner Application
+─────────────────────                   ─────────────────────                 ────────────────────────
+RunAgentServiceInterface  ←──────────   RunAgentService       ───────────>   RunAgentCommandHandler
+(ChainRunRequestVo, ChainRunResultVo)   AgentDtoMapper         ───────────>   (RunAgentCommand, RunAgentResultDto)
 ```
 
 ### VO-маппинг на границе модулей
 
-Каждый модуль имеет собственные VO. Маппинг выполняется в `AgentVoMapper` (Infrastructure):
+Каждый модуль имеет собственные VO. Маппинг выполняется в `AgentDtoMapper` (Integration):
 
-| Orchestrator VO (Domain)          | AgentRunner VO (Domain)     |
-|-----------------------------------|-----------------------------|
-| `ChainRunRequestVo`               | `AgentRunRequestVo`         |
-| `ChainRunResultVo`                | `AgentResultVo`             |
-| `ChainTurnResultVo`               | `AgentTurnResultVo`         |
-| `ChainRetryPolicyVo`              | `RetryPolicyVo`             |
+| Orchestrator VO (Domain)          | AgentRunner Application DTO  |
+|-----------------------------------|------------------------------|
+| `ChainRunRequestVo`               | `RunAgentCommand`            |
+| `ChainRunResultVo`                | `RunAgentResultDto`          |
+| `ChainRetryPolicyVo`              | `RunAgentCommand` (поля retry) |
 
-**Принцип:** Orchestrator Domain не зависит от AgentRunner Domain. VO дублированы намеренно — каждый модуль владеет своими типами.
+**Принцип:** Orchestrator Domain не зависит от AgentRunner. VO дублированы намеренно — каждый модуль владеет своими типами.
 
 ## Зависимости модулей и слоёв
 
@@ -96,9 +101,11 @@ AgentRunnerRegistryPortInterface ←───  AgentRunnerRegistryAdapter ──
 |---|---|---|
 | **Orchestrator** Domain | — | Только PHP std + `Psr\Log\LoggerInterface` |
 | **Orchestrator** Application | **Orchestrator** Domain | Через интерфейсы и VOs |
-| **Orchestrator** Infrastructure | **Orchestrator** Domain (interfaces) | Реализует Port-интерфейсы через Adapter |
-| **Orchestrator** Infrastructure | **AgentRunner** Domain (interfaces + VO) | Adapter маппит VO и делегирует |
+| **Orchestrator** Integration | **Orchestrator** Domain (interfaces) | Реализует `RunAgentServiceInterface` |
+| **Orchestrator** Integration | **AgentRunner** Application | Делегирует в `RunAgentCommandHandler` |
+| **Orchestrator** Infrastructure | **Orchestrator** Domain (interfaces) | Реализует Domain-интерфейсы |
 | **AgentRunner** Domain | — | Только PHP std + `Psr\Log\LoggerInterface` |
+| **AgentRunner** Application | **AgentRunner** Domain | Через интерфейсы и VOs |
 | **AgentRunner** Infrastructure | **AgentRunner** Domain (interfaces) | Реализует AgentRunnerInterface |
 | Presentation | Application only | Внедряет use case handler'ы напрямую или через Bus |
 
@@ -123,6 +130,22 @@ CommandHandler может возвращать DTO — это допустимо
 
 ```
 src/Module/AgentRunner/
+├── Application/
+│   └── UseCase/
+│       ├── Command/
+│       │   └── RunAgent/
+│       │       ├── RunAgentCommand.php                    # DTO команды запуска
+│       │       ├── RunAgentCommandHandler.php             # обработчик: выбор runner + retry
+│       │       └── RunAgentResultDto.php                  # DTO результата
+│       └── Query/
+│           ├── GetRunnerByName/
+│           │   ├── GetRunnerByNameQuery.php
+│           │   └── GetRunnerByNameQueryHandler.php
+│           └── GetRunners/
+│               ├── GetRunnersQuery.php
+│               ├── GetRunnersQueryHandler.php
+│               ├── GetRunnersResultDto.php
+│               └── RunnerDto.php
 ├── Domain/
 │   ├── Enum/
 │   │   └── CircuitStateEnum.php                         # closed | half_open | open
@@ -204,9 +227,8 @@ src/Module/Orchestrator/
 │   │   │       ├── CheckStaticBudgetService.php
 │   │   │       ├── ExecuteStaticStepService.php
 │   │   │       └── RunStaticChainService.php
-│   │   ├── Port/
-│   │   │   ├── AgentRunnerPortInterface.php             # порт движка AI-агента
-│   │   │   └── AgentRunnerRegistryPortInterface.php     # порт реестра движков
+│   │   ├── Integration/
+│   │   │   └── RunAgentServiceInterface.php              # интеграционный интерфейс
 │   │   └── Prompt/
 │   │       └── PromptProviderInterface.php
 │   └── ValueObject/
@@ -272,11 +294,12 @@ src/Module/Orchestrator/
 │               ├── GetRunnersQuery.php
 │               ├── GetRunnersQueryHandler.php
 │               └── RunnerDto.php
+├── Integration/
+│   └── Service/
+│       └── AgentRunner/
+│           ├── RunAgentService.php                       # реализует RunAgentServiceInterface
+│           └── AgentDtoMapper.php                        # маппер VO Orchestrator ↔ AgentRunner DTO
 └── Infrastructure/
-    ├── Adapter/                                          # Port → AgentRunner
-    │   ├── AgentRunnerAdapter.php                        # реализует AgentRunnerPortInterface
-    │   ├── AgentRunnerRegistryAdapter.php                # реализует AgentRunnerRegistryPortInterface
-    │   └── AgentVoMapper.php                             # маппер VO Orchestrator ↔ AgentRunner
     └── Service/
         ├── Chain/
         │   ├── ChainSessionLogger.php
