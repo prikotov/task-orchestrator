@@ -8,7 +8,7 @@ author: Тимлид (Алекс)
 assignee: Тимлид (Алекс)
 branch:
 pr:
-status: in_progress
+status: done
 assignee: Тимлид (Алекс)
 branch: task/docs-architecture-sync-and-delegation
 ---
