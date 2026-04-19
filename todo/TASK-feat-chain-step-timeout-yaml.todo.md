@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic: EPIC-arch-orchestrator-module-decomposition
 author: Бэкендер
-assignee:
-branch:
+assignee: Бэкендер (Левша)
+branch: task/feat-chain-step-timeout-yaml
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-chain-step-timeout-yaml: Таймаут на шаг цепочки через YAML
