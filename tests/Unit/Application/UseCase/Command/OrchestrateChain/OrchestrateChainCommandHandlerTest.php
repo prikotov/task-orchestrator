@@ -176,6 +176,61 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         self::assertSame('pi', $capturedRunner);
     }
 
+    #[Test]
+    public function invokeStaticUsesCliTimeoutWhenProvided(): void
+    {
+        $chain = ChainDefinitionVo::createFromSteps(
+            name: 'static-cli-timeout',
+            description: '',
+            steps: [ChainStepVo::agent(role: 'step1', runner: 'pi')],
+        );
+
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $capturedTimeout = null;
+        $this->staticChainExecutor->method('execute')
+            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName, string $t, ?string $m, ?string $w, int $timeout) use (&$capturedTimeout): OrchestrateChainResultDto {
+                $capturedTimeout = $timeout;
+
+                return new OrchestrateChainResultDto();
+            });
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'static-cli-timeout',
+            task: 'Test',
+            timeout: 600,
+        ));
+
+        self::assertSame(600, $capturedTimeout);
+    }
+
+    #[Test]
+    public function invokeStaticFallsBackToDefaultTimeoutWhenNoCliTimeout(): void
+    {
+        $chain = ChainDefinitionVo::createFromSteps(
+            name: 'static-default-timeout',
+            description: '',
+            steps: [ChainStepVo::agent(role: 'step1', runner: 'pi')],
+        );
+
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $capturedTimeout = null;
+        $this->staticChainExecutor->method('execute')
+            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName, string $t, ?string $m, ?string $w, int $timeout) use (&$capturedTimeout): OrchestrateChainResultDto {
+                $capturedTimeout = $timeout;
+
+                return new OrchestrateChainResultDto();
+            });
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'static-default-timeout',
+            task: 'Test',
+        ));
+
+        self::assertSame(300, $capturedTimeout);
+    }
+
     // --- Dynamic chain tests ---
 
     #[Test]
@@ -1079,6 +1134,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         int $maxRounds = 10,
         string $topic = 'test topic',
         string $runnerName = 'pi',
+        int $timeout = 1800,
     ): DynamicChainContextVo {
         return new DynamicChainContextVo(
             facilitatorRole: $facilitatorRole,
@@ -1093,6 +1149,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             facilitatorFinalizePrompt: 'Final %s %s',
             participantAppendPrompt: 'Part append %s',
             participantUserPrompt: 'Ctx %s %s',
+            timeout: $timeout,
         );
     }
 }

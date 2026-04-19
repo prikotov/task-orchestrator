@@ -28,7 +28,7 @@ final readonly class DynamicChainContextVo
         public string $participantUserPrompt,
         public ?string $model = null,
         public ?string $workingDir = null,
-        public int $timeout = 1800,
+        public int $timeout,
     ) {
     }
 }
