@@ -36,9 +36,9 @@ description: "Оркестратор эпиков. Запускает сабаг
 
 Скиллы:
 
-* [run-pi-subagent](../../skills/run-pi-subagent/SKILL.md)
-* [epic-via-subagents](../../skills/epic-via-subagents/SKILL.md)
-* [retrospective](../../skills/retrospective/SKILL.md)
+* [run-pi-subagent](../../skills/run-pi-subagent/SKILL.md) — запуск сабагента для делегирования задачи роли. Использовать **для каждой задачи**, которую Тимлид не выполняет сам (реализация, ревью, тестирование, документация, архитектурный анализ).
+* [epic-via-subagents](../../skills/epic-via-subagents/SKILL.md) — оркестрация эпика через сабагентов. Использовать при начале работы над эпиком для планирования и последовательного запуска задач.
+* [retrospective](../../skills/retrospective/SKILL.md) — проведение ретроспективы. Использовать **после завершения эпика** или серии задач с повторяющимися проблемами.
 
 ## Выходные данные
 
