@@ -654,6 +654,191 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         self::assertSame('Journal', $capturedJournal);
     }
 
+    // --- Resume timeout tests ---
+
+    #[Test]
+    public function resumeDynamicUsesChainTimeoutWhenNoCliOverride(): void
+    {
+        $chain = $this->createDynamicChainWithTimeout(
+            name: 'timed_chain',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            timeout: 600,
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $state = new ChainSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed with chain timeout',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?AuditLoggerInterface $auditLogger = null,
+            ) use (
+                &$capturedTimeout,
+                $loopResult
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $ctx->timeout;
+
+                return $loopResult;
+            });
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'timed_chain',
+            task: 'Test',
+            resumeDir: '/tmp/resume-dir',
+        ));
+
+        self::assertSame(600, $capturedTimeout);
+    }
+
+    #[Test]
+    public function resumeDynamicCliTimeoutOverridesChainTimeout(): void
+    {
+        $chain = $this->createDynamicChainWithTimeout(
+            name: 'timed_chain',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            timeout: 600,
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $state = new ChainSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed with CLI timeout',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?AuditLoggerInterface $auditLogger = null,
+            ) use (
+                &$capturedTimeout,
+                $loopResult
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $ctx->timeout;
+
+                return $loopResult;
+            });
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'timed_chain',
+            task: 'Test',
+            timeout: 300,
+            resumeDir: '/tmp/resume-dir',
+        ));
+
+        self::assertSame(300, $capturedTimeout);
+    }
+
+    #[Test]
+    public function resumeDynamicFallsBackTo1800WhenNoTimeoutAnywhere(): void
+    {
+        $chain = $this->createDynamicChain(
+            name: 'no_timeout',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $state = new ChainSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed with default timeout',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?AuditLoggerInterface $auditLogger = null,
+            ) use (
+                &$capturedTimeout,
+                $loopResult
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $ctx->timeout;
+
+                return $loopResult;
+            });
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'no_timeout',
+            task: 'Test',
+            resumeDir: '/tmp/resume-dir',
+        ));
+
+        self::assertSame(1800, $capturedTimeout);
+    }
+
     // --- Audit logger DI tests ---
 
     #[Test]
