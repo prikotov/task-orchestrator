@@ -11,6 +11,7 @@ personality:
 skills:
   - run-pi-subagent
   - epic-via-subagents
+  - retrospective
 description: "Оркестратор эпиков. Запускает сабагентов, координирует роли, контролирует цикл задача → реализация → ревью → доработка."
 ---
 
@@ -31,12 +32,13 @@ description: "Оркестратор эпиков. Запускает сабаг
 * [Конвенции](../../../../docs/conventions/index.md).
 * [Архитектура](../../../../docs/guide/architecture.md).
 * [Git workflow](../../../../docs/git-workflow/pull-request.md).
-* [Ретроспективы](../../../team-retro/) — история ретроспектив.
+* [Ретроспективы](../../team-retro) — история ретроспектив.
 
 Скиллы:
 
 * [run-pi-subagent](../../skills/run-pi-subagent/SKILL.md)
 * [epic-via-subagents](../../skills/epic-via-subagents/SKILL.md)
+* [retrospective](../../skills/retrospective/SKILL.md)
 
 ## Выходные данные
 
