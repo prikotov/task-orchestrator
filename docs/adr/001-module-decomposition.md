@@ -25,31 +25,37 @@
 **Ответственность:** запуск AI-агента через конкретный CLI-инструмент.
 
 - Domain: `AgentRunnerInterface`, `AgentRunnerRegistryServiceInterface`, VO (`AgentResultVo`, `AgentRunRequestVo`, …)
+- Application: `RunAgentCommandHandler`, `GetRunnersQueryHandler`, `GetRunnerByNameQueryHandler`
 - Infrastructure: `PiAgentRunner`, `RetryingAgentRunner`, `CircuitBreakerAgentRunner`, `RetryableRunnerFactory`
 
 ### Модуль Orchestrator
 
 **Ответственность:** оркестрация цепочек агентов (static/dynamic), бюджет, аудит.
 
-- Domain: бизнес-логика цепочек, Port-интерфейсы (`AgentRunnerPortInterface`), собственные VO (`ChainRunRequestVo`, `ChainRunResultVo`, …)
+- Domain: бизнес-логика цепочек, интеграционный интерфейс (`RunAgentServiceInterface`), собственные VO (`ChainRunRequestVo`, `ChainRunResultVo`, …)
 - Application: use cases (`OrchestrateChainCommandHandler`, `RunAgentCommandHandler`)
-- Infrastructure: Adapter'ы к AgentRunner (`AgentRunnerAdapter`, `AgentVoMapper`), YAML-загрузка, JSONL-лог
+- Integration: ACL к AgentRunner (`RunAgentService`, `AgentDtoMapper`)
+- Infrastructure: YAML-загрузка, JSONL-лог, Session
 
-### Связь через Port/Adapter
+### Связь через Integration-слой (Clean Architecture)
 
-Orchestrator Domain определяет Port-интерфейсы (`AgentRunnerPortInterface`, `AgentRunnerRegistryPortInterface`). Infrastructure-слой Orchestrator реализует Adapter'ы, которые:
+Модули связаны через Integration-слой Orchestrator. Orchestrator Domain определяет интерфейс `RunAgentServiceInterface` в `Domain/Service/Integration/`. Integration-слой реализует `RunAgentService`, который:
 
-1. Маппят Orchestrator VO → AgentRunner VO через `AgentVoMapper`
-2. Делегируют вызовы в `AgentRunnerInterface`
-3. Инкапсулируют retry через `RetryableRunnerFactory`
+1. Маппит Orchestrator VO → AgentRunner Application DTO через `AgentDtoMapper`
+2. Делегирует вызовы в `RunAgentCommandHandler` (Application-слой AgentRunner)
+3. Маппит результат обратно: AgentRunner Application DTO → Orchestrator VO
 
 ```
-Orchestrator Domain (Port)
-    ↓ implements
-Orchestrator Infrastructure (Adapter)
-    ↓ delegates to
-AgentRunner Domain (Interface)
+Orchestrator Domain (RunAgentServiceInterface)
+    ↑ implements
+Orchestrator Integration (RunAgentService)
+    → delegates to
+AgentRunner Application (RunAgentCommandHandler)
+    → uses
+AgentRunner Domain (AgentRunnerInterface + VO)
 ```
+
+**DI:** Symfony связывает интерфейс с реализацией через alias в `services.yaml`.
 
 ## Обоснование
 
@@ -57,7 +63,7 @@ AgentRunner Domain (Interface)
 |-------------------------------|--------------------------|-------------------------------------|
 | Связность модулей             | Высокая coupling         | Независимые модули                  |
 | Расширяемость движков         | Требует понимания Domain| Только `AgentRunnerInterface`       |
-| Тестируемость                 | Моки на всю Domain       | Моки только на Port-интерфейсы      |
+| Тестируемость                 | Моки на всю Domain       | Моки на `RunAgentServiceInterface`  |
 | Переиспользование AgentRunner | Невозможно               | Отдельный модуль, независимая сборка|
 | VO Ownership                  | Общие VO                 | Каждый модуль владеет своими VO     |
 
@@ -67,20 +73,20 @@ AgentRunner Domain (Interface)
 
 - AgentRunner можно переиспользовать в других бандлах без оркестрации.
 - Orchestrator Domain не зависит от конкретного движка — замена Pi на Codex не затрагивает Domain.
-- Тестирование Orchestrator Domain упрощается — мокируются Port-интерфейсы, не конкретные runner'ы.
+- Тестирование Orchestrator Domain упрощается — мокируется `RunAgentServiceInterface`, а не конкретные runner'ы.
 - VO дублирование намеренно: каждый модуль владеет своей моделью данных.
 
 ### Отрицательные
 
-- Дублирование VO на границе модулей (`ChainRunRequestVo` ↔ `AgentRunRequestVo`) — требует поддержки `AgentVoMapper`.
-- Дополнительный уровень косвенности (Port → Adapter → Runner) — незначительный overhead в рантайме.
+- Дублирование VO на границе модулей (`ChainRunRequestVo` ↔ `AgentRunRequestVo`) — требует поддержки `AgentDtoMapper`.
+- Дополнительный уровень косвенности (Integration → AgentRunner Application → AgentRunner Domain) — незначительный overhead в рантайме.
 
 ### Риски
 
-- Рассинхронизация VO при изменении полей — митигируется тестами на `AgentVoMapper` и `AgentRunnerAdapter`.
+- Рассинхронизация VO при изменении полей — митигируется тестами на `AgentDtoMapper` и `RunAgentService`.
 
 ## Альтернативы
 
-1. **Общий модуль с namespace-разделением:** без Port/Adapter, но с разделением на подпространства имён. Отвергнуто — не решает проблему coupling на уровне VO.
+1. **Общий модуль с namespace-разделением:** без Integration-слоя, но с разделением на подпространства имён. Отвергнуто — не решает проблему coupling на уровне VO.
 2. **Shared Kernel:** выделить общие VO в отдельный пакет. Отвергнуто — создаёт нежелательную зависимость обоих модулей от третьего.
 3. **Events-based связка:** модули общаются через события. Отвергнуто — избыточно для синхронного вызова движка.

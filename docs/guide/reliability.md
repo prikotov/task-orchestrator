@@ -28,12 +28,12 @@ chains:
 | `maxDelayMs` | `int` | Верхняя граница задержки в мс |
 | `multiplier` | `float` | Множитель экспоненциальной задержки |
 
-**Архитектура retry:** Retry инкапсулирован внутри `AgentRunnerAdapter`. Последовательность:
+**Архитектура retry:** Retry инкапсулирован внутри `RunAgentCommandHandler` (AgentRunner Application). Последовательность:
 
-1. Orchestrator Domain вызывает `AgentRunnerPortInterface::run(ChainRunRequestVo, ChainRetryPolicyVo)`
-2. `AgentRunnerAdapter` маппит VO через `AgentVoMapper` в AgentRunner-типы (`AgentRunRequestVo`, `RetryPolicyVo`)
-3. Если retryPolicy задана — оборачивает runner через `RetryableRunnerFactory`, иначе вызывает напрямую
-4. `RetryingAgentRunner` (модуль AgentRunner) выполняет повторные попытки с экспоненциальной задержкой
+1. Orchestrator Domain вызывает `RunAgentServiceInterface::run(ChainRunRequestVo, ChainRetryPolicyVo)`
+2. `RunAgentService` (Integration) маппит VO через `AgentDtoMapper` в AgentRunner Application DTO (`RunAgentCommand`)
+3. `RunAgentCommandHandler` получает runner из реестра, при наличии retry-параметров — оборачивает через `RetryableRunnerFactory`
+4. `RetryingAgentRunner` (модуль AgentRunner, Infrastructure) выполняет повторные попытки с экспоненциальной задержкой
 
 ## Circuit Breaker
 

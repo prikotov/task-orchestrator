@@ -2,7 +2,7 @@
 
 **Дата:** 2026-04-17
 **Эпик:** `EPIC-arch-orchestrator-module-decomposition` (4 задачи, 4 PR)
-**Что делали:** Декомпозиция модуля Orchestrator (110 файлов) на AgentRunner (~18 файлов) и Orchestrator (~103 файла) с Port/Adapter изоляцией.
+**Что делали:** Декомпозиция модуля Orchestrator (110 файлов) на AgentRunner (~18 файлов) и Orchestrator (~103 файла). Изначально — Port/Adapter, позже переработано в Integration-слой (Clean Architecture).
 
 ## Что прошло хорошо
 
