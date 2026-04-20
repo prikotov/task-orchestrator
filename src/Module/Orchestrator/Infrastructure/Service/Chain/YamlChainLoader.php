@@ -173,6 +173,7 @@ final class YamlChainLoader implements ChainLoaderInterface
             roles: $roles,
             defaultRetryPolicy: $chainRetryPolicy,
             budget: $budget,
+            timeout: $raw['timeout'] ?? null,
         );
     }
 
@@ -215,6 +216,7 @@ final class YamlChainLoader implements ChainLoaderInterface
             participantUserPrompt: $prompts['participant_user'],
             roles: $roles,
             budget: $budget,
+            timeout: $raw['timeout'] ?? null,
         );
     }
 

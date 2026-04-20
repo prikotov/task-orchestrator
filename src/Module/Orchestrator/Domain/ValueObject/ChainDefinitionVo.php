@@ -36,6 +36,7 @@ final readonly class ChainDefinitionVo
      * @param array<string, RoleConfigVo> $roles per-role конфигурация (key = role name)
      * @param ChainRetryPolicyVo|null $defaultRetryPolicy политика retry по умолчанию для шагов цепочки
      * @param BudgetVo|null $budget бюджетные ограничения цепочки (null = безлимит)
+     * @param int|null $timeout таймаут цепочки в секундах (null = использовать CLI --timeout или default)
      */
     private function __construct(
         private string $name,
@@ -56,6 +57,7 @@ final readonly class ChainDefinitionVo
         private array $roles = [],
         private ?ChainRetryPolicyVo $defaultRetryPolicy = null,
         private ?BudgetVo $budget = null,
+        private ?int $timeout = null,
     ) {
     }
 
@@ -74,6 +76,7 @@ final readonly class ChainDefinitionVo
         array $roles = [],
         ?ChainRetryPolicyVo $defaultRetryPolicy = null,
         ?BudgetVo $budget = null,
+        ?int $timeout = null,
     ): self {
         if (count($steps) === 0) {
             throw new InvalidArgumentException(
@@ -102,6 +105,7 @@ final readonly class ChainDefinitionVo
             roles: $roles,
             defaultRetryPolicy: $defaultRetryPolicy,
             budget: $budget,
+            timeout: $timeout,
         );
     }
 
@@ -127,6 +131,7 @@ final readonly class ChainDefinitionVo
         array $roles = [],
         ?ChainRetryPolicyVo $defaultRetryPolicy = null,
         ?BudgetVo $budget = null,
+        ?int $timeout = null,
     ): self {
         if ($facilitator === '') {
             throw new InvalidArgumentException(
@@ -173,6 +178,7 @@ final readonly class ChainDefinitionVo
             roles: $roles,
             defaultRetryPolicy: $defaultRetryPolicy,
             budget: $budget,
+            timeout: $timeout,
         );
     }
 
@@ -284,6 +290,14 @@ final readonly class ChainDefinitionVo
     public function isDynamic(): bool
     {
         return $this->type === ChainTypeEnum::dynamicType;
+    }
+
+    /**
+     * Возвращает таймаут цепочки в секундах (null = не задан, использовать CLI --timeout или default).
+     */
+    public function getTimeout(): ?int
+    {
+        return $this->timeout;
     }
 
     /**

@@ -467,8 +467,49 @@ ROUND N: Facilitator → {done: true, synthesis: "..."}
 | `facilitator` | да | Роль фасилитатора |
 | `participants` | да | Список ролей-участников (min 1) |
 | `max_rounds` | нет | Лимит раундов (default: 10) |
+| `timeout` | нет | Таймаут цепочки в секундах |
 | `description` | нет | Описание |
 | `prompts` | нет | Маппинг именных промптов (файлы .txt). Если указан — все 7 ключей обязательны |
+
+### Chain-level timeout
+
+Параметр `timeout` задаёт максимальное время выполнения цепочки (в секундах).
+Доступен на уровне цепочки в YAML-конфигурации.
+
+**Приоритет fallback (от высшего к низшему):**
+
+```
+CLI --timeout → chain.timeout → 1800 (default)
+```
+
+1. **CLI `--timeout`** — если передан из командной строки, переопределяет всё.
+2. **`chain.timeout`** — значение из YAML-конфигурации цепочки.
+3. **`1800`** — дефолт, если нигде не указано.
+
+**Пример:**
+
+```yaml
+chains:
+  brainstorm:
+    type: dynamic
+    timeout: 600              # ← 10 минут на всю цепочку
+    facilitator: team_lead
+    participants: [architect, marketer]
+    max_rounds: 20
+```
+
+Без `timeout` в YAML:
+```yaml
+chains:
+  brainstorm:
+    type: dynamic
+    facilitator: team_lead
+    participants: [architect, marketer]
+```
+
+В этом случае таймаут берётся из CLI `--timeout`, а если и он не задан — используется **1800 секунд** (30 минут).
+
+Таймаут действует одинаково для начального запуска и для **resume** (возобновления прерванной сессии).
 
 ## Кастомная static-цепочка
 
