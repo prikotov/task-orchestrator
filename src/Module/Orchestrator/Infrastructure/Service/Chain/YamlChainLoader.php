@@ -217,6 +217,7 @@ final class YamlChainLoader implements ChainLoaderInterface
             roles: $roles,
             budget: $budget,
             timeout: $raw['timeout'] ?? null,
+            maxTime: $raw['max_time'] ?? null,
         );
     }
 

@@ -29,6 +29,7 @@ final readonly class DynamicChainContextVo
         public ?string $model = null,
         public ?string $workingDir = null,
         public int $timeout,
+        public ?int $maxTime = null,
     ) {
     }
 }

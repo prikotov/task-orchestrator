@@ -59,6 +59,7 @@ final class DynamicLoopExecution
     private ?string $interruptionReason = null;
     private ?DynamicBudgetCheckVo $budgetBreak = null;
     private bool $budgetWarning80Logged = false;
+    private bool $maxTimeExceeded = false;
 
     public function __construct(
         int $startRound = 0,
@@ -127,6 +128,11 @@ final class DynamicLoopExecution
     public function isBudgetWarning80Logged(): bool
     {
         return $this->budgetWarning80Logged;
+    }
+
+    public function isMaxTimeExceeded(): bool
+    {
+        return $this->maxTimeExceeded;
     }
 
     /**
@@ -253,6 +259,11 @@ final class DynamicLoopExecution
         $this->budgetWarning80Logged = true;
     }
 
+    public function markMaxTimeExceeded(): void
+    {
+        $this->maxTimeExceeded = true;
+    }
+
     // ─── Init from resume ─────────────────────────────────────────────
 
     /**
@@ -290,6 +301,7 @@ final class DynamicLoopExecution
             budgetExceeded: $this->budgetBreak?->budgetExceeded ?? false,
             budgetLimit: $this->budgetBreak?->budgetLimit ?? 0.0,
             budgetExceededRole: $this->budgetBreak?->budgetExceededRole,
+            maxTimeExceeded: $this->maxTimeExceeded,
         );
     }
 }

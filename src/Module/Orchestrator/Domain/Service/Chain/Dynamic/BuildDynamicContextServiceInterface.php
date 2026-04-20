@@ -27,6 +27,7 @@ interface BuildDynamicContextServiceInterface
         ?string $model,
         ?string $workingDir,
         int $timeout,
+        ?int $maxTime = null,
     ): DynamicChainContextVo;
 
     /**

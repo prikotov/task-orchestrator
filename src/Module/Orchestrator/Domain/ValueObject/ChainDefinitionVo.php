@@ -37,6 +37,7 @@ final readonly class ChainDefinitionVo
      * @param ChainRetryPolicyVo|null $defaultRetryPolicy политика retry по умолчанию для шагов цепочки
      * @param BudgetVo|null $budget бюджетные ограничения цепочки (null = безлимит)
      * @param int|null $timeout таймаут цепочки в секундах (null = использовать CLI --timeout или default)
+     * @param int|null $maxTime максимальное суммарное время выполнения цепочки в секундах (null = безлимит)
      */
     private function __construct(
         private string $name,
@@ -58,6 +59,7 @@ final readonly class ChainDefinitionVo
         private ?ChainRetryPolicyVo $defaultRetryPolicy = null,
         private ?BudgetVo $budget = null,
         private ?int $timeout = null,
+        private ?int $maxTime = null,
     ) {
     }
 
@@ -106,6 +108,7 @@ final readonly class ChainDefinitionVo
             defaultRetryPolicy: $defaultRetryPolicy,
             budget: $budget,
             timeout: $timeout,
+            maxTime: null,
         );
     }
 
@@ -132,6 +135,7 @@ final readonly class ChainDefinitionVo
         ?ChainRetryPolicyVo $defaultRetryPolicy = null,
         ?BudgetVo $budget = null,
         ?int $timeout = null,
+        ?int $maxTime = null,
     ): self {
         if ($facilitator === '') {
             throw new InvalidArgumentException(
@@ -179,6 +183,7 @@ final readonly class ChainDefinitionVo
             defaultRetryPolicy: $defaultRetryPolicy,
             budget: $budget,
             timeout: $timeout,
+            maxTime: $maxTime,
         );
     }
 
@@ -314,6 +319,14 @@ final readonly class ChainDefinitionVo
     public function getBudget(): ?BudgetVo
     {
         return $this->budget;
+    }
+
+    /**
+     * Возвращает максимальное суммарное время выполнения цепочки в секундах (null = безлимит).
+     */
+    public function getMaxTime(): ?int
+    {
+        return $this->maxTime;
     }
 
     /**
