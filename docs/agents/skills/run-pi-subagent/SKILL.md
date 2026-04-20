@@ -21,6 +21,8 @@ PROMPT
 
 Скрипт `watch-subagent.sh` лежит рядом с этим SKILL.md в папке `scripts/`.
 
+Сабагент запускается с **упрощённым системным промптом** (`scripts/subagent_system.txt`) — без лишних ссылок на документацию pi, только базовая роль AI-ассистента.
+
 Параметры:
 
 | Параметр          | Сокращение | Описание                                                     | По умолчанию |
@@ -29,6 +31,7 @@ PROMPT
 | `--hard-timeout`  | `-m`       | Абсолютный максимум в секундах                               | 1200         |
 | `--stall-timeout` | `-t`       | Нет событий N секунд → агент завис → завершить принудительно | 120          |
 | `--output`        | `-o`       | Формат вывода через запятую (см. ниже)                       | `raw`        |
+| `--role-file`     | `-r`       | Путь к файлу описания роли (обязателен)                      | —            |
 | `[prompt text]`   | —          | Промпт. Если не указан — читается из stdin                   | —            |
 
 ### Контроль
@@ -48,24 +51,33 @@ PROMPT
 | `tools`  | Список вызванных инструментов (имя + args)   |
 | `files`  | Список созданных/отредактированных файлов    |
 
+### Роль (`--role-file`)
+
+Обязательный параметр. Принимает путь к файлу описания роли (относительно корня проекта или абсолютный).
+В системный промпт добавляется инструкция: `Возьми на себя роль из файла: <путь>` — модель сама прочитает файл через `read`.
+
+Файлы ролей: `docs/agents/roles/team/`.
+
 ### Примеры
 
 ```bash
-# Полный поток событий
-scripts/watch-subagent.sh -s 600 <<'PROMPT'
-Загрузи роль из docs/agents/roles/team/backend_developer.ru.md и выполни задачу: todo/TASK-feat-example.todo.md.
+# Делегирование Бэкендеру
+scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer.ru.md <<'PROMPT'
+Выполни задачу: todo/TASK-feat-example.todo.md.
 Следуй инструкциям из секции 'Инструкции для сабагента' в файле задачи и AGENTS.md.
 PROMPT
 ```
 
 ```bash
-# Только финальный ответ
-scripts/watch-subagent.sh -s 600 -o text "Скажи hello"
+# Полный поток событий
+scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer.ru.md <<'PROMPT'
+Проанализируй структуру src/Domain/ и предложи рефакторинг.
+PROMPT
 ```
 
 ```bash
 # Ответ + какие файлы менялись
-scripts/watch-subagent.sh -s 600 -o text,files <<'PROMPT'
+scripts/watch-subagent.sh -s 600 -o text,files -r docs/agents/roles/team/backend_developer.ru.md <<'PROMPT'
 Реализуй фичу X в src/Domain/...
 PROMPT
 ```
