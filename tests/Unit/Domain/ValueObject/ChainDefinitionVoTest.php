@@ -377,4 +377,59 @@ final class ChainDefinitionVoTest extends TestCase
 
         self::assertNull($vo->getTimeout());
     }
+
+    #[Test]
+    public function createFromDynamicWithMaxTime(): void
+    {
+        $vo = ChainDefinitionVo::createFromDynamic(
+            name: 'dyn_maxtime',
+            description: '',
+            facilitator: 'fac',
+            participants: ['p1'],
+            maxRounds: 5,
+            brainstormSystemPrompt: 'BS',
+            facilitatorAppendPrompt: 'FA %s',
+            facilitatorStartPrompt: 'St %s',
+            facilitatorContinuePrompt: 'C %s %s',
+            facilitatorFinalizePrompt: 'F %s %s',
+            participantAppendPrompt: 'PA %s',
+            participantUserPrompt: 'P %s %s',
+            maxTime: 1800,
+        );
+
+        self::assertSame(1800, $vo->getMaxTime());
+    }
+
+    #[Test]
+    public function createFromDynamicWithoutMaxTimeReturnsNull(): void
+    {
+        $vo = ChainDefinitionVo::createFromDynamic(
+            name: 'dyn_no_maxtime',
+            description: '',
+            facilitator: 'fac',
+            participants: ['p1'],
+            maxRounds: 5,
+            brainstormSystemPrompt: 'BS',
+            facilitatorAppendPrompt: 'FA %s',
+            facilitatorStartPrompt: 'St %s',
+            facilitatorContinuePrompt: 'C %s %s',
+            facilitatorFinalizePrompt: 'F %s %s',
+            participantAppendPrompt: 'PA %s',
+            participantUserPrompt: 'P %s %s',
+        );
+
+        self::assertNull($vo->getMaxTime());
+    }
+
+    #[Test]
+    public function createFromStepsMaxTimeAlwaysNull(): void
+    {
+        $vo = ChainDefinitionVo::createFromSteps(
+            name: 'static_no_maxtime',
+            description: '',
+            steps: [ChainStepVo::agent(role: 'r1')],
+        );
+
+        self::assertNull($vo->getMaxTime());
+    }
 }

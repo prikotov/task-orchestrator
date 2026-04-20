@@ -10,8 +10,10 @@ epic: EPIC-arch-orchestrator-module-decomposition
 author: Бэкендер
 assignee:
 branch:
-pr:
-status: todo
+pr: https://github.com/prikotov/task-orchestrator/pull/32
+status: done
+assignee: Бэкендер (Левша)
+branch: task/feat-chain-max-time-yaml
 ---
 
 # TASK-feat-chain-max-time-yaml: Общий таймаут цепочки через YAML
@@ -39,40 +41,40 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] `max_time` на уровне цепочки в YAML: `chains.brainstorm.max_time: 1800` (30 мин)
-- [ ] `ChainDefinitionVo` содержит `?int $maxTime`
-- [ ] `YamlChainLoader` парсит `max_time` для dynamic chains
-- [ ] Проверка перед каждым раундом: `elapsed >= maxTime` → прерываем с finalize
-- [ ] Graceful shutdown: при `max_time_exceeded` даётся один finalize-шаг фасилитатору для synthesis
-- [ ] `session.json`: `completion_reason: "max_time_exceeded"`
-- [ ] `result.md`: отображается причина `Max time exceeded`
-- [ ] Fallback: `max_time` не указан → безлимит (как сейчас)
+- [x] `max_time` на уровне цепочки в YAML: `chains.brainstorm.max_time: 1800` (30 мин)
+- [x] `ChainDefinitionVo` содержит `?int $maxTime`
+- [x] `YamlChainLoader` парсит `max_time` для dynamic chains
+- [x] Проверка перед каждым раундом: `elapsed >= maxTime` → прерываем с finalize
+- [x] Graceful shutdown: при `max_time_exceeded` даётся один finalize-шаг фасилитатору для synthesis
+- [x] `session.json`: `completion_reason: "max_time_exceeded"`
+- [x] `result.md`: отображается причина `Max time exceeded`
+- [x] Fallback: `max_time` не указан → безлимит (как сейчас)
 ### 🟡 Should Have (Желательно)
-- [ ] Psalm: 0 errors
+- [x] Psalm: 0 errors
 - [ ] Warning при достижении 80% лимита (аналог budget warning)
-- [ ] Unit-тесты: elapsed ≥ maxTime → finalize, elapsed < maxTime → continue
+- [x] Unit-тесты: elapsed ≥ maxTime → finalize, elapsed < maxTime → continue
 ### 🟢 Could Have (Опционально)
 - [ ] CLI `--max-time` для переопределения YAML
 ### ⚫ Won't Have (Не будем делать)
 - Static chains support на этом этапе
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Добавить `maxTime: ?int` в `ChainDefinitionVo`
-2. [ ] В `YamlChainLoader::parseDynamicChain()` — читать `$raw['max_time']`
-3. [ ] Добавить `maxTime: ?int` в `DynamicChainContextVo`
-4. [ ] В `BuildDynamicContextService::buildContext()` — проброс `maxTime`
-5. [ ] В `RunDynamicLoopService::execute()` — проверка `elapsed >= maxTime` перед каждым раундом, вызов `executeFinalizeTurn` при превышении
-6. [ ] В `ChainSessionLogger::completeSession()` — обработка причины `max_time_exceeded`
-7. [ ] Unit-тесты на все ветки
-8. [ ] Обновить `config/chains.yaml` — добавить `max_time: 1800` для brainstorm
+1. [x] Добавить `maxTime: ?int` в `ChainDefinitionVo`
+2. [x] В `YamlChainLoader::parseDynamicChain()` — читать `$raw['max_time']`
+3. [x] Добавить `maxTime: ?int` в `DynamicChainContextVo`
+4. [x] В `BuildDynamicContextService::buildContext()` — проброс `maxTime`
+5. [x] В `RunDynamicLoopService::execute()` — проверка `elapsed >= maxTime` перед каждым раундом, вызов `executeFinalizeTurn` при превышении
+6. [x] В `OrchestrateChainCommandHandler::finalizeSession()` — обработка причины `max_time_exceeded`
+7. [x] Unit-тесты на все ветки
+8. [x] Обновить `config/chains.yaml` — добавить `max_time: 1800` для brainstorm
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] `chains.yaml` с `max_time: 1800` → цепочка завершается не позже 30 мин
-- [ ] `chains.yaml` без `max_time` → безлимит (обратная совместимость)
-- [ ] При `max_time_exceeded` фасилитатор даёт synthesis (не обрыв)
-- [ ] `session.json` содержит `completion_reason: "max_time_exceeded"`
-- [ ] `result.md` содержит причину прерывания
-- [ ] PHPUnit + Psalm проходят
+- [x] `chains.yaml` с `max_time: 1800` → цепочка завершается не позже 30 мин
+- [x] `chains.yaml` без `max_time` → безлимит (обратная совместимость)
+- [x] При `max_time_exceeded` фасилитатор даёт synthesis (не обрыв)
+- [x] `session.json` содержит `completion_reason: "max_time_exceeded"`
+- [x] `result.md` содержит причину прерывания
+- [x] PHPUnit + Psalm проходят
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -98,3 +100,5 @@ vendor/bin/psalm --no-cache
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-18 | Бэкендер | Создание задачи |
+| 2026-04-20 | Бэкендер (Левша) | Реализация: maxTime через все слои |
+| 2026-04-20 | Пуаро (Ревьювер) | Code review — апрув с 1 minor CR |

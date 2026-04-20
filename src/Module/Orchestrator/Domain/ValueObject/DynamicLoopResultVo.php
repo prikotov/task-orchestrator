@@ -27,6 +27,7 @@ final readonly class DynamicLoopResultVo
         public bool $budgetExceeded = false,
         public float $budgetLimit = 0.0,
         public ?string $budgetExceededRole = null,
+        public bool $maxTimeExceeded = false,
     ) {
     }
 }

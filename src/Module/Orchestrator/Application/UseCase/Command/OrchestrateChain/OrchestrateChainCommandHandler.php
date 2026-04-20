@@ -130,6 +130,7 @@ final readonly class OrchestrateChainCommandHandler
             $command->model,
             $command->workingDir,
             $timeout,
+            $chain->getMaxTime(),
         );
 
         $loopResult = $this->runDynamicLoop($chain, $context, $runnerName, auditLogger: $auditLogger);
@@ -179,6 +180,7 @@ final readonly class OrchestrateChainCommandHandler
             $command->model,
             $command->workingDir,
             $resumeTimeout,
+            $chain->getMaxTime(),
         );
 
         $loopResult = $this->runDynamicLoop(
@@ -221,9 +223,11 @@ final readonly class OrchestrateChainCommandHandler
         $synthesis = $loopResult->synthesis;
         $reason = $loopResult->budgetExceeded
             ? 'budget_exceeded'
-            : ($synthesis !== null
-                ? ($loopResult->maxRoundsReached ? 'max_rounds_reached' : 'facilitator_done')
-                : ($loopResult->interruptionReason ?? 'no_synthesis'));
+            : ($loopResult->maxTimeExceeded
+                ? 'max_time_exceeded'
+                : ($synthesis !== null
+                    ? ($loopResult->maxRoundsReached ? 'max_rounds_reached' : 'facilitator_done')
+                    : ($loopResult->interruptionReason ?? 'no_synthesis')));
 
         if ($synthesis !== null) {
             $this->sessionLogger->completeSession(
