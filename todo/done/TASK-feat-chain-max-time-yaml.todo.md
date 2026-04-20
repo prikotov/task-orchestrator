@@ -10,7 +10,7 @@ epic: EPIC-arch-orchestrator-module-decomposition
 author: Бэкендер
 assignee:
 branch:
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/32
 status: done
 assignee: Бэкендер (Левша)
 branch: task/feat-chain-max-time-yaml
