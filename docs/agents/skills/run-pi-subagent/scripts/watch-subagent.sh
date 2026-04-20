@@ -12,6 +12,7 @@
 #   -m, --hard-timeout   — абсолютный максимум в секундах (default: 1200).
 #   -t, --stall-timeout  — секунд без событий до признания зависания (default: 120).
 #   -o, --output         — формат вывода через запятую: raw, text, tools, files (default: raw).
+#   -r, --role-file <file> — путь к файлу описания роли (обязателен).
 #   [prompt text]        — промпт. Если не указан — читается из stdin.
 #
 # Выход:
@@ -25,6 +26,11 @@ HARD_TIMEOUT=1200
 STALL_TIMEOUT=120
 SOFT_TIMEOUT=""
 OUTPUT="raw"
+ROLE_FILE=""
+
+# Определяем пути относительно расположения скрипта
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SYSTEM_PROMPT_FILE="$SCRIPT_DIR/subagent_system.txt"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -32,12 +38,14 @@ while [[ $# -gt 0 ]]; do
         -m|--hard-timeout)  HARD_TIMEOUT="$2"; shift 2 ;;
         -t|--stall-timeout) STALL_TIMEOUT="$2"; shift 2 ;;
         -o|--output)        OUTPUT="$2"; shift 2 ;;
+        -r|--role-file)    ROLE_FILE="$2"; shift 2 ;;
         -h|--help)
             echo "Использование: $0 -s <soft-timeout> [options] [prompt text]"
             echo "  -s, --soft-timeout   базовый таймаут в секундах (обязателен)"
             echo "  -m, --hard-timeout   абсолютный максимум в секундах (default: 1200)"
             echo "  -t, --stall-timeout  секунд без событий до зависания (default: 120)"
             echo "  -o, --output         формат вывода через запятую: raw, text, tools, files (default: raw)"
+            echo "  -r, --role-file <file> путь к файлу описания роли (обязателен)"
             exit 0
             ;;
         *) break ;;
@@ -61,7 +69,15 @@ if [[ -z "$PROMPT" ]]; then
     exit 1
 fi
 
-# Парсим список форматов
+if [[ -z "$ROLE_FILE" ]]; then
+    echo "Ошибка: -r/--role-file обязателен" >&2
+    exit 1
+fi
+
+if [[ ! -f "$ROLE_FILE" ]]; then
+    echo "Ошибка: файл роли не найден: $ROLE_FILE" >&2
+    exit 1
+fi
 IFS=',' read -ra FORMATS <<< "$OUTPUT"
 VALID="raw text tools files"
 for fmt in "${FORMATS[@]}"; do
@@ -110,8 +126,12 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# Запуск pi, вывод в именованный pipe
-pi --mode json --no-session <<< "$PROMPT" > "$PIPE" 2>/dev/null &
+# Парсим список форматов
+
+# Формируем команду pi с упрощённым системным промптом и ролью
+PI_CMD=(pi --mode json --no-session --system-prompt "$SYSTEM_PROMPT_FILE")
+PI_CMD+=(--append-system-prompt "Возьми на себя роль из файла: $ROLE_FILE")
+"${PI_CMD[@]}" <<< "$PROMPT" > "$PIPE" 2>/dev/null &
 PI_PID=$!
 
 START_TIME=$(date +%s)
