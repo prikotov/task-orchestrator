@@ -10,7 +10,7 @@ author: Бэкендер
 assignee: Бэкендер (Левша)
 branch: task/feat-chain-step-timeout-yaml
 pr: https://github.com/prikotov/task-orchestrator/pull/31
-status: in_progress
+status: done
 ---
 
 # TASK-feat-chain-step-timeout-yaml: Таймаут на шаг цепочки через YAML
