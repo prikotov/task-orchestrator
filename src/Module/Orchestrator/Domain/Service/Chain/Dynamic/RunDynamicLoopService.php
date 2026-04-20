@@ -68,6 +68,16 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         $auditLogger?->logChainStart($chain->getName(), $context->topic);
 
         while ($execution->getParticipantRounds() < $context->maxRounds) {
+            // Проверка maxTime перед каждым раундом
+            if ($this->isMaxTimeExceeded($context->maxTime, $startTime)) {
+                $execution->markMaxTimeExceeded();
+                $this->logger?->info('Max time exceeded, initiating graceful finalize.', [
+                    'maxTime' => $context->maxTime,
+                    'elapsed' => round(microtime(true) - $startTime, 1),
+                ]);
+                break;
+            }
+
             $execution->advanceStep();
             $execution->advanceRound();
 
@@ -104,10 +114,11 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
         $execution->markMaxRoundsReached(
             $execution->getSynthesis() === null
-            && $execution->getParticipantRounds() >= $context->maxRounds,
+            && $execution->getParticipantRounds() >= $context->maxRounds
+            && !$execution->isMaxTimeExceeded(),
         );
 
-        if ($execution->isMaxRoundsReached() && $execution->getSynthesis() === null) {
+        if (($execution->isMaxRoundsReached() || $execution->isMaxTimeExceeded()) && $execution->getSynthesis() === null) {
             $this->executeFinalizeTurn(
                 $chain,
                 $context,
@@ -429,5 +440,12 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
                 $execution->getRoundResults(),
             ),
         );
+    }
+
+    // ─── Time checks ────────────────────────────────────────────────────
+
+    private function isMaxTimeExceeded(?int $maxTime, float $startTime): bool
+    {
+        return $maxTime !== null && (microtime(true) - $startTime) >= $maxTime;
     }
 }

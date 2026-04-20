@@ -1570,4 +1570,73 @@ YAML);
             rmdir($fixtureDir);
         }
     }
+
+    // --- max_time parsing tests ---
+
+    #[Test]
+    public function loadParsesDynamicChainMaxTime(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_dyn_maxtime_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  dyn_mt:
+    type: dynamic
+    facilitator: x
+    participants: [a]
+    max_time: 1800
+    prompts:
+      brainstorm_system: "BS"
+      facilitator_append: "FA %s"
+      facilitator_start: "St %s"
+      facilitator_continue: "C %s %s"
+      facilitator_finalize: "F %s %s"
+      participant_append: "PA %s"
+      participant_user: "PU %s %s"
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('dyn_mt');
+
+            self::assertSame(1800, $chain->getMaxTime());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadDynamicChainWithoutMaxTimeReturnsNull(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_dyn_no_maxtime_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  dyn_nmt:
+    type: dynamic
+    facilitator: x
+    participants: [a]
+    prompts:
+      brainstorm_system: "BS"
+      facilitator_append: "FA %s"
+      facilitator_start: "St %s"
+      facilitator_continue: "C %s %s"
+      facilitator_finalize: "F %s %s"
+      participant_append: "PA %s"
+      participant_user: "PU %s %s"
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('dyn_nmt');
+
+            self::assertNull($chain->getMaxTime());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
 }

@@ -36,6 +36,7 @@ final readonly class BuildDynamicContextService implements BuildDynamicContextSe
         ?string $model,
         ?string $workingDir,
         int $timeout,
+        ?int $maxTime = null,
     ): DynamicChainContextVo {
         $brainstormSystemPrompt = $chain->getBrainstormSystemPrompt();
         $facilitatorAppendPrompt = $chain->getFacilitatorAppendPrompt();
@@ -77,6 +78,7 @@ final readonly class BuildDynamicContextService implements BuildDynamicContextSe
             model: $model,
             workingDir: $workingDir,
             timeout: $timeout,
+            maxTime: $maxTime,
         );
     }
 
