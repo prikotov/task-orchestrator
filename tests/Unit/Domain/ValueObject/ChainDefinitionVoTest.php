@@ -309,4 +309,72 @@ final class ChainDefinitionVoTest extends TestCase
 
         self::assertNull($step->getRetryPolicy());
     }
+
+    #[Test]
+    public function createFromStepsWithTimeout(): void
+    {
+        $vo = ChainDefinitionVo::createFromSteps(
+            name: 'timed',
+            description: '',
+            steps: [ChainStepVo::agent(role: 'r1')],
+            timeout: 600,
+        );
+
+        self::assertSame(600, $vo->getTimeout());
+    }
+
+    #[Test]
+    public function createFromStepsWithoutTimeoutReturnsNull(): void
+    {
+        $vo = ChainDefinitionVo::createFromSteps(
+            name: 'untimed',
+            description: '',
+            steps: [ChainStepVo::agent(role: 'r1')],
+        );
+
+        self::assertNull($vo->getTimeout());
+    }
+
+    #[Test]
+    public function createFromDynamicWithTimeout(): void
+    {
+        $vo = ChainDefinitionVo::createFromDynamic(
+            name: 'dyn_timed',
+            description: '',
+            facilitator: 'fac',
+            participants: ['p1'],
+            maxRounds: 5,
+            brainstormSystemPrompt: 'BS',
+            facilitatorAppendPrompt: 'FA %s',
+            facilitatorStartPrompt: 'St %s',
+            facilitatorContinuePrompt: 'C %s %s',
+            facilitatorFinalizePrompt: 'F %s %s',
+            participantAppendPrompt: 'PA %s',
+            participantUserPrompt: 'P %s %s',
+            timeout: 900,
+        );
+
+        self::assertSame(900, $vo->getTimeout());
+    }
+
+    #[Test]
+    public function createFromDynamicWithoutTimeoutReturnsNull(): void
+    {
+        $vo = ChainDefinitionVo::createFromDynamic(
+            name: 'dyn_untimed',
+            description: '',
+            facilitator: 'fac',
+            participants: ['p1'],
+            maxRounds: 5,
+            brainstormSystemPrompt: 'BS',
+            facilitatorAppendPrompt: 'FA %s',
+            facilitatorStartPrompt: 'St %s',
+            facilitatorContinuePrompt: 'C %s %s',
+            facilitatorFinalizePrompt: 'F %s %s',
+            participantAppendPrompt: 'PA %s',
+            participantUserPrompt: 'P %s %s',
+        );
+
+        self::assertNull($vo->getTimeout());
+    }
 }

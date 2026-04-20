@@ -1457,4 +1457,117 @@ YAML);
             rmdir($fixtureDir);
         }
     }
+
+    // --- Timeout parsing tests ---
+
+    #[Test]
+    public function loadParsesDynamicChainTimeout(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_dyn_timeout_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  dyn_t:
+    type: dynamic
+    facilitator: x
+    participants: [a]
+    timeout: 600
+    prompts:
+      brainstorm_system: "BS"
+      facilitator_append: "FA %s"
+      facilitator_start: "St %s"
+      facilitator_continue: "C %s %s"
+      facilitator_finalize: "F %s %s"
+      participant_append: "PA %s"
+      participant_user: "PU %s %s"
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('dyn_t');
+
+            self::assertSame(600, $chain->getTimeout());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadDynamicChainWithoutTimeoutReturnsNull(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_dyn_no_timeout_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  dyn_nt:
+    type: dynamic
+    facilitator: x
+    participants: [a]
+    prompts:
+      brainstorm_system: "BS"
+      facilitator_append: "FA %s"
+      facilitator_start: "St %s"
+      facilitator_continue: "C %s %s"
+      facilitator_finalize: "F %s %s"
+      participant_append: "PA %s"
+      participant_user: "PU %s %s"
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('dyn_nt');
+
+            self::assertNull($chain->getTimeout());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadParsesStaticChainTimeout(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_static_timeout_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  static_t:
+    timeout: 1200
+    steps:
+      - { type: agent, role: r1 }
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('static_t');
+
+            self::assertSame(1200, $chain->getTimeout());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadStaticChainWithoutTimeoutReturnsNull(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_static_no_timeout_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, "chains:\n  plain:\n    steps:\n      - { type: agent, role: r1 }\n");
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('plain');
+
+            self::assertNull($chain->getTimeout());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
 }

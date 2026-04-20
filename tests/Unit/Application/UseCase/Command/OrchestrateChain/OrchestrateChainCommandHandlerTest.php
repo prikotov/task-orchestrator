@@ -176,6 +176,61 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         self::assertSame('pi', $capturedRunner);
     }
 
+    #[Test]
+    public function invokeStaticUsesCliTimeoutWhenProvided(): void
+    {
+        $chain = ChainDefinitionVo::createFromSteps(
+            name: 'static-cli-timeout',
+            description: '',
+            steps: [ChainStepVo::agent(role: 'step1', runner: 'pi')],
+        );
+
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $capturedTimeout = null;
+        $this->staticChainExecutor->method('execute')
+            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName, string $t, ?string $m, ?string $w, int $timeout) use (&$capturedTimeout): OrchestrateChainResultDto {
+                $capturedTimeout = $timeout;
+
+                return new OrchestrateChainResultDto();
+            });
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'static-cli-timeout',
+            task: 'Test',
+            timeout: 600,
+        ));
+
+        self::assertSame(600, $capturedTimeout);
+    }
+
+    #[Test]
+    public function invokeStaticFallsBackToDefaultTimeoutWhenNoCliTimeout(): void
+    {
+        $chain = ChainDefinitionVo::createFromSteps(
+            name: 'static-default-timeout',
+            description: '',
+            steps: [ChainStepVo::agent(role: 'step1', runner: 'pi')],
+        );
+
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $capturedTimeout = null;
+        $this->staticChainExecutor->method('execute')
+            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName, string $t, ?string $m, ?string $w, int $timeout) use (&$capturedTimeout): OrchestrateChainResultDto {
+                $capturedTimeout = $timeout;
+
+                return new OrchestrateChainResultDto();
+            });
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'static-default-timeout',
+            task: 'Test',
+        ));
+
+        self::assertSame(300, $capturedTimeout);
+    }
+
     // --- Dynamic chain tests ---
 
     #[Test]
@@ -438,6 +493,138 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         self::assertSame(1, $logCapture['max_rounds']);
     }
 
+    #[Test]
+    public function invokeDynamicUsesChainTimeoutWhenNoCliOverride(): void
+    {
+        $chain = $this->createDynamicChainWithTimeout(
+            name: 'timed_chain',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            timeout: 600,
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 0.0,
+            totalInputTokens: 0,
+            totalOutputTokens: 0,
+            totalCost: 0.0,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')->willReturnCallback(
+            function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $context,
+            ) use (
+                &$capturedTimeout,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $context->timeout;
+
+                return $loopResult;
+            },
+        );
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'timed_chain',
+            task: 'Test',
+        ));
+
+        self::assertSame(600, $capturedTimeout);
+    }
+
+    #[Test]
+    public function invokeDynamicCliTimeoutOverridesChain(): void
+    {
+        $chain = $this->createDynamicChainWithTimeout(
+            name: 'timed_chain',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            timeout: 600,
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 0.0,
+            totalInputTokens: 0,
+            totalOutputTokens: 0,
+            totalCost: 0.0,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')->willReturnCallback(
+            function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $context,
+            ) use (
+                &$capturedTimeout,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $context->timeout;
+
+                return $loopResult;
+            },
+        );
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'timed_chain',
+            task: 'Test',
+            timeout: 300,
+        ));
+
+        self::assertSame(300, $capturedTimeout);
+    }
+
+    #[Test]
+    public function invokeDynamicDefaultsTo1800WhenNoTimeoutAnyWhere(): void
+    {
+        $chain = $this->createDynamicChain(
+            name: 'no_timeout',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 0.0,
+            totalInputTokens: 0,
+            totalOutputTokens: 0,
+            totalCost: 0.0,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')->willReturnCallback(
+            function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $context,
+            ) use (
+                &$capturedTimeout,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $context->timeout;
+
+                return $loopResult;
+            },
+        );
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'no_timeout',
+            task: 'Test',
+        ));
+
+        self::assertSame(1800, $capturedTimeout);
+    }
+
     // --- Resume tests ---
 
     #[Test]
@@ -520,6 +707,191 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         self::assertSame(3, $capturedStartRound);
         self::assertSame('History', $capturedHistory);
         self::assertSame('Journal', $capturedJournal);
+    }
+
+    // --- Resume timeout tests ---
+
+    #[Test]
+    public function resumeDynamicUsesChainTimeoutWhenNoCliOverride(): void
+    {
+        $chain = $this->createDynamicChainWithTimeout(
+            name: 'timed_chain',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            timeout: 600,
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $state = new ChainSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed with chain timeout',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?AuditLoggerInterface $auditLogger = null,
+            ) use (
+                &$capturedTimeout,
+                $loopResult
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $ctx->timeout;
+
+                return $loopResult;
+            });
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'timed_chain',
+            task: 'Test',
+            resumeDir: '/tmp/resume-dir',
+        ));
+
+        self::assertSame(600, $capturedTimeout);
+    }
+
+    #[Test]
+    public function resumeDynamicCliTimeoutOverridesChainTimeout(): void
+    {
+        $chain = $this->createDynamicChainWithTimeout(
+            name: 'timed_chain',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            timeout: 600,
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $state = new ChainSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed with CLI timeout',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?AuditLoggerInterface $auditLogger = null,
+            ) use (
+                &$capturedTimeout,
+                $loopResult
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $ctx->timeout;
+
+                return $loopResult;
+            });
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'timed_chain',
+            task: 'Test',
+            timeout: 300,
+            resumeDir: '/tmp/resume-dir',
+        ));
+
+        self::assertSame(300, $capturedTimeout);
+    }
+
+    #[Test]
+    public function resumeDynamicFallsBackTo1800WhenNoTimeoutAnywhere(): void
+    {
+        $chain = $this->createDynamicChain(
+            name: 'no_timeout',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+        );
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $state = new ChainSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed with default timeout',
+            maxRoundsReached: false,
+        );
+
+        $capturedTimeout = null;
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                ChainDefinitionVo $c,
+                DynamicChainContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?AuditLoggerInterface $auditLogger = null,
+            ) use (
+                &$capturedTimeout,
+                $loopResult
+            ): DynamicLoopResultVo {
+                $capturedTimeout = $ctx->timeout;
+
+                return $loopResult;
+            });
+
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'no_timeout',
+            task: 'Test',
+            resumeDir: '/tmp/resume-dir',
+        ));
+
+        self::assertSame(1800, $capturedTimeout);
     }
 
     // --- Audit logger DI tests ---
@@ -729,12 +1101,40 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         );
     }
 
+    /**
+     * @param list<string> $participants
+     */
+    private function createDynamicChainWithTimeout(
+        string $name,
+        string $facilitator,
+        array $participants,
+        int $timeout,
+        int $maxRounds = 10,
+    ): ChainDefinitionVo {
+        return ChainDefinitionVo::createFromDynamic(
+            name: $name,
+            description: '',
+            facilitator: $facilitator,
+            participants: $participants,
+            maxRounds: $maxRounds,
+            brainstormSystemPrompt: 'Base system prompt',
+            facilitatorAppendPrompt: 'Fac append %s',
+            facilitatorStartPrompt: 'Start %s',
+            facilitatorContinuePrompt: 'Cont %s %s %s',
+            facilitatorFinalizePrompt: 'Final %s %s',
+            participantAppendPrompt: 'Part append %s',
+            participantUserPrompt: 'Ctx %s %s',
+            timeout: $timeout,
+        );
+    }
+
     private function createDynamicContextDto(
         string $facilitatorRole = 'facilitator',
         array $participants = ['participant'],
         int $maxRounds = 10,
         string $topic = 'test topic',
         string $runnerName = 'pi',
+        int $timeout = 1800,
     ): DynamicChainContextVo {
         return new DynamicChainContextVo(
             facilitatorRole: $facilitatorRole,
@@ -749,6 +1149,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             facilitatorFinalizePrompt: 'Final %s %s',
             participantAppendPrompt: 'Part append %s',
             participantUserPrompt: 'Ctx %s %s',
+            timeout: $timeout,
         );
     }
 }
