@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic: EPIC-research-agent-frameworks-comparison
 author: Технический писатель (Гермиона)
-assignee:
-branch:
+assignee: Технический писатель (Гермиона)
+branch: task/research-charmbracelet-crush
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-charmbracelet-crush: Исследовать и оценить charmbracelet/crush для интеграции
@@ -63,6 +63,20 @@ ls docs/research/crush-comparison.md
 
 ## 9. Comments (Комментарии)
 Charmbracelet — авторы Bubbletea, Lip Gloss, VHS. Качество их проектов высокое, подход может быть полезен.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
+**Ветка:** task/research-charmbracelet-crush (уже создана и активна)
+**PR:** уже создан (draft) из task/research-charmbracelet-crush в task/research-agent-frameworks-comparison — [PR #40](https://github.com/prikotov/task-orchestrator/pull/40)
+
+### Порядок действий
+1. Переключись в ветку `task/research-charmbracelet-crush`: `git checkout task/research-charmbracelet-crush`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

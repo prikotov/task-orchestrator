@@ -7,11 +7,11 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 0 / 11 исследований
+> **Статус заполнения:** 1 / 11 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
-| 1 | Charmbracelet Crush | Go | | | | | | | [crush-comparison.md](crush-comparison.md) ⏳ |
+| 1 | Charmbracelet Crush | Go | `CLI-agent` | `agent-loop` (LLM → tool call → LLM → ...) | `persistent` (SQLite) | `manual` (только retry при 401) | `MCP + SKILL.md + config` | 🟡 заимствовать отдельные паттерны | [crush-comparison.md](crush-comparison.md) ✅ |
 | 2 | pi_agent_rust | Rust | | | | | | | [pi-agent-rust-comparison.md](pi-agent-rust-comparison.md) ⏳ |
 | 3 | CrewAI | Python | | | | | | | [crewai-langgraph-autogen-comparison.md](crewai-langgraph-autogen-comparison.md) ⏳ |
 | 4 | LangGraph | Python | | | | | | | *(в отчёте №3)* ⏳ |
@@ -44,15 +44,17 @@
 
 ### Приоритет 1 (Quick wins)
 
-*
+* Crush: loop detection (защита от зацикливания в fix_iterations) — 🟡 P2
 
 ### Приоритет 2 (Среднесрочные)
 
-*
+* Crush: формализация Agent Skills (SKILL.md standard, discovery, validation) — 🟡 P2
 
 ### Приоритет 3 (Долгосрочные / R&D)
 
-*
+* Crush: auto-summarization при переполнении контекста — 🟡 P3
+* Crush: permission system для автономного выполнения — 🟡 P3
+* Crush: множественный context file discovery (CRUSH.md, CLAUDE.md и т.д.) — 🟡 P3
 
 ---
 
