@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Технический писатель (Гермиона)
+branch: task/research-metagpt-openclaw
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-metagpt-openclaw: Исследовать MetaGPT и OpenClaw для сравнения с task-orchestrator
@@ -66,6 +66,20 @@ ls docs/research/metagpt-openclaw-comparison.md
 
 ## 9. Comments (Комментарии)
 MetaGPT интересен SOP-подходом — стандартные операционные процедуры для AI-агентов с ролевой моделью. Это близко к нашим chain-определениям с facilitator/participants. OpenClaw — менее известный проект, стоит проверить его уникальность.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
+**Ветка:** task/research-metagpt-openclaw (уже создана и активна)
+**PR:** будет создан после коммита
+
+### Порядок действий
+1. Переключись в ветку `task/research-metagpt-openclaw`: `git checkout task/research-metagpt-openclaw`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
