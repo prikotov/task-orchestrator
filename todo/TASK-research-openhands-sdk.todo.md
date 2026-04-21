@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Технический писатель (Гермиона)
+branch: task/research-openhands-sdk
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-openhands-sdk: Исследовать OpenHands SDK для сравнения с task-orchestrator
@@ -64,6 +64,20 @@ ls docs/research/openhands-sdk-comparison.md
 
 ## 9. Comments (Комментарии)
 OpenHands — один из самых активных open-source AI-agent проектов. Их action/observation протокол и SDK-подход к расширяемости могут быть полезны для нашей архитектуры runner'ов и chain-оркестрации.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
+**Ветка:** task/research-openhands-sdk (уже создана и активна)
+**PR:** будет создан после коммита
+
+### Порядок действий
+1. Переключись в ветку `task/research-openhands-sdk`: `git checkout task/research-openhands-sdk`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
