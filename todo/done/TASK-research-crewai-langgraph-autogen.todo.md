@@ -9,7 +9,7 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/research-crewai-langgraph-autogen
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/42
 status: done
 ---
 

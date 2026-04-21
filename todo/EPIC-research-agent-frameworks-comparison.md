@@ -70,7 +70,7 @@ pr:
 
 - [x] [TASK-research-charmbracelet-crush](done/TASK-research-charmbracelet-crush.todo.md) — Charmbracelet Crush (Go, CLI-agent)
 - [x] [TASK-research-pi-agent-rust](done/TASK-research-pi-agent-rust.todo.md) — pi_agent_rust (Rust)
-- [ ] [TASK-research-crewai-langgraph-autogen](TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
+- [x] [TASK-research-crewai-langgraph-autogen](done/TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
 - [ ] [TASK-research-openhands-sdk](TASK-research-openhands-sdk.todo.md) — OpenHands SDK (Python, SDK-подход)
 - [ ] [TASK-research-archon-ai-planner](TASK-research-archon-ai-planner.todo.md) — Archon (Python, мета-оркестрация)
 - [ ] [TASK-research-metagpt-openclaw](TASK-research-metagpt-openclaw.todo.md) — MetaGPT, OpenClaw (Python, SOP/роли)
