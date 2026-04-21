@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/research-docker-agent-codex
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-docker-agent-codex: Исследовать Docker Agent и OpenAI Codex для сравнения с task-orchestrator
@@ -29,28 +29,28 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Изучить Docker Agent: архитектуру, контейнеризацию, sandboxing, связь с хост-системой
-- [ ] Изучить OpenAI Codex (CLI / cloud): агентный цикл, модель инструментов, контекст
-- [ ] Сравнить оба продукта с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [ ] Оформить отчёт в docs/research/docker-agent-codex-comparison.md по формату существующих comparison-документов
-- [ ] Заполнить строку для Docker Agent + Codex в сводной таблице docs/research/agent-frameworks-summary.md
+- [x] Изучить Docker Agent: архитектуру, контейнеризацию, sandboxing, связь с хост-системой
+- [x] Изучить OpenAI Codex (CLI / cloud): агентный цикл, модель инструментов, контекст
+- [x] Сравнить оба продукта с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
+- [x] Оформить отчёт в docs/research/docker-agent-codex-comparison.md по формату существующих comparison-документов
+- [x] Заполнить строку для Docker Agent + Codex в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
-- [ ] Определить конкретные паттерны, которые стоит заимствовать
-- [ ] Оценить подход к изоляции выполнения и безопасности
+- [x] Определить конкретные паттерны, которые стоит заимствовать
+- [x] Оценить подход к изоляции выполнения и безопасности
 ### 🟢 Could Have (Опционально)
 ### ⚫ Won't Have (Не будем делать)
 - [ ] Написание кода интеграции
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Изучить документацию OpenAI: Docker Agent, Codex CLI
-2. [ ] Изучить открытые материалы: статьи, GitHub, API reference
-3. [ ] Сравнить с нашей моделью оркестрации
-4. [ ] Написать docs/research/docker-agent-codex-comparison.md
+1. [x] Изучить документацию OpenAI: Docker Agent, Codex CLI
+2. [x] Изучить открытые материалы: статьи, GitHub, API reference
+3. [x] Сравнить с нашей моделью оркестрации
+4. [x] Написать docs/research/docker-agent-codex-comparison.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт docs/research/docker-agent-codex-comparison.md создан по формату существующих comparison-документов
-- [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
-- [ ] Строка Docker Agent + Codex в сводной таблице docs/research/agent-frameworks-summary.md заполнена
+- [x] Отчёт docs/research/docker-agent-codex-comparison.md создан по формату существующих comparison-документов
+- [x] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [x] Строка Docker Agent + Codex в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -82,3 +82,4 @@ ls docs/research/docker-agent-codex-comparison.md
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-20 | Тимлид (Алекс) | Создание задачи |
+| 2026-04-22 | Технический писатель (Гермиона) | Задача выполнена: создан отчёт, заполнена сводная таблица |

@@ -77,7 +77,7 @@ pr:
 - [x] [TASK-research-mastra-ai](done/TASK-research-mastra-ai.todo.md) — Mastra AI (TypeScript, workflows)
 - [x] [TASK-research-claude-code](done/TASK-research-claude-code.todo.md) — Claude Code (проприетарный, agent loop)
 - [x] [TASK-research-copilot-agent-hq](done/TASK-research-copilot-agent-hq.todo.md) — GitHub Copilot Agent HQ (проприетарный, cloud)
-- [ ] [TASK-research-docker-agent-codex](TASK-research-docker-agent-codex.todo.md) — Docker Agent, OpenAI Codex (проприетарный, sandboxing)
+- [x] [TASK-research-docker-agent-codex](done/TASK-research-docker-agent-codex.todo.md) — Docker Agent, OpenAI Codex (проприетарный, sandboxing)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 

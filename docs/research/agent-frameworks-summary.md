@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 12 / 13 исследований
+> **Статус заполнения:** 13 / 13 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -23,7 +23,7 @@
 | 10 | Mastra AI | TypeScript (Node.js) | `SDK` | `step-based workflow (chaining API: .then/.branch/.parallel/.dowhile/.dountil/.foreach) + agent-loop` | `pluggable (LibSQL/PostgreSQL/D1/Upstash)` | `basic retry (attempts+delay, no exponential backoff) + TripWire (abort with retry hint)` | `Processors pipeline + MCP + Tools (Zod schemas) + custom storage + Agent network (delegation)` | 🟡 заимствовать отдельные паттерны | [mastra-ai-comparison.md](mastra-ai-comparison.md) ✅ |
 | 11 | Claude Code | — (проприетарный) | `CLI-agent` | `agent-loop` (LLM → tool call → observation → LLM → ...) | `in-memory + auto-compact` | `basic API retry` (429/500, без backoff) | `MCP + hooks (shell) + CLAUDE.md + slash commands + sub-agents` | 🟡 заимствовать отдельные паттерны | [claude-code-comparison.md](claude-code-comparison.md) ✅ |
 | 12 | GitHub Copilot Agent HQ | — (проприетарный) | `cloud/SaaS` | `agent-loop` (cloud sandbox, Issue→Plan→Execute→PR) | `cloud-managed` (session-based, GitHub infrastructure) | `transparent` (built-in API retry, org-level rate limits) | `MCP + custom instructions + GitHub Actions + GitHub Models marketplace` | 🟡 заимствовать отдельные паттерны | [copilot-agent-hq-comparison.md](copilot-agent-hq-comparison.md) ✅ |
-| 13 | Docker Agent + OpenAI Codex | — (проприетарный) | | | | | | | [docker-agent-codex-comparison.md](docker-agent-codex-comparison.md) ⏳ |
+| 13 | Docker Agent + OpenAI Codex | Rust (codex-rs) + TypeScript | `CLI-agent + cloud/SaaS` | `agent-loop` (LLM → tool call → observation → LLM → ...) + hierarchical multi-agent | `persistent` (SQLite + rollout JSONL files) + `auto-compact` | `basic API retry` + `Guardian (LLM safety reviewer)` + `exec policy (rules)` | `MCP client/server` + `SKILL.md` + `AGENTS.md` + `apps (connectors)` + `custom agent roles` + `Docker sandbox` | 🟡 заимствовать отдельные паттерны | [docker-agent-codex-comparison.md](docker-agent-codex-comparison.md) ✅ |
 
 ### Легенда колонок
 
@@ -115,6 +115,15 @@
 * GitHub Copilot Agent HQ: policy engine (permissions, scopes, org-level ограничения) — 🟡 P2
 * GitHub Copilot Agent HQ: Plan → Review → Execute (LLM-generated dynamic chains с human-in-the-loop) — 🟡 P3
 * GitHub Copilot Agent HQ: knowledge base integration (обогащение контекста документацией) — 🟡 P3
+* Docker Agent + Codex: Docker-based sandboxing (container isolation + iptables firewall + domain whitelist) — 🟡 P2
+* Docker Agent + Codex: network isolation (iptables/ipset — DROP default, whitelist доменов) — 🟡 P2
+* Docker Agent + Codex: Guardian (LLM-based safety reviewer — data exfiltration, credential probing, destructive actions) — 🟡 P2
+* Docker Agent + Codex: exec policy (rules-based command filtering — banned prefixes, safe command detection) — 🟡 P2
+* Docker Agent + Codex: split filesystem permissions (per-path read/write/none) — 🟡 P2
+* Docker Agent + Codex: hierarchical multi-agent (spawn/send_message/wait/close_agent + depth limit + mailbox) — 🟡 P2
+* Docker Agent + Codex: auto-compaction (LLM summarization при context overflow, inline + remote) — 🟡 P3
+* Docker Agent + Codex: plan mode (read-only exploration перед execution) — 🟡 P3
+* Docker Agent + Codex: session persistence (SQLite + rollout JSONL — resumable sessions) — 🟡 P3
 
 ---
 
@@ -155,6 +164,14 @@
 * Typed I/O per step — повторяющийся паттерн: Mastra (Zod-схемы), LangGraph (TypedDict + reducers), Archon (JSON Schema). Валидация входных/выходных данных каждого шага повышает надёжность цепочек.
 * Observational memory (Mastra) — самый продвинутый подход к context management из исследованных: Observer + Reflector agents с async buffering, token budgets, и activation thresholds. Это развитие идей auto-summarization (Crush) и auto-compaction (pi_agent_rust).
 * Conditional branching — третий проект с branching (после LangGraph и Archon), что подтверждает востребованность этого паттерна для workflows.
+* OpenAI Codex CLI — наиболее технически продвинутый CLI-агент из исследованных: Rust-ядро, multi-platform sandboxing (Seatbelt/Landlock/Bubblewrap/Docker + iptables), hierarchical multi-agent с depth limit и mailbox, Guardian (LLM-based safety reviewer), exec policy (rules-based command filtering), auto-compaction, MCP client/server. При этом — не chain-оркестратор, работает на уровне single agent loop.
+* Docker-based sandboxing (Codex) — наиболее полная реализация container isolation для AI-агента из исследованных: Docker container + iptables/ipset firewall (whitelist доменов) + auto-cleanup. Для CI/CD pipeline — production-ready подход к изоляции shell-команд.
+* Guardian (Codex) — первый проект с LLM-based pre-execution safety review. В отличие от наших post-execution quality gates, Guardian оценивает risk ДО выполнения команды: data exfiltration, credential probing, destructive actions, persistent security weakening. Это дополняет quality gates, а не заменяет.
+* Exec policy (Codex) — декларативные .rules файлы для command filtering: banned prefixes (bash -c, python -c), safe command detection, network rules. Простой и надёжный механизм, применимый к task-orchestrator.
+* Multi-agent v2 (Codex) — наиболее продвинутая sub-agent система из CLI-агентов: spawn/send_message/wait/close_agent/list_agents, depth limit (agent_max_depth), mailbox pattern (async channels), fork modes (full history / clean), role system. Для dynamic chains — готовый паттерн иерархического делегирования.
+* Network isolation через iptables (Codex) — второй проект с production-grade Docker sandbox (после GitHub Copilot Agent HQ). Codex идёт дальше: iptables + ipset + DNS resolution + verification (проверяет, что example.com заблокирован, а api.openai.com доступен).
+* Codex CLI не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны.
+* Guardian + exec policy + Docker sandbox — трёхуровневая модель безопасности Codex: (1) rules filter → (2) LLM safety review → (3) container isolation. Это «defence in depth» для AI-agent execution.
 
 ---
 
@@ -171,3 +188,4 @@
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт mastra-ai-comparison.md, заполнена строка Mastra AI (#10), добавлены рекомендации и тренды |
 | 2026-04-22 | Технический писатель (Гермиона) | Создан отчёт claude-code-comparison.md, заполнена строка Claude Code (#11), добавлены рекомендации и тренды |
 | 2026-04-22 | Технический писатель (Гермиона) | Создан отчёт copilot-agent-hq-comparison.md, заполнена строка GitHub Copilot Agent HQ (#12), добавлены рекомендации и тренды |
+| 2026-04-22 | Технический писатель (Гермиона) | Создан отчёт docker-agent-codex-comparison.md, заполнена строка Docker Agent + OpenAI Codex (#13), добавлены рекомендации и тренды. Все 13 исследований завершены. |
