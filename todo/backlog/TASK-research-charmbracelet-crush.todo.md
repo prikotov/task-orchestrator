@@ -5,7 +5,7 @@ value: V2
 complexity: C3
 priority: P2
 depends_on:
-epic:
+epic: EPIC-research-agent-frameworks-comparison
 author: Технический писатель (Гермиона)
 assignee:
 branch:
@@ -32,6 +32,7 @@ status: todo
 - [ ] Изучить репозиторий https://github.com/charmbracelet/crush: архитектуру, стек, модель цепочек
 - [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
 - [ ] Оформить отчёт в docs/research/crush-comparison.md по формату существующих comparison-документов
+- [ ] Заполнить строку(и) для Crush в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Определить конкретные паттерны, которые стоит заимствовать
 - [ ] Оценить возможность использования crush как runner'а (аналогично pi)
@@ -47,6 +48,7 @@ status: todo
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] Отчёт docs/research/crush-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [ ] Строка Crush в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash

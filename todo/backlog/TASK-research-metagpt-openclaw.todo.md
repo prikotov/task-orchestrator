@@ -5,7 +5,7 @@ value: V3
 complexity: C3
 priority: P2
 depends_on: []
-epic:
+epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee:
 branch:
@@ -33,6 +33,7 @@ status: todo
 - [ ] Изучить OpenClaw (openclaw): архитектуру, подход к multi-agent координации, модель оркестрации
 - [ ] Сравнить оба продукта с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
 - [ ] Оформить отчёт в docs/research/metagpt-openclaw-comparison.md по формату существующих comparison-документов
+- [ ] Заполнить строки для MetaGPT и OpenClaw в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Определить конкретные паттерны SOP и ролевой координации, которые стоит заимствовать
 - [ ] Оценить подход к стандартизации output между агентами (shared context, message passing)
@@ -48,6 +49,7 @@ status: todo
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] Отчёт docs/research/metagpt-openclaw-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [ ] Строки MetaGPT и OpenClaw в сводной таблице docs/research/agent-frameworks-summary.md заполнены
 
 ## 6. Verification (Самопроверка)
 ```bash

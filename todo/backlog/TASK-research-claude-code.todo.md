@@ -5,7 +5,7 @@ value: V3
 complexity: C3
 priority: P2
 depends_on: []
-epic:
+epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee:
 branch:
@@ -32,6 +32,7 @@ status: todo
 - [ ] Изучить Claude Code: архитектуру агентного цикла, tool use protocol, контекст-менеджмент
 - [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
 - [ ] Оформить отчёт в docs/research/claude-code-comparison.md по формату существующих comparison-документов
+- [ ] Заполнить строку для Claude Code в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Определить конкретные паттерны, которые стоит заимствовать
 - [ ] Оценить подходы к retry/fallback и обработке ошибок
@@ -48,6 +49,7 @@ status: todo
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] Отчёт docs/research/claude-code-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [ ] Строка Claude Code в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
