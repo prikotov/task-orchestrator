@@ -9,8 +9,8 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Технический писатель (Гермиона)
 assignee: Технический писатель (Гермиона)
 branch: task/research-pi-agent-rust
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/41
+status: done
 ---
 
 # TASK-research-pi-agent-rust: Исследовать и оценить Dicklesworthstone/pi_agent_rust для интеграции
