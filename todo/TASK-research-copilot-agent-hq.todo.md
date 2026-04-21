@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Технический писатель (Гермиона)
+branch: task/research-copilot-agent-hq
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-copilot-agent-hq: Исследовать GitHub Copilot cloud agent / Agent HQ для сравнения с task-orchestrator
@@ -67,6 +67,16 @@ ls docs/research/copilot-agent-hq-comparison.md
 
 ## 9. Comments (Комментарии)
 GitHub — крупнейшая платформа разработки. Их подход к интеграции AI-агентов в development workflow (Issue → Workspace → PR) может дать паттерны для chain-оркестрации с человеко-машинным взаимодействием.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
+**Ветка:** task/research-copilot-agent-hq (уже создана и активна)
+
+### Порядок действий
+1. Реализуй задачу согласно описанию.
+2. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+3. Сделай git commit и git push после завершения.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
