@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Технический писатель (Гермиона)
+branch: task/research-crewai-langgraph-autogen
 pr:
-status: todo
+status: done
 ---
 
 # TASK-research-crewai-langgraph-autogen: Исследовать CrewAI, LangGraph и AutoGen для сравнения с task-orchestrator
@@ -70,6 +70,20 @@ ls docs/research/crewai-langgraph-autogen-comparison.md
 
 ## 9. Comments (Комментарии)
 Тройка самых популярных multi-agent orchestration фреймворков на Python. Прямые конкуренты по функциональности. Важно понять чем наша chain-модель лучше/хуже и какие паттерны стоит перенять.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
+**Ветка:** task/research-crewai-langgraph-autogen (уже создана и активна)
+**PR:** будет создан после коммита
+
+### Порядок действий
+1. Переключись в ветку `task/research-crewai-langgraph-autogen`: `git checkout task/research-crewai-langgraph-autogen`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

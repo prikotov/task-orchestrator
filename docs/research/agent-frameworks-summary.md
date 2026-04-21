@@ -7,15 +7,15 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 2 / 13 исследований
+> **Статус заполнения:** 5 / 13 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
 | 1 | Charmbracelet Crush | Go | `CLI-agent` | `agent-loop` (LLM → tool call → LLM → ...) | `persistent` (SQLite) | `manual` (только retry при 401) | `MCP + SKILL.md + config` | 🟡 заимствовать отдельные паттерны | [crush-comparison.md](crush-comparison.md) ✅ |
 | 2 | pi_agent_rust | Rust | `CLI-agent` | `agent-loop` (LLM → tool call → LLM → ...) | `persistent` (JSONL tree + SQLite index) | `basic retry` (exponential backoff, global config) | `Extensions (QuickJS/WASM) + Skills (SKILL.md) + Packages` | 🟡 заимствовать отдельные паттерны | [pi-agent-rust-comparison.md](pi-agent-rust-comparison.md) ✅ |
-| 3 | CrewAI | Python | | | | | | | [crewai-langgraph-autogen-comparison.md](crewai-langgraph-autogen-comparison.md) ⏳ |
-| 4 | LangGraph | Python | | | | | | | *(в отчёте №3)* ⏳ |
-| 5 | AutoGen | Python | | | | | | | *(в отчёте №3)* ⏳ |
+| 3 | CrewAI | Python | `multi-agent` | `sequential / hierarchical (Crews) + event-driven (Flows)` | `in-memory + checkpoint (SQLite)` | `basic retry (LLM level)` | `custom tools + Skills (SKILL.md) + MCP + RAG + Flows` | 🟡 заимствовать отдельные паттерны | [crewai-langgraph-autogen-comparison.md](crewai-langgraph-autogen-comparison.md) ✅ |
+| 4 | LangGraph | Python | `multi-agent` | `graph/DAG (StateGraph) + superstep execution` | `TypedDict + reducers + checkpoint (memory/SQLite/PostgreSQL)` | `RetryPolicy per node, durable execution` | `subgraphs + conditional edges + Send (map-reduce) + interrupts` | 🟡 заимствовать отдельные паттерны | *(в отчёте №3)* ✅ |
+| 5 | AutoGen (Microsoft) | Python + .NET | `multi-agent` | `event-driven (Core) / group chat (AgentChat) / graph` | `message thread + model context` | `CancellationToken, exception propagation` | `custom agents + tools + group chat managers + subscriptions` | 🟡 заимствовать отдельные паттерны | *(в отчёте №3)* ✅ |
 | 6 | OpenHands SDK | Python | | | | | | | [openhands-sdk-comparison.md](openhands-sdk-comparison.md) ⏳ |
 | 7 | Archon | Python | | | | | | | [archon-comparison.md](archon-comparison.md) ⏳ |
 | 8 | MetaGPT | Python | | | | | | | [metagpt-openclaw-comparison.md](metagpt-openclaw-comparison.md) ⏳ |
@@ -50,6 +50,7 @@
 
 * Crush: формализация Agent Skills (SKILL.md standard, discovery, validation) — 🟡 P2
 * pi_agent_rust: tool parallelism (параллельное выполнение read-only шагов в chain) — 🟡 P2
+* AutoGen: декларативные termination conditions (timeout, token limit, keyword) — 🟡 P2
 
 ### Приоритет 3 (Долгосрочные / R&D)
 
@@ -60,14 +61,25 @@
 * pi_agent_rust: session persistence с tree branching — 🟡 P3
 * pi_agent_rust: extension/permission system для custom runners — 🟡 P3
 * pi_agent_rust: формализация execution invariants для chain executor — 🟡 P3
+* LangGraph: graph-based conditional routing для сложных dynamic chains — 🟡 P3
+* LangGraph: checkpoint / durable execution (resume после сбоя) — 🟡 P3
+* CrewAI: hierarchical orchestration с manager (dynamic delegation) — 🟡 P3
+* CrewAI: event-driven architecture (events на уровне chain executor) — 🟡 P3
+* AutoGen: multi-agent patterns (swarm, handoff) для будущих dynamic chains — 🟡 P3
+* CrewAI / LangGraph: memory system (кэширование, обучение на предыдущих запусках) — 🟡 P3
 
 ---
 
 ## Общие тренды
 
-> Заполняется после завершения всех исследований.
+> Заполняется по мере завершения исследований.
 
-*
+* Все три Python multi-agent фреймворка (CrewAI, LangGraph, AutoGen) работают на уровне прямых LLM API, тогда как task-orchestrator работает на уровне runner'ов (pi, codex). Разный уровень абстракции.
+* LangGraph — единственный из тройки с durable execution и checkpoint persistence. Это ключевое преимущество для длинных workflows.
+* AutoGen в maintenance mode, Microsoft рекомендует Microsoft Agent Framework (MAF). Заимствование паттернов безопасно, но dependency невозможна.
+* CrewAI — самый «productized» из тройки: Enterprise (Crew Control Plane), сертификация 100k+ разработчиков, monetization через cloud.
+* Ни один из трёх фреймворков не имеет встроенных quality gates, budget control или circuit breaker — наши ключевые отличия.
+* Graph-based модель (LangGraph) — самый гибкий подход к оркестрации, но с более высоким порогом входа по сравнению с YAML chains.
 
 ---
 
@@ -77,3 +89,4 @@
 |:---|:---|:---|
 | 2026-04-21 | Тимлид (Алекс) | Создание шаблона сводной таблицы |
 | 2026-04-21 | Технический писатель (Гермиона) | Заполнена строка pi_agent_rust (#2), добавлены рекомендации |
+| 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт crewai-langgraph-autogen-comparison.md, заполнены строки CrewAI (#3), LangGraph (#4), AutoGen (#5) |
