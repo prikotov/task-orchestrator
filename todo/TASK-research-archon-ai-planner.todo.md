@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Технический писатель (Гермиона)
+branch: task/research-archon-ai-planner
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-archon-ai-planner: Исследовать coleam00/Archon для сравнения с task-orchestrator
@@ -63,6 +63,20 @@ ls docs/research/archon-comparison.md
 
 ## 9. Comments (Комментарии)
 Archon — "AI agent that builds AI agents". Мета-оркестрация — интересный паттерн, может быть полезен для динамической генерации цепочек в task-orchestrator.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
+**Ветка:** task/research-archon-ai-planner (уже создана и активна)
+**PR:** будет создан после коммита
+
+### Порядок действий
+1. Переключись в ветку `task/research-archon-ai-planner`: `git checkout task/research-archon-ai-planner`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
