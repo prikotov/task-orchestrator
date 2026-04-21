@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 7 / 13 исследований
+> **Статус заполнения:** 9 / 13 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -18,8 +18,8 @@
 | 5 | AutoGen (Microsoft) | Python + .NET | `multi-agent` | `event-driven (Core) / group chat (AgentChat) / graph` | `message thread + model context` | `CancellationToken, exception propagation` | `custom agents + tools + group chat managers + subscriptions` | 🟡 заимствовать отдельные паттерны | *(в отчёте №3)* ✅ |
 | 6 | OpenHands SDK | Python | `SDK` | `agent-loop` (LLM → Action → Tool → Observation → LLM → ...) | `event-stream` (file-backed) | `retry+backoff (tenacity) + fallback LLM profiles` | `custom tools + MCP + Skills (SKILL.md) + Plugins + Hooks + sub-agents` | 🟡 заимствовать отдельные паттерны | [openhands-sdk-comparison.md](openhands-sdk-comparison.md) ✅ |
 | 7 | Archon | TypeScript (Bun) | `workflow-engine` | `DAG (YAML) + topological layers + parallel execution` | `persistent (SQLite/PostgreSQL, 7 таблиц)` | `2-layer retry (SDK + node) + error classification (FATAL/TRANSIENT/UNKNOWN) + fallbackModel` | `IPlatformAdapter + IAgentProvider + IIsolationProvider + MCP + Hooks + Skills + Commands` | 🟡 заимствовать отдельные паттерны | [archon-comparison.md](archon-comparison.md) ✅ |
-| 8 | MetaGPT | Python | | | | | | | [metagpt-openclaw-comparison.md](metagpt-openclaw-comparison.md) ⏳ |
-| 9 | OpenClaw | Python | | | | | | | *(в отчёте №8)* ⏳ |
+| 8 | MetaGPT | Python | `multi-agent` | `SOP (BY_ORDER) / react-loop / plan-and-act` | `in-memory (Memory + index by cause_by)` | `budget guard (NoMoneyException)` | `custom roles + actions + tools + skills + RAG` | 🟡 заимствовать отдельные паттерны | [metagpt-openclaw-comparison.md](metagpt-openclaw-comparison.md) ✅ |
+| 9 | OpenClaw | TypeScript (Node.js) | `CLI-agent` | `agent-loop` (LLM → tool call → observation → LLM → ...) | `file-backed transcripts + pluggable context engine` | `model failover с cooldown + error classification` | `plugin SDK + 40+ extensions + Skills + MCP + sandbox` | 🟡 заимствовать отдельные паттерны | *(в отчёте №8)* ✅ |
 | 10 | Mastra AI | TypeScript | | | | | | | [mastra-ai-comparison.md](mastra-ai-comparison.md) ⏳ |
 | 11 | Claude Code | — (проприетарный) | | | | | | | [claude-code-comparison.md](claude-code-comparison.md) ⏳ |
 | 12 | GitHub Copilot Agent HQ | — (проприетарный) | | | | | | | [copilot-agent-hq-comparison.md](copilot-agent-hq-comparison.md) ⏳ |
@@ -57,6 +57,8 @@
 * Archon: loop nodes с `until_bash` — детерминированная проверка завершения (тесты прошли → стоп) — 🟡 P2
 * Archon: loop nodes с `fresh_context` — каждый iteration с чистым контекстом — 🟡 P2
 * Archon: `$nodeId.output` substitution — явная передача данных между шагами — 🟡 P2
+* OpenClaw: model failover с cooldown и per-profile error classification — 🟡 P2
+* OpenClaw: error classification (rate_limit, overloaded, auth, billing, timeout, model_not_found) — 🟡 P2
 
 ### Приоритет 3 (Долгосрочные / R&D)
 
@@ -86,6 +88,11 @@
 * Archon: `output_format` (structured JSON output для quality gates) — 🟡 P3
 * Archon: per-node provider/model override (дешёвая модель для простых шагов) — 🟡 P3
 * Archon: isolation через git worktrees (для параллельного выполнения цепочек) — 🟡 P3
+* MetaGPT: SOP event-driven step activation (watch/cause_by routing для dynamic chains) — 🟡 P3
+* MetaGPT: message-based coordination (Environment + Message + cause_by) — 🟡 P3
+* OpenClaw: pluggable context engine (ingest/assemble/compact/maintain с tokenBudget) — 🟡 P3
+* OpenClaw: sub-agent spawning с limits (maxDepth, maxChildren, maxConcurrent) — 🟡 P3
+* OpenClaw: bootstrap budget для context injection (защита от oversized промптов) — 🟡 P3
 
 ---
 
@@ -106,6 +113,11 @@
 * Archon v2 полностью переписан с Python на TypeScript/Bun — показательный пример смены стека для production-ready проекта.
 * DAG-модель оркестрации (Archon, LangGraph) — повторяющийся паттерн в двух проектах. Это альтернатива нашим YAML chains, но перенос в PHP требует значительных усилий.
 * Loop nodes с детерминированной проверкой завершения (`until_bash`) — паттерн, который усиливает наш `fix_iterations` без полной DAG-миграции.
+* MetaGPT подтверждает наш подход к оркестрации: Team (chain) + investment (budget) + n_round (max_iterations) + idle detection — концептуально идентично нашим YAML chains.
+* Model failover с error classification — повторяющийся паттерн: Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (rate_limit/overloaded/auth/billing/timeout/model_not_found). OpenClaw наиболее гранулярная реализация.
+* Pluggable context engine (OpenClaw) — единственный проект с формализованным интерфейсом для context management lifecycle (ingest → assemble → compact → maintain). Это уровень абстракции выше, чем auto-summarization в Crush и auto-compaction в pi_agent_rust.
+* OpenClaw — единственный проект с production-ready multi-channel personal assistant, включая 20+ мессенджеров, desktop/mobile apps, voice wake, live canvas. Это не фреймворк оркестрации, а законченный продукт.
+* MetaGPT SOP-подход ("Code = SOP(Team)") — концептуально близок нашим YAML chains, но реализован через message-passing (watch/cause_by) вместо позиционного порядка. Для dynamic chains message-passing может быть гибче.
 
 ---
 
@@ -118,3 +130,4 @@
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт crewai-langgraph-autogen-comparison.md, заполнены строки CrewAI (#3), LangGraph (#4), AutoGen (#5) |
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт openhands-sdk-comparison.md, заполнена строка OpenHands SDK (#6), добавлены рекомендации |
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт archon-comparison.md, заполнена строка Archon (#7), добавлены рекомендации |
+| 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт metagpt-openclaw-comparison.md, заполнены строки MetaGPT (#8) и OpenClaw (#9), добавлены рекомендации и тренды |

@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/research-metagpt-openclaw
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-metagpt-openclaw: Исследовать MetaGPT и OpenClaw для сравнения с task-orchestrator
@@ -29,27 +29,27 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Изучить MetaGPT (FoundationAgents): архитектуру, ролевую модель (ProductManager, Architect, Engineer), SOP, message passing
-- [ ] Изучить OpenClaw (openclaw): архитектуру, подход к multi-agent координации, модель оркестрации
-- [ ] Сравнить оба продукта с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [ ] Оформить отчёт в docs/research/metagpt-openclaw-comparison.md по формату существующих comparison-документов
-- [ ] Заполнить строки для MetaGPT и OpenClaw в сводной таблице docs/research/agent-frameworks-summary.md
+- [x] Изучить MetaGPT (FoundationAgents): архитектуру, ролевую модель (ProductManager, Architect, Engineer), SOP, message passing
+- [x] Изучить OpenClaw (openclaw): архитектуру, подход к multi-agent координации, модель оркестрации
+- [x] Сравнить оба продукта с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
+- [x] Оформить отчёт в docs/research/metagpt-openclaw-comparison.md по формату существующих comparison-документов
+- [x] Заполнить строки для MetaGPT и OpenClaw в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
-- [ ] Определить конкретные паттерны SOP и ролевой координации, которые стоит заимствовать
-- [ ] Оценить подход к стандартизации output между агентами (shared context, message passing)
+- [x] Определить конкретные паттерны SOP и ролевой координации, которые стоит заимствовать
+- [x] Оценить подход к стандартизации output между агентами (shared context, message passing)
 ### 🟢 Could Have (Опционально)
 ### ⚫ Won't Have (Не будем делать)
 - [ ] Написание кода интеграции
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Изучить репозитории: https://github.com/FoundationAgents/MetaGPT, https://github.com/openclaw/openclaw
-2. [ ] Сравнить модели оркестрации между собой и с нашей
-3. [ ] Написать docs/research/metagpt-openclaw-comparison.md
+1. [x] Изучить репозитории: https://github.com/FoundationAgents/MetaGPT, https://github.com/openclaw/openclaw
+2. [x] Сравнить модели оркестрации между собой и с нашей
+3. [x] Написать docs/research/metagpt-openclaw-comparison.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт docs/research/metagpt-openclaw-comparison.md создан по формату существующих comparison-документов
-- [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
-- [ ] Строки MetaGPT и OpenClaw в сводной таблице docs/research/agent-frameworks-summary.md заполнены
+- [x] Отчёт docs/research/metagpt-openclaw-comparison.md создан по формату существующих comparison-документов
+- [x] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [x] Строки MetaGPT и OpenClaw в сводной таблице docs/research/agent-frameworks-summary.md заполнены
 
 ## 6. Verification (Самопроверка)
 ```bash
