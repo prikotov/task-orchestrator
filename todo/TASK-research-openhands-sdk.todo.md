@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/research-openhands-sdk
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-openhands-sdk: Исследовать OpenHands SDK для сравнения с task-orchestrator
@@ -29,26 +29,26 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Изучить OpenHands SDK: архитектуру, action/observation протокол, модель агентов, sandboxing
-- [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [ ] Оформить отчёт в docs/research/openhands-sdk-comparison.md по формату существующих comparison-документов
-- [ ] Заполнить строку для OpenHands SDK в сводной таблице docs/research/agent-frameworks-summary.md
+- [x] Изучить OpenHands SDK: архитектуру, action/observation протокол, модель агентов, sandboxing
+- [x] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
+- [x] Оформить отчёт в docs/research/openhands-sdk-comparison.md по формату существующих comparison-документов
+- [x] Заполнить строку для OpenHands SDK в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
-- [ ] Определить конкретные паттерны, которые стоит заимствовать
-- [ ] Оценить SDK-подход к расширяемости и плагинной архитектуре
+- [x] Определить конкретные паттерны, которые стоит заимствовать
+- [x] Оценить SDK-подход к расширяемости и плагинной архитектуре
 ### 🟢 Could Have (Опционально)
 ### ⚫ Won't Have (Не будем делать)
 - [ ] Написание кода интеграции
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Изучить репозиторий https://github.com/All-Hands-AI/OpenHands: архитектуру, SDK, исходный код
-2. [ ] Сравнить с нашей моделью оркестрации
-3. [ ] Написать docs/research/openhands-sdk-comparison.md
+1. [x] Изучить репозиторий https://github.com/All-Hands-AI/OpenHands: архитектуру, SDK, исходный код
+2. [x] Сравнить с нашей моделью оркестрации
+3. [x] Написать docs/research/openhands-sdk-comparison.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт docs/research/openhands-sdk-comparison.md создан по формату существующих comparison-документов
-- [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
-- [ ] Строка OpenHands SDK в сводной таблице docs/research/agent-frameworks-summary.md заполнена
+- [x] Отчёт docs/research/openhands-sdk-comparison.md создан по формату существующих comparison-документов
+- [x] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [x] Строка OpenHands SDK в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash

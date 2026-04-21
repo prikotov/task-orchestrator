@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 5 / 13 исследований
+> **Статус заполнения:** 6 / 13 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -16,7 +16,7 @@
 | 3 | CrewAI | Python | `multi-agent` | `sequential / hierarchical (Crews) + event-driven (Flows)` | `in-memory + checkpoint (SQLite)` | `basic retry (LLM level)` | `custom tools + Skills (SKILL.md) + MCP + RAG + Flows` | 🟡 заимствовать отдельные паттерны | [crewai-langgraph-autogen-comparison.md](crewai-langgraph-autogen-comparison.md) ✅ |
 | 4 | LangGraph | Python | `multi-agent` | `graph/DAG (StateGraph) + superstep execution` | `TypedDict + reducers + checkpoint (memory/SQLite/PostgreSQL)` | `RetryPolicy per node, durable execution` | `subgraphs + conditional edges + Send (map-reduce) + interrupts` | 🟡 заимствовать отдельные паттерны | *(в отчёте №3)* ✅ |
 | 5 | AutoGen (Microsoft) | Python + .NET | `multi-agent` | `event-driven (Core) / group chat (AgentChat) / graph` | `message thread + model context` | `CancellationToken, exception propagation` | `custom agents + tools + group chat managers + subscriptions` | 🟡 заимствовать отдельные паттерны | *(в отчёте №3)* ✅ |
-| 6 | OpenHands SDK | Python | | | | | | | [openhands-sdk-comparison.md](openhands-sdk-comparison.md) ⏳ |
+| 6 | OpenHands SDK | Python | `SDK` | `agent-loop` (LLM → Action → Tool → Observation → LLM → ...) | `event-stream` (file-backed) | `retry+backoff (tenacity) + fallback LLM profiles` | `custom tools + MCP + Skills (SKILL.md) + Plugins + Hooks + sub-agents` | 🟡 заимствовать отдельные паттерны | [openhands-sdk-comparison.md](openhands-sdk-comparison.md) ✅ |
 | 7 | Archon | Python | | | | | | | [archon-comparison.md](archon-comparison.md) ⏳ |
 | 8 | MetaGPT | Python | | | | | | | [metagpt-openclaw-comparison.md](metagpt-openclaw-comparison.md) ⏳ |
 | 9 | OpenClaw | Python | | | | | | | *(в отчёте №8)* ⏳ |
@@ -51,6 +51,8 @@
 * Crush: формализация Agent Skills (SKILL.md standard, discovery, validation) — 🟡 P2
 * pi_agent_rust: tool parallelism (параллельное выполнение read-only шагов в chain) — 🟡 P2
 * AutoGen: декларативные termination conditions (timeout, token limit, keyword) — 🟡 P2
+* OpenHands SDK: stuck detection (5 паттернов зацикливания — repeating action-obs, action-error, monologue, alternating, context overflow) — 🟡 P2
+* OpenHands SDK: security risk assessment + confirmation policies (для автономного выполнения) — 🟡 P2
 
 ### Приоритет 3 (Долгосрочные / R&D)
 
@@ -67,6 +69,13 @@
 * CrewAI: event-driven architecture (events на уровне chain executor) — 🟡 P3
 * AutoGen: multi-agent patterns (swarm, handoff) для будущих dynamic chains — 🟡 P3
 * CrewAI / LangGraph: memory system (кэширование, обучение на предыдущих запусках) — 🟡 P3
+* OpenHands SDK: context condensation (LLM-суммаризация при переполнении context window) — 🟡 P3
+* OpenHands SDK: tool annotations (readOnly / destructive / idempotent / openWorld hints) — 🟡 P3
+* OpenHands SDK: critic (LLM-based quality scoring) + iterative refinement — 🟡 P3
+* OpenHands SDK: LLM Profile Store (файловые JSON-профили с параметрами LLM) — 🟡 P3
+* OpenHands SDK: hooks system (pre/post tool use shell-скрипты) — 🟡 P3
+* OpenHands SDK: parallel tool execution с resource-level locking — 🟡 P3
+* OpenHands SDK: sub-agent delegation (файловые YAML-определения агентов) — 🟡 P3
 
 ---
 
@@ -80,6 +89,9 @@
 * CrewAI — самый «productized» из тройки: Enterprise (Crew Control Plane), сертификация 100k+ разработчиков, monetization через cloud.
 * Ни один из трёх фреймворков не имеет встроенных quality gates, budget control или circuit breaker — наши ключевые отличия.
 * Graph-based модель (LangGraph) — самый гибкий подход к оркестрации, но с более высоким порогом входа по сравнению с YAML chains.
+* OpenHands SDK — наиболее зрелая Action/Observation-модель из исследованных: типизированные Action/Observation (Pydantic), security risk assessment, confirmation policies, stuck detection, parallel tool execution с resource locking, context condensation, sub-agent delegation. При этом SDK не является chain-оркестратором — он работает на уровне single agent loop.
+* OpenHands SDK — единственный проект с полноценной security-моделью (risk assessment + confirmation policies + defense-in-depth rails). Для autonomous execution — критически важная возможность.
+* Stuck detection — повторяющийся паттерн в нескольких проектах (Crush: loop detection, OpenHands SDK: 5-паттерн stuck detector). Это подтверждает актуальность P2-задачи.
 
 ---
 
@@ -90,3 +102,4 @@
 | 2026-04-21 | Тимлид (Алекс) | Создание шаблона сводной таблицы |
 | 2026-04-21 | Технический писатель (Гермиона) | Заполнена строка pi_agent_rust (#2), добавлены рекомендации |
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт crewai-langgraph-autogen-comparison.md, заполнены строки CrewAI (#3), LangGraph (#4), AutoGen (#5) |
+| 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт openhands-sdk-comparison.md, заполнена строка OpenHands SDK (#6), добавлены рекомендации |
