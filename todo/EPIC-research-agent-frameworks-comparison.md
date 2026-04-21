@@ -72,7 +72,7 @@ pr:
 - [x] [TASK-research-pi-agent-rust](done/TASK-research-pi-agent-rust.todo.md) — pi_agent_rust (Rust)
 - [x] [TASK-research-crewai-langgraph-autogen](done/TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
 - [x] [TASK-research-openhands-sdk](done/TASK-research-openhands-sdk.todo.md) — OpenHands SDK (Python, SDK-подход)
-- [ ] [TASK-research-archon-ai-planner](TASK-research-archon-ai-planner.todo.md) — Archon (Python, мета-оркестрация)
+- [x] [TASK-research-archon-ai-planner](done/TASK-research-archon-ai-planner.todo.md) — Archon (Python, мета-оркестрация)
 - [ ] [TASK-research-metagpt-openclaw](TASK-research-metagpt-openclaw.todo.md) — MetaGPT, OpenClaw (Python, SOP/роли)
 - [ ] [TASK-research-mastra-ai](TASK-research-mastra-ai.todo.md) — Mastra AI (TypeScript, workflows)
 - [ ] [TASK-research-claude-code](TASK-research-claude-code.todo.md) — Claude Code (проприетарный, agent loop)
