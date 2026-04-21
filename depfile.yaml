@@ -171,11 +171,6 @@ deptrac:
         - type: classLike
           value: ^[A-Za-z_]+\\Common\\DependencyInjection\\.*
 
-    - name: Bundle
-      collectors:
-        - type: classLike
-          value: ^[A-Za-z_]+\\Common\\Infrastructure\\Symfony\\.*
-
   ruleset:
     # DTO boundary
     Domain:
@@ -298,5 +293,3 @@ deptrac:
       - ApplicationDto
       - ApplicationCommand
       - ApplicationQuery
-    Bundle:
-      - DependencyInjection
