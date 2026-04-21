@@ -8,7 +8,7 @@ priority: P2
 author: Тимлид (Алекс)
 assignee:
 branch: task/research-agent-frameworks-comparison
-status: todo
+status: done
 pr:
 ---
 
@@ -81,14 +81,14 @@ pr:
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
-- [ ] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
+- [x] [TASK-research-agent-frameworks-summary](done/TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [ ] Все индивидуальные research-задачи выполнены
-- [ ] Каждый comparison-документ создан в `docs/research/`
-- [ ] Сводная таблица в `docs/research/agent-frameworks-summary.md` создана
-- [ ] По каждому фреймворку есть вердикт: заимствовать / dependency / не подходит
-- [ ] Выделены конкретные паттерны для заимствования с приоритетами
+- [x] Все индивидуальные research-задачи выполнены
+- [x] Каждый comparison-документ создан в `docs/research/`
+- [x] Сводная таблица в `docs/research/agent-frameworks-summary.md` создана
+- [x] По каждому фреймворку есть вердикт: заимствовать / dependency / не подходит
+- [x] Выделены конкретные паттерны для заимствования с приоритетами
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
 Не требуется — эпик содержит только исследовательские задачи (docs).
@@ -110,3 +110,4 @@ pr:
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-21 | Тимлид (Алекс) | Создание эпика |
+| 2026-04-22 | Технический писатель (Гермиона) | Все 11 задач выполнены. Эпик завершён. |
