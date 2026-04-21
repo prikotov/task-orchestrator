@@ -9,7 +9,7 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/research-metagpt-openclaw
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/45
 status: done
 ---
 
