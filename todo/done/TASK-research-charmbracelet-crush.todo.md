@@ -9,8 +9,8 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Технический писатель (Гермиона)
 assignee: Технический писатель (Гермиона)
 branch: task/research-charmbracelet-crush
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/40
+status: done
 ---
 
 # TASK-research-charmbracelet-crush: Исследовать и оценить charmbracelet/crush для интеграции

@@ -68,7 +68,7 @@ pr:
 
 ### Этап 1: Индивидуальные исследования (параллельные)
 
-- [ ] [TASK-research-charmbracelet-crush](TASK-research-charmbracelet-crush.todo.md) — Charmbracelet Crush (Go, CLI-agent)
+- [x] [TASK-research-charmbracelet-crush](done/TASK-research-charmbracelet-crush.todo.md) — Charmbracelet Crush (Go, CLI-agent)
 - [ ] [TASK-research-pi-agent-rust](TASK-research-pi-agent-rust.todo.md) — pi_agent_rust (Rust)
 - [ ] [TASK-research-crewai-langgraph-autogen](TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
 - [ ] [TASK-research-openhands-sdk](TASK-research-openhands-sdk.todo.md) — OpenHands SDK (Python, SDK-подход)
