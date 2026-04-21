@@ -7,12 +7,12 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 1 / 11 исследований
+> **Статус заполнения:** 2 / 13 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
 | 1 | Charmbracelet Crush | Go | `CLI-agent` | `agent-loop` (LLM → tool call → LLM → ...) | `persistent` (SQLite) | `manual` (только retry при 401) | `MCP + SKILL.md + config` | 🟡 заимствовать отдельные паттерны | [crush-comparison.md](crush-comparison.md) ✅ |
-| 2 | pi_agent_rust | Rust | | | | | | | [pi-agent-rust-comparison.md](pi-agent-rust-comparison.md) ⏳ |
+| 2 | pi_agent_rust | Rust | `CLI-agent` | `agent-loop` (LLM → tool call → LLM → ...) | `persistent` (JSONL tree + SQLite index) | `basic retry` (exponential backoff, global config) | `Extensions (QuickJS/WASM) + Skills (SKILL.md) + Packages` | 🟡 заимствовать отдельные паттерны | [pi-agent-rust-comparison.md](pi-agent-rust-comparison.md) ✅ |
 | 3 | CrewAI | Python | | | | | | | [crewai-langgraph-autogen-comparison.md](crewai-langgraph-autogen-comparison.md) ⏳ |
 | 4 | LangGraph | Python | | | | | | | *(в отчёте №3)* ⏳ |
 | 5 | AutoGen | Python | | | | | | | *(в отчёте №3)* ⏳ |
@@ -49,12 +49,17 @@
 ### Приоритет 2 (Среднесрочные)
 
 * Crush: формализация Agent Skills (SKILL.md standard, discovery, validation) — 🟡 P2
+* pi_agent_rust: tool parallelism (параллельное выполнение read-only шагов в chain) — 🟡 P2
 
 ### Приоритет 3 (Долгосрочные / R&D)
 
 * Crush: auto-summarization при переполнении контекста — 🟡 P3
 * Crush: permission system для автономного выполнения — 🟡 P3
 * Crush: множественный context file discovery (CRUSH.md, CLAUDE.md и т.д.) — 🟡 P3
+* pi_agent_rust: auto-compaction при переполнении контекста — 🟡 P3
+* pi_agent_rust: session persistence с tree branching — 🟡 P3
+* pi_agent_rust: extension/permission system для custom runners — 🟡 P3
+* pi_agent_rust: формализация execution invariants для chain executor — 🟡 P3
 
 ---
 
@@ -71,3 +76,4 @@
 | Дата | Автор | Изменение |
 |:---|:---|:---|
 | 2026-04-21 | Тимлид (Алекс) | Создание шаблона сводной таблицы |
+| 2026-04-21 | Технический писатель (Гермиона) | Заполнена строка pi_agent_rust (#2), добавлены рекомендации |
