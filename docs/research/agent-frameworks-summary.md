@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 10 / 13 исследований
+> **Статус заполнения:** 11 / 13 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -21,7 +21,7 @@
 | 8 | MetaGPT | Python | `multi-agent` | `SOP (BY_ORDER) / react-loop / plan-and-act` | `in-memory (Memory + index by cause_by)` | `budget guard (NoMoneyException)` | `custom roles + actions + tools + skills + RAG` | 🟡 заимствовать отдельные паттерны | [metagpt-openclaw-comparison.md](metagpt-openclaw-comparison.md) ✅ |
 | 9 | OpenClaw | TypeScript (Node.js) | `CLI-agent` | `agent-loop` (LLM → tool call → observation → LLM → ...) | `file-backed transcripts + pluggable context engine` | `model failover с cooldown + error classification` | `plugin SDK + 40+ extensions + Skills + MCP + sandbox` | 🟡 заимствовать отдельные паттерны | *(в отчёте №8)* ✅ |
 | 10 | Mastra AI | TypeScript (Node.js) | `SDK` | `step-based workflow (chaining API: .then/.branch/.parallel/.dowhile/.dountil/.foreach) + agent-loop` | `pluggable (LibSQL/PostgreSQL/D1/Upstash)` | `basic retry (attempts+delay, no exponential backoff) + TripWire (abort with retry hint)` | `Processors pipeline + MCP + Tools (Zod schemas) + custom storage + Agent network (delegation)` | 🟡 заимствовать отдельные паттерны | [mastra-ai-comparison.md](mastra-ai-comparison.md) ✅ |
-| 11 | Claude Code | — (проприетарный) | | | | | | | [claude-code-comparison.md](claude-code-comparison.md) ⏳ |
+| 11 | Claude Code | — (проприетарный) | `CLI-agent` | `agent-loop` (LLM → tool call → observation → LLM → ...) | `in-memory + auto-compact` | `basic API retry` (429/500, без backoff) | `MCP + hooks (shell) + CLAUDE.md + slash commands + sub-agents` | 🟡 заимствовать отдельные паттерны | [claude-code-comparison.md](claude-code-comparison.md) ✅ |
 | 12 | GitHub Copilot Agent HQ | — (проприетарный) | | | | | | | [copilot-agent-hq-comparison.md](copilot-agent-hq-comparison.md) ⏳ |
 | 13 | Docker Agent + OpenAI Codex | — (проприетарный) | | | | | | | [docker-agent-codex-comparison.md](docker-agent-codex-comparison.md) ⏳ |
 
@@ -104,6 +104,12 @@
 * Mastra AI: agent delegation (multi-agent orchestration с hooks) — 🟡 P3
 * Mastra AI: foreach (map/reduce) в chains — 🟡 P3
 * Mastra AI: workflow nesting (chain как шаг другой chain) — 🟡 P3
+* Claude Code: hooks system (pre/post step execution через shell-скрипты) — декларативная альтернатива decorator pattern — 🟡 P2
+* Claude Code: permission system (allow/deny для runner'ов и команд, CI/CD) — 🟡 P2
+* Claude Code: sub-agent pattern (Task tool: изолированный контекст, потенциально параллельно) — 🟡 P2
+* Claude Code: hierarchical context discovery (CLAUDE.md: dynamic loading по директории) — 🟡 P3
+* Claude Code: slash commands как макросы (файл = команда, $ARGUMENTS placeholder) — 🟡 P3
+* Claude Code: headless CI/CD mode (--max-turns, --allowedTools, JSON output) — 🟡 P3
 
 ---
 
@@ -129,6 +135,10 @@
 * Pluggable context engine (OpenClaw) — единственный проект с формализованным интерфейсом для context management lifecycle (ingest → assemble → compact → maintain). Это уровень абстракции выше, чем auto-summarization в Crush и auto-compaction в pi_agent_rust.
 * OpenClaw — единственный проект с production-ready multi-channel personal assistant, включая 20+ мессенджеров, desktop/mobile apps, voice wake, live canvas. Это не фреймворк оркестрации, а законченный продукт.
 * MetaGPT SOP-подход ("Code = SOP(Team)") — концептуально близок нашим YAML chains, но реализован через message-passing (watch/cause_by) вместо позиционного порядка. Для dynamic chains message-passing может быть гибче.
+* Claude Code — проприетарный CLI-агент Anthropic. Не фреймворк оркестрации, а single-agent tool. Наибольший интерес: hooks system (lifecycle-перехватчики для tool execution), sub-agent pattern (Task tool с изолированным контекстом), permission system (allow/deny для CI/CD).
+* Hooks system (Claude Code) — декларативная альтернатива нашему decorator pattern: shell-скрипты для pre/post проверок без модификации PHP-кода. Концептуально дополняет retry/circuit breaker/budget decorators.
+* Sub-agent pattern (Claude Code Task tool) — аналог "chain внутри chain" с собственным контекстом и бюджетом. Для dynamic chains позволяет изолировать подзадачи.
+* Claude Code не имеет retry с backoff, circuit breaker, quality gates или budget limits — все наши ключевые отличия актуальны.
 * Mastra AI — наиболее полный TypeScript-фреймворк из исследованных: step-based workflows с chaining API, 4-уровневая memory, eval framework, processor pipeline, agent network. При этом работает на уровне прямых LLM API, а не внешних runner'ов.
 * Mastra AI и Archon — два TypeScript-проекта с workflow engine, но на разных уровнях: Mastra = SDK (LLM API), Archon = orchestrator (subprocess SDK). Task-orchestrator ближе к Archon по уровню абстракции.
 * Processor pipeline (Mastra) — расширение middleware-паттерна: 6 фаз перехвата (input, inputStep, outputStream, outputResult, outputStep) vs. наш decorator pattern (retry, circuit breaker, budget). Pipeline даёт более granular контроль.
@@ -149,3 +159,4 @@
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт archon-comparison.md, заполнена строка Archon (#7), добавлены рекомендации |
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт metagpt-openclaw-comparison.md, заполнены строки MetaGPT (#8) и OpenClaw (#9), добавлены рекомендации и тренды |
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт mastra-ai-comparison.md, заполнена строка Mastra AI (#10), добавлены рекомендации и тренды |
+| 2026-04-22 | Технический писатель (Гермиона) | Создан отчёт claude-code-comparison.md, заполнена строка Claude Code (#11), добавлены рекомендации и тренды |
