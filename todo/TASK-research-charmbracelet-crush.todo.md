@@ -68,7 +68,7 @@ Charmbracelet — авторы Bubbletea, Lip Gloss, VHS. Качество их 
 
 **Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
 **Ветка:** task/research-charmbracelet-crush (уже создана и активна)
-**PR:** уже создан (draft) из task/research-charmbracelet-crush в task/research-agent-frameworks-comparison
+**PR:** уже создан (draft) из task/research-charmbracelet-crush в task/research-agent-frameworks-comparison — [PR #40](https://github.com/prikotov/task-orchestrator/pull/40)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-charmbracelet-crush`: `git checkout task/research-charmbracelet-crush`
