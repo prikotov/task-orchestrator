@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/research-mastra-ai
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-mastra-ai: Исследовать Mastra AI для сравнения с task-orchestrator
