@@ -93,15 +93,11 @@ deptrac:
     - name: Presentation
       collectors:
         - type: classLike
-          value: ^[A-Za-z_]+\\Common\\Module\\.*\\Controller\\.*
-        # - type: classLike
-        #   value: .*apps.*\\Controller\\.*
-        # - type: classLike
-        #   value: ^Api\\v1\\Module\\.*
-        # - type: classLike
-        #   value: ^Console\\Module\\.*\\Command\\.*
-        # - type: classLike
-        #   value: ^Console\\Module\\.*\\EventSubscriber\\.*
+          value: ^[A-Za-z_]+\\.*\\Controller\\.*
+        - type: classLike
+          value: ^[A-Za-z_]+\\Console\\Module\\.*\\Command\\.*
+        - type: classLike
+          value: ^[A-Za-z_]+\\Console\\Module\\.*\\EventSubscriber\\.*
 
     # --- Fine-grained: DTO, VO, Enum ---
 
