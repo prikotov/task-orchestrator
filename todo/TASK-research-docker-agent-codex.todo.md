@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Технический писатель (Гермиона)
+branch: task/research-docker-agent-codex
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-docker-agent-codex: Исследовать Docker Agent и OpenAI Codex для сравнения с task-orchestrator
@@ -67,6 +67,16 @@ ls docs/research/docker-agent-codex-comparison.md
 
 ## 9. Comments (Комментарии)
 Оба продукта используют контейнеризацию для изоляции выполнения агента. Это важный паттерн — можно заимствовать подход к sandboxing и управлению средой выполнения.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
+**Ветка:** task/research-docker-agent-codex (уже создана и активна)
+
+### Порядок действий
+1. Реализуй задачу согласно описанию.
+2. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+3. Сделай git commit и git push после завершения.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
