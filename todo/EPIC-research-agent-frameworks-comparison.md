@@ -7,6 +7,7 @@ complexity: C4
 priority: P2
 author: Тимлид (Алекс)
 assignee:
+branch: task/research-agent-frameworks-comparison
 status: todo
 pr:
 ---
@@ -67,20 +68,20 @@ pr:
 
 ### Этап 1: Индивидуальные исследования (параллельные)
 
-- [ ] [TASK-research-charmbracelet-crush](backlog/TASK-research-charmbracelet-crush.todo.md) — Charmbracelet Crush (Go, CLI-agent)
-- [ ] [TASK-research-pi-agent-rust](backlog/TASK-research-pi-agent-rust.todo.md) — pi_agent_rust (Rust)
-- [ ] [TASK-research-crewai-langgraph-autogen](backlog/TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
-- [ ] [TASK-research-openhands-sdk](backlog/TASK-research-openhands-sdk.todo.md) — OpenHands SDK (Python, SDK-подход)
-- [ ] [TASK-research-archon-ai-planner](backlog/TASK-research-archon-ai-planner.todo.md) — Archon (Python, мета-оркестрация)
-- [ ] [TASK-research-metagpt-openclaw](backlog/TASK-research-metagpt-openclaw.todo.md) — MetaGPT, OpenClaw (Python, SOP/роли)
-- [ ] [TASK-research-mastra-ai](backlog/TASK-research-mastra-ai.todo.md) — Mastra AI (TypeScript, workflows)
-- [ ] [TASK-research-claude-code](backlog/TASK-research-claude-code.todo.md) — Claude Code (проприетарный, agent loop)
-- [ ] [TASK-research-copilot-agent-hq](backlog/TASK-research-copilot-agent-hq.todo.md) — GitHub Copilot Agent HQ (проприетарный, cloud)
-- [ ] [TASK-research-docker-agent-codex](backlog/TASK-research-docker-agent-codex.todo.md) — Docker Agent, OpenAI Codex (проприетарный, sandboxing)
+- [ ] [TASK-research-charmbracelet-crush](TASK-research-charmbracelet-crush.todo.md) — Charmbracelet Crush (Go, CLI-agent)
+- [ ] [TASK-research-pi-agent-rust](TASK-research-pi-agent-rust.todo.md) — pi_agent_rust (Rust)
+- [ ] [TASK-research-crewai-langgraph-autogen](TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
+- [ ] [TASK-research-openhands-sdk](TASK-research-openhands-sdk.todo.md) — OpenHands SDK (Python, SDK-подход)
+- [ ] [TASK-research-archon-ai-planner](TASK-research-archon-ai-planner.todo.md) — Archon (Python, мета-оркестрация)
+- [ ] [TASK-research-metagpt-openclaw](TASK-research-metagpt-openclaw.todo.md) — MetaGPT, OpenClaw (Python, SOP/роли)
+- [ ] [TASK-research-mastra-ai](TASK-research-mastra-ai.todo.md) — Mastra AI (TypeScript, workflows)
+- [ ] [TASK-research-claude-code](TASK-research-claude-code.todo.md) — Claude Code (проприетарный, agent loop)
+- [ ] [TASK-research-copilot-agent-hq](TASK-research-copilot-agent-hq.todo.md) — GitHub Copilot Agent HQ (проприетарный, cloud)
+- [ ] [TASK-research-docker-agent-codex](TASK-research-docker-agent-codex.todo.md) — Docker Agent, OpenAI Codex (проприетарный, sandboxing)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
-- [ ] [TASK-research-agent-frameworks-summary](backlog/TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
+- [ ] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [ ] Все индивидуальные research-задачи выполнены
