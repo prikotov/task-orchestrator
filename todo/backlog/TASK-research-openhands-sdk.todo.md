@@ -5,7 +5,7 @@ value: V3
 complexity: C3
 priority: P2
 depends_on: []
-epic:
+epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee:
 branch:
@@ -32,6 +32,7 @@ status: todo
 - [ ] Изучить OpenHands SDK: архитектуру, action/observation протокол, модель агентов, sandboxing
 - [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
 - [ ] Оформить отчёт в docs/research/openhands-sdk-comparison.md по формату существующих comparison-документов
+- [ ] Заполнить строку для OpenHands SDK в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Определить конкретные паттерны, которые стоит заимствовать
 - [ ] Оценить SDK-подход к расширяемости и плагинной архитектуре
@@ -47,6 +48,7 @@ status: todo
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] Отчёт docs/research/openhands-sdk-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [ ] Строка OpenHands SDK в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash

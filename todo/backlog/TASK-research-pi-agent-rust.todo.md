@@ -5,7 +5,7 @@ value: V2
 complexity: C3
 priority: P2
 depends_on:
-epic:
+epic: EPIC-research-agent-frameworks-comparison
 author: Технический писатель (Гермиона)
 assignee:
 branch:
@@ -32,6 +32,7 @@ status: todo
 - [ ] Изучить репозиторий https://github.com/Dicklesworthstone/pi_agent_rust: архитектуру, стек, модель агентов
 - [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
 - [ ] Оформить отчёт в docs/research/pi-agent-rust-comparison.md по формату существующих comparison-документов
+- [ ] Заполнить строку для pi_agent_rust в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Определить конкретные паттерны, которые стоит заимствовать
 - [ ] Оценить подходы к retry/fallback/circuit-breaker в сравнении с нашими
@@ -47,6 +48,7 @@ status: todo
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] Отчёт docs/research/pi-agent-rust-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [ ] Строка pi_agent_rust в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
