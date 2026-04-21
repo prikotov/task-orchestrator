@@ -9,7 +9,7 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/research-openhands-sdk
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/43
 status: done
 ---
 
