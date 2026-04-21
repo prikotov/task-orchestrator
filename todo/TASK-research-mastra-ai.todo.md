@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Технический писатель (Гермиона)
+branch: task/research-mastra-ai
 pr:
-status: todo
+status: done
 ---
 
 # TASK-research-mastra-ai: Исследовать Mastra AI для сравнения с task-orchestrator
@@ -68,6 +68,20 @@ ls docs/research/mastra-ai-comparison.md
 
 ## 9. Comments (Комментарии)
 Mastra AI — TypeScript-фреймворк для построения AI-агентов и workflows. Интересен step-based workflow-моделью, встроенной памятью, RAG, eval-фреймворком и сильной интеграцией с LLM-провайдерами. TypeScript-first подход отличает его от Python-конкурентов (CrewAI, LangGraph, AutoGen), но паттерны оркестрации универсальны и могут быть заимствованы.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
+**Ветка:** task/research-mastra-ai (уже создана и активна)
+**PR:** будет создан после коммита
+
+### Порядок действий
+1. Переключись в ветку `task/research-mastra-ai`: `git checkout task/research-mastra-ai`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

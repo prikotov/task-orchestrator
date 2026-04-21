@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 9 / 13 исследований
+> **Статус заполнения:** 10 / 13 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -20,7 +20,7 @@
 | 7 | Archon | TypeScript (Bun) | `workflow-engine` | `DAG (YAML) + topological layers + parallel execution` | `persistent (SQLite/PostgreSQL, 7 таблиц)` | `2-layer retry (SDK + node) + error classification (FATAL/TRANSIENT/UNKNOWN) + fallbackModel` | `IPlatformAdapter + IAgentProvider + IIsolationProvider + MCP + Hooks + Skills + Commands` | 🟡 заимствовать отдельные паттерны | [archon-comparison.md](archon-comparison.md) ✅ |
 | 8 | MetaGPT | Python | `multi-agent` | `SOP (BY_ORDER) / react-loop / plan-and-act` | `in-memory (Memory + index by cause_by)` | `budget guard (NoMoneyException)` | `custom roles + actions + tools + skills + RAG` | 🟡 заимствовать отдельные паттерны | [metagpt-openclaw-comparison.md](metagpt-openclaw-comparison.md) ✅ |
 | 9 | OpenClaw | TypeScript (Node.js) | `CLI-agent` | `agent-loop` (LLM → tool call → observation → LLM → ...) | `file-backed transcripts + pluggable context engine` | `model failover с cooldown + error classification` | `plugin SDK + 40+ extensions + Skills + MCP + sandbox` | 🟡 заимствовать отдельные паттерны | *(в отчёте №8)* ✅ |
-| 10 | Mastra AI | TypeScript | | | | | | | [mastra-ai-comparison.md](mastra-ai-comparison.md) ⏳ |
+| 10 | Mastra AI | TypeScript (Node.js) | `SDK` | `step-based workflow (chaining API: .then/.branch/.parallel/.dowhile/.dountil/.foreach) + agent-loop` | `pluggable (LibSQL/PostgreSQL/D1/Upstash)` | `basic retry (attempts+delay, no exponential backoff) + TripWire (abort with retry hint)` | `Processors pipeline + MCP + Tools (Zod schemas) + custom storage + Agent network (delegation)` | 🟡 заимствовать отдельные паттерны | [mastra-ai-comparison.md](mastra-ai-comparison.md) ✅ |
 | 11 | Claude Code | — (проприетарный) | | | | | | | [claude-code-comparison.md](claude-code-comparison.md) ⏳ |
 | 12 | GitHub Copilot Agent HQ | — (проприетарный) | | | | | | | [copilot-agent-hq-comparison.md](copilot-agent-hq-comparison.md) ⏳ |
 | 13 | Docker Agent + OpenAI Codex | — (проприетарный) | | | | | | | [docker-agent-codex-comparison.md](docker-agent-codex-comparison.md) ⏳ |
@@ -59,6 +59,11 @@
 * Archon: `$nodeId.output` substitution — явная передача данных между шагами — 🟡 P2
 * OpenClaw: model failover с cooldown и per-profile error classification — 🟡 P2
 * OpenClaw: error classification (rate_limit, overloaded, auth, billing, timeout, model_not_found) — 🟡 P2
+* Mastra AI: TripWire (LLM-based quality abort с retry hint) — дополнение к shell-based quality gates — 🟡 P2
+* Mastra AI: Processor pipeline (6-фазная input/output middleware) — альтернатива decorator pattern — 🟡 P2
+* Mastra AI: typed I/O per step (Zod-схемы для валидации входа/выхода) — 🟡 P2
+* Mastra AI: conditional branching в chains (концепция из .branch()) — 🟡 P2
+* Mastra AI: LLM-based evaluation (scorers, LLM-as-judge) — 🟡 P2
 
 ### Приоритет 3 (Долгосрочные / R&D)
 
@@ -93,6 +98,12 @@
 * OpenClaw: pluggable context engine (ingest/assemble/compact/maintain с tokenBudget) — 🟡 P3
 * OpenClaw: sub-agent spawning с limits (maxDepth, maxChildren, maxConcurrent) — 🟡 P3
 * OpenClaw: bootstrap budget для context injection (защита от oversized промптов) — 🟡 P3
+* Mastra AI: observational memory (Observer + Reflector agents для auto-compression) — для длинных dynamic loops — 🟡 P3
+* Mastra AI: suspend/resume (human-in-the-loop с persistence) — 🟡 P3
+* Mastra AI: parallel execution в chains — 🟡 P3
+* Mastra AI: agent delegation (multi-agent orchestration с hooks) — 🟡 P3
+* Mastra AI: foreach (map/reduce) в chains — 🟡 P3
+* Mastra AI: workflow nesting (chain как шаг другой chain) — 🟡 P3
 
 ---
 
@@ -118,6 +129,12 @@
 * Pluggable context engine (OpenClaw) — единственный проект с формализованным интерфейсом для context management lifecycle (ingest → assemble → compact → maintain). Это уровень абстракции выше, чем auto-summarization в Crush и auto-compaction в pi_agent_rust.
 * OpenClaw — единственный проект с production-ready multi-channel personal assistant, включая 20+ мессенджеров, desktop/mobile apps, voice wake, live canvas. Это не фреймворк оркестрации, а законченный продукт.
 * MetaGPT SOP-подход ("Code = SOP(Team)") — концептуально близок нашим YAML chains, но реализован через message-passing (watch/cause_by) вместо позиционного порядка. Для dynamic chains message-passing может быть гибче.
+* Mastra AI — наиболее полный TypeScript-фреймворк из исследованных: step-based workflows с chaining API, 4-уровневая memory, eval framework, processor pipeline, agent network. При этом работает на уровне прямых LLM API, а не внешних runner'ов.
+* Mastra AI и Archon — два TypeScript-проекта с workflow engine, но на разных уровнях: Mastra = SDK (LLM API), Archon = orchestrator (subprocess SDK). Task-orchestrator ближе к Archon по уровню абстракции.
+* Processor pipeline (Mastra) — расширение middleware-паттерна: 6 фаз перехвата (input, inputStep, outputStream, outputResult, outputStep) vs. наш decorator pattern (retry, circuit breaker, budget). Pipeline даёт более granular контроль.
+* Typed I/O per step — повторяющийся паттерн: Mastra (Zod-схемы), LangGraph (TypedDict + reducers), Archon (JSON Schema). Валидация входных/выходных данных каждого шага повышает надёжность цепочек.
+* Observational memory (Mastra) — самый продвинутый подход к context management из исследованных: Observer + Reflector agents с async buffering, token budgets, и activation thresholds. Это развитие идей auto-summarization (Crush) и auto-compaction (pi_agent_rust).
+* Conditional branching — третий проект с branching (после LangGraph и Archon), что подтверждает востребованность этого паттерна для workflows.
 
 ---
 
@@ -131,3 +148,4 @@
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт openhands-sdk-comparison.md, заполнена строка OpenHands SDK (#6), добавлены рекомендации |
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт archon-comparison.md, заполнена строка Archon (#7), добавлены рекомендации |
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт metagpt-openclaw-comparison.md, заполнены строки MetaGPT (#8) и OpenClaw (#9), добавлены рекомендации и тренды |
+| 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт mastra-ai-comparison.md, заполнена строка Mastra AI (#10), добавлены рекомендации и тренды |
