@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/research-crewai-langgraph-autogen
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-crewai-langgraph-autogen: Исследовать CrewAI, LangGraph и AutoGen для сравнения с task-orchestrator
