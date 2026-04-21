@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 11 / 13 исследований
+> **Статус заполнения:** 12 / 13 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -22,7 +22,7 @@
 | 9 | OpenClaw | TypeScript (Node.js) | `CLI-agent` | `agent-loop` (LLM → tool call → observation → LLM → ...) | `file-backed transcripts + pluggable context engine` | `model failover с cooldown + error classification` | `plugin SDK + 40+ extensions + Skills + MCP + sandbox` | 🟡 заимствовать отдельные паттерны | *(в отчёте №8)* ✅ |
 | 10 | Mastra AI | TypeScript (Node.js) | `SDK` | `step-based workflow (chaining API: .then/.branch/.parallel/.dowhile/.dountil/.foreach) + agent-loop` | `pluggable (LibSQL/PostgreSQL/D1/Upstash)` | `basic retry (attempts+delay, no exponential backoff) + TripWire (abort with retry hint)` | `Processors pipeline + MCP + Tools (Zod schemas) + custom storage + Agent network (delegation)` | 🟡 заимствовать отдельные паттерны | [mastra-ai-comparison.md](mastra-ai-comparison.md) ✅ |
 | 11 | Claude Code | — (проприетарный) | `CLI-agent` | `agent-loop` (LLM → tool call → observation → LLM → ...) | `in-memory + auto-compact` | `basic API retry` (429/500, без backoff) | `MCP + hooks (shell) + CLAUDE.md + slash commands + sub-agents` | 🟡 заимствовать отдельные паттерны | [claude-code-comparison.md](claude-code-comparison.md) ✅ |
-| 12 | GitHub Copilot Agent HQ | — (проприетарный) | | | | | | | [copilot-agent-hq-comparison.md](copilot-agent-hq-comparison.md) ⏳ |
+| 12 | GitHub Copilot Agent HQ | — (проприетарный) | `cloud/SaaS` | `agent-loop` (cloud sandbox, Issue→Plan→Execute→PR) | `cloud-managed` (session-based, GitHub infrastructure) | `transparent` (built-in API retry, org-level rate limits) | `MCP + custom instructions + GitHub Actions + GitHub Models marketplace` | 🟡 заимствовать отдельные паттерны | [copilot-agent-hq-comparison.md](copilot-agent-hq-comparison.md) ✅ |
 | 13 | Docker Agent + OpenAI Codex | — (проприетарный) | | | | | | | [docker-agent-codex-comparison.md](docker-agent-codex-comparison.md) ⏳ |
 
 ### Легенда колонок
@@ -110,6 +110,11 @@
 * Claude Code: hierarchical context discovery (CLAUDE.md: dynamic loading по директории) — 🟡 P3
 * Claude Code: slash commands как макросы (файл = команда, $ARGUMENTS placeholder) — 🟡 P3
 * Claude Code: headless CI/CD mode (--max-turns, --allowedTools, JSON output) — 🟡 P3
+* GitHub Copilot Agent HQ: Issue → Agent → PR workflow pattern (webhook-triggered chains, PR review chains) — 🟡 P2
+* GitHub Copilot Agent HQ: sandboxed execution (Docker-container изоляция для shell-команд в CI/CD) — 🟡 P2
+* GitHub Copilot Agent HQ: policy engine (permissions, scopes, org-level ограничения) — 🟡 P2
+* GitHub Copilot Agent HQ: Plan → Review → Execute (LLM-generated dynamic chains с human-in-the-loop) — 🟡 P3
+* GitHub Copilot Agent HQ: knowledge base integration (обогащение контекста документацией) — 🟡 P3
 
 ---
 
@@ -139,6 +144,11 @@
 * Hooks system (Claude Code) — декларативная альтернатива нашему decorator pattern: shell-скрипты для pre/post проверок без модификации PHP-кода. Концептуально дополняет retry/circuit breaker/budget decorators.
 * Sub-agent pattern (Claude Code Task tool) — аналог "chain внутри chain" с собственным контекстом и бюджетом. Для dynamic chains позволяет изолировать подзадачи.
 * Claude Code не имеет retry с backoff, circuit breaker, quality gates или budget limits — все наши ключевые отличия актуальны.
+* GitHub Copilot Agent HQ — проприетарный cloud SaaS от GitHub/Microsoft. Не фреймворк оркестрации, а встроенный в платформу AI-agent. Наибольший интерес: Issue→Agent→PR workflow pattern (интеграция AI-chain в development lifecycle), sandboxed execution (Docker-container для безопасного выполнения), policy engine (org-level ограничения для autonomous execution).
+* GitHub Copilot Agent HQ подтверждает тренд multi-model marketplace: единый API поверх GPT-4, Claude, Gemini, Llama и др. Это индустриальный аналог нашего AgentRunnerInterface.
+* Sandboxed execution (Copilot Agent) — единственный из исследованных проектов с production-grade Docker-container sandbox для AI-агента. Для autonomous CI/CD — критически важная безопасность.
+* Plan → Review → Execute pattern (Copilot Workspace) — концептуально близок к нашим dynamic chains с human-in-the-loop: LLM генерирует chain → пользователь подтверждает → оркестратор выполняет.
+* GitHub Copilot Agent HQ не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны даже против крупнейшего коммерческого AI-agent продукта.
 * Mastra AI — наиболее полный TypeScript-фреймворк из исследованных: step-based workflows с chaining API, 4-уровневая memory, eval framework, processor pipeline, agent network. При этом работает на уровне прямых LLM API, а не внешних runner'ов.
 * Mastra AI и Archon — два TypeScript-проекта с workflow engine, но на разных уровнях: Mastra = SDK (LLM API), Archon = orchestrator (subprocess SDK). Task-orchestrator ближе к Archon по уровню абстракции.
 * Processor pipeline (Mastra) — расширение middleware-паттерна: 6 фаз перехвата (input, inputStep, outputStream, outputResult, outputStep) vs. наш decorator pattern (retry, circuit breaker, budget). Pipeline даёт более granular контроль.
@@ -160,3 +170,4 @@
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт metagpt-openclaw-comparison.md, заполнены строки MetaGPT (#8) и OpenClaw (#9), добавлены рекомендации и тренды |
 | 2026-04-21 | Технический писатель (Гермиона) | Создан отчёт mastra-ai-comparison.md, заполнена строка Mastra AI (#10), добавлены рекомендации и тренды |
 | 2026-04-22 | Технический писатель (Гермиона) | Создан отчёт claude-code-comparison.md, заполнена строка Claude Code (#11), добавлены рекомендации и тренды |
+| 2026-04-22 | Технический писатель (Гермиона) | Создан отчёт copilot-agent-hq-comparison.md, заполнена строка GitHub Copilot Agent HQ (#12), добавлены рекомендации и тренды |
