@@ -86,6 +86,9 @@ deptrac:
               value: ^TaskOrchestrator\\Common\\Module\\.*\\Integration\\Listener\\.*
             - type: classLike
               value: ^TaskOrchestrator\\Common\\Module\\.*\\Integration\\.*Dto$
+            # Domain\Service\Integration — порты (интерфейсы), остаются в слое Domain
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Domain\\Service\\Integration\\.*
 
     - name: Presentation
       collectors:

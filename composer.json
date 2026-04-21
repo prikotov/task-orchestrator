@@ -22,7 +22,8 @@
         "prikotov/todo-md": "^0.0",
         "prikotov/git-workflow": "^0.0",
         "vimeo/psalm": "^6.16",
-        "psalm/plugin-symfony": "^5.3"
+        "psalm/plugin-symfony": "^5.3",
+        "deptrac/deptrac": "^2.0"
     },
     "repositories": [
         {"type": "vcs", "url": "https://github.com/prikotov/coding-standard"},
