@@ -1,0 +1,307 @@
+# Deptrac — task-orchestrator (Symfony Bundle, DDD)
+#
+# Implements deterministic verification of architectural rules from docs/conventions/.
+#
+# See README.md for layer descriptions and dependency rules.
+
+deptrac:
+  paths:
+    - ./src
+    # ./apps — зарезервировано на будущее
+
+  exclude_files:
+    - '#.*tests.*#'
+
+  layers:
+    # --- Main layers ---
+
+    - name: Domain
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Domain\\.*
+          must_not:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Domain\\(Entity\\)?ValueObject\\.*Vo$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Domain\\Enum\\.*
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Domain\\.*Dto$
+
+    - name: Application
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\.*
+          must_not:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\.*Dto$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\Enum\\.*
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\UseCase\\Command\\.*\\.*Command$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\UseCase\\Command\\.*\\.*CommandHandler$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\UseCase\\Query\\.*\\.*Query$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\UseCase\\Query\\.*\\.*QueryHandler$
+
+    - name: IntegrationListener
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Integration\\Listener\\.*
+
+    - name: Infrastructure
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Infrastructure\\(?!Model|Listener).*$
+          must_not:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Infrastructure\\.*Dto$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Infrastructure\\Component\\.*
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Infrastructure\\Enum\\.*
+
+    - name: InfrastructureComponent
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Infrastructure\\Component\\.*(Component|ComponentInterface)$
+
+    - name: Integration
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Integration\\.*
+          must_not:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Integration\\Listener\\.*
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\.*\\Integration\\.*Dto$
+
+    - name: Presentation
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Controller\\.*
+        # - type: classLike
+        #   value: .*apps.*\\Controller\\.*
+        # - type: classLike
+        #   value: ^Api\\v1\\Module\\.*
+        # - type: classLike
+        #   value: ^Console\\Module\\.*\\Command\\.*
+        # - type: classLike
+        #   value: ^Console\\Module\\.*\\EventSubscriber\\.*
+
+    # --- Fine-grained: DTO, VO, Enum ---
+
+    - name: DomainVo
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Domain\\(Entity\\)?ValueObject\\.*Vo$
+
+    - name: DomainEnum
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Domain\\Enum\\.*
+
+    - name: DomainDto
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Domain\\.*Dto$
+
+    - name: ApplicationDto
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\.*Dto$
+
+    - name: ApplicationEnum
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\Enum\\.*
+
+    - name: ApplicationCommonDto
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Application\\Dto\\.*Dto$
+
+    - name: IntegrationDto
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Integration\\.*Dto$
+
+    - name: InfrastructureDto
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Infrastructure\\.*Dto$
+
+    - name: InfrastructureEnum
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Infrastructure\\Enum\\.*
+
+    # --- CQRS artifacts ---
+
+    - name: ApplicationCommand
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\UseCase\\Command\\.*\\.*Command$
+
+    - name: ApplicationCommandHandler
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\UseCase\\Command\\.*\\.*CommandHandler$
+
+    - name: ApplicationQuery
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\UseCase\\Query\\.*\\.*Query$
+
+    - name: ApplicationQueryHandler
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Application\\UseCase\\Query\\.*\\.*QueryHandler$
+
+    # --- Symfony Bundle plumbing ---
+
+    - name: DependencyInjection
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\DependencyInjection\\.*
+
+    - name: Bundle
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Infrastructure\\Symfony\\.*
+
+  ruleset:
+    # DTO boundary
+    Domain:
+      - Domain
+      - DomainDto
+      - DomainEnum
+      - DomainVo
+    DomainVo:
+      - Domain
+      - DomainEnum
+      - DomainVo
+    DomainEnum:
+      - DomainEnum
+    ApplicationDto:
+      - ApplicationDto
+      - ApplicationCommonDto
+      - ApplicationEnum
+    ApplicationCommonDto:
+      - ApplicationCommonDto
+    IntegrationDto:
+      - Integration
+      - IntegrationDto
+    InfrastructureDto:
+      - Domain
+      - DomainDto
+      - DomainEnum
+      - DomainVo
+      - Infrastructure
+      - InfrastructureComponent
+      - InfrastructureDto
+    DomainDto:
+      - Domain
+      - DomainDto
+      - DomainEnum
+      - DomainVo
+
+    # CQRS
+    ApplicationCommand:
+      - Application
+      - ApplicationDto
+      - ApplicationCommonDto
+      - ApplicationEnum
+    ApplicationQuery:
+      - Application
+      - ApplicationDto
+      - ApplicationCommonDto
+      - ApplicationEnum
+    ApplicationCommandHandler:
+      - Application
+      - +ApplicationCommand
+      - Domain
+      - DomainDto
+      - DomainEnum
+      - DomainVo
+    ApplicationQueryHandler:
+      - Application
+      - +ApplicationQuery
+      - Domain
+      - DomainDto
+      - DomainEnum
+      - DomainVo
+
+    # Layer dependencies
+    Presentation:
+      - Application
+      - +ApplicationCommand
+      - +ApplicationQuery
+      - ApplicationCommandHandler
+      - ApplicationQueryHandler
+    Application:
+      - Application
+      - +ApplicationCommandHandler
+      - +ApplicationQueryHandler
+    Integration:
+      - Integration
+      - IntegrationDto
+      - Application
+      - ApplicationCommand
+      - ApplicationQuery
+      - ApplicationCommandHandler
+      - ApplicationQueryHandler
+      - ApplicationDto
+      - ApplicationCommonDto
+      - ApplicationEnum
+      - Domain
+      - DomainDto
+      - DomainEnum
+      - DomainVo
+    Infrastructure:
+      - Infrastructure
+      - InfrastructureComponent
+      - InfrastructureDto
+      - InfrastructureEnum
+      - Domain
+      - DomainDto
+      - DomainEnum
+      - DomainVo
+    InfrastructureEnum:
+      - InfrastructureEnum
+    InfrastructureComponent:
+      - InfrastructureComponent
+      - InfrastructureDto
+    IntegrationListener:
+      - IntegrationListener
+      - Integration
+      - IntegrationDto
+      - Application
+      - +ApplicationCommand
+      - +ApplicationQuery
+      - ApplicationCommandHandler
+      - ApplicationQueryHandler
+
+    # Symfony Bundle plumbing
+    DependencyInjection:
+      - Domain
+      - DomainDto
+      - DomainEnum
+      - DomainVo
+      - Application
+      - ApplicationDto
+      - ApplicationCommand
+      - ApplicationQuery
+    Bundle:
+      - DependencyInjection
