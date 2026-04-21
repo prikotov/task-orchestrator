@@ -17,10 +17,10 @@ depends_on:
   - TASK-research-docker-agent-codex
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Технический писатель (Гермиона)
+branch: task/research-agent-frameworks-summary
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-agent-frameworks-summary: Финализация сводной таблицы и итоговые рекомендации
@@ -89,6 +89,17 @@ grep -c "✅\|🟢\|🟡\|🔴" docs/research/agent-frameworks-summary.md
 
 ## 9. Comments (Комментарии)
 Это финальная задача эпика EPIC-research-agent-frameworks-comparison. Запускается только после завершения всех индивидуальных исследований. Индивидуальные задачи заполняют строки в сводной таблице инкрементально — эта задача финализирует таблицу и добавляет аналитику. Результат — ключевой артефакт для принятия архитектурных решений.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
+**Ветка:** task/research-agent-frameworks-summary
+
+### Порядок действий
+1. Реализуй задачу согласно описанию.
+2. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+3. Сделай git commit и git push.
+4. Обязательно перемести файл задачи в todo/done/ и обнови эпик.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
