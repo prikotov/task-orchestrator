@@ -22,6 +22,18 @@ psalm: ## Запустить статический анализ
 	@echo
 	@out=$$(vendor/bin/psalm --no-cache --no-progress --output-format=compact --monochrome 2>&1); ec=$$?; if [ "$$ec" -eq 0 ]; then echo "Psalm: OK"; else echo "$$out" | grep -vE '^(Running custom Psalm bootstrap|[[:space:]]*$$)'; fi; exit $$ec
 
+.PHONY: phpmd
+phpmd: ## Запустить PHP Mess Detector
+	@echo
+	@echo "PHPMD:"
+	@vendor/bin/phpmd analyze src --format=text --ruleset=phpmd.xml --baseline-file=phpmd.baseline.xml && echo "No violations."
+
+.PHONY: phpmd-full
+phpmd-full: ## Запустить PHPMD без baseline
+	@echo
+	@echo "PHPMD (full):"
+	@vendor/bin/phpmd analyze src --format=text --ruleset=phpmd.xml
+
 .PHONY: tests-unit
 tests-unit: ## Запустить unit-тесты
 	@echo
@@ -45,7 +57,7 @@ tests: ## Запустить все тесты
 ############
 
 .PHONY: check
-check: ## Запустить все проверки (deptrac + psalm + tests)
-	@${MAKE} --no-print-directory deptrac psalm tests && \
+check: ## Запустить все проверки (deptrac + psalm + phpmd + tests)
+	@${MAKE} --no-print-directory deptrac psalm phpmd tests && \
 		{ echo; echo "✅ Все проверки завершены успешно."; } || \
 		{ echo; echo "❌ Проверки завершены с ошибками."; exit 1; }

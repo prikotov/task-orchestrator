@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<phpmd-baseline>
+  <violation rule="PHPMD\Rule\CleanCode\MissingImport" file="src/Infrastructure/Symfony/TaskOrchestratorBundle.php"/>
+  <violation rule="PHPMD\Rule\Naming\BooleanGetMethodName" file="src/Module/AgentRunner/Domain/ValueObject/AgentRunRequestVo.php" method="getNoContextFiles"/>
+  <violation rule="PHPMD\Rule\CleanCode\MissingImport" file="src/Module/AgentRunner/Infrastructure/Service/Pi/PiAgentRunner.php"/>
+  <violation rule="PHPMD\Rule\UnusedFormalParameter" file="src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php"/>
+  <violation rule="PHPMD\Rule\CleanCode\MissingImport" file="src/Module/Orchestrator/Application/UseCase/Query/GenerateReport/ReportResultFactory.php"/>
+  <violation rule="PHPMD\Rule\Naming\BooleanGetMethodName" file="src/Module/Orchestrator/Domain/ValueObject/ChainRunRequestVo.php" method="getNoContextFiles"/>
+  <violation rule="PHPMD\Rule\Naming\BooleanGetMethodName" file="src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php" method="getNoContextFiles"/>
+  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php"/>
+  <violation rule="PHPMD\Rule\Naming\ShortVariable" file="src/Module/Orchestrator/Integration/Service/AgentRunner/AgentDtoMapper.php"/>
+</phpmd-baseline>
