@@ -5,7 +5,7 @@ value: V3
 complexity: C4
 priority: P2
 depends_on: []
-epic:
+epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee:
 branch:
@@ -34,6 +34,7 @@ status: todo
 - [ ] Изучить AutoGen: multi-agent conversations, code execution, human-in-the-loop
 - [ ] Сравнить все три с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
 - [ ] Оформить отчёт в docs/research/crewai-langgraph-autogen-comparison.md по формату существующих comparison-документов
+- [ ] Заполнить строки для CrewAI, LangGraph, AutoGen в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Составить сравнительную таблицу: модель оркестрации, state management, error handling, extensibility
 - [ ] Определить конкретные паттерны, которые стоит заимствовать из каждого
@@ -51,6 +52,7 @@ status: todo
 - [ ] Отчёт docs/research/crewai-langgraph-autogen-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит сравнительную таблицу трёх фреймворков
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [ ] Строки CrewAI, LangGraph, AutoGen в сводной таблице docs/research/agent-frameworks-summary.md заполнены
 
 ## 6. Verification (Самопроверка)
 ```bash
