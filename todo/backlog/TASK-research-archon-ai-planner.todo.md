@@ -5,7 +5,7 @@ value: V3
 complexity: C3
 priority: P2
 depends_on: []
-epic:
+epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee:
 branch:
@@ -32,6 +32,7 @@ status: todo
 - [ ] Изучить репозиторий https://github.com/coleam00/Archon: архитектуру, модель мета-оркестрации, планирование
 - [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
 - [ ] Оформить отчёт в docs/research/archon-comparison.md по формату существующих comparison-документов
+- [ ] Заполнить строку для Archon в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Определить конкретные паттерны мета-оркестрации, которые стоит заимствовать
 - [ ] Оценить подход к генерации agent-конфигураций и self-improvement
@@ -47,6 +48,7 @@ status: todo
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] Отчёт docs/research/archon-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [ ] Строка Archon в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
