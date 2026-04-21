@@ -164,13 +164,6 @@ deptrac:
         - type: classLike
           value: ^[A-Za-z_]+\\Common\\Module\\.*\\Application\\UseCase\\Query\\.*\\.*QueryHandler$
 
-    # --- Symfony Bundle plumbing ---
-
-    - name: DependencyInjection
-      collectors:
-        - type: classLike
-          value: ^[A-Za-z_]+\\Common\\DependencyInjection\\.*
-
   ruleset:
     # DTO boundary
     Domain:
@@ -283,13 +276,3 @@ deptrac:
       - ApplicationCommandHandler
       - ApplicationQueryHandler
 
-    # Symfony Bundle plumbing
-    DependencyInjection:
-      - Domain
-      - DomainDto
-      - DomainEnum
-      - DomainVo
-      - Application
-      - ApplicationDto
-      - ApplicationCommand
-      - ApplicationQuery
