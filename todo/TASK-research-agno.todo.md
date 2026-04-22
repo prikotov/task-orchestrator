@@ -8,9 +8,9 @@ depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee:
-branch:
+branch: task/research-agno
 pr:
-status: todo
+status: review
 ---
 
 # TASK-research-agno: Исследовать Agno (бывший Phi) для сравнения с task-orchestrator
