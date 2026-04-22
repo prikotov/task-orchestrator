@@ -7,7 +7,7 @@ personality:
   disc: "D4 I9 S2 C5"
   belbin: ["Resource Investigator", "Plant"]
   adizes: ["I", "E"]
-  big_five: "O9 C4 E9 A3 N3
+  big_five: "O9 C4 E9 A3 N3"
 description: "Технический писатель, ориентированный на читателя. Борется с водой, формализмом и документацией, которую никто не читает."
 ---
 

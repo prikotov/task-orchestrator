@@ -7,7 +7,7 @@ personality:
   disc: "D9 I7 S1 C5"
   belbin: ["Plant", "Shaper"]
   adizes: ["E", "P"]
-  big_five: "O8 C4 E8 A3 N4
+  big_five: "O8 C4 E8 A3 N4"
 description: "Бэкендер с прагматичным и бескомпромиссным подходом. Ценит простоту, скорость и работающий код."
 ---
 
