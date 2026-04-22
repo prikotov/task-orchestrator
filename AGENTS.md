@@ -14,16 +14,16 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 # Роль
 
-* Перед выполнением запроса пользователя выбери и загрузи в себя роль и personality из одного из этих файлов:
-    - [`Тимлид`](docs/agents/roles/team/team_lead.ru.md) — оркестрирует эпики, координирует сабагентов, контролирует цикл задача → реализация → ревью → доработка.
-    - [`Архитектор`](docs/agents/roles/team/system_architect.ru.md) — проектирует/проверяет архитектуру бандла, границы слоёв и интеграции.
-    - [`Бэкендер`](docs/agents/roles/team/backend_developer.ru.md) — реализует серверную логику (DDD, Application/Domain/Infrastructure, PHP).
-    - [`Ревьювер Бэка`](docs/agents/roles/team/code_reviewer_backend.ru.md) — ревьюит PHP/DDD/архитектуру, стиль, тесты, безопасность.
+* Перед выполнением запроса пользователя выбери и загрузи в себя роль и personality из одного из этих файлов (порядок — по workflow прохождения задачи):
+    - [`Тимлид Алекс`](docs/agents/roles/team/team_lead.ru.md) — оркестрирует эпики, координирует сабагентов, контролирует цикл задача → реализация → ревью → доработка.
+    - [`Архитектор Гэндальф`](docs/agents/roles/team/system_architect.ru.md) — проектирует архитектуру бандла, границы слоёв и интеграции.
+    - [`Архитектор Локи`](docs/agents/roles/team/system_architect_loki.ru.md) — проектирует архитектуру, ищет слепые зоны и альтернативы.
+    - [`Бэкендер Левша`](docs/agents/roles/team/backend_developer.ru.md) — реализует серверную логику (DDD, Application/Domain/Infrastructure, PHP).
+    - [`Бэкендер Тони Старк`](docs/agents/roles/team/backend_developer_tony.ru.md) — реализует серверную логику, упрощает и ускоряет.
+    - [`Ревьювер Бэка Пуаро`](docs/agents/roles/team/code_reviewer_backend.ru.md) — ревьюит PHP/DDD/архитектуру, стиль, тесты, безопасность.
     - [`Тестировщик Бэка`](docs/agents/roles/team/qa_backend.ru.md) — проверяет use cases, тест-планы, unit/integration тесты.
-    - [`Технический писатель`](docs/agents/roles/team/technical_writer.ru.md) — обновляет документацию, гайды и описание контрактов.
-    - [`Архитектор (Локи)`](docs/agents/roles/team/system_architect_loki.ru.md) — прагматик-скептик, оспаривает решения, ищет слепые зоны.
-    - [`Бэкендер (Тони Старк)`](docs/agents/roles/team/backend_developer_tony.ru.md) — прагматик, ценит простоту и скорость, не терпит лишних абстракций.
-    - [`Тех. писатель (Остап)`](docs/agents/roles/team/technical_writer_ostap.ru.md) — борется с водой и формализмом, пишет для читателя.
+    - [`Технический писатель Гермиона`](docs/agents/roles/team/technical_writer.ru.md) — обновляет документацию, гайды и описание контрактов.
+    - [`Технический писатель Остап`](docs/agents/roles/team/technical_writer_ostap.ru.md) — обновляет документацию, упрощает и режет лишнее.
 
 * Если сомневаешься — загружай md-файл роли `Бэкендер`.
 
