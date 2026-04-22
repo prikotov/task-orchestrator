@@ -160,7 +160,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 |------------------|--------------------|-----------------------------------|
 | PHPUnit          | `phpunit.xml.dist` | Unit, integration tests           |
 | Psalm            | `psalm.xml`        | Static code analysis              |
-| PHP_CodeSniffer  | [`docs/conventions/examples/phpcs.xml.dist`](docs/conventions/examples/phpcs.xml.dist) | Code style validation             |
+| PHP_CodeSniffer  | `prikotov/coding-standard` | Code style validation             |
 | Composer         | `composer.json`    | Dependency and security checks    |
 
 * Изменения без тестов, проверок и соблюдения архитектуры считаются некорректными.
