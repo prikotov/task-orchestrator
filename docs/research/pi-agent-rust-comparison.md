@@ -27,7 +27,7 @@ src/
 ├── models.rs                Model registry + resolver (162KB)
 ├── model.rs                 Message/content types, StreamEvent
 ├── provider.rs              Provider trait + Context/StreamOptions
-├── providers/               11 native провайдеров (Anthropic, OpenAI, Gemini, Cohere, Azure, Bedrock, Vertex, Copilot, GitLab)
+├── providers/               10 native провайдеров (Anthropic, OpenAI, OpenAI Responses, Gemini, Cohere, Azure, Bedrock, Vertex, Copilot, GitLab)
 ├── tools.rs                 8 встроенных инструментов (read/write/edit/bash/grep/find/ls/hashline_edit)
 ├── session.rs               JSONL session persistence (v3, tree branching)
 ├── session_index.rs         SQLite session index (metadata, search)
@@ -58,7 +58,7 @@ src/
 | **Тип** | CLI-агент (TUI), одноагентный |
 | **Модель выполнения** | Agent loop (LLM → tool call → LLM → ...) с max 50 итераций |
 | **State management** | JSONL (v3, tree branching) + SQLite index + optional SQLite backend |
-| **Провайдеры** | 11 native (Anthropic, OpenAI Chat/Responses, Gemini, Cohere, Azure, Bedrock, Vertex, Copilot, GitLab) + extension-provided |
+| **Провайдеры** | 10 native (Anthropic, OpenAI, OpenAI Responses, Gemini, Cohere, Azure, Bedrock, Vertex, Copilot, GitLab) + extension-provided |
 | **Расширяемость** | Extensions (QuickJS/WASM), Skills (SKILL.md), Prompt templates, Packages |
 | **Интерфейс** | Interactive TUI (Bubble Tea v2) / Print mode / RPC mode / SDK |
 | **Безопасность** | Capability-gated hostcalls, trust lifecycle, command-level exec mediation |
@@ -96,7 +96,7 @@ src/
 | **Fallback routing** | ✅ Per-step fallback runner | ⚠️ Model auto-select fallback (3 модели в цепочке), но не per-step | ✅ У нас лучше |
 | **Audit Trail (JSONL)** | ✅ JsonlAuditLogger | ✅ JSONL session v3 (tree-structured) + session index (SQLite) | ✅ Паритет (у них богаче) |
 | **Ролевые промпты** | ✅ .md файлы (18+ ролей) | ✅ System prompt + skills (SKILL.md) + prompt templates | ✅ У нас лучше (множество ролей) |
-| **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ 11 native провайдеров + extension-provided | ✅ У них шире |
+| **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ 10 native провайдеров + extension-provided | ✅ У них шире |
 | **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Плоская структура `src/` (все в одном crate) | ✅ У нас лучше |
 | **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов Provider | ✅ У нас лучше |
 | **YAML-конфигурация** | ✅ Chains + roles в YAML | ✅ settings.json (JSON) | ✅ Паритет (разные форматы) |
@@ -112,7 +112,7 @@ src/
 | **Structured concurrency** | ❌ Нет (PHP/Symfony) | ✅ asupersync: structured cancellation, capability context | 🟢 Разный стек |
 | **Retry config** | ✅ В YAML, per-step | ✅ В settings.json (global: enabled, max_retries, base/max delay) | ✅ Паритет |
 | **Streaming** | ✅ Через runner | ✅ Native SSE parser, streaming-first architecture | ✅ Паритет |
-| **Cost tracking** | ✅ Через budget/check | ✅ Per-session token/cost metrics (session_metrics.rs) | ✅ Паритет |
+| **Cost tracking** | ✅ Через budget/check | ✅ Per-session token/cost metrics (Usage/Cost в model.rs, отображение в TUI) | ✅ Паритет |
 
 ---
 
@@ -212,7 +212,7 @@ const MAX_CONCURRENT_TOOLS: usize = 8;
 ```
 
 - Read-only tools (`read`, `grep`, `find`, `ls`) выполняются параллельно
-- Write tools (`write`, `edit`, `bash`) — последовательно
+- Write tools (`write`, `edit`, `bash`, `hashline_edit`) — последовательно
 - Tool trait имеет метод `is_read_only()` → `bool`
 
 **Почему нам интересно:** В наших цепочках все шаги выполняются последовательно. Если несколько шагов в chain независимы — можно выполнять их параллельно. Это особенно полезно для dynamic chains, где LLM может вызывать несколько инструментов одновременно.
@@ -228,8 +228,8 @@ const MAX_CONCURRENT_TOOLS: usize = 8;
   "retry": {
     "enabled": true,
     "max_retries": 3,
-    "base_delay_ms": 1000,
-    "max_delay_ms": 30000
+    "base_delay_ms": 2000,
+    "max_delay_ms": 60000
   }
 }
 ```
@@ -274,9 +274,9 @@ asupersync — Rust-специфичный async runtime с structured concurren
 
 Встроенный JS/WASM runtime для расширений — это полноценная VM. Для PHP/Symfony бандла это не применимо. Расширяемость runner'ов через interface достаточна.
 
-### 4.6 🟢 Model Registry (11+ провайдеров)
+### 4.6 🟢 Model Registry (10+ провайдеров)
 
-pi_agent_rust поддерживает 11 native провайдеров LLM. Наш оркестратор общается с LLM через runner'ы (pi, codex), которые сами работают с конкретными API. Нам не нужна собственная абстракция над провайдерами.
+pi_agent_rust поддерживает 10 native провайдеров LLM. Наш оркестратор общается с LLM через runner'ы (pi, codex), которые сами работают с конкретными API. Нам не нужна собственная абстракция над провайдерами.
 
 ### 4.7 🟢 Performance Engineering (LTO, jemalloc, binary size)
 

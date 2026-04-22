@@ -37,6 +37,7 @@ lib/crewai/src/crewai/
   llm.py / llms/             LLM abstraction (multi-provider)
   memory/                    Short-term + long-term memory
   knowledge/                 RAG integration
+  mcp/                       MCP (Model Context Protocol) integration
   tools/                     Built-in + custom tool framework
   security/                  Fingerprint, security config
   skills/                    Agent Skills (SKILL.md-based)
@@ -61,7 +62,7 @@ lib/crewai/src/crewai/
 
 ### 1.2 LangGraph
 
-LangGraph — low-level orchestration framework для построения stateful AI-агентов и multi-step workflows. Построен на абстракции directed graph (узлы = функции, рёбра = переходы), вдохновлён Pregel/Apache Beam. Часть экосистемы LangChain, но может использоваться standalone.
+LangGraph — low-level orchestration framework для построения stateful AI-агентов и multi-step workflows. Построен на абстракции directed graph (узлы = функции, рёбра = переходы), вдохновлён Pregel/Apache Beam. Часть экосистемы LangChain; требует `langchain-core` как обязательную зависимость, но может использоваться без полного набора LangChain.
 
 **Архитектура:**
 
@@ -74,13 +75,22 @@ libs/langgraph/langgraph/
     message.py               Message graph utilities
   pregel/                    Pregel execution engine (supersteps)
   channels/                  State channels: reducers, aggregation
-  checkpoint/                State persistence (memory / SQLite / PostgreSQL)
-  store/                     Long-term key-value store
   func/                      Functional API (@entrypoint, @task)
   errors.py                  Error types
   types.py                   RetryPolicy, Send, Command
   callbacks.py               Execution callbacks
   runtime.py                 Runtime context injection
+
+libs/checkpoint/             State persistence (отдельный пакет)
+  langgraph/checkpoint/
+    base/                    Base checkpointer interface
+    memory/                  In-memory checkpointer
+  langgraph/store/           Long-term key-value store
+    base/
+    memory/
+
+libs/checkpoint-sqlite/      SQLite-backed checkpoint (отдельный пакет)
+libs/checkpoint-postgres/    PostgreSQL-backed checkpoint (отдельный пакет)
 ```
 
 **Ключевые характеристики:**
@@ -90,7 +100,7 @@ libs/langgraph/langgraph/
 | **Тип** | Low-level orchestration framework (graph-based) |
 | **Модель выполнения** | Directed graph (StateGraph): nodes → conditional edges → superstep execution |
 | **State management** | TypedDict state + reducer functions, checkpoint persistence (memory / SQLite / PostgreSQL) |
-| **Провайдеры** | Любые через LangChain или прямые API |
+| **Провайдеры** | Любые через langchain-core (обязательная зависимость) или прямые API |
 | **Расширяемость** | Subgraphs, branches, Send (map-reduce), human-in-the-loop interrupts |
 | **Человеческий контроль** | Interrupts + state inspection/modification |
 | **Durable execution** | Checkpoints + replay, survive failures |
@@ -168,7 +178,7 @@ python/packages/
 | **Circuit Breaker** | ✅ 3-state (closed/open/half-open) | ❌ Нет | ❌ Нет | ❌ Нет |
 | **Audit Trail** | ✅ JSONL | ⚠️ Event bus + telemetry | ⚠️ Checkpoint history | ⚠️ Logging |
 | **Ролевые промпты** | ✅ .md файлы (18+ ролей) | ✅ role/goal/backstory в YAML | ❌ Системный промпт = node function | ✅ system_message per agent |
-| **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ Multi-provider (LiteLLM) | ✅ Любые через Runnable | ✅ Multi-provider (extensions) |
+| **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ Multi-provider (LiteLLM) | ✅ Любые через langchain-core Runnable | ✅ Multi-provider (extensions) |
 | **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Плоская структура (lib/crewai/) | ❌ Flat module (libs/langgraph/) | ⚠️ Слоистая (core/agentchat/ext) |
 | **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов | ❌ Node functions | ✅ RoutedAgent + subscriptions |
 | **Human-in-the-loop** | ❌ Нет | ✅ Human feedback | ✅ Interrupts + state modification | ✅ Intervention hooks |
@@ -366,7 +376,7 @@ AutoGen имеет встроенный sandbox для выполнения ко
 
 ### 4.6 🟢 LangChain Dependency (LangGraph)
 
-LangGraph технически standalone, но тесно интегрирован с LangChain ecosystem (LangSmith, LangChain core). Мы не используем LangChain и не хотим эту зависимость.
+LangGraph требует `langchain-core` как обязательную зависимость (указано в `pyproject.toml`). Хотя README утверждает «может использоваться standalone», это означает «без полного набора LangChain», а не без зависимостей вообще. Мы не используем LangChain и не хотим эту зависимость.
 
 ### 4.7 🟢 Maintenance Mode (AutoGen)
 
@@ -420,7 +430,8 @@ AutoGen в maintenance mode. Microsoft рекомендует переход н�
 - [`libs/langgraph/langgraph/graph/_branch.py`](https://github.com/langchain-ai/langgraph/blob/main/libs/langgraph/langgraph/graph/_branch.py) — Conditional branching
 - [`libs/langgraph/langgraph/pregel/`](https://github.com/langchain-ai/langgraph/blob/main/libs/langgraph/langgraph/pregel/) — Pregel execution engine (supersteps)
 - [`libs/langgraph/langgraph/types.py`](https://github.com/langchain-ai/langgraph/blob/main/libs/langgraph/langgraph/types.py) — RetryPolicy, Send, Command, CachePolicy
-- [`libs/checkpoint/`](https://github.com/langchain-ai/langgraph/blob/main/libs/checkpoint/) — Checkpoint persistence (memory, SQLite, PostgreSQL)
+- [`libs/checkpoint/`](https://github.com/langchain-ai/langgraph/blob/main/libs/checkpoint/) — Checkpoint persistence (базовый интерфейс, memory, store)
+- [`libs/checkpoint-sqlite/`](https://github.com/langchain-ai/langgraph/blob/main/libs/checkpoint-sqlite/) — SQLite-backed checkpoint store
 - [`libs/checkpoint-postgres/`](https://github.com/langchain-ai/langgraph/blob/main/libs/checkpoint-postgres/) — PostgreSQL-backed checkpoint store
 - [docs.langchain.com/langgraph](https://docs.langchain.com/oss/python/langgraph/overview) — Официальная документация
 
