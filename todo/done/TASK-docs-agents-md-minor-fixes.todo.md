@@ -11,7 +11,7 @@ author: Бэкендер (Левша)
 assignee: Технический писатель (Гермиона)
 branch:
 pr:
-status: todo
+status: done
 ---
 
 # TASK-docs-agents-md-minor-fixes: Мелкие исправления в AGENTS.md (ссылки, таблица инструментов)
@@ -33,24 +33,24 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Ссылка на architecture.md оформлена как `[docs/guide/architecture.md](docs/guide/architecture.md)`
-- [ ] Таблица инструментов: PHP_CodeSniffer — указать `docs/conventions/examples/phpcs.xml.dist` или добавить комментарий
+- [x] Ссылка на architecture.md оформлена как `[docs/guide/architecture.md](docs/guide/architecture.md)` — уже была кликабельной, фикс не потребовался
+- [x] Таблица инструментов: PHP_CodeSniffer — указан путь [`docs/conventions/examples/phpcs.xml.dist`](docs/conventions/examples/phpcs.xml.dist)
 ### 🟡 Should Have (Желательно)
-- [ ] Комментарий в секции структуры про назначение `docs/releases/` vs `docs/git-workflow/releases/`
+- [x] Комментарий в секции структуры про назначение `docs/releases/` vs `docs/git-workflow/releases/`
 ### 🟢 Could Have (Опционально)
 - [ ] ...
 ### ⚫ Won't Have (Не будем делать)
-- [ ] Создание phpcs.xml.dist в корне проекта
+- [x] Создание phpcs.xml.dist в корне проекта — не создавался (won't have)
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Заменить plain text ссылку на architecture.md на markdown-ссылку
-2. [ ] Обновить ячейку PHP_CodeSniffer в таблице: указать путь `docs/conventions/examples/phpcs.xml.dist`
-3. [ ] Добавить краткое пояснение про docs/releases/ (опционально)
+1. [x] Заменить plain text ссылку на architecture.md на markdown-ссылку — уже была кликабельной
+2. [x] Обновить ячейку PHP_CodeSniffer в таблице: указан путь `docs/conventions/examples/phpcs.xml.dist`
+3. [x] Добавить краткое пояснение про docs/releases/ vs docs/git-workflow/releases/
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Ссылка на architecture.md кликабельна
-- [ ] Таблица инструментов не содержит прочерков без пояснений
-- [ ] PHPUnit и Psalm не затронуты (docs-only)
+- [x] Ссылка на architecture.md кликабельна
+- [x] Таблица инструментов не содержит прочерков без пояснений
+- [x] PHPUnit и Psalm не затронуты (docs-only)
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -61,7 +61,7 @@ status: todo
 - Зависит от TASK-docs-agents-md-structure (структура может измениться)
 
 ## 8. Sources (Источники)
-- [ ] [AGENTS.md](../AGENTS.md)
+- [x] [AGENTS.md](../AGENTS.md)
 
 ## 9. Comments (Комментарии)
 Выявлено при аудите 2026-04-20.
@@ -70,3 +70,4 @@ status: todo
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-20 | Бэкендер (Левша) | Создание задачи |
+| 2026-04-22 | Техписатель (Гермиона) | Выполнены 3 фикса: ссылка (уже была), таблица phpcs.xml.dist, пояснение docs/releases/ |
