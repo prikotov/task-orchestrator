@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/research-claude-code
 pr: https://github.com/prikotov/task-orchestrator/pull/47
-status: in_progress
+status: done
 ---
 
 # TASK-research-claude-code: Исследовать и оценить Claude Code для сравнения с task-orchestrator

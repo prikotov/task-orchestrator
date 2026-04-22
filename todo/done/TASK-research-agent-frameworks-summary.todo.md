@@ -19,7 +19,7 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/research-agent-frameworks-summary
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/50
 status: done
 ---
 
