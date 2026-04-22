@@ -56,8 +56,14 @@ tests: ## Запустить все тесты
 # Проверки  #
 ############
 
+.PHONY: phpcs
+phpcs: ## Запустить PHP_CodeSniffer
+	@echo
+	@echo "PHPCS:"
+	@vendor/bin/phpcs --standard=phpcs.xml.dist --no-colors -n src/ 2>&1; ec=$$?; if [ "$$ec" -eq 0 ]; then echo "PHPCS: OK"; fi; exit $$ec
+
 .PHONY: check
-check: ## Запустить все проверки (deptrac + psalm + phpmd + tests)
-	@${MAKE} --no-print-directory deptrac psalm phpmd tests && \
+check: ## Запустить все проверки (deptrac + psalm + phpmd + phpcs + tests)
+	@${MAKE} --no-print-directory deptrac psalm phpmd phpcs tests && \
 		{ echo; echo "✅ Все проверки завершены успешно."; } || \
 		{ echo; echo "❌ Проверки завершены с ошибками."; exit 1; }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
 use LogicException;
 use Override;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
 
 use function array_filter;
 use function implode;
