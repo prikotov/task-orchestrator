@@ -51,7 +51,7 @@ chains:
 ```yaml
 roles:
   backend_developer:
-    prompt_file: docs/agents/roles/team/backend_developer.ru.md
+    prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
     command: [pi, ...]
     fallback:
       command: [codex, --model, gpt-4o, ...]

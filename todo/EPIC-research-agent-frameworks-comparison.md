@@ -7,7 +7,8 @@ complexity: C4
 priority: P2
 author: Тимлид (Алекс)
 assignee:
-status: todo
+branch: task/research-agent-frameworks-comparison
+status: done
 pr:
 ---
 
@@ -32,14 +33,14 @@ pr:
 ## 3. Requirements (Требования, MoSCoW)
 
 ### 🔴 Must Have (Блокирующие требования)
-- [ ] Каждый фреймворк исследован по единой методологии (модель оркестрации, state, error handling, extensibility)
-- [ ] По каждому фреймворку создан отчёт в `docs/research/` по формату существующих comparison-документов
-- [ ] Сводная таблица в `docs/research/agent-frameworks-summary.md` со всеми фреймворками
-- [ ] Чёткий вердикт по каждому: заимствовать / dependency / не подходит
+- [x] Каждый фреймворк исследован по единой методологии (модель оркестрации, state, error handling, extensibility)
+- [x] По каждому фреймворку создан отчёт в `docs/research/` по формату существующих comparison-документов
+- [x] Сводная таблица в `docs/research/agent-frameworks-summary.md` со всеми фреймворками
+- [x] Чёткий вердикт по каждому: заимствовать / dependency / не подходит
 
 ### 🟡 Should Have (Важные требования)
-- [ ] Сравнительная таблица с группировкой по категориям (multi-agent, single-agent, cloud, meta-orchestration)
-- [ ] Рекомендации по приоритетам заимствования паттернов
+- [x] Сравнительная таблица с группировкой по категориям (multi-agent, single-agent, cloud, meta-orchestration)
+- [x] Рекомендации по приоритетам заимствования паттернов
 
 ### 🟢 Could Have (Желательно)
 - [ ] Визуализация (Mermaid-диаграммы) ключевых архитектурных различий
@@ -67,27 +68,27 @@ pr:
 
 ### Этап 1: Индивидуальные исследования (параллельные)
 
-- [ ] [TASK-research-charmbracelet-crush](backlog/TASK-research-charmbracelet-crush.todo.md) — Charmbracelet Crush (Go, CLI-agent)
-- [ ] [TASK-research-pi-agent-rust](backlog/TASK-research-pi-agent-rust.todo.md) — pi_agent_rust (Rust)
-- [ ] [TASK-research-crewai-langgraph-autogen](backlog/TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
-- [ ] [TASK-research-openhands-sdk](backlog/TASK-research-openhands-sdk.todo.md) — OpenHands SDK (Python, SDK-подход)
-- [ ] [TASK-research-archon-ai-planner](backlog/TASK-research-archon-ai-planner.todo.md) — Archon (Python, мета-оркестрация)
-- [ ] [TASK-research-metagpt-openclaw](backlog/TASK-research-metagpt-openclaw.todo.md) — MetaGPT, OpenClaw (Python, SOP/роли)
-- [ ] [TASK-research-mastra-ai](backlog/TASK-research-mastra-ai.todo.md) — Mastra AI (TypeScript, workflows)
-- [ ] [TASK-research-claude-code](backlog/TASK-research-claude-code.todo.md) — Claude Code (проприетарный, agent loop)
-- [ ] [TASK-research-copilot-agent-hq](backlog/TASK-research-copilot-agent-hq.todo.md) — GitHub Copilot Agent HQ (проприетарный, cloud)
-- [ ] [TASK-research-docker-agent-codex](backlog/TASK-research-docker-agent-codex.todo.md) — Docker Agent, OpenAI Codex (проприетарный, sandboxing)
+- [x] [TASK-research-charmbracelet-crush](done/TASK-research-charmbracelet-crush.todo.md) — Charmbracelet Crush (Go, CLI-agent)
+- [x] [TASK-research-pi-agent-rust](done/TASK-research-pi-agent-rust.todo.md) — pi_agent_rust (Rust)
+- [x] [TASK-research-crewai-langgraph-autogen](done/TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
+- [x] [TASK-research-openhands-sdk](done/TASK-research-openhands-sdk.todo.md) — OpenHands SDK (Python, SDK-подход)
+- [x] [TASK-research-archon-ai-planner](done/TASK-research-archon-ai-planner.todo.md) — Archon (Python, мета-оркестрация)
+- [x] [TASK-research-metagpt-openclaw](done/TASK-research-metagpt-openclaw.todo.md) — MetaGPT, OpenClaw (Python, SOP/роли)
+- [x] [TASK-research-mastra-ai](done/TASK-research-mastra-ai.todo.md) — Mastra AI (TypeScript, workflows)
+- [x] [TASK-research-claude-code](done/TASK-research-claude-code.todo.md) — Claude Code (проприетарный, agent loop)
+- [x] [TASK-research-copilot-agent-hq](done/TASK-research-copilot-agent-hq.todo.md) — GitHub Copilot Agent HQ (проприетарный, cloud)
+- [x] [TASK-research-docker-agent-codex](done/TASK-research-docker-agent-codex.todo.md) — Docker Agent, OpenAI Codex (проприетарный, sandboxing)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
-- [ ] [TASK-research-agent-frameworks-summary](backlog/TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
+- [x] [TASK-research-agent-frameworks-summary](done/TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [ ] Все индивидуальные research-задачи выполнены
-- [ ] Каждый comparison-документ создан в `docs/research/`
-- [ ] Сводная таблица в `docs/research/agent-frameworks-summary.md` создана
-- [ ] По каждому фреймворку есть вердикт: заимствовать / dependency / не подходит
-- [ ] Выделены конкретные паттерны для заимствования с приоритетами
+- [x] Все индивидуальные research-задачи выполнены
+- [x] Каждый comparison-документ создан в `docs/research/`
+- [x] Сводная таблица в `docs/research/agent-frameworks-summary.md` создана
+- [x] По каждому фреймворку есть вердикт: заимствовать / dependency / не подходит
+- [x] Выделены конкретные паттерны для заимствования с приоритетами
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
 Не требуется — эпик содержит только исследовательские задачи (docs).
@@ -109,3 +110,4 @@ pr:
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-21 | Тимлид (Алекс) | Создание эпика |
+| 2026-04-22 | Технический писатель (Гермиона) | Все 11 задач выполнены. Эпик завершён. |

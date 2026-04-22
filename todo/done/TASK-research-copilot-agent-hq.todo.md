@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Технический писатель (Гермиона)
+branch: task/research-copilot-agent-hq
+pr: https://github.com/prikotov/task-orchestrator/pull/48
+status: done
 ---
 
 # TASK-research-copilot-agent-hq: Исследовать GitHub Copilot cloud agent / Agent HQ для сравнения с task-orchestrator
@@ -29,28 +29,28 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Изучить GitHub Copilot cloud agent: архитектуру, модель выполнения задач, интеграцию с GitHub Issues/PR/Actions
-- [ ] Изучить Agent HQ: подход к оркестрации нескольких агентов, распределение задач
-- [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [ ] Оформить отчёт в docs/research/copilot-agent-hq-comparison.md по формату существующих comparison-документов
-- [ ] Заполнить строку для GitHub Copilot Agent HQ в сводной таблице docs/research/agent-frameworks-summary.md
+- [x] Изучить GitHub Copilot cloud agent: архитектуру, модель выполнения задач, интеграцию с GitHub Issues/PR/Actions
+- [x] Изучить Agent HQ: подход к оркестрации нескольких агентов, распределение задач
+- [x] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
+- [x] Оформить отчёт в docs/research/copilot-agent-hq-comparison.md по формату существующих comparison-документов
+- [x] Заполнить строку для GitHub Copilot Agent HQ в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
-- [ ] Определить конкретные паттерны, которые стоит заимствовать
-- [ ] Оценить подход к интеграции с development workflow (Issues → PR → Review → Merge)
+- [x] Определить конкретные паттерны, которые стоит заимствовать
+- [x] Оценить подход к интеграции с development workflow (Issues → PR → Review → Merge)
 ### 🟢 Could Have (Опционально)
 ### ⚫ Won't Have (Не будем делать)
 - [ ] Написание кода интеграции
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Изучить документацию GitHub: Copilot agent mode, Agent HQ
-2. [ ] Изучить открытые материалы: GitHub Blog, changelog, talks
-3. [ ] Сравнить с нашей моделью оркестрации
-4. [ ] Написать docs/research/copilot-agent-hq-comparison.md
+1. [x] Изучить документацию GitHub: Copilot agent mode, Agent HQ
+2. [x] Изучить открытые материалы: GitHub Blog, changelog, talks
+3. [x] Сравнить с нашей моделью оркестрации
+4. [x] Написать docs/research/copilot-agent-hq-comparison.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт docs/research/copilot-agent-hq-comparison.md создан по формату существующих comparison-документов
-- [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
-- [ ] Строка GitHub Copilot Agent HQ в сводной таблице docs/research/agent-frameworks-summary.md заполнена
+- [x] Отчёт docs/research/copilot-agent-hq-comparison.md создан по формату существующих comparison-документов
+- [x] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [x] Строка GitHub Copilot Agent HQ в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -68,7 +68,18 @@ ls docs/research/copilot-agent-hq-comparison.md
 ## 9. Comments (Комментарии)
 GitHub — крупнейшая платформа разработки. Их подход к интеграции AI-агентов в development workflow (Issue → Workspace → PR) может дать паттерны для chain-оркестрации с человеко-машинным взаимодействием.
 
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer_hermione.ru.md
+**Ветка:** task/research-copilot-agent-hq (уже создана и активна)
+
+### Порядок действий
+1. Реализуй задачу согласно описанию.
+2. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+3. Сделай git commit и git push после завершения.
+
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-20 | Тимлид (Алекс) | Создание задачи |
+| 2026-04-22 | Технический писатель (Гермиона) | Задача выполнена: создан copilot-agent-hq-comparison.md, заполнена строка #12 в summary |

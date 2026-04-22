@@ -82,7 +82,7 @@ vendor/bin/psalm --no-cache
 
 ## Инструкции для сабагента
 
-**Твоя роль:** docs/agents/roles/team/backend_developer.ru.md
+**Твоя роль:** docs/agents/roles/team/backend_developer_levsha.ru.md
 **Ветка:** task/feat-chain-step-timeout-yaml (уже создана и активна)
 **PR:** уже создан (draft) из task/feat-chain-step-timeout-yaml в main — [PR #31](https://github.com/prikotov/task-orchestrator/pull/31)
 

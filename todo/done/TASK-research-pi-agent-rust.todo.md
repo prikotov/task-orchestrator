@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic: EPIC-research-agent-frameworks-comparison
 author: Технический писатель (Гермиона)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Технический писатель (Гермиона)
+branch: task/research-pi-agent-rust
+pr: https://github.com/prikotov/task-orchestrator/pull/41
+status: done
 ---
 
 # TASK-research-pi-agent-rust: Исследовать и оценить Dicklesworthstone/pi_agent_rust для интеграции
@@ -63,6 +63,20 @@ ls docs/research/pi-agent-rust-comparison.md
 
 ## 9. Comments (Комментарии)
 pi_agent_rust — реализация AI-agent orchestration на Rust. Может предложить интересные архитектурные паттерны, особенно в обработке параллелизма и ошибок.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer_hermione.ru.md
+**Ветка:** task/research-pi-agent-rust (уже создана и активна)
+**PR:** будет создан после коммита
+
+### Порядок действий
+1. Переключись в ветку `task/research-pi-agent-rust`: `git checkout task/research-pi-agent-rust`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

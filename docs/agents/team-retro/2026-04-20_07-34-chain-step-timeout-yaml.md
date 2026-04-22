@@ -6,7 +6,7 @@
 
 ## Оценка ролей
 
-- **Бэкендер (Левша)** (`docs/agents/roles/team/backend_developer.ru.md`)
+- **Бэкендер (Левша)** (`docs/agents/roles/team/backend_developer_levsha.ru.md`)
   - **Плюсы:**
     - Реализация выполнена за 1 проход — 5 файлов, чистая слоистая структура (Domain → Infrastructure → Application)
     - 11 тестов написаны сразу (ChainDefinitionVo, YamlChainLoader, Handler)
@@ -16,7 +16,7 @@
     - Пункт 4 плана задачи («убрать hardcoded 300 в DynamicChainContextVo») формально пропущен — дефолт оставлен, хотя и переопределяется
   - **Предложения по улучшению:** При реализации задачи с несколькими ветками (initial + resume) — сразу писать тесты на обе ветки, а не ждать self-review
 
-- **Ревьювер Бэка (Пуаро)** (`docs/agents/roles/team/code_reviewer_backend.ru.md`)
+- **Ревьювер Бэка (Пуаро)** (`docs/agents/roles/team/code_reviewer_backend_puaro.ru.md`)
   - **Плюсы:**
     - Точное попадание: 4 конкретных замечания (CR-1..CR-4), каждое с код-примером и рекомендацией
     - Проверил соответствие задаче по чеклисту Must Have / Should Have — обнаружил, что `role.timeout` не участвует в fallback handler'а
@@ -24,7 +24,7 @@
   - **Минусы:** Без замечаний
   - **Предложения по улучшению:** Без предложений
 
-- **Тимлид (Алекс)** (`docs/agents/roles/team/team_lead.ru.md`)
+- **Тимлид (Алекс)** (`docs/agents/roles/team/team_lead_alex.ru.md`)
   - **Плюсы:**
     - Правило делегирования соблюдено: задача делегирована Бэкендеру через сабагент, сам код не писал
     - Full cycle: подготовка (ветка, PR, инструкция) → реализация → self-review → доработка → внешнее ревью → доработка → merge → закрытие задачи
