@@ -52,7 +52,7 @@ packages/
       observability/                 OpenTelemetry tracing + spans
       rag/                           RAG pipeline (в packages/rag)
       llm/                           Model routing: 40+ провайдеров
-  memory/                            Пакет @mastra/memory (deprecated, merged into core)
+  memory/                            Пакет @mastra/memory (расширяет MastraMemory из core, v1.16.0)
   rag/                               Пакет @mastra/rag
   evals/                             Пакет @mastra/evals
   server/                            HTTP server + API endpoints
@@ -68,7 +68,7 @@ packages/
 | **Тип** | SDK-фреймворк (TypeScript), работает на уровне LLM API |
 | **Модель выполнения (Agents)** | Agent loop (LLM → tool call → observation → LLM → ...) |
 | **Модель выполнения (Workflows)** | Step-based: `.then()`, `.branch()`, `.parallel()`, `.dowhile()`, `.dountil()`, `.foreach()` |
-| **State management** | Pluggable storage (LibSQL/SQLite, PostgreSQL, Cloudflare D1, Upstash) |
+| **State management** | Pluggable storage (22+ адаптеров: LibSQL, PostgreSQL, MongoDB, Redis, ClickHouse, Cloudflare D1, Upstash, Pinecone, Qdrant и др.) |
 | **Провайдеры** | 40+ LLM-провайдеров через model router |
 | **Расширяемость** | Processors (input/output), MCP-серверы, Tools, custom storage |
 | **Memory** | Conversation history + Semantic recall (RAG) + Working memory + Observational memory |
@@ -80,12 +80,13 @@ packages/
 
 | Компонент | Назначение |
 |---|---|
-| [`packages/core/src/agent/agent.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/agent/agent.ts) | Agent: generate/stream, tools, memory, processors, network (multi-agent delegation) |
+| [`packages/core/src/agent/agent.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/agent/agent.ts) | Agent: generate/stream, tools, memory, processors, network() для multi-agent delegation |
+| [`packages/core/src/loop/network/index.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/loop/network/index.ts) | Network loop: multi-agent collaboration, routing, delegation hooks |
 | [`packages/core/src/workflows/workflow.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/workflows/workflow.ts) | Workflow: step-based execution engine с chaining API (.then/.branch/.parallel) |
 | [`packages/core/src/workflows/step.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/workflows/step.ts) | Step: единица выполнения в workflow, Zod-схемы для I/O |
 | [`packages/core/src/memory/memory.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/memory/memory.ts) | MastraMemory: 4 типа памяти (conversation, semantic, working, observational) |
 | [`packages/core/src/evals/base.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/evals/base.ts) | Evaluation: judge-based scoring, trajectory analysis |
-| [`packages/core/src/processors/index.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/processors/index.ts) | Processors: pipeline для обработки input/output на уровне agent и workflow |
+| [`packages/core/src/processors/index.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/processors/index.ts) | Processors: 6-фазная обработка input/output (processInput, processInputStep, processOutputStream, processOutputResult, processOutputStep, processAPIError) |
 | [`packages/core/src/tools/tool.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/tools/tool.ts) | Tool: типизированные инструменты с Zod-схемами, suspend/resume |
 | [`packages/core/src/storage/base.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/storage/base.ts) | MastraCompositeStore: 15+ доменов хранения (workflows, memory, agents, etc.) |
 | [`packages/core/src/workflows/execution-engine.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/workflows/execution-engine.ts) | ExecutionEngine: абстракция для pluggable execution backends |
@@ -118,8 +119,8 @@ packages/
 | **RAG** | ❌ Нет | ✅ Встроенный RAG pipeline (document processing, vector store) | 🟢 Не берём |
 | **Evaluation framework** | ❌ Нет | ✅ Judge-based + trajectory scorers с LLM-as-judge | 🟡 Позже |
 | **MCP-протокол** | ❌ Нет | ✅ MCP servers (author + consume) | 🟡 Позже |
-| **Processor pipeline** | ❌ Нет | ✅ Input/Output processors с 6 фазами (input, inputStep, outputStream, outputResult, outputStep) | 🟡 Интересно |
-| **Agent delegation (network)** | ❌ Нет | ✅ Agent network: delegation с message filtering, hooks | 🟡 Позже |
+| **Processor pipeline** | ❌ Нет | ✅ Input/Output processors с 6 фазами (input, inputStep, outputStream, outputResult, outputStep, apiError) | 🟡 Интересно |
+| **Agent delegation (network)** | ❌ Нет | ✅ Agent network loop: routing agent + sub-agents, delegation hooks (onDelegationStart/Complete), messageFilter | 🟡 Позже |
 | **Observability** | ❌ Нет (только JSONL audit) | ✅ OpenTelemetry tracing, spans, custom exporters | 🟡 Позже |
 | **TripWire** | ❌ Нет | ✅ Досрочная остановка workflow/agent с retry hint | 🟡 Интересно |
 | **Sleep/SleepUntil** | ❌ Нет | ✅ `.sleep(duration)`, `.sleepUntil(date)` — durable timers | 🟢 Не берём |
@@ -160,6 +161,7 @@ workflow.run({ prompt: "Implement feature X" });
 - `.branch([[cond, step], ...])` — условное ветвление
 - `.dowhile(step, condition)` / `.dountil(step, condition)` — циклы
 - `.foreach(step, { concurrency })` — map/reduce
+- `.sleep(duration)` / `.sleepUntil(date)` — durable timers
 
 **Почему нам интересно:** Наша YAML-based chain модель ограничена линейными цепочками + fix_iterations. Mastra показывает, как можно добавить conditional branching и parallel execution без полной миграции на DAG. Однако перенос chaining API в PHP требует значительных усилий — TypeScript fluent API активно использует generics и type inference.
 
@@ -169,9 +171,9 @@ workflow.run({ prompt: "Implement feature X" });
 
 ---
 
-### 3.2 🟡 Observational Memory — трёхуровневая система памяти (`packages/core/src/memory/`)
+### 3.2 🟡 Observational Memory — четырёхуровневая система памяти (`packages/core/src/memory/`)
 
-**Что у них:** Три уровня памяти для агентов:
+**Что у них:** Четыре типа памяти для агентов:
 
 1. **Conversation history** (`lastMessages: N`) — последние N сообщений из текущего треда
 2. **Semantic recall** (RAG) — векторный поиск релевантных сообщений из прошлых диалогов через embeddings
@@ -234,6 +236,7 @@ interface Processor {
   processOutputStream(ctx): Promise<...>; // Потоковая обработка output chunks
   processOutputResult(ctx): Promise<...>; // После LLM: модификация результата
   processOutputStep(ctx): Promise<...>;   // После каждого LLM-вызова
+  processAPIError(ctx): Promise<...>;     // При ошибке LLM API: retry/reject
 }
 ```
 
@@ -241,6 +244,7 @@ interface Processor {
 - `SkillsProcessor` — инжекция навыков из workspace
 - `WorkspaceInstructionsProcessor` — инструкции из workspace
 - `TokenLimiterProcessor` — лимит токенов
+- `ObservationalMemoryProcessor` — observational memory (Observer + Reflector)
 - Memory-процессоры (conversation history, semantic recall, working memory)
 
 **Почему нам интересно:** Мы используем decorator pattern для runner'ов (retry, circuit breaker, budget). Processor pipeline — это альтернативный паттерн с более granular контролем (6 фаз вместо одного intercept). Для будущих dynamic chains processor pipeline может заменить декораторы.
@@ -321,32 +325,48 @@ createStep({
 
 ---
 
-### 3.8 🟡 Agent Network — Delegation с hooks (`packages/core/src/agent/`)
+### 3.8 🟡 Agent Network — Multi-agent collaboration (`packages/core/src/agent/`, `packages/core/src/loop/network/`)
 
-**Что у них:** Агент может делегировать задачи другим агентам через tools:
+**Что у них:** Агент может выполнять сетевой цикл (network loop), в котором routing-агент делегирует задачи sub-агентам:
 
 ```typescript
+// Определение координатора с sub-агентами
 const coordinator = new Agent({
   name: 'coordinator',
-  tools: { specialist: specialistAgent.asTool() },
-  // или через network:
   model: 'openai/gpt-4o',
+  instructions: 'Coordinate between specialist agents...',
 });
 
-// Delegation hooks:
-coordinator.onDelegationStart((ctx) => {
-  // Фильтрация сообщений, модификация промпта
-  return { proceed: true, modifiedPrompt: "..." };
+// Запуск network loop — routing-агент автоматически делегирует sub-агентам
+const result = await coordinator.network('Analyze and fix this code', {
+  maxSteps: 10,
+  teams: { coder: coderAgent, reviewer: reviewerAgent },
+  delegation: {
+    onDelegationStart: async (ctx) => {
+      // Фильтрация, модификация промпта, rejection
+      return { proceed: true };
+    },
+    onDelegationComplete: async (ctx) => {
+      // Feedback, остановка обработки
+      return { stop: false };
+    },
+    messageFilter: ({ messages }) => {
+      // Какие сообщения parent передаёт sub-agent
+      return messages.slice(-5);
+    },
+  },
 });
 ```
 
 **Механика:**
-- Агент может быть обёрнут как tool (`agent.asTool()`)
-- Delegation hooks: `onDelegationStart`, `onDelegationComplete`
-- Message filter: какие сообщения parent agent передаёт sub-agent
-- Max iterations для предотвращения бесконечной делегации
+- `agent.network(messages, options)` — запуск multi-agent collaboration loop
+- Routing-агент автоматически выбирает sub-агентов из `teams`
+- Delegation hooks: `onDelegationStart` (reject/modify), `onDelegationComplete` (feedback/stop)
+- `messageFilter`: контроль какие сообщения parent agent передаёт sub-agent
+- Max steps для предотвращения бесконечной делегации
+- Suspend/resume поддерживается и в network loop
 
-**Почему нам интересно:** Это паттерн multi-agent orchestration, которого у нас нет. Для будущих dynamic chains концепция delegation + hooks может стать основой.
+**Почему нам интересно:** Это паттерн multi-agent orchestration, которого у нас нет. Для будущих dynamic chains концепция network loop + delegation hooks может стать основой.
 
 ---
 
@@ -422,7 +442,8 @@ Mastra имеет browser automation для агентов (web browsing, scrapi
 - [`packages/core/src/workflows/step.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/workflows/step.ts) — Step interface, createStep() factory, ExecuteFunction
 - [`packages/core/src/workflows/execution-engine.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/workflows/execution-engine.ts) — ExecutionEngine: абстрактный класс для pluggable backends
 - [`packages/core/src/workflows/default.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/workflows/default.ts) — DefaultExecutionEngine: in-process выполнение, retry logic
-- [`packages/core/src/agent/agent.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/agent/agent.ts) — Agent: generate/stream, tools, memory, processors, network delegation
+- [`packages/core/src/agent/agent.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/agent/agent.ts) — Agent: generate/stream, tools, memory, processors, network() для multi-agent delegation
+- [`packages/core/src/loop/network/index.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/loop/network/index.ts) — Network loop: routing, delegation, suspend/resume
 - [`packages/core/src/memory/memory.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/memory/memory.ts) — MastraMemory: 4 типа памяти, conversation history, semantic recall, working memory
 - [`packages/core/src/memory/types.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/memory/types.ts) — MemoryConfig, SemanticRecall, WorkingMemory, ObservationalMemory, VectorIndexConfig
 - [`packages/core/src/evals/base.ts`](https://github.com/mastra-ai/mastra/blob/main/packages/core/src/evals/base.ts) — Scorer: judge-based, trajectory-based evaluation
