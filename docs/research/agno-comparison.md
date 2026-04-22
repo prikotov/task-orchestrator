@@ -107,7 +107,7 @@ libs/agno/agno/
 | **Conditional branching** | ❌ Нет | ✅ Condition (if/else) + Router (selector/CEL) | 🟡 Позже |
 | **Parallel execution** | ❌ Нет | ✅ Parallel — параллельное выполнение | 🟡 Позже |
 | **Циклы (loops)** | ✅ fix_iterations с max_iterations | ✅ Loop с max_iterations + end_condition (callable/CEL) | ✅ Паритет, у них богаче |
-| **Retry с backoff** | ✅ RetryingAgentRunner (exponential backoff) | ⚠️ `max_retries` на Step (без exponential backoff) | ✅ У нас лучше |
+| **Retry с backoff** | ✅ RetryingAgentRunner (exponential backoff) | ⚠️ `max_retries` на Step (без backoff, но есть FallbackConfig) | ⚠️ Разные стратегии (retry-same vs fallback-to-alternative) |
 | **Circuit Breaker** | ✅ CircuitBreakerAgentRunner | ❌ Нет | ✅ У нас есть |
 | **Quality Gates** | ✅ Shell-команды как проверки | ⚠️ Guardrails (PII, prompt injection, moderation) + Evals (pre/post checks) | ✅ Разный фокус |
 | **Бюджетный контроль** | ✅ BudgetVo (cost-based) | ❌ Нет встроенного budget control | ✅ У нас есть |
@@ -115,16 +115,16 @@ libs/agno/agno/
 | **Audit Trail (JSONL)** | ✅ JsonlAuditLogger | ✅ Tracing (spans, traces) + session persistence | ✅ Паритет (разный подход) |
 | **Ролевые промпты** | ✅ .md файлы (18+ ролей) | ⚠️ `instructions` в Agent constructor (строка) + Skills | ✅ У нас лучше |
 | **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ 40+ провайдеров через model integration | ✅ Паритет (разный уровень) |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Монорепозиторий, пакетная структура | ✅ У нас лучше |
+| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Монорепозиторий, пакетная структура | ⚠️ Разные типы проектов (приложение vs SDK) |
 | **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов + hooks | ✅ У нас лучше |
 | **YAML-конфигурация** | ✅ Chains + roles в YAML | ⚠️ AgentOS поддерживает YAML config для runtime | ✅ Разный подход |
 | **Human-in-the-loop** | ❌ Нет | ✅ 3 режима: confirmation, user_input, output_review + CEL + HITL retry + timeout | 🟡 Позже |
-| **Session persistence** | ❌ Нет (in-memory) | ✅ Pluggable storage (12+ адаптеров) | 🟡 Позже |
+| **Session persistence** | ❌ Нет (in-memory) | ✅ Pluggable storage (12+ адаптеров) | 🟡 Предусловие для Loop/Parallel (см. §7) |
 | **Memory system** | ❌ Нет | ✅ MemoryManager: user memories, CRUD, semantic search, agentic memory | 🟡 Интересно |
 | **RAG / Knowledge** | ❌ Нет | ✅ Knowledge + VectorDB + agentic knowledge filters | 🟢 Не берём |
 | **Evaluation framework** | ❌ Нет | ✅ BaseEval: abstract pre/post checks (sync + async) | 🟡 Позже |
 | **Compression** | ❌ Нет | ✅ CompressionManager: LLM-based сжатие tool call results при overflow | 🟡 Интересно |
-| **CEL expressions** | ❌ Нет | ✅ Common Expression Language для conditions/routers/loops | 🟡 Интересно |
+| **CEL expressions** | ❌ Нет | ✅ Common Expression Language для conditions/routers/loops | 🟡 Интересно, но нельзя выразить в YAML |
 | **Approval system** | ❌ Нет | ✅ Runtime approval enforcement | 🟡 Позже |
 | **Guardrails** | ❌ Нет | ✅ PII detection, prompt injection, OpenAI moderation | 🟡 Позже |
 | **Multi-agent Teams** | ❌ Нет | ✅ 4 режима: coordinate, route, broadcast, tasks | 🟡 Позже |
@@ -172,7 +172,11 @@ workflow = Workflow(
 )
 ```
 
-**Почему нам интересно:** Наш YAML chain = `Steps` (последовательная цепочка). Agno показывает, как расширить до полноценного workflow engine без DAG. `Loop` с `end_condition` — прямое усиление нашего `fix_iterations`. `Parallel` и `Router` — востребованные расширения.
+**Вложенные workflows:** Step может ссылаться на другой Workflow (до 10 уровней вложенности, ограничение `_MAX_NESTED_WORKFLOW_DEPTH`). Контекст передаётся через `StepInput/StepOutput`, изоляция через отдельный `WorkflowSession`.
+
+> ⚠️ **Риск overengineering:** Сейчас у нас 1 тип цепочки (static + dynamic brainstorm). Внедрение 6 блоков workflow — минимум 3× рост кодовой базы. Без реальной user story на Parallel/Router это premature abstraction. Рекомендация: внедрять по одному блоку по мере появления задач.
+
+
 
 ---
 
@@ -196,6 +200,8 @@ workflow = Workflow(
 
 **Почему нам интересно:** `route` mode — это routing к конкретному runner (аналог нашего `resolve_runner`). `coordinate` — наш dynamic loop с facilitator. `tasks` mode с autonomous decomposition — следующий шаг для dynamic chains.
 
+> ⚠️ **Риск premature abstraction:** Сейчас у нас ровно 2 runner'а (Pi + Codex). Broadcast (все runners одновременно) при 2 runners — бессмысленно. Route — тривиально. Tasks mode не реализуем без LLM-in-the-loop для декомпозиции, а LLM-вызовы делает runner, не оркестратор. Рекомендация: возвращаться к TeamMode когда появится 4+ runners.
+
 ---
 
 ### 3.3 🟡 FallbackConfig — error-specific model routing (`models/fallback.py`)
@@ -218,6 +224,8 @@ FallbackConfig(
 - Приоритет: error-specific → general (только для retryable ошибок)
 
 **Почему нам интересно:** Наш `CircuitBreakerAgentRunner` защищает от cascade failures, но не переключает на альтернативный runner. Agno показывает, как добавить **error-specific fallback**: при rate limit → дешёвый runner, при timeout → быстрый runner, при context overflow → runner с другим model. Это дополнение к нашему circuit breaker.
+
+> ⚠️ **Требуется domain model:** Наш `FallbackConfigVo` — массив CLI-аргументов без типа ошибки. Для error-specific fallback нужна классификация: rate limit ≠ timeout ≠ malformed output ≠ context overflow. Без модели ошибок реализация начнётся с неправильной абстракции.
 
 ---
 
@@ -249,6 +257,8 @@ Router(
 ```
 
 **Почему нам интересно:** Production-ready HITL — востребованная функция для автономных цепочек. Три режима покрывают основные сценарии: confirm → input → review. Callable в `requires_output_review` позволяет условный review (только если результат не устраивает).
+
+> ⚠️ **Архитектурное ограничение:** task-orchestrator — CLI-утилита. HITL в CLI означает блокировку терминала и невозможность запуска в CI/CD. Agno решает это через FastAPI runtime (WebSocket, REST API), который мы не берём. HITL без runtime — ограниченная фича. Реалистичный сценарий: интерактивный режим при ручном запуске, skip при CI/CD.
 
 ---
 
@@ -282,6 +292,8 @@ Loop(
 
 **Почему нам интересно:** Прямое усиление нашего `fix_iterations`: сейчас только `max_iterations`, а с `end_condition` — детерминированная проверка завершения. CEL-выражения позволяют декларативно описать условие без кода. Аналог Archon `until_bash`, но более общий (не только shell).
 
+> ⚠️ **CEL vs YAML:** CEL отброшен как зависимость (§4.6), но callable нельзя положить в YAML — наш core формат конфигурации. Нужно решить: либо DSL для условий в YAML (свой мини-CEL), либо callable регистрируется через service container, либо `end_condition` выражается как shell-команда (как `until_bash` у Archon). Третий вариант — самый совместимый с текущей архитектурой.
+
 ---
 
 ### 3.6 🟡 CompressionManager — LLM-based сжатие (`compression/manager.py`)
@@ -302,7 +314,7 @@ CompressionManager(
 - Сжимать: описания, пояснения, списки
 - Удалять: вступления, filler, форматирование, redundancy
 
-**Почему нам интересно:** Для длинных dynamic loops контекст растёт. Сжатие tool results — самый простой第一步 (первый шаг): не сжимать весь контекст, а только output tool calls. Менее радикально, чем auto-summarization всего диалога.
+**Почему нам интересно:** Для длинных dynamic loops контекст растёт. Сжатие tool results — самый простой первый шаг: не сжимать весь контекст, а только output tool calls. Менее радикально, чем auto-summarization всего диалога.
 
 ---
 
@@ -390,7 +402,6 @@ CEL — мощный, но добавляет зависимость на Google
 | Compression (tool results) | 🟡 P3 | LLM-based сжатие tool results при context overflow |
 | Guardrails (pre-flight checks) | 🟡 P3 | Проверка входных данных перед отправкой в runner |
 | Evaluation (pre/post checks) | 🟡 P3 | LLM-based оценка качества, дополнение к shell-based quality gates |
-| Typed I/O per step | 🟡 P3 | Валидация входных/выходных данных каждого шага |
 | Nested workflows | 🟡 P3 | Вложенные цепочки (chain как шаг другой chain) |
 | AgentOS Runtime | 🟢 — | CLI-утилита, не нужен |
 | Knowledge / RAG | 🟢 — | Out of scope |

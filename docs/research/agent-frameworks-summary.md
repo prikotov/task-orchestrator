@@ -41,7 +41,7 @@
 
 ## Резюме для принятия решений (Executive Summary)
 
-По результатам исследования 13 AI-agent фреймворков и инструментов можно сделать **три главных вывода**:
+По результатам исследования 14 AI-agent фреймворков и инструментов можно сделать **три главных вывода**:
 
 1. **task-orchestrator обладает уникальной комбинацией возможностей**, которой нет ни у одного из исследованных проектов: YAML-цепочки + retry с backoff + circuit breaker + quality gates (shell) + бюджетный контроль + fix_iterations + fallback routing + JSONL audit trail. Ни один фреймворк — ни open-source, ни проприетарный — не предлагает все эти механизмы вместе.
 
@@ -63,7 +63,8 @@
 
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
-| **Error classification** | Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (6 категорий), Codex (Guardian) | Классификация ошибок перед retry: FATAL → не retry, TRANSIENT → retry с backoff, UNKNOWN →保守ный подход | Не тратить попытки retry на заведомо неисправимые ошибки (401, 403). Подтверждён 3+ проектами |
+| **Error classification** | Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (6 категорий), Codex (Guardian) | Классификация ошибок перед retry: FATAL → не retry, TRANSIENT → retry с backoff, UNKNOWN → консервативный подход | Не тратить попытки retry на заведомо неисправимые ошибки (401, 403). Подтверждён 3+ проектами |
+| **Error-specific fallback routing** | Agno (FallbackConfig: on_error/on_rate_limit/on_context_overflow) | При ошибке конкретного типа → переключение на альтернативный runner, а не retry того же | Дополнение к circuit breaker: CB защищает от cascade, error-specific routing переключает на альтернативу по типу ошибки |
 | **Stuck / Loop detection** | Crush (window-based), OpenHands SDK (4+1: 4 активных + 1 TODO) | Обнаружение зацикливания: повторяющиеся действия, повторяющиеся ошибки, чередование (context overflow — TODO) | Актуально для fix_iterations — если агент повторяет одни и те же действия, лучше остановить раньше. Подтверждено 2+ проектами |
 | **Model failover с cooldown** | OpenClaw (per-profile), Archon (fallbackModel), OpenHands SDK (FallbackStrategy) | При недоступности модели → переключение на fallback с cooldown, чтобы не «долбить» упавший endpoint | Дополнение к нашему circuit breaker: CB защищает от cascade failures, failover — переключает на альтернативу |
 
@@ -104,8 +105,9 @@
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
 | **Loop с `until_bash`** | Archon | Detector завершения цикла через shell-команду (тесты прошли → стоп) | Усиление fix_iterations: сейчас только max_iterations, а с until_bash — детерминированная проверка |
+| **Loop с `end_condition` (callable)** | Agno (Loop: callable/CEL end_condition + forward_iteration_output) | Detector завершения цикла через произвольное условие или CEL-выражение | Обобщение until_bash: произвольная проверка вместо только shell. Для YAML нужен DSL или shell-команда |
 | **Loop с `fresh_context`** | Archon | Каждый iteration с чистым контекстом (agent читает state с диска) | Альтернатива накоплению контекста: agent не «перегружается» историей предыдущих итераций |
-| **Conditional branching** | Mastra AI (.branch()), LangGraph (conditional edges), Archon (when: expressions) | Условное ветвление внутри цепочки | Подтверждено 3+ проектами. Реализуемо без полной DAG-миграции через расширение YAML-chain DSL |
+| **Conditional branching** | Mastra AI (.branch()), LangGraph (conditional edges), Archon (when: expressions), Agno (Condition + Router) | Условное ветвление внутри цепочки | Подтверждено 4+ проектами. Реализуемо без полной DAG-миграции через расширение YAML-chain DSL |
 
 #### 🟡 Среднесрочные (P3)
 
@@ -148,8 +150,8 @@
 | **Graph/DAG orchestration** | LangGraph (StateGraph), Archon (DAG + topological layers) | Произвольный направленный граф вместо линейной цепочки | Самый гибкий подход, но высокий порог входа. Подтверждён 2 проектами. Отдельный PR с обоснованием |
 | **Checkpoint / Durable execution** | LangGraph (checkpoint + replay) | Сохранение состояния после каждого шага, resume после сбоя | LangGraph — единственный с полноценным durable execution |
 | **SOP / Message-passing** | MetaGPT (watch/cause_by routing), CrewAI (event-driven Flows) | Event-driven активация шагов по типу результата, а не по позиции | Для dynamic chains: шаг активируется когда готов его input, а не по порядку |
-| **Human-in-the-loop** | Archon (approval nodes), Mastra AI (suspend/resume), Copilot Workspace (plan review) | Пауза для подтверждения человеком в критических точках | Для production: LLM генерирует chain → человек подтверждает → оркестратор выполняет |
-| **Workflow nesting** | Mastra AI (chain как шаг другой chain) | Вложенные цепочки: реализация → (review + fix) → deploy | Композиция chain из переиспользуемых подцепочек |
+| **Human-in-the-loop** | Archon (approval nodes), Mastra AI (suspend/resume), Copilot Workspace (plan review), Agno (3 режима: confirmation/user_input/output_review) | Пауза для подтверждения человеком в критических точках | Для production: LLM генерирует chain → человек подтверждает → оркестратор выполняет. ⚠️ В CLI ограниченно: только интерактивный режим |
+| **Workflow nesting** | Mastra AI (chain как шаг другой chain), Agno (Workflow как Step, до 10 уровней) | Вложенные цепочки: реализация → (review + fix) → deploy | Композиция chain из переиспользуемых подцепочек |
 | **Git worktree isolation** | Archon (IIsolationProvider) | Каждый run в своём git worktree — параллельные runs не конфликтуют | Для параллельного выполнения цепочек в одном репозитории |
 
 ### Полный перечень индивидуальных рекомендаций
@@ -191,6 +193,9 @@
 * Docker Agent + Codex: exec policy (rules-based command filtering — banned prefixes, safe command detection) — 🟡 P2
 * Docker Agent + Codex: split filesystem permissions (per-path read/write/none) — 🟡 P2
 * Docker Agent + Codex: hierarchical multi-agent (spawn/send_message/wait/close_agent + depth limit + mailbox) — 🟡 P2
+* Agno: error-specific fallback routing (FallbackConfig: on_error/on_rate_limit/on_context_overflow) — 🟡 P2
+* Agno: Loop с end_condition (callable/CEL) — усиление fix_iterations — 🟡 P2
+* Agno: conditional branching (Condition + Router) — 🟡 P2
 
 #### Долгосрочные / R&D (P3)
 
@@ -240,6 +245,13 @@
 * Docker Agent + Codex: auto-compaction (LLM summarization при context overflow, inline + remote) — 🟡 P3
 * Docker Agent + Codex: plan mode (read-only exploration перед execution) — 🟡 P3
 * Docker Agent + Codex: session persistence (SQLite + rollout JSONL — resumable sessions) — 🟡 P3
+* Agno: HITL — 3 режима (confirmation/user_input/output_review) — ⚠️ только интерактивный CLI — 🟡 P3
+* Agno: compression (LLM-based сжатие tool results при overflow) — 🟡 P3
+* Agno: guardrails (PII detection, prompt injection, moderation) — 🟡 P3
+* Agno: evaluation (pre/post checks) — 🟡 P3
+* Agno: multi-agent Teams (4 режима) — 🟡 P3
+* Agno: parallel execution (Parallel) — 🟡 P3
+* Agno: nested workflows (Workflow как Step, до 10 уровней) — 🟡 P3
 
 </details>
 
@@ -251,33 +263,35 @@
 
 ### 1. Уникальная позиция task-orchestrator
 
-**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это нашственная (genuine) комбинация, отличающая task-orchestrator от всех 13 фреймворков.
+**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 14 фреймворков.
 
 **Ни один проприетарный продукт** (Claude Code, GitHub Copilot Cloud Agent, OpenAI Codex) не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны даже против крупнейших коммерческих AI-agent продуктов.
 
-**Ближайший аналог** по уровню абстракции — Archon (TypeScript/Bun), который тоже оркестирует внешние AI-ассистенты через subprocess SDK. Однако Archon не имеет circuit breaker, quality gates или бюджетного контроля.
+**Ближайший аналог** по уровню абстракции — Archon (TypeScript/Bun), который тоже оркестирует внешние AI-ассистенты через subprocess SDK. Однако Archon не имеет circuit breaker, quality gates или бюджетного контроля. Agno (Python SDK) предлагает наиболее развитый workflow engine из исследованных (6 строительных блоков + вложенные workflows), но работает на уровне прямых LLM API, а не оркестрации внешних runner'ов.
 
 ### 2. Agent Loop — доминирующая модель выполнения
 
-**11 из 13 фреймворков** используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, OpenHands SDK, MetaGPT, OpenClaw, Claude Code, Copilot Cloud Agent, Codex и др.). Только LangGraph (graph/DAG с superstep execution) и Archon (DAG + subprocess SDK) используют принципиально другие модели.
+**12 из 14 фреймворков** используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, OpenHands SDK, MetaGPT, OpenClaw, Claude Code, Copilot Cloud Agent, Codex, Agno и др.). Только LangGraph (graph/DAG с superstep execution) и Archon (DAG + subprocess SDK) используют принципиально другие модели.
+
+Agno также поддерживает **step-based workflow** (Step/Steps/Loop/Parallel/Router/Condition) и **4 team modes** (coordinate/route/broadcast/tasks) поверх agent loop — наиболее развитый workflow engine из исследованных.
 
 **Вывод для task-orchestrator:** Наша модель (YAML chain → runner call → payload) — это оркестрация поверх agent loop. Это правильный уровень: мы не дублируем LLM interaction, а управляем им.
 
 ### 3. Разделение на два уровня абстракции
 
-Все 13 проектов чётко делятся на два уровня:
+Все 14 проектов чётко делятся на два уровня:
 
 | Уровень | Проекты | Что делают | Аналог в task-orchestrator |
 |---|---|---|---|
-| **SDK / Agent runtime** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, OpenClaw | Работают на уровне прямых LLM API | Runner'ы (pi, codex) |
+| **SDK / Agent runtime** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, OpenClaw, Agno | Работают на уровне прямых LLM API | Runner'ы (pi, codex) |
 | **Оркестратор / Workflow engine** | CrewAI, LangGraph, AutoGen, Archon, MetaGPT, Copilot Workspace | Управляют потоком выполнения между агентами/шагами | Chain executor |
 
 **MetaGPT** подтверждает наш подход концептуально: `Team` (chain) + `investment` (budget) + `n_round` (max_iterations) + `idle detection` — практически идентично нашим YAML chains.
 
 ### 4. SKILL.md / AGENTS.md — де-факто стандарт
 
-**8 из 13 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
-- Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex
+**9 из 14 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
+- Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex, Agno
 - Формат: YAML frontmatter + markdown body, discovery из нескольких мест, валидация
 - Стандарт [agentskills.io](https://agentskills.io) получает широкое распространение
 
@@ -285,16 +299,16 @@
 
 ### 5. MCP (Model Context Protocol) — повсеместный протокол расширения
 
-**9 из 13 проектов** поддерживают MCP:
-- Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex
+**10 из 14 проектов** поддерживают MCP:
+- Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno
 - MCP — стандарт де-факто для расширения возможностей AI-агентов через внешние tool-серверы
 
 **Вывод:** MCP-поддержка в task-orchestrator — вопрос времени. Но реализовывать нужно на уровне runner'ов, не оркестратора.
 
 ### 6. Контекст-менеджмент — повсеместная проблема
 
-**6 из 13 проектов** реализуют auto-compaction / auto-summarization при context overflow:
-- Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex
+**7 из 14 проектов** реализуют auto-compaction / auto-summarization при context overflow:
+- Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, Agno
 - Все используют LLM-суммаризацию для сжатия истории
 - OpenClaw пошёл дальше: формализованный `ContextEngine` interface (ingest → assemble → compact → maintain) с tokenBudget
 - Mastra AI — самый продвинутый подход: Observer + Reflector agents с async buffering
@@ -318,16 +332,16 @@
 
 ### 8. Sub-agents / Multi-agent — тренд к иерархической декомпозиции
 
-**9 из 13 проектов** поддерживают sub-agents или multi-agent:
-- Crush (Coder → Task), Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat)
+**10 из 14 проектов** поддерживают sub-agents или multi-agent:
+- Crush (Coder → Task), Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat), Agno (Team с 4 режимами)
 - Codex — наиболее продвинутая sub-agent система: mailbox pattern, fork modes, role system
 
 **Вывод:** Sub-agent pattern — готовый механизм для dynamic chains. Рекомендуется как P2: «chain внутри chain» с изолированным контекстом.
 
 ### 9. Conditional branching — востребованная возможность
 
-**4 проекта** реализуют conditional branching:
-- LangGraph (conditional edges), Archon (`when:` expressions), Mastra AI (`.branch()`), Copilot Workspace (plan branching)
+**5 проектов** реализуют conditional branching:
+- LangGraph (conditional edges), Archon (`when:` expressions), Mastra AI (`.branch()`), Copilot Workspace (plan branching), Agno (Condition + Router)
 
 **Вывод:** Conditional branching — самый запрашиваемый паттерн для расширения YAML chains. Реализуемо без полной DAG-миграции.
 
@@ -343,6 +357,8 @@
 **3 проекта** классифицируют ошибки для умного retry:
 - Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (6 категорий по HTTP status), Codex (Guardian risk taxonomy)
 
+Agno предлагает **error-specific fallback routing** (on_error/on_rate_limit/on_context_overflow) — уникальная модель, не классификация для retry, а routing на другой провайдер по типу ошибки. Дополняет, а не заменяет error classification.
+
 **Вывод:** Классификация ошибок — актуальное улучшение для RetryingAgentRunner. Не тратить попытки retry на неисправимые ошибки (401, 403).
 
 ### 12. Архитектурная зрелость проекта
@@ -357,7 +373,7 @@
 
 | Язык | Проекты | Примечание |
 |---|---|---|
-| **Python** | CrewAI, LangGraph, AutoGen, OpenHands SDK, MetaGPT | Доминирующий язык для AI-agent фреймворков |
+| **Python** | CrewAI, LangGraph, AutoGen, OpenHands SDK, MetaGPT, Agno | Доминирующий язык для AI-agent фреймворков |
 | **TypeScript** | Archon, OpenClaw, Mastra AI | Растущая экосистема, особенно для workflow engines |
 | **Rust** | pi_agent_rust, Codex (codex-rs) | High-performance CLI-агенты |
 | **Go** | Crush | TUI-ориентированный агент |
@@ -375,6 +391,7 @@
 * **Mastra AI и Archon — два TypeScript-проекта с workflow engine**, но на разных уровнях: Mastra = SDK (LLM API), Archon = orchestrator (subprocess SDK). Task-orchestrator ближе к Archon.
 * **OpenClaw — production-ready multi-channel personal assistant** (20+ мессенджеров, desktop/mobile apps, voice wake). Не фреймворк оркестрации, а законченный продукт.
 * **Copilot Cloud Agent подтверждает тренд multi-model marketplace:** единый API поверх GPT-4, Claude, Gemini, Llama. Индустриальный аналог нашего AgentRunnerInterface.
+* **Agno — наиболее развитый workflow engine** из исследованных: 6 строительных блоков (Step, Steps, Loop, Parallel, Router, Condition) + nested workflows (до 10 уровней). При этом Agno — in-process SDK, не оркестратор внешних runner'ов. Error-specific fallback routing (on_error/on_rate_limit/on_context_overflow) — уникальная модель, дополняющая error classification. HITL (3 режима) требует runtime (FastAPI) — в CLI ограниченно применимо.
 
 ---
 
@@ -394,3 +411,4 @@
 | 2026-04-22 | Технический писатель (Гермиона) | Создан отчёт docker-agent-codex-comparison.md, заполнена строка Docker Agent + OpenAI Codex (#13), добавлены рекомендации и тренды. Все 13 исследований завершены. |
 | 2026-04-22 | Технический писатель (Гермиона) | Финализация сводной таблицы: добавлен Executive Summary, реорганизованы рекомендации по 5 тематическим кластерам (Quick wins / Среднесрочные / R&D), консолидированы 14 общих трендов с кросс-анализом всех 13 исследований. |
 | 2026-04-22 | Архитектор (Локи) | Ревью консистентности: исправлены данные по результатам ревью индивидуальных отчётов — Archon (8 таблиц, node-level retry, 21 hook), Mastra AI (22+ адаптеров), Claude Code (30+ tools, 20+ hook events, Agent SDK, agent teams), Codex (hooks, memories, plugins, Starlark exec policy, external-sandbox), Crush (sub-agents Coder → Task), OpenHands SDK (4+1 stuck detector, 6 hook events), Copilot (Cloud Agent, CLI/SDK/Spark), LangGraph (langchain-core dependency). Обновлён тренд sub-agents (9/13 вместо 8/13). |
+| 2026-04-22 | Тимлид (Алекс) | Добавлена строка Agno (#14). Пересчитаны тренды (13→14): agent loop 12/14, SKILL.md 9/14, MCP 10/14, sub-agents 10/14, conditional branching 5 проектов, compression 7/14. Добавлен error-specific fallback routing (Agno) в Кластер 1. Добавлены Loop end_condition и Agno conditional branching в Кластер 3. Добавлены индивидуальные рекомендации Agno (P2: error-specific fallback, Loop end_condition, conditional branching; P3: HITL, compression, guardrails, evals, Teams, parallel, nested workflows). |
