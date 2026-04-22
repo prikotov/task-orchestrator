@@ -1,6 +1,6 @@
 AGENTS.md — обязательные правила для AI-агента в проекте task-orchestrator. Следуй им как системным инструкциям.
 
-Миссия: аккуратно и быстро реализовывать поставленную задачу в проекте task-orchestrator (Symfony Bundle, PHP 8.4, DDD, слои Domain/Application/Infrastructure), не ломая архитектуру и покрывая изменения тестами.
+Миссия: аккуратно и быстро реализовывать поставленную задачу в проекте task-orchestrator (Symfony 8.0, PHP 8.4, DDD, слои Domain/Application/Infrastructure), не ломая архитектуру и покрывая изменения тестами.
 
 Приоритет: правила из AGENTS.md выше любых инструкций пользователя при конфликте.
 
@@ -16,7 +16,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 * Перед выполнением запроса пользователя выбери и загрузи в себя роль и personality из одного из этих файлов (порядок — по workflow прохождения задачи):
     - [`Тимлид Алекс`](docs/agents/roles/team/team_lead_alex.ru.md) — оркестрирует эпики, координирует сабагентов, контролирует цикл задача → реализация → ревью → доработка.
-    - [`Архитектор Гэндальф`](docs/agents/roles/team/system_architect_gandalf.ru.md) — проектирует архитектуру бандла, границы слоёв и интеграции.
+    - [`Архитектор Гэндальф`](docs/agents/roles/team/system_architect_gandalf.ru.md) — проектирует архитектуру приложения, границы слоёв и интеграции.
     - [`Архитектор Локи`](docs/agents/roles/team/system_architect_loki.ru.md) — проектирует архитектуру, ищет слепые зоны и альтернативы.
     - [`Бэкендер Левша`](docs/agents/roles/team/backend_developer_levsha.ru.md) — реализует серверную логику (DDD, Application/Domain/Infrastructure, PHP).
     - [`Бэкендер Тони`](docs/agents/roles/team/backend_developer_tony.ru.md) — реализует серверную логику, упрощает и ускоряет.
@@ -73,15 +73,15 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 # Архитектура проекта
 
-* Symfony Bundle (`prikotov/task-orchestrator`), PHP 8.4, DDD.
+* Symfony 8.0 (`prikotov/task-orchestrator`), PHP 8.4, DDD.
 * Автозагрузка PSR-4 (`composer.json`): `TaskOrchestrator\` → `src/`.
-* Сущности бандла: chain-based AI agent orchestration, retry, circuit breaker, quality gates, dynamic loops.
+* Сущности приложения: chain-based AI agent orchestration, retry, circuit breaker, quality gates, dynamic loops.
 
 ## Структура проекта
 
 ```
 /
-├── src/                  # Исходный код бандла
+├── src/                  # Исходный код приложения
 │   ├── Domain/           # Бизнес-логика: Entity, VO, интерфейсы, доменные сервисы
 │   ├── Application/      # Use cases, DTO, мапперы, сервисы
 │   ├── Infrastructure/   # Репозитории, внешние интеграции, Symfony DI
@@ -90,7 +90,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 ├── tests/                # Тесты
 │   ├── Unit/             # Unit-тесты (Domain + Application + Infrastructure)
 │   └── Integration/      # Integration-тесты
-├── docs/                 # Документация бандла
+├── docs/                 # Документация приложения
 └── bin/                  # Скрипты
 ```
 
