@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 13 / 13 исследований
+> **Статус заполнения:** 14 / 14 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -24,6 +24,7 @@
 | 11 | Claude Code | — (проприетарный) | `CLI-agent` | `agent-loop` (LLM → tool call → observation → LLM → ...) | `in-memory + auto-compact` | `basic API retry` (429/500, без backoff) | `MCP + 30+ tools + hooks (20+ events, 4 handler types) + CLAUDE.md + slash commands + sub-agents + Agent SDK + agent teams` | 🟡 заимствовать отдельные паттерны | [claude-code-comparison.md](claude-code-comparison.md) ✅ |
 | 12 | GitHub Copilot Cloud Agent | — (проприетарный) | `cloud/SaaS` | `agent-loop` (cloud sandbox, Issue→Plan→Execute→PR) | `cloud-managed` (session-based, GitHub infrastructure) | `transparent` (built-in API retry, org-level rate limits) | `MCP + custom instructions + GitHub Actions + GitHub Models marketplace + Copilot CLI/SDK/Spark` | 🟡 заимствовать отдельные паттерны | [copilot-agent-hq-comparison.md](copilot-agent-hq-comparison.md) ✅ |
 | 13 | Docker Agent + OpenAI Codex | Rust (codex-rs) + TypeScript | `CLI-agent + cloud/SaaS` | `agent-loop` (LLM → tool call → observation → LLM → ...) + hierarchical multi-agent | `persistent` (SQLite + rollout JSONL files) + `auto-compact` | `basic API retry` + `Guardian (LLM safety reviewer)` + `Starlark exec policy (rules)` | `MCP client/server` + `SKILL.md` + `AGENTS.md` + `hooks` + `memories` + `plugins` + `Starlark exec policy` + `external-sandbox` + `custom agent roles` + `Docker sandbox` | 🟡 заимствовать отдельные паттерны | [docker-agent-codex-comparison.md](docker-agent-codex-comparison.md) ✅ |
+| 14 | Agno (бывший Phi) | Python | `SDK` | `step-based workflow (Step/Steps/Loop/Parallel/Router/Condition) + agent-loop + 4 team modes (coordinate/route/broadcast/tasks)` | `pluggable (12+ адаптеров: PostgreSQL, SQLite, MySQL, Redis, MongoDB, DynamoDB, Firestore, ...)` | `FallbackConfig (error-specific: on_error/on_rate_limit/on_context_overflow) + max_retries per step` | `Tools + MCP + Skills + Guardrails (PII, prompt injection) + Evals + Hooks + custom DB + HITL (3 режима) + Compression` | 🟡 заимствовать отдельные паттерны | [agno-comparison.md](agno-comparison.md) ✅ |
 
 ### Легенда колонок
 
