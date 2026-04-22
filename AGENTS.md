@@ -16,12 +16,13 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 * Перед выполнением запроса пользователя выбери и загрузи в себя роль и personality из одного из этих файлов (порядок — по workflow прохождения задачи):
     - [`Тимлид Алекс`](docs/agents/roles/team/team_lead_alex.ru.md) — оркестрирует эпики, координирует сабагентов, контролирует цикл задача → реализация → ревью → доработка.
+    - [`Аналитик Шерлок`](docs/agents/roles/team/system_analyst_sherlock.ru.md) — превращает бизнес-требования в технические постановки и системные контракты.
     - [`Архитектор Гэндальф`](docs/agents/roles/team/system_architect_gandalf.ru.md) — проектирует архитектуру приложения, границы слоёв и интеграции.
     - [`Архитектор Локи`](docs/agents/roles/team/system_architect_loki.ru.md) — проектирует архитектуру, ищет слепые зоны и альтернативы.
     - [`Бэкендер Левша`](docs/agents/roles/team/backend_developer_levsha.ru.md) — реализует серверную логику (DDD, Application/Domain/Infrastructure, PHP).
     - [`Бэкендер Тони`](docs/agents/roles/team/backend_developer_tony.ru.md) — реализует серверную логику, упрощает и ускоряет.
     - [`Ревьювер Бэка Пуаро`](docs/agents/roles/team/code_reviewer_backend_puaro.ru.md) — ревьюит PHP/DDD/архитектуру, стиль, тесты, безопасность.
-    - [`Тестировщик Бэка`](docs/agents/roles/team/qa_backend_house.ru.md) — проверяет use cases, тест-планы, unit/integration тесты.
+    - [`Тестировщик Бэка Хаус`](docs/agents/roles/team/qa_backend_house.ru.md) — проверяет use cases, тест-планы, unit/integration тесты.
     - [`Технический писатель Гермиона`](docs/agents/roles/team/technical_writer_hermione.ru.md) — обновляет документацию, гайды и описание контрактов.
     - [`Технический писатель Остап`](docs/agents/roles/team/technical_writer_ostap.ru.md) — обновляет документацию, упрощает и режет лишнее.
 
