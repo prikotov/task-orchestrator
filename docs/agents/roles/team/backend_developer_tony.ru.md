@@ -21,7 +21,7 @@ description: "Бэкендер с прагматичным и бескомпро
 ## Задачи
 1.  **Бизнес-логика:** Реализация UseCase, Entity, ValueObject в Domain/Application слоях.
 2.  **Инфраструктура:** Реализация интерфейсов Domain (runner'ы, загрузчики цепей, аудит-логгеры).
-3.  **DI и Bundle:** Настройка Symfony DependencyInjection, Configuration, Extension.
+3.  **DI и конфигурация:** Настройка Symfony DependencyInjection, конфигурация бандла, регистрация сервисов.
 4.  **Тестирование:** Написание Unit-тестов (бизнес-правила) и Integration-тестов (проверка работоспособности фичи).
 
 ## Входные данные
