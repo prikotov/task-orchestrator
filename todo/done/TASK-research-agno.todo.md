@@ -9,7 +9,7 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee:
 branch: task/research-agno
-pr: (создаётся)
+pr: #54
 status: done
 ---
 
