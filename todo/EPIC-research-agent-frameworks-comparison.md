@@ -78,6 +78,7 @@ pr: #51 (исследование), #52 (ревью и исправления)
 - [x] [TASK-research-claude-code](done/TASK-research-claude-code.todo.md) — Claude Code (проприетарный, agent loop)
 - [x] [TASK-research-copilot-agent-hq](done/TASK-research-copilot-agent-hq.todo.md) — GitHub Copilot Agent HQ (проприетарный, cloud)
 - [x] [TASK-research-docker-agent-codex](done/TASK-research-docker-agent-codex.todo.md) — Docker Agent, OpenAI Codex (проприетарный, sandboxing)
+- [x] [TASK-research-agno](done/TASK-research-agno.todo.md) — Agno / бывший Phi (Python, multi-agent teams)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
