@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Технический писатель (Гермиона)
+branch: task/research-claude-code
+pr: https://github.com/prikotov/task-orchestrator/pull/47
+status: done
 ---
 
 # TASK-research-claude-code: Исследовать и оценить Claude Code для сравнения с task-orchestrator
@@ -65,6 +65,20 @@ ls docs/research/claude-code-comparison.md
 
 ## 9. Comments (Комментарии)
 Claude Code — один из ведущих coding-агентов. Их подход к agent loop (agentic coding) и tool use может дать полезные паттерны для chain-оркестрации.
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/technical_writer_hermione.ru.md
+**Ветка:** task/research-claude-code (уже создана и активна)
+**PR:** будет создан после коммита
+
+### Порядок действий
+1. Переключись в ветку `task/research-claude-code`: `git checkout task/research-claude-code`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты.
+5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
