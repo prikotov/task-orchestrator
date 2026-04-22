@@ -1,8 +1,8 @@
 # Исследование: MetaGPT и OpenClaw — SOP/ролевая модель и multi-channel AI-ассистент
 
 > **Проекты:**
-> - [github.com/FoundationAgents/MetaGPT](https://github.com/FoundationAgents/MetaGPT) (★ 52k, MIT)
-> - [github.com/openclaw/openclaw](https://github.com/openclaw/openclaw) (MIT)
+> - [github.com/FoundationAgents/MetaGPT](https://github.com/FoundationAgents/MetaGPT) (★ 67k, MIT)
+> - [github.com/openclaw/openclaw](https://github.com/openclaw/openclaw) (★ 362k, MIT)
 >
 > **Дата анализа:** 2026-04-21
 > **Язык:** Python (MetaGPT), TypeScript / Node.js (OpenClaw)
