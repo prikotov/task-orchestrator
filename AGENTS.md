@@ -82,7 +82,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 ```
 /
-├── src/                              # Исходный код библиотеки (TaskOrchestrator\Common\)
+├── src/                              # Исходный код приложения (TaskOrchestrator\Common\)
 │   ├── Module/
 │   │   ├── AgentRunner/               # Модуль движка AI-агента
 │   │   └── Orchestrator/              # Модуль оркестрации цепочек
