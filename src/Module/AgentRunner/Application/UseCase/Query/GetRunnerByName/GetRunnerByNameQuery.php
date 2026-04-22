@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunnerByName;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\RunnerDto;
-
 /**
  * DTO запроса runner'а по имени.
  *

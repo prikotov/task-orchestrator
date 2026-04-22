@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper;
 
+use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ReportFormatMapperInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
-use Override;
 
 use function count;
 use function round;

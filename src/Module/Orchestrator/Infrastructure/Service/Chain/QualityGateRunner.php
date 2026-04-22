@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
 
+use Override;
+use Symfony\Component\Process\Process;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\QualityGateRunnerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateVo;
-use Override;
-use Symfony\Component\Process\Process;
 
 /**
  * Выполнение quality gate через Symfony Process.

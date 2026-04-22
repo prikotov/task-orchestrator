@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Event\OrchestrateChain\OrchestrateRoundCompletedEvent;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\RoundCompletedNotifierInterface;
 use Override;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Event\OrchestrateChain\OrchestrateRoundCompletedEvent;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\RoundCompletedNotifierInterface;
 
 /**
  * Application-реализация: диспатчит OrchestrateRoundCompletedEvent через PSR EventDispatcher.

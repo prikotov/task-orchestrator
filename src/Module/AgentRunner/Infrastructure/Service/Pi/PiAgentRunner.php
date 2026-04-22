@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi;
 
+use Override;
+use Symfony\Component\Process\Process;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
-use Override;
-use Symfony\Component\Process\Process;
 
 /**
  * Реализация AgentRunnerInterface для pi CLI.

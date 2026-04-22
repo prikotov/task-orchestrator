@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo as FixIterationGroupVo;
 use InvalidArgumentException;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
 
 /**
  * Value Object определения цепочки оркестрации.
