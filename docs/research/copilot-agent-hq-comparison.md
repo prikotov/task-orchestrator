@@ -1,4 +1,4 @@
-# Исследование: GitHub Copilot Agent Mode / Agent HQ (проприетарный, cloud)
+# Исследование: GitHub Copilot Agent Mode / Cloud Agent (проприетарный, cloud)
 
 > **Проект:** [github.com/features/copilot](https://github.com/features/copilot)
 > **Дата анализа:** 2026-04-22
@@ -10,53 +10,73 @@
 
 ## 1. Обзор проекта
 
-GitHub Copilot Agent Mode — следующая эволюция GitHub Copilot, превращающая AI-ассистента из автодополняющего инструмента в автономного агента, способного самостоятельно выполнять многошаговые задачи разработки. Agent Mode работает как в IDE (VS Code, Visual Studio, JetBrains), так и в cloud-среде GitHub — через Copilot Workspace, GitHub Issues/PR интеграцию и Agent HQ (enterprise-платформу для управления fleet-ом агентов).
+GitHub Copilot Agent Mode — следующая эволюция GitHub Copilot, превращающая AI-ассистента из автодополняющего инструмента в автономного агента, способного самостоятельно выполнять многошаговые задачи разработки. Agent Mode работает как в IDE (VS Code, Visual Studio, JetBrains), так и в cloud-среде GitHub — через Copilot Cloud Agent (Issue → Agent → PR → Review → Merge), Copilot CLI (с командой `/fleet` для параллельного выполнения), Copilot Spark (генерация и деплой приложений), а также Copilot SDK для программного доступа.
 
-GitHub Copilot Agent HQ — облачная платформа GitHub для координации нескольких Copilot-агентов, запускаемых по событиям (Issue → Agent → PR → Review → Merge). Agent HQ предоставляет dashboard, policy management, audit logging и интеграцию с GitHub Actions.
+GitHub Copilot Cloud Agent (официальный термин GitHub, ранее иногда упоминался как «Agent Mode в cloud») — облачный агент, запускаемый по событиям (Issue → Agent → PR → Review → Merge). Cloud Agent предоставляет agent management, access management, policy management, audit logging, hooks, MCP-интеграцию и настраиваемый firewall.
 
-Copilot Agent Mode/HQ **не является** фреймворком оркестрации в классическом смысле. Это **проприетарный cloud-сервис**, встроенный в экосистему GitHub. В отличие от task-orchestrator, Copilot не поддерживает декларативные цепочки шагов (chains), retry-механизмы с backoff, circuit breaker, бюджетный контроль или quality gates. Однако его модель интеграции AI-агентов в development workflow (Issue → Plan → Code → Test → PR) и подход к sandboxed-выполнению представляют значительный интерес.
+> **Примечание:** Архитектура восстановлена по официальной документации GitHub Docs (актуальная на 2026-04-22). Некоторые детали реализации (устройство sandbox, внутренняя архитектура) — проприетарные и могут отличаться от описанных.
+
+Copilot Agent Mode / Cloud Agent **не является** фреймворком оркестрации в классическом смысле. Это **проприетарный cloud-сервис**, встроенный в экосистему GitHub. В отличие от task-orchestrator, Copilot не поддерживает декларативные цепочки шагов (chains), retry-механизмы с backoff, circuit breaker, бюджетный контроль или quality gates. Однако его модель интеграции AI-агентов в development workflow (Issue → Plan → Code → Test → PR), подход к управлению агентами и sandboxed-выполнение представляют значительный интерес.
 
 ### Архитектура
 
-GitHub Copilot Agent — проприетарный продукт. Архитектура восстановлена по официальной документации GitHub, GitHub Blog, GitHub Universe 2024–2025 announcements и наблюдаемому поведению.
+GitHub Copilot Agent — проприетарный продукт. Архитектура восстановлена по официальной документации GitHub Docs (docs.github.com/en/copilot), GitHub Blog, GitHub Universe 2024–2025 announcements и наблюдаемому поведению. Детали реализации sandbox и внутренних механизмов — предположительные ( GitHub не раскрывает их публично).
 
 ```
 github.com                                   Cloud platform (GitHub infrastructure)
-  copilot-agent/                             Agent Mode execution engine
+  cloud-agent/                              Copilot Cloud Agent (официальный термин)
     agent-loop                               Core: LLM → tool call → observation → LLM → ...
     tools/                                   Встроенные инструменты агента
       file-operations                        Чтение/запись/редактирование файлов в репозитории
-      terminal-commands                      Выполнение shell-команд в sandbox
+      terminal-commands                      Выполнение shell-команд в изолированной среде
       search                                 Поиск по коду (GitHub Search API)
       browser                                Веб-браузер для поиска документации
       edit                                   Точечное редактирование файлов
-    sandbox/                                 Изолированная среда выполнения
-      docker-container                       Container-based isolation (devcontainer)
-      network-restrictions                   Ограничение сетевого доступа
-      file-system-sandbox                    Chroot / restricted filesystem
+    sandbox/                                 Изолированная среда выполнения (подробности не раскрыты)
+      container-based-isolation              Изоляция выполнения (предположительно container-based)
+      firewall                               Настраиваемый firewall (domain/URL allowlist на уровне org/repo)
     context/                                 Управление контекстом
       repository-context                     Автоматический анализ структуры репозитория
       issue-context                          Контекст из Issue / PR description
-      custom-instructions                    .github/copilot-instructions.md
-      knowledge-bases                        Подключённые knowledge bases (docs)
+      copilot-memory                         Агент сохраняет знания о кодовой базе для будущих сессий
+      custom-instructions                    Многоуровневые инструкции (personal / repo / path-specific / org)
+      spaces                                 Copilot Spaces — коллаборативный контекст
     session/                                 Управление сессиями
       agent-session                          Cloud-based agent session (не локальный)
       resume                                 Возможность возобновления сессии
+    hooks/                                   Pre/post execution hooks
+      pre-tool-use                           Хук перед выполнением инструмента
+      post-tool-use                          Хук после выполнения инструмента
+      user-prompt-submitted                  Хук при отправке промпта
     integration/                             Интеграция с GitHub
       issue-triggered                        Агент запускается по Issue / @copilot mention
       pr-review                              Автоматический review PR агентом
       actions-integration                    Запуск агента из GitHub Actions
       checks                                 Agent results как GitHub Check
-  copilot-workspace/                         Copilot Workspace — planning + execution
-    plan-generation                          LLM-генерация плана из Issue description
-    step-by-step-execution                   Пошаговое выполнение плана с подтверждением
-    environment-provisioning                 Автоматическое создание dev environment
-  agent-hq/                                  Agent HQ — enterprise fleet management
-    dashboard                                Управление fleet-ом агентов
-    policy-engine                            Политики выполнения (permissions, scopes)
-    audit-log                                Audit trail всех действий агентов
+  copilot-cli/                               Copilot CLI — терминальный агент
+    fleet                                    /fleet — параллельное выполнение задач
+    custom-agents                            Пользовательские агенты для CLI
+    plugins                                  CLI-плагины (marketplace)
+    autonomous-tasks                         Автономное выполнение задач
+  spark/                                     Copilot Spark — генерация и деплой приложений
+    prompt-to-app                            Промпт → готовое приложение
+    deploy                                   Деплой из CLI
+  copilot-sdk/                               Copilot SDK — программный доступ
+    hooks                                    Pre/post hooks, session lifecycle
+    mcp-servers                              MCP-серверы через SDK
+    session-persistence                     Сохранение сессий
+    streaming                                Streaming events (OpenTelemetry)
+    byok                                     Bring Your Own Key (пользовательские модели)
+    custom-skills                            Пользовательские навыки
+  management/                                Управление (enterprise/org)
+    agent-management                         Управление агентами (cloud agent)
+    access-management                        Управление доступом к агентам
+    policies                                 Org-level политики (permissions, scopes)
+    audit-logs                               Audit trail действий агентов
     mcp-servers                              Model Context Protocol серверы
-    custom-tools                             Расширения через MCP
+    custom-agents                            Пользовательские агенты для cloud agent
+    firewall-config                          Настройка firewall (org/repo level)
+    monitor-agentic-activity                 Мониторинг активности агентов
 ```
 
 ### Ключевые характеристики
@@ -66,8 +86,8 @@ github.com                                   Cloud platform (GitHub infrastructu
 | **Тип** | Cloud SaaS: AI-агент, встроенный в GitHub platform |
 | **Модель выполнения** | Agent loop (LLM → tool call → observation → LLM → ...) в cloud sandbox |
 | **State management** | Cloud-managed (GitHub infrastructure), session-based |
-| **Провайдер** | Мультимодельный: OpenAI GPT-4.x, Anthropic Claude, Google Gemini (выбор модели через Copilot) |
-| **Расширяемость** | MCP-серверы, custom instructions, GitHub Actions, GitHub Models |
+| **Провайдер** | Мультимодельный: OpenAI, Anthropic, Google Gemini, и другие (выбор модели через Copilot; конкретные модели меняются со временем) |
+| **Расширяемость** | MCP-серверы, custom instructions (4 уровня), hooks, custom agents, Copilot SDK, GitHub Models |
 | **Интерфейс** | IDE-интеграция (VS Code, Visual Studio, JetBrains) + Web (github.com) + API |
 | **Платформы** | Cloud (GitHub infrastructure), sandboxed containers |
 
@@ -75,14 +95,20 @@ github.com                                   Cloud platform (GitHub infrastructu
 
 | Компонент | Назначение |
 |---|---|
-| Agent Mode | Автономный многошаговый агент: получает задачу → планирует → выполняет (edit files, run commands, search) → завершает |
-| Copilot Workspace | Planning tool: Issue → Plan → Implementation steps. Пользователь подтверждает план до выполнения |
-| Agent HQ | Enterprise dashboard: fleet management, policy engine, audit logging, MCP server management |
-| Sandbox | Docker-based изолированная среда для выполнения агентом shell-команд и изменения файлов |
-| Custom Instructions | `.github/copilot-instructions.md` — проектные инструкции для агента (аналог CLAUDE.md / AGENTS.md) |
-| MCP Integration | Model Context Protocol серверы для расширения возможностей агента |
+| Cloud Agent | Автономный многошаговый агент: получает задачу → планирует → выполняет (edit files, run commands, search) → завершает. Официальный термин: «Copilot cloud agent» |
+| Copilot CLI | Терминальный агент с командой `/fleet` для параллельного выполнения задач, custom agents, plugins |
+| Copilot Spark | Генерация и деплой приложений из промпта (prompt → app → deploy) |
+| Copilot SDK | Программный доступ к Copilot: hooks, MCP, session persistence, BYOK, OpenTelemetry |
+| Sandbox | Изолированная среда для выполнения агентом shell-команд и изменения файлов (подробности реализации не раскрыты) |
+| Custom Instructions | Многоуровневые инструкции: personal, `.github/copilot-instructions.md` (repo), `*.instructions.md` (path-specific), org-level |
+| Copilot Memory | Агент запоминает факты о кодовой базе и использует их в будущих сессиях |
+| Copilot Spaces | Коллаборативный контекст: общие пространства для совместной работы с Copilot |
+| MCP Integration | Model Context Protocol серверы для расширения возможностей агента (cloud agent + CLI + SDK) |
+| Hooks | Pre/post execution hooks: pre-tool-use, post-tool-use, user-prompt-submitted, session lifecycle |
+| Custom Agents | Пользовательские агенты для cloud agent и CLI |
+| Agent Firewall | Настраиваемый firewall: domain/URL allowlist на уровне org и repo |
 | GitHub Actions Integration | Запуск агента из CI/CD pipeline, результаты как Checks |
-| Knowledge Bases | Подключение документации (docs sites, repositories) для обогащения контекста агента |
+| Agent Management | Управление агентами: access management, monitor agentic activity, enable/block cloud agent |
 
 ---
 
