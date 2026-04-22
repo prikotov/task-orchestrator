@@ -66,7 +66,7 @@ Archon — "AI agent that builds AI agents". Мета-оркестрация —
 
 ## Инструкции для сабагента
 
-**Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
+**Твоя роль:** docs/agents/roles/team/technical_writer_hermione.ru.md
 **Ветка:** task/research-archon-ai-planner (уже создана и активна)
 **PR:** будет создан после коммита
 

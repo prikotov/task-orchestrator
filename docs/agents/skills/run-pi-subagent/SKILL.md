@@ -62,7 +62,7 @@ PROMPT
 
 ```bash
 # Делегирование Бэкендеру
-scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer.ru.md <<'PROMPT'
+scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer_lvsha.ru.md <<'PROMPT'
 Выполни задачу: todo/TASK-feat-example.todo.md.
 Следуй инструкциям из секции 'Инструкции для сабагента' в файле задачи и AGENTS.md.
 PROMPT
@@ -70,14 +70,14 @@ PROMPT
 
 ```bash
 # Полный поток событий
-scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer.ru.md <<'PROMPT'
+scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer_lvsha.ru.md <<'PROMPT'
 Проанализируй структуру src/Domain/ и предложи рефакторинг.
 PROMPT
 ```
 
 ```bash
 # Ответ + какие файлы менялись
-scripts/watch-subagent.sh -s 600 -o text,files -r docs/agents/roles/team/backend_developer.ru.md <<'PROMPT'
+scripts/watch-subagent.sh -s 600 -o text,files -r docs/agents/roles/team/backend_developer_lvsha.ru.md <<'PROMPT'
 Реализуй фичу X в src/Domain/...
 PROMPT
 ```

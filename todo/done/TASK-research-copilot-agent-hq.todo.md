@@ -70,7 +70,7 @@ GitHub — крупнейшая платформа разработки. Их п
 
 ## Инструкции для сабагента
 
-**Твоя роль:** docs/agents/roles/team/technical_writer.ru.md
+**Твоя роль:** docs/agents/roles/team/technical_writer_hermione.ru.md
 **Ветка:** task/research-copilot-agent-hq (уже создана и активна)
 
 ### Порядок действий
