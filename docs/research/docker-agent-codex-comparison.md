@@ -65,12 +65,19 @@ codex (binary)                     CLI entry point (Rust / Ratatui TUI)
         list_dir.rs                Directory listing
         js_repl.rs                 JavaScript REPL
         agent_jobs.rs              Background agent jobs
-    context/                        Context management
+    context/                        Context assembly (prompt instructions, permission prompts, environment)
       agents_md.rs                 AGENTS.md hierarchical discovery
-      context_manager/             Conversation history management
+    context_manager/                Conversation history management
+      history.rs                   History entry storage/lookup
+      updates.rs                   History update logic
   codex-rs/exec/                    Headless CLI (codex exec)
   codex-rs/tui/                     Full-screen TUI (Ratatui)
-  codex-rs/cli/                     CLI multitool (subcommands: exec, sandbox, mcp-server)
+  codex-rs/cli/                     CLI multitool (subcommands: exec, review, sandbox, mcp, plugin, mcp-server, app, apply, resume, fork, …)
+  codex-rs/hooks/                   Hook engine (pre/post tool use, session start/stop)
+  codex-rs/memories/                Long-term memory (citations, storage, compaction)
+  codex-rs/plugins/                 Plugin system (marketplace, dynamic tool loading)
+  codex-rs/network-proxy/           Network proxy for outbound traffic control
+  codex-rs/process-hardening/       Process-level security hardening
   codex-cli/Dockerfile              Docker container for sandboxed execution
   codex-cli/scripts/
     run_in_container.sh            Docker run with iptables firewall
@@ -83,12 +90,12 @@ codex (binary)                     CLI entry point (Rust / Ratatui TUI)
 |---|---|
 | **Тип** | CLI-агент + cloud-агент, одноагентный (с hierarchical sub-agent'ами) |
 | **Модель выполнения** | Agent loop (LLM → tool call → observation → LLM → ...) |
-| **State management** | SQLite + rollout files (persistent), auto-compact при переполнении |
-| **Провайдер** | OpenAI (GPT-4.1, o-series), Ollama (local), custom providers |
-| **Расширяемость** | MCP client/server, SKILL.md, AGENTS.md, exec policy rules, custom agent roles, apps (connectors) |
-| **Интерфейс** | Interactive TUI + headless (`codex exec`) + MCP server + IDE + Web |
+| **State management** | SQLite + rollout files (persistent), auto-compact при переполнении, memories (long-term) |
+| **Провайдер** | OpenAI (GPT-4.1, o-series), Ollama (local), custom providers, Amazon Bedrock |
+| **Расширяемость** | MCP client/server, SKILL.md, AGENTS.md, exec policy rules, custom agent roles, plugins, apps (connectors), hooks |
+| **Интерфейс** | Interactive TUI + headless (`codex exec`) + MCP server + desktop app (`codex app`) + IDE + Web |
 | **Платформы** | macOS, Linux, Windows (npm / brew / binary) |
-| **Sandboxing** | Seatbelt (macOS), Landlock/Bubblewrap (Linux), restricted token (Windows), Docker + iptables firewall |
+| **Sandboxing** | Seatbelt (macOS), Landlock/Bubblewrap (Linux), restricted token (Windows), Docker + iptables firewall, external-sandbox mode |
 | **Лицензия** | Apache-2.0 (CLI), проприетарный (Web) |
 
 ### Основные компоненты
@@ -98,15 +105,19 @@ codex (binary)                     CLI entry point (Rust / Ratatui TUI)
 | Agent loop | Ядро: итеративный вызов LLM с инструментами, до естественного завершения или лимита итераций |
 | Sandbox (OS-level) | Seatbelt (macOS), Landlock/Bubblewrap (Linux), restricted token (Windows) — filesystem + network isolation |
 | Sandbox (Docker) | Docker container + iptables/ipset firewall — whitelist доменов, auto-cleanup |
+| Sandbox (external) | `external-sandbox` — когда процесс уже в контейнере/VM, full disk access, network по настройке |
 | Guardian | LLM-based safety reviewer — risk taxonomy (exfiltration, credential probing, destructive actions, security weakening) → allow/deny/escalate |
-| Exec policy | Rules-based command filtering — `.rules` файлы, banned prefixes, safe command detection |
-| Multi-agent (v2) | Hierarchical sub-agents — spawn/send_message/wait/close_agent/list_agents с depth limit |
+| Exec policy | Starlark-based rules DSL (`.rules`/`.codexpolicy` файлы) — `prefix_rule`, `define_program`, banned prefixes, safe command detection |
+| Multi-agent (v2) | Hierarchical sub-agents — spawn/send_message/wait/close_agent/list_agents/message_tool/followup_task + depth limit |
 | Compaction | Auto-compact при context overflow — inline LLM summarization или remote compaction task |
 | MCP client/server | MCP для расширения инструментов; Codex может быть MCP tool для других агентов |
 | Skills (SKILL.md) | Bundled + custom skills — формализованные каталоги с инструкциями и скриптами |
 | AGENTS.md | Hierarchical context discovery — глубокий файл перекрывает верхний |
-| Session persistence | SQLite state DB + rollout files (JSONL) — resumable sessions, conversation history |
-| Plan mode | Анализ без выполнения (read-only tool calls) — для exploration/planning |
+| Session persistence | SQLite state DB + rollout files (JSONL) — resumable sessions (`codex resume`/`codex fork`) |
+| Plan mode | TUI collaboration mode (`ModeKind::Plan`) — модель использует `update_plan` для структурированного планирования |
+| Hooks | Pre/post tool use, session start/stop — внешние hook-скрипты для CI/CD интеграции |
+| Memories | Long-term memory с citations, storage, компактификация — персистентный контекст между сессиями |
+| Plugins | Динамическая загрузка инструментов из marketplace — расширяет capabilities агента |
 
 ---
 
@@ -120,10 +131,10 @@ codex (binary)                     CLI entry point (Rust / Ratatui TUI)
 | **Quality Gates** | ✅ Shell-команды как проверки | ❌ Нет (LLM сам оценивает результат) | ✅ У нас есть |
 | **Бюджетный контроль** | ✅ BudgetVo (cost-based лимиты) | ⚠️ ChatGPT plan limits, но без программных лимитов | ✅ У нас лучше |
 | **Итерационные циклы (fix_iterations)** | ✅ Группа шагов с max_iterations | ❌ Нет явных итерационных циклов | ✅ У нас есть |
-| **Fallback routing** | ✅ Per-step fallback runner | ❌ Нет (единственный провайдер — OpenAI, но поддержка Ollama/custom) | ✅ У нас есть |
+| **Fallback routing** | ✅ Per-step fallback runner | ⚠️ Нет (поддержка OpenAI + Ollama + Amazon Bedrock + custom providers, но без fallback routing) | ✅ У нас есть |
 | **Audit Trail (JSONL)** | ✅ JsonlAuditLogger | ✅ Rollout files (JSONL) + SQLite state | ✅ Паритет |
 | **Ролевые промпты** | ✅ .md файлы (18+ ролей) | ✅ AGENTS.md + agent roles (TOML) | ✅ Паритет |
-| **Multiple runners** | ✅ Pi + Codex (через interface) | ⚠️ OpenAI + Ollama + custom providers | ✅ У нас лучше |
+| **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ OpenAI + Ollama + Amazon Bedrock + custom providers + model_provider в config.toml | ✅ Паритет |
 | **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Monorepo crate structure | ✅ У нас есть |
 | **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов | ✅ У нас есть |
 | **YAML-конфигурация** | ✅ Chains + roles в YAML | ✅ config.toml (TOML) | ✅ Паритет |
@@ -138,11 +149,13 @@ codex (binary)                     CLI entry point (Rust / Ratatui TUI)
 | **MCP server mode** | ❌ Нет | ✅ `codex mcp-server` — Codex как MCP tool для других агентов | 🟡 Интересно |
 | **MCP client** | ❌ Нет | ✅ MCP servers в config.toml, parallel tool calls support | 🟡 Позже |
 | **SKILL.md** | ✅ Есть в agent skills | ✅ Bundled + custom skills | ✅ Паритет |
-| **Session persistence** | ❌ Нет (in-memory) | ✅ SQLite + rollout files (JSONL) — resumable | 🟡 Позже |
-| **Plan mode** | ❌ Нет | ✅ Read-only exploration без выполнения | 🟡 Интересно |
+| **Session persistence** | ❌ Нет (in-memory) | ✅ SQLite + rollout files (JSONL) — `codex resume`/`codex fork` | 🟡 Позже |
+| **Plan mode** | ❌ Нет | ✅ TUI collaboration mode (`ModeKind::Plan`) — структурированное планирование через `update_plan` tool | 🟡 Интересно |
 | **Headless mode** | ✅ CLI Symfony Console | ✅ `codex exec` (stdin/stdout) | ✅ Паритет |
 | **Non-interactive CI mode** | ✅ CLI pipeline | ✅ `codex exec --full-auto` — для CI/CD | ✅ Паритет |
-| **Apps (connectors)** | ❌ Нет | ✅ ChatGPT connectors через `$` в composer | 🟢 Не берём |
+| **Hooks (lifecycle)** | ❌ Нет | ✅ Pre/post tool use, session start/stop — внешние скрипты | 🟡 Позже |
+| **Memories (long-term)** | ❌ Нет | ✅ Citations, storage, компактификация — персистентный контекст между сессиями | 🟡 Позже |
+| **Plugins (marketplace)** | ❌ Нет | ✅ Динамическая загрузка инструментов через `codex plugin` | 🟢 Не берём |
 | **IDE integration** | ❌ Нет | ✅ VS Code / Cursor / Windsurf extensions | 🟢 Не берём |
 | **Realtime audio** | ❌ Нет | ✅ Experimental realtime audio mode | 🟢 Не берём |
 | **Image generation** | ❌ Нет | ✅ Built-in image generation context | 🟢 Не берём |
@@ -175,7 +188,9 @@ entries = [
   { path = "/workspace/.env", access = "none" },
   { path = "/workspace/secrets", access = "read" },
 ]
-```
+``` 
+
+> **Примечание:** Фактический формат конфигурации в `config.toml` использует `SandboxPolicy` enum с вариантами `danger-full-access`, `read-only`, `workspace-write`, `external-sandbox`. Каждый вариант имеет свои параметры: `read_only_access`, `writable_roots`, `network_access`, `readable_roots`, `read_only_subpaths`.
 
 **Уровень 3: Docker + iptables firewall**
 ```
@@ -232,16 +247,22 @@ Agent → tool call (shell command / file write)
 
 **Что у них:** Codex CLI использует `.rules` файлы для декларативного управления разрешёнными командами:
 
-```rules
-# default.rules
-allow git status
-allow git diff
-allow git log
-allow cargo test
-allow cargo build
-deny rm -rf /
-deny curl *
-deny wget *
+```python
+# default.rules / .codexpolicy — Starlark DSL
+prefix_rule(
+    pattern = ["git", "reset", "--hard"],
+    decision = "forbidden",
+    justification = "destructive operation",
+    match   = [["git", "reset", "--hard"]],
+    not_match = [["git", "reset", "--keep"]],
+)
+
+define_program(
+    program="ls",
+    system_path=["/bin/ls", "/usr/bin/ls"],
+    options=[flag("-a"), flag("-l")],
+    args=[ARG_RFILES_OR_CWD],
+)
 ```
 
 Дополнительные механизмы:
@@ -276,12 +297,12 @@ Codex (main agent)
 ```
 
 **Механика:**
-- **Tools:** `spawn`, `send_message`, `wait`, `close_agent`, `list_agents`, `message_tool`
+- **Tools:** `spawn`, `send_message`, `wait`, `close_agent`, `list_agents`, `message_tool`, `followup_task`
 - **Depth limit:** `agent_max_depth` — ограничение вложенности (agent → sub-agent → sub-sub-agent)
 - **Mailbox pattern:** async message passing через `Sender/Receiver` channels
 - **Isolated context:** sub-agent получает собственный context window + config
-- **Fork modes:** `FullHistory` (наследует историю) или `Clean` (чистый старт)
-- **Role system:** `agent_type` — назначение роли sub-agent'у (default, custom)
+- **Fork modes:** управляется через `fork_turns` параметр: `"all"` (FullHistory — наследует всю историю), `"none"` (чистый старт), или число (последние N turns). В v2 `fork_context` не поддерживается
+- **Role system:** `agent_type` — назначение роли sub-agent'у (default, custom, built-in roles)
 - **Approval routing:** sub-agent approval requests направляются parent session
 
 **Почему нам интересно:** Для dynamic chains — возможность делегировать подзадачу отдельному агенту с чистым контекстом. Sub-agent pattern позволяет:
@@ -299,12 +320,17 @@ Codex (main agent)
 **Что у них:** Codex CLI при запуске в Docker container инициализирует iptables firewall:
 
 ```bash
-# 1. Flush existing rules
+# 1. Flush existing rules (all tables)
 iptables -F && iptables -X
+iptables -t nat -F && iptables -t nat -X
+iptables -t mangle -F && iptables -t mangle -X
+ipset destroy allowed-domains 2>/dev/null || true
 
 # 2. Allow DNS and localhost
 iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
-iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT  -p udp --sport 53 -j ACCEPT
+iptables -A INPUT  -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
 
 # 3. Create ipset with allowed domains
 ipset create allowed-domains hash:net
@@ -313,15 +339,28 @@ for domain in "${ALLOWED_DOMAINS[@]}"; do
   ipset add allowed-domains "$ips"
 done
 
-# 4. Default DROP
-iptables -P INPUT DROP
-iptables -P OUTPUT DROP
+# 4. Allow host network (Docker host → container communication)
+HOST_IP=$(ip route | grep default | cut -d" " -f3)
+iptables -A INPUT  -s "$HOST_NETWORK" -j ACCEPT
+iptables -A OUTPUT -d "$HOST_NETWORK" -j ACCEPT
+
+# 5. Default DROP
+iptables -P INPUT   DROP
+iptables -P OUTPUT  DROP
 iptables -P FORWARD DROP
 
-# 5. Allow only whitelisted domains
+# 6. Allow established connections + whitelisted domains
+iptables -A INPUT  -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -m set --match-set allowed-domains dst -j ACCEPT
 
-# 6. Verify: example.com blocked, api.openai.com allowed
+# 7. REJECT (not DROP) for immediate error feedback
+iptables -A INPUT   -p tcp -j REJECT --reject-with tcp-reset
+iptables -A OUTPUT  -p tcp -j REJECT --reject-with tcp-reset
+
+# 8. Verify: example.com blocked, api.openai.com allowed
+curl --connect-timeout 5 https://example.com     # must fail
+curl --connect-timeout 5 https://api.openai.com  # must succeed
 ```
 
 **Почему нам интересно:** Для autonomous pipeline — критически важно ограничить network access. Если AI-агент может выполнять shell-команды, он потенциально может:
