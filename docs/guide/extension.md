@@ -140,7 +140,7 @@ chains:
 ```yaml
 roles:
   backend_developer_codex:
-    prompt_file: docs/agents/roles/team/backend_developer_lvsha.ru.md
+    prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
     command:
       - codex
       - --full-auto
@@ -350,7 +350,7 @@ chains:
 ### Как работает маппинг
 
 1. В YAML-конфигурации шаг ссылается на роль по имени: `role: backend_developer`
-2. `RolePromptBuilder` ищет файл `<roles_dir>/backend_developer_lvsha.ru.md`
+2. `RolePromptBuilder` ищет файл `<roles_dir>/backend_developer_levsha.ru.md`
 3. Содержимое файла становится system prompt для агента
 4. `@system-prompt` в `command` резолвится в содержимое `prompt_file`
 

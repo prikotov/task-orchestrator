@@ -44,7 +44,7 @@ roles:
 ## Маппинг имени → файл
 
 - `system_analyst` → `system_analyst.ru.md`
-- `backend_developer` → `backend_developer_lvsha.ru.md`
+- `backend_developer` → `backend_developer_levsha.ru.md`
 - и т.д.
 
 Путь к директории с ролями — параметр `%task_orchestrator.roles_dir%`.

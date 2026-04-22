@@ -6,7 +6,7 @@
 
 ## Оценка ролей
 
-- **Бэкендер (Левша)** (`docs/agents/roles/team/backend_developer_lvsha.ru.md`)
+- **Бэкендер (Левша)** (`docs/agents/roles/team/backend_developer_levsha.ru.md`)
   - **Плюсы:**
     - Реализация за 1 проход: 10 файлов, чистая слоистая структура (Domain → Infrastructure → Application). Ни одного нарушения границ слоя.
     - 9 тестов написаны сразу — ChainDefinitionVo (3), YamlChainLoader (2), DynamicLoopExecution (4). Все — на позитивные и негативные кейсы.
