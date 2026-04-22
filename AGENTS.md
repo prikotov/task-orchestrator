@@ -74,42 +74,37 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 # Архитектура проекта
 
-* Symfony 8.0 (`prikotov/task-orchestrator`), PHP 8.4, DDD.
-* Автозагрузка PSR-4 (`composer.json`): `TaskOrchestrator\` → `src/`.
+* Symfony 8.0 (`prikotov/task-orchestrator`), PHP 8.4, DDD, Clean Architecture.
+* Автозагрузка PSR-4 (`composer.json`): `TaskOrchestrator\Common\` → `src/`, `TaskOrchestrator\Console\` → `apps/console/src/`.
 * Сущности приложения: chain-based AI agent orchestration, retry, circuit breaker, quality gates, dynamic loops.
 
 ## Структура проекта
 
 ```
 /
-├── src/                  # Исходный код приложения
-│   ├── Domain/           # Бизнес-логика: Entity, VO, интерфейсы, доменные сервисы
-│   ├── Application/      # Use cases, DTO, мапперы, сервисы
-│   ├── Infrastructure/   # Репозитории, внешние интеграции, Symfony DI
-│   └── DependencyInjection/  # Конфигурация Symfony DI
-├── config/               # Конфигурация services.yaml
-├── tests/                # Тесты
-│   ├── Unit/             # Unit-тесты (Domain + Application + Infrastructure)
-│   └── Integration/      # Integration-тесты
-├── docs/                 # Документация приложения
-└── bin/                  # Скрипты
+├── src/                              # Исходный код приложения (TaskOrchestrator\Common\)
+│   ├── Module/
+│   │   ├── AgentRunner/               # Модуль движка AI-агента
+│   │   └── Orchestrator/              # Модуль оркестрации цепочек
+│   ├── DependencyInjection/           # Symfony Extension + Configuration (TreeBuilder)
+│   └── Infrastructure/Symfony/        # TaskOrchestratorBundle
+├── apps/console/                      # Presentation-слой: CLI-приложение (TaskOrchestrator\Console\)
+├── config/                            # Конфигурация services.yaml
+├── tests/                             # Тесты
+│   ├── Unit/
+│   └── Integration/
+├── docs/                              # Документация приложения
+└── bin/                               # Скрипты
 ```
 
 ## Слои
 
-* **Domain** (`src/Domain/`): бизнес-логика, сущности, VO, enum, интерфейсы, доменные сервисы.
-  - Строго запрещено: любые зависимости на другие слои или сторонние библиотеки.
-* **Application** (`src/Application/`): use case handlers, DTO, мапперы, сервисы.
-  - Координирует работу домена. Запрещено содержание инфраструктурных деталей.
-* **Infrastructure** (`src/Infrastructure/`): реализации интерфейсов Domain (репозитории, runner'ы, Symfony integration).
-  - Реализует только интерфейсы Domain/Application. Не содержит бизнес-логики.
+Каждый модуль в `src/Module/` следует DDD-слоистой архитектуре. Подробное описание слоёв и правила зависимостей — в [`docs/conventions/index.md`](docs/conventions/index.md) и [`docs/guide/architecture.md`](docs/guide/architecture.md).
 
-**Ключевой принцип:** слои изолированы.
-* `Application` → `Domain`.
-* `Infrastructure` → `Domain` (interfaces only), `Application`.
-* `Domain` не зависит ни от кого.
-
-Для детальных архитектурных правил используй `docs/guide/architecture.md`.
+* **Domain**: бизнес-логика, Entity, VO, enum, интерфейсы, доменные сервисы. Не зависит ни от кого.
+* **Application**: use case handlers, DTO, мапперы. → `Domain`.
+* **Integration** (если требуется): ACL между модулями. → `Domain` (interfaces only), другой модуль `Application`.
+* **Infrastructure**: реализации интерфейсов Domain/Application. → `Domain` (interfaces only).
 
 ---
 
