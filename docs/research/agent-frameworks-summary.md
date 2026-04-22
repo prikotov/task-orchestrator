@@ -11,19 +11,19 @@
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
-| 1 | Charmbracelet Crush | Go | `CLI-agent` | `agent-loop` (LLM → tool call → LLM → ...) | `persistent` (SQLite) | `manual` (только retry при 401) | `MCP + SKILL.md + config` | 🟡 заимствовать отдельные паттерны | [crush-comparison.md](crush-comparison.md) ✅ |
+| 1 | Charmbracelet Crush | Go | `CLI-agent` | `agent-loop` (LLM → tool call → LLM → ...) | `persistent` (SQLite) | `manual` (только retry при 401) | `MCP + SKILL.md + config + sub-agents (Coder → Task)` | 🟡 заимствовать отдельные паттерны | [crush-comparison.md](crush-comparison.md) ✅ |
 | 2 | pi_agent_rust | Rust | `CLI-agent` | `agent-loop` (LLM → tool call → LLM → ...) | `persistent` (JSONL tree + SQLite index) | `basic retry` (exponential backoff, global config) | `Extensions (QuickJS/WASM) + Skills (SKILL.md) + Packages` | 🟡 заимствовать отдельные паттерны | [pi-agent-rust-comparison.md](pi-agent-rust-comparison.md) ✅ |
 | 3 | CrewAI | Python | `multi-agent` | `sequential / hierarchical (Crews) + event-driven (Flows)` | `in-memory + checkpoint (SQLite)` | `basic retry (LLM level)` | `custom tools + Skills (SKILL.md) + MCP + RAG + Flows` | 🟡 заимствовать отдельные паттерны | [crewai-langgraph-autogen-comparison.md](crewai-langgraph-autogen-comparison.md) ✅ |
 | 4 | LangGraph | Python | `multi-agent` | `graph/DAG (StateGraph) + superstep execution` | `TypedDict + reducers + checkpoint (memory/SQLite/PostgreSQL)` | `RetryPolicy per node, durable execution` | `subgraphs + conditional edges + Send (map-reduce) + interrupts` | 🟡 заимствовать отдельные паттерны | *(в отчёте №3)* ✅ |
 | 5 | AutoGen (Microsoft) | Python + .NET | `multi-agent` | `event-driven (Core) / group chat (AgentChat) / graph` | `message thread + model context` | `CancellationToken, exception propagation` | `custom agents + tools + group chat managers + subscriptions` | 🟡 заимствовать отдельные паттерны | *(в отчёте №3)* ✅ |
 | 6 | OpenHands SDK | Python | `SDK` | `agent-loop` (LLM → Action → Tool → Observation → LLM → ...) | `event-stream` (file-backed) | `retry+backoff (tenacity) + fallback LLM profiles` | `custom tools + MCP + Skills (SKILL.md) + Plugins + Hooks + sub-agents` | 🟡 заимствовать отдельные паттерны | [openhands-sdk-comparison.md](openhands-sdk-comparison.md) ✅ |
-| 7 | Archon | TypeScript (Bun) | `workflow-engine` | `DAG (YAML) + topological layers + parallel execution` | `persistent (SQLite/PostgreSQL, 7 таблиц)` | `2-layer retry (SDK + node) + error classification (FATAL/TRANSIENT/UNKNOWN) + fallbackModel` | `IPlatformAdapter + IAgentProvider + IIsolationProvider + MCP + Hooks + Skills + Commands` | 🟡 заимствовать отдельные паттерны | [archon-comparison.md](archon-comparison.md) ✅ |
+| 7 | Archon | TypeScript (Bun) | `workflow-engine` | `DAG (YAML) + topological layers + parallel execution` | `persistent (SQLite/PostgreSQL, 8 таблиц)` | `node-level retry (default 2, max 5) + error classification (FATAL/TRANSIENT/UNKNOWN) + fallbackModel` | `IPlatformAdapter + IAgentProvider + IIsolationProvider + MCP + Hooks (21 SDK event) + Skills + Commands` | 🟡 заимствовать отдельные паттерны | [archon-comparison.md](archon-comparison.md) ✅ |
 | 8 | MetaGPT | Python | `multi-agent` | `SOP (BY_ORDER) / react-loop / plan-and-act` | `in-memory (Memory + index by cause_by)` | `budget guard (NoMoneyException)` | `custom roles + actions + tools + skills + RAG` | 🟡 заимствовать отдельные паттерны | [metagpt-openclaw-comparison.md](metagpt-openclaw-comparison.md) ✅ |
 | 9 | OpenClaw | TypeScript (Node.js) | `CLI-agent` | `agent-loop` (LLM → tool call → observation → LLM → ...) | `file-backed transcripts + pluggable context engine` | `model failover с cooldown + error classification` | `plugin SDK + 40+ extensions + Skills + MCP + sandbox` | 🟡 заимствовать отдельные паттерны | *(в отчёте №8)* ✅ |
-| 10 | Mastra AI | TypeScript (Node.js) | `SDK` | `step-based workflow (chaining API: .then/.branch/.parallel/.dowhile/.dountil/.foreach) + agent-loop` | `pluggable (LibSQL/PostgreSQL/D1/Upstash)` | `basic retry (attempts+delay, no exponential backoff) + TripWire (abort with retry hint)` | `Processors pipeline + MCP + Tools (Zod schemas) + custom storage + Agent network (delegation)` | 🟡 заимствовать отдельные паттерны | [mastra-ai-comparison.md](mastra-ai-comparison.md) ✅ |
-| 11 | Claude Code | — (проприетарный) | `CLI-agent` | `agent-loop` (LLM → tool call → observation → LLM → ...) | `in-memory + auto-compact` | `basic API retry` (429/500, без backoff) | `MCP + hooks (shell) + CLAUDE.md + slash commands + sub-agents` | 🟡 заимствовать отдельные паттерны | [claude-code-comparison.md](claude-code-comparison.md) ✅ |
-| 12 | GitHub Copilot Agent HQ | — (проприетарный) | `cloud/SaaS` | `agent-loop` (cloud sandbox, Issue→Plan→Execute→PR) | `cloud-managed` (session-based, GitHub infrastructure) | `transparent` (built-in API retry, org-level rate limits) | `MCP + custom instructions + GitHub Actions + GitHub Models marketplace` | 🟡 заимствовать отдельные паттерны | [copilot-agent-hq-comparison.md](copilot-agent-hq-comparison.md) ✅ |
-| 13 | Docker Agent + OpenAI Codex | Rust (codex-rs) + TypeScript | `CLI-agent + cloud/SaaS` | `agent-loop` (LLM → tool call → observation → LLM → ...) + hierarchical multi-agent | `persistent` (SQLite + rollout JSONL files) + `auto-compact` | `basic API retry` + `Guardian (LLM safety reviewer)` + `exec policy (rules)` | `MCP client/server` + `SKILL.md` + `AGENTS.md` + `apps (connectors)` + `custom agent roles` + `Docker sandbox` | 🟡 заимствовать отдельные паттерны | [docker-agent-codex-comparison.md](docker-agent-codex-comparison.md) ✅ |
+| 10 | Mastra AI | TypeScript (Node.js) | `SDK` | `step-based workflow (chaining API: .then/.branch/.parallel/.dowhile/.dountil/.foreach) + agent-loop` | `pluggable (22+ адаптеров: LibSQL, PostgreSQL, MongoDB, Redis, ClickHouse, D1, Upstash и др.)` | `basic retry (attempts+delay, no exponential backoff) + TripWire (abort with retry hint)` | `Processors pipeline + MCP + Tools (Zod schemas) + custom storage + Agent network (delegation)` | 🟡 заимствовать отдельные паттерны | [mastra-ai-comparison.md](mastra-ai-comparison.md) ✅ |
+| 11 | Claude Code | — (проприетарный) | `CLI-agent` | `agent-loop` (LLM → tool call → observation → LLM → ...) | `in-memory + auto-compact` | `basic API retry` (429/500, без backoff) | `MCP + 30+ tools + hooks (20+ events, 4 handler types) + CLAUDE.md + slash commands + sub-agents + Agent SDK + agent teams` | 🟡 заимствовать отдельные паттерны | [claude-code-comparison.md](claude-code-comparison.md) ✅ |
+| 12 | GitHub Copilot Cloud Agent | — (проприетарный) | `cloud/SaaS` | `agent-loop` (cloud sandbox, Issue→Plan→Execute→PR) | `cloud-managed` (session-based, GitHub infrastructure) | `transparent` (built-in API retry, org-level rate limits) | `MCP + custom instructions + GitHub Actions + GitHub Models marketplace + Copilot CLI/SDK/Spark` | 🟡 заимствовать отдельные паттерны | [copilot-agent-hq-comparison.md](copilot-agent-hq-comparison.md) ✅ |
+| 13 | Docker Agent + OpenAI Codex | Rust (codex-rs) + TypeScript | `CLI-agent + cloud/SaaS` | `agent-loop` (LLM → tool call → observation → LLM → ...) + hierarchical multi-agent | `persistent` (SQLite + rollout JSONL files) + `auto-compact` | `basic API retry` + `Guardian (LLM safety reviewer)` + `Starlark exec policy (rules)` | `MCP client/server` + `SKILL.md` + `AGENTS.md` + `hooks` + `memories` + `plugins` + `Starlark exec policy` + `external-sandbox` + `custom agent roles` + `Docker sandbox` | 🟡 заимствовать отдельные паттерны | [docker-agent-codex-comparison.md](docker-agent-codex-comparison.md) ✅ |
 
 ### Легенда колонок
 
@@ -63,7 +63,7 @@
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
 | **Error classification** | Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (6 категорий), Codex (Guardian) | Классификация ошибок перед retry: FATAL → не retry, TRANSIENT → retry с backoff, UNKNOWN →保守ный подход | Не тратить попытки retry на заведомо неисправимые ошибки (401, 403). Подтверждён 3+ проектами |
-| **Stuck / Loop detection** | Crush (window-based), OpenHands SDK (5 паттернов) | Обнаружение зацикливания: повторяющиеся действия, повторяющиеся ошибки, чередование, context overflow | Актуально для fix_iterations — если агент повторяет одни и те же действия, лучше остановить раньше. Подтверждено 2+ проектами |
+| **Stuck / Loop detection** | Crush (window-based), OpenHands SDK (4+1: 4 активных + 1 TODO) | Обнаружение зацикливания: повторяющиеся действия, повторяющиеся ошибки, чередование (context overflow — TODO) | Актуально для fix_iterations — если агент повторяет одни и те же действия, лучше остановить раньше. Подтверждено 2+ проектами |
 | **Model failover с cooldown** | OpenClaw (per-profile), Archon (fallbackModel), OpenHands SDK (FallbackStrategy) | При недоступности модели → переключение на fallback с cooldown, чтобы не «долбить» упавший endpoint | Дополнение к нашему circuit breaker: CB защищает от cascade failures, failover — переключает на альтернативу |
 
 #### 🟡 Среднесрочные (P2–P3)
@@ -89,10 +89,10 @@
 
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
-| **Docker-based sandboxing** | Codex (iptables + Docker), Copilot Agent HQ (container isolation) | Shell-команды в Docker-контейнере с network whitelist | Для production CI/CD — критически важно. Codex — наиболее полная реализация: iptables + ipset + auto-cleanup |
+| **Docker-based sandboxing** | Codex (iptables + Docker), Copilot Cloud Agent (container isolation) | Shell-команды в Docker-контейнере с network whitelist | Для production CI/CD — критически важно. Codex — наиболее полная реализация: iptables + ipset + auto-cleanup |
 | **Guardian (LLM safety reviewer)** | Codex | Pre-execution LLM-based risk assessment: data exfiltration, credential probing, destructive actions | Дополняет наши post-execution quality gates. Guardian оценивает risk ДО выполнения, gates — ПОСЛЕ |
 | **Network isolation** | Codex (iptables/ipset) | Default DROP, whitelist доменов (API endpoints, git servers) | Блокировка data exfiltration через network-level firewall |
-| **Policy engine** | Copilot Agent HQ (org-level policies) | Организационные политики: scope, permissions, audit | Для enterprise-использования: ограничение chain execution по env, repo, team |
+| **Policy engine** | Copilot Cloud Agent (org-level policies) | Организационные политики: scope, permissions, audit | Для enterprise-использования: ограничение chain execution по env, repo, team |
 
 ### Кластер 3: Расширенные модели оркестрации
 
@@ -165,7 +165,7 @@
 * Crush: формализация Agent Skills (SKILL.md standard, discovery, validation) — 🟡 P2
 * pi_agent_rust: tool parallelism (параллельное выполнение read-only шагов в chain) — 🟡 P2
 * AutoGen: декларативные termination conditions (timeout, token limit, keyword) — 🟡 P2
-* OpenHands SDK: stuck detection (5 паттернов зацикливания — repeating action-obs, action-error, monologue, alternating, context overflow) — 🟡 P2
+* OpenHands SDK: stuck detection (4 активных + 1 TODO — repeating action-obs, action-error, monologue, alternating; context-window loop не реализован) — 🟡 P2
 * OpenHands SDK: security risk assessment + confirmation policies (для автономного выполнения) — 🟡 P2
 * Archon: error classification (FATAL/TRANSIENT/UNKNOWN) — умный retry, не тратить попытки на неисправимые ошибки — 🟡 P2
 * Archon: loop nodes с `until_bash` — детерминированная проверка завершения (тесты прошли → стоп) — 🟡 P2
@@ -181,9 +181,9 @@
 * Claude Code: hooks system (pre/post step execution через shell-скрипты) — декларативная альтернатива decorator pattern — 🟡 P2
 * Claude Code: permission system (allow/deny для runner'ов и команд, CI/CD) — 🟡 P2
 * Claude Code: sub-agent pattern (Task tool: изолированный контекст, потенциально параллельно) — 🟡 P2
-* GitHub Copilot Agent HQ: Issue → Agent → PR workflow pattern (webhook-triggered chains, PR review chains) — 🟡 P2
-* GitHub Copilot Agent HQ: sandboxed execution (Docker-container изоляция для shell-команд в CI/CD) — 🟡 P2
-* GitHub Copilot Agent HQ: policy engine (permissions, scopes, org-level ограничения) — 🟡 P2
+* GitHub Copilot Cloud Agent: Issue → Agent → PR workflow pattern (webhook-triggered chains, PR review chains) — 🟡 P2
+* GitHub Copilot Cloud Agent: sandboxed execution (Docker-container изоляция для shell-команд в CI/CD) — 🟡 P2
+* GitHub Copilot Cloud Agent: policy engine (permissions, scopes, org-level ограничения) — 🟡 P2
 * Docker Agent + Codex: Docker-based sandboxing (container isolation + iptables firewall + domain whitelist) — 🟡 P2
 * Docker Agent + Codex: network isolation (iptables/ipset — DROP default, whitelist доменов) — 🟡 P2
 * Docker Agent + Codex: Guardian (LLM-based safety reviewer — data exfiltration, credential probing, destructive actions) — 🟡 P2
@@ -196,6 +196,7 @@
 * Crush: auto-summarization при переполнении контекста — 🟡 P3
 * Crush: permission system для автономного выполнения — 🟡 P3
 * Crush: множественный context file discovery (CRUSH.md, CLAUDE.md и т.д.) — 🟡 P3
+* Crush: sub-agent pattern (Coder → Task: иерархия «основный агент → субагент поиска») — 🟡 P3
 * pi_agent_rust: auto-compaction при переполнении контекста — 🟡 P3
 * pi_agent_rust: session persistence с tree branching — 🟡 P3
 * pi_agent_rust: extension/permission system для custom runners — 🟡 P3
@@ -210,7 +211,7 @@
 * OpenHands SDK: tool annotations (readOnly / destructive / idempotent / openWorld hints) — 🟡 P3
 * OpenHands SDK: critic (LLM-based quality scoring) + iterative refinement — 🟡 P3
 * OpenHands SDK: LLM Profile Store (файловые JSON-профили с параметрами LLM) — 🟡 P3
-* OpenHands SDK: hooks system (pre/post tool use shell-скрипты) — 🟡 P3
+* OpenHands SDK: hooks system (6 lifecycle events, pre/post tool use shell-скрипты) — 🟡 P3
 * OpenHands SDK: parallel tool execution с resource-level locking — 🟡 P3
 * OpenHands SDK: sub-agent delegation (файловые YAML-определения агентов) — 🟡 P3
 * Archon: DAG-based workflow (parallel execution независимых шагов) — 🟡 P3
@@ -233,8 +234,8 @@
 * Claude Code: hierarchical context discovery (CLAUDE.md: dynamic loading по директории) — 🟡 P3
 * Claude Code: slash commands как макросы (файл = команда, $ARGUMENTS placeholder) — 🟡 P3
 * Claude Code: headless CI/CD mode (--max-turns, --allowedTools, JSON output) — 🟡 P3
-* GitHub Copilot Agent HQ: Plan → Review → Execute (LLM-generated dynamic chains с human-in-the-loop) — 🟡 P3
-* GitHub Copilot Agent HQ: knowledge base integration (обогащение контекста документацией) — 🟡 P3
+* GitHub Copilot Cloud Agent: Plan → Review → Execute (LLM-generated dynamic chains с human-in-the-loop) — 🟡 P3
+* GitHub Copilot Cloud Agent: knowledge base integration (обогащение контекста документацией) — 🟡 P3
 * Docker Agent + Codex: auto-compaction (LLM summarization при context overflow, inline + remote) — 🟡 P3
 * Docker Agent + Codex: plan mode (read-only exploration перед execution) — 🟡 P3
 * Docker Agent + Codex: session persistence (SQLite + rollout JSONL — resumable sessions) — 🟡 P3
@@ -251,13 +252,13 @@
 
 **Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это нашственная (genuine) комбинация, отличающая task-orchestrator от всех 13 фреймворков.
 
-**Ни один проприетарный продукт** (Claude Code, GitHub Copilot Agent HQ, OpenAI Codex) не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны даже против крупнейших коммерческих AI-agent продуктов.
+**Ни один проприетарный продукт** (Claude Code, GitHub Copilot Cloud Agent, OpenAI Codex) не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны даже против крупнейших коммерческих AI-agent продуктов.
 
 **Ближайший аналог** по уровню абстракции — Archon (TypeScript/Bun), который тоже оркестирует внешние AI-ассистенты через subprocess SDK. Однако Archon не имеет circuit breaker, quality gates или бюджетного контроля.
 
 ### 2. Agent Loop — доминирующая модель выполнения
 
-**11 из 13 фреймворков** используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, OpenHands SDK, MetaGPT, OpenClaw, Claude Code, Copilot Agent HQ, Codex и др.). Только LangGraph (graph/DAG с superstep execution) и Archon (DAG + subprocess SDK) используют принципиально другие модели.
+**11 из 13 фреймворков** используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, OpenHands SDK, MetaGPT, OpenClaw, Claude Code, Copilot Cloud Agent, Codex и др.). Только LangGraph (graph/DAG с superstep execution) и Archon (DAG + subprocess SDK) используют принципиально другие модели.
 
 **Вывод для task-orchestrator:** Наша модель (YAML chain → runner call → payload) — это оркестрация поверх agent loop. Это правильный уровень: мы не дублируем LLM interaction, а управляем им.
 
@@ -284,7 +285,7 @@
 ### 5. MCP (Model Context Protocol) — повсеместный протокол расширения
 
 **9 из 13 проектов** поддерживают MCP:
-- Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Agent HQ, Codex
+- Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex
 - MCP — стандарт де-факто для расширения возможностей AI-агентов через внешние tool-серверы
 
 **Вывод:** MCP-поддержка в task-orchestrator — вопрос времени. Но реализовывать нужно на уровне runner'ов, не оркестратора.
@@ -306,7 +307,7 @@
 | Проект | Подход | Уровень зрелости |
 |---|---|---|
 | **Codex** | Guardian (LLM safety) + exec policy (rules) + Docker sandbox (iptables) + split FS permissions | Production-ready, defence in depth |
-| **Copilot Agent HQ** | Docker-container sandbox + org-level policy engine + audit | Production-grade, enterprise |
+| **Copilot Cloud Agent** | Docker-container sandbox + org-level policy engine + audit | Production-grade, enterprise |
 | **OpenHands SDK** | Security risk assessment (LLM + heuristics) + confirmation policies + defense-in-depth rails | SDK-level, composable |
 | **Claude Code** | Permission system (allow/deny) + tiered prompts | Basic but effective |
 
@@ -316,8 +317,8 @@
 
 ### 8. Sub-agents / Multi-agent — тренд к иерархической декомпозиции
 
-**8 из 13 проектов** поддерживают sub-agents или multi-agent:
-- Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat)
+**9 из 13 проектов** поддерживают sub-agents или multi-agent:
+- Crush (Coder → Task), Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat)
 - Codex — наиболее продвинутая sub-agent система: mailbox pattern, fork modes, role system
 
 **Вывод:** Sub-agent pattern — готовый механизм для dynamic chains. Рекомендуется как P2: «chain внутри chain» с изолированным контекстом.
@@ -359,20 +360,20 @@
 | **TypeScript** | Archon, OpenClaw, Mastra AI | Растущая экосистема, особенно для workflow engines |
 | **Rust** | pi_agent_rust, Codex (codex-rs) | High-performance CLI-агенты |
 | **Go** | Crush | TUI-ориентированный агент |
-| **Проприетарный** | Claude Code, Copilot Agent HQ | Закрытый код, анализ по документации |
+| **Проприетарный** | Claude Code, Copilot Cloud Agent | Закрытый код, анализ по документации |
 
 **Task-orchestrator (PHP/Symfony)** — единственный в своей нише: Symfony Bundle для chain-оркестрации AI-агентов. Это не недостаток — это уникальная позиция в PHP-экосистеме.
 
 ### 14. Отдельные наблюдения
 
-* **LangGraph — единственный** с durable execution и checkpoint persistence. Ключевое преимущество для длинных workflows.
+* **LangGraph — единственный** с durable execution и checkpoint persistence. Ключевое преимущество для длинных workflows. Требует `langchain-core` как обязательную зависимость — не standalone.
 * **AutoGen в maintenance mode**, Microsoft рекомендует Microsoft Agent Framework (MAF). Заимствование паттернов безопасно, но dependency невозможна.
 * **CrewAI — самый «productized»:** Enterprise (Crew Control Plane), сертификация 100k+ разработчиков, monetization через cloud.
 * **Archon v2 переписан с Python на TypeScript/Bun** — показательный пример смены стека для production-ready проекта.
 * **OpenHands SDK — наиболее зрелая Action/Observation-модель:** типизированные Action/Observation (Pydantic), security risk assessment, stuck detection, context condensation, sub-agent delegation — при этом SDK работает на уровне single agent loop, не оркестрации.
 * **Mastra AI и Archon — два TypeScript-проекта с workflow engine**, но на разных уровнях: Mastra = SDK (LLM API), Archon = orchestrator (subprocess SDK). Task-orchestrator ближе к Archon.
 * **OpenClaw — production-ready multi-channel personal assistant** (20+ мессенджеров, desktop/mobile apps, voice wake). Не фреймворк оркестрации, а законченный продукт.
-* **Copilot Agent HQ подтверждает тренд multi-model marketplace:** единый API поверх GPT-4, Claude, Gemini, Llama. Индустриальный аналог нашего AgentRunnerInterface.
+* **Copilot Cloud Agent подтверждает тренд multi-model marketplace:** единый API поверх GPT-4, Claude, Gemini, Llama. Индустриальный аналог нашего AgentRunnerInterface.
 
 ---
 
@@ -391,3 +392,4 @@
 | 2026-04-22 | Технический писатель (Гермиона) | Создан отчёт copilot-agent-hq-comparison.md, заполнена строка GitHub Copilot Agent HQ (#12), добавлены рекомендации и тренды |
 | 2026-04-22 | Технический писатель (Гермиона) | Создан отчёт docker-agent-codex-comparison.md, заполнена строка Docker Agent + OpenAI Codex (#13), добавлены рекомендации и тренды. Все 13 исследований завершены. |
 | 2026-04-22 | Технический писатель (Гермиона) | Финализация сводной таблицы: добавлен Executive Summary, реорганизованы рекомендации по 5 тематическим кластерам (Quick wins / Среднесрочные / R&D), консолидированы 14 общих трендов с кросс-анализом всех 13 исследований. |
+| 2026-04-22 | Архитектор (Локи) | Ревью консистентности: исправлены данные по результатам ревью индивидуальных отчётов — Archon (8 таблиц, node-level retry, 21 hook), Mastra AI (22+ адаптеров), Claude Code (30+ tools, 20+ hook events, Agent SDK, agent teams), Codex (hooks, memories, plugins, Starlark exec policy, external-sandbox), Crush (sub-agents Coder → Task), OpenHands SDK (4+1 stuck detector, 6 hook events), Copilot (Cloud Agent, CLI/SDK/Spark), LangGraph (langchain-core dependency). Обновлён тренд sub-agents (9/13 вместо 8/13). |
