@@ -9,9 +9,9 @@ depends_on:
 epic: EPIC-docs-agents-md-contradictions
 author: Бэкендер (Левша)
 assignee: Технический писатель (Гермиона)
-branch:
-pr:
-status: todo
+branch: task/docs-agents-md-structure
+pr: https://github.com/prikotov/task-orchestrator/pull/53
+status: done
 ---
 
 # TASK-docs-agents-md-structure: Актуализировать структуру проекта, слои и namespace в AGENTS.md
