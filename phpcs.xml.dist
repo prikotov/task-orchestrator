@@ -10,7 +10,17 @@
     <arg name="extensions" value="php"/>
     <arg name="bootstrap" value="vendor/autoload.php"/>
 
-    <rule ref="coding-standard"/>
+    <rule ref="PSR12">
+        <exclude name="PSR2.Files.EndFileNewline.NoneFound"/>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses"/>
+    <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
+    <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
+        <properties>
+            <property name="searchAnnotations" value="true"/>
+        </properties>
+    </rule>
 
     <exclude-pattern>/vendor</exclude-pattern>
     <exclude-pattern>/var</exclude-pattern>

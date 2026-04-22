@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static;
 
+use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\StepAuditStatusDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\StaticChainExecution;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
@@ -15,7 +16,6 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationG
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticProcessResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticStepResultVo;
-use Psr\Log\LoggerInterface;
 
 use function count;
 use function sprintf;
