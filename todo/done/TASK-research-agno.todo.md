@@ -9,8 +9,8 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee:
 branch: task/research-agno
-pr:
-status: review
+pr: (создаётся)
+status: done
 ---
 
 # TASK-research-agno: Исследовать Agno (бывший Phi) для сравнения с task-orchestrator
@@ -29,29 +29,29 @@ status: review
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Изучить Agno: архитектуру, Python-first подход, модель агентов, multi-agent teams, tools
-- [ ] Изучить систему оркестрации: Agent Teams, workflow-паттерны, routing
-- [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [ ] Оформить отчёт в docs/research/agno-comparison.md по формату существующих comparison-документов
-- [ ] Заполнить строку для Agno в сводной таблице docs/research/agent-frameworks-summary.md
+- [x] Изучить Agno: архитектуру, Python-first подход, модель агентов, multi-agent teams, tools
+- [x] Изучить систему оркестрации: Agent Teams, workflow-паттерны, routing
+- [x] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
+- [x] Оформить отчёт в docs/research/agno-comparison.md по формату существующих comparison-документов
+- [x] Заполнить строку для Agno в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
-- [ ] Определить конкретные паттерны, которые стоит заимствовать
-- [ ] Оценить подход Agno к memory (short-term, long-term), RAG, multimodal
-- [ ] Сравнить Python-first подход с нашим PHP/Symfony подходом
+- [x] Определить конкретные паттерны, которые стоит заимствовать
+- [x] Оценить подход Agno к memory (short-term, long-term), RAG, multimodal
+- [x] Сравнить Python-first подход с нашим PHP/Symfony подходом
 ### 🟢 Could Have (Опционально)
 ### ⚫ Won't Have (Не будем делать)
 - [ ] Написание кода интеграции
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Изучить репозиторий https://github.com/agno-agi/agno и документацию https://docs.agno.com
-2. [ ] Сравнить модель agents/teams и оркестрации с нашей
-3. [ ] Написать docs/research/agno-comparison.md
-4. [ ] Добавить строку Agno в docs/research/agent-frameworks-summary.md
+1. [x] Изучить репозиторий https://github.com/agno-agi/agno и документацию https://docs.agno.com
+2. [x] Сравнить модель agents/teams и оркестрации с нашей
+3. [x] Написать docs/research/agno-comparison.md
+4. [x] Добавить строку Agno в docs/research/agent-frameworks-summary.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт docs/research/agno-comparison.md создан по формату существующих comparison-документов
-- [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
-- [ ] Строка Agno в сводной таблице docs/research/agent-frameworks-summary.md заполнена
+- [x] Отчёт docs/research/agno-comparison.md создан по формату существующих comparison-документов
+- [x] Содержит чёткий вывод: заимствовать / использовать / не подходит
+- [x] Строка Agno в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
