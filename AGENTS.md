@@ -21,9 +21,9 @@ AGENTS.md — обязательные правила для AI-агента в 
     - [`Ревьювер Бэка`](docs/agents/roles/team/code_reviewer_backend.ru.md) — ревьюит PHP/DDD/архитектуру, стиль, тесты, безопасность.
     - [`Тестировщик Бэка`](docs/agents/roles/team/qa_backend.ru.md) — проверяет use cases, тест-планы, unit/integration тесты.
     - [`Технический писатель`](docs/agents/roles/team/technical_writer.ru.md) — обновляет документацию, гайды и описание контрактов.
-    - [`Архитектор-Возмутитель`](docs/agents/roles/team/system_architect_contrarian.ru.md) — теневой архитектор (Локи), оспаривает устоявшиеся решения, ищет слепые зоны.
-    - [`Бэкендер-Возмутитель`](docs/agents/roles/team/backend_developer_contrarian.ru.md) — теневой бэкендер (Тони Старк), бросает вызов подходам, предлагает радикальные альтернативы.
-    - [`Писатель-Возмутитель`](docs/agents/roles/team/technical_writer_contrarian.ru.md) — теневой тех. писатель (Остап), борется с формализмом и мёртвой документацией.
+    - [`Архитектор (Локи)`](docs/agents/roles/team/system_architect_loki.ru.md) — прагматик-скептик, оспаривает решения, ищет слепые зоны.
+    - [`Бэкендер (Тони Старк)`](docs/agents/roles/team/backend_developer_tony.ru.md) — прагматик, ценит простоту и скорость, не терпит лишних абстракций.
+    - [`Тех. писатель (Остап)`](docs/agents/roles/team/technical_writer_ostap.ru.md) — борется с водой и формализмом, пишет для читателя.
 
 * Если сомневаешься — загружай md-файл роли `Бэкендер`.
 
