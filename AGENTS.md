@@ -94,6 +94,8 @@ AGENTS.md — обязательные правила для AI-агента в 
 │   ├── Unit/
 │   └── Integration/
 ├── docs/                              # Документация приложения
+│   ├── releases/                      # Release plans (планы релизов)
+│   └── git-workflow/releases/         # Документация процесса релизов (шаблоны, инструкции)
 └── bin/                               # Скрипты
 ```
 
@@ -159,7 +161,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 |------------------|--------------------|-----------------------------------|
 | PHPUnit          | `phpunit.xml.dist` | Unit, integration tests           |
 | Psalm            | `psalm.xml`        | Static code analysis              |
-| PHP_CodeSniffer  | —                  | Code style validation             |
+| PHP_CodeSniffer  | [`docs/conventions/examples/phpcs.xml.dist`](docs/conventions/examples/phpcs.xml.dist) | Code style validation             |
 | Composer         | `composer.json`    | Dependency and security checks    |
 
 * Изменения без тестов, проверок и соблюдения архитектуры считаются некорректными.

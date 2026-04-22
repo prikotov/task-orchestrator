@@ -58,7 +58,7 @@ pr:
 ## 5. Implementation Plan (План реализации)
 
 - [ ] [TASK-docs-agents-md-structure](done/TASK-docs-agents-md-structure.todo.md) — актуализировать структуру проекта, слои и namespace в AGENTS.md
-- [ ] [TASK-docs-agents-md-minor-fixes](TASK-docs-agents-md-minor-fixes.todo.md) — кликабельная ссылка на architecture.md, таблица инструментов, комментарий про docs/releases/
+- [ ] [TASK-docs-agents-md-minor-fixes](done/TASK-docs-agents-md-minor-fixes.todo.md) — кликабельная ссылка на architecture.md, таблица инструментов, комментарий про docs/releases/
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [ ] AGENTS.md точно описывает реальную структуру `src/`
