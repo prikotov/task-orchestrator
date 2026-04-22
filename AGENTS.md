@@ -85,58 +85,26 @@ AGENTS.md — обязательные правила для AI-агента в 
 ├── src/                              # Исходный код библиотеки (TaskOrchestrator\Common\)
 │   ├── Module/
 │   │   ├── AgentRunner/               # Модуль движка AI-агента
-│   │   │   ├── Domain/                # Контракт движка: AgentRunnerInterface, VO, Registry
-│   │   │   ├── Application/           # Use cases: RunAgentCommandHandler, GetRunners
-│   │   │   └── Infrastructure/        # Реализации: PiAgentRunner, Retry, Circuit Breaker
 │   │   └── Orchestrator/              # Модуль оркестрации цепочек
-│   │       ├── Domain/                # Бизнес-логика: Chain, Budget, Dynamic, Static
-│   │       ├── Application/           # Use cases, DTO, мапперы
-│   │       ├── Integration/           # ACL к AgentRunner: RunAgentService, AgentDtoMapper
-│   │       └── Infrastructure/        # YAML-загрузка, JSONL-лог, Session, Prompt
 │   ├── DependencyInjection/           # Symfony Extension + Configuration (TreeBuilder)
 │   └── Infrastructure/Symfony/        # TaskOrchestratorBundle
 ├── apps/console/                      # Presentation-слой: CLI-приложение (TaskOrchestrator\Console\)
 ├── config/                            # Конфигурация services.yaml
 ├── tests/                             # Тесты
-│   ├── Unit/                          # Unit-тесты (Domain + Application + Infrastructure)
-│   └── Integration/                   # Integration-тесты
+│   ├── Unit/
+│   └── Integration/
 ├── docs/                              # Документация приложения
 └── bin/                               # Скрипты
 ```
 
 ## Слои
 
-Каждый модуль имеет собственные DDD-слои. Domain не зависит ни от кого (только `Psr\Log\LoggerInterface`).
+Каждый модуль в `src/Module/` следует DDD-слоистой архитектуре. Подробное описание слоёв и правила зависимостей — в [`docs/conventions/index.md`](docs/conventions/index.md) и [`docs/guide/architecture.md`](docs/guide/architecture.md).
 
-### Модуль AgentRunner (3 слоя)
-
-* **Domain** (`src/Module/AgentRunner/Domain/`): контракт движка — `AgentRunnerInterface`, VO, Registry.
-  - Строго запрещено: любые зависимости на другие слои или сторонние библиотеки.
-* **Application** (`src/Module/AgentRunner/Application/`): use case handlers, DTO.
-  - Координирует работу домена. Запрещено содержание инфраструктурных деталей.
-* **Infrastructure** (`src/Module/AgentRunner/Infrastructure/`): реализации `AgentRunnerInterface` (PiAgentRunner, Retry, Circuit Breaker).
-  - Реализует только интерфейсы Domain. Не содержит бизнес-логики.
-
-### Модуль Orchestrator (4 слоя)
-
-* **Domain** (`src/Module/Orchestrator/Domain/`): бизнес-логика цепочек — Entity, VO, сервисы Chain/Budget/Prompt.
-  - Строго запрещено: любые зависимости на другие слои или сторонние библиотеки.
-* **Application** (`src/Module/Orchestrator/Application/`): use case handlers, DTO, мапперы, сервисы.
-  - Координирует работу домена. Запрещено содержание инфраструктурных деталей.
-* **Integration** (`src/Module/Orchestrator/Integration/`): ACL к AgentRunner — `RunAgentService`, `AgentDtoMapper`.
-  - Реализует `RunAgentServiceInterface` из Domain, делегирует в AgentRunner Application.
-  - Маппит VO Orchestrator ↔ DTO AgentRunner.
-* **Infrastructure** (`src/Module/Orchestrator/Infrastructure/`): YAML-загрузка, JSONL-лог, Session, QualityGate.
-  - Реализует только интерфейсы Domain/Application. Не содержит бизнес-логики.
-
-### Правило зависимостей
-
-* `Application` → `Domain` (через интерфейсы и VO).
-* `Integration` → `Domain` (interfaces only), `AgentRunner Application`.
-* `Infrastructure` → `Domain` (interfaces only).
-* `Domain` не зависит ни от кого.
-
-Для детальных архитектурных правил используйте [`docs/guide/architecture.md`](docs/guide/architecture.md).
+* **Domain**: бизнес-логика, Entity, VO, enum, интерфейсы, доменные сервисы. Не зависит ни от кого.
+* **Application**: use case handlers, DTO, мапперы. → `Domain`.
+* **Integration** (если требуется): ACL между модулями. → `Domain` (interfaces only), другой модуль `Application`.
+* **Infrastructure**: реализации интерфейсов Domain/Application. → `Domain` (interfaces only).
 
 ---
 
