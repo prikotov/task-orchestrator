@@ -73,10 +73,23 @@ pr:
 ## 5. Implementation Plan (План реализации)
 
 ### Фаза 1: Исследование и выбор решения
-- [ ] [TASK-research-cli-distribution-options](TASK-research-cli-distribution-options.todo.md) — Мозговой штурм: исследовать варианты дистрибуции, оформить RFC, согласовать с владельцем проекта
+- [x] [TASK-research-cli-distribution-options](TASK-research-cli-distribution-options.todo.md) — Мозговой штурм: исследовать варианты дистрибуции, оформить RFC, согласовать с владельцем проекта
 
-### Фаза 2: Реализация (задачи будут добавлены после утверждения решения из Фазы 1)
-- [ ] Задачи на реализацию будут декомпозированы на основе утверждённого решения
+### Фаза 2: Реализация (P0)
+- [ ] [TASK-chore-composer-library-type](TASK-chore-composer-library-type.todo.md) — Изменить type на library + добавить bin в composer.json (~1.5 ч)
+- [ ] [TASK-chore-packagist-register](TASK-chore-packagist-register.todo.md) — Регистрация пакета на Packagist (~10 мин)
+- [ ] [TASK-feat-typed-exit-codes](TASK-feat-typed-exit-codes.todo.md) — Typed exit codes для CLI-команды (~2–2.5 ч)
+
+### Фаза 3: Реализация (P1)
+- [ ] [TASK-feat-validate-config](TASK-feat-validate-config.todo.md) — Флаг --validate-config для проверки конфигурации (~2–2.5 ч)
+- [ ] [TASK-chore-phar-build](TASK-chore-phar-build.todo.md) — Настройка сборки Phar через box-project/box (~45 мин)
+- [ ] [TASK-docs-install-skill](TASK-docs-install-skill.todo.md) — SKILL.md для установки AI-агентами + README (~2 ч)
+
+### Backlog (P2, после v1.0)
+- [ ] GPG-подпись Phar
+- [ ] Windows CI для Phar
+- [ ] JSON Schema для chains.yaml
+- [ ] Programmatic API (вход через PHP-код, не CLI)
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [ ] Проведён мозговой штурм, результаты задокументированы
@@ -110,3 +123,4 @@ pr:
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-21 | Бэкендер (Левша) | Создание эпика |
+| 2026-04-23 | Тимлид (Алекс) | Фаза 1 завершена (RFC). Добавлены задачи Фазы 2/3 + backlog |
