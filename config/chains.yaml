@@ -145,7 +145,224 @@ roles:
       - --system-prompt
       - "@system-prompt"
 
+  # ──────────────────────────────────────────────────────────────────────────────
+  # Примеры конфигурации ролей с другими CLI-раннерами
+  # ──────────────────────────────────────────────────────────────────────────────
+  #
+  # Qwen CLI (qwen) — https://github.com/QwenLM/qwen-code
+  # Поддерживает --system-prompt для инъекции роли через @system-prompt.
+  # Флаги: --yolo (авто-подтверждение), --output-format json, --max-session-turns.
+  #
+  # backend_developer_levsha_qwen:
+  #   prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
+  #   command:
+  #     - qwen
+  #     - --model
+  #     - qwen3-235b-a22b
+  #     - --yolo
+  #     - --output-format
+  #     - json
+  #     - --max-session-turns
+  #     - "1"
+  #     - --system-prompt
+  #     - "@system-prompt"
+  #
+  # Gemini CLI (gemini) — https://github.com/google-gemini/gemini-cli
+  # Не имеет флага --system-prompt; проектные инструкции читаются из AGENTS.md
+  # в корне проекта. Runner должен подставить содержимое prompt_file в AGENTS.md
+  # или передать через stdin. Флаги: -p (headless), --yolo, --output-format json.
+  #
+  # backend_developer_levsha_gemini:
+  #   prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
+  #   command:
+  #     - gemini
+  #     - --model
+  #     - gemini-2.5-pro
+  #     - --yolo
+  #     - --output-format
+  #     - json
+  #     - -p
+  #     - "@system-prompt"              # @system-prompt резолвится в путь к файлу;
+  #                                     # Runner должен прочитать файл и передать
+  #                                     # содержимое как prompt в headless mode
+  #
+  # OpenCode (opencode) — https://github.com/opencode-ai/opencode
+  # Подкоманда `run` для non-interactive режима, --format json для машинного вывода.
+  # Не имеет флага --system-prompt; инструкции берутся из OPENCODE.md или config.
+  # Runner должен инжектировать prompt через --prompt или stdin.
+  #
+  # backend_developer_levsha_opencode:
+  #   prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
+  #   command:
+  #     - opencode
+  #     - run
+  #     - --model
+  #     - openrouter/glm-4.1
+  #     - --format
+  #     - json
+  #     - --prompt
+  #     - "@system-prompt"              # @system-prompt резолвится в путь к файлу;
+  #                                     # Runner должен прочитать и передать как prompt
+  #
+  # Kilo CLI (kilo) — https://github.com/kilocode/kilo
+  # Форк OpenCode с идентичным CLI-интерфейсом. Подкоманда `run`, --format json,
+  # флаг --auto для автономного режима (без подтверждений).
+  # Не имеет флага --system-prompt; инструкции берутся из конфига проекта.
+  #
+  # backend_developer_levsha_kilo:
+  #   prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
+  #   command:
+  #     - kilo
+  #     - run
+  #     - --model
+  #     - openrouter/glm-4.1
+  #     - --format
+  #     - json
+  #     - --auto
+  #     - --prompt
+  #     - "@system-prompt"              # @system-prompt резолвится в путь к файлу;
+  #                                     # Runner должен прочитать и передать как prompt
+
 chains:
+  # ──────────────────────────────────────────────────────────────────────────
+  # Пример полной конфигурации цепочки с retry_policy:
+  #
+  #   implement:
+  #     description: "Полный цикл реализации фичи"
+  #     retry_policy:
+  #       max_retries: 3
+  #       initial_delay_ms: 1000
+  #       max_delay_ms: 30000
+  #       multiplier: 2.0
+  #     steps:
+  #       - type: agent
+  #         role: system_analyst_sherlock
+  #         retry_policy:                  # Переопределение на уровне шага
+  #           max_retries: 5
+  #       - type: agent
+  #         role: backend_developer_levsha
+  #         name: implement
+  #       - type: agent
+  #         role: code_reviewer_backend_puaro
+  #         name: review
+  #     fix_iterations:
+  #       - group: dev-review
+  #         steps: [implement, review]
+  #         max_iterations: 3
+  #
+  # Fallback конфигурируется на уровне роли (секция roles), например:
+  #
+  #   backend_developer_levsha:
+  #     prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
+  #     command:
+  #       - pi
+  #       - --mode
+  #       - json
+  #       - -p
+  #       - --no-session
+  #       - --model
+  #       - glm-5-turbo
+  #       - --system-prompt
+  #       - "@system-prompt"
+  #     fallback:                            # Если pi недоступен → fallback runner
+  #       command:                           # @system-prompt резолвится в путь к prompt_file
+  #         - codex
+  #         - --model
+  #         - gpt-4o
+  #         - --full-auto
+  #         - --system-prompt
+  #         - "@system-prompt"
+  #
+  # Budget — ограничение стоимости цепочки (в USD), проверяется перед/после каждого шага:
+  #
+  #   implement:
+  #     description: "Цепочка с бюджетом"
+  #     steps:
+  #       - { type: agent, role: system_analyst_sherlock }
+  #       - { type: agent, role: backend_developer_levsha }
+  #     budget:
+  #       max_cost_total: 5.0                # Максимум $5 на всю цепочку (null = безлимит)
+  #       max_cost_per_step: 1.5             # Максимум $1.50 за один шаг (null = безлимит)
+  #       per_role:                          # Per-role бюджеты (опционально)
+  #         backend_developer_levsha:        # Лимит для роли backend_developer_levsha
+  #           max_cost_total: 2.0            # Максимум $2 суммарно для этой роли
+  #         code_reviewer_backend_puaro:
+  #           max_cost_total: 1.0
+  #           max_cost_per_step: 0.5         # Максимум $0.50 за один шаг этой роли
+  # ──────────────────────────────────────────────────────────────────────────
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Cross-model Verification — кросс-модельная верификация результата шага.
+  # Реализуется как обычный agent-шаг с любой ролью (другая модель).
+  # Верификатор получает результат предыдущего шага через context.
+  #
+  # Роль-верификатор использует другую модель для независимой
+  # проверки результата основного агента. Это снижает эффект
+  # систематических ошибок одной модели.
+  #
+  # Пример цепочки с кросс-модельной верификацией:
+  #
+  #   implement_verified:
+  #     description: "Полный цикл с верификацией архитектурных решений"
+  #     steps:
+  #       - { type: agent, role: system_analyst_sherlock }
+  #       - type: agent
+  #         role: system_architect_gandalf
+  #         name: architect
+  #       - type: agent
+  #         role: verifier                # ← обычный шаг, другая модель
+  #         name: verify_architect
+  #       - type: agent
+  #         role: backend_developer_levsha
+  #         name: implement
+  #       - type: agent
+  #         role: code_reviewer_backend_puaro
+  #         name: review
+  #     fix_iterations:
+  #       - group: architect-verify
+  #         steps: [architect, verify_architect]   # итерации: архитектор ↔ верификатор
+  #         max_iterations: 2
+  #       - group: dev-review
+  #         steps: [implement, review]
+  #         max_iterations: 3
+  #
+  # CLI-вывод при верификации:
+  #   [2/5] system_architect_gandalf @ pi ... ✓ (↑4.5k ↓2.0k $0.0156, 11s)
+  #   [3/5] verifier @ pi ... ✓ (↑1.2k ↓0.5k $0.003, 4s)
+  # ──────────────────────────────────────────────────────────────────────────
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Quality Gates — отдельный тип шага (type: quality_gate).
+  # Выполняется как детерминированная shell-команда через Symfony Process.
+  # Failed gate = warning (не прерывает цепочку).
+  #
+  # Пример цепочки с quality gate шагами:
+  #
+  #   implement_with_qa:
+  #     description: "Полный цикл: реализация → ревью → тесты"
+  #     steps:
+  #       - { type: agent, role: system_analyst_sherlock }
+  #       - { type: agent, role: system_architect_gandalf }
+  #       - type: agent
+  #         role: backend_developer_levsha
+  #         name: implement
+  #       - type: agent
+  #         role: code_reviewer_backend_puaro
+  #         name: review
+  #       - type: quality_gate
+  #         command: 'vendor/bin/phpcs'
+  #         label: 'PHP CodeSniffer'
+  #         timeout_seconds: 60
+  #       - type: quality_gate
+  #         command: 'vendor/bin/phpunit tests/Unit/'
+  #         label: 'Unit Tests'
+  #         timeout_seconds: 120
+  #     fix_iterations:
+  #       - group: dev-review
+  #         steps: [implement, review]
+  #         max_iterations: 3
+  # ──────────────────────────────────────────────────────────────────────────
+
   implement:
     description: "Полный цикл реализации фичи с тестами"
     steps:
