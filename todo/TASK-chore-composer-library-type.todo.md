@@ -1,0 +1,71 @@
+---
+# Metadata (Метаданные)
+type: chore
+created: 2026-04-23
+value: V2
+complexity: C1
+priority: P0
+depends_on:
+epic: EPIC-feat-standalone-cli
+author: Тимлид (Алекс)
+assignee:
+branch:
+pr:
+status: todo
+---
+
+# TASK-chore-composer-library-type: Изменить type на library и добавить bin в composer.json
+
+## 1. Concept and Goal (Концепция и Цель)
+### Story (User Story)
+> Как PHP-разработчик, я хочу установить task-orchestrator через `composer require`, чтобы использовать его как CLI-утилиту в своём проекте.
+
+### Goal (Цель по SMART)
+Изменить `composer.json`: `type: "project"` → `"library"`, добавить `"bin": ["bin/task-orchestrator"]`. После этого пакет можно зарегистрировать на Packagist и устанавливать через `composer require`.
+
+## 2. Context and Scope (Контекст и Границы)
+* **Где делаем:** `composer.json`, `bin/`
+* **Текущее поведение:** `type: "project"` — Packagist не индексирует, `bin` не объявлен
+* **Границы:**
+  - Не регистрируем на Packagist (отдельная задача)
+  - Не создаём Phar (отдельная задача)
+
+## 3. Requirements (Требования)
+### 🔴 Must Have
+- [ ] `type` изменён на `"library"` в composer.json
+- [ ] Добавлен `"bin": ["bin/task-orchestrator"]` в composer.json
+- [ ] Файл `bin/task-orchestrator` создан (точка входа: PHP shebang + require autoload + Console Application)
+- [ ] `vendor/bin/task-orchestrator --version` работает после `composer install`
+
+### 🟡 Should Have
+- [ ] Проверка: `composer validate` проходит без ошибок
+
+## 4. Implementation Plan
+1. Создать `bin/task-orchestrator` — точку входа (shebang + autoload + Application)
+2. Обновить `composer.json`: `type` + `bin`
+3. Проверить локально: `composer install` → `vendor/bin/task-orchestrator --version`
+
+## 5. Definition of Done
+- [ ] `composer validate` без ошибок
+- [ ] `vendor/bin/task-orchestrator --version` выводит версию
+- [ ] PHPUnit и Psalm зелёные
+
+## 6. Verification
+```bash
+composer validate
+vendor/bin/task-orchestrator --version
+vendor/bin/phpunit
+vendor/bin/psalm
+```
+
+## 7. Risks
+- Текущая структура `apps/console/` может не совпадать с ожиданиями от `bin/` — нужно проверить совместимость
+
+## 8. Sources
+- [RFC: cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md) — Решение 2
+- [Composer vendor binaries](https://getcomposer.org/doc/articles/vendor-binaries.md)
+
+## Change History
+| Дата | Автор (роль) | Изменение |
+| :--- | :--- | :--- |
+| 2026-04-23 | Тимлид (Алекс) | Создание задачи из RFC brainstorm |
