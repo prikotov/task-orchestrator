@@ -9,9 +9,9 @@ depends_on:
 epic: EPIC-feat-standalone-cli
 author: Бэкендер (Левша)
 assignee: Архитектор (Зевс)
-branch:
+branch: task/research-cli-distribution
 pr:
-status: todo
+status: review
 ---
 
 # TASK-research-cli-distribution-options: Мозговой штурм — варианты дистрибуции task-orchestrator как CLI-утилиты
@@ -32,25 +32,25 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] RFC-документ (`docs/research/cli-distribution-rfc.md`) с анализом вариантов:
+- [x] RFC-документ (`docs/research/cli-distribution-rfc.md`) с анализом вариантов:
   - **Вариант A:** Composer binary (`vendor/bin/task-orchestrator`) — Symfony Console Application
   - **Вариант B:** Phar-архив (исполняемый файл, сборка через box-project/box)
   - **Вариант C:** Гибрид (Composer binary + Phar через GitHub Releases)
   - **Вариант D:** Docker image (запуск через `docker run`)
-- [ ] Для каждого варианта:
+- [x] Для каждого варианта:
   - Плюсы и минусы
   - Влияние на текущую архитектуру бандла
   - Трудозатраты (оценка в часах/задачах)
   - UX для конечного пользователя (шаги установки и запуска)
-- [ ] Рекомендация с обоснованием
+- [x] Рекомендация с обоснованием
 - [ ] Результат согласован с владельцем проекта (комментарий в задаче)
 
 ### 🟡 Should Have (Желательно)
-- [ ] Сравнительная таблица вариантов в RFC
-- [ ] Анализ аналогов (как реализованы deptrac, psalm, composer, phpstan)
+- [x] Сравнительная таблица вариантов в RFC (investment tier table)
+- [x] Анализ аналогов (как реализованы deptrac, psalm, composer, phpstan)
 
 ### 🟢 Could Have (Опционально)
-- [ ] Прототип/proof-of-concept для наиболее перспективного варианта
+- [x] Прототип/proof-of-concept — проведён через brainstorm-сессию (21 раунд, 31 мин)
 
 ### ⚫ Won't Have (Не будем делать)
 - [ ] Реализация кода (только документирование)
@@ -58,17 +58,17 @@ status: todo
 
 ## 4. Implementation Plan (План реализации)
 *Заполняется исполнителем (агентом) перед стартом.*
-1. [ ] Изучить текущую структуру проекта (composer.json, apps/console/, DI-конфигурация)
-2. [ ] Исследовать подходы к дистрибуции PHP CLI-утилит
-3. [ ] Проанализировать аналоги (deptrac, psalm, phpstan, composer)
-4. [ ] Написать RFC-документ с анализом вариантов
-5. [ ] Сформулировать рекомендацию
+1. [x] Изучить текущую структуру проекта (composer.json, apps/console/, DI-конфигурация)
+2. [x] Исследовать подходы к дистрибуции PHP CLI-утилит
+3. [x] Проанализировать аналоги (deptrac, psalm, phpstan, composer)
+4. [x] Написать RFC-документ с анализом вариантов
+5. [x] Сформулировать рекомендацию
 6. [ ] Передать на согласование владельцу проекта
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] RFC-документ создан в `docs/research/cli-distribution-rfc.md`
-- [ ] Все 4 варианта проанализированы
-- [ ] Есть рекомендация с обоснованием
+- [x] RFC-документ создан в `docs/research/cli-distribution-rfc.md`
+- [x] Все 4 варианта проанализированы
+- [x] Есть рекомендация с обоснованием
 - [ ] Владелец проекта ознакомлен и согласовал решение (комментарий в задаче)
 - [ ] Эпик `EPIC-feat-standalone-cli` обновлён: добавлены задачи Фазы 2 на основе утверждённого решения
 
@@ -93,7 +93,29 @@ cat docs/research/cli-distribution-rfc.md
 ## 9. Comments (Комментарии)
 Эта задача — Фаза 1 эпика. После согласования результата владелец проекта даёт «добро», после чего декомпозируются задачи Фазы 2 (реализация).
 
+### Результат brainstorm-сессии (2026-04-22)
+
+**Цепочка:** `cli-distribution` (config/chains.yaml)
+**Участники:** Архитектор Гэндальф, Архитектор Локи, Бэкендер Тони
+**Фасилитатор:** Тимлид Алекс
+**Раунды:** 21 (31 мин, завершён естественно)
+**RFC:** [docs/research/cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md)
+**Сессия:** `var/sessions/cli-distribution/2026-04-22_16-22-53/`
+
+#### Принятые решения
+1. **Два канала с v0.1.0:** Composer/Packagist — primary, Phar (GitHub Releases) — secondary/best-effort
+2. **`type: "library"`** в composer.json
+3. **Investment tier:** Composer — full support + CI gate, Phar — best-effort (warning only)
+4. **Phar-ограничения до v1.0:** без GPG, Windows CI, self-update (`@techdebt`)
+
+#### Оценка трудозатрат: ~3.5–4 часа
+
+#### Ожидают согласования владельцем
+- Решение по companion artifacts (SBOM/GPG)
+- Декомпозиция задач Фазы 2
+
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-21 | Бэкендер (Левша) | Создание задачи |
+| 2026-04-22 | Тимлид (Алекс) | Brainstorm проведён (21 раунд). RFC создан. Status → review. |
