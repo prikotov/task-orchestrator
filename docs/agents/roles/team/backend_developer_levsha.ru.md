@@ -1,7 +1,8 @@
 ---
+full_role_name: backend_developer_levsha
 role: backend_developer
-title: "Backend Developer"
 name: "Левша"
+title: "Бэкендер Левша"
 personality:
   jung: ["Creator"]
   disc: "D5 I2 S4 C9"

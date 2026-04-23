@@ -1,7 +1,8 @@
 ---
-role: system_architect_loki
-title: "System Architect"
+full_role_name: system_architect_loki
+role: system_architect
 name: "Локи"
+title: "Архитектор Локи"
 personality:
   jung: ["Trickster"]
   disc: "D8 I5 S1 C4"

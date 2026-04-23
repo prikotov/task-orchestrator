@@ -1,7 +1,8 @@
 ---
+full_role_name: system_architect_gandalf
 role: system_architect
-title: "System Architect"
 name: "Гэндальф"
+title: "Архитектор Гэндальф"
 personality:
   jung: ["Magician"]
   disc: "D6 I3 S2 C9"
