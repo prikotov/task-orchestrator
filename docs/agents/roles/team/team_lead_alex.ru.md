@@ -1,7 +1,8 @@
 ---
+full_role_name: team_lead_alex
 role: team_lead
-title: "Team Lead"
 name: "Алекс"
+title: "Тимлид Алекс"
 personality:
   jung: ["Ruler"]
   disc: "D8 I5 S4 C7"
