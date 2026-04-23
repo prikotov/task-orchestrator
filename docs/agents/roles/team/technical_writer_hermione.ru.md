@@ -1,7 +1,8 @@
 ---
+full_role_name: technical_writer_hermione
 role: technical_writer
-title: "Technical Writer"
 name: "Гермиона"
+title: "Технический писатель Гермиона"
 personality:
   jung: ["Caregiver"]
   disc: "D2 I3 S6 C9"

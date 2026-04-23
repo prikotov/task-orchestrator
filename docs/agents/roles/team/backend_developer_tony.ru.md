@@ -1,7 +1,8 @@
 ---
-role: backend_developer_tony
-title: "Backend Developer"
+full_role_name: backend_developer_tony
+role: backend_developer
 name: "Тони Старк"
+title: "Бэкендер Тони"
 personality:
   jung: ["Rebel"]
   disc: "D9 I7 S1 C5"

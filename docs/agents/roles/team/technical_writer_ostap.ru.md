@@ -1,7 +1,8 @@
 ---
-role: technical_writer_ostap
-title: "Technical Writer"
+full_role_name: technical_writer_ostap
+role: technical_writer
 name: "Остап"
+title: "Технический писатель Остап"
 personality:
   jung: ["Jester"]
   disc: "D4 I9 S2 C5"

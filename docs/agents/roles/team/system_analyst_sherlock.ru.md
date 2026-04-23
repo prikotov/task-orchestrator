@@ -1,7 +1,8 @@
 ---
+full_role_name: system_analyst_sherlock
 role: system_analyst
-title: "System Analyst"
 name: "Шерлок"
+title: "Аналитик Шерлок"
 personality:
   jung: ["Sage"]
   disc: "D2 I2 S7 C9"
