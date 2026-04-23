@@ -1,7 +1,8 @@
 ---
+full_role_name: qa_backend_house
 role: qa_backend
-title: "Backend QA"
 name: "Хаус"
+title: "Тестировщик бэка Хаус"
 personality:
   jung: ["Outlaw (Rebel)"]
   disc: "D7 I2 S2 C9"
