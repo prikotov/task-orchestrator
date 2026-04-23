@@ -1,0 +1,203 @@
+roles:
+  team_lead_alex:
+    prompt_file: docs/agents/roles/team/team_lead_alex.ru.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - glm-5-turbo
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+
+  system_analyst_sherlock:
+    prompt_file: docs/agents/roles/team/system_analyst_sherlock.ru.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - glm-4.7
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+      - --tools
+      - "read,grep,find,ls"
+
+  system_architect_gandalf:
+    prompt_file: docs/agents/roles/team/system_architect_gandalf.ru.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - glm-5-turbo
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+      - --tools
+      - "read,grep,find,ls"
+
+  system_architect_loki:
+    prompt_file: docs/agents/roles/team/system_architect_loki.ru.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - glm-5-turbo
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+      - --tools
+      - "read,grep,find,ls"
+
+  backend_developer_levsha:
+    prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - glm-5-turbo
+      - --system-prompt
+      - "@system-prompt"
+
+  backend_developer_tony:
+    prompt_file: docs/agents/roles/team/backend_developer_tony.ru.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - glm-5-turbo
+      - --system-prompt
+      - "@system-prompt"
+
+  code_reviewer_backend_puaro:
+    prompt_file: docs/agents/roles/team/code_reviewer_backend_puaro.ru.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - glm-5-turbo
+      - --system-prompt
+      - "@system-prompt"
+
+  qa_backend_house:
+    prompt_file: docs/agents/roles/team/qa_backend_house.ru.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - glm-4.7
+      - --system-prompt
+      - "@system-prompt"
+
+  technical_writer_hermione:
+    prompt_file: docs/agents/roles/team/technical_writer_hermione.ru.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - glm-4.7
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+
+  technical_writer_ostap:
+    prompt_file: docs/agents/roles/team/technical_writer_ostap.ru.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - glm-4.7
+      - --system-prompt
+      - "@system-prompt"
+
+chains:
+  implement:
+    description: "Полный цикл реализации фичи с тестами"
+    steps:
+      - { type: agent, role: system_analyst_sherlock }
+      - { type: agent, role: system_architect_gandalf }
+      - type: agent
+        role: backend_developer_levsha
+        name: implement
+      - type: agent
+        role: code_reviewer_backend_puaro
+        name: review
+      - type: quality_gate
+        command: 'vendor/bin/phpcs'
+        label: 'PHP CodeSniffer'
+        timeout_seconds: 60
+      - type: quality_gate
+        command: 'vendor/bin/phpunit tests/Unit/'
+        label: 'Unit Tests'
+        timeout_seconds: 120
+      - type: agent
+        role: qa_backend_house
+        name: test
+    fix_iterations:
+      - group: dev-review
+        steps: [implement, review]
+        max_iterations: 3
+
+  analyze:
+    description: "Анализ без реализации"
+    steps:
+      - { type: agent, role: system_analyst_sherlock }
+      - { type: agent, role: system_architect_gandalf }
+
+  hotfix:
+    description: "Срочный фикс"
+    steps:
+      - { type: agent, role: backend_developer_levsha }
+      - { type: agent, role: code_reviewer_backend_puaro }
+
+  brainstorm:
+    type: dynamic
+    description: "Фасилитируемый brainstorm с конструктивным конфликтом"
+    timeout: 3600
+    facilitator: team_lead_alex
+    participants: [system_architect_gandalf, system_architect_loki, backend_developer_tony]
+    max_rounds: 20
+    max_time: 1800
+    prompts:
+      brainstorm_system: prompts/brainstorm/brainstorm_system.txt
+      facilitator_append: prompts/brainstorm/facilitator_append.txt
+      facilitator_start: prompts/brainstorm/facilitator_start.txt
+      facilitator_continue: prompts/brainstorm/facilitator_continue.txt
+      facilitator_finalize: prompts/brainstorm/facilitator_finalize.txt
+      participant_append: prompts/brainstorm/participant_append.txt
+      participant_user: prompts/brainstorm/participant_user.txt

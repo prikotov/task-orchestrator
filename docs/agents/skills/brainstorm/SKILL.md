@@ -39,7 +39,7 @@ description: >
 | `--facilitator`    | Роль фасилитатора                            | `team_lead_alex`                                                        |
 | `--participants`   | Участники через запятую                      | `system_architect_gandalf,system_architect_loki,backend_developer_tony` |
 | `--max-rounds`     | Макс. раундов обсуждения                     | `20`                                                                    |
-| `--timeout`        | Таймаут на шаг, секунды                      | `600`                                                                   |
+| `--timeout`        | Таймаут на шаг, секунды                      | `3600`                                                                  |
 
 **Подбор участников:**
 
@@ -65,10 +65,8 @@ description: >
 | `--facilitator`    |            | Роль фасилитатора                            | имя роли              | из chains.yaml|
 | `--participants`   |            | Участники через запятую                      | имена ролей           | из chains.yaml|
 | `--max-rounds`     |            | Макс. раундов (dynamic)                      | число                 | из chains.yaml|
-| `--timeout`        | `-t`       | Таймаут на шаг, секунды                      | число                 | из chains.yaml|
+| `--timeout`        | `-t`       | Таймаут на шаг, секунды                      | число                 | `3600`        |
 | `--topic`          |            | Тема (если отличается от аргумента task)     | текст                 | = task        |
-| `--runner`         | `-r`       | Движок AI                                    | `pi`                  | `pi`          |
-| `--model`          | `-m`       | Модель LLM                                   | имя модели           | по умолчанию  |
 | `--dry-run`        |            | Показать план без запуска                    | —                     | выкл          |
 | `--report-format`  |            | Формат отчёта                                | `text`, `json`, `none`| `text`        |
 | `--report-file`    |            | Путь к файлу отчёта                          | путь                  | stdout        |
