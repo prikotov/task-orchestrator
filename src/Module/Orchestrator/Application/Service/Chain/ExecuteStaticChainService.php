@@ -27,9 +27,7 @@ final readonly class ExecuteStaticChainService implements ExecuteStaticChainServ
     #[Override]
     public function execute(
         ChainDefinitionVo $chain,
-        string $runnerName,
         string $task,
-        ?string $model = null,
         ?string $workingDir = null,
         int $timeout = 300,
         ?AuditLoggerInterface $auditLogger = null,
@@ -37,9 +35,7 @@ final readonly class ExecuteStaticChainService implements ExecuteStaticChainServ
     ): OrchestrateChainResultDto {
         $result = $this->staticChainRunner->execute(
             $chain,
-            $runnerName,
             $task,
-            $model,
             $workingDir,
             $timeout,
             $auditLogger,

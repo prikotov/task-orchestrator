@@ -30,8 +30,6 @@ final class OrchestrateCommand extends Command
 {
     private const string ARG_TASK = 'task';
     private const string OPT_CHAIN = 'chain';
-    private const string OPT_RUNNER = 'runner';
-    private const string OPT_MODEL = 'model';
     private const string OPT_WORKING_DIR = 'working-dir';
     private const string OPT_DRY_RUN = 'dry-run';
     private const string OPT_TIMEOUT = 'timeout';
@@ -62,8 +60,6 @@ final class OrchestrateCommand extends Command
         $this
             ->addArgument(self::ARG_TASK, InputArgument::REQUIRED, 'Задача для оркестрации')
             ->addOption(self::OPT_CHAIN, 'c', InputOption::VALUE_OPTIONAL, 'Имя цепочки', 'implement')
-            ->addOption(self::OPT_RUNNER, 'r', InputOption::VALUE_OPTIONAL, 'Движок (по умолчанию: pi)')
-            ->addOption(self::OPT_MODEL, 'm', InputOption::VALUE_OPTIONAL, 'Модель LLM')
             ->addOption(self::OPT_WORKING_DIR, 'd', InputOption::VALUE_OPTIONAL, 'Рабочая директория')
             ->addOption(self::OPT_DRY_RUN, null, InputOption::VALUE_NONE, 'Показать план без запуска')
             ->addOption(self::OPT_TIMEOUT, 't', InputOption::VALUE_OPTIONAL, 'Таймаут на шаг (секунды)', '1800')
@@ -99,10 +95,6 @@ final class OrchestrateCommand extends Command
             $dryRun = $input->getOption(self::OPT_DRY_RUN);
             $timeout = (int) $input->getOption(self::OPT_TIMEOUT);
 
-            /** @var string|null $runner */
-            $runner = $input->getOption(self::OPT_RUNNER);
-            /** @var string|null $model */
-            $model = $input->getOption(self::OPT_MODEL);
             /** @var string|null $workingDir */
             $workingDir = $input->getOption(self::OPT_WORKING_DIR);
 
@@ -130,8 +122,6 @@ final class OrchestrateCommand extends Command
                 $result = ($this->orchestrateHandler)(new OrchestrateChainCommand(
                     chainName: $chainName,
                     task: $task,
-                    runner: $runner !== null && $runner !== '' ? $runner : null,
-                    model: $model !== null && $model !== '' ? $model : null,
                     workingDir: $workingDir !== null && $workingDir !== '' ? $workingDir : null,
                     timeout: $timeout,
                     resumeDir: $resumeDir,
@@ -157,8 +147,6 @@ final class OrchestrateCommand extends Command
             $result = ($this->orchestrateHandler)(new OrchestrateChainCommand(
                 chainName: $chainName,
                 task: $task,
-                runner: $runner !== null && $runner !== '' ? $runner : null,
-                model: $model !== null && $model !== '' ? $model : null,
                 workingDir: $workingDir !== null && $workingDir !== '' ? $workingDir : null,
                 timeout: $timeout,
                 topic: $topic !== null && $topic !== '' ? $topic : null,
