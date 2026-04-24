@@ -13,8 +13,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigValidationErrorDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ChainConfigValidatorInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainHandlerInterface;
@@ -60,6 +62,7 @@ final class OrchestrateCommand extends Command
     private const string OPT_REPORT_FORMAT = 'report-format';
     private const string OPT_REPORT_FILE = 'report-file';
     private const string OPT_NO_CONTEXT_FILES = 'no-context-files';
+    private const string OPT_VALIDATE_CONFIG = 'validate-config';
 
     public const string LOCK_RESOURCE = 'command:agent:orchestrate';
 
@@ -69,6 +72,7 @@ final class OrchestrateCommand extends Command
         private readonly LockFactory $lockFactory,
         private readonly ChainLoaderInterface $chainLoader,
         private readonly ResolveExitCodeServiceInterface $exitCodeResolver,
+        private readonly ChainConfigValidatorInterface $chainConfigValidator,
     ) {
         parent::__construct();
     }
@@ -90,7 +94,8 @@ final class OrchestrateCommand extends Command
             ->addOption(self::OPT_NO_AUDIT_LOG, null, InputOption::VALUE_NONE, 'Отключить audit-логирование')
             ->addOption(self::OPT_REPORT_FORMAT, null, InputOption::VALUE_OPTIONAL, 'Формат отчёта: text|json (none — отключить)', 'text')
             ->addOption(self::OPT_REPORT_FILE, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу для записи отчёта')
-            ->addOption(self::OPT_NO_CONTEXT_FILES, null, InputOption::VALUE_NONE, 'Отключить автоматическую загрузку контекстных файлов (AGENTS.md, CLAUDE.md)');
+            ->addOption(self::OPT_NO_CONTEXT_FILES, null, InputOption::VALUE_NONE, 'Отключить автоматическую загрузку контекстных файлов (AGENTS.md, CLAUDE.md)')
+            ->addOption(self::OPT_VALIDATE_CONFIG, null, InputOption::VALUE_NONE, 'Проверить конфигурацию цепочки без запуска оркестрации');
     }
 
     #[Override]
@@ -98,6 +103,13 @@ final class OrchestrateCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $lock = $this->lockFactory->createLock(self::LOCK_RESOURCE);
+
+        // ── --validate-config: проверить конфиг и выйти без запуска ──
+        /** @var bool $validateConfig */
+        $validateConfig = $input->getOption(self::OPT_VALIDATE_CONFIG);
+        if ($validateConfig) {
+            return $this->executeValidateConfig($input, $io);
+        }
 
         if (!$lock->acquire()) {
             $io->warning(sprintf('Команда "%s" уже выполняется. Пропускаем.', $this->getName() ?? static::class));
@@ -210,6 +222,42 @@ final class OrchestrateCommand extends Command
         } finally {
             $lock->release();
         }
+    }
+
+    /**
+     * Обрабатывает флаг --validate-config: валидирует конфигурацию цепочки и выводит результат.
+     *
+     * Если указана опция --chain — валидирует конкретную цепочку,
+     * иначе — все цепочки.
+     */
+    private function executeValidateConfig(InputInterface $input, SymfonyStyle $io): int
+    {
+        // Если --chain передана явно — валидируем конкретную цепочку
+        if ($input->hasParameterOption('--chain') || $input->hasParameterOption('-c')) {
+            /** @var string $chainName */
+            $chainName = $input->getOption(self::OPT_CHAIN);
+            $result = $this->chainConfigValidator->validateChain($chainName);
+        } else {
+            $result = $this->chainConfigValidator->validateAll();
+        }
+
+        if ($result->isValid) {
+            $io->success(sprintf(
+                '✅ Config is valid (%d chain(s): %s).',
+                count($result->validatedChains),
+                implode(', ', $result->validatedChains),
+            ));
+
+            return OrchestrateExitCodeEnum::success->value;
+        }
+
+        $io->error('❌ Config validation failed:');
+        foreach ($result->errors as $error) {
+            $fieldSuffix = $error->field !== null ? sprintf(' [%s]', $error->field) : '';
+            $io->text(sprintf('  • [%s]%s %s', $error->chainName, $fieldSuffix, $error->message));
+        }
+
+        return OrchestrateExitCodeEnum::invalidConfig->value;
     }
 
     /**
