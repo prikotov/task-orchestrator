@@ -74,8 +74,6 @@ description: >
 
 **Приоритет опций:** CLI-аргумент > значение из `config/chains.yaml` > CLI-дефолт. Если опция передана явно — она всегда побеждает.
 
-> ⚠️ **Resume:** при `--resume` опции `--facilitator`, `--participants`, `--max-rounds`, `--topic` **игнорируются** — используются значения из прерванной сессии.
-
 Примеры:
 
 ```bash
@@ -99,11 +97,42 @@ description: >
     # Dry run — посмотреть план без запуска
     php bin/console app:agent:orchestrate "Паттерн retry" --chain=brainstorm --dry-run
 
-    # Resume прерванной сессии (--facilitator и --participants игнорируются)
+    # Resume прерванной сессии
     php bin/console app:agent:orchestrate "Продолжение brainstorm" \
         --chain=brainstorm \
         --resume=var/sessions/brainstorm/2026-04-23_03-02-36
 ```
+
+### Resume прерванной сессии
+
+Brainstorm может быть прерван: таймаут шага, исчерпание бюджета, ошибка агента, ручная остановка (Ctrl+C). В таком случае сессия сохраняется в состоянии `interrupted` и её можно продолжить.
+
+**Зачем:** brainstorm — долгий процесс (до 20 раундов). Потеря прогресса из-за сбоя на 15-м раунде — критична. Resume позволяет продолжить с того места, где остановились, не повторяя уже пройденные раунды.
+
+**Что сохраняется:**
+- `topic`, `facilitator`, `participants`, `max_rounds` — исходные параметры сессии
+- `completed_rounds` — количество завершённых раундов
+- `discussion_history` — вся история обсуждения
+- `facilitator_journal` — журнал фасилитатора (оценки, решения по routing)
+- `audit.jsonl` — полный аудит вызовов агентов
+
+**Как запустить resume:**
+
+1. Найди директорию прерванной сессии: `var/sessions/brainstorm/<timestamp>/`
+2. Запусти команду с `--resume`:
+
+```bash
+    php bin/console app:agent:orchestrate "<тема>" --chain=brainstorm \
+        --resume=var/sessions/brainstorm/<timestamp>
+```
+
+**Тонкости:**
+
+- Опции `--facilitator`, `--participants`, `--max-rounds`, `--topic` **игнорируются** — используются значения из прерванной сессии. Нельзя сменить состав участников при resume.
+- `--timeout` **действует** — можно увеличить таймаут, если сессия прервалась по лимиту на шаг.
+- `--chain` **должен совпадать** с исходной цепочкой (обычно `brainstorm`).
+- Аргумент `task` обязательный, но при resume используется только как контекст для фасилитатора — фактическая тема берётся из сессии.
+- Resume можно вызывать несколько раз: если после resume сессия снова прервалась — можно сделать resume повторно.
 
 ### **Шаг 4:** Анализ результата
 
