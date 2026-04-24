@@ -13,7 +13,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigValid
  * наличие обязательных полей и правильность типов — без запуска оркестрации.
  * Presentation-слой вызывает этот интерфейс, а не Domain-исключения напрямую.
  */
-interface ChainConfigValidatorInterface
+interface ValidateChainConfigServiceInterface
 {
     /**
      * Валидирует все цепочки в конфигурации.

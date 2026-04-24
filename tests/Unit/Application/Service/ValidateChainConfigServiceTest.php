@@ -8,14 +8,14 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ChainConfigValidator;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigService;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 
-#[CoversClass(ChainConfigValidator::class)]
-final class ChainConfigValidatorTest extends TestCase
+#[CoversClass(ValidateChainConfigService::class)]
+final class ValidateChainConfigServiceTest extends TestCase
 {
     private ChainLoaderInterface&MockObject $chainLoader;
 
@@ -126,9 +126,9 @@ final class ChainConfigValidatorTest extends TestCase
 
     // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-    private function createValidator(): ChainConfigValidator
+    private function createValidator(): ValidateChainConfigService
     {
-        return new ChainConfigValidator($this->chainLoader);
+        return new ValidateChainConfigService($this->chainLoader);
     }
 
     private function createStaticChain(string $name): ChainDefinitionVo

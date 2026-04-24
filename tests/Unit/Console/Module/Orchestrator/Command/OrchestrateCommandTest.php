@@ -14,7 +14,7 @@ use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\SharedLockInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigValidationResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ChainConfigValidatorInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainHandlerInterface;
@@ -36,7 +36,7 @@ final class OrchestrateCommandTest extends TestCase
     private ChainLoaderInterface&MockObject $chainLoader;
     private OrchestrateChainHandlerInterface&MockObject $orchestrateHandler;
     private GenerateReportHandlerInterface&MockObject $reportHandler;
-    private ChainConfigValidatorInterface&MockObject $chainConfigValidator;
+    private ValidateChainConfigServiceInterface&MockObject $chainConfigValidator;
     private SharedLockInterface&MockObject $lock;
 
     #[Override]
@@ -46,7 +46,7 @@ final class OrchestrateCommandTest extends TestCase
         $this->chainLoader = $this->createMock(ChainLoaderInterface::class);
         $this->orchestrateHandler = $this->createMock(OrchestrateChainHandlerInterface::class);
         $this->reportHandler = $this->createMock(GenerateReportHandlerInterface::class);
-        $this->chainConfigValidator = $this->createMock(ChainConfigValidatorInterface::class);
+        $this->chainConfigValidator = $this->createMock(ValidateChainConfigServiceInterface::class);
         $this->lock = $this->createMock(SharedLockInterface::class);
 
         $this->lockFactory

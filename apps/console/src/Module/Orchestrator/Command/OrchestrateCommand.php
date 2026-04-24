@@ -13,10 +13,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigValidationErrorDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ChainConfigValidatorInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainHandlerInterface;
@@ -72,7 +71,7 @@ final class OrchestrateCommand extends Command
         private readonly LockFactory $lockFactory,
         private readonly ChainLoaderInterface $chainLoader,
         private readonly ResolveExitCodeServiceInterface $exitCodeResolver,
-        private readonly ChainConfigValidatorInterface $chainConfigValidator,
+        private readonly ValidateChainConfigServiceInterface $chainConfigValidator,
     ) {
         parent::__construct();
     }

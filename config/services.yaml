@@ -61,8 +61,8 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService
 
-  TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ChainConfigValidatorInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ChainConfigValidator
+  TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigService
 
   TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainHandlerInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler
