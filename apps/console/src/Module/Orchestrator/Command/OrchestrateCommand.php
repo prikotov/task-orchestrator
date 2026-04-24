@@ -33,6 +33,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefiniti
 /**
  * @techdebt 2026-04-24: Command зависит от Domain\ChainLoaderInterface и Domain\ChainDefinitionVo.
  * Нужно вынести загрузку chain в Application-слой (ChainDefinitionDto + ChainLoaderApplicationInterface).
+ * Задача: todo/TASK-chore-presentation-domain-decouple.todo.md
  *
  * Exit codes:
  *
