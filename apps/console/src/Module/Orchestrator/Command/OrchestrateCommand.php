@@ -19,6 +19,9 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\Orch
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\OrchestrateExitCodeEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 
@@ -83,7 +86,7 @@ final class OrchestrateCommand extends Command
         if (!$lock->acquire()) {
             $io->warning(sprintf('Команда "%s" уже выполняется. Пропускаем.', $this->getName() ?? static::class));
 
-            return Command::SUCCESS;
+            return OrchestrateExitCodeEnum::success->value;
         }
 
         try {
@@ -129,7 +132,9 @@ final class OrchestrateCommand extends Command
                     noContextFiles: $noContextFiles,
                 ));
 
-                return $this->renderDynamicResult($io, $result);
+                $this->renderDynamicResult($io, $result);
+
+                return $this->resolveExitCodeFromResult($result, true)->value;
             }
 
             $chain = $this->chainLoader->load($chainName);
@@ -138,7 +143,7 @@ final class OrchestrateCommand extends Command
             if ($dryRun) {
                 $this->renderDryRun($io, $chainName, $task, $chain, $isDynamic, $topic, $facilitator, $participants, $maxRounds);
 
-                return Command::SUCCESS;
+                return OrchestrateExitCodeEnum::success->value;
             }
 
             $io->section(sprintf('🚀 Orchestrating: %s (%s)', $chainName, $isDynamic ? 'dynamic' : 'static'));
@@ -175,14 +180,16 @@ final class OrchestrateCommand extends Command
             }
 
             if ($isDynamic) {
-                return $this->renderDynamicResult($io, $result);
+                $this->renderDynamicResult($io, $result);
+            } else {
+                $this->renderStaticResult($io, $result);
             }
 
-            return $this->renderStaticResult($io, $result);
+            return $this->resolveExitCodeFromResult($result, $isDynamic)->value;
         } catch (\Throwable $e) {
             $io->error($e->getMessage());
 
-            return Command::FAILURE;
+            return $this->resolveExitCodeFromThrowable($e)->value;
         } finally {
             $lock->release();
         }
@@ -233,10 +240,9 @@ final class OrchestrateCommand extends Command
     /**
      * Рендерит результат static-цепочки.
      */
-    private function renderStaticResult(SymfonyStyle $io, OrchestrateChainResultDto $result): int
+    private function renderStaticResult(SymfonyStyle $io, OrchestrateChainResultDto $result): void
     {
         $total = count($result->stepResults);
-        $hasError = false;
         foreach ($result->stepResults as $i => $stepResult) {
             $num = $i + 1;
             $duration = round($stepResult->duration);
@@ -281,7 +287,6 @@ final class OrchestrateCommand extends Command
 
                 if ($stepResult->isError) {
                     $io->error(sprintf('Agent error: %s', $stepResult->errorMessage ?? 'Unknown'));
-                    $hasError = true;
                     break;
                 }
             }
@@ -297,7 +302,7 @@ final class OrchestrateCommand extends Command
             ));
         }
 
-        if (!$hasError && !$result->budgetExceeded) {
+        if (!$this->staticChainHasError($result) && !$result->budgetExceeded) {
             $io->success(sprintf(
                 '✅ Chain completed in %ds | Total: ↑%s ↓%s $%.4f',
                 round($result->totalTime),
@@ -306,16 +311,64 @@ final class OrchestrateCommand extends Command
                 $result->totalCost,
             ));
         }
-
-        return ($hasError || $result->budgetExceeded) ? Command::FAILURE : Command::SUCCESS;
     }
 
     /**
      * Рендерит результат dynamic-цепочки.
      */
-    private function renderDynamicResult(SymfonyStyle $io, OrchestrateChainResultDto $result): int
+    private function renderDynamicResult(SymfonyStyle $io, OrchestrateChainResultDto $result): void
     {
-        return $result->synthesis !== null ? Command::SUCCESS : Command::FAILURE;
+        if ($result->synthesis !== null) {
+            $io->success('✅ Dynamic chain completed with synthesis.');
+        } else {
+            $io->error('❌ Dynamic chain failed: no synthesis produced.');
+        }
+    }
+
+    /**
+     * Определяет exit code по типу исключения.
+     */
+    private function resolveExitCodeFromThrowable(\Throwable $e): OrchestrateExitCodeEnum
+    {
+        return match (true) {
+            $e instanceof ChainNotFoundException => OrchestrateExitCodeEnum::chainNotFound,
+            $e instanceof RoleNotFoundException => OrchestrateExitCodeEnum::invalidConfig,
+            default => OrchestrateExitCodeEnum::chainFailed,
+        };
+    }
+
+    /**
+     * Определяет exit code по результату оркестрации.
+     */
+    private function resolveExitCodeFromResult(OrchestrateChainResultDto $result, bool $isDynamic): OrchestrateExitCodeEnum
+    {
+        if ($result->budgetExceeded) {
+            return OrchestrateExitCodeEnum::budgetExceeded;
+        }
+
+        if ($isDynamic) {
+            return $result->synthesis !== null
+                ? OrchestrateExitCodeEnum::success
+                : OrchestrateExitCodeEnum::chainFailed;
+        }
+
+        return $this->staticChainHasError($result)
+            ? OrchestrateExitCodeEnum::chainFailed
+            : OrchestrateExitCodeEnum::success;
+    }
+
+    /**
+     * Проверяет, содержит ли static-цепочка ошибку на каком-либо шаге.
+     */
+    private function staticChainHasError(OrchestrateChainResultDto $result): bool
+    {
+        foreach ($result->stepResults as $stepResult) {
+            if ($stepResult->isError) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function formatTokens(int $tokens): string
