@@ -84,7 +84,7 @@ pr:
 ### Фаза 3: Реализация (P1)
 - [x] [TASK-feat-validate-config](done/TASK-feat-validate-config.todo.md) — Флаг --validate-config для проверки конфигурации (~2–2.5 ч)
 - [ ] [TASK-chore-phar-build](TASK-chore-phar-build.todo.md) — Настройка сборки Phar через box-project/box (~45 мин)
-- [ ] [TASK-docs-install-skill](TASK-docs-install-skill.todo.md) — SKILL.md для установки AI-агентами + README (~2 ч)
+- [ ] [TASK-docs-install-skill](done/TASK-docs-install-skill.todo.md) — SKILL.md для установки AI-агентами + README (~2 ч)
 
 ### Backlog (P2, после v1.0)
 - [ ] GPG-подпись Phar
