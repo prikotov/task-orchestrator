@@ -79,7 +79,7 @@ pr:
 ### Фаза 2: Реализация (P0)
 - [x] [TASK-chore-composer-library-type](done/TASK-chore-composer-library-type.todo.md) — Изменить type на library + добавить bin в composer.json (~1.5 ч)
 - [ ] [TASK-chore-packagist-register](TASK-chore-packagist-register.todo.md) — Регистрация пакета на Packagist (~10 мин)
-- [ ] [TASK-feat-typed-exit-codes](TASK-feat-typed-exit-codes.todo.md) — Typed exit codes для CLI-команды (~2–2.5 ч)
+- [x] [TASK-feat-typed-exit-codes](done/TASK-feat-typed-exit-codes.todo.md) — Typed exit codes для CLI-команды (~2–2.5 ч)
 
 ### Фаза 3: Реализация (P1)
 - [ ] [TASK-feat-validate-config](TASK-feat-validate-config.todo.md) — Флаг --validate-config для проверки конфигурации (~2–2.5 ч)
