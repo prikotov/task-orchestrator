@@ -10,7 +10,7 @@ author: Архитектор (Локи)
 assignee: Бэкендер Левша
 branch: task/refactor-remove-runner-model-options
 pr: #59
-status: review
+status: done
 ---
 
 # TASK-refactor-remove-runner-model-options: Удалить опции --runner и --model из CLI и цепочек
