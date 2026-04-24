@@ -77,7 +77,7 @@ pr:
 - [x] [TASK-research-cli-distribution-options](TASK-research-cli-distribution-options.todo.md) — Мозговой штурм: исследовать варианты дистрибуции, оформить RFC, согласовать с владельцем проекта
 
 ### Фаза 2: Реализация (P0)
-- [ ] [TASK-chore-composer-library-type](TASK-chore-composer-library-type.todo.md) — Изменить type на library + добавить bin в composer.json (~1.5 ч)
+- [x] [TASK-chore-composer-library-type](done/TASK-chore-composer-library-type.todo.md) — Изменить type на library + добавить bin в composer.json (~1.5 ч)
 - [ ] [TASK-chore-packagist-register](TASK-chore-packagist-register.todo.md) — Регистрация пакета на Packagist (~10 мин)
 - [ ] [TASK-feat-typed-exit-codes](TASK-feat-typed-exit-codes.todo.md) — Typed exit codes для CLI-команды (~2–2.5 ч)
 
