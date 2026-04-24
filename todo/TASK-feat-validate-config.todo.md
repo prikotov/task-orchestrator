@@ -73,7 +73,7 @@ vendor/bin/psalm
 
 **Твоя роль:** docs/agents/roles/team/backend_developer_levsha.ru.md
 **Ветка:** task/feat-validate-config (уже создана и активна)
-**PR:** уже создан (draft) из task/feat-validate-config в epic/feat-standalone-cli — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/feat-validate-config в epic/feat-standalone-cli — [PR #65](https://github.com/prikotov/task-orchestrator/pull/65)
 
 ### Порядок действий
 1. Переключись в ветку `task/feat-validate-config`: `git checkout task/feat-validate-config`
