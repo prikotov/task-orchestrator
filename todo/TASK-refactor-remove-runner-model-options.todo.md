@@ -9,7 +9,7 @@ epic:
 author: Архитектор (Локи)
 assignee: Бэкендер Левша
 branch: task/refactor-remove-runner-model-options
-pr: #TBD
+pr: #59
 status: review
 ---
 
