@@ -8,10 +8,10 @@ priority: P1
 depends_on: TASK-chore-composer-library-type
 epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер (Левша)
+branch: task/chore-phar-build
+pr: '#66'
+status: in_progress
 ---
 
 # TASK-chore-phar-build: Настройка сборки Phar через box-project/box

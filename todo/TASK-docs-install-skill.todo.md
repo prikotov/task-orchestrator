@@ -8,10 +8,10 @@ priority: P1
 depends_on: TASK-chore-composer-library-type
 epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Тех. писатель (Гермиона)
+branch: task/docs-install-skill
+pr: '#67'
+status: in_progress
 ---
 
 # TASK-docs-install-skill: SKILL.md для установки AI-агентами + секция в README
