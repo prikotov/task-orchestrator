@@ -1,3 +1,18 @@
+# Release Phar
+#
+# При пуше тега v* (например, v1.0.0) собирает task-orchestrator.phar
+# и прикрепляет его к GitHub Release.
+#
+# Как работает:
+#   1. composer install (без dev-зависимостей)
+#   2. box compile → task-orchestrator.phar (конфиг: box.json.dist)
+#   3. Smoke test: php task-orchestrator.phar --version
+#   4. Загрузка Phar в assets релиза
+#
+# Ошибка сборки Phar = warning, не блокирует релиз (continue-on-error).
+# Box установлен как standalone tool через setup-php (не через Composer,
+# т.к. humbug/box конфликтует с Symfony 8.x).
+
 name: Release Phar
 
 on:
