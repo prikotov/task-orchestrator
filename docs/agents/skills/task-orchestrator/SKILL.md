@@ -1,5 +1,5 @@
 ---
-name: use-task-orchestrator
+name: task-orchestrator
 description: Запуск оркестрации AI-агентов по цепочке: static/dynamic chains, quality gates, отчёты, resume
 ---
 
