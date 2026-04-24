@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Dto;
 /**
  * Результат валидации конфигурации цепочек.
  *
- * Application-DTO: используется ChainConfigValidator для возврата
+ * Application-DTO: используется ValidateChainConfigService для возврата
  * структурированного результата в Presentation-слой (OrchestrateCommand).
  */
 final readonly class ChainConfigValidationResultDto

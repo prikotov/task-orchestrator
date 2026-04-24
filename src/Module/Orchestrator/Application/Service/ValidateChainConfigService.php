@@ -8,6 +8,8 @@ use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigValidationErrorDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigValidationResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 
 /**
  * Валидирует конфигурацию цепочек оркестрации (runtime-валидация).
@@ -21,8 +23,10 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\Chai
  * - Типы шагов (agent/quality_gate) и обязательные поля шагов
  * - Корректность fix_iterations (ссылки на существующие шаги)
  */
-final readonly class ChainConfigValidator implements ChainConfigValidatorInterface
+final readonly class ValidateChainConfigService implements ValidateChainConfigServiceInterface
 {
+    private const string GLOBAL_CONTEXT = '__global__';
+
     public function __construct(
         private ChainLoaderInterface $chainLoader,
     ) {
@@ -35,11 +39,11 @@ final readonly class ChainConfigValidator implements ChainConfigValidatorInterfa
 
         try {
             $chains = $this->chainLoader->list();
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             return new ChainConfigValidationResultDto(
                 isValid: false,
                 errors: [new ChainConfigValidationErrorDto(
-                    chainName: '__global__',
+                    chainName: self::GLOBAL_CONTEXT,
                     message: sprintf('Failed to load chains configuration: %s', $e->getMessage()),
                 )],
                 validatedChains: [],
@@ -50,7 +54,7 @@ final readonly class ChainConfigValidator implements ChainConfigValidatorInterfa
             return new ChainConfigValidationResultDto(
                 isValid: false,
                 errors: [new ChainConfigValidationErrorDto(
-                    chainName: '__global__',
+                    chainName: self::GLOBAL_CONTEXT,
                     message: 'No chains defined in configuration.',
                 )],
                 validatedChains: [],
@@ -77,7 +81,7 @@ final readonly class ChainConfigValidator implements ChainConfigValidatorInterfa
     {
         try {
             $chain = $this->chainLoader->load($chainName);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             return new ChainConfigValidationResultDto(
                 isValid: false,
                 errors: [new ChainConfigValidationErrorDto(
@@ -105,7 +109,7 @@ final readonly class ChainConfigValidator implements ChainConfigValidatorInterfa
      *
      * @return list<ChainConfigValidationErrorDto>
      */
-    private function validateChainDefinition(string $name, object $chain): array
+    private function validateChainDefinition(string $name, ChainDefinitionVo $chain): array
     {
         $errors = [];
 
@@ -121,7 +125,7 @@ final readonly class ChainConfigValidator implements ChainConfigValidatorInterfa
     /**
      * @return list<ChainConfigValidationErrorDto>
      */
-    private function validateStaticChain(string $name, object $chain): array
+    private function validateStaticChain(string $name, ChainDefinitionVo $chain): array
     {
         $errors = [];
         $steps = $chain->getSteps();
@@ -171,7 +175,7 @@ final readonly class ChainConfigValidator implements ChainConfigValidatorInterfa
     /**
      * @return list<ChainConfigValidationErrorDto>
      */
-    private function validateDynamicChain(string $name, object $chain): array
+    private function validateDynamicChain(string $name, ChainDefinitionVo $chain): array
     {
         $errors = [];
 
@@ -207,7 +211,7 @@ final readonly class ChainConfigValidator implements ChainConfigValidatorInterfa
     /**
      * @return list<ChainConfigValidationErrorDto>
      */
-    private function validateStep(string $chainName, int $index, object $step): array
+    private function validateStep(string $chainName, int $index, ChainStepVo $step): array
     {
         $errors = [];
         $fieldPrefix = sprintf('steps[%d]', $index);
