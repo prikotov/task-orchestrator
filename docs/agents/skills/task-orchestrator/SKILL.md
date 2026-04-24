@@ -18,7 +18,7 @@ description: Запуск оркестрации AI-агентов по цепо
 
 ### Шаг 1: Проверить конфигурацию (опционально)
 
-Перед первым запуском или после изменения `chains.yaml` — проверить конфиг:
+Перед первым запуском или после изменения `chains.yaml` — проверить конфигурацию:
 
 ```bash
 task-orchestrator app:agent:orchestrate --validate-config "check"
@@ -28,7 +28,7 @@ task-orchestrator app:agent:orchestrate --validate-config "check"
 
 | Опция | Описание | По умолчанию |
 |-------|----------|--------------|
-| `--validate-config` | Проверить конфиг без запуска | — |
+| `--validate-config` | Проверить конфигурацию без запуска | — |
 | `--chain <name>` | Проверить конкретную цепочку | Все цепочки |
 
 Примеры:
@@ -99,7 +99,7 @@ task-orchestrator app:agent:orchestrate --chain=<name> "<задача>"
 task-orchestrator app:agent:orchestrate "Создать endpoint POST /users"
 
 # Анализ без реализации
-task-orchestrator app:agent:orchestrate --chain=analyze "Проанализировать architecture"
+task-orchestrator app:agent:orchestrate --chain=analyze "Проанализировать архитектуру"
 
 # Срочный фикс
 task-orchestrator app:agent:orchestrate --chain=hotfix "Исправить NPE в UserService"
@@ -140,7 +140,7 @@ task-orchestrator app:agent:orchestrate --chain=brainstorm --participants=dev1,d
 
 ### Шаг 5: Resume прерванной цепочки
 
-Если цепочка прервалась — можно возобновить из последнего шага:
+Если цепочка прервалась, можно возобновить с прерванного шага:
 
 ```bash
 task-orchestrator app:agent:orchestrate --resume=<path-to-session-dir> "<задача>"
@@ -155,6 +155,6 @@ task-orchestrator app:agent:orchestrate --resume=var/agent/chains/implement_2026
 ## Результат
 
 - CLI выводит ход выполнения каждого шага: роль, runner, токены, стоимость, время
-- Итоговый отчёт в выбранном формате (text/json)
-- Exit code: 0 — успех, 1 — ошибка, 3 — цепочка не найдена, 5 — невалидный конфиг
+- Итоговый отчёт в выбранном формате (`text`/`json`; `none` — отключить)
+- Exit code: 0 — успех, 1 — ошибка шага, 3 — цепочка не найдена, 4 — превышен бюджет, 5 — невалидный конфиг
 - JSONL audit-log в `var/agent_audit.jsonl` (если не отключён)
