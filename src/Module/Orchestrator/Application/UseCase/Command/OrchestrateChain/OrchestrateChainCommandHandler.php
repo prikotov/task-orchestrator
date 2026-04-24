@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain;
 
+use Override;
 use LogicException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Event\OrchestrateChain\OrchestrateSessionCompletedEvent;
@@ -27,7 +28,7 @@ use function count;
  * делегирует выполнение сервисам оркестрации,
  * финализирует сессию.
  */
-final readonly class OrchestrateChainCommandHandler
+final readonly class OrchestrateChainCommandHandler implements OrchestrateChainHandlerInterface
 {
     /** @var int Дефолтный таймаут (секунды) для dynamic-цепочки при отсутствии CLI и chain timeout */
     private const int DEFAULT_DYNAMIC_TIMEOUT = 1800;
@@ -50,6 +51,7 @@ final readonly class OrchestrateChainCommandHandler
     /**
      * Выполняет оркестрацию цепочки.
      */
+    #[Override]
     public function __invoke(OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
         if ($command->resumeDir !== null) {

@@ -13,12 +13,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainHandlerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportHandlerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 
@@ -26,6 +28,22 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefiniti
     name: 'app:agent:orchestrate',
     description: 'Оркестрация AI-агентов по цепочке (static/dynamic)',
 )]
+
+/**
+ * @techdebt 2026-04-24: Command зависит от Domain\ChainLoaderInterface и Domain\ChainDefinitionVo.
+ * Нужно вынести загрузку chain в Application-слой (ChainDefinitionDto + ChainLoaderApplicationInterface).
+ *
+ * Exit codes:
+ *
+ * | Code | Constant        | Meaning                                    |
+ * |------|-----------------|--------------------------------------------|
+ * | 0    | success         | Цепочка выполнена успешно                  |
+ * | 1    | chainFailed     | Ошибка выполнения шага/агента              |
+ * | 3    | chainNotFound   | Запрошенная цепочка не найдена             |
+ * | 4    | budgetExceeded  | Превышен бюджет цепочки                    |
+ * | 5    | invalidConfig   | Неверная конфигурация цепочки или аргументы|
+ * | 6    | timeout         | Превышен таймаут (зарезервирован)          |
+ */
 final class OrchestrateCommand extends Command
 {
     private const string ARG_TASK = 'task';
@@ -46,10 +64,11 @@ final class OrchestrateCommand extends Command
     public const string LOCK_RESOURCE = 'command:agent:orchestrate';
 
     public function __construct(
-        private readonly OrchestrateChainCommandHandler $orchestrateHandler,
-        private readonly GenerateReportQueryHandler $reportHandler,
+        private readonly OrchestrateChainHandlerInterface $orchestrateHandler,
+        private readonly GenerateReportHandlerInterface $reportHandler,
         private readonly LockFactory $lockFactory,
         private readonly ChainLoaderInterface $chainLoader,
+        private readonly ResolveExitCodeServiceInterface $exitCodeResolver,
     ) {
         parent::__construct();
     }
@@ -83,7 +102,7 @@ final class OrchestrateCommand extends Command
         if (!$lock->acquire()) {
             $io->warning(sprintf('Команда "%s" уже выполняется. Пропускаем.', $this->getName() ?? static::class));
 
-            return Command::SUCCESS;
+            return OrchestrateExitCodeEnum::success->value;
         }
 
         try {
@@ -129,7 +148,10 @@ final class OrchestrateCommand extends Command
                     noContextFiles: $noContextFiles,
                 ));
 
-                return $this->renderDynamicResult($io, $result);
+                // Resume всегда резолвит exit code как dynamic — информация о типе цепочки не сохраняется в сессии.
+                $this->renderDynamicResult($io, $result);
+
+                return $this->exitCodeResolver->resolveFromResult($result, true)->value;
             }
 
             $chain = $this->chainLoader->load($chainName);
@@ -138,7 +160,7 @@ final class OrchestrateCommand extends Command
             if ($dryRun) {
                 $this->renderDryRun($io, $chainName, $task, $chain, $isDynamic, $topic, $facilitator, $participants, $maxRounds);
 
-                return Command::SUCCESS;
+                return OrchestrateExitCodeEnum::success->value;
             }
 
             $io->section(sprintf('🚀 Orchestrating: %s (%s)', $chainName, $isDynamic ? 'dynamic' : 'static'));
@@ -175,14 +197,16 @@ final class OrchestrateCommand extends Command
             }
 
             if ($isDynamic) {
-                return $this->renderDynamicResult($io, $result);
+                $this->renderDynamicResult($io, $result);
+            } else {
+                $this->renderStaticResult($io, $result);
             }
 
-            return $this->renderStaticResult($io, $result);
+            return $this->exitCodeResolver->resolveFromResult($result, $isDynamic)->value;
         } catch (\Throwable $e) {
             $io->error($e->getMessage());
 
-            return Command::FAILURE;
+            return $this->exitCodeResolver->resolveFromThrowable($e)->value;
         } finally {
             $lock->release();
         }
@@ -233,10 +257,9 @@ final class OrchestrateCommand extends Command
     /**
      * Рендерит результат static-цепочки.
      */
-    private function renderStaticResult(SymfonyStyle $io, OrchestrateChainResultDto $result): int
+    private function renderStaticResult(SymfonyStyle $io, OrchestrateChainResultDto $result): void
     {
         $total = count($result->stepResults);
-        $hasError = false;
         foreach ($result->stepResults as $i => $stepResult) {
             $num = $i + 1;
             $duration = round($stepResult->duration);
@@ -281,7 +304,6 @@ final class OrchestrateCommand extends Command
 
                 if ($stepResult->isError) {
                     $io->error(sprintf('Agent error: %s', $stepResult->errorMessage ?? 'Unknown'));
-                    $hasError = true;
                     break;
                 }
             }
@@ -297,7 +319,7 @@ final class OrchestrateCommand extends Command
             ));
         }
 
-        if (!$hasError && !$result->budgetExceeded) {
+        if ($this->exitCodeResolver->isSuccessfulResult($result, false) && !$result->budgetExceeded) {
             $io->success(sprintf(
                 '✅ Chain completed in %ds | Total: ↑%s ↓%s $%.4f',
                 round($result->totalTime),
@@ -306,16 +328,18 @@ final class OrchestrateCommand extends Command
                 $result->totalCost,
             ));
         }
-
-        return ($hasError || $result->budgetExceeded) ? Command::FAILURE : Command::SUCCESS;
     }
 
     /**
      * Рендерит результат dynamic-цепочки.
      */
-    private function renderDynamicResult(SymfonyStyle $io, OrchestrateChainResultDto $result): int
+    private function renderDynamicResult(SymfonyStyle $io, OrchestrateChainResultDto $result): void
     {
-        return $result->synthesis !== null ? Command::SUCCESS : Command::FAILURE;
+        if ($result->synthesis !== null) {
+            $io->success('✅ Dynamic chain completed with synthesis.');
+        } else {
+            $io->error('❌ Dynamic chain failed: no synthesis produced.');
+        }
     }
 
     private function formatTokens(int $tokens): string
