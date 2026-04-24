@@ -24,4 +24,12 @@ interface ResolveExitCodeServiceInterface
      * Определяет exit code по результату оркестрации.
      */
     public function resolveFromResult(OrchestrateChainResultDto $result, bool $isDynamic): OrchestrateExitCodeEnum;
+
+    /**
+     * Проверяет, завершена ли цепочка успешно (для рендера итогового сообщения).
+     *
+     * Инкапсулирует логику определения «есть ли ошибка» — Presentation-слой
+     * не дублирует проверку stepResults вручную.
+     */
+    public function isSuccessfulResult(OrchestrateChainResultDto $result, bool $isDynamic): bool;
 }

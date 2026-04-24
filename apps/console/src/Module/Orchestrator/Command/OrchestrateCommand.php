@@ -28,6 +28,22 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefiniti
     name: 'app:agent:orchestrate',
     description: 'Оркестрация AI-агентов по цепочке (static/dynamic)',
 )]
+
+/**
+ * @techdebt 2026-04-24: Command зависит от Domain\ChainLoaderInterface и Domain\ChainDefinitionVo.
+ * Нужно вынести загрузку chain в Application-слой (ChainDefinitionDto + ChainLoaderApplicationInterface).
+ *
+ * Exit codes:
+ *
+ * | Code | Constant        | Meaning                                    |
+ * |------|-----------------|--------------------------------------------|
+ * | 0    | success         | Цепочка выполнена успешно                  |
+ * | 1    | chainFailed     | Ошибка выполнения шага/агента              |
+ * | 3    | chainNotFound   | Запрошенная цепочка не найдена             |
+ * | 4    | budgetExceeded  | Превышен бюджет цепочки                    |
+ * | 5    | invalidConfig   | Неверная конфигурация цепочки или аргументы|
+ * | 6    | timeout         | Превышен таймаут (зарезервирован)          |
+ */
 final class OrchestrateCommand extends Command
 {
     private const string ARG_TASK = 'task';
@@ -132,6 +148,7 @@ final class OrchestrateCommand extends Command
                     noContextFiles: $noContextFiles,
                 ));
 
+                // Resume всегда резолвит exit code как dynamic — информация о типе цепочки не сохраняется в сессии.
                 $this->renderDynamicResult($io, $result);
 
                 return $this->exitCodeResolver->resolveFromResult($result, true)->value;
@@ -302,7 +319,7 @@ final class OrchestrateCommand extends Command
             ));
         }
 
-        if (!$this->staticChainHasError($result) && !$result->budgetExceeded) {
+        if ($this->exitCodeResolver->isSuccessfulResult($result, false) && !$result->budgetExceeded) {
             $io->success(sprintf(
                 '✅ Chain completed in %ds | Total: ↑%s ↓%s $%.4f',
                 round($result->totalTime),
@@ -323,20 +340,6 @@ final class OrchestrateCommand extends Command
         } else {
             $io->error('❌ Dynamic chain failed: no synthesis produced.');
         }
-    }
-
-    /**
-     * Проверяет, содержит ли static-цепочка ошибку на каком-либо шаге.
-     */
-    private function staticChainHasError(OrchestrateChainResultDto $result): bool
-    {
-        foreach ($result->stepResults as $stepResult) {
-            if ($stepResult->isError) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private function formatTokens(int $tokens): string
