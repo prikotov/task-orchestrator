@@ -23,8 +23,6 @@ interface BuildDynamicContextServiceInterface
         array $participants,
         int $maxRounds,
         string $topic,
-        string $runnerName,
-        ?string $model,
         ?string $workingDir,
         int $timeout,
         ?int $maxTime = null,
@@ -40,7 +38,6 @@ interface BuildDynamicContextServiceInterface
     public function buildInvocation(
         ChainDefinitionVo $chain,
         string $task,
-        ?string $model,
         int $timeout,
         ?string $workingDir,
         ?string $resumeDir,

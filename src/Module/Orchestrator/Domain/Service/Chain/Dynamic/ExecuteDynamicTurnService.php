@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
+use LogicException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
@@ -13,6 +14,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainC
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorResponseVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorTurnResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
 
 use function array_map;
 use function implode;
@@ -58,11 +60,12 @@ final readonly class ExecuteDynamicTurnService
             )
             : '';
         $facRoleConfig = $chain->getRoleConfig($context->facilitatorRole);
+        $facRunner = $this->resolveRunner($facRoleConfig);
         $auditLogger?->logStepStart(
             $chain->getName(),
             $execution->getStep(),
             $context->facilitatorRole,
-            $context->runnerName,
+            $facRunner,
         );
 
         /** @var array{ChainTurnResultVo, FacilitatorResponseVo} $facRun */
@@ -75,7 +78,6 @@ final readonly class ExecuteDynamicTurnService
             $context->facilitatorAppendPrompt,
             $context->facilitatorStartPrompt,
             $context->facilitatorContinuePrompt,
-            $context->model,
             $context->workingDir,
             $execution->getFacilitatorSummary(),
             $facResponseFilesList,
@@ -104,7 +106,7 @@ final readonly class ExecuteDynamicTurnService
             $execution->getStep(),
             $execution->getRound(),
             $chain->getName(),
-            $context->runnerName,
+            $facRunner,
             $context->facilitatorRole,
             true,
             $roundVo,
@@ -150,11 +152,12 @@ final readonly class ExecuteDynamicTurnService
             )
             : '';
         $partRoleConfig = $chain->getRoleConfig($nextRole);
+        $partRunner = $this->resolveRunner($partRoleConfig);
         $auditLogger?->logStepStart(
             $chain->getName(),
             $execution->getStep(),
             $nextRole,
-            $context->runnerName,
+            $partRunner,
         );
 
         $turnResult = $this->agentRunner->runParticipant(
@@ -165,7 +168,6 @@ final readonly class ExecuteDynamicTurnService
             $context->brainstormSystemPrompt,
             $context->participantAppendPrompt,
             $context->participantUserPrompt,
-            $context->model,
             $context->workingDir,
             $responseFilesList,
             $partRoleConfig?->getTimeout() ?? $context->timeout,
@@ -185,7 +187,7 @@ final readonly class ExecuteDynamicTurnService
             $execution->getStep(),
             $execution->getRound(),
             $chain->getName(),
-            $context->runnerName,
+            $partRunner,
             $nextRole,
             false,
             $roundVo,
@@ -214,11 +216,12 @@ final readonly class ExecuteDynamicTurnService
             )
             : '';
         $finRoleConfig = $chain->getRoleConfig($context->facilitatorRole);
+        $finRunner = $this->resolveRunner($finRoleConfig);
         $auditLogger?->logStepStart(
             $chain->getName(),
             $execution->getStep(),
             $context->facilitatorRole,
-            $context->runnerName,
+            $finRunner,
         );
 
         $turnResult = $this->agentRunner->runFacilitatorFinalize(
@@ -229,7 +232,6 @@ final readonly class ExecuteDynamicTurnService
             brainstormSystemPrompt: $context->brainstormSystemPrompt,
             facilitatorAppendPrompt: $context->facilitatorAppendPrompt,
             facilitatorFinalizePrompt: $context->facilitatorFinalizePrompt,
-            model: $context->model,
             workingDir: $context->workingDir,
             responseFilesList: $facResponseFilesList,
             timeout: $finRoleConfig?->getTimeout() ?? $context->timeout,
@@ -247,7 +249,7 @@ final readonly class ExecuteDynamicTurnService
             $execution->getStep(),
             $execution->getRound(),
             $chain->getName(),
-            $context->runnerName,
+            $finRunner,
             $context->facilitatorRole,
             true,
             $roundVo,
@@ -257,6 +259,25 @@ final readonly class ExecuteDynamicTurnService
         );
 
         return $turnResult;
+    }
+
+    /**
+     * Извлекает имя runner'а из конфигурации роли.
+     *
+     * Runner — первый элемент массива command в RoleConfigVo.
+     *
+     * @throws LogicException если конфигурация роли отсутствует или command пуста
+     */
+    private function resolveRunner(?RoleConfigVo $roleConfig): string
+    {
+        $command = $roleConfig?->getCommand() ?? [];
+        if ($command === [] || $command[0] === '') {
+            throw new LogicException(
+                'Role configuration must define a non-empty command with runner name as the first element.',
+            );
+        }
+
+        return $command[0];
     }
 
     private function toRoundResultVo(

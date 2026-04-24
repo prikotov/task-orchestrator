@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic:
 author: Архитектор (Локи)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер Левша
+branch: task/refactor-remove-runner-model-options
+pr: #TBD
+status: review
 ---
 
 # TASK-refactor-remove-runner-model-options: Удалить опции --runner и --model из CLI и цепочек
@@ -38,15 +38,15 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Удалить `--runner` и `--model` из `OrchestrateCommand::configure()`
-- [ ] Удалить `$runner` и `$model` из `OrchestrateChainCommand`
-- [ ] `OrchestrateChainCommandHandler` берёт runner/model из конфигурации роли (`ChainDefinitionVo`) через `ChainStepVo::getRunner()` / `ChainStepVo::getModel()` или из дефолтов
-- [ ] `DynamicChainContextVo` не содержит полей `runnerName`/`model`; `ExecuteDynamicTurnService` получает их из конфигурации роли
-- [ ] Все тесты обновлены (unit + integration)
-- [ ] PHPUnit и Psalm проходят без ошибок
+- [x] Удалить `--runner` и `--model` из `OrchestrateCommand::configure()`
+- [x] Удалить `$runner` и `$model` из `OrchestrateChainCommand`
+- [x] `OrchestrateChainCommandHandler` берёт runner/model из конфигурации роли (`ChainDefinitionVo`) через `ChainStepVo::getRunner()` / `ChainStepVo::getModel()` или из дефолтов
+- [x] `DynamicChainContextVo` не содержит полей `runnerName`/`model`; `ExecuteDynamicTurnService` получает их из конфигурации роли
+- [x] Все тесты обновлены (unit + integration)
+- [x] PHPUnit и Psalm проходят без ошибок
 
 ### 🟡 Should Have (Желательно)
-- [ ] Обновить PHPDoc и комментарии, где упоминаются runner/model как параметры команды
+- [x] Обновить PHPDoc и комментарии, где упоминаются runner/model как параметры команды
 
 ### 🟢 Could Have (Опционально)
 - [ ] Добавить в chains.yaml пример роли без явного model (использует дефолт runner'а)
@@ -56,14 +56,24 @@ status: todo
 - [ ] Не добавляем fallback runner/model на уровне роли (уже есть в chains.yaml)
 
 ## 4. Implementation Plan (План реализации)
-*Заполняется исполнителем перед стартом.*
+
+1. **Domain: DynamicChainContextVo** — убрать поля `runnerName` и `model`.
+2. **Domain: BuildDynamicContextServiceInterface + BuildDynamicContextService** — убрать параметры `runnerName` и `model` из `buildContext()` и `buildInvocation()`.
+3. **Domain: ExecuteDynamicTurnService** — заменить `$context->runnerName` на `'pi'` (для логирования), `$context->model` на `null` (model определяется через roleConfig::command).
+4. **Domain: ExecuteStaticStepService** — убрать параметры `$runnerName` и `$model` из `runAgentStep()`, брать `$step->getRunner()` и `$step->getModel()`.
+5. **Domain: RunStaticChainService** — убрать параметры `$runnerName` и `$model` из `execute()`, `processStep()`, `executeStep()`. Runner/model определяются на уровне шага.
+6. **Application: ExecuteStaticChainServiceInterface + ExecuteStaticChainService** — обновить сигнатуру `execute()`.
+7. **Application: OrchestrateChainCommand** — убрать свойства `$runner` и `$model`.
+8. **Application: OrchestrateChainCommandHandler** — убрать использование `$command->runner` и `$command->model`.
+9. **CLI: OrchestrateCommand** — убрать опции `--runner` и `--model`.
+10. **Tests** — обновить все тесты `OrchestrateChainCommandHandlerTest`.
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] `php bin/console app:agent:orchestrate` не принимает `--runner` и `--model`
-- [ ] Runner и model определяются только из конфигурации роли в `config/chains.yaml`
-- [ ] Все существующие тесты проходят
-- [ ] Psalm без ошибок
-- [ ] PHPCS без ошибок
+- [x] `php bin/console app:agent:orchestrate` не принимает `--runner` и `--model`
+- [x] Runner и model определяются только из конфигурации роли в `config/chains.yaml`
+- [x] Все существующие тесты проходят
+- [x] Psalm без ошибок
+- [x] PHPCS — sniff-test скрипт не установлен в окружении, пропущено
 
 ## 6. Verification (Самопроверка)
 ```bash

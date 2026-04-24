@@ -39,9 +39,7 @@ final readonly class ExecuteStaticStepService
 
     public function runAgentStep(
         ChainStepVo $step,
-        string $runnerName,
         string $task,
-        ?string $model,
         ?string $workingDir,
         int $timeout,
         ?string $previousContext,
@@ -58,12 +56,13 @@ final readonly class ExecuteStaticStepService
             )
             : null;
 
+        $runnerName = $step->getRunner();
         $request = new ChainRunRequestVo(
             role: $role,
             task: $task,
             systemPrompt: null,
             previousContext: $context,
-            model: $model ?? $step->getModel(),
+            model: $step->getModel(),
             tools: $step->getTools(),
             workingDir: $workingDir,
             timeout: $roleConfig?->getTimeout() ?? $timeout,
