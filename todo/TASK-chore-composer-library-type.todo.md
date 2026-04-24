@@ -10,8 +10,8 @@ epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
 assignee: Бэкендер (Тони)
 branch: task/chore-composer-library-type
-pr:
-status: in_progress
+pr: #63
+status: done
 ---
 
 # TASK-chore-composer-library-type: Изменить type на library и добавить bin в composer.json
@@ -32,13 +32,13 @@ status: in_progress
 
 ## 3. Requirements (Требования)
 ### 🔴 Must Have
-- [ ] `type` изменён на `"library"` в composer.json
-- [ ] Добавлен `"bin": ["bin/task-orchestrator"]` в composer.json
-- [ ] Файл `bin/task-orchestrator` создан (точка входа: PHP shebang + require autoload + Console Application)
-- [ ] `vendor/bin/task-orchestrator --version` работает после `composer install`
+- [x] `type` изменён на `"library"` в composer.json
+- [x] Добавлен `"bin": ["bin/task-orchestrator"]` в composer.json
+- [x] Файл `bin/task-orchestrator` создан (точка входа: PHP shebang + require autoload + Console Application)
+- [x] `vendor/bin/task-orchestrator --version` работает после `composer install`
 
 ### 🟡 Should Have
-- [ ] Проверка: `composer validate` проходит без ошибок
+- [x] Проверка: `composer validate` проходит без ошибок
 
 ## 4. Implementation Plan
 1. Создать `bin/task-orchestrator` — точку входа (shebang + autoload + Application)
@@ -46,9 +46,9 @@ status: in_progress
 3. Проверить локально: `composer install` → `vendor/bin/task-orchestrator --version`
 
 ## 5. Definition of Done
-- [ ] `composer validate` без ошибок
-- [ ] `vendor/bin/task-orchestrator --version` выводит версию
-- [ ] PHPUnit и Psalm зелёные
+- [x] `composer validate` без ошибок
+- [x] `vendor/bin/task-orchestrator --version` выводит версию
+- [x] PHPUnit и Psalm зелёные
 
 ## 6. Verification
 ```bash
@@ -84,3 +84,4 @@ vendor/bin/psalm
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-23 | Тимлид (Алекс) | Создание задачи из RFC brainstorm |
+| 2026-04-24 | Бэкендер (Тони) | Реализация: bin/task-orchestrator, composer.json type+bin, PR #63 |

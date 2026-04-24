@@ -1,7 +1,8 @@
 {
     "name": "prikotov/task-orchestrator",
     "description": "TasK Agent Orchestrator — chain-based AI agent orchestration with retry, circuit breaker, quality gates, dynamic loops",
-    "type": "project",
+    "type": "library",
+    "bin": ["bin/task-orchestrator"],
     "license": "MIT",
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -42,6 +43,14 @@
             "TaskOrchestrator\\Tests\\": "tests/",
             "TaskOrchestrator\\Console\\Tests\\": "apps/console/tests/"
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@php bin/create-symlink.php"
+        ],
+        "post-update-cmd": [
+            "@php bin/create-symlink.php"
+        ]
     },
     "config": {
         "allow-plugins": {
