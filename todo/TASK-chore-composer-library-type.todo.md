@@ -8,10 +8,10 @@ priority: P0
 depends_on:
 epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Бэкендер (Тони)
+branch: task/chore-composer-library-type
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-chore-composer-library-type: Изменить type на library и добавить bin в composer.json
@@ -64,6 +64,21 @@ vendor/bin/psalm
 ## 8. Sources
 - [RFC: cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md) — Решение 2
 - [Composer vendor binaries](https://getcomposer.org/doc/articles/vendor-binaries.md)
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/backend_developer_tony.ru.md
+**Ветка:** task/chore-composer-library-type (уже создана и активна)
+**PR:** уже создан (draft) из task/chore-composer-library-type в epic/feat-standalone-cli — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/chore-composer-library-type`: `git checkout task/chore-composer-library-type`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History
 | Дата | Автор (роль) | Изменение |
