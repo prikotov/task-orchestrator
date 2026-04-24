@@ -15,10 +15,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainHandlerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportHandlerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
@@ -49,8 +49,8 @@ final class OrchestrateCommand extends Command
     public const string LOCK_RESOURCE = 'command:agent:orchestrate';
 
     public function __construct(
-        private readonly OrchestrateChainCommandHandler $orchestrateHandler,
-        private readonly GenerateReportQueryHandler $reportHandler,
+        private readonly OrchestrateChainHandlerInterface $orchestrateHandler,
+        private readonly GenerateReportHandlerInterface $reportHandler,
         private readonly LockFactory $lockFactory,
         private readonly ChainLoaderInterface $chainLoader,
     ) {

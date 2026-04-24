@@ -11,13 +11,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Lock\SharedLockInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainHandlerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportHandlerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
@@ -32,17 +32,18 @@ final class OrchestrateCommandTest extends TestCase
 {
     private LockFactory&MockObject $lockFactory;
     private ChainLoaderInterface&MockObject $chainLoader;
-    private LockInterface&MockObject $lock;
-
-    /** @var \Closure(OrchestrateChainCommand): OrchestrateChainResultDto|null */
-    private ?\Closure $orchestrateHandlerCallback = null;
+    private OrchestrateChainHandlerInterface&MockObject $orchestrateHandler;
+    private GenerateReportHandlerInterface&MockObject $reportHandler;
+    private SharedLockInterface&MockObject $lock;
 
     #[Override]
     protected function setUp(): void
     {
         $this->lockFactory = $this->createMock(LockFactory::class);
         $this->chainLoader = $this->createMock(ChainLoaderInterface::class);
-        $this->lock = $this->createMock(LockInterface::class);
+        $this->orchestrateHandler = $this->createMock(OrchestrateChainHandlerInterface::class);
+        $this->reportHandler = $this->createMock(GenerateReportHandlerInterface::class);
+        $this->lock = $this->createMock(SharedLockInterface::class);
 
         $this->lockFactory
             ->method('createLock')
@@ -50,6 +51,10 @@ final class OrchestrateCommandTest extends TestCase
 
         $this->lock->method('acquire')->willReturn(true);
         $this->lock->method('release');
+
+        $this->reportHandler
+            ->method('__invoke')
+            ->willReturn(new GenerateReportResultDto(content: '', format: 'text'));
     }
 
     // ─── resolveExitCodeFromThrowable: ChainNotFoundException → chainNotFound (3) ──
@@ -105,10 +110,12 @@ final class OrchestrateCommandTest extends TestCase
         $chain = $this->createStaticChainDefinition();
         $this->chainLoader->method('load')->willReturn($chain);
 
-        $this->setOrchestrateHandlerResult(new OrchestrateChainResultDto(
-            stepResults: [],
-            budgetExceeded: false,
-        ));
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturn(new OrchestrateChainResultDto(
+                stepResults: [],
+                budgetExceeded: false,
+            ));
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => 'do something', '--report-format' => 'none']);
@@ -124,22 +131,24 @@ final class OrchestrateCommandTest extends TestCase
         $chain = $this->createStaticChainDefinition();
         $this->chainLoader->method('load')->willReturn($chain);
 
-        $this->setOrchestrateHandlerResult(new OrchestrateChainResultDto(
-            stepResults: [
-                new StepResultDto(
-                    role: 'agent',
-                    runner: 'pi',
-                    outputText: '',
-                    inputTokens: 0,
-                    outputTokens: 0,
-                    cost: 0.0,
-                    duration: 1.0,
-                    isError: true,
-                    errorMessage: 'Agent crashed',
-                ),
-            ],
-            budgetExceeded: false,
-        ));
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturn(new OrchestrateChainResultDto(
+                stepResults: [
+                    new StepResultDto(
+                        role: 'agent',
+                        runner: 'pi',
+                        outputText: '',
+                        inputTokens: 0,
+                        outputTokens: 0,
+                        cost: 0.0,
+                        duration: 1.0,
+                        isError: true,
+                        errorMessage: 'Agent crashed',
+                    ),
+                ],
+                budgetExceeded: false,
+            ));
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => 'do something', '--report-format' => 'none']);
@@ -155,12 +164,14 @@ final class OrchestrateCommandTest extends TestCase
         $chain = $this->createStaticChainDefinition();
         $this->chainLoader->method('load')->willReturn($chain);
 
-        $this->setOrchestrateHandlerResult(new OrchestrateChainResultDto(
-            stepResults: [],
-            budgetExceeded: true,
-            budgetLimit: 10.0,
-            totalCost: 12.0,
-        ));
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturn(new OrchestrateChainResultDto(
+                stepResults: [],
+                budgetExceeded: true,
+                budgetLimit: 10.0,
+                totalCost: 12.0,
+            ));
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => 'do something', '--report-format' => 'none']);
@@ -176,10 +187,12 @@ final class OrchestrateCommandTest extends TestCase
         $chain = $this->createDynamicChainDefinition();
         $this->chainLoader->method('load')->willReturn($chain);
 
-        $this->setOrchestrateHandlerResult(new OrchestrateChainResultDto(
-            synthesis: 'Done.',
-            budgetExceeded: false,
-        ));
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturn(new OrchestrateChainResultDto(
+                synthesis: 'Done.',
+                budgetExceeded: false,
+            ));
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => 'do something', '--report-format' => 'none']);
@@ -195,10 +208,12 @@ final class OrchestrateCommandTest extends TestCase
         $chain = $this->createDynamicChainDefinition();
         $this->chainLoader->method('load')->willReturn($chain);
 
-        $this->setOrchestrateHandlerResult(new OrchestrateChainResultDto(
-            synthesis: null,
-            budgetExceeded: false,
-        ));
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturn(new OrchestrateChainResultDto(
+                synthesis: null,
+                budgetExceeded: false,
+            ));
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => 'do something', '--report-format' => 'none']);
@@ -228,24 +243,26 @@ final class OrchestrateCommandTest extends TestCase
         $chain = $this->createStaticChainDefinition();
         $this->chainLoader->method('load')->willReturn($chain);
 
-        $this->setOrchestrateHandlerResult(new OrchestrateChainResultDto(
-            stepResults: [
-                new StepResultDto(
-                    role: 'agent',
-                    runner: 'pi',
-                    outputText: '',
-                    inputTokens: 0,
-                    outputTokens: 0,
-                    cost: 0.0,
-                    duration: 1.0,
-                    isError: true,
-                    errorMessage: 'Agent crashed',
-                ),
-            ],
-            budgetExceeded: true,
-            budgetLimit: 5.0,
-            totalCost: 6.0,
-        ));
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturn(new OrchestrateChainResultDto(
+                stepResults: [
+                    new StepResultDto(
+                        role: 'agent',
+                        runner: 'pi',
+                        outputText: '',
+                        inputTokens: 0,
+                        outputTokens: 0,
+                        cost: 0.0,
+                        duration: 1.0,
+                        isError: true,
+                        errorMessage: 'Agent crashed',
+                    ),
+                ],
+                budgetExceeded: true,
+                budgetLimit: 5.0,
+                totalCost: 6.0,
+            ));
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => 'do something', '--report-format' => 'none']);
@@ -255,58 +272,17 @@ final class OrchestrateCommandTest extends TestCase
 
     // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-    private function setOrchestrateHandlerResult(OrchestrateChainResultDto $result): void
-    {
-        $this->orchestrateHandlerCallback = static fn(): OrchestrateChainResultDto => $result;
-    }
-
     private function createCommandTester(): CommandTester
     {
-        $callback = $this->orchestrateHandlerCallback;
-        $handler = new class($callback) extends OrchestrateChainCommandHandler {
-            /** @var \Closure(OrchestrateChainCommand): OrchestrateChainResultDto|null */
-            private readonly ?\Closure $callback;
-
-            /**
-             * @param \Closure(OrchestrateChainCommand): OrchestrateChainResultDto|null $callback
-             */
-            public function __construct(?\Closure $callback)
-            {
-                // phpcs:ignore -- parent constructor intentionally not called: stub
-                $this->callback = $callback;
-            }
-
-            public function __invoke(OrchestrateChainCommand $command): OrchestrateChainResultDto
-            {
-                if ($this->callback !== null) {
-                    return ($this->callback)($command);
-                }
-
-                return new OrchestrateChainResultDto();
-            }
-        };
-
-        $reportHandler = new class extends GenerateReportQueryHandler {
-            public function __construct()
-            {
-                // phpcs:ignore -- parent constructor intentionally not called: stub
-            }
-
-            public function __invoke(GenerateReportQuery $query): GenerateReportResultDto
-            {
-                return new GenerateReportResultDto(content: '');
-            }
-        };
-
         $command = new OrchestrateCommand(
-            $handler,
-            $reportHandler,
+            $this->orchestrateHandler,
+            $this->reportHandler,
             $this->lockFactory,
             $this->chainLoader,
         );
 
         $application = new Application();
-        $application->add($command);
+        $application->addCommand($command);
         $registeredCommand = $application->find('app:agent:orchestrate');
 
         return new CommandTester($registeredCommand);
