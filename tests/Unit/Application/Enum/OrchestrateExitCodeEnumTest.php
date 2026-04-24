@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Tests\Unit\Domain\Enum;
+namespace TaskOrchestrator\Tests\Unit\Application\Enum;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\OrchestrateExitCodeEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
 
 #[CoversClass(OrchestrateExitCodeEnum::class)]
 final class OrchestrateExitCodeEnumTest extends TestCase

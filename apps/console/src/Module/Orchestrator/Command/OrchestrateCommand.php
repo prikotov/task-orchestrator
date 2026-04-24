@@ -13,15 +13,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainHandlerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportHandlerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\OrchestrateExitCodeEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 
@@ -53,6 +52,7 @@ final class OrchestrateCommand extends Command
         private readonly GenerateReportHandlerInterface $reportHandler,
         private readonly LockFactory $lockFactory,
         private readonly ChainLoaderInterface $chainLoader,
+        private readonly ResolveExitCodeServiceInterface $exitCodeResolver,
     ) {
         parent::__construct();
     }
@@ -134,7 +134,7 @@ final class OrchestrateCommand extends Command
 
                 $this->renderDynamicResult($io, $result);
 
-                return $this->resolveExitCodeFromResult($result, true)->value;
+                return $this->exitCodeResolver->resolveFromResult($result, true)->value;
             }
 
             $chain = $this->chainLoader->load($chainName);
@@ -185,11 +185,11 @@ final class OrchestrateCommand extends Command
                 $this->renderStaticResult($io, $result);
             }
 
-            return $this->resolveExitCodeFromResult($result, $isDynamic)->value;
+            return $this->exitCodeResolver->resolveFromResult($result, $isDynamic)->value;
         } catch (\Throwable $e) {
             $io->error($e->getMessage());
 
-            return $this->resolveExitCodeFromThrowable($e)->value;
+            return $this->exitCodeResolver->resolveFromThrowable($e)->value;
         } finally {
             $lock->release();
         }
@@ -323,38 +323,6 @@ final class OrchestrateCommand extends Command
         } else {
             $io->error('❌ Dynamic chain failed: no synthesis produced.');
         }
-    }
-
-    /**
-     * Определяет exit code по типу исключения.
-     */
-    private function resolveExitCodeFromThrowable(\Throwable $e): OrchestrateExitCodeEnum
-    {
-        return match (true) {
-            $e instanceof ChainNotFoundException => OrchestrateExitCodeEnum::chainNotFound,
-            $e instanceof RoleNotFoundException => OrchestrateExitCodeEnum::invalidConfig,
-            default => OrchestrateExitCodeEnum::chainFailed,
-        };
-    }
-
-    /**
-     * Определяет exit code по результату оркестрации.
-     */
-    private function resolveExitCodeFromResult(OrchestrateChainResultDto $result, bool $isDynamic): OrchestrateExitCodeEnum
-    {
-        if ($result->budgetExceeded) {
-            return OrchestrateExitCodeEnum::budgetExceeded;
-        }
-
-        if ($isDynamic) {
-            return $result->synthesis !== null
-                ? OrchestrateExitCodeEnum::success
-                : OrchestrateExitCodeEnum::chainFailed;
-        }
-
-        return $this->staticChainHasError($result)
-            ? OrchestrateExitCodeEnum::chainFailed
-            : OrchestrateExitCodeEnum::success;
     }
 
     /**
