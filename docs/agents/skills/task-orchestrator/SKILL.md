@@ -16,44 +16,7 @@ description: Запуск оркестрации AI-агентов по цепо
 
 ## Конфигурация
 
-Цепочки описываются в `chains.yaml` — две секции: `roles` (роли агентов) и `chains` (цепочки). Подробный формат — в [README.md](README.md).
-
-```yaml
-roles:
-  analyst:
-    prompt_file: prompts/analyst.md
-    command: [pi, --mode, json, -p, --no-session, --model, gpt-4o, --system-prompt, "@system-prompt"]
-
-  developer:
-    prompt_file: prompts/developer.md
-    command: [pi, --mode, json, -p, --no-session, --model, gpt-4o, --system-prompt, "@system-prompt"]
-
-chains:
-  implement:
-    description: "Analyze → Implement → Review"
-    steps:
-      - { type: agent, role: analyst, name: analyze }
-      - { type: agent, role: developer, name: implement }
-      - { type: quality_gate, command: 'vendor/bin/phpunit', label: 'Tests', timeout_seconds: 120 }
-    fix_iterations:
-      - group: dev-review
-        steps: [implement, review]
-        max_iterations: 3
-
-  brainstorm:
-    type: dynamic
-    facilitator: analyst
-    participants: [developer, reviewer]
-    max_rounds: 10
-    prompts:
-      brainstorm_system: prompts/brainstorm/system.txt
-      facilitator_append: prompts/brainstorm/facilitator_append.txt
-      facilitator_start: prompts/brainstorm/facilitator_start.txt
-      facilitator_continue: prompts/brainstorm/facilitator_continue.txt
-      facilitator_finalize: prompts/brainstorm/facilitator_finalize.txt
-      participant_append: prompts/brainstorm/participant_append.txt
-      participant_user: prompts/brainstorm/participant_user.txt
-```
+Цепочки описываются в `chains.yaml` — две секции: `roles` (роли агентов) и `chains` (цепочки). Подробный формат и описание всех полей — в [README.md](README.md). Полный пример конфига — в [assets/chains-example.yaml](assets/chains-example.yaml).
 
 ## Синтаксис
 
