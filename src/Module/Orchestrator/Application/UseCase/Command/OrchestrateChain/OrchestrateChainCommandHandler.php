@@ -69,13 +69,9 @@ final readonly class OrchestrateChainCommandHandler
         ChainDefinitionVo $chain,
         OrchestrateChainCommand $command,
     ): OrchestrateChainResultDto {
-        $runnerName = $command->runner ?? 'pi';
-
         return $this->staticChainExecutor->execute(
             $chain,
-            $runnerName,
             $command->task,
-            $command->model,
             $command->workingDir,
             $command->timeout ?? self::DEFAULT_STATIC_TIMEOUT,
             null, // static chains have no session-scoped audit log
@@ -93,7 +89,6 @@ final readonly class OrchestrateChainCommandHandler
         $participants = $command->participants ?? $chain->getParticipants();
         $maxRounds = $command->maxRounds ?? $chain->getMaxRounds();
         $topic = $command->topic ?? $command->task;
-        $runnerName = $command->runner ?? 'pi';
         $timeout = $command->timeout ?? $chain->getTimeout() ?? self::DEFAULT_DYNAMIC_TIMEOUT;
 
         $sessionDir = $this->sessionLogger->startSession(
@@ -109,7 +104,6 @@ final readonly class OrchestrateChainCommandHandler
             $this->contextBuilder->buildInvocation(
                 $chain,
                 $command->task,
-                $command->model,
                 $timeout,
                 $command->workingDir,
                 $command->resumeDir,
@@ -126,14 +120,12 @@ final readonly class OrchestrateChainCommandHandler
             $participants,
             $maxRounds,
             $topic,
-            $runnerName,
-            $command->model,
             $command->workingDir,
             $timeout,
             $chain->getMaxTime(),
         );
 
-        $loopResult = $this->runDynamicLoop($chain, $context, $runnerName, auditLogger: $auditLogger);
+        $loopResult = $this->runDynamicLoop($chain, $context, auditLogger: $auditLogger);
         $this->finalizeSession($loopResult, $sessionDir);
 
         return $this->toResultDto($loopResult, $sessionDir);
@@ -158,7 +150,6 @@ final readonly class OrchestrateChainCommandHandler
         $invocation = $this->contextBuilder->buildInvocation(
             $chain,
             $command->task,
-            $command->model,
             $resumeTimeout,
             $command->workingDir,
             $command->resumeDir,
@@ -176,8 +167,6 @@ final readonly class OrchestrateChainCommandHandler
             $state->getParticipants(),
             $state->getMaxRounds(),
             $state->getTopic(),
-            $command->runner ?? 'pi',
-            $command->model,
             $command->workingDir,
             $resumeTimeout,
             $chain->getMaxTime(),
@@ -186,7 +175,6 @@ final readonly class OrchestrateChainCommandHandler
         $loopResult = $this->runDynamicLoop(
             $chain,
             $context,
-            $command->runner ?? 'pi',
             $state->getCompletedRounds(),
             $state->getDiscussionHistory(),
             $state->getFacilitatorJournal(),
@@ -202,7 +190,6 @@ final readonly class OrchestrateChainCommandHandler
     private function runDynamicLoop(
         ChainDefinitionVo $chain,
         \TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo $context,
-        string $runnerName,
         int $startRound = 0,
         string $initialDiscussionHistory = '',
         string $initialFacilitatorJournal = '',
