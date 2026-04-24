@@ -12,14 +12,14 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\SharedLockInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainHandlerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportHandlerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
@@ -270,6 +270,82 @@ final class OrchestrateCommandTest extends TestCase
         self::assertSame(OrchestrateExitCodeEnum::budgetExceeded->value, $tester->getStatusCode());
     }
 
+    // ─── Lock scenario: already running → success (0) with warning ──
+
+    #[Test]
+    public function lockNotAcquiredReturnsSuccessWithWarning(): void
+    {
+        $lock = $this->createMock(SharedLockInterface::class);
+        $lock->method('acquire')->willReturn(false);
+        $lock->expects($this->never())->method('release');
+
+        $lockFactory = $this->createMock(LockFactory::class);
+        $lockFactory->method('createLock')->willReturn($lock);
+
+        $command = new OrchestrateCommand(
+            $this->orchestrateHandler,
+            $this->reportHandler,
+            $lockFactory,
+            $this->chainLoader,
+            new ResolveExitCodeService(),
+        );
+
+        $application = new Application();
+        $application->addCommand($command);
+        $tester = new CommandTester($application->find('app:agent:orchestrate'));
+
+        $tester->execute(['task' => 'do something']);
+
+        self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+        self::assertStringContainsString('уже выполняется', $tester->getDisplay());
+    }
+
+    // ─── Resume scenario: --resume path → handler called with resumeDir ──
+
+    #[Test]
+    public function resumeOptionPassesResumeDirToHandler(): void
+    {
+        $resumeDir = '/tmp/session-abc';
+
+        $this->orchestrateHandler
+            ->expects($this->once())
+            ->method('__invoke')
+            ->with($this->callback(static fn(OrchestrateChainCommand $cmd): bool => $cmd->resumeDir === $resumeDir))
+            ->willReturn(new OrchestrateChainResultDto(
+                synthesis: 'Resumed result.',
+                budgetExceeded: false,
+            ));
+
+        $tester = $this->createCommandTester();
+        $tester->execute([
+            'task' => 'continue task',
+            '--resume' => $resumeDir,
+            '--report-format' => 'none',
+        ]);
+
+        self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+    }
+
+    #[Test]
+    public function resumeWithoutSynthesisReturnsChainFailed(): void
+    {
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturn(new OrchestrateChainResultDto(
+                synthesis: null,
+                budgetExceeded: false,
+            ));
+
+        $tester = $this->createCommandTester();
+        $tester->execute([
+            'task' => 'continue task',
+            '--resume' => '/tmp/session-fail',
+            '--report-format' => 'none',
+        ]);
+
+        self::assertSame(OrchestrateExitCodeEnum::chainFailed->value, $tester->getStatusCode());
+    }
+
     // ─── Helpers ───────────────────────────────────────────────────────────────────
 
     private function createCommandTester(): CommandTester
@@ -279,6 +355,7 @@ final class OrchestrateCommandTest extends TestCase
             $this->reportHandler,
             $this->lockFactory,
             $this->chainLoader,
+            new ResolveExitCodeService(),
         );
 
         $application = new Application();
