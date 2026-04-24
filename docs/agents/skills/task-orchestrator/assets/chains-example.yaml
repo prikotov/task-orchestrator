@@ -1,43 +1,338 @@
-# Полный пример chains.yaml
+# ──────────────────────────────────────────────────────────────────────────────
+# Полный пример chains.yaml со всеми возможностями.
+# Активные (незакомментированные) примеры — минимальный рабочий набор.
+# Закомментированные — продвинутые возможности: fallback, budget, retry_policy,
+# cross-model verification, разные CLI-раннеры.
+# ──────────────────────────────────────────────────────────────────────────────
+
+# ── Роли агентов ──────────────────────────────────────────────────────────────
 #
-# Две секции: roles (роли агентов) и chains (цепочки).
-# Формат описан в README.md.
+# Каждая роль описывает: какой промпт использовать и какой CLI-раннер вызывать.
+#
+# Поля:
+#   prompt_file  — путь к файлу системного промпта (.md), обязательное
+#   command      — массив аргументов CLI-команды, обязательное
+#   fallback     — запасная команда при недоступности основной, опциональное
+#
+# Специальные плейсхолдеры в command:
+#   @system-prompt        → резолвится в путь к файлу из prompt_file
+#   @append-system-prompt → резолвится в путь к файлу дополнения (если указан)
+#
+# Секция command — массив аргументов, которые передаются в Symfony Process.
+# Поддерживается любой CLI-раннер: pi, qwen, gemini, opencode, kilo и т.д.
 
 roles:
   analyst:
     prompt_file: prompts/analyst.md
-    command: [pi, --mode, json, -p, --no-session, --model, gpt-4o, --system-prompt, "@system-prompt"]
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - gpt-4o
+      - --system-prompt
+      - "@system-prompt"               # → путь к prompts/analyst.md
 
   developer:
     prompt_file: prompts/developer.md
-    command: [pi, --mode, json, -p, --no-session, --model, gpt-4o, --system-prompt, "@system-prompt"]
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - gpt-4o
+      - --system-prompt
+      - "@system-prompt"
 
   reviewer:
     prompt_file: prompts/reviewer.md
-    command: [pi, --mode, json, -p, --no-session, --model, gpt-4o, --system-prompt, "@system-prompt"]
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - gpt-4o
+      - --system-prompt
+      - "@system-prompt"
+
+  # ── Роль с fallback-раннером ──────────────────────────────────────────────
+  #
+  # Если основная команда (pi) недоступна — автоматически используется fallback.
+  # @system-prompt в fallback тоже резолвится в путь к prompt_file.
+  #
+  # developer_with_fallback:
+  #   prompt_file: prompts/developer.md
+  #   command:
+  #     - pi
+  #     - --mode
+  #     - json
+  #     - -p
+  #     - --no-session
+  #     - --model
+  #     - gpt-4o
+  #     - --system-prompt
+  #     - "@system-prompt"
+  #   fallback:
+  #     command:
+  #       - codex
+  #       - --model
+  #       - gpt-4o
+  #       - --full-auto
+  #       - --system-prompt
+  #       - "@system-prompt"
+
+  # ── Роль с tools (доступ к файловой системе) ──────────────────────────────
+  #
+  # developer_with_tools:
+  #   prompt_file: prompts/developer.md
+  #   command:
+  #     - pi
+  #     - --mode
+  #     - json
+  #     - -p
+  #     - --no-session
+  #     - --model
+  #     - gpt-4o
+  #     - --system-prompt
+  #     - "@system-prompt"
+  #     - --tools
+  #     - "read,grep,find,ls"
+
+  # ── Роль с append-system-prompt ───────────────────────────────────────────
+  #
+  # @append-system-prompt резолвится в путь к файлу дополнения.
+  # Полезно для контекстных инструкций поверх основного промпта.
+  #
+  # developer_with_append:
+  #   prompt_file: prompts/developer.md
+  #   command:
+  #     - pi
+  #     - --mode
+  #     - json
+  #     - -p
+  #     - --no-session
+  #     - --model
+  #     - gpt-4o
+  #     - --system-prompt
+  #     - "@system-prompt"
+  #     - --append-system-prompt
+  #     - "@append-system-prompt"
+
+  # ── Другие CLI-раннеры ────────────────────────────────────────────────────
+  #
+  # Qwen CLI (qwen) — https://github.com/QwenLM/qwen-code
+  #
+  # developer_qwen:
+  #   prompt_file: prompts/developer.md
+  #   command:
+  #     - qwen
+  #     - --model
+  #     - qwen3-235b-a22b
+  #     - --yolo
+  #     - --output-format
+  #     - json
+  #     - --max-session-turns
+  #     - "1"
+  #     - --system-prompt
+  #     - "@system-prompt"
+  #
+  # Gemini CLI (gemini) — https://github.com/google-gemini/gemini-cli
+  # Не имеет --system-prompt; Runner читает содержимое prompt_file и передаёт
+  # через stdin в headless mode (-p).
+  #
+  # developer_gemini:
+  #   prompt_file: prompts/developer.md
+  #   command:
+  #     - gemini
+  #     - --model
+  #     - gemini-2.5-pro
+  #     - --yolo
+  #     - --output-format
+  #     - json
+  #     - -p
+  #     - "@system-prompt"
+  #
+  # OpenCode (opencode) — https://github.com/opencode-ai/opencode
+  # Подкоманда `run` для non-interactive режима.
+  #
+  # developer_opencode:
+  #   prompt_file: prompts/developer.md
+  #   command:
+  #     - opencode
+  #     - run
+  #     - --model
+  #     - openrouter/glm-4.1
+  #     - --format
+  #     - json
+  #     - --prompt
+  #     - "@system-prompt"
+  #
+  # Kilo CLI (kilo) — https://github.com/kilocode/kilo
+  # Форк OpenCode; флаг --auto для автономного режима.
+  #
+  # developer_kilo:
+  #   prompt_file: prompts/developer.md
+  #   command:
+  #     - kilo
+  #     - run
+  #     - --model
+  #     - openrouter/glm-4.1
+  #     - --format
+  #     - json
+  #     - --auto
+  #     - --prompt
+  #     - "@system-prompt"
+
+
+# ── Цепочки ──────────────────────────────────────────────────────────────────
+#
+# Два типа цепочек:
+#   Static  — фиксированная последовательность шагов (ключ `steps`)
+#   Dynamic — фасилитатор выбирает, кто говорит в каждом раунде (ключ `type: dynamic`)
 
 chains:
+
+  # ── Static: минимальная цепочка ───────────────────────────────────────────
+  #
+  # Два agent-шага, без наворотов. Хорошая отправная точка.
+
   implement:
     description: "Analyze → Implement → Review"
     steps:
       - { type: agent, role: analyst, name: analyze }
       - { type: agent, role: developer, name: implement }
-      - { type: quality_gate, command: 'vendor/bin/phpunit', label: 'Tests', timeout_seconds: 120 }
+      - { type: agent, role: reviewer, name: review }
     fix_iterations:
       - group: dev-review
         steps: [implement, review]
         max_iterations: 3
 
-  brainstorm:
-    type: dynamic
-    facilitator: analyst
-    participants: [developer, reviewer]
-    max_rounds: 10
-    prompts:
-      brainstorm_system: prompts/brainstorm/system.txt
-      facilitator_append: prompts/brainstorm/facilitator_append.txt
-      facilitator_start: prompts/brainstorm/facilitator_start.txt
-      facilitator_continue: prompts/brainstorm/facilitator_continue.txt
-      facilitator_finalize: prompts/brainstorm/facilitator_finalize.txt
-      participant_append: prompts/brainstorm/participant_append.txt
-      participant_user: prompts/brainstorm/participant_user.txt
+  # ── Static: цепочка с retry_policy ───────────────────────────────────────
+  #
+  # Retry с exponential backoff на уровне цепочки.
+  # Можно переопределить на уровне отдельного шага.
+  #
+  # implement_with_retry:
+  #   description: "Цепочка с retry"
+  #   retry_policy:
+  #     max_retries: 3                # Максимум попыток
+  #     initial_delay_ms: 1000        # Начальная задержка (мс)
+  #     max_delay_ms: 30000           # Максимальная задержка (мс)
+  #     multiplier: 2.0               # Множитель backoff
+  #   steps:
+  #     - type: agent
+  #       role: analyst
+  #       retry_policy:              # Переопределение retry на уровне шага
+  #         max_retries: 5
+  #     - type: agent
+  #       role: developer
+  #       name: implement
+  #     - type: agent
+  #       role: reviewer
+  #       name: review
+  #   fix_iterations:
+  #     - group: dev-review
+  #       steps: [implement, review]
+  #       max_iterations: 3
+
+  # ── Static: цепочка с budget ─────────────────────────────────────────────
+  #
+  # Ограничение стоимости в USD. Проверяется перед/после каждого шага.
+  # null = безлимит (по умолчанию).
+  #
+  # implement_with_budget:
+  #   description: "Цепочка с бюджетом"
+  #   steps:
+  #     - { type: agent, role: analyst }
+  #     - { type: agent, role: developer }
+  #   budget:
+  #     max_cost_total: 5.0           # Максимум $5 на всю цепочку
+  #     max_cost_per_step: 1.5        # Максимум $1.50 за один шаг
+  #     per_role:                     # Per-role бюджеты (опционально)
+  #       developer:
+  #         max_cost_total: 2.0       # Максимум $2 суммарно для роли developer
+  #       reviewer:
+  #         max_cost_total: 1.0
+  #         max_cost_per_step: 0.5    # Максимум $0.50 за один шаг роли reviewer
+
+  # ── Static: цепочка с quality gates ──────────────────────────────────────
+  #
+  # quality_gate — shell-команда (pass/fail). Failed gate = warning,
+  # не прерывает цепочку. Выполняется через Symfony Process.
+  #
+  # implement_with_qa:
+  #   description: "Реализация → ревью → тесты"
+  #   steps:
+  #     - { type: agent, role: analyst }
+  #     - { type: agent, role: developer, name: implement }
+  #     - { type: agent, role: reviewer, name: review }
+  #     - type: quality_gate
+  #       command: 'vendor/bin/phpcs'
+  #       label: 'PHP CodeSniffer'
+  #       timeout_seconds: 60
+  #     - type: quality_gate
+  #       command: 'vendor/bin/phpunit tests/Unit/'
+  #       label: 'Unit Tests'
+  #       timeout_seconds: 120
+  #   fix_iterations:
+  #     - group: dev-review
+  #       steps: [implement, review]
+  #       max_iterations: 3
+
+  # ── Static: cross-model verification ─────────────────────────────────────
+  #
+  # Верификатор — обычный agent-шаг с другой моделью.
+  # Получает результат предыдущего шага через context.
+  # Снижает эффект систематических ошибок одной модели.
+  #
+  # implement_verified:
+  #   description: "Полный цикл с верификацией"
+  #   steps:
+  #     - { type: agent, role: analyst }
+  #     - type: agent
+  #       role: architect
+  #       name: architect
+  #     - type: agent
+  #       role: verifier           # ← другая модель
+  #       name: verify_architect
+  #     - type: agent
+  #       role: developer
+  #       name: implement
+  #     - type: agent
+  #       role: reviewer
+  #       name: review
+  #   fix_iterations:
+  #     - group: architect-verify
+  #       steps: [architect, verify_architect]
+  #       max_iterations: 2
+  #     - group: dev-review
+  #       steps: [implement, review]
+  #       max_iterations: 3
+
+  # ── Dynamic: brainstorm ──────────────────────────────────────────────────
+  #
+  # Фасилитатор выбирает, какой участник говорит в каждом раунде.
+  # Обязательные поля: facilitator, participants, max_rounds, prompts.
+  #
+  # brainstorm:
+  #   type: dynamic
+  #   description: "Фасилитируемый brainstorm"
+  #   timeout: 3600                # Общий таймаут цепочки (секунды)
+  #   facilitator: analyst         # Роль фасилитатора
+  #   participants: [developer, reviewer]
+  #   max_rounds: 10               # Максимум раундов
+  #   max_time: 1800               # Максимум времени (секунды)
+  #   prompts:
+  #     brainstorm_system: prompts/brainstorm/brainstorm_system.txt
+  #     facilitator_append: prompts/brainstorm/facilitator_append.txt
+  #     facilitator_start: prompts/brainstorm/facilitator_start.txt
+  #     facilitator_continue: prompts/brainstorm/facilitator_continue.txt
+  #     facilitator_finalize: prompts/brainstorm/facilitator_finalize.txt
+  #     participant_append: prompts/brainstorm/participant_append.txt
+  #     participant_user: prompts/brainstorm/participant_user.txt
