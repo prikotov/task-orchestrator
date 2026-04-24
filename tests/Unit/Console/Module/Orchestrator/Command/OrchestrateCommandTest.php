@@ -12,7 +12,9 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\SharedLockInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigValidationResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainHandlerInterface;
@@ -34,6 +36,7 @@ final class OrchestrateCommandTest extends TestCase
     private ChainLoaderInterface&MockObject $chainLoader;
     private OrchestrateChainHandlerInterface&MockObject $orchestrateHandler;
     private GenerateReportHandlerInterface&MockObject $reportHandler;
+    private ValidateChainConfigServiceInterface&MockObject $chainConfigValidator;
     private SharedLockInterface&MockObject $lock;
 
     #[Override]
@@ -43,6 +46,7 @@ final class OrchestrateCommandTest extends TestCase
         $this->chainLoader = $this->createMock(ChainLoaderInterface::class);
         $this->orchestrateHandler = $this->createMock(OrchestrateChainHandlerInterface::class);
         $this->reportHandler = $this->createMock(GenerateReportHandlerInterface::class);
+        $this->chainConfigValidator = $this->createMock(ValidateChainConfigServiceInterface::class);
         $this->lock = $this->createMock(SharedLockInterface::class);
 
         $this->lockFactory
@@ -288,6 +292,7 @@ final class OrchestrateCommandTest extends TestCase
             $lockFactory,
             $this->chainLoader,
             new ResolveExitCodeService(),
+            $this->chainConfigValidator,
         );
 
         $application = new Application();
@@ -346,6 +351,95 @@ final class OrchestrateCommandTest extends TestCase
         self::assertSame(OrchestrateExitCodeEnum::chainFailed->value, $tester->getStatusCode());
     }
 
+    // ─── --validate-config: valid config → success (0) ──
+
+    #[Test]
+    public function validateConfigValidReturnsSuccess(): void
+    {
+        $this->chainConfigValidator
+            ->method('validateAll')
+            ->willReturn(new ChainConfigValidationResultDto(
+                isValid: true,
+                errors: [],
+                validatedChains: ['implement', 'analyze'],
+            ));
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => '_', '--validate-config' => true]);
+
+        self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+        self::assertStringContainsString('Config is valid', $tester->getDisplay());
+    }
+
+    // ─── --validate-config: invalid config → invalidConfig (5) ──
+
+    #[Test]
+    public function validateConfigInvalidReturnsInvalidConfig(): void
+    {
+        $this->chainConfigValidator
+            ->method('validateAll')
+            ->willReturn(new ChainConfigValidationResultDto(
+                isValid: false,
+                errors: [
+                    new \TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigValidationErrorDto(
+                        chainName: 'broken',
+                        message: 'Missing field X',
+                        field: 'steps[0].role',
+                    ),
+                ],
+                validatedChains: ['broken'],
+            ));
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => '_', '--validate-config' => true]);
+
+        self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
+        self::assertStringContainsString('Config validation failed', $tester->getDisplay());
+    }
+
+    // ─── --validate-config --chain=<name>: validates specific chain ──
+
+    #[Test]
+    public function validateConfigSpecificChainValidReturnsSuccess(): void
+    {
+        $this->chainConfigValidator
+            ->method('validateChain')
+            ->willReturn(new ChainConfigValidationResultDto(
+                isValid: true,
+                errors: [],
+                validatedChains: ['hotfix'],
+            ));
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => '_', '--validate-config' => true, '--chain' => 'hotfix']);
+
+        self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+        self::assertStringContainsString('hotfix', $tester->getDisplay());
+    }
+
+    // ─── --validate-config does not start orchestration (handler not called) ──
+
+    #[Test]
+    public function validateConfigDoesNotCallOrchestrateHandler(): void
+    {
+        $this->chainConfigValidator
+            ->method('validateAll')
+            ->willReturn(new ChainConfigValidationResultDto(
+                isValid: true,
+                errors: [],
+                validatedChains: ['implement'],
+            ));
+
+        $this->orchestrateHandler
+            ->expects($this->never())
+            ->method('__invoke');
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => '_', '--validate-config' => true]);
+
+        self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+    }
+
     // ─── Helpers ───────────────────────────────────────────────────────────────────
 
     private function createCommandTester(): CommandTester
@@ -356,6 +450,7 @@ final class OrchestrateCommandTest extends TestCase
             $this->lockFactory,
             $this->chainLoader,
             new ResolveExitCodeService(),
+            $this->chainConfigValidator,
         );
 
         $application = new Application();
