@@ -12,8 +12,6 @@ final readonly class OrchestrateChainCommand
     public function __construct(
         public string $chainName,
         public string $task,
-        public ?string $runner = null,
-        public ?string $model = null,
         public ?string $workingDir = null,
         public ?int $timeout = null,
         public ?string $topic = null,

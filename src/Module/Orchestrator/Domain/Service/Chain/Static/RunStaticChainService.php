@@ -41,9 +41,7 @@ final readonly class RunStaticChainService
      */
     public function execute(
         ChainDefinitionVo $chain,
-        string $runnerName,
         string $task,
-        ?string $model = null,
         ?string $workingDir = null,
         int $timeout = 300,
         ?AuditLoggerInterface $auditLogger = null,
@@ -65,9 +63,7 @@ final readonly class RunStaticChainService
         while (!$execution->isComplete(count($steps))) {
             $stepResult = $this->processStep(
                 $chain,
-                $runnerName,
                 $task,
-                $model,
                 $workingDir,
                 $timeout,
                 $execution,
@@ -113,9 +109,7 @@ final readonly class RunStaticChainService
      */
     private function processStep(
         ChainDefinitionVo $chain,
-        string $runnerName,
         string $task,
-        ?string $model,
         ?string $workingDir,
         int $timeout,
         StaticChainExecution $execution,
@@ -139,9 +133,7 @@ final readonly class RunStaticChainService
         $stepResult = $this->executeStep(
             $step,
             $chain,
-            $runnerName,
             $task,
-            $model,
             $workingDir,
             $timeout,
             $execution,
@@ -227,9 +219,7 @@ final readonly class RunStaticChainService
     private function executeStep(
         ChainStepVo $step,
         ChainDefinitionVo $chain,
-        string $runnerName,
         string $task,
-        ?string $model,
         ?string $workingDir,
         int $timeout,
         StaticChainExecution $execution,
@@ -265,6 +255,7 @@ final readonly class RunStaticChainService
         $iterationNumber = $iterationGroup !== null
             ? $execution->getIterationNumber($iterationGroup->getGroup()) : null;
         $roleConfig = $chain->getRoleConfig($role);
+        $runnerName = $step->getRunner();
         $auditLogger?->logStepStart(
             $chain->getName(),
             $stepIndex1,
@@ -274,9 +265,7 @@ final readonly class RunStaticChainService
 
         $stepResult = $this->stepExecution->runAgentStep(
             $step,
-            $runnerName,
             $task,
-            $model,
             $workingDir,
             $timeout,
             $execution->getPreviousContext(),

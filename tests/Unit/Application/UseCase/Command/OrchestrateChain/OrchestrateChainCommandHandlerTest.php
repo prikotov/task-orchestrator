@@ -121,62 +121,6 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function invokeStaticPassesRunnerOverride(): void
-    {
-        $chain = ChainDefinitionVo::createFromSteps(
-            name: 'runner-test',
-            description: '',
-            steps: [ChainStepVo::agent(role: 'step1', runner: 'pi')],
-        );
-
-        $this->chainLoader->method('load')->willReturn($chain);
-
-        $staticResult = new OrchestrateChainResultDto();
-        $capturedRunner = null;
-        $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName) use (&$capturedRunner, $staticResult): OrchestrateChainResultDto {
-                $capturedRunner = $runnerName;
-
-                return $staticResult;
-            });
-
-        ($this->handler)(new OrchestrateChainCommand(
-            chainName: 'runner-test',
-            task: 'Test',
-            runner: 'codex',
-        ));
-
-        self::assertSame('codex', $capturedRunner);
-    }
-
-    #[Test]
-    public function invokeStaticUsesDefaultRunnerPiWhenNotProvided(): void
-    {
-        $chain = ChainDefinitionVo::createFromSteps(
-            name: 'default-runner',
-            description: '',
-            steps: [ChainStepVo::agent(role: 'step1', runner: 'pi')],
-        );
-
-        $this->chainLoader->method('load')->willReturn($chain);
-
-        $capturedRunner = null;
-        $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName) use (&$capturedRunner): OrchestrateChainResultDto {
-                $capturedRunner = $runnerName;
-
-                return new OrchestrateChainResultDto();
-            });
-
-        ($this->handler)(new OrchestrateChainCommand(
-            chainName: 'default-runner',
-            task: 'Test',
-        ));
-
-        self::assertSame('pi', $capturedRunner);
-    }
-
-    #[Test]
     public function invokeStaticUsesCliTimeoutWhenProvided(): void
     {
         $chain = ChainDefinitionVo::createFromSteps(
@@ -189,7 +133,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
 
         $capturedTimeout = null;
         $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName, string $t, ?string $m, ?string $w, int $timeout) use (&$capturedTimeout): OrchestrateChainResultDto {
+            ->willReturnCallback(function (ChainDefinitionVo $c, string $t, ?string $w, int $timeout) use (&$capturedTimeout): OrchestrateChainResultDto {
                 $capturedTimeout = $timeout;
 
                 return new OrchestrateChainResultDto();
@@ -217,7 +161,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
 
         $capturedTimeout = null;
         $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName, string $t, ?string $m, ?string $w, int $timeout) use (&$capturedTimeout): OrchestrateChainResultDto {
+            ->willReturnCallback(function (ChainDefinitionVo $c, string $t, ?string $w, int $timeout) use (&$capturedTimeout): OrchestrateChainResultDto {
                 $capturedTimeout = $timeout;
 
                 return new OrchestrateChainResultDto();
@@ -481,13 +425,11 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         ($this->handler)(new OrchestrateChainCommand(
             chainName: 'brainstorm',
             task: 'Design a system',
-            model: 'gpt-4o-mini',
             timeout: 60,
         ));
 
         self::assertNotNull($logCapture);
         self::assertSame('Design a system', $logCapture['task']);
-        self::assertSame('gpt-4o-mini', $logCapture['model']);
         self::assertSame(60, $logCapture['timeout']);
         self::assertSame('system_analyst', $logCapture['facilitator']);
         self::assertSame(1, $logCapture['max_rounds']);
@@ -909,7 +851,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
 
         $capturedLogger = 'not-null';
         $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (ChainDefinitionVo $c, string $runnerName, string $t, ?string $m, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
+            ->willReturnCallback(function (ChainDefinitionVo $c, string $t, ?string $w, int $to, ?AuditLoggerInterface $logger) use (&$capturedLogger): OrchestrateChainResultDto {
                 $capturedLogger = $logger;
 
                 return new OrchestrateChainResultDto();
@@ -1133,7 +1075,6 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         array $participants = ['participant'],
         int $maxRounds = 10,
         string $topic = 'test topic',
-        string $runnerName = 'pi',
         int $timeout = 1800,
     ): DynamicChainContextVo {
         return new DynamicChainContextVo(
@@ -1141,7 +1082,6 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             participants: $participants,
             maxRounds: $maxRounds,
             topic: $topic,
-            runnerName: $runnerName,
             brainstormSystemPrompt: 'Base system prompt',
             facilitatorAppendPrompt: 'Fac append participant',
             facilitatorStartPrompt: 'Start %s',
