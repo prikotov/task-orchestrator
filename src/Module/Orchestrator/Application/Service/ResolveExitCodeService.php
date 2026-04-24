@@ -48,6 +48,12 @@ final readonly class ResolveExitCodeService implements ResolveExitCodeServiceInt
             : OrchestrateExitCodeEnum::success;
     }
 
+    #[Override]
+    public function isSuccessfulResult(OrchestrateChainResultDto $result, bool $isDynamic): bool
+    {
+        return $this->resolveFromResult($result, $isDynamic) === OrchestrateExitCodeEnum::success;
+    }
+
     /**
      * Проверяет, содержит ли static-цепочка ошибку на каком-либо шаге.
      */

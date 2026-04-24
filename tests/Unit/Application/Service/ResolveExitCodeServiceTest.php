@@ -171,6 +171,66 @@ final class ResolveExitCodeServiceTest extends TestCase
         self::assertSame(OrchestrateExitCodeEnum::budgetExceeded, $exitCode);
     }
 
+    // ─── isSuccessfulResult ──────────────────────────────────────────────────
+
+    #[Test]
+    public function isSuccessfulResultReturnsTrueForStaticSuccess(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            stepResults: [],
+            budgetExceeded: false,
+        );
+
+        self::assertTrue($this->service->isSuccessfulResult($result, false));
+    }
+
+    #[Test]
+    public function isSuccessfulResultReturnsFalseForStaticFailure(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            stepResults: [
+                new StepResultDto(
+                    role: 'agent',
+                    runner: 'pi',
+                    outputText: '',
+                    inputTokens: 0,
+                    outputTokens: 0,
+                    cost: 0.0,
+                    duration: 1.0,
+                    isError: true,
+                    errorMessage: 'Agent crashed',
+                ),
+            ],
+            budgetExceeded: false,
+        );
+
+        self::assertFalse($this->service->isSuccessfulResult($result, false));
+    }
+
+    #[Test]
+    public function isSuccessfulResultReturnsTrueForDynamicWithSynthesis(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            synthesis: 'Done.',
+            budgetExceeded: false,
+        );
+
+        self::assertTrue($this->service->isSuccessfulResult($result, true));
+    }
+
+    #[Test]
+    public function isSuccessfulResultReturnsFalseForBudgetExceeded(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            stepResults: [],
+            budgetExceeded: true,
+            budgetLimit: 10.0,
+            totalCost: 12.0,
+        );
+
+        self::assertFalse($this->service->isSuccessfulResult($result, false));
+    }
+
     #[Test]
     public function budgetExceededTakesPriorityOverDynamicFailure(): void
     {
