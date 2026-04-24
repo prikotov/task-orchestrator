@@ -59,24 +59,38 @@ Built with **DDD principles**, minimal dependencies in the domain layer (only `p
 ### Requirements
 
 - PHP >= 8.4
-- Symfony >= 7.3 (for Bundle integration)
 
-### Install via Composer
+### Install via Composer (recommended)
+
+```bash
+composer global require prikotov/task-orchestrator
+```
+
+Verify:
+
+```bash
+~/.composer/vendor/bin/task-orchestrator --version
+```
+
+To add to an existing project instead:
 
 ```bash
 composer require prikotov/task-orchestrator
+vendor/bin/task-orchestrator --version
 ```
 
-### Register the Bundle
+### Install via Phar (alternative)
 
-Add to your `config/bundles.php`:
+Download the latest Phar from [GitHub Releases](https://github.com/prikotov/task-orchestrator/releases):
 
-```php
-return [
-    // ...
-    TaskOrchestrator\Common\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
-];
+```bash
+curl -L -o task-orchestrator.phar https://github.com/prikotov/task-orchestrator/releases/latest/download/task-orchestrator.phar
+chmod +x task-orchestrator.phar
+mv task-orchestrator.phar /usr/local/bin/task-orchestrator
+task-orchestrator --version
 ```
+
+> **Note:** Phar is published on a best-effort basis. For full feature support and easy updates, use Composer.
 
 ---
 
