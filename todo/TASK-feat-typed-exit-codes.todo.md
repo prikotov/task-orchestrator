@@ -78,7 +78,7 @@ vendor/bin/psalm
 
 **Твоя роль:** docs/agents/roles/team/backend_developer_levsha.ru.md
 **Ветка:** task/feat-typed-exit-codes (уже создана и активна)
-**PR:** уже создан (draft) из task/feat-typed-exit-codes в epic/feat-standalone-cli — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/feat-typed-exit-codes в epic/feat-standalone-cli — [PR #64](https://github.com/prikotov/task-orchestrator/pull/64)
 
 ### Порядок действий
 1. Переключись в ветку `task/feat-typed-exit-codes`: `git checkout task/feat-typed-exit-codes`
