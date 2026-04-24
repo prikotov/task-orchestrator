@@ -1,0 +1,34 @@
+name: Release Phar
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-phar:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    name: Build & publish Phar
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: box
+
+      - run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - run: box compile --no-configuration
+
+      - name: Smoke test
+        run: php task-orchestrator.phar --version
+
+      - name: Upload Phar to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: task-orchestrator.phar
