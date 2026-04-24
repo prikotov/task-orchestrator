@@ -1,0 +1,16 @@
+{
+    "output": "task-orchestrator.phar",
+    "files": [
+        "config/services.yaml",
+        "config/console_services.yaml",
+        "config/chains.yaml"
+    ],
+    "directories": [
+        "src",
+        "apps/console/src",
+        "vendor",
+        "config/prompts",
+        "docs/agents/roles"
+    ],
+    "compression": "GZ"
+}
