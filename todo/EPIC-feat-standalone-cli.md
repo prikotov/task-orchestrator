@@ -6,8 +6,9 @@ value: V3
 complexity: C4
 priority: P1
 author: Бэкендер (Левша)
-assignee:
-status: todo
+assignee: Тимлид (Алекс)
+status: in_progress
+branch: epic/feat-standalone-cli
 pr:
 ---
 
