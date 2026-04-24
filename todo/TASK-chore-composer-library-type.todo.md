@@ -69,7 +69,7 @@ vendor/bin/psalm
 
 **Твоя роль:** docs/agents/roles/team/backend_developer_tony.ru.md
 **Ветка:** task/chore-composer-library-type (уже создана и активна)
-**PR:** уже создан (draft) из task/chore-composer-library-type в epic/feat-standalone-cli — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/chore-composer-library-type в epic/feat-standalone-cli — [PR #62](https://github.com/prikotov/task-orchestrator/pull/62)
 
 ### Порядок действий
 1. Переключись в ветку `task/chore-composer-library-type`: `git checkout task/chore-composer-library-type`
