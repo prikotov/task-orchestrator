@@ -21,6 +21,8 @@ composer global require prikotov/task-orchestrator
 composer require prikotov/task-orchestrator
 ```
 
+Если Composer не установлен — см. [официальную инструкцию](https://getcomposer.org/).
+
 Проверка:
 
 ```bash
