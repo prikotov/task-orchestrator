@@ -12,9 +12,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\SharedLockInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigValidationResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
@@ -24,6 +22,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Genera
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefinitionValidator;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
@@ -36,7 +35,7 @@ final class OrchestrateCommandTest extends TestCase
     private ChainLoaderInterface&MockObject $chainLoader;
     private OrchestrateChainCommandHandler&MockObject $orchestrateHandler;
     private GenerateReportQueryHandler&MockObject $reportHandler;
-    private ValidateChainConfigServiceInterface&MockObject $chainConfigValidator;
+    private ChainDefinitionValidator $chainValidator;
     private SharedLockInterface&MockObject $lock;
 
     #[Override]
@@ -46,7 +45,7 @@ final class OrchestrateCommandTest extends TestCase
         $this->chainLoader = $this->createMock(ChainLoaderInterface::class);
         $this->orchestrateHandler = $this->createMock(OrchestrateChainCommandHandler::class);
         $this->reportHandler = $this->createMock(GenerateReportQueryHandler::class);
-        $this->chainConfigValidator = $this->createMock(ValidateChainConfigServiceInterface::class);
+        $this->chainValidator = new ChainDefinitionValidator();
         $this->lock = $this->createMock(SharedLockInterface::class);
 
         $this->lockFactory
@@ -292,7 +291,7 @@ final class OrchestrateCommandTest extends TestCase
             $lockFactory,
             $this->chainLoader,
             new ResolveExitCodeService(),
-            $this->chainConfigValidator,
+            $this->chainValidator,
         );
 
         $application = new Application();
@@ -356,13 +355,12 @@ final class OrchestrateCommandTest extends TestCase
     #[Test]
     public function validateConfigValidReturnsSuccess(): void
     {
-        $this->chainConfigValidator
-            ->method('validateAll')
-            ->willReturn(new ChainConfigValidationResultDto(
-                isValid: true,
-                errors: [],
-                validatedChains: ['implement', 'analyze'],
-            ));
+        $chains = [
+            'implement' => $this->createStaticChainDefinition('implement'),
+            'analyze' => $this->createStaticChainDefinition('analyze'),
+        ];
+
+        $this->chainLoader->method('list')->willReturn($chains);
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => '_', '--validate-config' => true]);
@@ -371,44 +369,60 @@ final class OrchestrateCommandTest extends TestCase
         self::assertStringContainsString('Config is valid', $tester->getDisplay());
     }
 
-    // ─── --validate-config: invalid config → invalidConfig (5) ──
+    // ─── --validate-config: invalid config (domain violation) → invalidConfig (5) ──
 
     #[Test]
-    public function validateConfigInvalidReturnsInvalidConfig(): void
+    public function validateConfigWithViolationReturnsInvalidConfig(): void
     {
-        $this->chainConfigValidator
-            ->method('validateAll')
-            ->willReturn(new ChainConfigValidationResultDto(
-                isValid: false,
-                errors: [
-                    new \TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigValidationErrorDto(
-                        chainName: 'broken',
-                        message: 'Missing field X',
-                        field: 'steps[0].role',
-                    ),
-                ],
-                validatedChains: ['broken'],
-            ));
+        $chains = [
+            'broken' => $this->createInvalidDynamicChainDefinition(),
+        ];
+
+        $this->chainLoader->method('list')->willReturn($chains);
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => '_', '--validate-config' => true]);
 
         self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
         self::assertStringContainsString('Config validation failed', $tester->getDisplay());
+        self::assertStringContainsString('max_rounds', $tester->getDisplay());
     }
 
-    // ─── --validate-config --chain=<name>: validates specific chain ──
+    // ─── --validate-config: empty chains → invalidConfig (5) ──
+
+    #[Test]
+    public function validateConfigEmptyChainsReturnsInvalidConfig(): void
+    {
+        $this->chainLoader->method('list')->willReturn([]);
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => '_', '--validate-config' => true]);
+
+        self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
+        self::assertStringContainsString('No chains defined', $tester->getDisplay());
+    }
+
+    // ─── --validate-config: loader fails → invalidConfig (5) ──
+
+    #[Test]
+    public function validateConfigLoaderFailsReturnsInvalidConfig(): void
+    {
+        $this->chainLoader->method('list')->willThrowException(new \RuntimeException('YAML parse error'));
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => '_', '--validate-config' => true]);
+
+        self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
+        self::assertStringContainsString('Failed to load', $tester->getDisplay());
+    }
+
+    // ─── --validate-config --chain=<name>: validates specific chain (valid) ──
 
     #[Test]
     public function validateConfigSpecificChainValidReturnsSuccess(): void
     {
-        $this->chainConfigValidator
-            ->method('validateChain')
-            ->willReturn(new ChainConfigValidationResultDto(
-                isValid: true,
-                errors: [],
-                validatedChains: ['hotfix'],
-            ));
+        $chain = $this->createStaticChainDefinition('hotfix');
+        $this->chainLoader->method('load')->with('hotfix')->willReturn($chain);
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => '_', '--validate-config' => true, '--chain' => 'hotfix']);
@@ -417,18 +431,28 @@ final class OrchestrateCommandTest extends TestCase
         self::assertStringContainsString('hotfix', $tester->getDisplay());
     }
 
+    // ─── --validate-config --chain=<name>: chain not found → invalidConfig (5) ──
+
+    #[Test]
+    public function validateConfigSpecificChainNotFoundReturnsInvalidConfig(): void
+    {
+        $this->chainLoader->method('load')->willThrowException(new ChainNotFoundException('missing'));
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => '_', '--validate-config' => true, '--chain' => 'missing']);
+
+        self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
+        self::assertStringContainsString('missing', $tester->getDisplay());
+    }
+
     // ─── --validate-config does not start orchestration (handler not called) ──
 
     #[Test]
     public function validateConfigDoesNotCallOrchestrateHandler(): void
     {
-        $this->chainConfigValidator
-            ->method('validateAll')
-            ->willReturn(new ChainConfigValidationResultDto(
-                isValid: true,
-                errors: [],
-                validatedChains: ['implement'],
-            ));
+        $this->chainLoader->method('list')->willReturn([
+            'implement' => $this->createStaticChainDefinition('implement'),
+        ]);
 
         $this->orchestrateHandler
             ->expects($this->never())
@@ -450,7 +474,7 @@ final class OrchestrateCommandTest extends TestCase
             $this->lockFactory,
             $this->chainLoader,
             new ResolveExitCodeService(),
-            $this->chainConfigValidator,
+            $this->chainValidator,
         );
 
         $application = new Application();
@@ -460,10 +484,10 @@ final class OrchestrateCommandTest extends TestCase
         return new CommandTester($registeredCommand);
     }
 
-    private function createStaticChainDefinition(): ChainDefinitionVo
+    private function createStaticChainDefinition(string $name = 'test-static'): ChainDefinitionVo
     {
         return ChainDefinitionVo::createFromSteps(
-            name: 'test-static',
+            name: $name,
             description: 'Test static chain',
             steps: [
                 ChainStepVo::agent(role: 'agent', runner: 'pi'),
@@ -486,6 +510,28 @@ final class OrchestrateCommandTest extends TestCase
             facilitatorFinalizePrompt: 'Facilitator finalize %s %s',
             participantAppendPrompt: 'Participant append %s',
             participantUserPrompt: 'Participant user %s %s',
+        );
+    }
+
+    /**
+     * Создаёт dynamic-цепочку, которая проходит VO-конструктор,
+     * но содержит нарушение, обнаруживаемое Domain Validator (maxRounds < 1).
+     */
+    private function createInvalidDynamicChainDefinition(): ChainDefinitionVo
+    {
+        return ChainDefinitionVo::createFromDynamic(
+            name: 'broken',
+            description: 'Broken dynamic chain',
+            facilitator: 'analyst',
+            participants: ['dev'],
+            maxRounds: 0,
+            brainstormSystemPrompt: 'System prompt',
+            facilitatorAppendPrompt: 'Fac append %s',
+            facilitatorStartPrompt: 'Fac start %s',
+            facilitatorContinuePrompt: 'Fac continue %s %s %s',
+            facilitatorFinalizePrompt: 'Fac finalize %s %s',
+            participantAppendPrompt: 'Part append %s',
+            participantUserPrompt: 'Part user %s %s',
         );
     }
 }
