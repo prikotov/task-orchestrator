@@ -56,7 +56,6 @@ master
 ```markdown
 ## Инструкции для сабагента
 
-**Твоя роль:** docs/agents/roles/team/<role-file>.ru.md
 **Ветка:** <task-subbranch> (уже создана и активна)
 **PR:** уже создан (draft) из <task-subbranch> в <epic-branch> — [PR #<PR_NUMBER>](<PR_LINK>)
 
@@ -76,17 +75,21 @@ master
 
 ### **Шаг 3:** Реализация и правки
 
-Запусти сабагента-исполнителя. Пример промпта на реализацию:
+Запусти сабагента-исполнителя.
+
+> `<role-title>` — заголовок роли из поля `title` файла роли (например, `Бэкендер Левша`). Файл роли передаётся через `-r`, путь в промпте не нужен.
+
+Пример промпта на реализацию:
 
 ```
-Используй роль docs/agents/roles/team/<role-file>.ru.md и выполни задачу: todo/<TASK-ID>.todo.md.
+<role-title>, выполни задачу: todo/<TASK-ID>.todo.md.
 Следуй инструкциям из секции 'Инструкции для сабагента' в файле задачи.
 ```
 
 Для доработки по замечаниям ревьювера:
 
 ```
-Используй роль docs/agents/roles/team/<role-file>.ru.md и доработай задачу: todo/<TASK-ID>.todo.md по замечаниям ревьювера:
+<role-title>, доработай задачу: todo/<TASK-ID>.todo.md по замечаниям ревьювера:
 <суть замечаний>
 
 [PR #<PR_NUMBER>](<PR_LINK>) уже существует, после правок закоммить и сделай `git push`.
@@ -113,7 +116,7 @@ master
 Пример промпта:
 
 ```
-Используй роль docs/agents/roles/team/<role-file>.ru.md и выполни ревью своих изменений в PR [PR #<PR_NUMBER>](<PR_LINK>).
+<role-title>, выполни ревью своих изменений в PR [PR #<PR_NUMBER>](<PR_LINK>).
 Проверь соответствие задаче: todo/<TASK-ID>.todo.md.
 ```
 
@@ -127,7 +130,7 @@ master
 2. Запускай последовательно сабагента для каждого ревьювера. Пример промпта:
 
 ```
-Используй роль docs/agents/roles/team/<reviewer-role-file>.ru.md и выполни ревью [PR #<PR_NUMBER>](<PR_LINK>) из <task-subbranch> в <epic-branch>.
+<reviewer-role-title>, выполни ревью [PR #<PR_NUMBER>](<PR_LINK>) из <task-subbranch> в <epic-branch>.
 Проверь соответствие задаче: todo/<TASK-ID>.todo.md.
 ```
 
