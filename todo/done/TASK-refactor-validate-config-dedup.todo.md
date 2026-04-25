@@ -10,7 +10,7 @@ epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/refactor-validate-config-dedup
-pr:
+pr: #70
 status: done
 ---
 
