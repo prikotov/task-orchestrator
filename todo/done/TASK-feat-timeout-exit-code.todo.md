@@ -10,7 +10,7 @@ epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/feat-timeout-exit-code
-pr:
+pr: #71
 status: done
 ---
 
