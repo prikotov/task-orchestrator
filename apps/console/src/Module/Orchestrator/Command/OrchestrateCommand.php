@@ -20,7 +20,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitC
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportHandlerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
@@ -68,7 +68,7 @@ final class OrchestrateCommand extends Command
 
     public function __construct(
         private readonly OrchestrateChainCommandHandler $orchestrateHandler,
-        private readonly GenerateReportHandlerInterface $reportHandler,
+        private readonly GenerateReportQueryHandler $reportHandler,
         private readonly LockFactory $lockFactory,
         private readonly ChainLoaderInterface $chainLoader,
         private readonly ResolveExitCodeServiceInterface $exitCodeResolver,
