@@ -87,6 +87,7 @@ pr:
 - [ ] [TASK-docs-install-skill](done/TASK-docs-install-skill.todo.md) — SKILL.md для установки AI-агентами + README (~2 ч)
 
 ### Backlog (P2, после v1.0)
+- [ ] [TASK-refactor-validate-config-dedup](TASK-refactor-validate-config-dedup.todo.md) — Вынести валидационные инварианты в Domain Specification
 - [ ] [TASK-feat-cli-config-option](TASK-feat-cli-config-option.todo.md) — CLI-опция --config для указания chains.yaml
 - [ ] [TASK-feat-timeout-exit-code](TASK-feat-timeout-exit-code.todo.md) — Propagation таймаута в CLI exit code 6
 - [ ] [TASK-chore-presentation-domain-decouple](TASK-chore-presentation-domain-decouple.todo.md) — Presentation→Domain dependency removal
