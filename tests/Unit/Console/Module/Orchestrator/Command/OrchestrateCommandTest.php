@@ -20,7 +20,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\Orch
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportHandlerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
@@ -35,7 +35,7 @@ final class OrchestrateCommandTest extends TestCase
     private LockFactory&MockObject $lockFactory;
     private ChainLoaderInterface&MockObject $chainLoader;
     private OrchestrateChainCommandHandler&MockObject $orchestrateHandler;
-    private GenerateReportHandlerInterface&MockObject $reportHandler;
+    private GenerateReportQueryHandler&MockObject $reportHandler;
     private ValidateChainConfigServiceInterface&MockObject $chainConfigValidator;
     private SharedLockInterface&MockObject $lock;
 
@@ -45,7 +45,7 @@ final class OrchestrateCommandTest extends TestCase
         $this->lockFactory = $this->createMock(LockFactory::class);
         $this->chainLoader = $this->createMock(ChainLoaderInterface::class);
         $this->orchestrateHandler = $this->createMock(OrchestrateChainCommandHandler::class);
-        $this->reportHandler = $this->createMock(GenerateReportHandlerInterface::class);
+        $this->reportHandler = $this->createMock(GenerateReportQueryHandler::class);
         $this->chainConfigValidator = $this->createMock(ValidateChainConfigServiceInterface::class);
         $this->lock = $this->createMock(SharedLockInterface::class);
 

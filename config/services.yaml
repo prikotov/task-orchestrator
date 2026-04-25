@@ -65,9 +65,6 @@ services:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigService
 
 
-  TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportHandlerInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler
-
   # --- Infrastructure Service alias ---
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ResolveChainRunnerServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ResolveChainRunnerService
