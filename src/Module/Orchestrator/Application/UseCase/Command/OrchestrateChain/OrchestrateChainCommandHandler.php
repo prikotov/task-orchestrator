@@ -27,7 +27,7 @@ use function count;
  * делегирует выполнение сервисам оркестрации,
  * финализирует сессию.
  */
-final readonly class OrchestrateChainCommandHandler
+class OrchestrateChainCommandHandler
 {
     /** @var int Дефолтный таймаут (секунды) для dynamic-цепочки при отсутствии CLI и chain timeout */
     private const int DEFAULT_DYNAMIC_TIMEOUT = 1800;

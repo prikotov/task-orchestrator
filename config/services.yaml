@@ -58,6 +58,13 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainService
 
+  TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService
+
+  TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigService
+
+
   # --- Infrastructure Service alias ---
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ResolveChainRunnerServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ResolveChainRunnerService

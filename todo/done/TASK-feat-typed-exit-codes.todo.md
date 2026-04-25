@@ -8,10 +8,10 @@ priority: P0
 depends_on: TASK-chore-composer-library-type
 epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер (Левша)
+branch: task/feat-typed-exit-codes
+pr: '#64'
+status: done
 ---
 
 # TASK-feat-typed-exit-codes: Typed exit codes для CLI-команды
@@ -73,6 +73,21 @@ vendor/bin/psalm
 ## 8. Sources
 - [RFC: cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md) — Brainstorm #2, решение про typed exit codes
 - [OrchestrateCommand.php](../apps/console/src/Module/Orchestrator/Command/OrchestrateCommand.php) — текущая реализация
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/backend_developer_levsha.ru.md
+**Ветка:** task/feat-typed-exit-codes (уже создана и активна)
+**PR:** уже создан (draft) из task/feat-typed-exit-codes в epic/feat-standalone-cli — [PR #64](https://github.com/prikotov/task-orchestrator/pull/64)
+
+### Порядок действий
+1. Переключись в ветку `task/feat-typed-exit-codes`: `git checkout task/feat-typed-exit-codes`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History
 | Дата | Автор (роль) | Изменение |

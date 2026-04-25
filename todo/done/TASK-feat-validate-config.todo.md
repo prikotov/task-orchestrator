@@ -8,10 +8,10 @@ priority: P1
 depends_on:
 epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер (Левша)
+branch: task/feat-validate-config
+pr: '#65'
+status: done
 ---
 
 # TASK-feat-validate-config: Флаг --validate-config для проверки конфигурации цепочки
@@ -68,6 +68,21 @@ vendor/bin/psalm
 ## 8. Sources
 - [RFC: cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md) — Brainstorm #2
 - [chains.yaml](../config/chains.yaml) — структура конфигурации
+
+## Инструкции для сабагента
+
+**Твоя роль:** docs/agents/roles/team/backend_developer_levsha.ru.md
+**Ветка:** task/feat-validate-config (уже создана и активна)
+**PR:** уже создан (draft) из task/feat-validate-config в epic/feat-standalone-cli — [PR #65](https://github.com/prikotov/task-orchestrator/pull/65)
+
+### Порядок действий
+1. Переключись в ветку `task/feat-validate-config`: `git checkout task/feat-validate-config`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History
 | Дата | Автор (роль) | Изменение |

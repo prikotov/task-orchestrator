@@ -9,7 +9,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Genera
 /**
  * UseCase генерации отчёта по результатам оркестрации цепочки AI-агентов.
  */
-final readonly class GenerateReportQueryHandler
+class GenerateReportQueryHandler
 {
     public function __construct(
         private readonly ReportResultFactory $reportResultFactory,

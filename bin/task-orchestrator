@@ -1,0 +1,74 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Task Orchestrator — CLI entry point.
+ *
+ * Works in two contexts:
+ * 1. Standalone: running from the project root (bin/task-orchestrator)
+ * 2. Vendor binary: installed via composer require (vendor/bin/task-orchestrator)
+ */
+
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use TaskOrchestrator\Common\DependencyInjection\TaskOrchestratorExtension;
+
+// Find Composer autoloader (vendor dependency or standalone project)
+if (file_exists(__DIR__ . '/../../../autoload.php')) {
+    require __DIR__ . '/../../../autoload.php';
+} elseif (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require __DIR__ . '/../vendor/autoload.php';
+} else {
+    throw new LogicException('Dependencies are missing. Try running "composer install".');
+}
+
+// Package root: always the directory containing this package's composer.json
+$packageRoot = dirname(__DIR__);
+
+$container = new ContainerBuilder();
+$container->setParameter('kernel.project_dir', $packageRoot);
+
+// Resolve version: prefer installed package version, fall back to root package, then default
+$version = '0.1.0';
+if (class_exists(\Composer\InstalledVersions::class)) {
+    $version = \Composer\InstalledVersions::getVersion('prikotov/task-orchestrator')
+        ?? \Composer\InstalledVersions::getRootPackage()['version']
+        ?? $version;
+}
+$container->setParameter('app.version', ltrim($version, 'v'));
+
+// Load bundle services (Domain, Application, Infrastructure)
+$extension = new TaskOrchestratorExtension();
+$extension->load([
+    [
+        'roles_dir' => $packageRoot . '/docs/agents/roles/team',
+        'base_path' => $packageRoot,
+        'chains_yaml' => $packageRoot . '/config/chains.yaml',
+        'chains_session_dir' => $packageRoot . '/var/sessions',
+    ],
+], $container);
+
+// Load console presentation services
+$loader = new YamlFileLoader($container, new FileLocator($packageRoot . '/config'));
+$loader->load('console_services.yaml');
+
+$container->compile();
+
+/** @var Application $application */
+$application = $container->get('console.application');
+
+// Register tagged console commands
+$commands = [];
+foreach ($container->findTaggedServiceIds('console.command') as $id => $tags) {
+    $service = $container->get($id);
+    if ($service instanceof \Symfony\Component\Console\Command\Command) {
+        $commands[] = $service;
+    }
+}
+$application->addCommands($commands);
+
+$application->run();
