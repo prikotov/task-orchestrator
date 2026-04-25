@@ -18,7 +18,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnu
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainHandlerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportHandlerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
@@ -67,7 +67,7 @@ final class OrchestrateCommand extends Command
     public const string LOCK_RESOURCE = 'command:agent:orchestrate';
 
     public function __construct(
-        private readonly OrchestrateChainHandlerInterface $orchestrateHandler,
+        private readonly OrchestrateChainCommandHandler $orchestrateHandler,
         private readonly GenerateReportHandlerInterface $reportHandler,
         private readonly LockFactory $lockFactory,
         private readonly ChainLoaderInterface $chainLoader,
