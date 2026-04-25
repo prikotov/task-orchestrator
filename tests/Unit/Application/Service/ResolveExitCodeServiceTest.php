@@ -245,4 +245,115 @@ final class ResolveExitCodeServiceTest extends TestCase
 
         self::assertSame(OrchestrateExitCodeEnum::budgetExceeded, $exitCode);
     }
+
+    // ─── resolveFromResult: timeout ───────────────────────────────────────────
+
+    #[Test]
+    public function staticChainWithTimedOutStepReturnsTimeout(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            stepResults: [
+                new StepResultDto(
+                    role: 'agent',
+                    runner: 'pi',
+                    outputText: '',
+                    inputTokens: 0,
+                    outputTokens: 0,
+                    cost: 0.0,
+                    duration: 30.0,
+                    isError: true,
+                    errorMessage: 'Agent timed out after 30 seconds.',
+                    timedOut: true,
+                ),
+            ],
+            budgetExceeded: false,
+            timedOut: true,
+        );
+
+        $exitCode = $this->service->resolveFromResult($result, false);
+
+        self::assertSame(OrchestrateExitCodeEnum::timeout, $exitCode);
+    }
+
+    #[Test]
+    public function dynamicChainTimedOutReturnsTimeout(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            synthesis: null,
+            budgetExceeded: false,
+            timedOut: true,
+        );
+
+        $exitCode = $this->service->resolveFromResult($result, true);
+
+        self::assertSame(OrchestrateExitCodeEnum::timeout, $exitCode);
+    }
+
+    #[Test]
+    public function budgetExceededTakesPriorityOverTimeout(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            stepResults: [
+                new StepResultDto(
+                    role: 'agent',
+                    runner: 'pi',
+                    outputText: '',
+                    inputTokens: 0,
+                    outputTokens: 0,
+                    cost: 0.0,
+                    duration: 30.0,
+                    isError: true,
+                    errorMessage: 'Agent timed out',
+                    timedOut: true,
+                ),
+            ],
+            budgetExceeded: true,
+            budgetLimit: 5.0,
+            totalCost: 6.0,
+            timedOut: true,
+        );
+
+        $exitCode = $this->service->resolveFromResult($result, false);
+
+        self::assertSame(OrchestrateExitCodeEnum::budgetExceeded, $exitCode);
+    }
+
+    #[Test]
+    public function timeoutTakesPriorityOverGenericError(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            stepResults: [
+                new StepResultDto(
+                    role: 'agent',
+                    runner: 'pi',
+                    outputText: '',
+                    inputTokens: 0,
+                    outputTokens: 0,
+                    cost: 0.0,
+                    duration: 30.0,
+                    isError: true,
+                    errorMessage: 'Agent timed out after 30 seconds.',
+                    timedOut: true,
+                ),
+            ],
+            budgetExceeded: false,
+            timedOut: true,
+        );
+
+        $exitCode = $this->service->resolveFromResult($result, false);
+
+        self::assertSame(OrchestrateExitCodeEnum::timeout, $exitCode);
+    }
+
+    #[Test]
+    public function isSuccessfulResultReturnsFalseForTimedOut(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            stepResults: [],
+            budgetExceeded: false,
+            timedOut: true,
+        );
+
+        self::assertFalse($this->service->isSuccessfulResult($result, false));
+    }
 }

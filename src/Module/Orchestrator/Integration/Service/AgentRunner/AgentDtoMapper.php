@@ -60,6 +60,7 @@ final readonly class AgentDtoMapper
             return ChainRunResultVo::createFromError(
                 errorMessage: $dto->errorMessage ?? 'unknown',
                 exitCode: $dto->exitCode,
+                timedOut: $dto->timedOut,
             );
         }
 

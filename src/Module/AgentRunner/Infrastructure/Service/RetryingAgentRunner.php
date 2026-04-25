@@ -48,10 +48,13 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
     {
         $attempt = 0;
         $lastThrowable = null;
+        /** @var AgentResultVo|null $lastResult */
+        $lastResult = null;
 
         while ($attempt <= $this->retryPolicy->getMaxRetries()) {
             try {
                 $result = $this->innerRunner->run($request);
+                $lastResult = $result;
 
                 if (!$result->isError()) {
                     if ($attempt > 0) {
@@ -104,6 +107,9 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
             ),
         );
 
+        // Если последний результат был timeout — пробрасываем флаг
+        $timedOut = $lastResult?->isTimedOut() ?? false;
+
         return AgentResultVo::createFromError(
             errorMessage: sprintf(
                 'All %d attempts exhausted for runner "%s". Last error: %s',
@@ -111,6 +117,7 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
                 $this->innerRunner->getName(),
                 $lastThrowable?->getMessage() ?? 'unknown',
             ),
+            timedOut: $timedOut,
         );
     }
 

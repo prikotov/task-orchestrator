@@ -50,27 +50,36 @@ final readonly class ExecuteStaticChainService implements ExecuteStaticChainServ
      */
     private function toResultDto(StaticChainResultVo $result): OrchestrateChainResultDto
     {
-        return new OrchestrateChainResultDto(
-            stepResults: array_map(
-                static fn(StaticStepResultVo $step): StepResultDto => new StepResultDto(
-                    role: $step->role,
-                    runner: $step->runner,
-                    outputText: $step->outputText,
-                    inputTokens: $step->inputTokens,
-                    outputTokens: $step->outputTokens,
-                    cost: $step->cost,
-                    duration: $step->duration,
-                    isError: $step->isError,
-                    errorMessage: $step->errorMessage,
-                    fallbackRunnerUsed: $step->fallbackRunnerUsed,
-                    iterationNumber: $step->iterationNumber,
-                    iterationWarning: $step->iterationWarning,
-                    passed: $step->passed,
-                    exitCode: $step->exitCode,
-                    label: $step->label,
-                ),
-                $result->stepResults,
+        $stepDtos = array_map(
+            static fn(StaticStepResultVo $step): StepResultDto => new StepResultDto(
+                role: $step->role,
+                runner: $step->runner,
+                outputText: $step->outputText,
+                inputTokens: $step->inputTokens,
+                outputTokens: $step->outputTokens,
+                cost: $step->cost,
+                duration: $step->duration,
+                isError: $step->isError,
+                errorMessage: $step->errorMessage,
+                fallbackRunnerUsed: $step->fallbackRunnerUsed,
+                iterationNumber: $step->iterationNumber,
+                iterationWarning: $step->iterationWarning,
+                passed: $step->passed,
+                exitCode: $step->exitCode,
+                label: $step->label,
+                timedOut: $step->timedOut,
             ),
+            $result->stepResults,
+        );
+
+        // Цепочка timedOut, если хотя бы один шаг завершился по таймауту
+        $chainTimedOut = array_any(
+            $result->stepResults,
+            static fn(StaticStepResultVo $step): bool => $step->timedOut,
+        );
+
+        return new OrchestrateChainResultDto(
+            stepResults: $stepDtos,
             totalTime: $result->totalTime,
             totalInputTokens: $result->totalInputTokens,
             totalOutputTokens: $result->totalOutputTokens,
@@ -79,6 +88,7 @@ final readonly class ExecuteStaticChainService implements ExecuteStaticChainServ
             budgetLimit: $result->budgetLimit,
             budgetExceededRole: $result->budgetExceededRole,
             totalIterations: $result->totalIterations,
+            timedOut: $chainTimedOut,
         );
     }
 }

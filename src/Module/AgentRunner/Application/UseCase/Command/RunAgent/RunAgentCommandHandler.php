@@ -48,6 +48,7 @@ final readonly class RunAgentCommandHandler
             turns: $result->getTurns(),
             isError: $result->isError(),
             errorMessage: $result->getErrorMessage(),
+            timedOut: $result->isTimedOut(),
         );
     }
 

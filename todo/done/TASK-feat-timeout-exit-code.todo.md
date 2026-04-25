@@ -8,10 +8,10 @@ priority: P2
 depends_on:
 epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Бэкендер (Левша)
+branch: task/feat-timeout-exit-code
 pr:
-status: todo
+status: done
 ---
 
 # TASK-feat-timeout-exit-code: Propagation таймаута в CLI exit code
