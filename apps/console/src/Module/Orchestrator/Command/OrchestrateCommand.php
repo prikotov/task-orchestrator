@@ -15,14 +15,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ValidateChainConfigServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefinitionValidator;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainConfigViolationVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 
 #[AsCommand(
@@ -31,7 +32,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefiniti
 )]
 
 /**
- * @techdebt 2026-04-24: Command зависит от Domain\ChainLoaderInterface и Domain\ChainDefinitionVo.
+ * @techdebt 2026-04-24: Command зависит от Domain (ChainLoaderInterface, ChainDefinitionValidator, ChainDefinitionVo).
  * Нужно вынести загрузку chain в Application-слой (ChainDefinitionDto + ChainLoaderApplicationInterface).
  * Задача: todo/TASK-chore-presentation-domain-decouple.todo.md
  *
@@ -72,7 +73,7 @@ final class OrchestrateCommand extends Command
         private readonly LockFactory $lockFactory,
         private readonly ChainLoaderInterface $chainLoader,
         private readonly ResolveExitCodeServiceInterface $exitCodeResolver,
-        private readonly ValidateChainConfigServiceInterface $chainConfigValidator,
+        private readonly ChainDefinitionValidator $chainValidator,
     ) {
         parent::__construct();
     }
@@ -229,6 +230,9 @@ final class OrchestrateCommand extends Command
      *
      * Если указана опция --chain — валидирует конкретную цепочку,
      * иначе — все цепочки.
+     *
+     * Domain-сервисы (ChainLoader, ChainDefinitionValidator) вызываются напрямую.
+     * Маппинг ChainConfigViolationVo → вывод выполняется в Presentation.
      */
     private function executeValidateConfig(InputInterface $input, SymfonyStyle $io): int
     {
@@ -236,28 +240,91 @@ final class OrchestrateCommand extends Command
         if ($input->hasParameterOption('--chain') || $input->hasParameterOption('-c')) {
             /** @var string $chainName */
             $chainName = $input->getOption(self::OPT_CHAIN);
-            $result = $this->chainConfigValidator->validateChain($chainName);
-        } else {
-            $result = $this->chainConfigValidator->validateAll();
+
+            return $this->validateSpecificChain($chainName, $io);
         }
 
-        if ($result->isValid) {
+        return $this->validateAllChains($io);
+    }
+
+    private function validateSpecificChain(string $chainName, SymfonyStyle $io): int
+    {
+        try {
+            $chain = $this->chainLoader->load($chainName);
+        } catch (\Exception $e) {
+            $io->error('❌ Config validation failed:');
+            $io->text(sprintf('  • [%s] %s', $chainName, $e->getMessage()));
+
+            return OrchestrateExitCodeEnum::invalidConfig->value;
+        }
+
+        $violations = $this->chainValidator->validate($chain);
+
+        if ($violations === []) {
+            $io->success(sprintf('✅ Config is valid (1 chain: %s).', $chainName));
+
+            return OrchestrateExitCodeEnum::success->value;
+        }
+
+        $io->error('❌ Config validation failed:');
+        $this->renderViolations($io, $violations);
+
+        return OrchestrateExitCodeEnum::invalidConfig->value;
+    }
+
+    private function validateAllChains(SymfonyStyle $io): int
+    {
+        try {
+            $chains = $this->chainLoader->list();
+        } catch (\Exception $e) {
+            $io->error('❌ Config validation failed:');
+            $io->text(sprintf('  • [__global__] Failed to load chains configuration: %s', $e->getMessage()));
+
+            return OrchestrateExitCodeEnum::invalidConfig->value;
+        }
+
+        if ($chains === []) {
+            $io->error('❌ Config validation failed:');
+            $io->text('  • [__global__] No chains defined in configuration.');
+
+            return OrchestrateExitCodeEnum::invalidConfig->value;
+        }
+
+        $allViolations = [];
+        foreach ($chains as $chain) {
+            $chainViolations = $this->chainValidator->validate($chain);
+            $allViolations = [...$allViolations, ...$chainViolations];
+        }
+
+        $chainNames = array_keys($chains);
+
+        if ($allViolations === []) {
             $io->success(sprintf(
                 '✅ Config is valid (%d chain(s): %s).',
-                count($result->validatedChains),
-                implode(', ', $result->validatedChains),
+                count($chainNames),
+                implode(', ', $chainNames),
             ));
 
             return OrchestrateExitCodeEnum::success->value;
         }
 
         $io->error('❌ Config validation failed:');
-        foreach ($result->errors as $error) {
-            $fieldSuffix = $error->field !== null ? sprintf(' [%s]', $error->field) : '';
-            $io->text(sprintf('  • [%s]%s %s', $error->chainName, $fieldSuffix, $error->message));
-        }
+        $this->renderViolations($io, $allViolations);
 
         return OrchestrateExitCodeEnum::invalidConfig->value;
+    }
+
+    /**
+     * Форматирует список нарушений конфигурации для вывода.
+     *
+     * @param list<ChainConfigViolationVo> $violations
+     */
+    private function renderViolations(SymfonyStyle $io, array $violations): void
+    {
+        foreach ($violations as $v) {
+            $fieldSuffix = $v->getField() !== null ? sprintf(' [%s]', $v->getField()) : '';
+            $io->text(sprintf('  • [%s]%s %s', $v->getChainName(), $fieldSuffix, $v->getMessage()));
+        }
     }
 
     /**

@@ -8,10 +8,10 @@ priority: P2
 depends_on:
 epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер (Левша)
+branch: task/refactor-validate-config-dedup
+pr: #70
+status: done
 ---
 
 # TASK-refactor-validate-config-dedup: Вынести валидационные инварианты в Domain Specification
