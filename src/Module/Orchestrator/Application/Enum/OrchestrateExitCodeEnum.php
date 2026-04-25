@@ -34,6 +34,7 @@ enum OrchestrateExitCodeEnum: int
      *       обрабатывается внутри PiAgentRunner и не доходит до Command.
      *       Для корректного возврата timeout (6) нужно реализовать propagation timeout-информации
      *       через OrchestrateChainResultDto или отдельное Domain-исключение.
+     *       Задача: todo/TASK-feat-timeout-exit-code.todo.md
      */
     case timeout = 6;
 }
