@@ -11,7 +11,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/chore-phar-build
 pr: '#66'
-status: done
+status: in_progress
 ---
 
 # TASK-chore-phar-build: Настройка сборки Phar через box-project/box
@@ -34,16 +34,16 @@ status: done
 
 ## 3. Requirements (Требования)
 ### 🔴 Must Have
-- [x] `box.json.dist` создан и настроен
-- [x] `box compile` → `task-orchestrator.phar` собирается локально
-- [x] `php task-orchestrator.phar --version` работает на Linux/macOS
-- [x] CI step: при tag → compile → publish на GitHub Releases
+- [ ] `box.json.dist` создан и настроен
+- [ ] `box compile` → `task-orchestrator.phar` собирается локально
+- [ ] `php task-orchestrator.phar --version` работает на Linux/macOS
+- [ ] CI step: при tag → compile → publish на GitHub Releases
 
 ### 🟡 Should Have
-- [x] Smoke test в CI: `php task-orchestrator.phar --version`
+- [ ] Smoke test в CI: `php task-orchestrator.phar --version`
 
 ### 🟢 Could Have
-- [x] `.phar` добавлен в `.gitignore`
+- [ ] `.phar` добавлен в `.gitignore`
 
 ## 4. Implementation Plan
 1. Создать `box.json.dist` (composer bin + stub + exclude dev)
@@ -52,9 +52,9 @@ status: done
 4. Smoke test в CI
 
 ## 5. Definition of Done
-- [x] `box compile` собирает Phar
-- [x] Phar запускается и выводит версию
-- [x] CI публикует Phar на GitHub Releases при tag
+- [ ] `box compile` собирает Phar
+- [ ] Phar запускается и выводит версию
+- [ ] CI публикует Phar на GitHub Releases при tag
 
 ## 6. Verification
 ```bash
@@ -75,4 +75,3 @@ php task-orchestrator.phar --version
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-23 | Тимлид (Алекс) | Создание задачи из RFC brainstorm |
-| 2026-04-24 | Бэкендер (Левша) | Реализация: box.json.dist, CI workflow, symfony/finder |

@@ -11,7 +11,7 @@ author: Тимлид (Алекс)
 assignee:
 branch:
 pr:
-status: todo
+status: deferred
 ---
 
 # TASK-chore-packagist-register: Регистрация пакета на Packagist

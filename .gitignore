@@ -10,3 +10,5 @@
 *.swo
 
 /var/
+
+*.phar

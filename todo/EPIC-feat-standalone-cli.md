@@ -6,8 +6,9 @@ value: V3
 complexity: C4
 priority: P1
 author: Бэкендер (Левша)
-assignee:
-status: todo
+assignee: Тимлид (Алекс)
+status: in_progress
+branch: epic/feat-standalone-cli
 pr:
 ---
 
@@ -76,16 +77,20 @@ pr:
 - [x] [TASK-research-cli-distribution-options](TASK-research-cli-distribution-options.todo.md) — Мозговой штурм: исследовать варианты дистрибуции, оформить RFC, согласовать с владельцем проекта
 
 ### Фаза 2: Реализация (P0)
-- [ ] [TASK-chore-composer-library-type](TASK-chore-composer-library-type.todo.md) — Изменить type на library + добавить bin в composer.json (~1.5 ч)
+- [x] [TASK-chore-composer-library-type](done/TASK-chore-composer-library-type.todo.md) — Изменить type на library + добавить bin в composer.json (~1.5 ч)
 - [ ] [TASK-chore-packagist-register](TASK-chore-packagist-register.todo.md) — Регистрация пакета на Packagist (~10 мин)
-- [ ] [TASK-feat-typed-exit-codes](TASK-feat-typed-exit-codes.todo.md) — Typed exit codes для CLI-команды (~2–2.5 ч)
+- [x] [TASK-feat-typed-exit-codes](done/TASK-feat-typed-exit-codes.todo.md) — Typed exit codes для CLI-команды (~2–2.5 ч)
 
 ### Фаза 3: Реализация (P1)
-- [ ] [TASK-feat-validate-config](TASK-feat-validate-config.todo.md) — Флаг --validate-config для проверки конфигурации (~2–2.5 ч)
-- [ ] [TASK-chore-phar-build](TASK-chore-phar-build.todo.md) — Настройка сборки Phar через box-project/box (~45 мин)
-- [ ] [TASK-docs-install-skill](TASK-docs-install-skill.todo.md) — SKILL.md для установки AI-агентами + README (~2 ч)
+- [x] [TASK-feat-validate-config](done/TASK-feat-validate-config.todo.md) — Флаг --validate-config для проверки конфигурации (~2–2.5 ч)
+- [ ] [TASK-chore-phar-build](done/TASK-chore-phar-build.todo.md) — Настройка сборки Phar через box-project/box (~45 мин)
+- [ ] [TASK-docs-install-skill](done/TASK-docs-install-skill.todo.md) — SKILL.md для установки AI-агентами + README (~2 ч)
 
 ### Backlog (P2, после v1.0)
+- [ ] [TASK-refactor-validate-config-dedup](TASK-refactor-validate-config-dedup.todo.md) — Вынести валидационные инварианты в Domain Specification
+- [ ] [TASK-feat-cli-config-option](TASK-feat-cli-config-option.todo.md) — CLI-опция --config для указания chains.yaml
+- [ ] [TASK-feat-timeout-exit-code](TASK-feat-timeout-exit-code.todo.md) — Propagation таймаута в CLI exit code 6
+- [ ] [TASK-chore-presentation-domain-decouple](TASK-chore-presentation-domain-decouple.todo.md) — Presentation→Domain dependency removal
 - [ ] GPG-подпись Phar
 - [ ] Windows CI для Phar
 - [ ] JSON Schema для chains.yaml
