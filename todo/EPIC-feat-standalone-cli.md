@@ -83,13 +83,13 @@ pr:
 
 ### Фаза 3: Реализация (P1)
 - [x] [TASK-feat-validate-config](done/TASK-feat-validate-config.todo.md) — Флаг --validate-config для проверки конфигурации (~2–2.5 ч)
-- [ ] [TASK-chore-phar-build](done/TASK-chore-phar-build.todo.md) — Настройка сборки Phar через box-project/box (~45 мин)
-- [ ] [TASK-docs-install-skill](done/TASK-docs-install-skill.todo.md) — SKILL.md для установки AI-агентами + README (~2 ч)
+- [x] [TASK-chore-phar-build](done/TASK-chore-phar-build.todo.md) — Настройка сборки Phar через box-project/box (~45 мин)
+- [x] [TASK-docs-install-skill](done/TASK-docs-install-skill.todo.md) — SKILL.md для установки AI-агентами + README (~2 ч)
 
 ### Backlog (P2, после v1.0)
 - [x] [TASK-refactor-validate-config-dedup](done/TASK-refactor-validate-config-dedup.todo.md) — Вынести валидационные инварианты в Domain Specification
 - [x] [TASK-feat-cli-config-option](done/TASK-feat-cli-config-option.todo.md) — CLI-опция --config для указания chains.yaml
-- [ ] [TASK-feat-timeout-exit-code](done/TASK-feat-timeout-exit-code.todo.md) — Propagation таймаута в CLI exit code 6
+- [x] [TASK-feat-timeout-exit-code](done/TASK-feat-timeout-exit-code.todo.md) — Propagation таймаута в CLI exit code 6
 - [x] [TASK-chore-presentation-domain-decouple](done/TASK-chore-presentation-domain-decouple.todo.md) — Presentation→Domain dependency removal
 - [ ] GPG-подпись Phar
 - [ ] Windows CI для Phar
