@@ -28,6 +28,7 @@ final readonly class StepResultDto
         public bool $passed = true,
         public int $exitCode = 0,
         public string $label = '',
+        public bool $timedOut = false,
     ) {
     }
 }

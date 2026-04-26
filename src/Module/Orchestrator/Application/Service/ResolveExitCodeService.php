@@ -24,9 +24,6 @@ final readonly class ResolveExitCodeService implements ResolveExitCodeServiceInt
         return match (true) {
             $e instanceof ChainNotFoundException => OrchestrateExitCodeEnum::chainNotFound,
             $e instanceof RoleNotFoundException => OrchestrateExitCodeEnum::invalidConfig,
-            // @todo 2026-04-24: ProcessTimedOutException обрабатывается в PiAgentRunner,
-            //       Задача: todo/TASK-feat-timeout-exit-code.todo.md
-            // timeout (6) пока не возвращается.
             default => OrchestrateExitCodeEnum::chainFailed,
         };
     }
@@ -36,6 +33,10 @@ final readonly class ResolveExitCodeService implements ResolveExitCodeServiceInt
     {
         if ($result->budgetExceeded) {
             return OrchestrateExitCodeEnum::budgetExceeded;
+        }
+
+        if ($result->timedOut) {
+            return OrchestrateExitCodeEnum::timeout;
         }
 
         if ($isDynamic) {

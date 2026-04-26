@@ -28,6 +28,7 @@ final readonly class StaticStepResultVo
         public bool $passed = true,
         public int $exitCode = 0,
         public string $label = '',
+        public bool $timedOut = false,
     ) {
     }
 
@@ -49,6 +50,7 @@ final readonly class StaticStepResultVo
             passed: $this->passed,
             exitCode: $this->exitCode,
             label: $this->label,
+            timedOut: $this->timedOut,
         );
     }
 }

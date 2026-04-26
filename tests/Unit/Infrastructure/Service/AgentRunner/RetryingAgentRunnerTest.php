@@ -198,4 +198,73 @@ final class RetryingAgentRunnerTest extends TestCase
 
         $runner->run($this->request);
     }
+
+    // ─── timeout propagation ────────────────────────────────────────────
+
+    #[Test]
+    public function propagatesTimedOutFromInnerRunnerErrorResult(): void
+    {
+        $timedOutResult = AgentResultVo::createFromError(
+            errorMessage: 'Agent timed out after 30 seconds.',
+            timedOut: true,
+        );
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::exactly(2))
+            ->method('run')
+            ->willReturnOnConsecutiveCalls($timedOutResult, $timedOutResult);
+
+        $policy = new RetryPolicyVo(maxRetries: 1, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger);
+
+        $result = $runner->run($this->request);
+
+        self::assertTrue($result->isError());
+        self::assertTrue($result->isTimedOut());
+    }
+
+    #[Test]
+    public function doesNotSetTimedOutWhenInnerErrorIsNotTimeout(): void
+    {
+        $errorResult = AgentResultVo::createFromError(errorMessage: 'API rate limit');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::exactly(2))
+            ->method('run')
+            ->willReturnOnConsecutiveCalls($errorResult, $errorResult);
+
+        $policy = new RetryPolicyVo(maxRetries: 1, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger);
+
+        $result = $runner->run($this->request);
+
+        self::assertTrue($result->isError());
+        self::assertFalse($result->isTimedOut());
+    }
+
+    #[Test]
+    public function retrySucceedsAfterTimeoutClearsTimedOut(): void
+    {
+        $timedOutResult = AgentResultVo::createFromError(
+            errorMessage: 'Agent timed out',
+            timedOut: true,
+        );
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'Recovered');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::exactly(2))
+            ->method('run')
+            ->willReturnOnConsecutiveCalls($timedOutResult, $successResult);
+
+        $policy = new RetryPolicyVo(maxRetries: 1, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger);
+
+        $result = $runner->run($this->request);
+
+        self::assertFalse($result->isError());
+        self::assertFalse($result->isTimedOut());
+    }
 }

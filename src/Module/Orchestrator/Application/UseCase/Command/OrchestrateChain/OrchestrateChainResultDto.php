@@ -32,6 +32,7 @@ final readonly class OrchestrateChainResultDto
         public float $budgetLimit = 0.0,
         public ?string $budgetExceededRole = null,
         public int $totalIterations = 0,
+        public bool $timedOut = false,
     ) {
     }
 }

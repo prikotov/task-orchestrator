@@ -45,7 +45,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefiniti
  * | 3    | chainNotFound   | Запрошенная цепочка не найдена             |
  * | 4    | budgetExceeded  | Превышен бюджет цепочки                    |
  * | 5    | invalidConfig   | Неверная конфигурация цепочки или аргументы|
- * | 6    | timeout         | Превышен таймаут (зарезервирован)          |
+ * | 6    | timeout         | Превышен таймаут шага/раунда               |
  */
 final class OrchestrateCommand extends Command
 {
@@ -418,7 +418,11 @@ final class OrchestrateCommand extends Command
                 ));
 
                 if ($stepResult->isError) {
-                    $io->error(sprintf('Agent error: %s', $stepResult->errorMessage ?? 'Unknown'));
+                    if ($stepResult->timedOut) {
+                        $io->error(sprintf('Agent timed out: %s', $stepResult->errorMessage ?? 'Timeout exceeded'));
+                    } else {
+                        $io->error(sprintf('Agent error: %s', $stepResult->errorMessage ?? 'Unknown'));
+                    }
                     break;
                 }
             }

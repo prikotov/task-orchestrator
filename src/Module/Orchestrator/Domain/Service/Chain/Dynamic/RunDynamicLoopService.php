@@ -27,7 +27,6 @@ use function count;
 use function date;
 use function in_array;
 use function sprintf;
-use function str_contains;
 
 /**
  * Исполнитель dynamic-цикла: координирует facilitator/participant turns, бюджет.
@@ -37,6 +36,8 @@ use function str_contains;
  */
 final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInterface
 {
+    /** @var string Причина прерывания цикла по таймауту */
+    private const string INTERRUPTION_REASON_TIMEOUT = 'timeout';
     public function __construct(
         private RunAgentServiceInterface $agentRunner,
         private ExecuteDynamicTurnService $turnExecution,
@@ -188,10 +189,9 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         }
 
         if ($turnResult->agentResult->isError()) {
-            $reason = str_contains(
-                $turnResult->agentResult->getErrorMessage() ?? '',
-                'imed out',
-            ) ? 'timeout' : 'agent_error';
+            $reason = $turnResult->agentResult->isTimedOut()
+                ? self::INTERRUPTION_REASON_TIMEOUT
+                : 'agent_error';
             $this->sessionLogger->interruptSession($reason);
 
             return new DynamicTurnResultVo(
@@ -303,10 +303,9 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
             }
         }
         if ($turnResult->agentResult->isError()) {
-            $reason = str_contains(
-                $turnResult->agentResult->getErrorMessage() ?? '',
-                'imed out',
-            ) ? 'timeout' : 'agent_error';
+            $reason = $turnResult->agentResult->isTimedOut()
+                ? self::INTERRUPTION_REASON_TIMEOUT
+                : 'agent_error';
             $this->sessionLogger->interruptSession($reason);
 
             return new DynamicTurnResultVo(

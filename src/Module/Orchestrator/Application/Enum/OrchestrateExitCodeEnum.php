@@ -30,11 +30,9 @@ enum OrchestrateExitCodeEnum: int
     /**
      * Превышен таймаут.
      *
-     * @todo 2026-04-24: timeout case определён, но пока не возвращается — ProcessTimedOutException
-     *       обрабатывается внутри PiAgentRunner и не доходит до Command.
-     *       Для корректного возврата timeout (6) нужно реализовать propagation timeout-информации
-     *       через OrchestrateChainResultDto или отдельное Domain-исключение.
-     *       Задача: todo/TASK-feat-timeout-exit-code.todo.md
+     * Возвращается, когда шаг цепочки или dynamic-раунд завершился
+     * по таймауту Symfony Process.
+     * Флаг timedOut propagate'ится через AgentResultVo → ChainRunResultVo → StepResultDto/OrchestrateChainResultDto.
      */
     case timeout = 6;
 }

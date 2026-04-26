@@ -350,6 +350,64 @@ final class OrchestrateCommandTest extends TestCase
         self::assertSame(OrchestrateExitCodeEnum::chainFailed->value, $tester->getStatusCode());
     }
 
+    // ─── resolveExitCodeFromResult: static chain timed out → timeout (6) ──
+
+    #[Test]
+    public function staticChainTimedOutReturnsTimeoutCode(): void
+    {
+        $chain = $this->createStaticChainDefinition();
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturn(new OrchestrateChainResultDto(
+                stepResults: [
+                    new StepResultDto(
+                        role: 'agent',
+                        runner: 'pi',
+                        outputText: '',
+                        inputTokens: 0,
+                        outputTokens: 0,
+                        cost: 0.0,
+                        duration: 30.0,
+                        isError: true,
+                        errorMessage: 'Agent timed out after 30 seconds.',
+                        timedOut: true,
+                    ),
+                ],
+                budgetExceeded: false,
+                timedOut: true,
+            ));
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'do something', '--report-format' => 'none']);
+
+        self::assertSame(OrchestrateExitCodeEnum::timeout->value, $tester->getStatusCode());
+        self::assertStringContainsString('imed out', $tester->getDisplay());
+    }
+
+    // ─── resolveExitCodeFromResult: dynamic chain timed out → timeout (6) ──
+
+    #[Test]
+    public function dynamicChainTimedOutReturnsTimeoutCode(): void
+    {
+        $chain = $this->createDynamicChainDefinition();
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturn(new OrchestrateChainResultDto(
+                synthesis: null,
+                budgetExceeded: false,
+                timedOut: true,
+            ));
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'do something', '--report-format' => 'none']);
+
+        self::assertSame(OrchestrateExitCodeEnum::timeout->value, $tester->getStatusCode());
+    }
+
     // ─── --validate-config: valid config → success (0) ──
 
     #[Test]

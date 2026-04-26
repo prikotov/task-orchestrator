@@ -25,6 +25,7 @@ final readonly class DynamicRoundResultDto
         public ?string $invocation = null,
         public string $systemPrompt = '',
         public string $userPrompt = '',
+        public bool $timedOut = false,
     ) {
     }
 }

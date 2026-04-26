@@ -23,6 +23,7 @@ final readonly class AgentResultVo
         private int $turns,
         private bool $isError,
         private ?string $errorMessage,
+        private bool $timedOut = false,
     ) {
     }
 
@@ -60,6 +61,7 @@ final readonly class AgentResultVo
     public static function createFromError(
         string $errorMessage,
         int $exitCode = 1,
+        bool $timedOut = false,
     ): self {
         return new self(
             outputText: '',
@@ -73,6 +75,7 @@ final readonly class AgentResultVo
             turns: 0,
             isError: true,
             errorMessage: $errorMessage,
+            timedOut: $timedOut,
         );
     }
 
@@ -129,5 +132,10 @@ final readonly class AgentResultVo
     public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
+    }
+
+    public function isTimedOut(): bool
+    {
+        return $this->timedOut;
     }
 }

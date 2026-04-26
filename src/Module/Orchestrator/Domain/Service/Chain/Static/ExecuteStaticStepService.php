@@ -77,6 +77,7 @@ final readonly class ExecuteStaticStepService
 
         $fallbackRunnerUsed = null;
         $fallbackConfig = $roleConfig?->getFallback();
+        $timedOut = $result->isTimedOut();
         if ($result->isError() && $fallbackConfig !== null) {
             $fallbackResult = $this->applyFallback(
                 $fallbackConfig,
@@ -90,13 +91,22 @@ final readonly class ExecuteStaticStepService
             $fallbackRunnerUsed = $fallbackResult->fallbackRunnerName;
             if ($fallbackResult->fallbackRunnerName !== null) {
                 $result = $fallbackResult->isError
-                    ? ChainRunResultVo::createFromError($fallbackResult->errorMessage ?? 'unknown')
+                    ? ChainRunResultVo::createFromError(
+                        $fallbackResult->errorMessage ?? 'unknown',
+                        timedOut: $fallbackResult->timedOut,
+                    )
                     : ChainRunResultVo::createFromSuccess(
                         $fallbackResult->outputText,
                         $fallbackResult->inputTokens,
                         $fallbackResult->outputTokens,
                         cost: $fallbackResult->cost,
                     );
+                // Если fallback успешен — сбрасываем timeout
+                if (!$fallbackResult->isError) {
+                    $timedOut = false;
+                } elseif ($fallbackResult->timedOut) {
+                    $timedOut = true;
+                }
             }
         }
 
@@ -112,6 +122,7 @@ final readonly class ExecuteStaticStepService
             errorMessage: $result->getErrorMessage(),
             fallbackRunnerUsed: $fallbackRunnerUsed,
             iterationNumber: $iterationNumber,
+            timedOut: $timedOut,
         );
     }
 
@@ -168,6 +179,7 @@ final readonly class ExecuteStaticStepService
         if ($stepResult->isError) {
             return ChainRunResultVo::createFromError(
                 $stepResult->errorMessage ?? 'unknown',
+                timedOut: $stepResult->timedOut,
             );
         }
 
@@ -210,6 +222,7 @@ final readonly class ExecuteStaticStepService
             fallbackRunnerName: $fallbackResult !== null
                 ? $fallbackConfig->getRunnerName()
                 : null,
+            timedOut: $fallbackResult?->isTimedOut() ?? false,
         );
     }
 }

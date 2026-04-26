@@ -214,4 +214,52 @@ final class AgentDtoMapperTest extends TestCase
         self::assertNull($result->getModel());
         self::assertSame(0, $result->getTurns());
     }
+
+    #[Test]
+    public function mapFromRunAgentResultDtoMapsTimedOutFromDto(): void
+    {
+        $dto = new RunAgentResultDto(
+            outputText: '',
+            inputTokens: 0,
+            outputTokens: 0,
+            cacheReadTokens: 0,
+            cacheWriteTokens: 0,
+            cost: 0.0,
+            exitCode: 1,
+            model: null,
+            turns: 0,
+            isError: true,
+            errorMessage: 'Agent timed out after 30 seconds.',
+            timedOut: true,
+        );
+
+        $result = $this->mapper->mapFromRunAgentResultDto($dto);
+
+        self::assertTrue($result->isError());
+        self::assertTrue($result->isTimedOut());
+        self::assertSame('Agent timed out after 30 seconds.', $result->getErrorMessage());
+    }
+
+    #[Test]
+    public function mapFromRunAgentResultDtoSuccessHasTimedOutFalse(): void
+    {
+        $dto = new RunAgentResultDto(
+            outputText: 'OK',
+            inputTokens: 10,
+            outputTokens: 5,
+            cacheReadTokens: 0,
+            cacheWriteTokens: 0,
+            cost: 0.01,
+            exitCode: 0,
+            model: 'gpt-4',
+            turns: 1,
+            isError: false,
+            errorMessage: null,
+        );
+
+        $result = $this->mapper->mapFromRunAgentResultDto($dto);
+
+        self::assertFalse($result->isError());
+        self::assertFalse($result->isTimedOut());
+    }
 }

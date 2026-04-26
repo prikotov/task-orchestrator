@@ -26,6 +26,7 @@ final readonly class DynamicRoundResultVo
         public ?string $invocation = null,
         public string $systemPrompt = '',
         public string $userPrompt = '',
+        public bool $timedOut = false,
     ) {
     }
 }

@@ -22,6 +22,7 @@ final readonly class FallbackAttemptVo
         public ?string $errorMessage,
         public float $extraDuration,
         public ?string $fallbackRunnerName,
+        public bool $timedOut = false,
     ) {
     }
 }

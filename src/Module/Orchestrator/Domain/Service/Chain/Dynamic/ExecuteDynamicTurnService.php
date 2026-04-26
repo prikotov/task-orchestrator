@@ -302,6 +302,7 @@ final readonly class ExecuteDynamicTurnService
             invocation: $turn->invocation,
             systemPrompt: $turn->systemPrompt,
             userPrompt: $turn->userPrompt,
+            timedOut: $agent->isTimedOut(),
         );
     }
 }
