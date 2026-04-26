@@ -10,7 +10,7 @@ epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/feat-cli-config-option
-pr:
+pr: #72
 status: done
 ---
 
