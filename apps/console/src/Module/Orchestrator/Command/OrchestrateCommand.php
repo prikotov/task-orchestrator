@@ -64,6 +64,7 @@ final class OrchestrateCommand extends Command
     private const string OPT_REPORT_FILE = 'report-file';
     private const string OPT_NO_CONTEXT_FILES = 'no-context-files';
     private const string OPT_VALIDATE_CONFIG = 'validate-config';
+    private const string OPT_CONFIG = 'config';
 
     public const string LOCK_RESOURCE = 'command:agent:orchestrate';
 
@@ -96,7 +97,8 @@ final class OrchestrateCommand extends Command
             ->addOption(self::OPT_REPORT_FORMAT, null, InputOption::VALUE_OPTIONAL, 'Формат отчёта: text|json (none — отключить)', 'text')
             ->addOption(self::OPT_REPORT_FILE, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу для записи отчёта')
             ->addOption(self::OPT_NO_CONTEXT_FILES, null, InputOption::VALUE_NONE, 'Отключить автоматическую загрузку контекстных файлов (AGENTS.md, CLAUDE.md)')
-            ->addOption(self::OPT_VALIDATE_CONFIG, null, InputOption::VALUE_NONE, 'Проверить конфигурацию цепочки без запуска оркестрации');
+            ->addOption(self::OPT_VALIDATE_CONFIG, null, InputOption::VALUE_NONE, 'Проверить конфигурацию цепочки без запуска оркестрации')
+            ->addOption(self::OPT_CONFIG, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу chains.yaml (переопределяет путь по умолчанию)');
     }
 
     #[Override]
@@ -104,6 +106,12 @@ final class OrchestrateCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $lock = $this->lockFactory->createLock(self::LOCK_RESOURCE);
+
+        // ── --config: переопределить путь к chains.yaml ──
+        $configOverrideError = $this->applyConfigOverride($input, $io);
+        if ($configOverrideError !== null) {
+            return $configOverrideError;
+        }
 
         // ── --validate-config: проверить конфиг и выйти без запуска ──
         /** @var bool $validateConfig */
@@ -223,6 +231,31 @@ final class OrchestrateCommand extends Command
         } finally {
             $lock->release();
         }
+    }
+
+    /**
+     * Применяет --config: переопределяет путь к chains.yaml через ChainLoaderInterface.
+     *
+     * Возвращает int (exit code) при ошибке или null, если всё ок.
+     */
+    private function applyConfigOverride(InputInterface $input, SymfonyStyle $io): ?int
+    {
+        /** @var string|null $configPath */
+        $configPath = $input->getOption(self::OPT_CONFIG);
+
+        if ($configPath === null || $configPath === '') {
+            return null;
+        }
+
+        if (!file_exists($configPath)) {
+            $io->error(sprintf('Config file not found: %s', $configPath));
+
+            return OrchestrateExitCodeEnum::invalidConfig->value;
+        }
+
+        $this->chainLoader->overridePath($configPath);
+
+        return null;
     }
 
     /**

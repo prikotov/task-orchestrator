@@ -8,10 +8,10 @@ priority: P2
 depends_on: EPIC-feat-standalone-cli
 epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Бэкендер (Левша)
+branch: task/feat-cli-config-option
 pr:
-status: todo
+status: done
 ---
 
 # TASK-feat-cli-config-option: CLI-опция --config для указания chains.yaml

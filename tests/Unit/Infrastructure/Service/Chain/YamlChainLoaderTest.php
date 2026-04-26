@@ -1639,4 +1639,80 @@ YAML);
             rmdir($fixtureDir);
         }
     }
+
+    // --- overridePath tests ---
+
+    #[Test]
+    public function overridePathLoadsFromNewFile(): void
+    {
+        // Loader изначально указывает на fixturePath (implement, analyze, brainstorm, inline_prompts)
+        $chains = $this->loader->list();
+        self::assertArrayHasKey('implement', $chains);
+
+        // Создаём альтернативный конфиг
+        $altDir = sys_get_temp_dir() . '/agent_chains_alt_' . uniqid();
+        mkdir($altDir);
+        $altPath = $altDir . '/chains.yaml';
+        file_put_contents($altPath, <<<'YAML'
+chains:
+  custom_chain:
+    description: "Custom chain from override"
+    steps:
+      - { type: agent, role: custom_role }
+YAML);
+
+        try {
+            $this->loader->overridePath($altPath);
+
+            // После override — другой набор цепочек
+            $newChains = $this->loader->list();
+            self::assertArrayNotHasKey('implement', $newChains);
+            self::assertArrayHasKey('custom_chain', $newChains);
+
+            $chain = $this->loader->load('custom_chain');
+            self::assertSame('Custom chain from override', $chain->getDescription());
+        } finally {
+            unlink($altPath);
+            rmdir($altDir);
+        }
+    }
+
+    #[Test]
+    public function overridePathClearsCache(): void
+    {
+        // Загружаем изначальный конфиг — кэш заполняется
+        $this->loader->load('implement');
+
+        // Создаём альтернативный конфиг без цепочки implement
+        $altDir = sys_get_temp_dir() . '/agent_chains_override_clear_' . uniqid();
+        mkdir($altDir);
+        $altPath = $altDir . '/chains.yaml';
+        file_put_contents($altPath, <<<'YAML'
+chains:
+  other:
+    description: "Other chain"
+    steps:
+      - { type: agent, role: r1 }
+YAML);
+
+        try {
+            $this->loader->overridePath($altPath);
+
+            // implement больше не должен существовать — кэш сброшен
+            $this->expectException(ChainNotFoundException::class);
+            $this->loader->load('implement');
+        } finally {
+            unlink($altPath);
+            rmdir($altDir);
+        }
+    }
+
+    #[Test]
+    public function overridePathWithNonExistentFileReturnsEmptyList(): void
+    {
+        $this->loader->overridePath('/nonexistent/path/chains.yaml');
+
+        $chains = $this->loader->list();
+        self::assertEmpty($chains);
+    }
 }

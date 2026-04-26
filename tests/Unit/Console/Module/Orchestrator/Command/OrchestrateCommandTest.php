@@ -26,6 +26,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefini
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\OrchestrateCommand;
 
 #[CoversClass(OrchestrateCommand::class)]
@@ -591,5 +592,139 @@ final class OrchestrateCommandTest extends TestCase
             participantAppendPrompt: 'Part append %s',
             participantUserPrompt: 'Part user %s %s',
         );
+    }
+
+    // ─── --config option tests ─────────────────────────────────────────────────────
+
+    #[Test]
+    public function configOptionWithNonExistentFileReturnsInvalidConfig(): void
+    {
+        $tester = $this->createCommandTester();
+        $tester->execute([
+            'task' => 'do something',
+            '--config' => '/nonexistent/chains.yaml',
+        ]);
+
+        self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
+        self::assertStringContainsString('Config file not found', $tester->getDisplay());
+    }
+
+    #[Test]
+    public function configOptionWithValidFileLoadsChainsFromIt(): void
+    {
+        // Создаём временный YAML с кастомной цепочкой
+        $tmpDir = sys_get_temp_dir() . '/orch_test_config_' . uniqid();
+        mkdir($tmpDir);
+        $tmpPath = $tmpDir . '/chains.yaml';
+        file_put_contents($tmpPath, <<<'YAML'
+chains:
+  custom:
+    description: "Custom chain"
+    steps:
+      - { type: agent, role: custom_role }
+YAML);
+
+        try {
+            // Создаём реальный YamlChainLoader с пустым исходным путём
+            $chainLoader = new YamlChainLoader('/nonexistent/default.yaml');
+
+            $command = new OrchestrateCommand(
+                $this->orchestrateHandler,
+                $this->reportHandler,
+                $this->lockFactory,
+                $chainLoader,
+                new ResolveExitCodeService(),
+                $this->chainValidator,
+            );
+
+            $application = new Application();
+            $application->addCommand($command);
+            $tester = new CommandTester($application->find('app:agent:orchestrate'));
+
+            $this->orchestrateHandler
+                ->method('__invoke')
+                ->willReturn(new OrchestrateChainResultDto(
+                    stepResults: [],
+                    budgetExceeded: false,
+                ));
+
+            $tester->execute([
+                'task' => 'do something',
+                '--chain' => 'custom',
+                '--config' => $tmpPath,
+                '--report-format' => 'none',
+            ]);
+
+            self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+        } finally {
+            unlink($tmpPath);
+            rmdir($tmpDir);
+        }
+    }
+
+    #[Test]
+    public function configOptionWithValidateConfigValidatesCustomFile(): void
+    {
+        // Создаём временный YAML с валидной цепочкой
+        $tmpDir = sys_get_temp_dir() . '/orch_test_validate_' . uniqid();
+        mkdir($tmpDir);
+        $tmpPath = $tmpDir . '/chains.yaml';
+        file_put_contents($tmpPath, <<<'YAML'
+chains:
+  mychain:
+    description: "My chain"
+    steps:
+      - { type: agent, role: role_a }
+YAML);
+
+        try {
+            $chainLoader = new YamlChainLoader('/nonexistent/default.yaml');
+
+            $command = new OrchestrateCommand(
+                $this->orchestrateHandler,
+                $this->reportHandler,
+                $this->lockFactory,
+                $chainLoader,
+                new ResolveExitCodeService(),
+                $this->chainValidator,
+            );
+
+            $application = new Application();
+            $application->addCommand($command);
+            $tester = new CommandTester($application->find('app:agent:orchestrate'));
+
+            $tester->execute([
+                'task' => '_',
+                '--validate-config' => true,
+                '--config' => $tmpPath,
+            ]);
+
+            self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+            self::assertStringContainsString('Config is valid', $tester->getDisplay());
+            self::assertStringContainsString('mychain', $tester->getDisplay());
+        } finally {
+            unlink($tmpPath);
+            rmdir($tmpDir);
+        }
+    }
+
+    #[Test]
+    public function configOptionWithoutValueUsesDefaultPath(): void
+    {
+        // Без --config поведение не должно измениться
+        $chain = $this->createStaticChainDefinition();
+        $this->chainLoader->method('load')->willReturn($chain);
+
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturn(new OrchestrateChainResultDto(
+                stepResults: [],
+                budgetExceeded: false,
+            ));
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'do something', '--report-format' => 'none']);
+
+        self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
     }
 }
