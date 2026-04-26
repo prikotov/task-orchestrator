@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 
 #[CoversClass(AgentResultVo::class)]
 final class AgentResultVoTest extends TestCase
 {
+    // ─── createFromSuccess: полная проверка конструирования ────────────────
+
     #[Test]
     public function fromSuccessCreatesCorrectVo(): void
     {
@@ -40,6 +42,29 @@ final class AgentResultVoTest extends TestCase
     }
 
     #[Test]
+    public function fromSuccessWithDefaults(): void
+    {
+        $vo = AgentResultVo::createFromSuccess(outputText: 'Result');
+
+        self::assertSame('Result', $vo->getOutputText());
+        self::assertSame(0, $vo->getInputTokens());
+        self::assertSame(0, $vo->getOutputTokens());
+        self::assertSame(0.0, $vo->getCost());
+        self::assertNull($vo->getModel());
+        self::assertFalse($vo->isError());
+    }
+
+    #[Test]
+    public function fromSuccessHasTimedOutFalse(): void
+    {
+        $vo = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        self::assertFalse($vo->isTimedOut());
+    }
+
+    // ─── createFromError: полная проверка конструирования ──────────────────
+
+    #[Test]
     public function fromErrorCreatesCorrectVo(): void
     {
         $vo = AgentResultVo::createFromError(
@@ -56,15 +81,37 @@ final class AgentResultVoTest extends TestCase
     }
 
     #[Test]
-    public function fromSuccessWithDefaults(): void
+    public function fromErrorDefaultHasTimedOutFalse(): void
     {
-        $vo = AgentResultVo::createFromSuccess(outputText: 'Result');
+        $vo = AgentResultVo::createFromError(errorMessage: 'Some error');
 
-        self::assertSame('Result', $vo->getOutputText());
-        self::assertSame(0, $vo->getInputTokens());
-        self::assertSame(0, $vo->getOutputTokens());
-        self::assertSame(0.0, $vo->getCost());
-        self::assertNull($vo->getModel());
-        self::assertFalse($vo->isError());
+        self::assertFalse($vo->isTimedOut());
+        self::assertTrue($vo->isError());
+    }
+
+    #[Test]
+    public function fromErrorWithTimedOutTrue(): void
+    {
+        $vo = AgentResultVo::createFromError(
+            errorMessage: 'Agent timed out after 30 seconds.',
+            timedOut: true,
+        );
+
+        self::assertTrue($vo->isTimedOut());
+        self::assertTrue($vo->isError());
+        self::assertSame('Agent timed out after 30 seconds.', $vo->getErrorMessage());
+    }
+
+    #[Test]
+    public function fromErrorWithCustomExitCodeAndTimedOut(): void
+    {
+        $vo = AgentResultVo::createFromError(
+            errorMessage: 'Timeout',
+            exitCode: 124,
+            timedOut: true,
+        );
+
+        self::assertTrue($vo->isTimedOut());
+        self::assertSame(124, $vo->getExitCode());
     }
 }

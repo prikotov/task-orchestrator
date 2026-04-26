@@ -18,6 +18,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAg
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
 
+use function array_any;
 use function count;
 
 /**
@@ -269,8 +270,16 @@ class OrchestrateChainCommandHandler
 
     private function toResultDto(DynamicLoopResultVo $loopResult, ?string $sessionDir): OrchestrateChainResultDto
     {
+        $roundDtos = $this->toRoundResultDtos($loopResult->roundResults);
+
+        // timedOut вычисляем из round-level флагов — хотя бы один раунд таймаут
+        $chainTimedOut = array_any(
+            $roundDtos,
+            static fn(DynamicRoundResultDto $round): bool => $round->timedOut,
+        );
+
         return new OrchestrateChainResultDto(
-            roundResults: $this->toRoundResultDtos($loopResult->roundResults),
+            roundResults: $roundDtos,
             totalTime: $loopResult->totalTime,
             totalInputTokens: $loopResult->totalInputTokens,
             totalOutputTokens: $loopResult->totalOutputTokens,
@@ -281,6 +290,7 @@ class OrchestrateChainCommandHandler
             budgetExceeded: $loopResult->budgetExceeded,
             budgetLimit: $loopResult->budgetLimit,
             budgetExceededRole: $loopResult->budgetExceededRole,
+            timedOut: $chainTimedOut,
         );
     }
 
@@ -306,6 +316,7 @@ class OrchestrateChainCommandHandler
                 invocation: $roundVo->invocation,
                 systemPrompt: $roundVo->systemPrompt,
                 userPrompt: $roundVo->userPrompt,
+                timedOut: $roundVo->timedOut,
             ),
             $roundVos,
         );

@@ -24,6 +24,7 @@ final readonly class RunAgentResultDto
         public int $turns,
         public bool $isError,
         public ?string $errorMessage,
+        public bool $timedOut = false,
     ) {
     }
 }
