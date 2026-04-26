@@ -18,7 +18,7 @@ AGENTS.md — обязательные правила для AI-агента в 
     - [`Тимлид Алекс`](docs/agents/roles/team/team_lead_alex.ru.md) — оркестрирует эпики, координирует сабагентов, контролирует цикл задача → реализация → ревью → доработка.
     - [`Аналитик Шерлок`](docs/agents/roles/team/system_analyst_sherlock.ru.md) — превращает бизнес-требования в технические постановки и системные контракты.
     - [`Архитектор Гэндальф`](docs/agents/roles/team/system_architect_gandalf.ru.md) — проектирует архитектуру приложения, границы слоёв и интеграции.
-    - [`Архитектор Локи`](docs/agents/roles/team/system_architect_loki.ru.md) — проектирует архитектуру, ищет слепые зоны и альтернативы.
+    -   — проектирует архитектуру, ищет слепые зоны и альтернативы.
     - [`Бэкендер Левша`](docs/agents/roles/team/backend_developer_levsha.ru.md) — реализует серверную логику (DDD, Application/Domain/Infrastructure, PHP).
     - [`Бэкендер Тони`](docs/agents/roles/team/backend_developer_tony.ru.md) — реализует серверную логику, упрощает и ускоряет.
     - [`Ревьювер Бэка Пуаро`](docs/agents/roles/team/code_reviewer_backend_puaro.ru.md) — ревьюит PHP/DDD/архитектуру, стиль, тесты, безопасность.
