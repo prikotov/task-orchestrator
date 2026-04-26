@@ -36,6 +36,9 @@ php bin/console app:agent:orchestrate <task> [options]
 | `--no-audit-log` | — | Отключить audit-логирование | — |
 | `--report-format` | — | Формат отчёта: `text`, `json`, `none` | `text` |
 | `--report-file` | — | Путь к файлу для записи отчёта | — |
+| `--no-context-files` | — | Не загружать AGENTS.md/CLAUDE.md | — |
+| `--validate-config` | — | Проверить конфигурацию без запуска | — |
+| `--config` | — | Путь к файлу `chains.yaml` (переопределяет путь по умолчанию) | — |
 
 **Примеры:**
 
@@ -54,7 +57,24 @@ php bin/console app:agent:orchestrate "Fix bug" --resume var/sessions/2026-04-16
 
 # Запуск с кастомной моделью и audit-логом
 php bin/console app:agent:orchestrate "Add tests" -m claude-4-sonnet --audit-log var/log/audit.jsonl
+
+# Кастомный конфиг цепочек
+task-orchestrator app:agent:orchestrate --config=path/to/chains.yaml "Задача"
+
+# Валидация кастомного конфига
+task-orchestrator app:agent:orchestrate --config=path/to/chains.yaml --validate-config "check"
 ```
+
+**Exit codes:**
+
+| Code | Constant | Meaning |
+|------|----------|---------|
+| `0` | `success` | Успех |
+| `1` | `chainFailed` | Ошибка шага/агента |
+| `3` | `chainNotFound` | Цепочка не найдена |
+| `4` | `budgetExceeded` | Превышен бюджет |
+| `5` | `invalidConfig` | Неверная конфигурация или аргументы |
+| `6` | `timeout` | Превышен таймаут шага/раунда |
 
 **Повторный запуск** заблокирован (mutex-lock). Если команда уже выполняется — повторный вызов будет пропущен с предупреждением.
 
