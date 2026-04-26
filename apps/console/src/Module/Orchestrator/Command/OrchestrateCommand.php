@@ -13,18 +13,20 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainDefinitionDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\LoadChain\LoadChainQuery;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\LoadChain\LoadChainQueryHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQuery;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQueryHandler;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigResult;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefinitionValidator;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainConfigViolationVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 
 #[AsCommand(
     name: 'app:agent:orchestrate',
@@ -32,10 +34,6 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefiniti
 )]
 
 /**
- * @techdebt 2026-04-24: Command зависит от Domain (ChainLoaderInterface, ChainDefinitionValidator, ChainDefinitionVo).
- * Нужно вынести загрузку chain в Application-слой (ChainDefinitionDto + ChainLoaderApplicationInterface).
- * Задача: todo/TASK-chore-presentation-domain-decouple.todo.md
- *
  * Exit codes:
  *
  * | Code | Constant        | Meaning                                    |
@@ -71,10 +69,10 @@ final class OrchestrateCommand extends Command
     public function __construct(
         private readonly OrchestrateChainCommandHandler $orchestrateHandler,
         private readonly GenerateReportQueryHandler $reportHandler,
+        private readonly LoadChainQueryHandler $loadChainHandler,
+        private readonly ValidateChainConfigQueryHandler $validateChainConfigHandler,
         private readonly LockFactory $lockFactory,
-        private readonly ChainLoaderInterface $chainLoader,
         private readonly ResolveExitCodeServiceInterface $exitCodeResolver,
-        private readonly ChainDefinitionValidator $chainValidator,
     ) {
         parent::__construct();
     }
@@ -107,17 +105,18 @@ final class OrchestrateCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $lock = $this->lockFactory->createLock(self::LOCK_RESOURCE);
 
-        // ── --config: переопределить путь к chains.yaml ──
-        $configOverrideError = $this->applyConfigOverride($input, $io);
-        if ($configOverrideError !== null) {
-            return $configOverrideError;
+        /** @var string|null $configPath */
+        $configPath = $input->getOption(self::OPT_CONFIG);
+        if ($configPath !== null && $configPath !== '' && !file_exists($configPath)) {
+            $io->error(sprintf('Config file not found: %s', $configPath));
+
+            return OrchestrateExitCodeEnum::invalidConfig->value;
         }
 
-        // ── --validate-config: проверить конфиг и выйти без запуска ──
         /** @var bool $validateConfig */
         $validateConfig = $input->getOption(self::OPT_VALIDATE_CONFIG);
         if ($validateConfig) {
-            return $this->executeValidateConfig($input, $io);
+            return $this->executeValidateConfig($input, $io, $configPath);
         }
 
         if (!$lock->acquire()) {
@@ -175,8 +174,12 @@ final class OrchestrateCommand extends Command
                 return $this->exitCodeResolver->resolveFromResult($result, true)->value;
             }
 
-            $chain = $this->chainLoader->load($chainName);
-            $isDynamic = $chain->isDynamic();
+            $loadResult = ($this->loadChainHandler)(new LoadChainQuery(
+                chainName: $chainName,
+                configPath: $configPath !== '' ? $configPath : null,
+            ));
+            $chain = $loadResult->chain;
+            $isDynamic = $chain->isDynamic;
 
             if ($dryRun) {
                 $this->renderDryRun($io, $chainName, $task, $chain, $isDynamic, $topic, $facilitator, $participants, $maxRounds);
@@ -233,130 +236,51 @@ final class OrchestrateCommand extends Command
         }
     }
 
-    /**
-     * Применяет --config: переопределяет путь к chains.yaml через ChainLoaderInterface.
-     *
-     * Возвращает int (exit code) при ошибке или null, если всё ок.
-     */
-    private function applyConfigOverride(InputInterface $input, SymfonyStyle $io): ?int
+    private function executeValidateConfig(InputInterface $input, SymfonyStyle $io, ?string $configPath): int
     {
-        /** @var string|null $configPath */
-        $configPath = $input->getOption(self::OPT_CONFIG);
-
-        if ($configPath === null || $configPath === '') {
-            return null;
-        }
-
-        if (!file_exists($configPath)) {
-            $io->error(sprintf('Config file not found: %s', $configPath));
-
-            return OrchestrateExitCodeEnum::invalidConfig->value;
-        }
-
-        $this->chainLoader->overridePath($configPath);
-
-        return null;
-    }
-
-    /**
-     * Обрабатывает флаг --validate-config: валидирует конфигурацию цепочки и выводит результат.
-     *
-     * Если указана опция --chain — валидирует конкретную цепочку,
-     * иначе — все цепочки.
-     *
-     * Domain-сервисы (ChainLoader, ChainDefinitionValidator) вызываются напрямую.
-     * Маппинг ChainConfigViolationVo → вывод выполняется в Presentation.
-     */
-    private function executeValidateConfig(InputInterface $input, SymfonyStyle $io): int
-    {
-        // Если --chain передана явно — валидируем конкретную цепочку
+        $chainName = null;
         if ($input->hasParameterOption('--chain') || $input->hasParameterOption('-c')) {
             /** @var string $chainName */
             $chainName = $input->getOption(self::OPT_CHAIN);
-
-            return $this->validateSpecificChain($chainName, $io);
         }
 
-        return $this->validateAllChains($io);
-    }
-
-    private function validateSpecificChain(string $chainName, SymfonyStyle $io): int
-    {
         try {
-            $chain = $this->chainLoader->load($chainName);
-        } catch (\Exception $e) {
-            $io->error('❌ Config validation failed:');
-            $io->text(sprintf('  • [%s] %s', $chainName, $e->getMessage()));
-
-            return OrchestrateExitCodeEnum::invalidConfig->value;
-        }
-
-        $violations = $this->chainValidator->validate($chain);
-
-        if ($violations === []) {
-            $io->success(sprintf('✅ Config is valid (1 chain: %s).', $chainName));
-
-            return OrchestrateExitCodeEnum::success->value;
-        }
-
-        $io->error('❌ Config validation failed:');
-        $this->renderViolations($io, $violations);
-
-        return OrchestrateExitCodeEnum::invalidConfig->value;
-    }
-
-    private function validateAllChains(SymfonyStyle $io): int
-    {
-        try {
-            $chains = $this->chainLoader->list();
-        } catch (\Exception $e) {
-            $io->error('❌ Config validation failed:');
-            $io->text(sprintf('  • [__global__] Failed to load chains configuration: %s', $e->getMessage()));
-
-            return OrchestrateExitCodeEnum::invalidConfig->value;
-        }
-
-        if ($chains === []) {
-            $io->error('❌ Config validation failed:');
-            $io->text('  • [__global__] No chains defined in configuration.');
-
-            return OrchestrateExitCodeEnum::invalidConfig->value;
-        }
-
-        $allViolations = [];
-        foreach ($chains as $chain) {
-            $chainViolations = $this->chainValidator->validate($chain);
-            $allViolations = [...$allViolations, ...$chainViolations];
-        }
-
-        $chainNames = array_keys($chains);
-
-        if ($allViolations === []) {
-            $io->success(sprintf(
-                '✅ Config is valid (%d chain(s): %s).',
-                count($chainNames),
-                implode(', ', $chainNames),
+            $result = ($this->validateChainConfigHandler)(new ValidateChainConfigQuery(
+                chainName: $chainName,
+                configPath: $configPath !== '' ? $configPath : null,
             ));
+        } catch (\Exception $e) {
+            $io->error('❌ Config validation failed:');
+            $io->text(sprintf('  • [%s] %s', $chainName ?? '__global__', $e->getMessage()));
+
+            return OrchestrateExitCodeEnum::invalidConfig->value;
+        }
+
+        if ($result->isValid) {
+            if ($result->validChainName !== null) {
+                $io->success(sprintf('✅ Config is valid (1 chain: %s).', $result->validChainName));
+            } else {
+                $io->success(sprintf(
+                    '✅ Config is valid (%d chain(s): %s).',
+                    count($result->chainNames),
+                    implode(', ', $result->chainNames),
+                ));
+            }
 
             return OrchestrateExitCodeEnum::success->value;
         }
 
         $io->error('❌ Config validation failed:');
-        $this->renderViolations($io, $allViolations);
+        $this->renderViolations($io, $result);
 
         return OrchestrateExitCodeEnum::invalidConfig->value;
     }
 
-    /**
-     * Форматирует список нарушений конфигурации для вывода.
-     *
-     * @param list<ChainConfigViolationVo> $violations
-     */
-    private function renderViolations(SymfonyStyle $io, array $violations): void
+    private function renderViolations(SymfonyStyle $io, ValidateChainConfigResult $result): void
     {
-        foreach ($violations as $v) {
-            $fieldSuffix = $v->getField() !== null ? sprintf(' [%s]', $v->getField()) : '';
-            $io->text(sprintf('  • [%s]%s %s', $v->getChainName(), $fieldSuffix, $v->getMessage()));
+        foreach ($result->violations as $v) {
+            $fieldSuffix = $v->field !== null ? sprintf(' [%s]', $v->field) : '';
+            $io->text(sprintf('  • [%s]%s %s', $v->chainName, $fieldSuffix, $v->message));
         }
     }
 
@@ -367,7 +291,7 @@ final class OrchestrateCommand extends Command
         SymfonyStyle $io,
         string $chainName,
         string $task,
-        ChainDefinitionVo $chain,
+        ChainDefinitionDto $chain,
         bool $isDynamic,
         ?string $topic,
         ?string $facilitator,
@@ -378,23 +302,21 @@ final class OrchestrateCommand extends Command
         $io->text(sprintf('Task: %s', $task));
 
         if ($isDynamic) {
-            $io->text(sprintf('Facilitator: %s', $facilitator ?? $chain->getFacilitator() ?? 'system_analyst'));
-            $io->text(sprintf('Participants: %s', implode(', ', $participants ?? $chain->getParticipants())));
-            $io->text(sprintf('Max rounds: %d', $maxRounds ?? $chain->getMaxRounds()));
+            $io->text(sprintf('Facilitator: %s', $facilitator ?? $chain->facilitator ?? 'system_analyst'));
+            $io->text(sprintf('Participants: %s', implode(', ', $participants ?? $chain->participants)));
+            $io->text(sprintf('Max rounds: %d', $maxRounds ?? $chain->maxRounds));
             if ($topic !== null) {
                 $io->text(sprintf('Topic: %s', $topic));
             }
         } else {
-            foreach ($chain->getSteps() as $i => $step) {
-                if ($step->isQualityGate()) {
-                    $io->text(sprintf('  [%d] 🔍 Quality Gate: %s', $i + 1, $step->getLabel()));
+            foreach ($chain->steps as $i => $step) {
+                if ($step->isQualityGate) {
+                    $io->text(sprintf('  [%d] 🔍 Quality Gate: %s', $i + 1, $step->label));
                 } else {
-                    $roleConfig = $chain->getRoleConfig($step->getRole() ?? '');
-                    $fallbackRunner = $roleConfig?->getFallback()?->getRunnerName();
-                    $fallback = $fallbackRunner !== null
-                        ? sprintf(' (fallback: %s)', $fallbackRunner)
+                    $fallback = $step->fallbackRunnerName !== null
+                        ? sprintf(' (fallback: %s)', $step->fallbackRunnerName)
                         : '';
-                    $io->text(sprintf('  [%d] %s @ %s%s', $i + 1, $step->getRole() ?? '', $step->getRunner(), $fallback));
+                    $io->text(sprintf('  [%d] %s @ %s%s', $i + 1, $step->role ?? '', $step->runner, $fallback));
                 }
             }
         }

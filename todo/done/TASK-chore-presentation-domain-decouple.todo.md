@@ -8,10 +8,10 @@ priority: P2
 depends_on:
 epic:
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Бэкендер (Левша)
+branch: task/chore-presentation-domain-decouple
 pr:
-status: todo
+status: done
 ---
 
 # TASK-chore-presentation-domain-decouple: Убрать зависимость OrchestrateCommand от Domain-слоя
@@ -32,14 +32,14 @@ status: todo
 
 ## 3. Requirements (Требования)
 ### 🔴 Must Have
-- [ ] `OrchestrateCommand` не содержит `use ...Domain\...` (кроме Domain-исключений для catch)
-- [ ] Создан `ChainDefinitionDto` в Application-слое (или используется существующий)
-- [ ] Создан `ChainLoaderApplicationInterface` в Application-слое (или используется существующий `ValidateChainConfigServiceInterface`)
-- [ ] PHPUnit и Psalm зелёные
+- [x] `OrchestrateCommand` не содержит `use ...Domain\...` (кроме Domain-исключений для catch)
+- [x] Создан `ChainDefinitionDto` в Application-слое (или используется существующий)
+- [x] Создан `ChainLoaderApplicationInterface` в Application-слое (или используется существующий `ValidateChainConfigServiceInterface`)
+- [x] PHPUnit и Psalm зелёные
 
 ### 🟡 Should Have
-- [ ] Alias в `services.yaml` для нового интерфейса
-- [ ] Unit-тесты обновлены
+- [x] Alias в `services.yaml` для нового интерфейса
+- [x] Unit-тесты обновлены
 
 ## 4. Implementation Plan
 1. Создать `ChainDefinitionDto` в Application\Dto (или проверить наличие)
@@ -49,10 +49,10 @@ status: todo
 5. Обновить тесты
 
 ## 5. Definition of Done
-- [ ] В OrchestrateCommand нет `use ...Domain\...` (кроме catch-исключений)
-- [ ] Psalm clean
-- [ ] PHPUnit 455+ тестов зелёные
-- [ ] @techdebt-комментарий удалён
+- [x] В OrchestrateCommand нет `use ...Domain\...` (кроме catch-исключений)
+- [x] Psalm clean (1 pre-existing error, не связанная с изменениями)
+- [x] PHPUnit 496 тестов зелёные
+- [x] @techdebt-комментарий удалён
 
 ## 6. Verification
 ```bash
