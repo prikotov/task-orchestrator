@@ -12,7 +12,11 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\SharedLockInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigViolationDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainDefinitionDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainStepDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainProviderServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
@@ -23,9 +27,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Genera
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefinitionValidator;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainProviderService;
 use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\OrchestrateCommand;
 
@@ -33,20 +35,18 @@ use TaskOrchestrator\Console\Module\Orchestrator\Command\OrchestrateCommand;
 final class OrchestrateCommandTest extends TestCase
 {
     private LockFactory&MockObject $lockFactory;
-    private ChainLoaderInterface&MockObject $chainLoader;
+    private ChainProviderServiceInterface&MockObject $chainProvider;
     private OrchestrateChainCommandHandler&MockObject $orchestrateHandler;
     private GenerateReportQueryHandler&MockObject $reportHandler;
-    private ChainDefinitionValidator $chainValidator;
     private SharedLockInterface&MockObject $lock;
 
     #[Override]
     protected function setUp(): void
     {
         $this->lockFactory = $this->createMock(LockFactory::class);
-        $this->chainLoader = $this->createMock(ChainLoaderInterface::class);
+        $this->chainProvider = $this->createMock(ChainProviderServiceInterface::class);
         $this->orchestrateHandler = $this->createMock(OrchestrateChainCommandHandler::class);
         $this->reportHandler = $this->createMock(GenerateReportQueryHandler::class);
-        $this->chainValidator = new ChainDefinitionValidator();
         $this->lock = $this->createMock(SharedLockInterface::class);
 
         $this->lockFactory
@@ -66,7 +66,7 @@ final class OrchestrateCommandTest extends TestCase
     #[Test]
     public function chainNotFoundExceptionReturnsChainNotFound(): void
     {
-        $this->chainLoader
+        $this->chainProvider
             ->method('load')
             ->willThrowException(new ChainNotFoundException('missing'));
 
@@ -81,7 +81,7 @@ final class OrchestrateCommandTest extends TestCase
     #[Test]
     public function roleNotFoundExceptionReturnsInvalidConfig(): void
     {
-        $this->chainLoader
+        $this->chainProvider
             ->method('load')
             ->willThrowException(new RoleNotFoundException('bad_role'));
 
@@ -96,7 +96,7 @@ final class OrchestrateCommandTest extends TestCase
     #[Test]
     public function genericExceptionReturnsChainFailed(): void
     {
-        $this->chainLoader
+        $this->chainProvider
             ->method('load')
             ->willThrowException(new \RuntimeException('something broke'));
 
@@ -112,7 +112,7 @@ final class OrchestrateCommandTest extends TestCase
     public function staticChainSuccessReturnsZero(): void
     {
         $chain = $this->createStaticChainDefinition();
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('load')->willReturn($chain);
 
         $this->orchestrateHandler
             ->method('__invoke')
@@ -133,7 +133,7 @@ final class OrchestrateCommandTest extends TestCase
     public function staticChainWithErrorReturnsChainFailed(): void
     {
         $chain = $this->createStaticChainDefinition();
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('load')->willReturn($chain);
 
         $this->orchestrateHandler
             ->method('__invoke')
@@ -166,7 +166,7 @@ final class OrchestrateCommandTest extends TestCase
     public function budgetExceededReturnsBudgetExceededCode(): void
     {
         $chain = $this->createStaticChainDefinition();
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('load')->willReturn($chain);
 
         $this->orchestrateHandler
             ->method('__invoke')
@@ -189,7 +189,7 @@ final class OrchestrateCommandTest extends TestCase
     public function dynamicChainWithSynthesisReturnsSuccess(): void
     {
         $chain = $this->createDynamicChainDefinition();
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('load')->willReturn($chain);
 
         $this->orchestrateHandler
             ->method('__invoke')
@@ -210,7 +210,7 @@ final class OrchestrateCommandTest extends TestCase
     public function dynamicChainWithoutSynthesisReturnsChainFailed(): void
     {
         $chain = $this->createDynamicChainDefinition();
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('load')->willReturn($chain);
 
         $this->orchestrateHandler
             ->method('__invoke')
@@ -231,7 +231,7 @@ final class OrchestrateCommandTest extends TestCase
     public function dryRunReturnsSuccess(): void
     {
         $chain = $this->createStaticChainDefinition();
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('load')->willReturn($chain);
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => 'do something', '--dry-run' => true]);
@@ -245,7 +245,7 @@ final class OrchestrateCommandTest extends TestCase
     public function budgetExceededTakesPriorityOverStepError(): void
     {
         $chain = $this->createStaticChainDefinition();
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('load')->willReturn($chain);
 
         $this->orchestrateHandler
             ->method('__invoke')
@@ -290,9 +290,8 @@ final class OrchestrateCommandTest extends TestCase
             $this->orchestrateHandler,
             $this->reportHandler,
             $lockFactory,
-            $this->chainLoader,
+            $this->chainProvider,
             new ResolveExitCodeService(),
-            $this->chainValidator,
         );
 
         $application = new Application();
@@ -357,7 +356,7 @@ final class OrchestrateCommandTest extends TestCase
     public function staticChainTimedOutReturnsTimeoutCode(): void
     {
         $chain = $this->createStaticChainDefinition();
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('load')->willReturn($chain);
 
         $this->orchestrateHandler
             ->method('__invoke')
@@ -393,7 +392,7 @@ final class OrchestrateCommandTest extends TestCase
     public function dynamicChainTimedOutReturnsTimeoutCode(): void
     {
         $chain = $this->createDynamicChainDefinition();
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('load')->willReturn($chain);
 
         $this->orchestrateHandler
             ->method('__invoke')
@@ -419,7 +418,8 @@ final class OrchestrateCommandTest extends TestCase
             'analyze' => $this->createStaticChainDefinition('analyze'),
         ];
 
-        $this->chainLoader->method('list')->willReturn($chains);
+        $this->chainProvider->method('list')->willReturn($chains);
+        $this->chainProvider->method('validate')->willReturn([]);
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => '_', '--validate-config' => true]);
@@ -428,16 +428,23 @@ final class OrchestrateCommandTest extends TestCase
         self::assertStringContainsString('Config is valid', $tester->getDisplay());
     }
 
-    // ─── --validate-config: invalid config (domain violation) → invalidConfig (5) ──
+    // ─── --validate-config: invalid config (violation) → invalidConfig (5) ──
 
     #[Test]
     public function validateConfigWithViolationReturnsInvalidConfig(): void
     {
         $chains = [
-            'broken' => $this->createInvalidDynamicChainDefinition(),
+            'broken' => $this->createDynamicChainDefinition('broken'),
         ];
 
-        $this->chainLoader->method('list')->willReturn($chains);
+        $this->chainProvider->method('list')->willReturn($chains);
+        $this->chainProvider->method('validate')->willReturn([
+            new ChainConfigViolationDto(
+                chainName: 'broken',
+                field: 'max_rounds',
+                message: 'Dynamic chain "broken" max_rounds must be >= 1.',
+            ),
+        ]);
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => '_', '--validate-config' => true]);
@@ -452,7 +459,7 @@ final class OrchestrateCommandTest extends TestCase
     #[Test]
     public function validateConfigEmptyChainsReturnsInvalidConfig(): void
     {
-        $this->chainLoader->method('list')->willReturn([]);
+        $this->chainProvider->method('list')->willReturn([]);
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => '_', '--validate-config' => true]);
@@ -466,7 +473,7 @@ final class OrchestrateCommandTest extends TestCase
     #[Test]
     public function validateConfigLoaderFailsReturnsInvalidConfig(): void
     {
-        $this->chainLoader->method('list')->willThrowException(new \RuntimeException('YAML parse error'));
+        $this->chainProvider->method('list')->willThrowException(new \RuntimeException('YAML parse error'));
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => '_', '--validate-config' => true]);
@@ -481,7 +488,8 @@ final class OrchestrateCommandTest extends TestCase
     public function validateConfigSpecificChainValidReturnsSuccess(): void
     {
         $chain = $this->createStaticChainDefinition('hotfix');
-        $this->chainLoader->method('load')->with('hotfix')->willReturn($chain);
+        $this->chainProvider->method('load')->with('hotfix')->willReturn($chain);
+        $this->chainProvider->method('validate')->with($chain)->willReturn([]);
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => '_', '--validate-config' => true, '--chain' => 'hotfix']);
@@ -495,7 +503,7 @@ final class OrchestrateCommandTest extends TestCase
     #[Test]
     public function validateConfigSpecificChainNotFoundReturnsInvalidConfig(): void
     {
-        $this->chainLoader->method('load')->willThrowException(new ChainNotFoundException('missing'));
+        $this->chainProvider->method('load')->willThrowException(new ChainNotFoundException('missing'));
 
         $tester = $this->createCommandTester();
         $tester->execute(['task' => '_', '--validate-config' => true, '--chain' => 'missing']);
@@ -509,9 +517,10 @@ final class OrchestrateCommandTest extends TestCase
     #[Test]
     public function validateConfigDoesNotCallOrchestrateHandler(): void
     {
-        $this->chainLoader->method('list')->willReturn([
+        $this->chainProvider->method('list')->willReturn([
             'implement' => $this->createStaticChainDefinition('implement'),
         ]);
+        $this->chainProvider->method('validate')->willReturn([]);
 
         $this->orchestrateHandler
             ->expects($this->never())
@@ -531,9 +540,8 @@ final class OrchestrateCommandTest extends TestCase
             $this->orchestrateHandler,
             $this->reportHandler,
             $this->lockFactory,
-            $this->chainLoader,
+            $this->chainProvider,
             new ResolveExitCodeService(),
-            $this->chainValidator,
         );
 
         $application = new Application();
@@ -543,54 +551,34 @@ final class OrchestrateCommandTest extends TestCase
         return new CommandTester($registeredCommand);
     }
 
-    private function createStaticChainDefinition(string $name = 'test-static'): ChainDefinitionVo
+    private function createStaticChainDefinition(string $name = 'test-static'): ChainDefinitionDto
     {
-        return ChainDefinitionVo::createFromSteps(
+        return new ChainDefinitionDto(
             name: $name,
-            description: 'Test static chain',
+            isDynamic: false,
+            facilitator: null,
+            participants: [],
+            maxRounds: 10,
             steps: [
-                ChainStepVo::agent(role: 'agent', runner: 'pi'),
+                new ChainStepDto(
+                    role: 'agent',
+                    runner: 'pi',
+                    label: '',
+                    isQualityGate: false,
+                ),
             ],
         );
     }
 
-    private function createDynamicChainDefinition(): ChainDefinitionVo
+    private function createDynamicChainDefinition(string $name = 'test-dynamic'): ChainDefinitionDto
     {
-        return ChainDefinitionVo::createFromDynamic(
-            name: 'test-dynamic',
-            description: 'Test dynamic chain',
+        return new ChainDefinitionDto(
+            name: $name,
+            isDynamic: true,
             facilitator: 'analyst',
             participants: ['dev', 'qa'],
             maxRounds: 3,
-            brainstormSystemPrompt: 'System prompt',
-            facilitatorAppendPrompt: 'Facilitator append %s',
-            facilitatorStartPrompt: 'Facilitator start %s',
-            facilitatorContinuePrompt: 'Facilitator continue %s %s %s',
-            facilitatorFinalizePrompt: 'Facilitator finalize %s %s',
-            participantAppendPrompt: 'Participant append %s',
-            participantUserPrompt: 'Participant user %s %s',
-        );
-    }
-
-    /**
-     * Создаёт dynamic-цепочку, которая проходит VO-конструктор,
-     * но содержит нарушение, обнаруживаемое Domain Validator (maxRounds < 1).
-     */
-    private function createInvalidDynamicChainDefinition(): ChainDefinitionVo
-    {
-        return ChainDefinitionVo::createFromDynamic(
-            name: 'broken',
-            description: 'Broken dynamic chain',
-            facilitator: 'analyst',
-            participants: ['dev'],
-            maxRounds: 0,
-            brainstormSystemPrompt: 'System prompt',
-            facilitatorAppendPrompt: 'Fac append %s',
-            facilitatorStartPrompt: 'Fac start %s',
-            facilitatorContinuePrompt: 'Fac continue %s %s %s',
-            facilitatorFinalizePrompt: 'Fac finalize %s %s',
-            participantAppendPrompt: 'Part append %s',
-            participantUserPrompt: 'Part user %s %s',
+            steps: [],
         );
     }
 
@@ -625,16 +613,16 @@ chains:
 YAML);
 
         try {
-            // Создаём реальный YamlChainLoader с пустым исходным путём
+            // Создаём реальный ChainProviderService с YamlChainLoader
             $chainLoader = new YamlChainLoader('/nonexistent/default.yaml');
+            $chainProvider = new ChainProviderService($chainLoader, new ChainDefinitionValidator());
 
             $command = new OrchestrateCommand(
                 $this->orchestrateHandler,
                 $this->reportHandler,
                 $this->lockFactory,
-                $chainLoader,
+                $chainProvider,
                 new ResolveExitCodeService(),
-                $this->chainValidator,
             );
 
             $application = new Application();
@@ -679,14 +667,14 @@ YAML);
 
         try {
             $chainLoader = new YamlChainLoader('/nonexistent/default.yaml');
+            $chainProvider = new ChainProviderService($chainLoader, new ChainDefinitionValidator());
 
             $command = new OrchestrateCommand(
                 $this->orchestrateHandler,
                 $this->reportHandler,
                 $this->lockFactory,
-                $chainLoader,
+                $chainProvider,
                 new ResolveExitCodeService(),
-                $this->chainValidator,
             );
 
             $application = new Application();
@@ -713,7 +701,7 @@ YAML);
     {
         // Без --config поведение не должно измениться
         $chain = $this->createStaticChainDefinition();
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('load')->willReturn($chain);
 
         $this->orchestrateHandler
             ->method('__invoke')

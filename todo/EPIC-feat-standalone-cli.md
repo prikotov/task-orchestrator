@@ -90,7 +90,7 @@ pr:
 - [x] [TASK-refactor-validate-config-dedup](done/TASK-refactor-validate-config-dedup.todo.md) — Вынести валидационные инварианты в Domain Specification
 - [x] [TASK-feat-cli-config-option](done/TASK-feat-cli-config-option.todo.md) — CLI-опция --config для указания chains.yaml
 - [ ] [TASK-feat-timeout-exit-code](done/TASK-feat-timeout-exit-code.todo.md) — Propagation таймаута в CLI exit code 6
-- [ ] [TASK-chore-presentation-domain-decouple](TASK-chore-presentation-domain-decouple.todo.md) — Presentation→Domain dependency removal
+- [x] [TASK-chore-presentation-domain-decouple](done/TASK-chore-presentation-domain-decouple.todo.md) — Presentation→Domain dependency removal
 - [ ] GPG-подпись Phar
 - [ ] Windows CI для Phar
 - [ ] JSON Schema для chains.yaml
