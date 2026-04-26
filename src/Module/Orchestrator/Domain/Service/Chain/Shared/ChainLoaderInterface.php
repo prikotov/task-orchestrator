@@ -24,4 +24,12 @@ interface ChainLoaderInterface
      * @return array<string, ChainDefinitionVo>
      */
     public function list(): array;
+
+    /**
+     * Переопределяет путь к источнику конфигурации и сбрасывает кэш.
+     *
+     * Предназначен для однократного вызова в CLI-контексте (опция --config).
+     * Реализация по умолчанию — no-op, если источник нельзя переопределить.
+     */
+    public function overridePath(string $yamlPath): void;
 }
