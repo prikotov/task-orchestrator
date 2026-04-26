@@ -63,6 +63,12 @@ task-orchestrator app:agent:orchestrate "Ваша задача"
 
 Полный пример со всеми возможностями (retry, budget, fallback, quality gates, dynamic chains, разные CLI-раннеры) — в [assets/chains-example.yaml](assets/chains-example.yaml).
 
+По умолчанию используется путь к `chains.yaml` из Symfony-конфигурации. Чтобы указать произвольный конфиг — опция `--config`:
+
+```bash
+task-orchestrator app:agent:orchestrate --config=path/to/chains.yaml "Задача"
+```
+
 ## Troubleshooting
 
 | Проблема | Решение |
