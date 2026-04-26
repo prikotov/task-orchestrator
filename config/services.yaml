@@ -55,7 +55,7 @@ services:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Prompt\RolePromptBuilder
 
   TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainProviderServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ChainProviderService
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainProviderService
 
   # --- Application Service alias ---
   TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainServiceInterface:
