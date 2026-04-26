@@ -51,12 +51,6 @@ task-orchestrator --version
 task-orchestrator app:agent:orchestrate --validate-config "check"
 ```
 
-Указать кастомный конфиг:
-
-```bash
-task-orchestrator app:agent:orchestrate --config=path/to/chains.yaml --validate-config "check"
-```
-
 Запустить цепочку:
 
 ```bash
