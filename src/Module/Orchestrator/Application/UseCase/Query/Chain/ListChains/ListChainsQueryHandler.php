@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ListChains;
 
-use Override;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainProviderServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ChainDefinitionDtoMapper;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
 
 /**
  * Возвращает список всех определений цепочек.
@@ -15,18 +15,19 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainP
 class ListChainsQueryHandler
 {
     public function __construct(
-        private ChainProviderServiceInterface $chainProvider,
+        private ChainLoaderInterface $chainLoader,
+        private ChainDefinitionDtoMapper $mapper,
     ) {
     }
 
     public function __invoke(ListChainsQuery $query): ListChainsResult
     {
         if ($query->configPath !== null) {
-            $this->chainProvider->overridePath($query->configPath);
+            $this->chainLoader->overridePath($query->configPath);
         }
 
         return new ListChainsResult(
-            chains: $this->chainProvider->list(),
+            chains: $this->mapper->mapList($this->chainLoader->list()),
         );
     }
 }

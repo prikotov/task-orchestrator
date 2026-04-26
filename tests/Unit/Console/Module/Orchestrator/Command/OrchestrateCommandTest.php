@@ -238,11 +238,8 @@ YAML);
 
         try {
             $chainLoader = new YamlChainLoader('/nonexistent/default.yaml');
-            $chainProviderService = new \TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainProviderService(
-                $chainLoader,
-                new \TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefinitionValidator(),
-            );
-            $loadHandler = new LoadChainQueryHandler($chainProviderService);
+            $mapper = new \TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ChainDefinitionDtoMapper();
+            $loadHandler = new LoadChainQueryHandler($chainLoader, $mapper);
 
             $command = new OrchestrateCommand(
                 $this->orchestrateHandler,
@@ -294,11 +291,9 @@ YAML);
 
         try {
             $chainLoader = new YamlChainLoader('/nonexistent/default.yaml');
-            $chainProviderService = new \TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainProviderService(
-                $chainLoader,
-                new \TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefinitionValidator(),
-            );
-            $validateHandler = new ValidateChainConfigQueryHandler($chainProviderService);
+            $chainValidator = new \TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefinitionValidator();
+            $violationMapper = new \TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ChainConfigViolationDtoMapper();
+            $validateHandler = new ValidateChainConfigQueryHandler($chainLoader, $chainValidator, $violationMapper);
 
             $command = new OrchestrateCommand(
                 $this->orchestrateHandler,

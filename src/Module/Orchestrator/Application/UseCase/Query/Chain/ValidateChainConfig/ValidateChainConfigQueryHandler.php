@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ValidateChainConfig;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainProviderServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ChainConfigViolationDtoMapper;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefinitionValidator;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
 
 /**
  * Валидирует конфигурацию цепочки (или всех цепочек).
@@ -14,14 +16,16 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainP
 class ValidateChainConfigQueryHandler
 {
     public function __construct(
-        private ChainProviderServiceInterface $chainProvider,
+        private ChainLoaderInterface $chainLoader,
+        private ChainDefinitionValidator $chainValidator,
+        private ChainConfigViolationDtoMapper $violationMapper,
     ) {
     }
 
     public function __invoke(ValidateChainConfigQuery $query): ValidateChainConfigResult
     {
         if ($query->configPath !== null) {
-            $this->chainProvider->overridePath($query->configPath);
+            $this->chainLoader->overridePath($query->configPath);
         }
 
         if ($query->chainName !== null) {
@@ -33,30 +37,30 @@ class ValidateChainConfigQueryHandler
 
     private function validateSpecificChain(string $chainName): ValidateChainConfigResult
     {
-        $chain = $this->chainProvider->load($chainName);
-        $violations = $this->chainProvider->validate($chain);
+        $chainVo = $this->chainLoader->load($chainName);
+        $violations = $this->chainValidator->validate($chainVo);
 
         return new ValidateChainConfigResult(
             isValid: $violations === [],
-            violations: $violations,
+            violations: $this->violationMapper->mapList($violations),
             validChainName: $chainName,
         );
     }
 
     private function validateAllChains(): ValidateChainConfigResult
     {
-        $chains = $this->chainProvider->list();
+        $chains = $this->chainLoader->list();
         $chainNames = array_keys($chains);
 
         $allViolations = [];
         foreach ($chains as $chain) {
-            $chainViolations = $this->chainProvider->validate($chain);
+            $chainViolations = $this->chainValidator->validate($chain);
             $allViolations = [...$allViolations, ...$chainViolations];
         }
 
         return new ValidateChainConfigResult(
             isValid: $allViolations === [],
-            violations: $allViolations,
+            violations: $this->violationMapper->mapList($allViolations),
             chainNames: $chainNames,
         );
     }
