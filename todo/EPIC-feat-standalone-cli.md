@@ -74,11 +74,11 @@ pr:
 ## 5. Implementation Plan (План реализации)
 
 ### Фаза 1: Исследование и выбор решения
-- [x] [TASK-research-cli-distribution-options](TASK-research-cli-distribution-options.todo.md) — Мозговой штурм: исследовать варианты дистрибуции, оформить RFC, согласовать с владельцем проекта
+- [x] [TASK-research-cli-distribution-options](done/TASK-research-cli-distribution-options.todo.md) — Мозговой штурм: исследовать варианты дистрибуции, оформить RFC, согласовано с владельцем проекта
 
 ### Фаза 2: Реализация (P0)
 - [x] [TASK-chore-composer-library-type](done/TASK-chore-composer-library-type.todo.md) — Изменить type на library + добавить bin в composer.json (~1.5 ч)
-- [ ] [TASK-chore-packagist-register](TASK-chore-packagist-register.todo.md) — Регистрация пакета на Packagist (~10 мин)
+- [ ] [TASK-chore-packagist-register](backlog/TASK-chore-packagist-register.todo.md) — Регистрация пакета на Packagist (~10 мин)
 - [x] [TASK-feat-typed-exit-codes](done/TASK-feat-typed-exit-codes.todo.md) — Typed exit codes для CLI-команды (~2–2.5 ч)
 
 ### Фаза 3: Реализация (P1)
