@@ -36,6 +36,9 @@ class OrchestrateChainCommandHandler
     /** @var int Дефолтный таймаут (секунды) для static-цепочки при отсутствии CLI timeout */
     private const int DEFAULT_STATIC_TIMEOUT = 300;
 
+    /** @var int Дефолтный max_time (секунды) для dynamic-цепочки при отсутствии CLI и chain max_time */
+    private const int DEFAULT_DYNAMIC_MAX_TIME = 3600;
+
     public function __construct(
         private ChainLoaderInterface $chainLoader,
         private RunAgentServiceInterface $agentRunner,
@@ -91,7 +94,7 @@ class OrchestrateChainCommandHandler
         $maxRounds = $command->maxRounds ?? $chain->getMaxRounds();
         $topic = $command->topic ?? $command->task;
         $timeout = $command->timeout ?? $chain->getTimeout() ?? self::DEFAULT_DYNAMIC_TIMEOUT;
-        $maxTime = $command->maxTime ?? $chain->getMaxTime();
+        $maxTime = $command->maxTime ?? $chain->getMaxTime() ?? self::DEFAULT_DYNAMIC_MAX_TIME;
 
         $sessionDir = $this->sessionLogger->startSession(
             $chain->getName(),
@@ -171,7 +174,7 @@ class OrchestrateChainCommandHandler
             $state->getTopic(),
             $command->workingDir,
             $resumeTimeout,
-            $command->maxTime ?? $chain->getMaxTime(),
+            $command->maxTime ?? $chain->getMaxTime() ?? self::DEFAULT_DYNAMIC_MAX_TIME,
         );
 
         $loopResult = $this->runDynamicLoop(

@@ -98,7 +98,7 @@ final class OrchestrateCommand extends Command
             ->addOption(self::OPT_NO_CONTEXT_FILES, null, InputOption::VALUE_NONE, 'Отключить автоматическую загрузку контекстных файлов (AGENTS.md, CLAUDE.md)')
             ->addOption(self::OPT_VALIDATE_CONFIG, null, InputOption::VALUE_NONE, 'Проверить конфигурацию цепочки без запуска оркестрации')
             ->addOption(self::OPT_CONFIG, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу chains.yaml (переопределяет путь по умолчанию)')
-            ->addOption(self::OPT_MAX_TIME, null, InputOption::VALUE_OPTIONAL, 'Макс. время сессии в секундах (dynamic, переопределяет chains.yaml)');
+            ->addOption(self::OPT_MAX_TIME, null, InputOption::VALUE_OPTIONAL, 'Макс. время сессии в секундах (dynamic, переопределяет chains.yaml)', '3600');
     }
 
     #[Override]
