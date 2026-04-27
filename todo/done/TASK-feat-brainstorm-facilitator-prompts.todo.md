@@ -10,8 +10,8 @@ epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер Тони (pi)
 branch: task/brainstorm-facilitator-prompts
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/80
+status: done
 ---
 
 # TASK-feat-brainstorm-facilitator-prompts: Consensus call и декомпозиция темы для фасилитатора

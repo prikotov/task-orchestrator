@@ -76,7 +76,7 @@ flowchart LR
 - [x] [TASK-feat-brainstorm-human-readable-protocol](done/TASK-feat-brainstorm-human-readable-protocol.todo.md) — Человекочитаемый формат discussion_history для фасилитатора (код) → **Бэкендер Левша** ✅
 - [x] [TASK-feat-brainstorm-finalize-time-guarantee](done/TASK-feat-brainstorm-finalize-time-guarantee.todo.md) — Гарантия вызова finalize до истечения max_time (код) → **Бэкендер Левша** ✅
 - [x] [TASK-feat-brainstorm-participant-prompts](done/TASK-feat-brainstorm-participant-prompts.todo.md) — Лимиты + tools + структура ответа (промпты) → **Бэкендер Тони** ✅
-- [ ] [TASK-feat-brainstorm-facilitator-prompts](TASK-feat-brainstorm-facilitator-prompts.todo.md) — Consensus call + декомпозиция темы (промпты) → **Бэкендер Тони**
+- [x] [TASK-feat-brainstorm-facilitator-prompts](done/TASK-feat-brainstorm-facilitator-prompts.todo.md) — Consensus call + декомпозиция темы (промпты) → **Бэкендер Тони** ✅
 - [ ] [TASK-feat-brainstorm-role-expertise](TASK-feat-brainstorm-role-expertise.todo.md) — Зоны ответственности в front matter ролей (docs) → **Тех. писатель Гермиона**
 
 ## 6. Definition of Done (Критерии приёмки эпика)
