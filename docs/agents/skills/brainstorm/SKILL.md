@@ -92,7 +92,7 @@ description: >
         --facilitator=team_lead_alex \
         --participants=backend_developer_levsha,system_architect_gandalf \
         --report-format=text \
-        --report-file=docs/brainstorm/cache-strategy.md
+        --report-file=var/sessions/brainstorm/cache-strategy-$(date +%Y-%m-%d_%H-%M-%S).md
 
     # Dry run — посмотреть план без запуска
     php bin/console app:agent:orchestrate "Паттерн retry" --chain=brainstorm --dry-run
