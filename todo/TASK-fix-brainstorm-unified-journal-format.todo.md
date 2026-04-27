@@ -10,7 +10,7 @@ epic: EPIC-fix-brainstorm-session-bugs
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Тони) (pi)
 branch: task/fix-brainstorm-unified-journal-format
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/87
 status: in_progress
 ---
 
@@ -71,7 +71,7 @@ vendor/bin/phpunit tests/Unit/Infrastructure/Service/Chain/PromptFormatterServic
 ## Инструкции для сабагента
 
 **Ветка:** task/fix-brainstorm-unified-journal-format (уже создана и активна)
-**PR:** уже создан (draft) из task/fix-brainstorm-unified-journal-format в fix/epic-brainstorm-session-bugs — будет заполнен после создания
+**PR:** уже создан (draft) из task/fix-brainstorm-unified-journal-format в fix/epic-brainstorm-session-bugs — [PR #87](https://github.com/prikotov/task-orchestrator/pull/87)
 
 ### Порядок действий
 1. Переключись в ветку `task/fix-brainstorm-unified-journal-format`: `git checkout task/fix-brainstorm-unified-journal-format`
