@@ -11,7 +11,7 @@ author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Левша) (pi)
 branch: task/fix-brainstorm-file-list-with-roles
 pr: https://github.com/prikotov/task-orchestrator/pull/86
-status: in_progress
+status: done
 ---
 
 # TASK-fix-brainstorm-file-list-with-roles: Добавление ролей в список файлов выступлений
