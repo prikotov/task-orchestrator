@@ -500,13 +500,4 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         );
     }
 
-    /**
-     * Проверяет, превышено ли maxTime (elapsed >= maxTime).
-     *
-     * Используется как safety-net после завершения цикла.
-     */
-    private function isMaxTimeExceeded(?int $maxTime, float $startTime): bool
-    {
-        return $maxTime !== null && (microtime(true) - $startTime) >= $maxTime;
-    }
 }
