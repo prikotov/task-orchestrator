@@ -10,8 +10,8 @@ epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/brainstorm-human-readable-protocol
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/77
+status: done
 ---
 
 # TASK-feat-brainstorm-human-readable-protocol: Человекочитаемый формат discussion_history для фасилитатора
