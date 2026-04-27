@@ -8,11 +8,10 @@ priority: P0
 depends_on:
 epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
-assignee:
-dependencies: []
-branch:
+assignee: Бэкендер Левша (pi)
+branch: task/brainstorm-finalize-time-guarantee
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-brainstorm-finalize-time-guarantee: Гарантия вызова finalize до истечения max_time
@@ -78,6 +77,19 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 Проблема обнаружена при ретроспективе: brainstorm 2026-04-27 длился 64 минуты, потратил все раунды на дискуссию, finalize не успел выполниться. result.md = "Interrupted: timeout". Пользователь (я) вручную вычитывал 200K discussion_history для восстановления результата.
+
+## Инструкции для сабагента
+
+**Ветка:** `task/brainstorm-finalize-time-guarantee` (уже создана и активна)
+**PR:** уже создан (draft) из `task/brainstorm-finalize-time-guarantee` в `feat/brainstorm-improvements` — [PR #78](https://github.com/prikotov/task-orchestrator/pull/78)
+
+### Порядок действий
+1. Переключись в ветку `task/brainstorm-finalize-time-guarantee`: `git checkout task/brainstorm-finalize-time-guarantee`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
