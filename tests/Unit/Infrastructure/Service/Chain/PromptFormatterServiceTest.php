@@ -101,7 +101,7 @@ final class PromptFormatterServiceTest extends TestCase
     #[Test]
     public function buildParticipantUserPromptRemovesSectionWhenNoPreviousResponses(): void
     {
-        $template = "# Тема:\n%s\n\n# Выступления предыдущих участников (файлы):\n%s\n\nРекомендуется начать с последних файлов — в них самая актуальная позиция и свежие аргументы. Более ранние выступления читай по необходимости.";
+        $template = "# Тема:\n%s\n\nВыступления предыдущих участников (файлы — прочитай их):\n%s\n\nРекомендуется начать с последних файлов — в них самая актуальная позиция и свежие аргументы. Более ранние выступления читай по необходимости.";
 
         $result = $this->service->buildParticipantUserPrompt(
             userPromptTemplate: $template,
@@ -118,7 +118,7 @@ final class PromptFormatterServiceTest extends TestCase
     #[Test]
     public function buildParticipantUserPromptKeepsSectionWhenHasPreviousResponses(): void
     {
-        $template = "# Тема:\n%s\n\n# Выступления предыдущих участников (файлы):\n%s\n\nРекомендуется начать с последних файлов — в них самая актуальная позиция и свежие аргументы. Более ранние выступления читай по необходимости.";
+        $template = "# Тема:\n%s\n\nВыступления предыдущих участников (файлы — прочитай их):\n%s\n\nРекомендуется начать с последних файлов — в них самая актуальная позиция и свежие аргументы. Более ранние выступления читай по необходимости.";
 
         $result = $this->service->buildParticipantUserPrompt(
             userPromptTemplate: $template,
