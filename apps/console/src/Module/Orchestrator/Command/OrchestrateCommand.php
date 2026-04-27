@@ -63,6 +63,7 @@ final class OrchestrateCommand extends Command
     private const string OPT_NO_CONTEXT_FILES = 'no-context-files';
     private const string OPT_VALIDATE_CONFIG = 'validate-config';
     private const string OPT_CONFIG = 'config';
+    private const string OPT_MAX_TIME = 'max-time';
 
     public const string LOCK_RESOURCE = 'command:agent:orchestrate';
 
@@ -96,7 +97,8 @@ final class OrchestrateCommand extends Command
             ->addOption(self::OPT_REPORT_FILE, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу для записи отчёта')
             ->addOption(self::OPT_NO_CONTEXT_FILES, null, InputOption::VALUE_NONE, 'Отключить автоматическую загрузку контекстных файлов (AGENTS.md, CLAUDE.md)')
             ->addOption(self::OPT_VALIDATE_CONFIG, null, InputOption::VALUE_NONE, 'Проверить конфигурацию цепочки без запуска оркестрации')
-            ->addOption(self::OPT_CONFIG, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу chains.yaml (переопределяет путь по умолчанию)');
+            ->addOption(self::OPT_CONFIG, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу chains.yaml (переопределяет путь по умолчанию)')
+            ->addOption(self::OPT_MAX_TIME, null, InputOption::VALUE_OPTIONAL, 'Макс. время сессии в секундах (dynamic, переопределяет chains.yaml)');
     }
 
     #[Override]
@@ -153,6 +155,8 @@ final class OrchestrateCommand extends Command
             /** @var bool $noAuditLog */
             $noAuditLog = $input->getOption(self::OPT_NO_AUDIT_LOG);
             $noContextFiles = (bool) $input->getOption(self::OPT_NO_CONTEXT_FILES);
+            $maxTimeStr = $input->getOption(self::OPT_MAX_TIME);
+            $maxTime = $maxTimeStr !== null ? (int) $maxTimeStr : null;
 
             if ($resumeDir !== null && $resumeDir !== '') {
                 $io->section(sprintf('🔄 Resuming session: %s', $resumeDir));
@@ -166,6 +170,7 @@ final class OrchestrateCommand extends Command
                     resumeDir: $resumeDir,
                     noAuditLog: $noAuditLog,
                     noContextFiles: $noContextFiles,
+                    maxTime: $maxTime,
                 ));
 
                 // Resume всегда резолвит exit code как dynamic — информация о типе цепочки не сохраняется в сессии.
@@ -202,6 +207,7 @@ final class OrchestrateCommand extends Command
                 resumeDir: null,
                 noAuditLog: $noAuditLog,
                 noContextFiles: $noContextFiles,
+                maxTime: $maxTime,
             ));
 
             // Генерация отчёта (если задан формат)
