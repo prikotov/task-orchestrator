@@ -168,6 +168,13 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
             $auditLogger,
         );
 
+        $execution->appendDiscussionHistory(
+            $this->journal->formatDiscussionEntry(
+                $context->facilitatorRole,
+                $turnResult->agentResult->getOutputText(),
+            ),
+        );
+
         $stepCost = $turnResult->agentResult->getCost();
         $execution->addRoleCost($context->facilitatorRole, $stepCost);
 
