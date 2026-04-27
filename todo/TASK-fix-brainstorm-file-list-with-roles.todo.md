@@ -10,7 +10,7 @@ epic: EPIC-fix-brainstorm-session-bugs
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Левша) (pi)
 branch: task/fix-brainstorm-file-list-with-roles
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/86
 status: in_progress
 ---
 
@@ -84,7 +84,7 @@ vendor/bin/psalm
 ## Инструкции для сабагента
 
 **Ветка:** task/fix-brainstorm-file-list-with-roles (уже создана и активна)
-**PR:** уже создан (draft) из task/fix-brainstorm-file-list-with-roles в fix/epic-brainstorm-session-bugs — будет заполнен после создания
+**PR:** уже создан (draft) из task/fix-brainstorm-file-list-with-roles в fix/epic-brainstorm-session-bugs — [PR #86](https://github.com/prikotov/task-orchestrator/pull/86)
 
 ### Порядок действий
 1. Переключись в ветку `task/fix-brainstorm-file-list-with-roles`: `git checkout task/fix-brainstorm-file-list-with-roles`
