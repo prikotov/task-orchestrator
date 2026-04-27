@@ -409,7 +409,7 @@ chains:
   brainstorm:
     type: dynamic
     description: "Фасилитируемый brainstorm с конструктивным конфликтом"
-    timeout: 3600
+    timeout: 600
     facilitator: team_lead_alex
     participants: [system_architect_gandalf, system_architect_loki, backend_developer_tony]
     max_rounds: 20

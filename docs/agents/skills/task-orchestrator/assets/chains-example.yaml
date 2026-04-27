@@ -323,7 +323,7 @@ chains:
   # brainstorm:
   #   type: dynamic
   #   description: "Фасилитируемый brainstorm"
-  #   timeout: 3600                # Общий таймаут цепочки (секунды)
+  #   timeout: 600                # Общий таймаут цепочки (секунды)
   #   facilitator: analyst         # Роль фасилитатора
   #   participants: [developer, reviewer]
   #   max_rounds: 10               # Максимум раундов

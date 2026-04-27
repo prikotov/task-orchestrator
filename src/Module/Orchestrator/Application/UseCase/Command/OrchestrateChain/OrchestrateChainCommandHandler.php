@@ -31,7 +31,7 @@ use function count;
 class OrchestrateChainCommandHandler
 {
     /** @var int Дефолтный таймаут (секунды) для dynamic-цепочки при отсутствии CLI и chain timeout */
-    private const int DEFAULT_DYNAMIC_TIMEOUT = 1800;
+    private const int DEFAULT_DYNAMIC_TIMEOUT = 600;
 
     /** @var int Дефолтный таймаут (секунды) для static-цепочки при отсутствии CLI timeout */
     private const int DEFAULT_STATIC_TIMEOUT = 300;
