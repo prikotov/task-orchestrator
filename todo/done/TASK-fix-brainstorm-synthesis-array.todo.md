@@ -11,7 +11,7 @@ author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Левша) (pi)
 branch: task/fix-brainstorm-synthesis-array
 pr: https://github.com/prikotov/task-orchestrator/pull/84
-status: in_progress
+status: done
 ---
 
 # TASK-fix-brainstorm-synthesis-array: Исправление бага synthesis=«Array» в result.md
