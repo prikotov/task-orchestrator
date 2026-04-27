@@ -26,9 +26,10 @@ php bin/console app:agent:orchestrate <task> [options]
 | `--model` | `-m` | Модель LLM | — |
 | `--working-dir` | `-d` | Рабочая директория проекта | — |
 | `--dry-run` | — | Показать план цепочки без запуска | — |
-| `--timeout` | `-t` | Таймаут на один шаг (секунды) | `1800` |
+| `--timeout` | `-t` | Таймаут на один шаг (секунды) | `600` |
 | `--topic` | — | Тема для dynamic-цепочки (по умолчанию = task) | — |
 | `--max-rounds` | — | Макс. раундов (dynamic) | — |
+| `--max-time` | — | Макс. время сессии в секундах (dynamic, переопределяет chains.yaml) | `3600` |
 | `--facilitator` | — | Роль фасилитатора (dynamic) | — |
 | `--participants` | — | Участники через запятую (dynamic) | — |
 | `--resume` | — | Путь к директории сессии для resume | — |

@@ -525,7 +525,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function invokeDynamicDefaultsTo1800WhenNoTimeoutAnyWhere(): void
+    public function invokeDynamicDefaultsTo600WhenNoTimeoutAnyWhere(): void
     {
         $chain = $this->createDynamicChain(
             name: 'no_timeout',
@@ -564,7 +564,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             task: 'Test',
         ));
 
-        self::assertSame(1800, $capturedTimeout);
+        self::assertSame(600, $capturedTimeout);
     }
 
     // --- Resume tests ---
@@ -777,7 +777,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function resumeDynamicFallsBackTo1800WhenNoTimeoutAnywhere(): void
+    public function resumeDynamicFallsBackTo600WhenNoTimeoutAnywhere(): void
     {
         $chain = $this->createDynamicChain(
             name: 'no_timeout',
@@ -833,7 +833,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             resumeDir: '/tmp/resume-dir',
         ));
 
-        self::assertSame(1800, $capturedTimeout);
+        self::assertSame(600, $capturedTimeout);
     }
 
     // --- Audit logger DI tests ---
@@ -1075,7 +1075,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         array $participants = ['participant'],
         int $maxRounds = 10,
         string $topic = 'test topic',
-        int $timeout = 1800,
+        int $timeout = 600,
     ): DynamicChainContextVo {
         return new DynamicChainContextVo(
             facilitatorRole: $facilitatorRole,

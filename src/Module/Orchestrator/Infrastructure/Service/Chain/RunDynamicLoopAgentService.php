@@ -72,7 +72,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             $round,
             $facilitatorRole,
             $facilitatorAppendPrompt,
-            '_1b_append.md',
+            '_2_append.md',
         );
 
         $request = new ChainRunRequestVo(
@@ -147,7 +147,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             $round,
             $role,
             $appendPromptContent,
-            '_1b_append.md',
+            '_2_append.md',
         );
 
         $request = new ChainRunRequestVo(
@@ -210,7 +210,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             $round,
             $facilitatorRole,
             $facilitatorAppendPrompt,
-            '_1b_append.md',
+            '_2_append.md',
         );
 
         $request = new ChainRunRequestVo(

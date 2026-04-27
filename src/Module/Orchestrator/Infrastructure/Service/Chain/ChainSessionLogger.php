@@ -124,17 +124,17 @@ final class ChainSessionLogger implements ChainSessionLoggerInterface
             $this->writeFile($this->currentSessionDir . '/' . $systemFile, $systemPrompt);
         }
 
-        // User prompt (файл #2)
-        $this->writeFile($this->currentSessionDir . '/' . $baseName . '_2_user.md', $userPrompt);
+        // User prompt (файл #3)
+        $this->writeFile($this->currentSessionDir . '/' . $baseName . '_3_user.md', $userPrompt);
 
-        // Response (файл #3)
-        $this->writeFile($this->currentSessionDir . '/' . $baseName . '_3_response.md', $response);
+        // Response (файл #4)
+        $this->writeFile($this->currentSessionDir . '/' . $baseName . '_4_response.md', $response);
 
         // Сохраняем пути + метрики для session.json
         $roundData = [
             'system' => $systemFile,
-            'user' => $baseName . '_2_user.md',
-            'response' => $baseName . '_3_response.md',
+            'user' => $baseName . '_3_user.md',
+            'response' => $baseName . '_4_response.md',
             'role' => $role,
             'is_facilitator' => $isFacilitator,
             'round' => $round,

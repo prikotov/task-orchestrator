@@ -4,14 +4,14 @@ type: chore
 created: 2026-04-23
 value: V2
 complexity: C2
-priority: P0
+priority: P2
 depends_on: TASK-chore-composer-library-type
 epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
 assignee:
 branch:
 pr:
-status: deferred
+status: backlog
 ---
 
 # TASK-chore-packagist-register: Регистрация пакета на Packagist

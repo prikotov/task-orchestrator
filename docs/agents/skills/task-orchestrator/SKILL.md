@@ -32,7 +32,7 @@ task-orchestrator app:agent:orchestrate [options] [--] <task>
 |-------|------------|----------|--------------|
 | `--chain` | `-c` | Имя цепочки из `chains.yaml` | `implement` |
 | `--working-dir` | `-d` | Рабочая директория | Текущая |
-| `--timeout` | `-t` | Таймаут на шаг (секунды) | `1800` |
+| `--timeout` | `-t` | Таймаут на шаг (секунды) | `600` |
 | `--dry-run` | — | Показать план без запуска | — |
 | `--config` | — | Путь к файлу `chains.yaml` (переопределяет путь по умолчанию) | — |
 | `--validate-config` | — | Проверить конфигурацию без запуска | — |
@@ -48,6 +48,7 @@ Dynamic-цепочки дополнительно:
 |-------|----------|--------------|
 | `--topic` | Тема обсуждения | = `<task>` |
 | `--max-rounds` | Максимум раундов | Из конфига |
+| `--max-time` | Макс. время сессии в секундах | `3600` |
 | `--facilitator` | Роль фасилитатора | Из конфига |
 | `--participants` | Участники через запятую | Из конфига |
 
@@ -105,7 +106,7 @@ task-orchestrator app:agent:orchestrate --chain=hotfix "Исправить NPE �
 task-orchestrator app:agent:orchestrate --report-format=json --report-file=report.json "Задача"
 
 # С увеличенным таймаутом
-task-orchestrator app:agent:orchestrate --timeout=3600 "Сложная задача"
+task-orchestrator app:agent:orchestrate --timeout=600 "Сложная задача"
 ```
 
 ### Dynamic-цепочка (brainstorm)

@@ -78,7 +78,7 @@ final readonly class FormatDynamicJournalService implements FormatDynamicJournal
         int $round,
     ): string {
         return sprintf(
-            "\n[%s %s] Step %d | Round %d | %s выступил\n",
+            "[%s %s] Step %d | Round %d | %s выступил\n",
             date('Y-m-d'),
             date('H:i:s'),
             $step,
