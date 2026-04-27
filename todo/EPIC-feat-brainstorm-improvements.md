@@ -73,7 +73,7 @@ flowchart LR
 
 ## 5. Implementation Plan (План реализации)
 
-- [ ] [TASK-feat-brainstorm-human-readable-protocol](TASK-feat-brainstorm-human-readable-protocol.todo.md) — Человекочитаемый формат discussion_history для фасилитатора (код) → **Бэкендер Левша**
+- [x] [TASK-feat-brainstorm-human-readable-protocol](done/TASK-feat-brainstorm-human-readable-protocol.todo.md) — Человекочитаемый формат discussion_history для фасилитатора (код) → **Бэкендер Левша** ✅
 - [ ] [TASK-feat-brainstorm-finalize-time-guarantee](TASK-feat-brainstorm-finalize-time-guarantee.todo.md) — Гарантия вызова finalize до истечения max_time (код) → **Бэкендер Левша**
 - [ ] [TASK-feat-brainstorm-participant-prompts](TASK-feat-brainstorm-participant-prompts.todo.md) — Лимиты + tools + структура ответа (промпты) → **Бэкендер Тони**
 - [ ] [TASK-feat-brainstorm-facilitator-prompts](TASK-feat-brainstorm-facilitator-prompts.todo.md) — Consensus call + декомпозиция темы (промпты) → **Бэкендер Тони**

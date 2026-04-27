@@ -169,9 +169,12 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         );
 
         $execution->appendDiscussionHistory(
-            $this->journal->formatDiscussionEntry(
+            $this->journal->formatFacilitatorDiscussionEntry(
                 $context->facilitatorRole,
-                $turnResult->agentResult->getOutputText(),
+                $facResponse->isDone(),
+                $facResponse->getNextRole(),
+                $facResponse->getChallenge(),
+                $facResponse->getSynthesis(),
             ),
         );
 
