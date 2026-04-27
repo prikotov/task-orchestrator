@@ -54,7 +54,7 @@ final readonly class ExecuteDynamicTurnService
             ? implode(
                 "\n",
                 array_map(
-                    static fn(string $path): string => "- {$path}",
+                    static fn(array $item): string => "- {$item['role']}: {$item['path']}",
                     $facResponsePaths,
                 ),
             )
@@ -146,7 +146,7 @@ final readonly class ExecuteDynamicTurnService
             ? implode(
                 "\n",
                 array_map(
-                    static fn(string $path): string => "- {$path}",
+                    static fn(array $item): string => "- {$item['role']}: {$item['path']}",
                     $prevResponsePaths,
                 ),
             )
@@ -210,7 +210,7 @@ final readonly class ExecuteDynamicTurnService
             ? implode(
                 "\n",
                 array_map(
-                    static fn(string $path): string => "- {$path}",
+                    static fn(array $item): string => "- {$item['role']}: {$item['path']}",
                     $facResponsePaths,
                 ),
             )

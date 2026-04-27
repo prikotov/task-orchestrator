@@ -9,9 +9,9 @@ depends_on:
 epic: EPIC-fix-brainstorm-session-bugs
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Левша) (pi)
-branch:
-pr:
-status: todo
+branch: task/fix-brainstorm-file-list-with-roles
+pr: https://github.com/prikotov/task-orchestrator/pull/86
+status: in_progress
 ---
 
 # TASK-fix-brainstorm-file-list-with-roles: Добавление ролей в список файлов выступлений
@@ -80,6 +80,20 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 `$roundData` уже содержит `role` (строка 155 в ChainSessionLogger.php) — нужно только использовать его при формировании списка файлов.
+
+## Инструкции для сабагента
+
+**Ветка:** task/fix-brainstorm-file-list-with-roles (уже создана и активна)
+**PR:** уже создан (draft) из task/fix-brainstorm-file-list-with-roles в fix/epic-brainstorm-session-bugs — [PR #86](https://github.com/prikotov/task-orchestrator/pull/86)
+
+### Порядок действий
+1. Переключись в ветку `task/fix-brainstorm-file-list-with-roles`: `git checkout task/fix-brainstorm-file-list-with-roles`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
