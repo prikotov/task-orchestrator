@@ -91,6 +91,7 @@ class OrchestrateChainCommandHandler
         $maxRounds = $command->maxRounds ?? $chain->getMaxRounds();
         $topic = $command->topic ?? $command->task;
         $timeout = $command->timeout ?? $chain->getTimeout() ?? self::DEFAULT_DYNAMIC_TIMEOUT;
+        $maxTime = $command->maxTime ?? $chain->getMaxTime();
 
         $sessionDir = $this->sessionLogger->startSession(
             $chain->getName(),
@@ -123,7 +124,7 @@ class OrchestrateChainCommandHandler
             $topic,
             $command->workingDir,
             $timeout,
-            $chain->getMaxTime(),
+            $maxTime,
         );
 
         $loopResult = $this->runDynamicLoop($chain, $context, auditLogger: $auditLogger);
@@ -170,7 +171,7 @@ class OrchestrateChainCommandHandler
             $state->getTopic(),
             $command->workingDir,
             $resumeTimeout,
-            $chain->getMaxTime(),
+            $command->maxTime ?? $chain->getMaxTime(),
         );
 
         $loopResult = $this->runDynamicLoop(

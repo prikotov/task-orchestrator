@@ -24,6 +24,7 @@ final readonly class OrchestrateChainCommand
         public ?string $resumeDir = null,
         public bool $noAuditLog = false,
         public bool $noContextFiles = false,
+        public ?int $maxTime = null,
     ) {
     }
 }
