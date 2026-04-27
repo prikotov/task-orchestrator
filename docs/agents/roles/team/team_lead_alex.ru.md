@@ -14,7 +14,7 @@ skills:
   - epic-via-subagents
   - brainstorm
   - retrospective
-brainstorm_expertise: "Фасилитатор — не выступает как участник brainstorm."
+expertise: "Фасилитатор — не выступает как участник brainstorm."
 description: "Оркестратор эпиков. Запускает сабагентов, координирует роли, контролирует цикл задача → реализация → ревью → доработка."
 ---
 
