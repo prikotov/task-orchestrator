@@ -8,10 +8,10 @@ priority: P1
 depends_on:
 epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
-assignee:
-branch:
-pr: https://github.com/prikotov/task-orchestrator/pull/76
-status: review
+assignee: Тех. писатель Гермиона (pi)
+branch: task/brainstorm-role-expertise
+pr: https://github.com/prikotov/task-orchestrator/pull/81
+status: done
 ---
 
 # TASK-feat-brainstorm-role-expertise: Зоны ответственности ролей в front matter файлов ролей
@@ -43,8 +43,8 @@ status: review
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Каждая роль имеет поле `brainstorm_expertise` в front matter с кратким описанием (1-2 предложения)
-- [ ] Описание сфокусировано на том, **какие вопросы** направлять роли, а не на общем описании роли
+- [x] Каждая роль имеет поле `brainstorm_expertise` в front matter с кратким описанием (1-2 предложения)
+- [x] Описание сфокусировано на том, **какие вопросы** направлять роли, а не на общем описании роли
 - [ ] Предлагаемый набор зон:
   - `system_architect_gandalf`: «Стратегическая архитектура, DDD-границы, bounded contexts, долгосрочные решения. Направлять вопросы: как это влияет на архитектуру в целом? какие долгосрочные последствия?»
   - `system_architect_loki`: «Альтернативные решения, поиск слепых зон, критика текущего плана. Направлять вопросы: какие альтернативы? что мы упускаем? где слабые места?»
@@ -66,12 +66,12 @@ status: review
 *Заполняется исполнителем перед стартом.*
 1. [ ] Прочитать front matter каждого файла роли
 2. [ ] Добавить поле `brainstorm_expertise` в каждый файл
-3. [ ] При необходимости обновить `facilitator_append.txt` ссылкой на expertise
+3. [x] При необходимости обновить `facilitator_append.txt` ссылкой на expertise
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Все 10 файлов ролей содержат `brainstorm_expertise` в front matter
-- [ ] Описания уникальны для каждой роли (не дублируются)
-- [ ] Изменения — только docs, проверки не требуются
+- [x] Все 10 файлов ролей содержат `brainstorm_expertise` в front matter
+- [x] Описания уникальны для каждой роли (не дублируются)
+- [x] Изменения — только docs, проверки не требуются
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -89,6 +89,19 @@ grep -l "brainstorm_expertise" docs/agents/roles/team/*.ru.md | wc -l
 
 ## 9. Comments (Комментарии)
 Задача — docs-only. Проверки PHPUnit/Psalm можно пропустить.
+
+## Инструкции для сабагента
+
+**Ветка:** `task/brainstorm-role-expertise` (уже создана и активна)
+**PR:** уже создан (draft) из `task/brainstorm-role-expertise` в `feat/brainstorm-improvements`
+
+### Порядок действий
+1. Переключись в ветку `task/brainstorm-role-expertise`: `git checkout task/brainstorm-role-expertise`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

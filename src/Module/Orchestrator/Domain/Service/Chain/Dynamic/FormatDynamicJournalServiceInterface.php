@@ -46,4 +46,18 @@ interface FormatDynamicJournalServiceInterface
         string $role,
         string $outputText,
     ): string;
+
+    /**
+     * Форматирует человекочитаемую запись discussion history для facilitator turn.
+     *
+     * Вместо сырого JSON-ответа фасилитатора записывает понятное описание действия:
+     * «Дал слово <role>. Вызов: <challenge>» или «Завершил обсуждение».
+     */
+    public function formatFacilitatorDiscussionEntry(
+        string $facilitatorRole,
+        bool $done,
+        ?string $nextRole,
+        ?string $challenge,
+        ?string $synthesis,
+    ): string;
 }

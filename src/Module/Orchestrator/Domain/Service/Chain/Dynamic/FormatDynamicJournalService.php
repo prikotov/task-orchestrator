@@ -94,4 +94,27 @@ final readonly class FormatDynamicJournalService implements FormatDynamicJournal
     ): string {
         return sprintf("\n\n# 👤 %s\n\n%s", $role, $outputText);
     }
+
+    #[Override]
+    public function formatFacilitatorDiscussionEntry(
+        string $facilitatorRole,
+        bool $done,
+        ?string $nextRole,
+        ?string $challenge,
+        ?string $synthesis,
+    ): string {
+        if ($done) {
+            $text = $synthesis !== null
+                ? sprintf('Завершил обсуждение. Synthesis: %s', $synthesis)
+                : 'Завершил обсуждение.';
+        } elseif ($nextRole !== null) {
+            $text = $challenge !== null && $challenge !== ''
+                ? sprintf('Дал слово %s. Вызов: %s', $nextRole, $challenge)
+                : sprintf('Дал слово %s.', $nextRole);
+        } else {
+            $text = 'Ожидание участников.';
+        }
+
+        return sprintf("\n\n# 🎯 %s\n\n%s", $facilitatorRole, $text);
+    }
 }
