@@ -101,17 +101,36 @@ final class PromptFormatterServiceTest extends TestCase
     #[Test]
     public function buildParticipantUserPromptRemovesSectionWhenNoPreviousResponses(): void
     {
-        $template = "Topic: %s Files: %s\n\n# Выступления предыдущих участников:\n";
+        $template = "# Тема:\n%s\n\n# Выступления предыдущих участников (файлы):\n%s\n\nРекомендуется начать с последних файлов — в них самая актуальная позиция и свежие аргументы. Более ранние выступления читай по необходимости.";
 
         $result = $this->service->buildParticipantUserPrompt(
             userPromptTemplate: $template,
             topic: 'Architecture',
-            responseFilesList: 'file.md',
+            responseFilesList: '',
             hasPreviousResponses: false,
             challenge: null,
         );
 
         self::assertStringNotContainsString('Выступления предыдущих участников', $result);
+        self::assertStringNotContainsString('Рекомендуется начать', $result);
+    }
+
+    #[Test]
+    public function buildParticipantUserPromptKeepsSectionWhenHasPreviousResponses(): void
+    {
+        $template = "# Тема:\n%s\n\n# Выступления предыдущих участников (файлы):\n%s\n\nРекомендуется начать с последних файлов — в них самая актуальная позиция и свежие аргументы. Более ранние выступления читай по необходимости.";
+
+        $result = $this->service->buildParticipantUserPrompt(
+            userPromptTemplate: $template,
+            topic: 'Architecture',
+            responseFilesList: "- file1.md\n- file2.md",
+            hasPreviousResponses: true,
+            challenge: null,
+        );
+
+        self::assertStringContainsString('Выступления предыдущих участников', $result);
+        self::assertStringContainsString('Рекомендуется начать', $result);
+        self::assertStringContainsString('file1.md', $result);
     }
 
     #[Test]
