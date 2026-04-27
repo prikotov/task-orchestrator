@@ -8,11 +8,10 @@ priority: P0
 depends_on:
 epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
-assignee:
-dependencies: []
-branch:
+assignee: Бэкендер Левша (pi)
+branch: task/brainstorm-human-readable-protocol
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-brainstorm-human-readable-protocol: Человекочитаемый формат discussion_history для фасилитатора
@@ -76,6 +75,19 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 Проблема обнаружена при ретроспективе brainstorm 2026-04-27: discussion_history на 200K содержит JSON-блоки фасилитатора, которые нечитаемы для человека. Участники пишут prose — с ними всё ок.
+
+## Инструкции для сабагента
+
+**Ветка:** `task/brainstorm-human-readable-protocol` (уже создана и активна)
+**PR:** будет создан (draft) из `task/brainstorm-human-readable-protocol` в `feat/brainstorm-improvements`
+
+### Порядок действий
+1. Переключись в ветку `task/brainstorm-human-readable-protocol`: `git checkout task/brainstorm-human-readable-protocol`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
