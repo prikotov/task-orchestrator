@@ -8,7 +8,7 @@ priority: P1
 author: Тимлид (Алекс) (pi)
 assignee: Тимлид (Алекс) (pi)
 status: todo
-branch:
+branch: fix/epic-brainstorm-session-bugs
 pr:
 ---
 
