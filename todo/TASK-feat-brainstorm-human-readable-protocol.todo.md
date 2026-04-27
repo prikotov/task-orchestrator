@@ -79,7 +79,7 @@ vendor/bin/psalm
 ## Инструкции для сабагента
 
 **Ветка:** `task/brainstorm-human-readable-protocol` (уже создана и активна)
-**PR:** будет создан (draft) из `task/brainstorm-human-readable-protocol` в `feat/brainstorm-improvements`
+**PR:** уже создан (draft) из `task/brainstorm-human-readable-protocol` в `feat/brainstorm-improvements` — [PR #77](https://github.com/prikotov/task-orchestrator/pull/77)
 
 ### Порядок действий
 1. Переключись в ветку `task/brainstorm-human-readable-protocol`: `git checkout task/brainstorm-human-readable-protocol`
