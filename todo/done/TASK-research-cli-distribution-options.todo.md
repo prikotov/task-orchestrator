@@ -11,7 +11,7 @@ author: Бэкендер (Левша)
 assignee: Архитектор (Зевс)
 branch: task/research-cli-distribution
 pr:
-status: review
+status: done
 ---
 
 # TASK-research-cli-distribution-options: Мозговой штурм — варианты дистрибуции task-orchestrator как CLI-утилиты

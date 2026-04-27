@@ -23,13 +23,11 @@ roles:
       - -p
       - --no-session
       - --model
-      - glm-4.7
+      - glm-5.1
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
       - "@append-system-prompt"
-      - --tools
-      - "read,grep,find,ls"
 
   system_architect_gandalf:
     prompt_file: docs/agents/roles/team/system_architect_gandalf.ru.md
@@ -40,13 +38,11 @@ roles:
       - -p
       - --no-session
       - --model
-      - glm-5-turbo
+      - glm-5.1
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
       - "@append-system-prompt"
-      - --tools
-      - "read,grep,find,ls"
 
   system_architect_loki:
     prompt_file: docs/agents/roles/team/system_architect_loki.ru.md
@@ -62,8 +58,6 @@ roles:
       - "@system-prompt"
       - --append-system-prompt
       - "@append-system-prompt"
-      - --tools
-      - "read,grep,find,ls"
 
   backend_developer_levsha:
     prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
@@ -74,9 +68,11 @@ roles:
       - -p
       - --no-session
       - --model
-      - glm-5-turbo
+      - glm-5.1
       - --system-prompt
       - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
 
   backend_developer_tony:
     prompt_file: docs/agents/roles/team/backend_developer_tony.ru.md
@@ -90,6 +86,8 @@ roles:
       - glm-5-turbo
       - --system-prompt
       - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
 
   code_reviewer_backend_puaro:
     prompt_file: docs/agents/roles/team/code_reviewer_backend_puaro.ru.md
@@ -100,9 +98,11 @@ roles:
       - -p
       - --no-session
       - --model
-      - glm-5-turbo
+      - glm-5.1
       - --system-prompt
       - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
 
   qa_backend_house:
     prompt_file: docs/agents/roles/team/qa_backend_house.ru.md
@@ -113,9 +113,11 @@ roles:
       - -p
       - --no-session
       - --model
-      - glm-4.7
+      - glm-5.1
       - --system-prompt
       - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
 
   technical_writer_hermione:
     prompt_file: docs/agents/roles/team/technical_writer_hermione.ru.md
@@ -126,7 +128,7 @@ roles:
       - -p
       - --no-session
       - --model
-      - glm-4.7
+      - glm-5.1
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -141,9 +143,11 @@ roles:
       - -p
       - --no-session
       - --model
-      - glm-4.7
+      - glm-5-turbo
       - --system-prompt
       - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
 
   # ──────────────────────────────────────────────────────────────────────────────
   # Примеры конфигурации ролей с другими CLI-раннерами
@@ -405,11 +409,11 @@ chains:
   brainstorm:
     type: dynamic
     description: "Фасилитируемый brainstorm с конструктивным конфликтом"
-    timeout: 3600
+    timeout: 600
     facilitator: team_lead_alex
     participants: [system_architect_gandalf, system_architect_loki, backend_developer_tony]
     max_rounds: 20
-    max_time: 1800
+    max_time: 3600
     prompts:
       brainstorm_system: prompts/brainstorm/brainstorm_system.txt
       facilitator_append: prompts/brainstorm/facilitator_append.txt

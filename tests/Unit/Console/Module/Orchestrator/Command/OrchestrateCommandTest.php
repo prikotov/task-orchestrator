@@ -121,7 +121,7 @@ final class OrchestrateCommandTest extends TestCase
             ));
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--timeout' => '3600', '--report-format' => 'none']);
+        $tester->execute(['task' => 'test', '--timeout' => '600', '--report-format' => 'none']);
 
         self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
     }

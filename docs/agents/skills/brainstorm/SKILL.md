@@ -60,7 +60,8 @@ description: >
 | `--facilitator`    |            | Роль фасилитатора (dynamic)                  | имя роли              | `team_lead_alex` ¹                   |
 | `--participants`   |            | Участники через запятую (dynamic)            | имена ролей           | `system_architect_gandalf,...` ¹     |
 | `--max-rounds`     |            | Макс. раундов обсуждения (dynamic)           | число                 | `20` ¹                               |
-| `--timeout`        | `-t`       | Таймаут на шаг, секунды                      | число                 | `3600` ¹                             |
+| `--timeout`        | `-t`       | Таймаут на шаг, секунды                      | число                 | `600` ¹                               |
+| `--max-time`       |            | Макс. время сессии, секунды (dynamic)        | число                 | `3600` ¹                              |
 | `--topic`          |            | Тема (если отличается от аргумента task)     | текст                 | = task                               |
 | `--dry-run`        |            | Показать план без запуска                    | —                     | выкл                                 |
 | `--report-format`  |            | Формат отчёта                                | `text`, `json`, `none`| `text`                               |
@@ -92,7 +93,7 @@ description: >
         --facilitator=team_lead_alex \
         --participants=backend_developer_levsha,system_architect_gandalf \
         --report-format=text \
-        --report-file=docs/brainstorm/cache-strategy.md
+        --report-file=var/sessions/brainstorm/cache-strategy-$(date +%Y-%m-%d_%H-%M-%S).md
 
     # Dry run — посмотреть план без запуска
     php bin/console app:agent:orchestrate "Паттерн retry" --chain=brainstorm --dry-run
@@ -130,6 +131,7 @@ Brainstorm может быть прерван по таймауту шага, и
 
 - Опции `--facilitator`, `--participants`, `--max-rounds`, `--topic` **игнорируются** — используются значения из прерванной сессии, сменить состав участников нельзя.
 - `--timeout` **действует** — можно увеличить таймаут, если сессия прервалась по лимиту на шаг.
+- `--max-time` **действует** — можно увеличить общее время сессии, если она прервалась по `max_time_exceeded`.
 - `--chain` **должен совпадать** с исходной цепочкой (обычно `brainstorm`).
 - Аргумент `task` обязательный, но при resume используется только как контекст для фасилитатора — фактическая тема берётся из сессии.
 - Resume можно вызывать несколько раз: если после resume сессия снова прервалась — можно сделать resume повторно.
