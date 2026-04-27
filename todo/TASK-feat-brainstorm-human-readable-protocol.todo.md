@@ -10,8 +10,8 @@ epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
 assignee:
 branch:
-pr:
-status: todo
+pr: https://github.com/prikotov/task-orchestrator/pull/76
+status: review
 ---
 
 # TASK-feat-brainstorm-human-readable-protocol: Человекочитаемый формат discussion_history для фасилитатора

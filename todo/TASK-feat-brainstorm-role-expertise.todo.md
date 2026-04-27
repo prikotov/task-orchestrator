@@ -10,8 +10,8 @@ epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
 assignee:
 branch:
-pr:
-status: todo
+pr: https://github.com/prikotov/task-orchestrator/pull/76
+status: review
 ---
 
 # TASK-feat-brainstorm-role-expertise: Зоны ответственности ролей в front matter файлов ролей

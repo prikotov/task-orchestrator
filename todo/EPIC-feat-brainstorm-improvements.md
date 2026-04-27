@@ -8,7 +8,7 @@ priority: P1
 author: Тимлид (Алекс) (pi)
 assignee: Тимлид (Алекс) (pi)
 status: todo
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/76
 ---
 
 # EPIC-feat-brainstorm-improvements: Улучшение процесса brainstorm-сессий

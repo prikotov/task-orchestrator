@@ -10,8 +10,8 @@ epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
 assignee:
 branch:
-pr:
-status: todo
+pr: https://github.com/prikotov/task-orchestrator/pull/76
+status: review
 ---
 
 # TASK-feat-brainstorm-participant-prompts: Лимиты ответов, напоминание о tools, структура ответа участников
