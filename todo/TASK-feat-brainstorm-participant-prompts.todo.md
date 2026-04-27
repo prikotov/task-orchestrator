@@ -82,7 +82,7 @@ vendor/bin/psalm
 ## Инструкции для сабагента
 
 **Ветка:** `task/brainstorm-participant-prompts` (уже создана и активна)
-**PR:** уже создан (draft) из `task/brainstorm-participant-prompts` в `feat/brainstorm-improvements`
+**PR:** уже создан (draft) из `task/brainstorm-participant-prompts` в `feat/brainstorm-improvements` — [PR #79](https://github.com/prikotov/task-orchestrator/pull/79)
 
 ### Порядок действий
 1. Переключись в ветку `task/brainstorm-participant-prompts`: `git checkout task/brainstorm-participant-prompts`
