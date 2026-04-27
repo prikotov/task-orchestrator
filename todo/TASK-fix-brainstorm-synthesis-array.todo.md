@@ -10,7 +10,7 @@ epic: EPIC-fix-brainstorm-session-bugs
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Левша) (pi)
 branch: task/fix-brainstorm-synthesis-array
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/84
 status: in_progress
 ---
 
@@ -72,7 +72,7 @@ vendor/bin/psalm
 ## Инструкции для сабагента
 
 **Ветка:** task/fix-brainstorm-synthesis-array (уже создана и активна)
-**PR:** уже создан (draft) из task/fix-brainstorm-synthesis-array в fix/epic-brainstorm-session-bugs — будет заполнен после создания
+**PR:** уже создан (draft) из task/fix-brainstorm-synthesis-array в fix/epic-brainstorm-session-bugs — [PR #84](https://github.com/prikotov/task-orchestrator/pull/84)
 
 ### Порядок действий
 1. Переключись в ветку `task/fix-brainstorm-synthesis-array`: `git checkout task/fix-brainstorm-synthesis-array`
