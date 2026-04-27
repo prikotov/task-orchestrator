@@ -10,8 +10,8 @@ epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/brainstorm-finalize-time-guarantee
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/78
+status: done
 ---
 
 # TASK-feat-brainstorm-finalize-time-guarantee: Гарантия вызова finalize до истечения max_time
