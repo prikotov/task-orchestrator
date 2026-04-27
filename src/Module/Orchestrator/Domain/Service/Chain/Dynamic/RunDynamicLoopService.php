@@ -78,9 +78,10 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
             // Проверка: хватит ли оставшегося времени на finalize перед следующим раундом
             if ($this->shouldReserveForFinalize($context->maxTime, $startTime)) {
                 $execution->markMaxTimeExceeded();
-                $reserve = $context->maxTime !== null
-                    ? self::calculateFinalizeReserve($context->maxTime)
-                    : 0;
+                // shouldReserveForFinalize returns false when maxTime is null,
+                // so maxTime is guaranteed non-null here.
+                \assert($context->maxTime !== null);
+                $reserve = self::calculateFinalizeReserve($context->maxTime);
                 $this->logger?->info('Discussion stopped: reserving time for synthesis.', [
                     'maxTime' => $context->maxTime,
                     'elapsed' => round(microtime(true) - $startTime, 1),
@@ -499,5 +500,4 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
             (int) round((float) $maxTime * self::FINALIZE_RESERVE_PERCENT),
         );
     }
-
 }

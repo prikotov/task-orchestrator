@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopService;
 
 #[CoversClass(RunDynamicLoopService::class)]
@@ -135,5 +136,27 @@ final class RunDynamicLoopServiceFinalizeReserveTest extends TestCase
         self::assertSame(180, RunDynamicLoopService::calculateFinalizeReserve(1800));
         // maxTime=5400 → 540
         self::assertSame(540, RunDynamicLoopService::calculateFinalizeReserve(5400));
+    }
+
+    // ─── shouldReserveForFinalize backward compatibility ────────────
+
+    /**
+     * При maxTime=null shouldReserveForFinalize должен возвращать false,
+     * чтобы цикл продолжался без резервирования — backward compatible.
+     */
+    #[Test]
+    public function shouldReserveForFinalizeReturnsFalseWhenMaxTimeIsNull(): void
+    {
+        $method = new ReflectionMethod(RunDynamicLoopService::class, 'shouldReserveForFinalize');
+        $method->setAccessible(true);
+
+        $service = (new \ReflectionClass(RunDynamicLoopService::class))
+            ->newInstanceWithoutConstructor();
+
+        $startTime = microtime(true) - 1000.0; // много времени прошло
+
+        $result = $method->invoke($service, null, $startTime);
+
+        self::assertFalse($result, 'shouldReserveForFinalize must return false when maxTime is null (backward compatible)');
     }
 }
