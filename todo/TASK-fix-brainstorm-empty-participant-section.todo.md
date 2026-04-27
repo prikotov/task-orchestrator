@@ -10,7 +10,7 @@ epic: EPIC-fix-brainstorm-session-bugs
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Левша) (pi)
 branch: task/fix-brainstorm-empty-participant-section
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/85
 status: in_progress
 ---
 
@@ -88,7 +88,7 @@ vendor/bin/psalm
 ## Инструкции для сабагента
 
 **Ветка:** task/fix-brainstorm-empty-participant-section (уже создана и активна)
-**PR:** уже создан (draft) из task/fix-brainstorm-empty-participant-section в fix/epic-brainstorm-session-bugs — будет заполнен после создания
+**PR:** уже создан (draft) из task/fix-brainstorm-empty-participant-section в fix/epic-brainstorm-session-bugs — [PR #85](https://github.com/prikotov/task-orchestrator/pull/85)
 
 ### Порядок действий
 1. Переключись в ветку `task/fix-brainstorm-empty-participant-section`: `git checkout task/fix-brainstorm-empty-participant-section`
