@@ -8,11 +8,10 @@ priority: P1
 depends_on:
 epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
-assignee:
-dependencies: []
-branch:
+assignee: Тех. писатель Гермиона (pi)
+branch: task/brainstorm-role-expertise
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-brainstorm-role-expertise: Зоны ответственности ролей в front matter файлов ролей
@@ -90,6 +89,19 @@ grep -l "brainstorm_expertise" docs/agents/roles/team/*.ru.md | wc -l
 
 ## 9. Comments (Комментарии)
 Задача — docs-only. Проверки PHPUnit/Psalm можно пропустить.
+
+## Инструкции для сабагента
+
+**Ветка:** `task/brainstorm-role-expertise` (уже создана и активна)
+**PR:** уже создан (draft) из `task/brainstorm-role-expertise` в `feat/brainstorm-improvements`
+
+### Порядок действий
+1. Переключись в ветку `task/brainstorm-role-expertise`: `git checkout task/brainstorm-role-expertise`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
