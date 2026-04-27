@@ -327,7 +327,7 @@ chains:
   #   facilitator: analyst         # Роль фасилитатора
   #   participants: [developer, reviewer]
   #   max_rounds: 10               # Максимум раундов
-  #   max_time: 1800               # Максимум времени (секунды)
+  #   max_time: 3600               # Максимум времени (секунды)
   #   prompts:
   #     brainstorm_system: prompts/brainstorm/brainstorm_system.txt
   #     facilitator_append: prompts/brainstorm/facilitator_append.txt

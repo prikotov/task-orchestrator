@@ -413,6 +413,7 @@ chains:
     facilitator: team_lead_alex
     participants: [system_architect_gandalf, system_architect_loki, backend_developer_tony]
     max_rounds: 20
+    max_time: 3600
     prompts:
       brainstorm_system: prompts/brainstorm/brainstorm_system.txt
       facilitator_append: prompts/brainstorm/facilitator_append.txt

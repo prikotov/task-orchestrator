@@ -61,7 +61,7 @@ description: >
 | `--participants`   |            | Участники через запятую (dynamic)            | имена ролей           | `system_architect_gandalf,...` ¹     |
 | `--max-rounds`     |            | Макс. раундов обсуждения (dynamic)           | число                 | `20` ¹                               |
 | `--timeout`        | `-t`       | Таймаут на шаг, секунды                      | число                 | `600` ¹                               |
-| `--max-time`       |            | Макс. время сессии, секунды (dynamic)        | число                 | из `chains.yaml` ¹                   |
+| `--max-time`       |            | Макс. время сессии, секунды (dynamic)        | число                 | `3600` ¹                              |
 | `--topic`          |            | Тема (если отличается от аргумента task)     | текст                 | = task                               |
 | `--dry-run`        |            | Показать план без запуска                    | —                     | выкл                                 |
 | `--report-format`  |            | Формат отчёта                                | `text`, `json`, `none`| `text`                               |
