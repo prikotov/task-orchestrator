@@ -74,7 +74,7 @@ flowchart TD
 - [x] Все задачи Must Have выполнены и протестированы
 - [x] PHPUnit проходит без регрессий
 - [x] Psalm проходит без новых ошибок
-- [ ] Ретроспектива записана в `docs/agents/team-retro/`
+- [x] Ретроспектива записана в `docs/agents/team-retro/`
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
 - [x] Изменения backward compatible, никаких миграций
