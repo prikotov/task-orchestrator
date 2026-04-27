@@ -7,7 +7,7 @@ complexity: C2
 priority: P1
 author: Тимлид (Алекс) (pi)
 assignee: Тимлид (Алекс) (pi)
-status: in_progress
+status: done
 branch: feat/brainstorm-improvements
 pr:
 ---
