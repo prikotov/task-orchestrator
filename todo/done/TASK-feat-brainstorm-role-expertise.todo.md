@@ -10,7 +10,7 @@ epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
 assignee: Тех. писатель Гермиона (pi)
 branch: task/brainstorm-role-expertise
-pr: #68
+pr: https://github.com/prikotov/task-orchestrator/pull/81
 status: done
 ---
 
