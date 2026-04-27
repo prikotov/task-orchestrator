@@ -9,6 +9,7 @@ personality:
   belbin: ["Teamworker", "Completer Finisher"]
   adizes: ["A"]
   big_five: "O5 C8 E4 A8 N2"
+brainstorm_expertise: "Документация, контракты, описание API. Направлять вопросы: как это задокументировать?"
 description: "Отвечает за пользовательскую документацию, release notes и встроенную справку."
 ---
 
