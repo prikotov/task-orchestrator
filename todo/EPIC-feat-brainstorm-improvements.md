@@ -7,8 +7,9 @@ complexity: C2
 priority: P1
 author: Тимлид (Алекс) (pi)
 assignee: Тимлид (Алекс) (pi)
-status: todo
-pr: https://github.com/prikotov/task-orchestrator/pull/76
+status: in_progress
+branch: feat/brainstorm-improvements
+pr:
 ---
 
 # EPIC-feat-brainstorm-improvements: Улучшение процесса brainstorm-сессий
@@ -72,11 +73,11 @@ flowchart LR
 
 ## 5. Implementation Plan (План реализации)
 
-- [ ] [TASK-feat-brainstorm-human-readable-protocol](TASK-feat-brainstorm-human-readable-protocol.todo.md) — Человекочитаемый формат discussion_history для фасилитатора (код)
-- [ ] [TASK-feat-brainstorm-finalize-time-guarantee](TASK-feat-brainstorm-finalize-time-guarantee.todo.md) — Гарантия вызова finalize до истечения max_time (код)
-- [ ] [TASK-feat-brainstorm-participant-prompts](TASK-feat-brainstorm-participant-prompts.todo.md) — Лимиты + tools + структура ответа (промпты)
-- [ ] [TASK-feat-brainstorm-facilitator-prompts](TASK-feat-brainstorm-facilitator-prompts.todo.md) — Consensus call + декомпозиция темы (промпты)
-- [ ] [TASK-feat-brainstorm-role-expertise](TASK-feat-brainstorm-role-expertise.todo.md) — Зоны ответственности в front matter ролей (docs)
+- [ ] [TASK-feat-brainstorm-human-readable-protocol](TASK-feat-brainstorm-human-readable-protocol.todo.md) — Человекочитаемый формат discussion_history для фасилитатора (код) → **Бэкендер Левша**
+- [ ] [TASK-feat-brainstorm-finalize-time-guarantee](TASK-feat-brainstorm-finalize-time-guarantee.todo.md) — Гарантия вызова finalize до истечения max_time (код) → **Бэкендер Левша**
+- [ ] [TASK-feat-brainstorm-participant-prompts](TASK-feat-brainstorm-participant-prompts.todo.md) — Лимиты + tools + структура ответа (промпты) → **Бэкендер Тони**
+- [ ] [TASK-feat-brainstorm-facilitator-prompts](TASK-feat-brainstorm-facilitator-prompts.todo.md) — Consensus call + декомпозиция темы (промпты) → **Бэкендер Тони**
+- [ ] [TASK-feat-brainstorm-role-expertise](TASK-feat-brainstorm-role-expertise.todo.md) — Зоны ответственности в front matter ролей (docs) → **Тех. писатель Гермиона**
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [ ] Все задачи Must Have выполнены

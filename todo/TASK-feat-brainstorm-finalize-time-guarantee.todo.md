@@ -9,9 +9,10 @@ depends_on:
 epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
 assignee:
+dependencies: []
 branch:
-pr: https://github.com/prikotov/task-orchestrator/pull/76
-status: review
+pr:
+status: todo
 ---
 
 # TASK-feat-brainstorm-finalize-time-guarantee: Гарантия вызова finalize до истечения max_time
