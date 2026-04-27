@@ -9,7 +9,7 @@ author: Тимлид (Алекс) (pi)
 assignee: Тимлид (Алекс) (pi)
 status: done
 branch: feat/brainstorm-improvements
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/82
 ---
 
 # EPIC-feat-brainstorm-improvements: Улучшение процесса brainstorm-сессий
