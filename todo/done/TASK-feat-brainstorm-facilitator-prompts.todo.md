@@ -8,11 +8,10 @@ priority: P1
 depends_on:
 epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
-assignee:
-dependencies: []
-branch:
-pr:
-status: todo
+assignee: Бэкендер Тони (pi)
+branch: task/brainstorm-facilitator-prompts
+pr: https://github.com/prikotov/task-orchestrator/pull/80
+status: done
 ---
 
 # TASK-feat-brainstorm-facilitator-prompts: Consensus call и декомпозиция темы для фасилитатора
@@ -77,6 +76,19 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 Проблема: в brainstorm 2026-04-27 раунды 9-13 (5 раундов из 13) ушли на спор о формате документа (plan в ADR vs Playbook) — вторичный вопрос, где консенсус был достигнут на раунде 8.
+
+## Инструкции для сабагента
+
+**Ветка:** `task/brainstorm-facilitator-prompts` (уже создана и активна)
+**PR:** уже создан (draft) из `task/brainstorm-facilitator-prompts` в `feat/brainstorm-improvements`
+
+### Порядок действий
+1. Переключись в ветку `task/brainstorm-facilitator-prompts`: `git checkout task/brainstorm-facilitator-prompts`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
