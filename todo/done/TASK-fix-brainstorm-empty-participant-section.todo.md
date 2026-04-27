@@ -11,7 +11,7 @@ author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Левша) (pi)
 branch: task/fix-brainstorm-empty-participant-section
 pr: https://github.com/prikotov/task-orchestrator/pull/85
-status: in_progress
+status: done
 ---
 
 # TASK-fix-brainstorm-empty-participant-section: Удаление пустой секции «Выступления предыдущих участников» в первом раунде
