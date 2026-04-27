@@ -29,6 +29,7 @@ php bin/console app:agent:orchestrate <task> [options]
 | `--timeout` | `-t` | Таймаут на один шаг (секунды) | `1800` |
 | `--topic` | — | Тема для dynamic-цепочки (по умолчанию = task) | — |
 | `--max-rounds` | — | Макс. раундов (dynamic) | — |
+| `--max-time` | — | Макс. время сессии в секундах (dynamic, переопределяет chains.yaml) | — |
 | `--facilitator` | — | Роль фасилитатора (dynamic) | — |
 | `--participants` | — | Участники через запятую (dynamic) | — |
 | `--resume` | — | Путь к директории сессии для resume | — |
