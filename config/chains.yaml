@@ -7,6 +7,8 @@ roles:
       - json
       - -p
       - --no-session
+      - --provider
+      - zai
       - --model
       - glm-5-turbo
       - --system-prompt
@@ -22,6 +24,8 @@ roles:
       - json
       - -p
       - --no-session
+      - --provider
+      - zai
       - --model
       - glm-5.1
       - --system-prompt
@@ -37,6 +41,8 @@ roles:
       - json
       - -p
       - --no-session
+      - --provider
+      - zai
       - --model
       - glm-5.1
       - --system-prompt
@@ -52,6 +58,8 @@ roles:
       - json
       - -p
       - --no-session
+      - --provider
+      - zai
       - --model
       - glm-5-turbo
       - --system-prompt
@@ -67,6 +75,8 @@ roles:
       - json
       - -p
       - --no-session
+      - --provider
+      - zai
       - --model
       - glm-5.1
       - --system-prompt
@@ -82,6 +92,8 @@ roles:
       - json
       - -p
       - --no-session
+      - --provider
+      - zai
       - --model
       - glm-5-turbo
       - --system-prompt
@@ -97,6 +109,8 @@ roles:
       - json
       - -p
       - --no-session
+      - --provider
+      - zai
       - --model
       - glm-5.1
       - --system-prompt
@@ -112,6 +126,8 @@ roles:
       - json
       - -p
       - --no-session
+      - --provider
+      - zai
       - --model
       - glm-5.1
       - --system-prompt
@@ -127,6 +143,8 @@ roles:
       - json
       - -p
       - --no-session
+      - --provider
+      - zai
       - --model
       - glm-5.1
       - --system-prompt
@@ -142,6 +160,8 @@ roles:
       - json
       - -p
       - --no-session
+      - --provider
+      - zai
       - --model
       - glm-5-turbo
       - --system-prompt
@@ -265,7 +285,7 @@ chains:
   #       - -p
   #       - --no-session
   #       - --model
-  #       - glm-5-turbo
+  #       - glm-5.1
   #       - --system-prompt
   #       - "@system-prompt"
   #     fallback:                            # Если pi недоступен → fallback runner
