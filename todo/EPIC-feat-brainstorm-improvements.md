@@ -7,8 +7,9 @@ complexity: C2
 priority: P1
 author: Тимлид (Алекс) (pi)
 assignee: Тимлид (Алекс) (pi)
-status: todo
-pr: https://github.com/prikotov/task-orchestrator/pull/76
+status: done
+branch: feat/brainstorm-improvements
+pr: https://github.com/prikotov/task-orchestrator/pull/82
 ---
 
 # EPIC-feat-brainstorm-improvements: Улучшение процесса brainstorm-сессий
@@ -35,19 +36,19 @@ pr: https://github.com/prikotov/task-orchestrator/pull/76
 ## 3. Requirements (Требования, MoSCoW)
 
 ### 🔴 Must Have (Блокирующие требования)
-- [ ] Фасилитатор пишет в discussion_history человекочитаемый текст, а не JSON
-- [ ] Финальный синтез (finalize) гарантированно вызывается до истечения max_time
-- [ ] Участники имеют лимит длины ответа (≤ 3000 символов) и времени (5-7 минут)
-- [ ] Участники знают о tools и могут проверять факты в коде
-- [ ] Фасилитатор имеет правило consensus call — фиксировать консенсус и двигаться дальше
+- [x] Фасилитатор пишет в discussion_history человекочитаемый текст, а не JSON
+- [x] Финальный синтез (finalize) гарантированно вызывается до истечения max_time
+- [x] Участники имеют лимит длины ответа (≤ 3000 символов) и времени (5-7 минут)
+- [x] Участники знают о tools и могут проверять факты в коде
+- [x] Фасилитатор имеет правило consensus call — фиксировать консенсус и двигаться дальше
 
 ### 🟡 Should Have (Важные требования)
-- [ ] Фасилитатор декомпозирует тему на подвопросы в начале сессии
-- [ ] Зоны ответственности ролей прописаны в front matter файлов ролей
-- [ ] Ответ участника имеет структурированный формат (Позиция → Аргумент → Контраргумент → Что принимаешь)
+- [x] Фасилитатор декомпозирует тему на подвопросы в начале сессии
+- [x] Зоны ответственности ролей прописаны в front matter файлов ролей
+- [x] Ответ участника имеет структурированный формат (Позиция → Аргумент → Контраргумент → Что принимаешь)
 
 ### 🟢 Could Have (Желательно)
-- [ ] SKILL.md обновлён с рекомендациями по memory_limit
+- [ ] SKILL.md обновлён с рекомендациями по memory_limit — отложено
 
 ### ⚫ Won't Have (Не в этот раз)
 - [ ] Суммаризация контекста (не требуется — архитектура уже использует списки файлов)
@@ -72,21 +73,21 @@ flowchart LR
 
 ## 5. Implementation Plan (План реализации)
 
-- [ ] [TASK-feat-brainstorm-human-readable-protocol](TASK-feat-brainstorm-human-readable-protocol.todo.md) — Человекочитаемый формат discussion_history для фасилитатора (код)
-- [ ] [TASK-feat-brainstorm-finalize-time-guarantee](TASK-feat-brainstorm-finalize-time-guarantee.todo.md) — Гарантия вызова finalize до истечения max_time (код)
-- [ ] [TASK-feat-brainstorm-participant-prompts](TASK-feat-brainstorm-participant-prompts.todo.md) — Лимиты + tools + структура ответа (промпты)
-- [ ] [TASK-feat-brainstorm-facilitator-prompts](TASK-feat-brainstorm-facilitator-prompts.todo.md) — Consensus call + декомпозиция темы (промпты)
-- [ ] [TASK-feat-brainstorm-role-expertise](TASK-feat-brainstorm-role-expertise.todo.md) — Зоны ответственности в front matter ролей (docs)
+- [x] [TASK-feat-brainstorm-human-readable-protocol](done/TASK-feat-brainstorm-human-readable-protocol.todo.md) — Человекочитаемый формат discussion_history для фасилитатора (код) → **Бэкендер Левша** ✅
+- [x] [TASK-feat-brainstorm-finalize-time-guarantee](done/TASK-feat-brainstorm-finalize-time-guarantee.todo.md) — Гарантия вызова finalize до истечения max_time (код) → **Бэкендер Левша** ✅
+- [x] [TASK-feat-brainstorm-participant-prompts](done/TASK-feat-brainstorm-participant-prompts.todo.md) — Лимиты + tools + структура ответа (промпты) → **Бэкендер Тони** ✅
+- [x] [TASK-feat-brainstorm-facilitator-prompts](done/TASK-feat-brainstorm-facilitator-prompts.todo.md) — Consensus call + декомпозиция темы (промпты) → **Бэкендер Тони** ✅
+- [x] [TASK-feat-brainstorm-role-expertise](done/TASK-feat-brainstorm-role-expertise.todo.md) — Зоны ответственности в front matter ролей (docs) → **Тех. писатель Гермиона**
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [ ] Все задачи Must Have выполнены
-- [ ] PHPUnit проходит
-- [ ] Psalm проходит
-- [ ] Внесённые изменения не ломают существующие цепочки (implement и другие)
+- [x] Все задачи Must Have выполнены
+- [x] PHPUnit проходит (519 тестов, 1379 assertions)
+- [x] Psalm проходит (0 новых ошибок, 1 pre-existing)
+- [x] Внесённые изменения не ломают существующие цепочки (implement и другие)
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
-- [ ] Изменения промптов и кода — backward compatible, никаких миграций
-- [ ] Рекомендуется обновить memory_limit до 2G при запуске brainstorm (описать в SKILL.md)
+- [x] Изменения промптов и кода — backward compatible, никаких миграций
+- [ ] Рекомендуется обновить memory_limit до 2G при запуске brainstorm (описать в SKILL.md) — отложено
 
 ## 8. Risks and Dependencies (Риски и зависимости)
 - Изменение `formatDiscussionEntry()` может сломать парсинг ответа фасилитатора — нужно убедиться, что JSON-парсинг (`FacilitatorResponse`) работает с системным промптом, а не с discussion_history

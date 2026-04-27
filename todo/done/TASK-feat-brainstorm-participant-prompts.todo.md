@@ -8,10 +8,10 @@ priority: P0
 depends_on:
 epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
-assignee:
-branch:
-pr: https://github.com/prikotov/task-orchestrator/pull/76
-status: review
+assignee: Бэкендер Тони (pi)
+branch: task/brainstorm-participant-prompts
+pr: https://github.com/prikotov/task-orchestrator/pull/79
+status: done
 ---
 
 # TASK-feat-brainstorm-participant-prompts: Лимиты ответов, напоминание о tools, структура ответа участников
@@ -78,6 +78,19 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 Текущие ответы участников: 12-18K символов, 130-196 строк. Целевые: ≤ 3000 символов. Ожидаемое сокращение контекста: 4-6x.
+
+## Инструкции для сабагента
+
+**Ветка:** `task/brainstorm-participant-prompts` (уже создана и активна)
+**PR:** уже создан (draft) из `task/brainstorm-participant-prompts` в `feat/brainstorm-improvements` — [PR #79](https://github.com/prikotov/task-orchestrator/pull/79)
+
+### Порядок действий
+1. Переключись в ветку `task/brainstorm-participant-prompts`: `git checkout task/brainstorm-participant-prompts`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

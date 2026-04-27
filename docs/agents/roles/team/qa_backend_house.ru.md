@@ -9,6 +9,7 @@ personality:
   belbin: ["Completer Finisher", "Implementer"]
   adizes: ["P", "A"]
   big_five: "O5 C9 E3 A3 N6"
+expertise: "Тестопригодность решений, написание unit/integration тестов (PHPUnit), выявление edge cases, проверка покрытия бизнес-логики."
 description: "Отвечает за проверку API, бизнес-логики и автотесты серверных сценариев."
 ---
 

@@ -38,6 +38,12 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 {
     /** @var string Причина прерывания цикла по таймауту */
     private const string INTERRUPTION_REASON_TIMEOUT = 'timeout';
+
+    /** @var float Доля maxTime, резервируемая на finalize (10%) */
+    private const float FINALIZE_RESERVE_PERCENT = 0.1;
+
+    /** @var int Минимальный резерв времени на finalize в секундах */
+    private const int FINALIZE_RESERVE_MIN_SECONDS = 60;
     public function __construct(
         private RunAgentServiceInterface $agentRunner,
         private ExecuteDynamicTurnService $turnExecution,
@@ -69,13 +75,24 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         $auditLogger?->logChainStart($chain->getName(), $context->topic);
 
         while ($execution->getParticipantRounds() < $context->maxRounds) {
-            // Проверка maxTime перед каждым раундом
-            if ($this->isMaxTimeExceeded($context->maxTime, $startTime)) {
+            // Проверка: хватит ли оставшегося времени на finalize перед следующим раундом
+            if ($this->shouldReserveForFinalize($context->maxTime, $startTime)) {
                 $execution->markMaxTimeExceeded();
-                $this->logger?->info('Max time exceeded, initiating graceful finalize.', [
+                // shouldReserveForFinalize returns false when maxTime is null,
+                // so maxTime is guaranteed non-null here.
+                \assert($context->maxTime !== null);
+                $reserve = self::calculateFinalizeReserve($context->maxTime);
+                $this->logger?->info('Discussion stopped: reserving time for synthesis.', [
                     'maxTime' => $context->maxTime,
                     'elapsed' => round(microtime(true) - $startTime, 1),
+                    'finalizeReserve' => $reserve,
                 ]);
+                $execution->appendFacilitatorJournal(sprintf(
+                    "[%s %s] Дискуссия остановлена: резервирование времени на синтез (reserve=%ds)\n",
+                    date('Y-m-d'),
+                    date('H:i'),
+                    $reserve,
+                ));
                 break;
             }
 
@@ -169,9 +186,12 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         );
 
         $execution->appendDiscussionHistory(
-            $this->journal->formatDiscussionEntry(
+            $this->journal->formatFacilitatorDiscussionEntry(
                 $context->facilitatorRole,
-                $turnResult->agentResult->getOutputText(),
+                $facResponse->isDone(),
+                $facResponse->getNextRole(),
+                $facResponse->getChallenge(),
+                $facResponse->getSynthesis(),
             ),
         );
 
@@ -450,8 +470,34 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
     // ─── Time checks ────────────────────────────────────────────────────
 
-    private function isMaxTimeExceeded(?int $maxTime, float $startTime): bool
+    /**
+     * Проверяет, нужно ли остановить дискуссию для резервирования времени на finalize.
+     *
+     * Возвращает true, если оставшееся время <= finalize_reserve.
+     * Если maxTime не задан — резервирование не применяется (backward compatible).
+     */
+    private function shouldReserveForFinalize(?int $maxTime, float $startTime): bool
     {
-        return $maxTime !== null && (microtime(true) - $startTime) >= $maxTime;
+        if ($maxTime === null) {
+            return false;
+        }
+
+        $elapsed = microtime(true) - $startTime;
+        $remaining = (float) $maxTime - $elapsed;
+
+        return $remaining <= self::calculateFinalizeReserve($maxTime);
+    }
+
+    /**
+     * Вычисляет резерв времени на finalize в секундах.
+     *
+     * Формула: max(60, maxTime * 10%). Гарантирует минимум 60 секунд на синтез.
+     */
+    public static function calculateFinalizeReserve(int $maxTime): int
+    {
+        return max(
+            self::FINALIZE_RESERVE_MIN_SECONDS,
+            (int) round((float) $maxTime * self::FINALIZE_RESERVE_PERCENT),
+        );
     }
 }
