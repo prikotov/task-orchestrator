@@ -10,8 +10,8 @@ epic: EPIC-feat-brainstorm-improvements
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер Тони (pi)
 branch: task/brainstorm-participant-prompts
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/79
+status: done
 ---
 
 # TASK-feat-brainstorm-participant-prompts: Лимиты ответов, напоминание о tools, структура ответа участников
