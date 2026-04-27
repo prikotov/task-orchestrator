@@ -68,7 +68,7 @@ flowchart TD
 - [x] [TASK-fix-brainstorm-synthesis-array](done/TASK-fix-brainstorm-synthesis-array.todo.md) — Исправление бага synthesis=Array в FacilitatorResponseParserService → **Бэкендер Левша**, P0
 - [x] [TASK-fix-brainstorm-empty-participant-section](done/TASK-fix-brainstorm-empty-participant-section.todo.md) — Удаление пустой секции + рекомендательной строки в PromptFormatterService → **Бэкендер Левша**, P0
 - [x] [TASK-fix-brainstorm-file-list-with-roles](done/TASK-fix-brainstorm-file-list-with-roles.todo.md) — Добавление ролей в список файлов выступлений → **Бэкендер Левша**, P1
-- [ ] [TASK-fix-brainstorm-unified-journal-format](TASK-fix-brainstorm-unified-journal-format.todo.md) — Унификация формата заголовка секции файлов в промптах → **Бэкендер Тони**, P2
+- [x] [TASK-fix-brainstorm-unified-journal-format](done/TASK-fix-brainstorm-unified-journal-format.todo.md) — Унификация формата заголовка секции файлов в промптах → **Бэкендер Тони**, P2
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [ ] Все задачи Must Have выполнены и протестированы

@@ -11,7 +11,7 @@ author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Тони) (pi)
 branch: task/fix-brainstorm-unified-journal-format
 pr: https://github.com/prikotov/task-orchestrator/pull/87
-status: in_progress
+status: done
 ---
 
 # TASK-fix-brainstorm-unified-journal-format: Унификация формата заголовка секции файлов в промптах
