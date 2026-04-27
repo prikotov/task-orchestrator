@@ -62,7 +62,7 @@ final readonly class PromptFormatterService implements PromptFormatterInterface
 
         if (!$hasPreviousResponses) {
             $userPrompt = preg_replace(
-                '/\n+# Выступления предыдущих участников.*$/s',
+                '/\n+Выступления предыдущих участников.*$/s',
                 '',
                 $userPrompt,
             ) ?? $userPrompt;
