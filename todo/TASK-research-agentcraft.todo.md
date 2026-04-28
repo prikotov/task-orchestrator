@@ -66,7 +66,7 @@ ls docs/research/agentcraft-comparison.md
 ## Инструкции для сабагента
 
 **Ветка:** task/research-agentcraft (уже создана и активна)
-**PR:** будет создан после подготовки
+**PR:** уже создан (draft) из task/research-agentcraft в task/research-agent-frameworks-comparison — [PR #96](https://github.com/prikotov/task-orchestrator/pull/96)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-agentcraft`: `git checkout task/research-agentcraft`
