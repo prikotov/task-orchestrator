@@ -9,8 +9,8 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/research-agentcraft
-pr:
-status: in_progress
+pr: "https://github.com/prikotov/task-orchestrator/pull/96"
+status: done
 ---
 
 # TASK-research-agentcraft: Исследовать AgentCraft для сравнения с task-orchestrator
