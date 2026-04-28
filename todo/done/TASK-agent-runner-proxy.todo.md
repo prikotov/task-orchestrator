@@ -7,10 +7,10 @@ priority: P2
 depends_on: TASK-orchestrator-codex-runner
 epic:
 author: Бэкендер Левша (backend_developer_levsha)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер Левша (backend_developer_levsha)
+branch: task/agent-runner-proxy
+pr: https://github.com/prikotov/task-orchestrator/pull/91
+status: done
 ---
 
 # TASK-agent-runner-proxy: Поддержка HTTP-прокси для CLI-раннеров (codex)
@@ -36,9 +36,9 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] `CodexAgentRunner` передаёт HTTP-прокси в процесс codex через env-переменные (`HTTPS_PROXY` / `HTTP_PROXY`)
-- [ ] Прокси можно задать через env-переменную `CODEX_HTTP_PROXY` (приоритет) или `HTTPS_PROXY`
-- [ ] В `config/chains.yaml` есть пример закомментированной конфигурации с прокси для codex-архитекторов
+- [x] `CodexAgentRunner` передаёт HTTP-прокси в процесс codex через env-переменные (`HTTPS_PROXY` / `HTTP_PROXY`)
+- [x] Прокси можно задать через env-переменную `CODEX_HTTP_PROXY` (приоритет) или `HTTPS_PROXY`
+- [x] В `config/chains.yaml` есть пример закомментированной конфигурации с прокси для codex-архитекторов
 
 ### 🟡 Should Have (Желательно)
 - [ ] Прокси можно включить/выключить через параметр в chains.yaml (булевый флаг или URL прокси)
@@ -53,13 +53,20 @@ status: todo
 - [ ] Проверка доступности прокси перед запуском
 
 ## 4. Implementation Plan (План реализации)
-*Заполняется исполнителем перед стартом.*
+
+1. **CodexAgentRunner::run()** — перед запуском Process добавить env-переменные:
+   - `HTTPS_PROXY` = значение из `CODEX_HTTP_PROXY` (приоритет) или `HTTPS_PROXY` (fallback) из окружения.
+   - `HTTP_PROXY` = значение из `HTTP_PROXY` из окружения (если задано).
+   - Symfony Process: `$process->setEnv([...getenv(), 'HTTPS_PROXY' => $proxy, ...])`.
+2. **CodexAgentRunner::run()** — передать полный env (`$_SERVER`/`$_ENV`) в Process через `setEnv()`, чтобы не потерять существующие переменные.
+3. **Unit-тесты** — добавить тесты на `buildCommand`/`run` с проверкой прокси-переменных в env процесса.
+4. **chains.yaml** — добавить закомментированный пример с прокси для codex-архитекторов (в секции комментариев).
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] CodexAgentRunner передаёт прокси в env процесса
-- [ ] Unit-тесты покрывают сценарии с/без прокси
-- [ ] chains.yaml содержит закомментированный пример с прокси
-- [ ] PHPUnit и Psalm без новых ошибок
+- [x] CodexAgentRunner передаёт прокси в env процесса
+- [x] Unit-тесты покрывают сценарии с/без прокси
+- [x] chains.yaml содержит закомментированный пример с прокси
+- [x] PHPUnit и Psalm без новых ошибок
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -78,7 +85,21 @@ vendor/bin/psalm
 ## 9. Comments (Комментарии)
 Задача создана по итогам работы над TASK-orchestrator-codex-runner. Codex-архитекторы в chains.yaml временно переключены на pi+zai (glm-5.1), пока не будет решён вопрос с прокси.
 
+## Инструкции для сабагента
+
+**Ветка:** task/agent-runner-proxy (уже создана и активна)
+
+### Порядок действий
+1. Переключись в ветку `task/agent-runner-proxy`: `git checkout task/agent-runner-proxy`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready 91`.
+
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-28 | Бэкендер Левша | Создание задачи |
+| 2026-04-28 | Тимлид Алекс | Задача выполнена, PR #91 одобрен |

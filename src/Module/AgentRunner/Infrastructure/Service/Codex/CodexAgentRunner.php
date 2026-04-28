@@ -109,6 +109,14 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
             $process->setWorkingDirectory($request->getWorkingDir());
         }
 
+        // Передача HTTP-прокси через env-переменные:
+        // CODEX_HTTP_PROXY (приоритет) подменяет HTTPS_PROXY для codex-процесса.
+        // Если CODEX_HTTP_PROXY не задан — Process наследует env родителя (HTTPS_PROXY, HTTP_PROXY).
+        $codexProxy = getenv('CODEX_HTTP_PROXY');
+        if ($codexProxy !== false && $codexProxy !== '') {
+            $process->setEnv($this->buildProcessEnv(getenv()));
+        }
+
         try {
             $process->run();
         } catch (\Symfony\Component\Process\Exception\ProcessTimedOutException) {
@@ -137,6 +145,31 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
             model: $parsed['model'],
             turns: $parsed['turns'],
         );
+    }
+
+    /**
+     * Формирует env-переменные для Symfony Process с учётом HTTP-прокси.
+     *
+     * Приоритет HTTPS_PROXY для codex-процесса:
+     *   CODEX_HTTP_PROXY (если задан) → подменяет HTTPS_PROXY
+     *   HTTPS_PROXY из окружения      → унаследуется автоматически (если setEnv не вызван)
+     *   HTTP_PROXY из окружения       → унаследуется автоматически
+     *
+     * Метод принимает текущее окружение как параметр для тестируемости.
+     *
+     * @param array<string, string> $currentEnv текущее окружение (например, из getenv())
+     *
+     * @return array<string, string> окружение с подменённым HTTPS_PROXY
+     */
+    public function buildProcessEnv(array $currentEnv): array
+    {
+        $codexProxy = $currentEnv['CODEX_HTTP_PROXY'] ?? null;
+
+        if ($codexProxy !== null && $codexProxy !== '') {
+            $currentEnv['HTTPS_PROXY'] = $codexProxy;
+        }
+
+        return $currentEnv;
     }
 
     /**
