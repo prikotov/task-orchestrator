@@ -1,5 +1,5 @@
 ---
-full_role_name: backend_developer_levsha
+agent: backend_developer_levsha
 role: backend_developer
 name: "Левша"
 title: "Бэкендер Левша"

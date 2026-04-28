@@ -1,5 +1,5 @@
 ---
-full_role_name: backend_developer_tony
+agent: backend_developer_tony
 role: backend_developer
 name: "Тони Старк"
 title: "Бэкендер Тони"
