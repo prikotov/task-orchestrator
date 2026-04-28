@@ -1,5 +1,5 @@
 ---
-full_role_name: system_analyst_sherlock
+agent: system_analyst_sherlock
 role: system_analyst
 name: "Шерлок"
 title: "Аналитик Шерлок"

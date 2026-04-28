@@ -1,5 +1,5 @@
 ---
-full_role_name: team_lead_alex
+agent: team_lead_alex
 role: team_lead
 name: "Алекс"
 title: "Тимлид Алекс"

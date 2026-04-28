@@ -1,5 +1,5 @@
 ---
-full_role_name: technical_writer_hermione
+agent: technical_writer_hermione
 role: technical_writer
 name: "Гермиона"
 title: "Технический писатель Гермиона"

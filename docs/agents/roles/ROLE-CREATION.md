@@ -9,20 +9,20 @@ ROLE (роль) — это описание персонажа-агента с �
 ```
 roles/
 └── team/
-    ├── full_role_name.ru.md    # Файл роли (локаль в суффиксе)
-    └── full_role_name.en.md    # Опционально — другая локаль
+    ├── agent.ru.md    # Файл роли (локаль в суффиксе)
+    └── agent.en.md    # Опционально — другая локаль
 ```
 
 ## Именование файлов
 
-Файл роли: `{full_role_name}.{locale}.md`
+Файл роли: `{agent}.{locale}.md`
 
-- `full_role_name` — уникальный идентификатор роли в формате `snake_case`: `{role}_{name}`
+- `agent` — уникальный идентификатор роли в формате `snake_case`: `{role}_{name}`
 - Совпадает с именем файла **без** расширения локали и `.md`
 
 Примеры:
 
-| Файл | full_role_name |
+| Файл | agent |
 |---|---|
 | `team_lead_alex.ru.md` | `team_lead_alex` |
 | `system_architect_gandalf.ru.md` | `system_architect_gandalf` |
@@ -36,7 +36,7 @@ roles/
 
 ```yaml
 ---
-full_role_name: <role_type>_<name>
+agent: <role_type>_<name>
 role: <role_type>
 name: "<Имя на языке файла>"
 title: "<Роль + Имя на языке файла>"
@@ -53,7 +53,7 @@ description: "Краткое описание ответственности р�
 
 | Поле | Формат | Описание | Пример |
 |---|---|---|---|
-| `full_role_name` | `snake_case`, латиница | Идентификатор = `role` + `_` + `name`, совпадает с именем файла | `team_lead_alex` |
+| `agent` | `snake_case`, латиница | Идентификатор = `role` + `_` + `name`, совпадает с именем файла | `team_lead_alex` |
 | `role` | `snake_case`, латиница | Тип роли (без имени) | `team_lead`, `backend_developer` |
 | `name` | Строка, язык файла | Имя персонажа | `"Алекс"`, `"Alex"` |
 | `title` | Строка, язык файла | Полное название роли: роль + имя | `"Тимлид Алекс"`, `"Team Lead Alex"` |
@@ -176,21 +176,21 @@ personality:
 
 ## Принципы
 
-1. **`full_role_name` = имя файла без `.{locale}.md`** — это уникальный идентификатор роли
+1. **`agent` = имя файла без `.{locale}.md`** — это уникальный идентификатор роли
 2. **`title` на языке файла** — для `.ru.md` на русском, для `.en.md` на английском
-3. **`full_role_name` всегда латиница** — совпадает с `role` + `_` + транслитерация `name`
+3. **`agent` всегда латиница** — совпадает с `role` + `_` + транслитерация `name`
 4. **Одна роль — один файл на локаль** — `.ru.md`, `.en.md` и т.д.
 5. **`role` без имени** — только тип (например `backend_developer`, не `backend_developer_tony`)
 
 ## Чеклист
 
 - [ ] Файл в `docs/agents/roles/team/` (или другом подкаталоге)
-- [ ] Имя файла: `{full_role_name}.{locale}.md`
+- [ ] Имя файла: `{agent}.{locale}.md`
 - [ ] YAML front matter обрамлён `---`
 - [ ] `role`: snake_case, латиница, без имени персонажа
 - [ ] `name`: имя персонажа на языке файла
 - [ ] `title`: роль + имя на языке файла, поле идёт после `name`
-- [ ] `full_role_name`: совпадает с именем файла без `.{locale}.md`
+- [ ] `agent`: совпадает с именем файла без `.{locale}.md`
 - [ ] `description`: краткое описание ответственности
 - [ ] `personality`: заполнены все 5 подсекций (jung, disc, belbin, adizes, big_five)
 - [ ] Тело файла начинается с `# <Title>`

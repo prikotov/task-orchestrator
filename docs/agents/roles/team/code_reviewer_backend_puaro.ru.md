@@ -1,5 +1,5 @@
 ---
-full_role_name: code_reviewer_backend_puaro
+agent: code_reviewer_backend_puaro
 role: code_reviewer_backend
 name: "Пуаро"
 title: "Ревьювер бэка Пуаро"
