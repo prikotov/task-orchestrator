@@ -8,7 +8,7 @@ priority: P2
 author: Тимлид (Алекс)
 assignee:
 branch: task/research-agent-frameworks-comparison
-status: done
+status: in_progress
 reopened: 2026-04-28
 pr: #51 (исследование), #52 (ревью и исправления)
 ---
@@ -83,7 +83,7 @@ pr: #51 (исследование), #52 (ревью и исправления)
 
 ### Этап 1b: Дополнительные исследования (2026-04-28)
 
-- [ ] [TASK-research-paperclip-ai](../TASK-research-paperclip-ai.todo.md) — Paperclip AI
+- [x] [TASK-research-paperclip-ai](TASK-research-paperclip-ai.todo.md) — Paperclip AI
 - [ ] [TASK-research-agentcraft](../TASK-research-agentcraft.todo.md) — AgentCraft
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
