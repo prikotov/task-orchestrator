@@ -10,7 +10,7 @@ author: Бэкендер Левша (backend_developer_levsha)
 assignee: Бэкендер Левша (backend_developer_levsha)
 branch: task/agent-runner-proxy
 pr: https://github.com/prikotov/task-orchestrator/pull/91
-status: in_progress
+status: done
 ---
 
 # TASK-agent-runner-proxy: Поддержка HTTP-прокси для CLI-раннеров (codex)
@@ -36,9 +36,9 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] `CodexAgentRunner` передаёт HTTP-прокси в процесс codex через env-переменные (`HTTPS_PROXY` / `HTTP_PROXY`)
-- [ ] Прокси можно задать через env-переменную `CODEX_HTTP_PROXY` (приоритет) или `HTTPS_PROXY`
-- [ ] В `config/chains.yaml` есть пример закомментированной конфигурации с прокси для codex-архитекторов
+- [x] `CodexAgentRunner` передаёт HTTP-прокси в процесс codex через env-переменные (`HTTPS_PROXY` / `HTTP_PROXY`)
+- [x] Прокси можно задать через env-переменную `CODEX_HTTP_PROXY` (приоритет) или `HTTPS_PROXY`
+- [x] В `config/chains.yaml` есть пример закомментированной конфигурации с прокси для codex-архитекторов
 
 ### 🟡 Should Have (Желательно)
 - [ ] Прокси можно включить/выключить через параметр в chains.yaml (булевый флаг или URL прокси)
@@ -63,10 +63,10 @@ status: in_progress
 4. **chains.yaml** — добавить закомментированный пример с прокси для codex-архитекторов (в секции комментариев).
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] CodexAgentRunner передаёт прокси в env процесса
-- [ ] Unit-тесты покрывают сценарии с/без прокси
-- [ ] chains.yaml содержит закомментированный пример с прокси
-- [ ] PHPUnit и Psalm без новых ошибок
+- [x] CodexAgentRunner передаёт прокси в env процесса
+- [x] Unit-тесты покрывают сценарии с/без прокси
+- [x] chains.yaml содержит закомментированный пример с прокси
+- [x] PHPUnit и Psalm без новых ошибок
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -102,3 +102,4 @@ vendor/bin/psalm
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-28 | Бэкендер Левша | Создание задачи |
+| 2026-04-28 | Тимлид Алекс | Задача выполнена, PR #91 одобрен |
