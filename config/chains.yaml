@@ -36,36 +36,34 @@ roles:
   system_architect_gandalf:
     prompt_file: docs/agents/roles/team/system_architect_gandalf.ru.md
     command:
-      - pi
-      - --mode
-      - json
-      - -p
-      - --no-session
-      - --provider
-      - zai
-      - --model
-      - glm-5.1
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+      - codex
+      - exec
+      - --full-auto
+      - --json
+      - --sandbox
+      - danger-full-access
+      - -m
+      - o3
+      - --skip-git-repo-check
+      - --ephemeral
+      - --ignore-user-config
+      - --ignore-rules
 
   system_architect_loki:
     prompt_file: docs/agents/roles/team/system_architect_loki.ru.md
     command:
-      - pi
-      - --mode
-      - json
-      - -p
-      - --no-session
-      - --provider
-      - zai
-      - --model
-      - glm-5-turbo
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+      - codex
+      - exec
+      - --full-auto
+      - --json
+      - --sandbox
+      - danger-full-access
+      - -m
+      - o3
+      - --skip-git-repo-check
+      - --ephemeral
+      - --ignore-user-config
+      - --ignore-rules
 
   backend_developer_levsha:
     prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md

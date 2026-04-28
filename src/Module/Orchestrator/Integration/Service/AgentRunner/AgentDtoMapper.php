@@ -28,7 +28,11 @@ final readonly class AgentDtoMapper
         ChainRunRequestVo $vo,
         ?ChainRetryPolicyVo $retryPolicy = null,
     ): RunAgentCommand {
-        $runnerName = $vo->getRunnerName() ?? '';
+        $runnerName = $vo->getRunnerName();
+        if (($runnerName === null || $runnerName === '') && $vo->getCommand() !== []) {
+            $runnerName = $vo->getCommand()[0];
+        }
+        $runnerName = $runnerName ?? '';
 
         return new RunAgentCommand(
             runnerName: $runnerName,
