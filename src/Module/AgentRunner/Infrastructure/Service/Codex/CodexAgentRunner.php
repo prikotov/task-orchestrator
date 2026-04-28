@@ -16,10 +16,11 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunReques
  * Запускает `codex exec --full-auto --json --sandbox danger-full-access`
  * через Symfony Process.
  *
- * Ключевое отличие от pi: Codex не имеет `--system-prompt`.
- * Системные инструкции (роль + append) передаются через
- * `-c developer_instructions="..."` (TOML config override).
- * Пользовательский промпт (контекст + задача) — последний позиционный аргумент.
+ * Ключевое отличие от pi: Codex не имеет `--system-prompt` / `--append-system-prompt`.
+ * Системные инструкции передаются через `-c developer_instructions="..."` (TOML config override).
+ *
+ * Маркер `@append-system-prompt` в command резолвится в содержимое файла,
+ * путь к которому передаётся через runnerArgs `--append-system-prompt <path>`.
  *
  * Если в AgentRunRequestVo задан command — используется он как базовая команда.
  * Иначе — стандартная: `codex exec --full-auto --json --sandbox danger-full-access -m <model>`.
@@ -49,16 +50,9 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
     /**
      * Строит массив CLI-команды для запуска Codex по AgentRunRequestVo.
      *
-     * Формирует команду в два уровня:
-     * 1. CLI-флаги: базовая команда из config (или default) + model
-     * 2. developer_instructions: системные инструкции через `-c` (роль + append)
-     * 3. Пользовательский промпт: последний позиционный аргумент (контекст + задача)
-     *
-     * Маркеры @system-prompt / @append-system-prompt в command удаляются —
-     * codex не поддерживает эти флаги, содержимое передаётся через developer_instructions.
-     *
-     * Аналогично, runnerArgs вида ['--append-system-prompt', '/path']
-     * обрабатываются: путь читается, содержимое добавляется в developer_instructions.
+     * Обработка маркеров в command:
+     * - `@append-system-prompt` — резолвится из runnerArgs `--append-system-prompt <path>`
+     *   в содержимое файла и подставляется в строку command.
      *
      * @param AgentRunRequestVo $request запрос на запуск агента
      *
@@ -83,18 +77,8 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
             ));
         }
 
-        // Удалить маркеры @system-prompt / @append-system-prompt из command
-        $command = $this->removePromptMarkers($command);
-
-        // Разрешение @file → содержимое файла (для остальных @-маркеров)
-        $command = $this->resolveCommandFiles($command, $request->getWorkingDir());
-
-        // Собрать developer_instructions из systemPrompt + append из runnerArgs
-        $devInstructions = $this->buildDeveloperInstructions($request);
-        if ($devInstructions !== '') {
-            $command[] = '-c';
-            $command[] = sprintf('developer_instructions="%s"', $this->escapeTomlString($devInstructions));
-        }
+        // Резолвить @append-system-prompt маркер в command → содержимое файла из runnerArgs
+        $command = $this->resolvePromptSlots($command, $request->getRunnerArgs());
 
         // Добавить runnerArgs без --append-system-prompt
         foreach ($this->getFilteredRunnerArgs($request->getRunnerArgs()) as $arg) {
@@ -151,96 +135,33 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
     }
 
     /**
-     * Удаляет маркеры @system-prompt / @append-system-prompt из command.
+     * Резолвит слоты @append-system-prompt в элементах command.
      *
-     * Codex не поддерживает эти флаги — содержимое передаётся через developer_instructions.
+     * Ищет `@append-system-prompt` в строках command, берёт путь из runnerArgs
+     * `--append-system-prompt <path>`, читает файл и подставляет содержимое
+     * вместо маркера (с TOML-экранированием).
      *
      * @param list<string> $command
+     * @param list<string> $runnerArgs
      *
      * @return list<string>
      */
-    private function removePromptMarkers(array $command): array
+    private function resolvePromptSlots(array $command, array $runnerArgs): array
     {
-        return array_values(array_filter(
-            $command,
-            static fn(string $value): bool => $value !== '@system-prompt' && $value !== '@append-system-prompt',
-        ));
-    }
+        // Извлечь содержимое файла из runnerArgs
+        $appendContent = $this->extractAppendFromRunnerArgs($runnerArgs);
+        $escapedContent = $appendContent !== '' ? $this->escapeTomlString($appendContent) : null;
 
-    /**
-     * Разрешает @file в элементах command.
-     *
-     * Формат: `@path/to/file.txt` → содержимое файла.
-     * Если файл не найден — значение остаётся как есть.
-     *
-     * @param list<string> $command
-     * @param string|null $workingDir базовая директория для относительных путей
-     *
-     * @return list<string>
-     */
-    private function resolveCommandFiles(array $command, ?string $workingDir): array
-    {
         $resolved = [];
-
         foreach ($command as $value) {
-            if (str_starts_with($value, '@')) {
-                $resolved[] = $this->resolveFileArg($value, $workingDir);
+            if ($escapedContent !== null && str_contains($value, '@append-system-prompt')) {
+                $resolved[] = str_replace('@append-system-prompt', $escapedContent, $value);
             } else {
                 $resolved[] = $value;
             }
         }
 
         return $resolved;
-    }
-
-    /**
-     * Разрешает единичный @file-аргумент в содержимое файла.
-     *
-     * Если файл не найден — возвращает исходное значение.
-     */
-    private function resolveFileArg(string $arg, ?string $workingDir): string
-    {
-        $path = substr($arg, 1);
-
-        if ($workingDir !== null && !str_starts_with($path, '/')) {
-            $path = $workingDir . '/' . $path;
-        }
-
-        if (file_exists($path)) {
-            $content = file_get_contents($path);
-            if ($content !== false) {
-                return trim($content);
-            }
-        }
-
-        return $arg;
-    }
-
-    /**
-     * Собирает developer_instructions из systemPrompt и --append-system-prompt из runnerArgs.
-     *
-     * Это аналоги --system-prompt и --append-system-prompt из pi,
-     * передаваемые через `-c developer_instructions="..."` в Codex.
-     */
-    private function buildDeveloperInstructions(AgentRunRequestVo $request): string
-    {
-        $parts = [];
-
-        // systemPrompt — путь к файлу или текст (от RunDynamicLoopAgentService)
-        if ($request->getSystemPrompt() !== null) {
-            $systemContent = $this->readFileOrValue($request->getSystemPrompt());
-            if ($systemContent !== '') {
-                $parts[] = $systemContent;
-            }
-        }
-
-        // --append-system-prompt <path> из runnerArgs
-        $appendContent = $this->extractAppendFromRunnerArgs($request->getRunnerArgs());
-        if ($appendContent !== '') {
-            $parts[] = $appendContent;
-        }
-
-        return implode("\n\n", $parts);
     }
 
     /**
@@ -282,9 +203,6 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
 
     /**
      * Извлекает содержимое --append-system-prompt <path> из runnerArgs.
-     *
-     * Codex не поддерживает этот флаг — содержимое файла
-     * добавляется в developer_instructions.
      *
      * @param list<string> $runnerArgs
      *
