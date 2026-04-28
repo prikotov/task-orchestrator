@@ -344,4 +344,77 @@ final class CodexAgentRunnerTest extends TestCase
         self::assertNotContains('--no-tools', $command);
         self::assertNotContains('--tools', $command);
     }
+
+    // ──── buildProcessEnv: proxy scenarios ───────────────────────────────
+
+    #[Test]
+    public function buildProcessEnvWithCodexProxySetsHttpsProxy(): void
+    {
+        $env = $this->runner->buildProcessEnv([
+            'PATH' => '/usr/bin',
+            'CODEX_HTTP_PROXY' => 'http://proxy.example.com:8080',
+        ]);
+
+        self::assertSame('http://proxy.example.com:8080', $env['HTTPS_PROXY']);
+        self::assertSame('/usr/bin', $env['PATH']);
+    }
+
+    #[Test]
+    public function buildProcessEnvWithoutCodexProxyReturnsEnvUnchanged(): void
+    {
+        $env = $this->runner->buildProcessEnv([
+            'PATH' => '/usr/bin',
+            'HOME' => '/home/user',
+        ]);
+
+        self::assertArrayNotHasKey('HTTPS_PROXY', $env);
+        self::assertSame('/usr/bin', $env['PATH']);
+        self::assertSame('/home/user', $env['HOME']);
+    }
+
+    #[Test]
+    public function buildProcessEnvCodexProxyOverridesExistingHttpsProxy(): void
+    {
+        $env = $this->runner->buildProcessEnv([
+            'PATH' => '/usr/bin',
+            'HTTPS_PROXY' => 'http://old-proxy:3128',
+            'CODEX_HTTP_PROXY' => 'http://new-proxy:8080',
+        ]);
+
+        self::assertSame('http://new-proxy:8080', $env['HTTPS_PROXY']);
+    }
+
+    #[Test]
+    public function buildProcessEnvEmptyCodexProxyDoesNotOverride(): void
+    {
+        $env = $this->runner->buildProcessEnv([
+            'HTTPS_PROXY' => 'http://existing-proxy:3128',
+            'CODEX_HTTP_PROXY' => '',
+        ]);
+
+        // Пустой CODEX_HTTP_PROXY не подменяет HTTPS_PROXY
+        self::assertSame('http://existing-proxy:3128', $env['HTTPS_PROXY']);
+    }
+
+    #[Test]
+    public function buildProcessEnvPreservesHttpProxy(): void
+    {
+        $env = $this->runner->buildProcessEnv([
+            'HTTP_PROXY' => 'http://http-proxy:3128',
+            'CODEX_HTTP_PROXY' => 'http://codex-proxy:8080',
+        ]);
+
+        // HTTP_PROXY не затрагивается — передаётся как есть
+        self::assertSame('http://http-proxy:3128', $env['HTTP_PROXY']);
+        self::assertSame('http://codex-proxy:8080', $env['HTTPS_PROXY']);
+    }
+
+    #[Test]
+    public function buildProcessEnvEmptyArrayReturnsEmpty(): void
+    {
+        $env = $this->runner->buildProcessEnv([]);
+
+        self::assertArrayNotHasKey('HTTPS_PROXY', $env);
+        self::assertSame([], $env);
+    }
 }
