@@ -7,10 +7,10 @@ priority: P2
 depends_on: TASK-orchestrator-codex-runner
 epic:
 author: Бэкендер Левша (backend_developer_levsha)
-assignee:
-branch:
+assignee: Бэкендер Левша (backend_developer_levsha)
+branch: task/agent-runner-proxy
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-agent-runner-proxy: Поддержка HTTP-прокси для CLI-раннеров (codex)
@@ -53,7 +53,14 @@ status: todo
 - [ ] Проверка доступности прокси перед запуском
 
 ## 4. Implementation Plan (План реализации)
-*Заполняется исполнителем перед стартом.*
+
+1. **CodexAgentRunner::run()** — перед запуском Process добавить env-переменные:
+   - `HTTPS_PROXY` = значение из `CODEX_HTTP_PROXY` (приоритет) или `HTTPS_PROXY` (fallback) из окружения.
+   - `HTTP_PROXY` = значение из `HTTP_PROXY` из окружения (если задано).
+   - Symfony Process: `$process->setEnv([...getenv(), 'HTTPS_PROXY' => $proxy, ...])`.
+2. **CodexAgentRunner::run()** — передать полный env (`$_SERVER`/`$_ENV`) в Process через `setEnv()`, чтобы не потерять существующие переменные.
+3. **Unit-тесты** — добавить тесты на `buildCommand`/`run` с проверкой прокси-переменных в env процесса.
+4. **chains.yaml** — добавить закомментированный пример с прокси для codex-архитекторов (в секции комментариев).
 
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] CodexAgentRunner передаёт прокси в env процесса
@@ -77,6 +84,18 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 Задача создана по итогам работы над TASK-orchestrator-codex-runner. Codex-архитекторы в chains.yaml временно переключены на pi+zai (glm-5.1), пока не будет решён вопрос с прокси.
+
+## Инструкции для сабагента
+
+**Ветка:** task/agent-runner-proxy (уже создана и активна)
+
+### Порядок действий
+1. Переключись в ветку `task/agent-runner-proxy`: `git checkout task/agent-runner-proxy`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
