@@ -184,12 +184,13 @@ final class CodexAgentRunnerTest extends TestCase
             $request = new AgentRunRequestVo(
                 role: 'test',
                 task: 'task',
-                command: ['codex', 'exec', '--json', '--full-auto'],
-                runnerArgs: ['@' . $tmpFile],
+                command: ['codex', 'exec', '--json', '--full-auto', '@' . $tmpFile],
             );
             $command = $this->runner->buildCommand($request);
 
-            self::assertContains('File content here', $command);
+            // @file в command резолвится в содержимое и попадает в склеенный промпт (последний элемент)
+            $last = end($command);
+            self::assertStringContainsString('File content here', $last);
             self::assertNotContains('@' . $tmpFile, $command);
         } finally {
             @unlink($tmpFile);
@@ -264,5 +265,101 @@ final class CodexAgentRunnerTest extends TestCase
         // Codex не поддерживает --tools / --no-tools
         self::assertNotContains('--no-tools', $command);
         self::assertNotContains('--tools', $command);
+    }
+
+    // ──── buildCommand: @system-prompt / @append-system-prompt markers ────
+
+    #[Test]
+    public function buildCommandRemovesSystemPromptMarkerFromCommand(): void
+    {
+        $request = new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: ['codex', 'exec', '--json', '--full-auto', '@system-prompt'],
+        );
+        $command = $this->runner->buildCommand($request);
+
+        self::assertNotContains('@system-prompt', $command);
+        self::assertNotContains('--system-prompt', $command);
+    }
+
+    #[Test]
+    public function buildCommandRemovesAppendSystemPromptMarkerFromCommand(): void
+    {
+        $request = new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: ['codex', 'exec', '--json', '--full-auto', '@system-prompt', '@append-system-prompt'],
+        );
+        $command = $this->runner->buildCommand($request);
+
+        self::assertNotContains('@system-prompt', $command);
+        self::assertNotContains('@append-system-prompt', $command);
+    }
+
+    // ──── buildCommand: --append-system-prompt in runnerArgs ──────────────
+
+    #[Test]
+    public function buildCommandExtractsAppendSystemPromptFromRunnerArgs(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'codex_append_');
+        file_put_contents($tmpFile, 'Append instructions here');
+
+        try {
+            $request = new AgentRunRequestVo(
+                role: 'test',
+                task: 'task',
+                command: ['codex', 'exec', '--json', '--full-auto'],
+                runnerArgs: ['--append-system-prompt', $tmpFile],
+            );
+            $command = $this->runner->buildCommand($request);
+
+            // --append-system-prompt и путь убраны из command
+            self::assertNotContains('--append-system-prompt', $command);
+            self::assertNotContains($tmpFile, $command);
+
+            // Содержимое файла — в склеенном промпте (последний элемент)
+            $last = end($command);
+            self::assertStringContainsString('Append instructions here', $last);
+        } finally {
+            @unlink($tmpFile);
+        }
+    }
+
+    // ──── buildCommand: systemPrompt as file path ────────────────────────
+
+    #[Test]
+    public function buildCommandReadsSystemPromptFileContent(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'codex_system_');
+        file_put_contents($tmpFile, 'You are a system architect.');
+
+        try {
+            $request = new AgentRunRequestVo(
+                role: 'test',
+                task: 'task',
+                systemPrompt: $tmpFile,
+            );
+            $command = $this->runner->buildCommand($request);
+
+            $last = end($command);
+            self::assertStringContainsString('You are a system architect.', $last);
+        } finally {
+            @unlink($tmpFile);
+        }
+    }
+
+    #[Test]
+    public function buildCommandUsesSystemPromptAsTextWhenNotAFile(): void
+    {
+        $request = new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            systemPrompt: 'Direct text prompt',
+        );
+        $command = $this->runner->buildCommand($request);
+
+        $last = end($command);
+        self::assertStringContainsString('Direct text prompt', $last);
     }
 }
