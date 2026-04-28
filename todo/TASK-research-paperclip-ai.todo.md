@@ -66,7 +66,7 @@ ls docs/research/paperclip-ai-comparison.md
 ## Инструкции для сабагента
 
 **Ветка:** task/research-paperclip-ai (уже создана и активна)
-**PR:** будет создан после подготовки
+**PR:** уже создан (draft) из task/research-paperclip-ai в task/research-agent-frameworks-comparison — [PR #95](https://github.com/prikotov/task-orchestrator/pull/95)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-paperclip-ai`: `git checkout task/research-paperclip-ai`
