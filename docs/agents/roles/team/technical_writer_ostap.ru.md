@@ -1,5 +1,5 @@
 ---
-full_role_name: technical_writer_ostap
+agent: technical_writer_ostap
 role: technical_writer
 name: "Остап"
 title: "Технический писатель Остап"

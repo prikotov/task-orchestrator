@@ -1,5 +1,5 @@
 ---
-full_role_name: system_architect_gandalf
+agent: system_architect_gandalf
 role: system_architect
 name: "Гэндальф"
 title: "Архитектор Гэндальф"

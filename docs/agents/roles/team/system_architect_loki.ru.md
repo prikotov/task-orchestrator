@@ -1,5 +1,5 @@
 ---
-full_role_name: system_architect_loki
+agent: system_architect_loki
 role: system_architect
 name: "Локи"
 title: "Архитектор Локи"

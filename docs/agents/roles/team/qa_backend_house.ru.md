@@ -1,5 +1,5 @@
 ---
-full_role_name: qa_backend_house
+agent: qa_backend_house
 role: qa_backend
 name: "Хаус"
 title: "Тестировщик бэка Хаус"
