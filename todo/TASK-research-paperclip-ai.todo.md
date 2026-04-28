@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Технический писатель (Гермиона)
+branch: task/research-paperclip-ai
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-paperclip-ai: Исследовать Paperclip AI для сравнения с task-orchestrator
@@ -41,7 +41,10 @@ status: todo
 - [ ] Написание кода интеграции
 
 ## 4. Implementation Plan (План реализации)
-*Заполняется исполнителем перед стартом.*
+1. Изучить репозиторий https://github.com/paperclipai/paperclip — архитектуру, модель агентов, workflow, tools
+2. При недостатке документации — проанализировать исходный код
+3. Составить отчёт по формату существующих comparison-документов (см. docs/research/crush-comparison.md как пример)
+4. Заполнить строку Paperclip AI (#15) в сводной таблице docs/research/agent-frameworks-summary.md
 
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] Отчёт docs/research/paperclip-ai-comparison.md создан по формату существующих comparison-документов
@@ -59,6 +62,21 @@ ls docs/research/paperclip-ai-comparison.md
 
 ## 8. Sources (Источники)
 - https://github.com/paperclipai/paperclip
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-paperclip-ai (уже создана и активна)
+**PR:** будет создан после подготовки
+
+### Порядок действий
+1. Переключись в ветку `task/research-paperclip-ai`: `git checkout task/research-paperclip-ai`
+2. Изучи проект Paperclip AI (https://github.com/paperclipai/paperclip) — архитектуру, модель агентов, workflow-паттерны, tools, state management, error handling, расширяемость.
+3. При недостатке документации — анализируй исходный код.
+4. Создай отчёт docs/research/paperclip-ai-comparison.md по формату существующих comparison-документов (как docs/research/crush-comparison.md).
+5. Заполни строку Paperclip AI (#15) в сводной таблице docs/research/agent-frameworks-summary.md.
+6. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+7. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` (хотя для docs-only они могут быть пропущены — укажи это в отчёте).
+8. Сделай `git push`.
 
 ## 9. Comments (Комментарии)
 
