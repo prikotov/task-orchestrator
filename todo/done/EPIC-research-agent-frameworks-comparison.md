@@ -84,7 +84,7 @@ pr: #51 (исследование), #52 (ревью и исправления)
 ### Этап 1b: Дополнительные исследования (2026-04-28)
 
 - [x] [TASK-research-paperclip-ai](TASK-research-paperclip-ai.todo.md) — Paperclip AI
-- [ ] [TASK-research-agentcraft](../TASK-research-agentcraft.todo.md) — AgentCraft
+- [x] [TASK-research-agentcraft](TASK-research-agentcraft.todo.md) — AgentCraft
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
