@@ -67,6 +67,7 @@ final class CodexJsonlParserTest extends TestCase
         self::assertSame(0.0, $result['cost']);
         self::assertNull($result['model']);
         self::assertSame(0, $result['turns']);
+        self::assertSame(0, $result['reasoningOutputTokens']);
     }
 
     #[Test]
@@ -252,5 +253,127 @@ final class CodexJsonlParserTest extends TestCase
         $result = $this->parser->parse($jsonl);
 
         self::assertSame('Part 1 Part 2', $result['outputText']);
+    }
+
+    // ================================================================
+    // Codex CLI v0.125.0 формат
+    // ================================================================
+
+    #[Test]
+    public function parseV1250ItemCompletedWithText(): void
+    {
+        $jsonl = implode("\n", [
+            '{"type":"thread.started","thread_id":"thread_abc"}',
+            '{"type":"turn.started"}',
+            '{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"PING_OK"}}',
+            '{"type":"turn.completed","usage":{"input_tokens":26231,"cached_input_tokens":15744,"output_tokens":84,"reasoning_output_tokens":76}}',
+        ]);
+
+        $result = $this->parser->parse($jsonl);
+
+        self::assertSame('PING_OK', $result['outputText']);
+        self::assertSame(26231, $result['inputTokens']);
+        self::assertSame(84, $result['outputTokens']);
+        self::assertSame(15744, $result['cacheReadTokens']);
+        self::assertSame(1, $result['turns']);
+        self::assertSame(76, $result['reasoningOutputTokens']);
+    }
+
+    #[Test]
+    public function parseV1250TurnCompletedWithTopLevelUsage(): void
+    {
+        $jsonl = implode("\n", [
+            '{"type":"thread.started","thread_id":"thread_xyz"}',
+            '{"type":"turn.started"}',
+            '{"type":"turn.completed","usage":{"input_tokens":1000,"output_tokens":500,"cached_input_tokens":200}}',
+        ]);
+
+        $result = $this->parser->parse($jsonl);
+
+        self::assertSame('', $result['outputText']); // нет item.completed с текстом
+        self::assertSame(1000, $result['inputTokens']);
+        self::assertSame(500, $result['outputTokens']);
+        self::assertSame(200, $result['cacheReadTokens']);
+        self::assertSame(1, $result['turns']);
+        self::assertSame(0, $result['reasoningOutputTokens']);
+    }
+
+    #[Test]
+    public function parseV1250FullRealOutput(): void
+    {
+        // Реальный вывод codex CLI v0.125.0
+        $jsonl = implode("\n", [
+            '{"type":"thread.started","thread_id":"thread_01"}',
+            '{"type":"turn.started"}',
+            '{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"The answer is 42"}}',
+            '{"type":"turn.completed","usage":{"input_tokens":5000,"cached_input_tokens":3000,"output_tokens":120,"reasoning_output_tokens":80}}',
+        ]);
+
+        $result = $this->parser->parse($jsonl);
+
+        self::assertSame('The answer is 42', $result['outputText']);
+        self::assertSame(5000, $result['inputTokens']);
+        self::assertSame(120, $result['outputTokens']);
+        self::assertSame(3000, $result['cacheReadTokens']);
+        self::assertSame(1, $result['turns']);
+        self::assertSame(80, $result['reasoningOutputTokens']);
+    }
+
+    #[Test]
+    public function parseV1250TurnCompletedOverwritesItemText(): void
+    {
+        // item.completed с item.text + turn.completed с turn.items — turn.completed перезапишет outputText
+        $jsonl = implode("\n", [
+            '{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"Item text v0.125.0"}}',
+            '{"type":"turn.completed","turn":{"items":[{"type":"agent_message","content":[{"type":"text","text":"Turn items text"}]}]},"usage":{"input_tokens":100,"output_tokens":50}}',
+        ]);
+
+        $result = $this->parser->parse($jsonl);
+
+        // turn.completed содержит текст в items — перезапишет item.completed
+        self::assertSame('Turn items text', $result['outputText']);
+        self::assertSame(100, $result['inputTokens']);
+    }
+
+    #[Test]
+    public function parseV1250UsageFallbackToTurnUsage(): void
+    {
+        // Если есть и верхний уровень usage, и turn.usage — верхний приоритет
+        $jsonl = implode("\n", [
+            '{"type":"turn.completed","usage":{"input_tokens":999,"output_tokens":111},"turn":{"usage":{"input_tokens":100,"output_tokens":50}}}',
+        ]);
+
+        $result = $this->parser->parse($jsonl);
+
+        self::assertSame(999, $result['inputTokens']);
+        self::assertSame(111, $result['outputTokens']);
+    }
+
+    #[Test]
+    public function parseV1250NoUsageAtTopLevelFallsBackToTurnUsage(): void
+    {
+        // Нет usage на верхнем уровне — fallback на turn.usage
+        $jsonl = implode("\n", [
+            '{"type":"turn.completed","turn":{"usage":{"input_tokens":200,"output_tokens":80}}}',
+        ]);
+
+        $result = $this->parser->parse($jsonl);
+
+        self::assertSame(200, $result['inputTokens']);
+        self::assertSame(80, $result['outputTokens']);
+    }
+
+    #[Test]
+    public function parseV1250IgnoresItemCompletedWithEmptyText(): void
+    {
+        // item.text — пустая строка, не должна перезаписать outputText
+        $jsonl = implode("\n", [
+            '{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":""}}',
+            '{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"Real text"}}',
+        ]);
+
+        $result = $this->parser->parse($jsonl);
+
+        self::assertSame('Real text', $result['outputText']);
     }
 }
