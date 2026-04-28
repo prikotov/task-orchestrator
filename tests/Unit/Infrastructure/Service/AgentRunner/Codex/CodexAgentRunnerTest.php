@@ -52,7 +52,7 @@ final class CodexAgentRunnerTest extends TestCase
     }
 
     #[Test]
-    public function buildCommandAppendsPromptAtEnd(): void
+    public function buildCommandAppendsUserPromptAtEnd(): void
     {
         $request = new AgentRunRequestVo(role: 'test', task: 'design the architecture');
         $command = $this->runner->buildCommand($request);
@@ -62,7 +62,7 @@ final class CodexAgentRunnerTest extends TestCase
     }
 
     #[Test]
-    public function buildCommandIncludesSystemPromptInMergedPrompt(): void
+    public function buildCommandDoesNotIncludeSystemPromptInUserPrompt(): void
     {
         $request = new AgentRunRequestVo(
             role: 'test',
@@ -71,13 +71,31 @@ final class CodexAgentRunnerTest extends TestCase
         );
         $command = $this->runner->buildCommand($request);
 
+        // systemPrompt идёт в developer_instructions, не в user prompt
         $last = end($command);
-        self::assertStringContainsString('You are Gandalf the architect.', $last);
-        self::assertStringContainsString('[Задача]: do something', $last);
+        self::assertStringNotContainsString('You are Gandalf the architect.', $last);
     }
 
     #[Test]
-    public function buildCommandIncludesPreviousContextInMergedPrompt(): void
+    public function buildCommandPassesSystemPromptViaDeveloperInstructions(): void
+    {
+        $request = new AgentRunRequestVo(
+            role: 'test',
+            task: 'do something',
+            systemPrompt: 'You are Gandalf the architect.',
+        );
+        $command = $this->runner->buildCommand($request);
+
+        // developer_instructions через -c
+        $cIdx = array_search('-c', $command, true);
+        self::assertNotFalse($cIdx);
+        $cValue = $command[$cIdx + 1];
+        self::assertStringStartsWith('developer_instructions=', $cValue);
+        self::assertStringContainsString('You are Gandalf the architect.', $cValue);
+    }
+
+    #[Test]
+    public function buildCommandIncludesPreviousContextInUserPrompt(): void
     {
         $request = new AgentRunRequestVo(
             role: 'test',
@@ -99,13 +117,13 @@ final class CodexAgentRunnerTest extends TestCase
         $request = new AgentRunRequestVo(
             role: 'test',
             task: 'task',
-            model: 'o3',
+            model: 'gpt-5.5',
         );
         $command = $this->runner->buildCommand($request);
 
-        self::assertContains('-m', $command);
-        $idx = array_search('-m', $command, true);
-        self::assertSame('o3', $command[$idx + 1]);
+        self::assertContains('--model', $command);
+        $idx = array_search('--model', $command, true);
+        self::assertSame('gpt-5.5', $command[$idx + 1]);
     }
 
     #[Test]
@@ -114,6 +132,7 @@ final class CodexAgentRunnerTest extends TestCase
         $request = new AgentRunRequestVo(role: 'test', task: 'task');
         $command = $this->runner->buildCommand($request);
 
+        self::assertNotContains('--model', $command);
         self::assertNotContains('-m', $command);
     }
 
@@ -128,7 +147,8 @@ final class CodexAgentRunnerTest extends TestCase
             command: [
                 'codex', 'exec', '--full-auto', '--json',
                 '--sandbox', 'danger-full-access',
-                '-m', 'o3',
+                '--model', 'gpt-5.5',
+                '-c', 'model_reasoning_effort="xhigh"',
                 '--skip-git-repo-check',
                 '--ephemeral',
             ],
@@ -138,7 +158,7 @@ final class CodexAgentRunnerTest extends TestCase
         self::assertSame('codex', $command[0]);
         self::assertContains('--skip-git-repo-check', $command);
         self::assertContains('--ephemeral', $command);
-        self::assertContains('-m', $command);
+        self::assertContains('--model', $command);
     }
 
     #[Test]
@@ -159,23 +179,23 @@ final class CodexAgentRunnerTest extends TestCase
     // ──── buildCommand: runner args ─────────────────────────────────────
 
     #[Test]
-    public function buildCommandAppendsRunnerArgs(): void
+    public function buildCommandAppendsFilteredRunnerArgs(): void
     {
         $request = new AgentRunRequestVo(
             role: 'test',
             task: 'task',
-            runnerArgs: ['--ignore-user-config', '--ignore-rules'],
+            runnerArgs: ['--some-flag', '--other-flag'],
         );
         $command = $this->runner->buildCommand($request);
 
-        self::assertContains('--ignore-user-config', $command);
-        self::assertContains('--ignore-rules', $command);
+        self::assertContains('--some-flag', $command);
+        self::assertContains('--other-flag', $command);
     }
 
     // ──── buildCommand: @file resolution ────────────────────────────────
 
     #[Test]
-    public function buildCommandResolvesAtFileArgs(): void
+    public function buildCommandResolvesAtFileArgsInCommand(): void
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'codex_test_');
         file_put_contents($tmpFile, 'File content here');
@@ -188,9 +208,8 @@ final class CodexAgentRunnerTest extends TestCase
             );
             $command = $this->runner->buildCommand($request);
 
-            // @file в command резолвится в содержимое и попадает в склеенный промпт (последний элемент)
-            $last = end($command);
-            self::assertStringContainsString('File content here', $last);
+            // @file резолвится в содержимое и заменяет исходный элемент в command
+            self::assertContains('File content here', $command);
             self::assertNotContains('@' . $tmpFile, $command);
         } finally {
             @unlink($tmpFile);
@@ -211,62 +230,6 @@ final class CodexAgentRunnerTest extends TestCase
         self::assertContains('@/nonexistent/file/path.md', $command);
     }
 
-    // ──── buildCommand: merged prompt order ─────────────────────────────
-
-    #[Test]
-    public function buildCommandMergesSystemPromptContextAndTaskInCorrectOrder(): void
-    {
-        $request = new AgentRunRequestVo(
-            role: 'test',
-            task: 'analyze this',
-            systemPrompt: 'You are Loki.',
-            previousContext: 'Previous analysis',
-        );
-        $command = $this->runner->buildCommand($request);
-
-        $last = end($command);
-        $lokiPos = strpos($last, 'You are Loki.');
-        $contextPos = strpos($last, 'Previous analysis');
-        $taskPos = strpos($last, '[Задача]: analyze this');
-
-        self::assertNotFalse($lokiPos);
-        self::assertNotFalse($contextPos);
-        self::assertNotFalse($taskPos);
-        // system prompt comes first, then context, then task
-        self::assertLessThan($contextPos, $lokiPos);
-        self::assertLessThan($taskPos, $contextPos);
-    }
-
-    // ──── buildCommand: prompt without system ───────────────────────────
-
-    #[Test]
-    public function buildCommandOnlyContainsTaskWhenNoSystemPromptOrContext(): void
-    {
-        $request = new AgentRunRequestVo(role: 'test', task: 'simple task');
-        $command = $this->runner->buildCommand($request);
-
-        $last = end($command);
-        self::assertStringContainsString('[Задача]: simple task', $last);
-        self::assertStringNotContainsString('You are', $last);
-    }
-
-    // ──── buildCommand: no tools flag (Codex doesn't support it) ────────
-
-    #[Test]
-    public function buildCommandIgnoresToolsParameter(): void
-    {
-        $request = new AgentRunRequestVo(
-            role: 'test',
-            task: 'task',
-            tools: '',
-        );
-        $command = $this->runner->buildCommand($request);
-
-        // Codex не поддерживает --tools / --no-tools
-        self::assertNotContains('--no-tools', $command);
-        self::assertNotContains('--tools', $command);
-    }
-
     // ──── buildCommand: @system-prompt / @append-system-prompt markers ────
 
     #[Test]
@@ -284,7 +247,7 @@ final class CodexAgentRunnerTest extends TestCase
     }
 
     #[Test]
-    public function buildCommandRemovesAppendSystemPromptMarkerFromCommand(): void
+    public function buildCommandRemovesBothPromptMarkersFromCommand(): void
     {
         $request = new AgentRunRequestVo(
             role: 'test',
@@ -318,11 +281,41 @@ final class CodexAgentRunnerTest extends TestCase
             self::assertNotContains('--append-system-prompt', $command);
             self::assertNotContains($tmpFile, $command);
 
-            // Содержимое файла — в склеенном промпте (последний элемент)
-            $last = end($command);
-            self::assertStringContainsString('Append instructions here', $last);
+            // Содержимое — в developer_instructions
+            $cIdx = array_search('-c', $command, true);
+            self::assertNotFalse($cIdx);
+            self::assertStringContainsString('Append instructions here', $command[$cIdx + 1]);
         } finally {
             @unlink($tmpFile);
+        }
+    }
+
+    #[Test]
+    public function buildCommandCombinesSystemAndAppendInDeveloperInstructions(): void
+    {
+        $sysFile = tempnam(sys_get_temp_dir(), 'codex_sys_');
+        $appendFile = tempnam(sys_get_temp_dir(), 'codex_append_');
+        file_put_contents($sysFile, 'You are Loki.');
+        file_put_contents($appendFile, 'Challenge all assumptions.');
+
+        try {
+            $request = new AgentRunRequestVo(
+                role: 'test',
+                task: 'task',
+                systemPrompt: $sysFile,
+                command: ['codex', 'exec', '--json', '--full-auto'],
+                runnerArgs: ['--append-system-prompt', $appendFile],
+            );
+            $command = $this->runner->buildCommand($request);
+
+            $cIdx = array_search('-c', $command, true);
+            self::assertNotFalse($cIdx);
+            $devInstructions = $command[$cIdx + 1];
+            self::assertStringContainsString('You are Loki.', $devInstructions);
+            self::assertStringContainsString('Challenge all assumptions.', $devInstructions);
+        } finally {
+            @unlink($sysFile);
+            @unlink($appendFile);
         }
     }
 
@@ -342,8 +335,9 @@ final class CodexAgentRunnerTest extends TestCase
             );
             $command = $this->runner->buildCommand($request);
 
-            $last = end($command);
-            self::assertStringContainsString('You are a system architect.', $last);
+            $cIdx = array_search('-c', $command, true);
+            self::assertNotFalse($cIdx);
+            self::assertStringContainsString('You are a system architect.', $command[$cIdx + 1]);
         } finally {
             @unlink($tmpFile);
         }
@@ -359,7 +353,60 @@ final class CodexAgentRunnerTest extends TestCase
         );
         $command = $this->runner->buildCommand($request);
 
+        $cIdx = array_search('-c', $command, true);
+        self::assertNotFalse($cIdx);
+        self::assertStringContainsString('Direct text prompt', $command[$cIdx + 1]);
+    }
+
+    // ──── buildCommand: TOML escaping ────────────────────────────────────
+
+    #[Test]
+    public function buildCommandEscapesTomlInDeveloperInstructions(): void
+    {
+        $request = new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            systemPrompt: 'He said "hello" and left\\nnew line',
+        );
+        $command = $this->runner->buildCommand($request);
+
+        $cIdx = array_search('-c', $command, true);
+        self::assertNotFalse($cIdx);
+        $value = $command[$cIdx + 1];
+        // Quotes should be escaped
+        self::assertStringContainsString('\\"hello\\"', $value);
+        // Backslash before 'n' should be escaped
+        self::assertStringContainsString('\\\\n', $value);
+    }
+
+    // ──── buildCommand: no tools flag (Codex doesn't support it) ────────
+
+    #[Test]
+    public function buildCommandIgnoresToolsParameter(): void
+    {
+        $request = new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            tools: '',
+        );
+        $command = $this->runner->buildCommand($request);
+
+        // Codex не поддерживает --tools / --no-tools
+        self::assertNotContains('--no-tools', $command);
+        self::assertNotContains('--tools', $command);
+    }
+
+    // ──── buildCommand: no system prompt → no -c ────────────────────────
+
+    #[Test]
+    public function buildCommandOmitsDeveloperInstructionsWhenNoSystemPrompt(): void
+    {
+        $request = new AgentRunRequestVo(role: 'test', task: 'simple task');
+        $command = $this->runner->buildCommand($request);
+
+        self::assertNotContains('-c', $command);
+        // Только user prompt в конце
         $last = end($command);
-        self::assertStringContainsString('Direct text prompt', $last);
+        self::assertStringContainsString('[Задача]: simple task', $last);
     }
 }
