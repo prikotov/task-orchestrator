@@ -9,9 +9,9 @@ depends_on:
 epic: EPIC-fix-brainstorm-session-bugs
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Левша) (pi)
-branch:
-pr:
-status: todo
+branch: task/fix-brainstorm-empty-participant-section
+pr: https://github.com/prikotov/task-orchestrator/pull/85
+status: done
 ---
 
 # TASK-fix-brainstorm-empty-participant-section: Удаление пустой секции «Выступления предыдущих участников» в первом раунде
@@ -84,6 +84,20 @@ vendor/bin/psalm
 
 Рекомендуется начать с последних файлов — в них самая актуальная позиция и свежие аргументы. Более ранние выступления читай по необходимости.
 ```
+
+## Инструкции для сабагента
+
+**Ветка:** task/fix-brainstorm-empty-participant-section (уже создана и активна)
+**PR:** уже создан (draft) из task/fix-brainstorm-empty-participant-section в fix/epic-brainstorm-session-bugs — [PR #85](https://github.com/prikotov/task-orchestrator/pull/85)
+
+### Порядок действий
+1. Переключись в ветку `task/fix-brainstorm-empty-participant-section`: `git checkout task/fix-brainstorm-empty-participant-section`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

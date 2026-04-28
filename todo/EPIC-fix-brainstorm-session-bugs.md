@@ -7,9 +7,9 @@ complexity: C2
 priority: P1
 author: Тимлид (Алекс) (pi)
 assignee: Тимлид (Алекс) (pi)
-status: todo
-branch:
-pr:
+status: done
+branch: fix/epic-brainstorm-session-bugs
+pr: https://github.com/prikotov/task-orchestrator/pull/88
 ---
 
 # EPIC-fix-brainstorm-session-bugs: Исправление багов brainstorm-сессии
@@ -38,13 +38,13 @@ pr:
 ## 3. Requirements (Требования, MoSCoW)
 
 ### 🔴 Must Have (Блокирующие требования)
-- [ ] `result.md` содержит текст synthesis, даже если LLM вернула synthesis как массив строк (склейка через `\n`)
-- [ ] В первом раунде промпт участника НЕ содержит секцию «Выступления предыдущих участников» и рекомендательную строку «Рекомендуется начать...»
-- [ ] Список файлов выступлений содержит имя роли рядом с каждым файлом (формат: `- <роль>: <путь>`)
-- [ ] Unit-тесты покрывают все 4 исправления
+- [x] `result.md` содержит текст synthesis, даже если LLM вернула synthesis как массив строк (склейка через `\n`)
+- [x] В первом раунде промпт участника НЕ содержит секцию «Выступления предыдущих участников» и рекомендательную строку «Рекомендуется начать...»
+- [x] Список файлов выступлений содержит имя роли рядом с каждым файлом (формат: `- <роль>: <путь>`)
+- [x] Unit-тесты покрывают все 4 исправления
 
 ### 🟡 Should Have (Важные требования)
-- [ ] Формат заголовка секции файлов унифицирован: одинаковый заголовок в `participant_user.txt` и `facilitator_continue.txt`
+- [x] Формат заголовка секции файлов унифицирован: одинаковый заголовок в `participant_user.txt` и `facilitator_continue.txt`
 
 ### 🟢 Could Have (Желательно)
 - [ ] Без пунктов
@@ -65,19 +65,19 @@ flowchart TD
 
 ## 5. Implementation Plan (План реализации)
 
-- [ ] [TASK-fix-brainstorm-synthesis-array](TASK-fix-brainstorm-synthesis-array.todo.md) — Исправление бага synthesis=Array в FacilitatorResponseParserService → **Бэкендер Левша**, P0
-- [ ] [TASK-fix-brainstorm-empty-participant-section](TASK-fix-brainstorm-empty-participant-section.todo.md) — Удаление пустой секции + рекомендательной строки в PromptFormatterService → **Бэкендер Левша**, P0
-- [ ] [TASK-fix-brainstorm-file-list-with-roles](TASK-fix-brainstorm-file-list-with-roles.todo.md) — Добавление ролей в список файлов выступлений → **Бэкендер Левша**, P1
-- [ ] [TASK-fix-brainstorm-unified-journal-format](TASK-fix-brainstorm-unified-journal-format.todo.md) — Унификация формата заголовка секции файлов в промптах → **Бэкендер Тони**, P2
+- [x] [TASK-fix-brainstorm-synthesis-array](done/TASK-fix-brainstorm-synthesis-array.todo.md) — Исправление бага synthesis=Array в FacilitatorResponseParserService → **Бэкендер Левша**, P0
+- [x] [TASK-fix-brainstorm-empty-participant-section](done/TASK-fix-brainstorm-empty-participant-section.todo.md) — Удаление пустой секции + рекомендательной строки в PromptFormatterService → **Бэкендер Левша**, P0
+- [x] [TASK-fix-brainstorm-file-list-with-roles](done/TASK-fix-brainstorm-file-list-with-roles.todo.md) — Добавление ролей в список файлов выступлений → **Бэкендер Левша**, P1
+- [x] [TASK-fix-brainstorm-unified-journal-format](done/TASK-fix-brainstorm-unified-journal-format.todo.md) — Унификация формата заголовка секции файлов в промптах → **Бэкендер Тони**, P2
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [ ] Все задачи Must Have выполнены и протестированы
-- [ ] PHPUnit проходит без регрессий
-- [ ] Psalm проходит без новых ошибок
-- [ ] Ретроспектива записана в `docs/agents/team-retro/`
+- [x] Все задачи Must Have выполнены и протестированы
+- [x] PHPUnit проходит без регрессий
+- [x] Psalm проходит без новых ошибок
+- [x] Ретроспектива записана в `docs/agents/team-retro/`
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
-- [ ] Изменения backward compatible, никаких миграций
+- [x] Изменения backward compatible, никаких миграций
 
 ## 8. Risks and Dependencies (Риски и зависимости)
 - Задача 3 (роли в списке файлов) меняет форматирование списка, что может повлиять на парсинг промпта агентом — но промпт использует список как контекст для чтения файлов, парсинг не зависит от формата

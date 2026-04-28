@@ -9,9 +9,9 @@ depends_on:
 epic: EPIC-fix-brainstorm-session-bugs
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Тони) (pi)
-branch:
-pr:
-status: todo
+branch: task/fix-brainstorm-unified-journal-format
+pr: https://github.com/prikotov/task-orchestrator/pull/87
+status: done
 ---
 
 # TASK-fix-brainstorm-unified-journal-format: Унификация формата заголовка секции файлов в промптах
@@ -67,6 +67,20 @@ vendor/bin/phpunit tests/Unit/Infrastructure/Service/Chain/PromptFormatterServic
 
 ## 9. Comments (Комментарии)
 Формат в `facilitator_continue.txt` («файлы — прочитай их») более информативен — он даёт прямую инструкцию агенту. Убираем `#` из заголовка participant, чтобы он совпадал по стилю с facilitator (без Markdown-заголовка).
+
+## Инструкции для сабагента
+
+**Ветка:** task/fix-brainstorm-unified-journal-format (уже создана и активна)
+**PR:** уже создан (draft) из task/fix-brainstorm-unified-journal-format в fix/epic-brainstorm-session-bugs — [PR #87](https://github.com/prikotov/task-orchestrator/pull/87)
+
+### Порядок действий
+1. Переключись в ветку `task/fix-brainstorm-unified-journal-format`: `git checkout task/fix-brainstorm-unified-journal-format`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

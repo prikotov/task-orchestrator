@@ -30,7 +30,9 @@ final readonly class FacilitatorResponseParserService implements FacilitatorResp
         }
 
         if (isset($json['done']) && (bool)$json['done']) {
-            return FacilitatorResponseVo::createFromDone((string)($json['synthesis'] ?? $llmText));
+            return FacilitatorResponseVo::createFromDone(
+                $this->normalizeSynthesis($json['synthesis'] ?? null, $llmText),
+            );
         }
 
         if (isset($json['next_role']) && is_string($json['next_role']) && $json['next_role'] !== '') {
@@ -42,6 +44,46 @@ final readonly class FacilitatorResponseParserService implements FacilitatorResp
         }
 
         return FacilitatorResponseVo::createFromDone($llmText);
+    }
+
+    /**
+     * Нормализует значение synthesis из ответа LLM в строку.
+     *
+     * LLM может вернуть synthesis как массив строк — в этом случае
+     * элементы склеиваются через перевод строки.
+     *
+     * @param mixed $value    Значение поля synthesis из JSON (string|array|null|другое)
+     * @param string $fallback Fallback-текст, если synthesis отсутствует
+     */
+    private function normalizeSynthesis(mixed $value, string $fallback): string
+    {
+        if ($value === null) {
+            return $fallback;
+        }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_array($value)) {
+            return implode("\n", array_map($this->flattenArrayElement(...), $value));
+        }
+
+        return (string)$value;
+    }
+
+    /**
+     * Приводит элемент массива synthesis к строке.
+     *
+     * Вложенные массивы рекурсивно склеиваются через перевод строки.
+     */
+    private function flattenArrayElement(mixed $element): string
+    {
+        if (is_array($element)) {
+            return implode("\n", array_map($this->flattenArrayElement(...), $element));
+        }
+
+        return (string)$element;
     }
 
     /**

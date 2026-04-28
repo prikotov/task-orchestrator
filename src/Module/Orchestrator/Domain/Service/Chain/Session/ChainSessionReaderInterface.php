@@ -22,7 +22,9 @@ interface ChainSessionReaderInterface
     /**
      * Возвращает относительные пути к response-файлам participant-раундов до шага $upToStep.
      *
-     * @return list<string>
+     * Каждый элемент содержит роль участника и путь к файлу.
+     *
+     * @return list<array{role: string, path: string}>
      */
     public function getResponseFilePaths(int $upToStep): array;
 
