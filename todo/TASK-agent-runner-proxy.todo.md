@@ -9,7 +9,7 @@ epic:
 author: Бэкендер Левша (backend_developer_levsha)
 assignee: Бэкендер Левша (backend_developer_levsha)
 branch: task/agent-runner-proxy
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/91
 status: in_progress
 ---
 
@@ -96,6 +96,7 @@ vendor/bin/psalm
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
 6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready 91`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
