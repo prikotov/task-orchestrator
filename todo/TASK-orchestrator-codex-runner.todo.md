@@ -10,8 +10,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Бэкендер Левша
 branch: task/orchestrator-codex-runner
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/89
+status: review
 ---
 
 # TASK-orchestrator-codex-runner: Codex CLI как runner для ролей в brainstorm
