@@ -53,6 +53,20 @@ roles:
       - model_instructions_file="@system-prompt"
       - -c
       - developer_instructions="@append-system-prompt"
+    # command:                            # pi (fallback)
+    #   - pi
+    #   - --mode
+    #   - json
+    #   - -p
+    #   - --no-session
+    #   - --provider
+    #   - zai
+    #   - --model
+    #   - glm-5.1
+    #   - --system-prompt
+    #   - "@system-prompt"
+    #   - --append-system-prompt
+    #   - "@append-system-prompt"
 
   system_architect_loki:
     prompt_file: docs/agents/roles/team/system_architect_loki.ru.md
@@ -74,6 +88,20 @@ roles:
       - model_instructions_file="@system-prompt"
       - -c
       - developer_instructions="@append-system-prompt"
+    # command:                            # pi (fallback)
+    #   - pi
+    #   - --mode
+    #   - json
+    #   - -p
+    #   - --no-session
+    #   - --provider
+    #   - zai
+    #   - --model
+    #   - glm-5.1
+    #   - --system-prompt
+    #   - "@system-prompt"
+    #   - --append-system-prompt
+    #   - "@append-system-prompt"
 
   backend_developer_levsha:
     prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
