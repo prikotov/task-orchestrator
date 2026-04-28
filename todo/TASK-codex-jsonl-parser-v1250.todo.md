@@ -9,8 +9,8 @@ epic:
 author: Бэкендер Левша (backend_developer_levsha)
 assignee: Бэкендер Левша (backend_developer_levsha)
 branch: task/fix-codex-jsonl-parser-v1250
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/93
+status: review
 ---
 
 # TASK-codex-jsonl-parser-v1250: Починить CodexJsonlParser под формат codex CLI v0.125.0
