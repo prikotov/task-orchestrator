@@ -170,9 +170,7 @@
 #### Среднесрочные (P2)
 
 * Crush: формализация Agent Skills (SKILL.md standard, discovery, validation) — 🟡 P2
-* Paperclip AI: scoped budget policies (company/agent/project с warning thresholds + hard stop + auto-pause) — 🟡 P2
 * Paperclip AI: adapter execution context (rich result: error family, cost, HITL question, runtime services) — 🟡 P2
-* Paperclip AI: goal alignment в промптах (goal ancestry: company → project → goal → issue) — 🟡 P2
 * pi_agent_rust: tool parallelism (параллельное выполнение read-only шагов в chain) — 🟡 P2
 * AutoGen: декларативные termination conditions (timeout, token limit, keyword) — 🟡 P2
 * OpenHands SDK: stuck detection (4 активных + 1 TODO — repeating action-obs, action-error, monologue, alternating; context-window loop не реализован) — 🟡 P2
@@ -207,6 +205,8 @@
 #### Долгосрочные / R&D (P3)
 
 * Crush: auto-summarization при переполнении контекста — 🟡 P3
+* Paperclip AI: scoped budget policies (company/agent/project с warning thresholds + hard stop + auto-pause) — 🟡 P3
+* Paperclip AI: goal alignment в промптах (goal ancestry: company → project → goal → issue) — 🟡 P3
 * Paperclip AI: session compaction policy (per-adapter: max runs/tokens/age thresholds, adapter-managed vs. threshold-based) — 🟡 P3
 * Paperclip AI: config revisions / rollback (agent config snapshots с API-driven rollback) — 🟡 P3
 * Paperclip AI: multi-stage execution policy (approval gates с participants — дополнение к quality gates) — 🟡 P3
@@ -431,4 +431,5 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 | 2026-04-28 | Тимлид (Алекс) | Эпик reopen: добавлены задачи на ресерч Paperclip AI и AgentCraft |
 | 2026-04-22 | Архитектор (Локи) | Ревью консистентности: исправлены данные по результатам ревью индивидуальных отчётов — Archon (8 таблиц, node-level retry, 21 hook), Mastra AI (22+ адаптеров), Claude Code (30+ tools, 20+ hook events, Agent SDK, agent teams), Codex (hooks, memories, plugins, Starlark exec policy, external-sandbox), Crush (sub-agents Coder → Task), OpenHands SDK (4+1 stuck detector, 6 hook events), Copilot (Cloud Agent, CLI/SDK/Spark), LangGraph (langchain-core dependency). Обновлён тренд sub-agents (9/13 вместо 8/13). |
 | 2026-04-22 | Тимлид (Алекс) | Добавлена строка Agno (#14). Пересчитаны тренды (13→14): agent loop 12/14, SKILL.md 9/14, MCP 10/14, sub-agents 10/14, conditional branching 5 проектов, compression 7/14. Добавлен error-specific fallback routing (Agno) в Кластер 1. Добавлены Loop end_condition и Agno conditional branching в Кластер 3. Добавлены индивидуальные рекомендации Agno (P2: error-specific fallback, Loop end_condition, conditional branching; P3: HITL, compression, guardrails, evals, Teams, parallel, nested workflows). |
-| 2026-04-28 | Технический писатель (Гермиона) | Создан отчёт paperclip-ai-comparison.md, заполнена строка Paperclip AI (#15). Пересчитаны тренды (14→15): agent loop 12/15, SKILL.md 9/15 (+Company Skills), MCP 11/15, sub-agents 10/15, compression 7/15 (+session compaction policy). Добавлен третий уровень абстракции (meta-orchestrator). Добавлены рекомендации Paperclip AI (P2: run liveness, error classification, escalation strategy, scoped budgets, adapter context, goal alignment; P3: session compaction, config revisions, execution policy, plugin system, run recovery). |
+| 2026-04-28 | Технический писатель (Гермиона) | Создан отчёт paperclip-ai-comparison.md, заполнена строка Paperclip AI (#15). Пересчитаны тренды (14→15): agent loop 12/15, SKILL.md 9/15 (+Company Skills), MCP 11/15, sub-agents 10/15, compression 7/15 (+session compaction policy). Добавлен третий уровень абстракции (meta-orchestrator). Добавлены рекомендации Paperclip AI (P2: run liveness, error classification, escalation strategy, adapter context; P3: session compaction, config revisions, execution policy, plugin system, run recovery, scoped budgets, goal alignment). |
+| 2026-04-28 | Технический писатель (Гермиона) | Доработка по замечаниям ревьювера (Архитектор Локи, PR #95): goal alignment — добавлена оговорка об ограниченной применимости для chain-оркестратора (секция 3.6); plugin system — добавлена оговорка о преждевременности для CLI (секция 3.8); добавлен подраздел Security: secrets management, execution environments, agent permissions (секция 3.10); scoped budget policies — унифицирован приоритет P3 в отчёте и сводной таблице. |

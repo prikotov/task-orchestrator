@@ -277,6 +277,8 @@ const DEFAULT_SESSION_COMPACTION_POLICY: SessionCompactionPolicy = {
 
 **Почему нам интересно:** Для сложных цепочек (implement → review → fix → deploy) — каждый шаг должен понимать *зачем* он выполняется, а не только *что*. Goal alignment в промпте улучшает качество решений агента.
 
+**⚠️ Ограниченная применимость для task-orchestrator:** Эффект ограничен: в task-orchestrator chain выполняется в контексте одной задачи, goal ancestry даст меньше пользы, чем в мета-оркестраторе с множеством параллельных агентов. Каждый шаг chain'а и так знает свою задачу из YAML-конфигурации. Полезность возрастёт только при переходе к multi-chain / multi-agent сценариям.
+
 **Отличие от нашей реализации:**
 - У нас: role .md промпт + payload (task description)
 - У них: goal ancestry + company mission + project context в каждом run
@@ -335,6 +337,8 @@ interface IssueExecutionPolicy {
 
 **Почему нам интересно:** Plugin system — это mechanism для расширения task-orchestrator без изменения core. Если мы хотим позволить пользователям добавлять custom runners, quality gates, event handlers — plugin SDK — готовый паттерн.
 
+**⚠️ Преждевременная рекомендация для CLI:** Plugin system оправдан только при появлении внешних пользователей, которым нужна кастомизация без форка. Для текущего stage проекта (CLI-утилита с внутренним использованием) — накладные расходы на plugin SDK (out-of-process workers, DB, UI contributions) не оправданы. Расширение через реализацию `AgentRunnerInterface` покрывает текущие потребности.
+
 **Отличие от нашей реализации:**
 - У нас: расширение через реализацию AgentRunnerInterface
 - У них: полноценный plugin SDK с events, jobs, data, tools, state, UI
@@ -386,6 +390,36 @@ interface AdapterExecutionResult {
 **Отличие от нашей реализации:**
 - У нас: AgentRunnerInterface с простым run() → AgentResult
 - У них: AdapterExecutionContext с rich result (error classification, cost, HITL, runtime services)
+
+---
+
+### 3.10 🟡 Security: Secrets Management, Execution Environments, Agent Permissions
+
+Paperclip AI реализует три уровня безопасности, которые не были разобраны в предыдущих секциях:
+
+**Secrets Management** (`server/src/secrets/`):
+- Encrypted storage секретов (API keys, tokens) с provider registry
+- Секреты резолвятся на уровне adapter execution — агент получает только нужные
+- Plugin SDK имеет доступ к секретам через `ctx.secrets.resolve(...)`
+- Export/import организаций включает scrubbing секретов
+
+**Execution Environments** (`server/src/services/environments.ts`):
+- Конфигурируемые окружения: local, remote, Docker
+- Каждый agent привязан к default environment
+- Execution workspaces (`server/src/services/execution-workspaces/`) — изоляция через git worktree
+- Runtime services: dev servers, preview URLs с auto-cleanup
+
+**Agent Permissions**:
+- Pause/resume/terminate агентов — административный контроль
+- Budget hard stops + auto-pause — автоматическое ограничение при превышении
+- Execution policy (multi-stage approval) — governance-level контроль
+- Activity audit — полный лог действий для compliance
+
+**Почему нам интересно:** Для автономного выполнения в CI/CD (наша roadmap) минимальный набор: secrets management (шифрование API keys runner'ов) + exec policy (ограничение shell-команд) + basic audit. Полноценные execution environments (Docker, git worktree) — долгосрочная перспектива.
+
+**Отличие от нашей реализации:**
+- У нас: нет secrets management (ключи в env vars), нет exec policy, нет sandboxing
+- У них: encrypted secrets + execution environments + governance permissions + audit
 
 ---
 
