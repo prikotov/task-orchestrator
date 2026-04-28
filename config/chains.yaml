@@ -53,7 +53,21 @@ roles:
       - model_instructions_file="@system-prompt"
       - -c
       - developer_instructions="@append-system-prompt"
-    # command:                            # pi (fallback)
+    # command:                            # pi + openai (example)
+    #   - pi
+    #   - --mode
+    #   - json
+    #   - -p
+    #   - --no-session
+    #   - --provider
+    #   - openai
+    #   - --model
+    #   - gpt-5.5
+    #   - --system-prompt
+    #   - "@system-prompt"
+    #   - --append-system-prompt
+    #   - "@append-system-prompt"
+    # command:                            # pi + zai (fallback)
     #   - pi
     #   - --mode
     #   - json
@@ -88,7 +102,21 @@ roles:
       - model_instructions_file="@system-prompt"
       - -c
       - developer_instructions="@append-system-prompt"
-    # command:                            # pi (fallback)
+    # command:                            # pi + openai (example)
+    #   - pi
+    #   - --mode
+    #   - json
+    #   - -p
+    #   - --no-session
+    #   - --provider
+    #   - openai
+    #   - --model
+    #   - gpt-5.5
+    #   - --system-prompt
+    #   - "@system-prompt"
+    #   - --append-system-prompt
+    #   - "@append-system-prompt"
+    # command:                            # pi + zai (fallback)
     #   - pi
     #   - --mode
     #   - json
