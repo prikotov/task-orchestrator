@@ -159,10 +159,60 @@ final class CodexAgentRunnerTest extends TestCase
         self::assertContains('--other-flag', $command);
     }
 
-    // ──── buildCommand: @append-system-prompt in command ────────────────
+    // ──── @system-prompt: resolved as file path ─────────────────────────
 
     #[Test]
-    public function buildCommandResolvesAppendSlotInCommand(): void
+    public function buildCommandResolvesSystemPromptAsPath(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'codex_sys_');
+        file_put_contents($tmpFile, 'You are Gandalf the architect.');
+
+        try {
+            $request = new AgentRunRequestVo(
+                role: 'test',
+                task: 'task',
+                systemPrompt: $tmpFile,
+                command: [
+                    'codex', 'exec', '--json', '--full-auto',
+                    '-c', 'model_instructions_file="@system-prompt"',
+                ],
+            );
+            $command = $this->runner->buildCommand($request);
+
+            // @system-prompt заменён на путь (codex читает файл сам)
+            $cIdx = array_search('-c', $command, true);
+            self::assertNotFalse($cIdx);
+            self::assertSame(
+                sprintf('model_instructions_file="%s"', $tmpFile),
+                $command[$cIdx + 1],
+            );
+        } finally {
+            @unlink($tmpFile);
+        }
+    }
+
+    #[Test]
+    public function buildCommandLeavesSystemPromptMarkerWhenNoFile(): void
+    {
+        $request = new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            systemPrompt: 'plain text, not a file',
+            command: [
+                'codex', 'exec', '--json', '--full-auto',
+                '-c', 'model_instructions_file="@system-prompt"',
+            ],
+        );
+        $command = $this->runner->buildCommand($request);
+
+        // Не файл — маркер остаётся
+        self::assertContains('model_instructions_file="@system-prompt"', $command);
+    }
+
+    // ──── @append-system-prompt: resolved as file content ───────────────
+
+    #[Test]
+    public function buildCommandResolvesAppendSlotAsContent(): void
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'codex_append_');
         file_put_contents($tmpFile, 'Challenge all assumptions.');
@@ -179,10 +229,10 @@ final class CodexAgentRunnerTest extends TestCase
             );
             $command = $this->runner->buildCommand($request);
 
-            // Маркер заменён на содержимое файла
-            $cIdx = array_search('-c', $command, true);
-            self::assertNotFalse($cIdx);
-            $cValue = $command[$cIdx + 1];
+            // @append-system-prompt заменён на содержимое файла
+            $cIndices = array_keys(array_filter($command, static fn($v) => $v === '-c'));
+            $devInstrIdx = end($cIndices);
+            $cValue = $command[$devInstrIdx + 1];
             self::assertStringContainsString('Challenge all assumptions.', $cValue);
             self::assertStringNotContainsString('@append-system-prompt', $cValue);
 
@@ -195,7 +245,7 @@ final class CodexAgentRunnerTest extends TestCase
     }
 
     #[Test]
-    public function buildCommandLeavesMarkerWhenNoRunnerArgs(): void
+    public function buildCommandLeavesAppendMarkerWhenNoRunnerArgs(): void
     {
         $request = new AgentRunRequestVo(
             role: 'test',
@@ -207,15 +257,15 @@ final class CodexAgentRunnerTest extends TestCase
         );
         $command = $this->runner->buildCommand($request);
 
-        // Нет runnerArgs → маркер остаётся как есть
+        // Нет runnerArgs → маркер остаётся
         self::assertContains('developer_instructions="@append-system-prompt"', $command);
     }
 
     #[Test]
-    public function buildCommandEscapesTomlInResolvedSlot(): void
+    public function buildCommandEscapesTomlInAppendContent(): void
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'codex_append_');
-        file_put_contents($tmpFile, 'He said "hello" and left');
+        file_put_contents($tmpFile, 'He said "hello"');
 
         try {
             $request = new AgentRunRequestVo(
@@ -229,32 +279,53 @@ final class CodexAgentRunnerTest extends TestCase
             );
             $command = $this->runner->buildCommand($request);
 
-            $cIdx = array_search('-c', $command, true);
-            self::assertNotFalse($cIdx);
-            $cValue = $command[$cIdx + 1];
-            // Quotes должны быть экранированы для TOML
+            $cIndices = array_keys(array_filter($command, static fn($v) => $v === '-c'));
+            $devInstrIdx = end($cIndices);
+            $cValue = $command[$devInstrIdx + 1];
             self::assertStringContainsString('\\"hello\\"', $cValue);
         } finally {
             @unlink($tmpFile);
         }
     }
 
-    // ──── buildCommand: systemPrompt ignored for codex ──────────────────
+    // ──── Both markers together ─────────────────────────────────────────
 
     #[Test]
-    public function buildCommandIgnoresSystemPrompt(): void
+    public function buildCommandResolvesBothMarkersTogether(): void
     {
-        $request = new AgentRunRequestVo(
-            role: 'test',
-            task: 'task',
-            systemPrompt: 'You are a system architect.',
-        );
-        $command = $this->runner->buildCommand($request);
+        $sysFile = tempnam(sys_get_temp_dir(), 'codex_sys_');
+        $appendFile = tempnam(sys_get_temp_dir(), 'codex_append_');
+        file_put_contents($sysFile, 'You are Loki.');
+        file_put_contents($appendFile, 'Challenge assumptions.');
 
-        // systemPrompt не передаётся codex
-        self::assertNotContains('-c', $command);
-        foreach ($command as $arg) {
-            self::assertStringNotContainsString('You are a system architect.', $arg);
+        try {
+            $request = new AgentRunRequestVo(
+                role: 'test',
+                task: 'task',
+                systemPrompt: $sysFile,
+                command: [
+                    'codex', 'exec', '--json', '--full-auto',
+                    '-c', 'model_instructions_file="@system-prompt"',
+                    '-c', 'developer_instructions="@append-system-prompt"',
+                ],
+                runnerArgs: ['--append-system-prompt', $appendFile],
+            );
+            $command = $this->runner->buildCommand($request);
+
+            // model_instructions_file содержит путь
+            $cIndices = array_keys(array_filter($command, static fn($v) => $v === '-c'));
+            $sysIdx = $cIndices[0];
+            self::assertSame(
+                sprintf('model_instructions_file="%s"', $sysFile),
+                $command[$sysIdx + 1],
+            );
+
+            // developer_instructions содержит текст
+            $appendIdx = $cIndices[1];
+            self::assertStringContainsString('Challenge assumptions.', $command[$appendIdx + 1]);
+        } finally {
+            @unlink($sysFile);
+            @unlink($appendFile);
         }
     }
 

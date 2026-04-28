@@ -50,6 +50,8 @@ roles:
       - --ephemeral
       - --ignore-rules
       - -c
+      - model_instructions_file="@system-prompt"
+      - -c
       - developer_instructions="@append-system-prompt"
 
   system_architect_loki:
@@ -68,6 +70,8 @@ roles:
       - --skip-git-repo-check
       - --ephemeral
       - --ignore-rules
+      - -c
+      - model_instructions_file="@system-prompt"
       - -c
       - developer_instructions="@append-system-prompt"
 
