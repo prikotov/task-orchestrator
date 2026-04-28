@@ -7,10 +7,10 @@ priority: P1
 depends_on: TASK-agent-runner-proxy
 epic:
 author: Бэкендер Левша (backend_developer_levsha)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер Левша (backend_developer_levsha)
+branch: task/fix-codex-jsonl-parser-v1250
+pr: https://github.com/prikotov/task-orchestrator/pull/93
+status: done
 ---
 
 # TASK-codex-jsonl-parser-v1250: Починить CodexJsonlParser под формат codex CLI v0.125.0
@@ -54,7 +54,12 @@ status: todo
 - [ ] Изменение контракта `parse()` — возвращаемая структура остаётся той же
 
 ## 4. Implementation Plan (План реализации)
-*Заполняется исполнителем перед стартом.*
+
+1. ✅ `extractTurnCompleted()` — поиск `usage` на верхнем уровне `$decoded` (v0.125.0), fallback на `$decoded['turn']['usage']` (обратная совместимость)
+2. ✅ `extractItemText()` — извлечение текста из `item.text` (v0.125.0), fallback на `item.content[]` (обратная совместимость)
+3. ✅ Добавлен `reasoningOutputTokens` в возвращаемый массив `parse()`
+4. ✅ Обновлён PHPDoc с документацией обоих форматов
+5. ✅ Unit-тесты: 7 новых тестов для codex v0.125.0 + обновлённые assertions
 
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] Парсер корректно обрабатывает реальный JSONL-вывод codex v0.125.0
