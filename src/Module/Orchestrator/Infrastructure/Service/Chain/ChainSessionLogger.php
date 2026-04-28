@@ -299,7 +299,7 @@ final class ChainSessionLogger implements ChainSessionLoggerInterface
             if ($step <= $upToStep && !$data['is_facilitator']) {
                 $relative = substr($this->currentSessionDir, strlen($this->basePath) + 1)
                     . '/' . $data['response'];
-                $paths[] = $relative;
+                $paths[] = ['role' => $data['role'], 'path' => $relative];
             }
         }
 

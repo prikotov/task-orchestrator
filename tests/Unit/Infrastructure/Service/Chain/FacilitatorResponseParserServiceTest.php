@@ -166,6 +166,51 @@ final class FacilitatorResponseParserServiceTest extends TestCase
         ];
     }
 
+    #[Test]
+    public function parseFromDoneWithSynthesisAsString(): void
+    {
+        $vo = $this->parser->parse('{"done": true, "synthesis": "Great ideas!"}');
+
+        self::assertTrue($vo->isDone());
+        self::assertSame('Great ideas!', $vo->getSynthesis());
+    }
+
+    #[Test]
+    public function parseFromDoneWithSynthesisArrayOfStrings(): void
+    {
+        $vo = $this->parser->parse('{"done": true, "synthesis": ["Line one", "Line two", "Line three"]}');
+
+        self::assertTrue($vo->isDone());
+        self::assertSame("Line one\nLine two\nLine three", $vo->getSynthesis());
+    }
+
+    #[Test]
+    public function parseFromDoneWithSynthesisArraySingleElement(): void
+    {
+        $vo = $this->parser->parse('{"done": true, "synthesis": ["Only line"]}');
+
+        self::assertTrue($vo->isDone());
+        self::assertSame('Only line', $vo->getSynthesis());
+    }
+
+    #[Test]
+    public function parseFromDoneWithSynthesisNestedArray(): void
+    {
+        $vo = $this->parser->parse('{"done": true, "synthesis": [["A", "B"], "C"]}');
+
+        self::assertTrue($vo->isDone());
+        self::assertSame("A\nB\nC", $vo->getSynthesis());
+    }
+
+    #[Test]
+    public function parseFromDoneWithSynthesisEmptyArray(): void
+    {
+        $vo = $this->parser->parse('{"done": true, "synthesis": []}');
+
+        self::assertTrue($vo->isDone());
+        self::assertSame('', $vo->getSynthesis());
+    }
+
     #[DataProvider('llmResponseProvider')]
     #[Test]
     public function parseFromVariousLLMResponses(

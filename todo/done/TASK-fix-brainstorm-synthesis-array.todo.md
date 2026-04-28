@@ -9,9 +9,9 @@ depends_on:
 epic: EPIC-fix-brainstorm-session-bugs
 author: Тимлид (Алекс) (pi)
 assignee: Бэкендер (Левша) (pi)
-branch:
-pr:
-status: todo
+branch: task/fix-brainstorm-synthesis-array
+pr: https://github.com/prikotov/task-orchestrator/pull/84
+status: done
 ---
 
 # TASK-fix-brainstorm-synthesis-array: Исправление бага synthesis=«Array» в result.md
@@ -68,6 +68,20 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 Баг обнаружен в сессии `var/sessions/brainstorm/2026-04-27_12-29-03/` — `result.md` содержит `## Synthesis\nArray`.
+
+## Инструкции для сабагента
+
+**Ветка:** task/fix-brainstorm-synthesis-array (уже создана и активна)
+**PR:** уже создан (draft) из task/fix-brainstorm-synthesis-array в fix/epic-brainstorm-session-bugs — [PR #84](https://github.com/prikotov/task-orchestrator/pull/84)
+
+### Порядок действий
+1. Переключись в ветку `task/fix-brainstorm-synthesis-array`: `git checkout task/fix-brainstorm-synthesis-array`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
