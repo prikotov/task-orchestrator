@@ -8,10 +8,10 @@ priority: P2
 depends_on:
 epic:
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер Левша
+branch: task/orchestrator-codex-runner
+pr: https://github.com/prikotov/task-orchestrator/pull/89
+status: review
 ---
 
 # TASK-orchestrator-codex-runner: Codex CLI как runner для ролей в brainstorm
@@ -60,13 +60,13 @@ status: todo
 
 ## 4. Implementation Plan (План реализации)
 *Заполняется исполнителем перед стартом.*
-1. [ ] Spike: запустить `codex exec --json` с тестовым промптом, изучить формат JSONL-событий
-2. [ ] Реализовать `CodexJsonlParser`
-3. [ ] Реализовать `CodexAgentRunner` (включая логику инъекции system-prompt через stdin)
-4. [ ] Зарегистрировать в `services.yaml` через тег `agent.runner`
-5. [ ] Обновить `config/chains.yaml` для архитекторов
-6. [ ] Unit-тесты
-7. [ ] Проверка: PHPUnit + Psalm
+1. [x] Spike: запустить `codex exec --json` с тестовым промптом, изучить формат JSONL-событий
+2. [x] Реализовать `CodexJsonlParser`
+3. [x] Реализовать `CodexAgentRunner` (включая логику инъекции system-prompt через stdin)
+4. [x] Зарегистрировать в `services.yaml` через тег `agent.runner` (автоматически через `_instanceof`)
+5. [x] Обновить `config/chains.yaml` для архитекторов
+6. [x] Unit-тесты
+7. [x] Проверка: PHPUnit + Psalm
 
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] `CodexAgentRunner` корректно реализует `AgentRunnerInterface` и возвращает `AgentResultVo`
