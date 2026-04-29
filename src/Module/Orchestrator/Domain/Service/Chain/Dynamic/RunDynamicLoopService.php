@@ -26,12 +26,12 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorRe
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorTurnResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
 
-use function array_map;
-use function count;
-use function date;
-use function implode;
-use function in_array;
-use function sprintf;
+
+
+
+
+
+
 
 /**
  * Исполнитель dynamic-цикла: координирует facilitator/participant turns, бюджет.
@@ -89,7 +89,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
                 $execution->markMaxTimeExceeded();
                 // shouldReserveForFinalize returns false when maxTime is null,
                 // so maxTime is guaranteed non-null here.
-                \assert($context->maxTime !== null);
+                assert($context->maxTime !== null);
                 $reserve = self::calculateFinalizeReserve($context->maxTime);
                 $this->logger?->info('Discussion stopped: reserving time for synthesis.', [
                     'maxTime' => $context->maxTime,
