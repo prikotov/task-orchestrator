@@ -9,8 +9,8 @@ epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/prompt-configuration-vo
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/102
+status: review
 ---
 
 # TASK-refactor-prompt-configuration-vo: PromptConfiguration VO для ChainDefinitionVo
