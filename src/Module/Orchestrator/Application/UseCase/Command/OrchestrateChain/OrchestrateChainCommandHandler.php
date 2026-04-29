@@ -4,50 +4,25 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain;
 
-use LogicException;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Event\OrchestrateChain\OrchestrateSessionCompletedEvent;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
-
-use function array_any;
-use function count;
 
 /**
  * UseCase оркестрации цепочки AI-агентов.
  *
- * Тонкий координатор: загружает цепочку, создаёт контекст,
- * делегирует выполнение сервисам оркестрации,
- * финализирует сессию.
+ * Чистый диспетчер: загружает цепочку, определяет стратегию выполнения,
+ * делегирует execute/resume. Поведенческая логика инкапсулирована в стратегиях.
  */
 class OrchestrateChainCommandHandler
 {
-    /** @var int Дефолтный таймаут (секунды) для dynamic-цепочки при отсутствии CLI и chain timeout */
-    private const int DEFAULT_DYNAMIC_TIMEOUT = 600;
-
-    /** @var int Дефолтный таймаут (секунды) для static-цепочки при отсутствии CLI timeout */
-    private const int DEFAULT_STATIC_TIMEOUT = 300;
-
-    /** @var int Дефолтный max_time (секунды) для dynamic-цепочки при отсутствии CLI и chain max_time */
-    private const int DEFAULT_DYNAMIC_MAX_TIME = 3600;
-
+    /**
+     * @param ChainLoaderInterface $chainLoader загрузчик определения цепочки
+     * @param iterable<ExecutionStrategyInterface> $strategies зарегистрированные стратегии выполнения
+     */
     public function __construct(
         private ChainLoaderInterface $chainLoader,
-        private RunAgentServiceInterface $agentRunner,
-        private ExecuteStaticChainServiceInterface $staticChainExecutor,
-        private RunDynamicLoopServiceInterface $dynamicLoopRunner,
-        private BuildDynamicContextServiceInterface $contextBuilder,
-        private ChainSessionLoggerInterface $sessionLogger,
-        private AuditLoggerFactoryInterface $auditLoggerFactory,
-        private ?EventDispatcherInterface $eventDispatcher = null,
+        private iterable $strategies,
     ) {
     }
 
@@ -56,273 +31,27 @@ class OrchestrateChainCommandHandler
      */
     public function __invoke(OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        if ($command->resumeDir !== null) {
-            return $this->resumeDynamic($command);
-        }
-
         $chain = $this->chainLoader->load($command->chainName);
+        $strategy = $this->resolveStrategy($chain);
 
-        return $chain->isDynamic()
-            ? $this->executeDynamic($chain, $command)
-            : $this->executeStatic($chain, $command);
-    }
-
-    // ─── Static chain ────────────────────────────────────────────────────
-
-    private function executeStatic(
-        ChainDefinitionVo $chain,
-        OrchestrateChainCommand $command,
-    ): OrchestrateChainResultDto {
-        return $this->staticChainExecutor->execute(
-            $chain,
-            $command->task,
-            $command->workingDir,
-            $command->timeout ?? self::DEFAULT_STATIC_TIMEOUT,
-            null, // static chains have no session-scoped audit log
-            $command->noContextFiles,
-        );
-    }
-
-    // ─── Dynamic chain ────────────────────────────────────────────────────
-
-    private function executeDynamic(
-        ChainDefinitionVo $chain,
-        OrchestrateChainCommand $command,
-    ): OrchestrateChainResultDto {
-        $facilitatorRole = $command->facilitator ?? $chain->getFacilitator() ?? 'team_lead';
-        $participants = $command->participants ?? $chain->getParticipants();
-        $maxRounds = $command->maxRounds ?? $chain->getMaxRounds();
-        $topic = $command->topic ?? $command->task;
-        $timeout = $command->timeout ?? $chain->getTimeout() ?? self::DEFAULT_DYNAMIC_TIMEOUT;
-        $maxTime = $command->maxTime ?? $chain->getMaxTime() ?? self::DEFAULT_DYNAMIC_MAX_TIME;
-
-        $sessionDir = $this->sessionLogger->startSession(
-            $chain->getName(),
-            $topic,
-            $facilitatorRole,
-            $participants,
-            $maxRounds,
-        );
-        $auditLogger = $this->resolveAuditLogger($sessionDir, $command->noAuditLog);
-        $this->sessionLogger->setBudget($chain->getBudget());
-        $this->sessionLogger->logInvocation(
-            $this->contextBuilder->buildInvocation(
-                $chain,
-                $command->task,
-                $timeout,
-                $command->workingDir,
-                $command->resumeDir,
-                $facilitatorRole,
-                $participants,
-                $maxRounds,
-                $topic,
-            ),
-        );
-
-        $context = $this->contextBuilder->buildContext(
-            $chain,
-            $facilitatorRole,
-            $participants,
-            $maxRounds,
-            $topic,
-            $command->workingDir,
-            $timeout,
-            $maxTime,
-        );
-
-        $loopResult = $this->runDynamicLoop($chain, $context, auditLogger: $auditLogger);
-        $this->finalizeSession($loopResult, $sessionDir);
-
-        return $this->toResultDto($loopResult, $sessionDir);
-    }
-
-    private function resumeDynamic(OrchestrateChainCommand $command): OrchestrateChainResultDto
-    {
-        $resumeDir = $command->resumeDir;
-        assert($resumeDir !== null);
-        $auditLogger = $this->resolveAuditLogger($resumeDir, $command->noAuditLog);
-        $this->sessionLogger->resumeSession($resumeDir);
-        $state = $this->sessionLogger->getResumedState();
-
-        if ($state === null) {
-            throw new LogicException("Failed to resume session from: {$resumeDir}");
-        }
-
-        $chain = $this->chainLoader->load($command->chainName);
-        $this->sessionLogger->setBudget($chain->getBudget());
-        $resumeTimeout = $command->timeout ?? $chain->getTimeout() ?? self::DEFAULT_DYNAMIC_TIMEOUT;
-
-        $invocation = $this->contextBuilder->buildInvocation(
-            $chain,
-            $command->task,
-            $resumeTimeout,
-            $command->workingDir,
-            $command->resumeDir,
-            $state->getFacilitator(),
-            $state->getParticipants(),
-            $state->getMaxRounds(),
-            $state->getTopic(),
-        );
-        $invocation['resumed_from'] = $resumeDir;
-        $this->sessionLogger->logInvocation($invocation);
-
-        $context = $this->contextBuilder->buildContext(
-            $chain,
-            $state->getFacilitator(),
-            $state->getParticipants(),
-            $state->getMaxRounds(),
-            $state->getTopic(),
-            $command->workingDir,
-            $resumeTimeout,
-            $command->maxTime ?? $chain->getMaxTime() ?? self::DEFAULT_DYNAMIC_MAX_TIME,
-        );
-
-        $loopResult = $this->runDynamicLoop(
-            $chain,
-            $context,
-            $state->getCompletedRounds(),
-            $state->getDiscussionHistory(),
-            $state->getFacilitatorJournal(),
-            $auditLogger,
-        );
-        $this->finalizeSession($loopResult, $resumeDir);
-
-        return $this->toResultDto($loopResult, $resumeDir);
-    }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────
-
-    private function runDynamicLoop(
-        ChainDefinitionVo $chain,
-        \TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo $context,
-        int $startRound = 0,
-        string $initialDiscussionHistory = '',
-        string $initialFacilitatorJournal = '',
-        ?AuditLoggerInterface $auditLogger = null,
-    ): DynamicLoopResultVo {
-        return $this->dynamicLoopRunner->execute(
-            $chain,
-            $context,
-            $startRound,
-            $initialDiscussionHistory,
-            $initialFacilitatorJournal,
-            $auditLogger,
-        );
-    }
-
-    private function finalizeSession(DynamicLoopResultVo $loopResult, ?string $sessionDir = null): void
-    {
-        $synthesis = $loopResult->synthesis;
-        $reason = $loopResult->budgetExceeded
-            ? 'budget_exceeded'
-            : ($loopResult->maxTimeExceeded
-                ? 'max_time_exceeded'
-                : ($synthesis !== null
-                    ? ($loopResult->maxRoundsReached ? 'max_rounds_reached' : 'facilitator_done')
-                    : ($loopResult->interruptionReason ?? 'no_synthesis')));
-
-        if ($synthesis !== null) {
-            $this->sessionLogger->completeSession(
-                $synthesis,
-                $loopResult->totalTime,
-                $loopResult->totalInputTokens,
-                $loopResult->totalOutputTokens,
-                $loopResult->totalCost,
-                count($loopResult->roundResults),
-                $reason,
-            );
-
-            $this->dispatchCompletedEvent($loopResult, $sessionDir, $reason);
-
-            return;
-        }
-
-        $this->sessionLogger->interruptSession($reason);
-        $this->dispatchCompletedEvent($loopResult, $sessionDir, $reason);
+        return $command->resumeDir !== null
+            ? $strategy->resume($chain, $command)
+            : $strategy->execute($chain, $command);
     }
 
     /**
-     * @param string|null $sessionDir Директория сессии для audit.jsonl
+     * Определяет стратегию выполнения по определению цепочки.
      */
-    private function resolveAuditLogger(?string $sessionDir, bool $noAuditLog = false): ?AuditLoggerInterface
+    private function resolveStrategy(ChainDefinitionVo $chain): ExecutionStrategyInterface
     {
-        if ($noAuditLog || $sessionDir === null) {
-            return null;
+        foreach ($this->strategies as $strategy) {
+            if ($strategy->supports($chain)) {
+                return $strategy;
+            }
         }
 
-        return $this->auditLoggerFactory->create($sessionDir . '/audit.jsonl');
-    }
-
-    private function dispatchCompletedEvent(DynamicLoopResultVo $loopResult, ?string $sessionDir, string $reason): void
-    {
-        $synthesis = $loopResult->synthesis;
-        $this->eventDispatcher?->dispatch(new OrchestrateSessionCompletedEvent(
-            status: $synthesis !== null ? 'completed' : 'interrupted',
-            completionReason: $reason,
-            totalRounds: count($loopResult->roundResults),
-            totalTime: $loopResult->totalTime,
-            totalInputTokens: $loopResult->totalInputTokens,
-            totalOutputTokens: $loopResult->totalOutputTokens,
-            totalCost: $loopResult->totalCost,
-            synthesis: $synthesis,
-            sessionDir: $sessionDir,
-            budgetExceeded: $loopResult->budgetExceeded,
-            budgetLimit: $loopResult->budgetLimit,
-            budgetExceededRole: $loopResult->budgetExceededRole,
-        ));
-    }
-
-    private function toResultDto(DynamicLoopResultVo $loopResult, ?string $sessionDir): OrchestrateChainResultDto
-    {
-        $roundDtos = $this->toRoundResultDtos($loopResult->roundResults);
-
-        // timedOut вычисляем из round-level флагов — хотя бы один раунд таймаут
-        $chainTimedOut = array_any(
-            $roundDtos,
-            static fn(DynamicRoundResultDto $round): bool => $round->timedOut,
-        );
-
-        return new OrchestrateChainResultDto(
-            roundResults: $roundDtos,
-            totalTime: $loopResult->totalTime,
-            totalInputTokens: $loopResult->totalInputTokens,
-            totalOutputTokens: $loopResult->totalOutputTokens,
-            totalCost: $loopResult->totalCost,
-            synthesis: $loopResult->synthesis,
-            maxRoundsReached: $loopResult->maxRoundsReached,
-            sessionDir: $sessionDir,
-            budgetExceeded: $loopResult->budgetExceeded,
-            budgetLimit: $loopResult->budgetLimit,
-            budgetExceededRole: $loopResult->budgetExceededRole,
-            timedOut: $chainTimedOut,
-        );
-    }
-
-    /**
-     * @param list<\TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo> $roundVos
-     *
-     * @return list<DynamicRoundResultDto>
-     */
-    private function toRoundResultDtos(array $roundVos): array
-    {
-        return array_map(
-            static fn(\TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo $roundVo): DynamicRoundResultDto => new DynamicRoundResultDto(
-                round: $roundVo->round,
-                role: $roundVo->role,
-                isFacilitator: $roundVo->isFacilitator,
-                outputText: $roundVo->outputText,
-                inputTokens: $roundVo->inputTokens,
-                outputTokens: $roundVo->outputTokens,
-                cost: $roundVo->cost,
-                duration: $roundVo->duration,
-                isError: $roundVo->isError,
-                errorMessage: $roundVo->errorMessage,
-                invocation: $roundVo->invocation,
-                systemPrompt: $roundVo->systemPrompt,
-                userPrompt: $roundVo->userPrompt,
-                timedOut: $roundVo->timedOut,
-            ),
-            $roundVos,
+        throw new \LogicException(
+            sprintf('No execution strategy found for chain "%s".', $chain->getName()),
         );
     }
 }
