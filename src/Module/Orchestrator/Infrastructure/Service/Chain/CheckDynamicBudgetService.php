@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Cha
 use Override;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Budget\CheckDynamicBudgetServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionWriterInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicBudgetCheckVo;
 
@@ -17,7 +17,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicBudget
 final readonly class CheckDynamicBudgetService implements CheckDynamicBudgetServiceInterface
 {
     public function __construct(
-        private ChainSessionLoggerInterface $sessionLogger,
+        private ChainSessionWriterInterface $sessionWriter,
         private ?LoggerInterface $logger = null,
     ) {
     }
@@ -72,7 +72,7 @@ final readonly class CheckDynamicBudgetService implements CheckDynamicBudgetServ
 
     private function budgetExceeded(float $limit, ?string $role): DynamicBudgetCheckVo
     {
-        $this->sessionLogger->interruptSession('budget_exceeded');
+        $this->sessionWriter->interruptSession('budget_exceeded');
 
         return new DynamicBudgetCheckVo(
             shouldBreak: true,
