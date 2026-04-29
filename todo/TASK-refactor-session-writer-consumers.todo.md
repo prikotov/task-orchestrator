@@ -7,10 +7,10 @@ priority: P1
 depends_on:
 epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Бэкендер (Левша)
+branch: task/session-writer-consumers
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-session-writer-consumers: Переключение 3 потребителей на ChainSessionWriterInterface
