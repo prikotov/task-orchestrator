@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject;
 
 use InvalidArgumentException;
+use LogicException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
@@ -236,36 +237,89 @@ final readonly class ChainDefinitionVo
         return $this->maxRounds;
     }
 
+    /**
+     * Возвращает конфигурацию промптов для dynamic-цепочки.
+     *
+     * @throws LogicException если цепочка не является dynamic или промпты не заданы
+     */
+    public function getPromptConfiguration(): PromptConfigurationVo
+    {
+        if (
+            $this->brainstormSystemPrompt === null
+            || $this->facilitatorAppendPrompt === null
+            || $this->facilitatorStartPrompt === null
+            || $this->facilitatorContinuePrompt === null
+            || $this->facilitatorFinalizePrompt === null
+            || $this->participantAppendPrompt === null
+            || $this->participantUserPrompt === null
+        ) {
+            throw new LogicException(
+                sprintf('Chain "%s" does not have prompt configuration.', $this->name),
+            );
+        }
+
+        return new PromptConfigurationVo(
+            brainstormSystemPrompt: $this->brainstormSystemPrompt,
+            facilitatorAppendPrompt: $this->facilitatorAppendPrompt,
+            facilitatorStartPrompt: $this->facilitatorStartPrompt,
+            facilitatorContinuePrompt: $this->facilitatorContinuePrompt,
+            facilitatorFinalizePrompt: $this->facilitatorFinalizePrompt,
+            participantAppendPrompt: $this->participantAppendPrompt,
+            participantUserPrompt: $this->participantUserPrompt,
+        );
+    }
+
+    /**
+     * @deprecated Use getPromptConfiguration() instead. Will be removed in a future version.
+     */
     public function getBrainstormSystemPrompt(): ?string
     {
         return $this->brainstormSystemPrompt;
     }
 
+    /**
+     * @deprecated Use getPromptConfiguration() instead. Will be removed in a future version.
+     */
     public function getFacilitatorAppendPrompt(): ?string
     {
         return $this->facilitatorAppendPrompt;
     }
 
+    /**
+     * @deprecated Use getPromptConfiguration() instead. Will be removed in a future version.
+     */
     public function getFacilitatorStartPrompt(): ?string
     {
         return $this->facilitatorStartPrompt;
     }
 
+    /**
+     * @deprecated Use getPromptConfiguration() instead. Will be removed in a future version.
+     */
     public function getFacilitatorContinuePrompt(): ?string
     {
         return $this->facilitatorContinuePrompt;
     }
 
+    /**
+     * @deprecated Use getPromptConfiguration() instead. Will be removed in a future version.
+     */
     public function getFacilitatorFinalizePrompt(): ?string
     {
         return $this->facilitatorFinalizePrompt;
     }
 
+    /**
+     * @deprecated Use getPromptConfiguration() instead. Will be removed in a future version.
+     */
     public function getParticipantAppendPrompt(): ?string
     {
         return $this->participantAppendPrompt;
     }
 
+    /**
+     * @deprecated Use getPromptConfiguration() instead. Will be removed in a future version.
+     */
     public function getParticipantUserPrompt(): ?string
     {
         return $this->participantUserPrompt;
