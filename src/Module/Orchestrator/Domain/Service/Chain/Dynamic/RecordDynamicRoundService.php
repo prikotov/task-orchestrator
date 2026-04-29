@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynam
 use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionWriterInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\RoundCompletedNotifierInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
@@ -18,7 +18,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundR
 final readonly class RecordDynamicRoundService implements RecordDynamicRoundServiceInterface
 {
     public function __construct(
-        private ChainSessionLoggerInterface $sessionLogger,
+        private ChainSessionWriterInterface $sessionWriter,
         private RoundCompletedNotifierInterface $roundNotifier,
     ) {
     }
@@ -65,7 +65,7 @@ final readonly class RecordDynamicRoundService implements RecordDynamicRoundServ
             $roundResult->duration * 1000.0,
         );
 
-        $this->sessionLogger->logRound(
+        $this->sessionWriter->logRound(
             $step,
             $round,
             $role,
@@ -79,7 +79,7 @@ final readonly class RecordDynamicRoundService implements RecordDynamicRoundServ
             $roundResult->cost,
             $roundResult->invocation,
         );
-        $this->sessionLogger->updateSessionState($step);
+        $this->sessionWriter->updateSessionState($step);
     }
 
     private function createDynamicAgentResult(DynamicRoundResultVo $roundResult): ChainRunResultVo

@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Cha
 
 use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopAgentServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionWriterInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\FacilitatorResponseParserInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
@@ -29,7 +29,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
 {
     public function __construct(
         private RunAgentServiceInterface $agentRunner,
-        private ChainSessionLoggerInterface $sessionLogger,
+        private ChainSessionWriterInterface $sessionWriter,
         private FacilitatorResponseParserInterface $responseParser,
         private PromptProviderInterface $promptProvider,
         private PromptFormatterInterface $formatter,
@@ -60,14 +60,14 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             $responseFilesList,
         );
 
-        $systemPromptFile = $this->sessionLogger->writePromptFile(
+        $systemPromptFile = $this->sessionWriter->writePromptFile(
             $step,
             $round,
             $facilitatorRole,
             $brainstormSystemPrompt,
             '_1_system.md',
         );
-        $appendPromptFile = $this->sessionLogger->writePromptFile(
+        $appendPromptFile = $this->sessionWriter->writePromptFile(
             $step,
             $round,
             $facilitatorRole,
@@ -135,14 +135,14 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             $challenge,
         );
 
-        $systemPromptFile = $this->sessionLogger->writePromptFile(
+        $systemPromptFile = $this->sessionWriter->writePromptFile(
             $step,
             $round,
             $role,
             $brainstormSystemPrompt,
             '_1_system.md',
         );
-        $appendPromptFile = $this->sessionLogger->writePromptFile(
+        $appendPromptFile = $this->sessionWriter->writePromptFile(
             $step,
             $round,
             $role,
@@ -198,14 +198,14 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             $responseFilesList,
         );
 
-        $systemPromptFile = $this->sessionLogger->writePromptFile(
+        $systemPromptFile = $this->sessionWriter->writePromptFile(
             $step,
             $round,
             $facilitatorRole,
             $brainstormSystemPrompt,
             '_1_system.md',
         );
-        $appendPromptFile = $this->sessionLogger->writePromptFile(
+        $appendPromptFile = $this->sessionWriter->writePromptFile(
             $step,
             $round,
             $facilitatorRole,
