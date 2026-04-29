@@ -7,10 +7,10 @@ priority: P1
 depends_on:
 epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер (Левша)
+branch: task/inline-execute-dynamic-turn
+pr: https://github.com/prikotov/task-orchestrator/pull/101
+status: review
 ---
 
 # TASK-refactor-inline-execute-dynamic-turn: Инлайнинг ExecuteDynamicTurnService в RunDynamicLoopService
