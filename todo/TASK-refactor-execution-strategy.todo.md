@@ -9,8 +9,8 @@ epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/execution-strategy-implementation
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/104
+status: review
 ---
 
 # TASK-refactor-execution-strategy: ExecutionStrategyInterface + Static/Dynamic + CommandHandler rewrite
