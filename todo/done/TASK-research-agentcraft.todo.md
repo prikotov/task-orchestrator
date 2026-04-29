@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Технический писатель (Гермиона)
+branch: task/research-agentcraft
+pr: "https://github.com/prikotov/task-orchestrator/pull/96"
+status: done
 ---
 
 # TASK-research-agentcraft: Исследовать AgentCraft для сравнения с task-orchestrator
@@ -41,7 +41,10 @@ status: todo
 - [ ] Написание кода интеграции
 
 ## 4. Implementation Plan (План реализации)
-*Заполняется исполнителем перед стартом.*
+1. Изучить проект AgentCraft (https://www.getagentcraft.com/) — архитектуру, модель агентов, workflow, tools
+2. При недостатке публичной документации — проанализировать доступные материалы (сайт, демо, API, GitHub)
+3. Составить отчёт по формату существующих comparison-документов (см. docs/research/crush-comparison.md как пример)
+4. Заполнить строку AgentCraft (#16) в сводной таблице docs/research/agent-frameworks-summary.md
 
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] Отчёт docs/research/agentcraft-comparison.md создан по формату существующих comparison-документов
@@ -59,6 +62,21 @@ ls docs/research/agentcraft-comparison.md
 
 ## 8. Sources (Источники)
 - https://www.getagentcraft.com/
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-agentcraft (уже создана и активна)
+**PR:** уже создан (draft) из task/research-agentcraft в task/research-agent-frameworks-comparison — [PR #96](https://github.com/prikotov/task-orchestrator/pull/96)
+
+### Порядок действий
+1. Переключись в ветку `task/research-agentcraft`: `git checkout task/research-agentcraft`
+2. Изучи проект AgentCraft (https://www.getagentcraft.com/) — архитектуру, модель агентов, workflow-паттерны, tools, state management, error handling, расширяемость.
+3. При недостатке документации — анализируй сайт, демо, API, GitHub-профиль, публичные материалы.
+4. Создай отчёт docs/research/agentcraft-comparison.md по формату существующих comparison-документов (как docs/research/crush-comparison.md).
+5. Заполни строку AgentCraft (#16) в сводной таблице docs/research/agent-frameworks-summary.md.
+6. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+7. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` (хотя для docs-only они могут быть пропущены — укажи это в отчёте).
+8. Сделай `git push`.
 
 ## 9. Comments (Комментарии)
 
