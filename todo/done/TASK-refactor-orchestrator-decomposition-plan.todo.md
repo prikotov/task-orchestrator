@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Тимлид (Алекс)
 branch: task/orchestrator-decomposition-plan
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-refactor-orchestrator-decomposition-plan: Оформление плана декомпозиции Orchestrator

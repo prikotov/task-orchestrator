@@ -98,7 +98,7 @@ pr: https://github.com/prikotov/task-orchestrator/pull/98
 - [x] [TASK-refactor-orchestrator-brainstorm-analysis](done/TASK-refactor-orchestrator-brainstorm-analysis.todo.md) — Глубокий brainstorm-анализ Orchestrator: 40 раундов, 81 шаг, 2ч 42мин, 10 решений, 16 action items. [Протокол](../var/sessions/brainstorm/2026-04-29_08-06-49/result.md).
 
 ### Фаза 2: Планирование (P1)
-- [ ] TASK-refactor-orchestrator-decomposition-plan — Оформление плана: 3 ADR (ExecutionStrategy, VO ACL, Shared Kernel), черновой roadmap, задачи на P1-action items.
+- [x] [TASK-refactor-orchestrator-decomposition-plan](done/TASK-refactor-orchestrator-decomposition-plan.todo.md) — Оформление плана: 3 ADR (ExecutionStrategy, VO ACL, Shared Kernel), черновой roadmap, задачи на P1-action items.
 
 ### Фаза 3: Реализация P1 (P1)
 - [ ] TASK-refactor-inline-execute-dynamic-turn — Инлайнинг ExecuteDynamicTurnService в RunDynamicLoopService. Вложенность 7→5.
