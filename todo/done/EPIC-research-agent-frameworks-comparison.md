@@ -8,9 +8,9 @@ priority: P2
 author: Тимлид (Алекс)
 assignee:
 branch: task/research-agent-frameworks-comparison
-status: in_progress
+status: done
 reopened: 2026-04-28
-pr: #51 (исследование), #52 (ревью и исправления)
+pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация)"
 ---
 
 # EPIC-research-agent-frameworks-comparison: Исследование AI-agent фреймворков и оркестраторов
