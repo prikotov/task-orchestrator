@@ -26,13 +26,6 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorRe
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorTurnResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
 
-
-
-
-
-
-
-
 /**
  * Исполнитель dynamic-цикла: координирует facilitator/participant turns, бюджет.
  *
