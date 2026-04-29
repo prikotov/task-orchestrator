@@ -8,9 +8,9 @@ depends_on:
 epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
 assignee: Тимлид (Алекс)
-branch:
-pr:
-status: todo
+branch: task/orchestrator-decomposition-epic
+pr: https://github.com/prikotov/task-orchestrator/pull/98
+status: review
 ---
 
 # TASK-refactor-orchestrator-brainstorm-analysis: Глубокий brainstorm-анализ Orchestrator (3 часа, 40 раундов)
