@@ -265,6 +265,11 @@
 * Agno: multi-agent Teams (4 режима) — 🟡 P3
 * Agno: parallel execution (Parallel) — 🟡 P3
 * Agno: nested workflows (Workflow как Step, до 10 уровней) — 🟡 P3
+* AgentCraft: git worktrees для параллельного выполнения цепочек — 🟡 P3
+* AgentCraft: multi-agent teams — эволюция dynamic chains (координация нескольких агентов) — 🟡 P3
+* AgentCraft: isolated containers (Docker/Apple Containers) для CI/CD sandboxing — 🟡 P3
+* AgentCraft: scheduled tasks (cron-like запуск chain по расписанию) — 🟡 P3
+* AgentCraft: channels — Human-in-the-loop через мессенджеры (Telegram/Discord) — 🟡 P3
 
 </details>
 
@@ -284,7 +289,7 @@
 
 ### 2. Agent Loop — доминирующая модель выполнения
 
-**12 из 15 фреймворков** используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, OpenHands SDK, MetaGPT, OpenClaw, Claude Code, Copilot Cloud Agent, Codex, Agno и др.). Только LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK) и Paperclip AI (heartbeat-based мета-оркестрация) используют принципиально другие модели.
+**12 из 16 фреймворков** используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, OpenHands SDK, MetaGPT, OpenClaw, Claude Code, Copilot Cloud Agent, Codex, Agno и др.). Только LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK), Paperclip AI (heartbeat-based мета-оркестрация) и AgentCraft (GUI wrapper поверх внешних агентов) используют принципиально другие модели.
 
 Agno также поддерживает **step-based workflow** (Step/Steps/Loop/Parallel/Router/Condition) и **4 team modes** (coordinate/route/broadcast/tasks) поверх agent loop — наиболее развитый workflow engine из исследованных.
 
@@ -292,19 +297,19 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 3. Разделение на три уровня абстракции
 
-**Все 15 проектов** чётко делятся на три уровня:
+**Все 16 проектов** чётко делятся на три уровня:
 
 | Уровень | Проекты | Что делают | Аналог в task-orchestrator |
 |---|---|---|---|
 | **SDK / Agent runtime** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, OpenClaw, Agno | Работают на уровне прямых LLM API | Runner'ы (pi, codex) |
-| **Оркестратор / Workflow engine** | CrewAI, LangGraph, AutoGen, Archon, MetaGPT, Copilot Workspace | Управляют потоком выполнения между агентами/шагами | Chain executor |
+| **Оркестратор / Workflow engine** | CrewAI, LangGraph, AutoGen, Archon, MetaGPT, Copilot Workspace, AgentCraft (GUI) | Управляют потоком выполнения между агентами/шагами | Chain executor |
 | **Мета-оркестратор / Control plane** | Paperclip AI | Управляет компаниями из агентов: org charts, budgets, governance, goals | — (нет аналога) |
 
 **Paperclip AI** подтверждает тренд на двухуровневую (а теперь трёхуровневую) абстракцию: SDK/runtime → оркестратор → мета-оркестратор. Paperclip — наиболее продвинутый мета-оркестратор из исследованных: org charts, budgets, governance, goal alignment, company portability.
 
 ### 4. SKILL.md / AGENTS.md — де-факто стандарт
 
-**9 из 15 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
+**9 из 16 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
 - Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex, Agno
 - Формат: YAML frontmatter + markdown body, discovery из нескольких мест, валидация
 - Стандарт [agentskills.io](https://agentskills.io) получает широкое распространение
@@ -314,7 +319,7 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 5. MCP (Model Context Protocol) — повсеместный протокол расширения
 
-**11 из 15 проектов** поддерживают MCP:
+**11 из 16 проектов** поддерживают MCP:
 - Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Paperclip AI
 - MCP — стандарт де-факто для расширения возможностей AI-агентов через внешние tool-серверы
 
@@ -322,7 +327,7 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 6. Контекст-менеджмент — повсеместная проблема
 
-**7 из 15 проектов** реализуют auto-compaction / auto-summarization при context overflow:
+**7 из 16 проектов** реализуют auto-compaction / auto-summarization при context overflow:
 - Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, Agno
 - Все используют LLM-суммаризацию для сжатия истории
 - OpenClaw пошёл дальше: формализованный `ContextEngine` interface (ingest → assemble → compact → maintain) с tokenBudget
@@ -436,4 +441,5 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 | 2026-04-22 | Тимлид (Алекс) | Добавлена строка Agno (#14). Пересчитаны тренды (13→14): agent loop 12/14, SKILL.md 9/14, MCP 10/14, sub-agents 10/14, conditional branching 5 проектов, compression 7/14. Добавлен error-specific fallback routing (Agno) в Кластер 1. Добавлены Loop end_condition и Agno conditional branching в Кластер 3. Добавлены индивидуальные рекомендации Agno (P2: error-specific fallback, Loop end_condition, conditional branching; P3: HITL, compression, guardrails, evals, Teams, parallel, nested workflows). |
 | 2026-04-28 | Технический писатель (Гермиона) | Создан отчёт paperclip-ai-comparison.md, заполнена строка Paperclip AI (#15). Пересчитаны тренды (14→15): agent loop 12/15, SKILL.md 9/15 (+Company Skills), MCP 11/15, sub-agents 10/15, compression 7/15 (+session compaction policy). Добавлен третий уровень абстракции (meta-orchestrator). Добавлены рекомендации Paperclip AI (P2: run liveness, error classification, escalation strategy, adapter context; P3: session compaction, config revisions, execution policy, plugin system, run recovery, scoped budgets, goal alignment). |
 | 2026-04-28 | Технический писатель (Гермиона) | Доработка по замечаниям ревьювера (Архитектор Локи, PR #95): goal alignment — добавлена оговорка об ограниченной применимости для chain-оркестратора (секция 3.6); plugin system — добавлена оговорка о преждевременности для CLI (секция 3.8); добавлен подраздел Security: secrets management, execution environments, agent permissions (секция 3.10); scoped budget policies — унифицирован приоритет P3 в отчёте и сводной таблице. |
+| 2026-04-29 | Технический писатель (Гермиона) | Доработка по результатам саморевью PR #96: исправлены счётчики трендов (15→16) в трендах 2–6, AgentCraft добавлен в список исключений тренда 2 (agent loop), добавлен в таблицу тренда 3 (уровни абстракции), добавлены индивидуальные рекомендации AgentCraft в секцию details. |
 | 2026-04-28 | Технический писатель (Гермиона) | Создан отчёт agentcraft-comparison.md, заполнена строка AgentCraft (#16). Пересчитаны тренды (15→16): sub-agents 10/16 (+AgentCraft Agent Teams), проприетарные продукты 3/16. Добавлено наблюдение: GUI-оркестратор как отдельная продуктовая ниша. Все 16 исследований завершены. |
