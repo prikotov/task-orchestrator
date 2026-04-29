@@ -9,7 +9,7 @@ epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
 assignee: Тимлид (Алекс)
 branch: task/orchestrator-brainstorm-analysis
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/99
 status: done
 ---
 
