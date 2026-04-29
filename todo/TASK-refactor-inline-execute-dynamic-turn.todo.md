@@ -9,8 +9,8 @@ epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/inline-execute-dynamic-turn
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/101
+status: review
 ---
 
 # TASK-refactor-inline-execute-dynamic-turn: Инлайнинг ExecuteDynamicTurnService в RunDynamicLoopService
