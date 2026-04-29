@@ -8,9 +8,9 @@ depends_on: TASK-refactor-orchestrator-brainstorm-analysis
 epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
 assignee: Тимлид (Алекс)
-branch:
+branch: task/orchestrator-decomposition-plan
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-orchestrator-decomposition-plan: Оформление плана декомпозиции Orchestrator
