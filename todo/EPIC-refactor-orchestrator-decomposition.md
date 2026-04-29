@@ -98,12 +98,20 @@ pr: https://github.com/prikotov/task-orchestrator/pull/98
 - [x] [TASK-refactor-orchestrator-brainstorm-analysis](done/TASK-refactor-orchestrator-brainstorm-analysis.todo.md) — Глубокий brainstorm-анализ Orchestrator: 40 раундов, 81 шаг, 2ч 42мин, 10 решений, 16 action items. [Протокол](../var/sessions/brainstorm/2026-04-29_08-06-49/result.md).
 
 ### Фаза 2: Планирование (P1)
-- [ ] TASK-refactor-orchestrator-decomposition-plan — Оформление плана декомпозиции в архитектурный документ, согласование с владельцем проекта, создание задач на реализацию.
+- [x] [TASK-refactor-orchestrator-decomposition-plan](done/TASK-refactor-orchestrator-decomposition-plan.todo.md) — Оформление плана: 3 ADR (ExecutionStrategy, VO ACL, Shared Kernel), черновой roadmap, задачи на P1-action items.
 
-### Фаза 3: Реализация (P2, задачи создаются по результатам Фазы 1–2)
-- [ ] Задачи на декомпозицию — определяются по результатам анализа
+### Фаза 3: Реализация P1 (P1)
+- [ ] TASK-refactor-inline-execute-dynamic-turn — Инлайнинг ExecuteDynamicTurnService в RunDynamicLoopService. Вложенность 7→5.
+- [ ] TASK-refactor-prompt-configuration-vo — PromptConfiguration VO: 7 промпт-полей → отдельный VO.
+- [ ] TASK-refactor-session-writer-consumers — Переключение 3 потребителей на ChainSessionWriterInterface.
 
-### Фаза 4: Валидация (P2)
+### Фаза 4: Реализация P2 (P2, задачи по готовности)
+- [ ] ExecutionStrategyInterface + StaticExecutionStrategy (ADR-006)
+- [ ] DynamicExecutionStrategy (ADR-006)
+- [ ] CommandHandler rewrite (ADR-006)
+- [ ] P4: Расщепление ChainDefinitionVo (ADR-008)
+
+### Фаза 5: Валидация (P2)
 - [ ] Deptrac-конфигурация для контроля границ
 - [ ] Обновление docs/guide/architecture.md
 
