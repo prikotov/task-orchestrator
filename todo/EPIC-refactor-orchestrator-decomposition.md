@@ -98,7 +98,7 @@ pr: https://github.com/prikotov/task-orchestrator/pull/98
 - [x] [TASK-refactor-orchestrator-brainstorm-analysis](done/TASK-refactor-orchestrator-brainstorm-analysis.todo.md) — Глубокий brainstorm-анализ Orchestrator: 40 раундов, 81 шаг, 2ч 42мин, 10 решений, 16 action items. [Протокол](../var/sessions/brainstorm/2026-04-29_08-06-49/result.md).
 
 ### Фаза 2: Планирование (P1)
-- [ ] TASK-refactor-orchestrator-decomposition-plan — Оформление плана декомпозиции в архитектурный документ, согласование с владельцем проекта, создание задач на реализацию.
+- [ ] TASK-refactor-orchestrator-decomposition-plan — Оформление плана: 3 ADR (ExecutionStrategy, VO ACL, Shared Kernel), черновой roadmap, задачи на P1-action items.
 
 ### Фаза 3: Реализация (P2, задачи создаются по результатам Фазы 1–2)
 - [ ] Задачи на декомпозицию — определяются по результатам анализа
