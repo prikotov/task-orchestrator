@@ -6,8 +6,8 @@ complexity: C4
 priority: P1
 author: Тимлид (Алекс)
 assignee: Тимлид (Алекс)
-status: todo
-pr:
+status: review
+pr: https://github.com/prikotov/task-orchestrator/pull/98
 ---
 
 # EPIC-refactor-orchestrator-decomposition: Декомпозиция модуля Orchestrator
