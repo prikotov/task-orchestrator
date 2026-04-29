@@ -7,10 +7,10 @@ priority: P1
 depends_on:
 epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер (Левша)
+branch: task/prompt-configuration-vo
+pr: https://github.com/prikotov/task-orchestrator/pull/102
+status: review
 ---
 
 # TASK-refactor-prompt-configuration-vo: PromptConfiguration VO для ChainDefinitionVo

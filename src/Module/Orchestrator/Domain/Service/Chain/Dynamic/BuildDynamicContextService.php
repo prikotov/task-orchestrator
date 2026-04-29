@@ -4,16 +4,10 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
-use LogicException;
 use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
-
-use function array_filter;
-use function implode;
-use function mb_strlen;
-use function mb_substr;
-use function sprintf;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\PromptConfigurationVo;
 
 /**
  * Создание DynamicChainContextVo из ChainDefinitionVo и параметров запуска.
@@ -36,42 +30,24 @@ final readonly class BuildDynamicContextService implements BuildDynamicContextSe
         int $timeout,
         ?int $maxTime = null,
     ): DynamicChainContextVo {
-        $brainstormSystemPrompt = $chain->getBrainstormSystemPrompt();
-        $facilitatorAppendPrompt = $chain->getFacilitatorAppendPrompt();
-        $facilitatorStartPrompt = $chain->getFacilitatorStartPrompt();
-        $facilitatorContinuePrompt = $chain->getFacilitatorContinuePrompt();
-        $facilitatorFinalizePrompt = $chain->getFacilitatorFinalizePrompt();
-        $participantAppendPrompt = $chain->getParticipantAppendPrompt();
-        $participantUserPrompt = $chain->getParticipantUserPrompt();
+        $promptConfig = $chain->getPromptConfiguration();
 
-        if (
-            $brainstormSystemPrompt === null
-            || $facilitatorAppendPrompt === null
-            || $facilitatorStartPrompt === null
-            || $facilitatorContinuePrompt === null
-            || $facilitatorFinalizePrompt === null
-            || $participantAppendPrompt === null
-            || $participantUserPrompt === null
-        ) {
-            throw new LogicException(
-                sprintf('Dynamic chain "%s" is missing required prompts.', $chain->getName()),
-            );
-        }
-
-        $facilitatorAppendPrompt = $this->formatAppendPrompt($facilitatorAppendPrompt, $participants);
+        $facilitatorAppendPrompt = $this->formatAppendPrompt($promptConfig->getFacilitatorAppendPrompt(), $participants);
 
         return new DynamicChainContextVo(
             facilitatorRole: $facilitatorRole,
             participants: $participants,
             maxRounds: $maxRounds,
             topic: $topic,
-            brainstormSystemPrompt: $brainstormSystemPrompt,
-            facilitatorAppendPrompt: $facilitatorAppendPrompt,
-            facilitatorStartPrompt: $facilitatorStartPrompt,
-            facilitatorContinuePrompt: $facilitatorContinuePrompt,
-            facilitatorFinalizePrompt: $facilitatorFinalizePrompt,
-            participantAppendPrompt: $participantAppendPrompt,
-            participantUserPrompt: $participantUserPrompt,
+            promptConfiguration: new PromptConfigurationVo(
+                brainstormSystemPrompt: $promptConfig->getBrainstormSystemPrompt(),
+                facilitatorAppendPrompt: $facilitatorAppendPrompt,
+                facilitatorStartPrompt: $promptConfig->getFacilitatorStartPrompt(),
+                facilitatorContinuePrompt: $promptConfig->getFacilitatorContinuePrompt(),
+                facilitatorFinalizePrompt: $promptConfig->getFacilitatorFinalizePrompt(),
+                participantAppendPrompt: $promptConfig->getParticipantAppendPrompt(),
+                participantUserPrompt: $promptConfig->getParticipantUserPrompt(),
+            ),
             workingDir: $workingDir,
             timeout: $timeout,
             maxTime: $maxTime,

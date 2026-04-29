@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject;
 /**
  * Контекст dynamic-цепочки: роли, промпты, модель, таймаут.
  *
- * Содержит только primitives — без Application зависимостей.
+ * Содержит PromptConfigurationVo вместо отдельных промпт-полей.
  *
  * @param array<int, string> $participants
  */
@@ -18,13 +18,7 @@ final readonly class DynamicChainContextVo
         public array $participants,
         public int $maxRounds,
         public string $topic,
-        public string $brainstormSystemPrompt,
-        public string $facilitatorAppendPrompt,
-        public string $facilitatorStartPrompt,
-        public string $facilitatorContinuePrompt,
-        public string $facilitatorFinalizePrompt,
-        public string $participantAppendPrompt,
-        public string $participantUserPrompt,
+        public PromptConfigurationVo $promptConfiguration,
         public ?string $workingDir = null,
         public int $timeout,
         public ?int $maxTime = null,
