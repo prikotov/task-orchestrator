@@ -277,11 +277,11 @@
 
 ## Общие тренды
 
-> Анализ выполнен на основе всех 13 исследований. Тренды сгруппированы по значимости для архитектуры task-orchestrator.
+> Анализ выполнен на основе всех 16 исследований. Тренды сгруппированы по значимости для архитектуры task-orchestrator.
 
 ### 1. Уникальная позиция task-orchestrator
 
-**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 14 фреймворков.
+**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 16 фреймворков.
 
 **Ни один проприетарный продукт** (Claude Code, GitHub Copilot Cloud Agent, OpenAI Codex) не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны даже против крупнейших коммерческих AI-agent продуктов.
 
@@ -289,23 +289,26 @@
 
 ### 2. Agent Loop — доминирующая модель выполнения
 
-**12 из 16 фреймворков** используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, OpenHands SDK, MetaGPT, OpenClaw, Claude Code, Copilot Cloud Agent, Codex, Agno и др.). Только LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK), Paperclip AI (heartbeat-based мета-оркестрация) и AgentCraft (GUI wrapper поверх внешних агентов) используют принципиально другие модели.
+**12 из 15 фреймворков** (исключая AgentCraft, см. ниже) используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, OpenHands SDK, MetaGPT, OpenClaw, Claude Code, Copilot Cloud Agent, Codex, Agno и др.). Только LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK) и Paperclip AI (heartbeat-based мета-оркестрация) используют принципиально другие модели.
+
+**AgentCraft не учитывается в этом подсчёте:** он не имеет собственной модели выполнения, а выступает как GUI wrapper, делегируя выполнение подключённым внешним агентам (Claude Code, OpenCode, Cursor, OpenClaw). Эти агенты сами используют agent loop — AgentCraft лишь управляет их запуском и визуализирует прогресс. Таким образом, AgentCraft не является ни «agent loop», ни «другой моделью выполнения» — это управляющий слой поверх существующих сред.
 
 Agno также поддерживает **step-based workflow** (Step/Steps/Loop/Parallel/Router/Condition) и **4 team modes** (coordinate/route/broadcast/tasks) поверх agent loop — наиболее развитый workflow engine из исследованных.
 
 **Вывод для task-orchestrator:** Наша модель (YAML chain → runner call → payload) — это оркестрация поверх agent loop. Это правильный уровень: мы не дублируем LLM interaction, а управляем им.
 
-### 3. Разделение на три уровня абстракции
+### 3. Разделение на четыре уровня абстракции
 
-**Все 16 проектов** чётко делятся на три уровня:
+**Все 16 проектов** чётко делятся на четыре уровня:
 
 | Уровень | Проекты | Что делают | Аналог в task-orchestrator |
 |---|---|---|---|
 | **SDK / Agent runtime** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, OpenClaw, Agno | Работают на уровне прямых LLM API | Runner'ы (pi, codex) |
-| **Оркестратор / Workflow engine** | CrewAI, LangGraph, AutoGen, Archon, MetaGPT, Copilot Workspace, AgentCraft (GUI) | Управляют потоком выполнения между агентами/шагами | Chain executor |
+| **Оркестратор / Workflow engine** | CrewAI, LangGraph, AutoGen, Archon, MetaGPT, Copilot Workspace | Управляют потоком выполнения между агентами/шагами | Chain executor |
+| **GUI Manager / Launcher** | AgentCraft | Визуальный интерфейс для запуска и мониторинга внешних агентов, без собственной логики выполнения | — (нет аналога) |
 | **Мета-оркестратор / Control plane** | Paperclip AI | Управляет компаниями из агентов: org charts, budgets, governance, goals | — (нет аналога) |
 
-**Paperclip AI** подтверждает тренд на двухуровневую (а теперь трёхуровневую) абстракцию: SDK/runtime → оркестратор → мета-оркестратор. Paperclip — наиболее продвинутый мета-оркестратор из исследованных: org charts, budgets, governance, goal alignment, company portability.
+**Paperclip AI** подтверждает тренд на многоуровневую абстракцию: SDK/runtime → оркестратор → GUI manager → мета-оркестратор. Paperclip — наиболее продвинутый мета-оркестратор из исследованных: org charts, budgets, governance, goal alignment, company portability.
 
 ### 4. SKILL.md / AGENTS.md — де-факто стандарт
 
@@ -443,3 +446,4 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 | 2026-04-28 | Технический писатель (Гермиона) | Доработка по замечаниям ревьювера (Архитектор Локи, PR #95): goal alignment — добавлена оговорка об ограниченной применимости для chain-оркестратора (секция 3.6); plugin system — добавлена оговорка о преждевременности для CLI (секция 3.8); добавлен подраздел Security: secrets management, execution environments, agent permissions (секция 3.10); scoped budget policies — унифицирован приоритет P3 в отчёте и сводной таблице. |
 | 2026-04-29 | Технический писатель (Гермиона) | Доработка по результатам саморевью PR #96: исправлены счётчики трендов (15→16) в трендах 2–6, AgentCraft добавлен в список исключений тренда 2 (agent loop), добавлен в таблицу тренда 3 (уровни абстракции), добавлены индивидуальные рекомендации AgentCraft в секцию details. |
 | 2026-04-28 | Технический писатель (Гермиона) | Создан отчёт agentcraft-comparison.md, заполнена строка AgentCraft (#16). Пересчитаны тренды (15→16): sub-agents 10/16 (+AgentCraft Agent Teams), проприетарные продукты 3/16. Добавлено наблюдение: GUI-оркестратор как отдельная продуктовая ниша. Все 16 исследований завершены. |
+| 2026-04-29 | Технический писатель (Гермиона) | Доработка по замечаниям ревьювера (Архитектор Локи, post-factum ревью PR #96): (1) исправлен stale-текст «13 исследований» → «16 исследований» в преамбуле трендов; (2) AgentCraft убран из перечисления «принципиально других моделей» в тренде 2 — добавлено пояснение, что AgentCraft не имеет собственной модели выполнения (GUI wrapper), счётчик 12/15; (3) AgentCraft выделен в отдельную строку «GUI Manager / Launcher» в таблице тренда 3. |
