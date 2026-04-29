@@ -23,6 +23,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\PromptConfigurationVo;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -1082,13 +1083,15 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             participants: $participants,
             maxRounds: $maxRounds,
             topic: $topic,
-            brainstormSystemPrompt: 'Base system prompt',
-            facilitatorAppendPrompt: 'Fac append participant',
-            facilitatorStartPrompt: 'Start %s',
-            facilitatorContinuePrompt: 'Cont %s %s %s',
-            facilitatorFinalizePrompt: 'Final %s %s',
-            participantAppendPrompt: 'Part append %s',
-            participantUserPrompt: 'Ctx %s %s',
+            promptConfiguration: new PromptConfigurationVo(
+                brainstormSystemPrompt: 'Base system prompt',
+                facilitatorAppendPrompt: 'Fac append participant',
+                facilitatorStartPrompt: 'Start %s',
+                facilitatorContinuePrompt: 'Cont %s %s %s',
+                facilitatorFinalizePrompt: 'Final %s %s',
+                participantAppendPrompt: 'Part append %s',
+                participantUserPrompt: 'Ctx %s %s',
+            ),
             timeout: $timeout,
         );
     }
