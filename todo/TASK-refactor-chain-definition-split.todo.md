@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Бэкендер (Левша)
+branch: task/chain-definition-split
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-chain-definition-split: Расщепление ChainDefinitionVo (ADR-008)
