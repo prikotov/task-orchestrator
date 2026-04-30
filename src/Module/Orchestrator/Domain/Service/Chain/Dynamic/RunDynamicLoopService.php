@@ -71,10 +71,10 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
             $initialDiscussionHistory,
             $initialFacilitatorJournal,
         );
-        $budget = $chain->getBudget();
+        $budget = $chain->getSharedDefinition()->getBudget();
         $startTime = microtime(true);
 
-        $auditLogger?->logChainStart($chain->getName(), $context->topic);
+        $auditLogger?->logChainStart($chain->getSharedDefinition()->getName(), $context->topic);
 
         while ($execution->getParticipantRounds() < $context->maxRounds) {
             // Проверка: хватит ли оставшегося времени на finalize перед следующим раундом
@@ -162,7 +162,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
         $auditLogger?->logChainResult(
             $this->buildChainAuditDto(
-                $chain->getName(),
+                $chain->getSharedDefinition()->getName(),
                 $startTime,
                 $execution,
             ),
@@ -528,10 +528,10 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
                 ),
             )
             : '';
-        $facRoleConfig = $chain->getRoleConfig($context->facilitatorRole);
+        $facRoleConfig = $chain->getSharedDefinition()->getRoleConfig($context->facilitatorRole);
         $facRunner = $this->resolveRunner($facRoleConfig);
         $auditLogger?->logStepStart(
-            $chain->getName(),
+            $chain->getSharedDefinition()->getName(),
             $execution->getStep(),
             $context->facilitatorRole,
             $facRunner,
@@ -574,7 +574,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
             $execution,
             $execution->getStep(),
             $execution->getRound(),
-            $chain->getName(),
+            $chain->getSharedDefinition()->getName(),
             $facRunner,
             $context->facilitatorRole,
             true,
@@ -623,10 +623,10 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
                 ),
             )
             : '';
-        $partRoleConfig = $chain->getRoleConfig($nextRole);
+        $partRoleConfig = $chain->getSharedDefinition()->getRoleConfig($nextRole);
         $partRunner = $this->resolveRunner($partRoleConfig);
         $auditLogger?->logStepStart(
-            $chain->getName(),
+            $chain->getSharedDefinition()->getName(),
             $execution->getStep(),
             $nextRole,
             $partRunner,
@@ -658,7 +658,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
             $execution,
             $execution->getStep(),
             $execution->getRound(),
-            $chain->getName(),
+            $chain->getSharedDefinition()->getName(),
             $partRunner,
             $nextRole,
             false,
@@ -690,10 +690,10 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
                 ),
             )
             : '';
-        $finRoleConfig = $chain->getRoleConfig($context->facilitatorRole);
+        $finRoleConfig = $chain->getSharedDefinition()->getRoleConfig($context->facilitatorRole);
         $finRunner = $this->resolveRunner($finRoleConfig);
         $auditLogger?->logStepStart(
-            $chain->getName(),
+            $chain->getSharedDefinition()->getName(),
             $execution->getStep(),
             $context->facilitatorRole,
             $finRunner,
@@ -723,7 +723,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
             $execution,
             $execution->getStep(),
             $execution->getRound(),
-            $chain->getName(),
+            $chain->getSharedDefinition()->getName(),
             $finRunner,
             $context->facilitatorRole,
             true,

@@ -52,7 +52,7 @@ class OrchestrateChainCommandHandler
         }
 
         throw new LogicException(
-            sprintf('No execution strategy found for chain "%s".', $chain->getName()),
+            sprintf('No execution strategy found for chain "%s".', $chain->getSharedDefinition()->getName()),
         );
     }
 }

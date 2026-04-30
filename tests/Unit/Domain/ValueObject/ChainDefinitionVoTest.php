@@ -7,13 +7,16 @@ namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\SharedChainDefinitionVo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ChainDefinitionVo::class)]
+#[CoversClass(SharedChainDefinitionVo::class)]
 #[CoversClass(ChainStepVo::class)]
 #[CoversClass(ChainTypeEnum::class)]
 #[CoversClass(RoleConfigVo::class)]
@@ -431,5 +434,81 @@ final class ChainDefinitionVoTest extends TestCase
         );
 
         self::assertNull($vo->getMaxTime());
+    }
+
+    #[Test]
+    public function getSharedDefinitionReturnsSharedChainDefinitionVo(): void
+    {
+        $vo = ChainDefinitionVo::createFromSteps(
+            name: 'test',
+            description: 'Test chain',
+            steps: [ChainStepVo::agent(role: 'r1')],
+        );
+
+        $shared = $vo->getSharedDefinition();
+
+        self::assertInstanceOf(SharedChainDefinitionVo::class, $shared);
+        self::assertSame('test', $shared->getName());
+        self::assertSame('Test chain', $shared->getDescription());
+        self::assertSame(ChainTypeEnum::staticType, $shared->getType());
+        self::assertFalse($shared->isDynamic());
+    }
+
+    #[Test]
+    public function getSharedDefinitionFromDynamicChain(): void
+    {
+        $roles = [
+            'fac' => new RoleConfigVo(command: ['pi']),
+        ];
+        $budget = new BudgetVo(maxCostTotal: 5.0);
+
+        $vo = ChainDefinitionVo::createFromDynamic(
+            name: 'dyn',
+            description: 'Dynamic chain',
+            facilitator: 'fac',
+            participants: ['p1'],
+            maxRounds: 5,
+            brainstormSystemPrompt: 'BS',
+            facilitatorAppendPrompt: 'FA %s',
+            facilitatorStartPrompt: 'St %s',
+            facilitatorContinuePrompt: 'C %s %s',
+            facilitatorFinalizePrompt: 'F %s %s',
+            participantAppendPrompt: 'PA %s',
+            participantUserPrompt: 'P %s %s',
+            roles: $roles,
+            budget: $budget,
+            timeout: 900,
+            maxTime: 1800,
+        );
+
+        $shared = $vo->getSharedDefinition();
+
+        self::assertSame('dyn', $shared->getName());
+        self::assertSame('Dynamic chain', $shared->getDescription());
+        self::assertSame(ChainTypeEnum::dynamicType, $shared->getType());
+        self::assertTrue($shared->isDynamic());
+        self::assertSame($roles, $shared->getRoles());
+        self::assertSame(['pi'], $shared->getRoleConfig('fac')->getCommand());
+        self::assertNull($shared->getRoleConfig('nonexistent'));
+        self::assertSame(5.0, $shared->getBudget()->getMaxCostTotal());
+        self::assertSame(900, $shared->getTimeout());
+        self::assertSame(1800, $shared->getMaxTime());
+    }
+
+    #[Test]
+    public function getSharedDefinitionReturnsNullsWhenNotSet(): void
+    {
+        $vo = ChainDefinitionVo::createFromSteps(
+            name: 'minimal',
+            description: '',
+            steps: [ChainStepVo::agent(role: 'r1')],
+        );
+
+        $shared = $vo->getSharedDefinition();
+
+        self::assertNull($shared->getBudget());
+        self::assertNull($shared->getTimeout());
+        self::assertNull($shared->getMaxTime());
+        self::assertSame([], $shared->getRoles());
     }
 }

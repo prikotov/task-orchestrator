@@ -505,6 +505,18 @@ final class ChainDefinitionValidatorTest extends TestCase
         $maxRoundsProp = $ref->getProperty('maxRounds');
         $maxRoundsProp->setValue($instance, $maxRounds);
 
+        $rolesProp = $ref->getProperty('roles');
+        $rolesProp->setValue($instance, []);
+
+        $budgetProp = $ref->getProperty('budget');
+        $budgetProp->setValue($instance, null);
+
+        $timeoutProp = $ref->getProperty('timeout');
+        $timeoutProp->setValue($instance, null);
+
+        $maxTimeProp = $ref->getProperty('maxTime');
+        $maxTimeProp->setValue($instance, null);
+
         return $instance;
     }
 }

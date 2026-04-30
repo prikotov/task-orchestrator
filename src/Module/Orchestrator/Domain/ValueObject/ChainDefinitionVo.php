@@ -188,16 +188,48 @@ final readonly class ChainDefinitionVo
         );
     }
 
+    /**
+     * Возвращает Shared Kernel — идентификацию цепочки (chain identity).
+     *
+     * Извлекает общие поля (name, description, type, budget, timeout, maxTime, roles)
+     * в immutable SharedChainDefinitionVo по ADR-008.
+     */
+    public function getSharedDefinition(): SharedChainDefinitionVo
+    {
+        return new SharedChainDefinitionVo(
+            name: $this->name,
+            description: $this->description,
+            type: $this->type,
+            budget: $this->budget,
+            timeout: $this->timeout,
+            maxTime: $this->maxTime,
+            roles: $this->roles,
+        );
+    }
+
+    /**
+     * @deprecated Use $chain->getSharedDefinition()->getName() instead. Will be removed in a future version.
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * Возвращает описание цепочки.
+     *
+     * @deprecated Use $chain->getSharedDefinition()->getDescription() instead. Will be removed in a future version.
+     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
+    /**
+     * Возвращает тип цепочки (static/dynamic).
+     *
+     * @deprecated Use $chain->getSharedDefinition()->getType() instead. Will be removed in a future version.
+     */
     public function getType(): ChainTypeEnum
     {
         return $this->type;
@@ -327,6 +359,8 @@ final readonly class ChainDefinitionVo
 
     /**
      * Возвращает конфигурацию роли или null, если не задана.
+     *
+     * @deprecated Use $chain->getSharedDefinition()->getRoleConfig($role) instead. Will be removed in a future version.
      */
     public function getRoleConfig(string $role): ?RoleConfigVo
     {
@@ -335,6 +369,8 @@ final readonly class ChainDefinitionVo
 
     /**
      * Возвращает все per-role конфигурации.
+     *
+     * @deprecated Use $chain->getSharedDefinition()->getRoles() instead. Will be removed in a future version.
      *
      * @return array<string, RoleConfigVo>
      */
@@ -345,6 +381,8 @@ final readonly class ChainDefinitionVo
 
     /**
      * Является ли цепочка динамической?
+     *
+     * @deprecated Use $chain->getSharedDefinition()->isDynamic() instead. Will be removed in a future version.
      */
     public function isDynamic(): bool
     {
@@ -353,6 +391,8 @@ final readonly class ChainDefinitionVo
 
     /**
      * Возвращает таймаут цепочки в секундах (null = не задан, использовать CLI --timeout или default).
+     *
+     * @deprecated Use $chain->getSharedDefinition()->getTimeout() instead. Will be removed in a future version.
      */
     public function getTimeout(): ?int
     {
@@ -369,6 +409,8 @@ final readonly class ChainDefinitionVo
 
     /**
      * Возвращает бюджетные ограничения цепочки (null = безлимит).
+     *
+     * @deprecated Use $chain->getSharedDefinition()->getBudget() instead. Will be removed in a future version.
      */
     public function getBudget(): ?BudgetVo
     {
@@ -377,6 +419,8 @@ final readonly class ChainDefinitionVo
 
     /**
      * Возвращает максимальное суммарное время выполнения цепочки в секундах (null = безлимит).
+     *
+     * @deprecated Use $chain->getSharedDefinition()->getMaxTime() instead. Will be removed in a future version.
      */
     public function getMaxTime(): ?int
     {
