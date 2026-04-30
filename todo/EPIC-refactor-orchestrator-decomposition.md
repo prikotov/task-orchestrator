@@ -106,7 +106,7 @@ pr: https://github.com/prikotov/task-orchestrator/pull/98
 - [ ] TASK-refactor-session-writer-consumers — Переключение 3 потребителей на ChainSessionWriterInterface.
 
 ### Фаза 4: Реализация P2 (P2, задачи по готовности)
-- [ ] TASK-refactor-execution-strategy — ExecutionStrategyInterface + Static/Dynamic + CommandHandler rewrite (ADR-006)
+- [x] TASK-refactor-execution-strategy — ExecutionStrategyInterface + Static/Dynamic + CommandHandler rewrite (ADR-006) — PR #104
 - [ ] TASK-refactor-chain-definition-split — Расщепление ChainDefinitionVo (ADR-008)
 
 ### Фаза 5: Валидация (P2)
