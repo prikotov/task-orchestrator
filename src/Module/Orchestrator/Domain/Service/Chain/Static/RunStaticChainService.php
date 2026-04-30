@@ -58,7 +58,7 @@ final readonly class RunStaticChainService
         /** @var list<StaticStepResultVo> $results */
         $results = [];
         $startTime = microtime(true);
-        $auditLogger?->logChainStart($chain->getName(), $task);
+        $auditLogger?->logChainStart($chain->getSharedDefinition()->getName(), $task);
 
         $stepCount = count($steps);
         while (!$execution->isComplete($stepCount)) {
@@ -89,7 +89,7 @@ final readonly class RunStaticChainService
         }
 
         $result = $this->buildResult(
-            $chain->getName(),
+            $chain->getSharedDefinition()->getName(),
             $startTime,
             $results, // @psalm-suppress ArgumentTypeCoercion loop reassignment widens type
             $execution,
@@ -125,7 +125,7 @@ final readonly class RunStaticChainService
         $step = $steps[$execution->getStepIndex()];
         $budgetRole = ($step->isAgent() ? $step->getRole() : null) ?? 'quality_gate';
 
-        if ($this->budgetService->shouldBreakBeforeStep($execution, $chain->getBudget(), $budgetRole)) {
+        if ($this->budgetService->shouldBreakBeforeStep($execution, $chain->getSharedDefinition()->getBudget(), $budgetRole)) {
             return null;
         }
 
@@ -157,7 +157,7 @@ final readonly class RunStaticChainService
 
         return $this->handlePostStep(
             $execution,
-            $chain->getBudget(),
+            $chain->getSharedDefinition()->getBudget(),
             $budgetRole,
             $stepResult,
             $step,
@@ -232,14 +232,14 @@ final readonly class RunStaticChainService
     ): StaticStepResultVo {
         if ($step->isQualityGate()) {
             $auditLogger?->logStepStart(
-                $chain->getName(),
+                $chain->getSharedDefinition()->getName(),
                 $stepIndex1,
                 $role,
                 'shell',
             );
             $stepResult = $this->stepExecution->runQualityGate($step);
             $auditLogger?->logStepResult(
-                $chain->getName(),
+                $chain->getSharedDefinition()->getName(),
                 $stepIndex1,
                 $role,
                 'shell',
@@ -255,10 +255,10 @@ final readonly class RunStaticChainService
         $iterationGroup = $groupForStep[$execution->getStepIndex()] ?? null;
         $iterationNumber = $iterationGroup !== null
             ? $execution->getIterationNumber($iterationGroup->getGroup()) : null;
-        $roleConfig = $chain->getRoleConfig($role);
+        $roleConfig = $chain->getSharedDefinition()->getRoleConfig($role);
         $runnerName = $step->getRunner();
         $auditLogger?->logStepStart(
-            $chain->getName(),
+            $chain->getSharedDefinition()->getName(),
             $stepIndex1,
             $role,
             $runnerName,
@@ -275,7 +275,7 @@ final readonly class RunStaticChainService
             $noContextFiles,
         );
         $auditLogger?->logStepResult(
-            $chain->getName(),
+            $chain->getSharedDefinition()->getName(),
             $stepIndex1,
             $role,
             $runnerName,

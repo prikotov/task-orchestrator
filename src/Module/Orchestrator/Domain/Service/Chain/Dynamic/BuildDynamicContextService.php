@@ -75,7 +75,7 @@ final readonly class BuildDynamicContextService implements BuildDynamicContextSe
     ): array {
         $invocation = [
             'command' => 'bin/console app:agent:orchestrate',
-            'chain' => $chain->getName(),
+            'chain' => $chain->getSharedDefinition()->getName(),
             'task' => $this->maskText($task),
             'topic' => $this->maskText($effectiveTopic),
             'facilitator' => $effectiveFacilitator,

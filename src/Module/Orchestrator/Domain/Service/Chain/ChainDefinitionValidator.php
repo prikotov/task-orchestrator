@@ -27,7 +27,7 @@ final readonly class ChainDefinitionValidator
      */
     public function validate(ChainDefinitionVo $chain): array
     {
-        if ($chain->isDynamic()) {
+        if ($chain->getSharedDefinition()->isDynamic()) {
             return $this->validateDynamicChain($chain);
         }
 
@@ -40,7 +40,7 @@ final readonly class ChainDefinitionValidator
     private function validateStaticChain(ChainDefinitionVo $chain): array
     {
         $violations = [];
-        $name = $chain->getName();
+        $name = $chain->getSharedDefinition()->getName();
         $steps = $chain->getSteps();
 
         if ($steps === []) {
@@ -91,7 +91,7 @@ final readonly class ChainDefinitionValidator
     private function validateDynamicChain(ChainDefinitionVo $chain): array
     {
         $violations = [];
-        $name = $chain->getName();
+        $name = $chain->getSharedDefinition()->getName();
 
         $facilitator = $chain->getFacilitator();
         if ($facilitator === null || $facilitator === '') {

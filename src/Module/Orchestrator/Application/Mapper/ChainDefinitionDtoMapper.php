@@ -17,7 +17,7 @@ final readonly class ChainDefinitionDtoMapper
     {
         $steps = [];
         foreach ($chain->getSteps() as $step) {
-            $roleConfig = $step->getRole() !== null ? $chain->getRoleConfig($step->getRole()) : null;
+            $roleConfig = $step->getRole() !== null ? $chain->getSharedDefinition()->getRoleConfig($step->getRole()) : null;
             $fallbackRunner = $roleConfig?->getFallback()?->getRunnerName();
 
             $steps[] = new ChainStepDto(
@@ -30,8 +30,8 @@ final readonly class ChainDefinitionDtoMapper
         }
 
         return new ChainDefinitionDto(
-            name: $chain->getName(),
-            isDynamic: $chain->isDynamic(),
+            name: $chain->getSharedDefinition()->getName(),
+            isDynamic: $chain->getSharedDefinition()->isDynamic(),
             facilitator: $chain->getFacilitator(),
             participants: $chain->getParticipants(),
             maxRounds: $chain->getMaxRounds(),

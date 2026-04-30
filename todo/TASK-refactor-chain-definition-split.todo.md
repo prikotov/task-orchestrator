@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер (Левша)
+branch: task/chain-definition-split
+pr: https://github.com/prikotov/task-orchestrator/pull/105
+status: done
 ---
 
 # TASK-refactor-chain-definition-split: Расщепление ChainDefinitionVo (ADR-008)
@@ -31,25 +31,25 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] `SharedChainDefinitionVo` создан (name, type, budget, roles, timeout)
-- [ ] `ChainDefinitionVo::getSharedDefinition()` добавлен
-- [ ] Старые геттеры shared-полей помечены `@deprecated`
-- [ ] Все тесты проходят
+- [x] `SharedChainDefinitionVo` создан (name, type, budget, roles, timeout)
+- [x] `ChainDefinitionVo::getSharedDefinition()` добавлен
+- [x] Старые геттеры shared-полей помечены `@deprecated`
+- [x] Все тесты проходят
 
 ### ⚫ Won't Have (Не будем делать)
 - [ ] Физическое расщепление на подклассы
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Создать `SharedChainDefinitionVo` (immutable, readonly)
-2. [ ] Добавить `getSharedDefinition()` в `ChainDefinitionVo`
-3. [ ] Пометить shared-геттеры `@deprecated`
-4. [ ] Адаптировать тесты
-5. [ ] Запустить проверки
+1. [x] Создать `SharedChainDefinitionVo` (immutable, readonly)
+2. [x] Добавить `getSharedDefinition()` в `ChainDefinitionVo`
+3. [x] Пометить shared-геттеры `@deprecated`
+4. [x] Адаптировать тесты
+5. [x] Запустить проверки
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] `SharedChainDefinitionVo` создан
-- [ ] `ChainDefinitionVo::getSharedDefinition()` работает
-- [ ] Все тесты проходят
+- [x] `SharedChainDefinitionVo` создан
+- [x] `ChainDefinitionVo::getSharedDefinition()` работает
+- [x] Все тесты проходят
 
 ## 6. Verification (Самопроверка)
 ```bash
