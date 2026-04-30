@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ValidateChainConfig;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigViolationDto;
 
 /**
  * @see ValidateChainConfigQueryHandler

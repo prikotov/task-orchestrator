@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain;
 
+use LogicException;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
-use LogicException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 
 /**

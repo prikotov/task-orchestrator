@@ -17,8 +17,8 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainRe
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticProcessResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticStepResultVo;
 
-use function count;
-use function sprintf;
+
+
 
 /**
  * Доменная логика выполнения static-цепочки: линейное выполнение шагов с итерациями и budget.
@@ -60,7 +60,8 @@ final readonly class RunStaticChainService
         $startTime = microtime(true);
         $auditLogger?->logChainStart($chain->getName(), $task);
 
-        while (!$execution->isComplete(count($steps))) {
+        $stepCount = count($steps);
+        while (!$execution->isComplete($stepCount)) {
             $stepResult = $this->processStep(
                 $chain,
                 $task,
