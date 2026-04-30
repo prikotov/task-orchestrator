@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/chain-definition-split
 pr: https://github.com/prikotov/task-orchestrator/pull/105
-status: review
+status: done
 ---
 
 # TASK-refactor-chain-definition-split: Расщепление ChainDefinitionVo (ADR-008)
