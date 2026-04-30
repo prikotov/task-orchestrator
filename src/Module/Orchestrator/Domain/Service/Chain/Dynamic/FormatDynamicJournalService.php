@@ -7,8 +7,8 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynam
 use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorTurnResultVo;
 
-use function date;
-use function sprintf;
+
+
 
 /**
  * Форматирование и ведение журнала dynamic-цикла.
@@ -111,7 +111,9 @@ final readonly class FormatDynamicJournalService implements FormatDynamicJournal
             $text = $challenge !== null && $challenge !== ''
                 ? sprintf('Дал слово %s. Вызов: %s', $nextRole, $challenge)
                 : sprintf('Дал слово %s.', $nextRole);
-        } else {
+        }
+
+        if (!isset($text)) {
             $text = 'Ожидание участников.';
         }
 

@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject;
 
 use InvalidArgumentException;
 
-use function sprintf;
+
 
 /**
  * Value Object политики повторных попыток (retry) для Agent Runner.

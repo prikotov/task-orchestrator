@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\StaticChainExecution;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
 
-use function sprintf;
+
 
 /**
  * Проверка бюджетных ограничений static-цепочки.

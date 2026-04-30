@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject;
 
 use InvalidArgumentException;
 
-use function sprintf;
+
 
 /**
  * Value Object политики повторных попыток (retry) для Orchestrator Port.

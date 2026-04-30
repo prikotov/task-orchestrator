@@ -16,7 +16,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackAttem
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticStepResultVo;
 
-use function sprintf;
+
 
 /**
  * Выполнение отдельного шага static-цепочки: agent-step, quality-gate, fallback.

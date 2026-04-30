@@ -7,6 +7,8 @@ services:
   _instanceof:
     TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
       tags: ['agent.runner']
+    TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecutionStrategyInterface:
+      tags: ['orchestrator.execution_strategy']
 
   # --- Auto-discovery (Application + Infrastructure, Domain исключён) ---
   TaskOrchestrator\Common\:
@@ -112,6 +114,11 @@ services:
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService:
     arguments:
       $runners: !tagged_iterator agent.runner
+
+  # --- CommandHandler: tagged strategies ---
+  TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler:
+    arguments:
+      $strategies: !tagged_iterator orchestrator.execution_strategy
 
   # --- Параметры путей (через bundle configuration) ---
   TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Prompt\RolePromptBuilder:

@@ -12,12 +12,12 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainConfigVi
  */
 final readonly class ChainConfigViolationDtoMapper
 {
-    public function map(ChainConfigViolationVo $vo): ChainConfigViolationDto
+    public function map(ChainConfigViolationVo $violation): ChainConfigViolationDto
     {
         return new ChainConfigViolationDto(
-            chainName: $vo->getChainName(),
-            field: $vo->getField(),
-            message: $vo->getMessage(),
+            chainName: $violation->getChainName(),
+            field: $violation->getField(),
+            message: $violation->getMessage(),
         );
     }
 
@@ -28,7 +28,7 @@ final readonly class ChainConfigViolationDtoMapper
     public function mapList(array $violations): array
     {
         return array_map(
-            fn(ChainConfigViolationVo $v): ChainConfigViolationDto => $this->map($v),
+            fn(ChainConfigViolationVo $item): ChainConfigViolationDto => $this->map($item),
             $violations,
         );
     }
