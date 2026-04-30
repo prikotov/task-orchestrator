@@ -6,7 +6,7 @@ complexity: C4
 priority: P1
 author: Тимлид (Алекс)
 assignee: Тимлид (Алекс)
-status: review
+status: done
 pr: https://github.com/prikotov/task-orchestrator/pull/98
 ---
 
@@ -101,26 +101,26 @@ pr: https://github.com/prikotov/task-orchestrator/pull/98
 - [x] [TASK-refactor-orchestrator-decomposition-plan](done/TASK-refactor-orchestrator-decomposition-plan.todo.md) — Оформление плана: 3 ADR (ExecutionStrategy, VO ACL, Shared Kernel), черновой roadmap, задачи на P1-action items.
 
 ### Фаза 3: Реализация P1 (P1)
-- [ ] TASK-refactor-inline-execute-dynamic-turn — Инлайнинг ExecuteDynamicTurnService в RunDynamicLoopService. Вложенность 7→5.
-- [ ] TASK-refactor-prompt-configuration-vo — PromptConfiguration VO: 7 промпт-полей → отдельный VO.
-- [ ] TASK-refactor-session-writer-consumers — Переключение 3 потребителей на ChainSessionWriterInterface.
+- [x] TASK-refactor-inline-execute-dynamic-turn — Инлайнинг ExecuteDynamicTurnService в RunDynamicLoopService. Вложенность 7→5. — PR #101
+- [x] TASK-refactor-prompt-configuration-vo — PromptConfiguration VO: 7 промпт-полей → отдельный VO. — PR #102
+- [x] TASK-refactor-session-writer-consumers — Переключение 3 потребителей на ChainSessionWriterInterface. — PR #103
 
 ### Фаза 4: Реализация P2 (P2, задачи по готовности)
 - [x] TASK-refactor-execution-strategy — ExecutionStrategyInterface + Static/Dynamic + CommandHandler rewrite (ADR-006) — PR #104
 - [x] TASK-refactor-chain-definition-split — Расщепление ChainDefinitionVo (ADR-008) — PR #105
 
 ### Фаза 5: Валидация (P2)
-- [ ] Deptrac-конфигурация для контроля границ
-- [ ] Обновление docs/guide/architecture.md
+- [x] Deptrac-конфигурация для контроля границ
+- [x] Обновление docs/guide/architecture.md
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [ ] Brainstorm-анализ проведён, протокол сохранён
-- [ ] План декомпозиции согласован
-- [ ] Модули разделены с явными Integration-слоями
-- [ ] `vendor/bin/phpunit` — все тесты проходят
-- [ ] `vendor/bin/psalm` — без ошибок
-- [ ] Deptrac контролирует границы модулей
-- [ ] Архитектурная документация обновлена
+- [x] Brainstorm-анализ проведён, протокол сохранён
+- [x] План декомпозиции согласован
+- [x] Модули разделены с явными Integration-слоями
+- [x] `vendor/bin/phpunit` — все тесты проходят
+- [x] `vendor/bin/psalm` — без ошибок
+- [x] Deptrac контролирует границы модулей
+- [x] Архитектурная документация обновлена
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
 - [ ] Заполняется по завершении
