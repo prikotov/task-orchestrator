@@ -86,12 +86,19 @@ while (true) {
     $targetHost = $m[1];
     $targetPort = (int) $m[2];
 
-    $ctx = stream_context_create([
-        'ssl' => [
-            'verify_peer' => true,
-            'verify_peer_name' => true,
-        ],
-    ]);
+    $verifyTls = getenv('BRIDGE_TLS_VERIFY') !== '0';
+
+    $sslOptions = [
+        'verify_peer' => $verifyTls,
+        'verify_peer_name' => $verifyTls,
+    ];
+
+    $caFile = getenv('BRIDGE_CA_FILE');
+    if ($caFile !== false && $caFile !== '' && file_exists($caFile)) {
+        $sslOptions['cafile'] = $caFile;
+    }
+
+    $ctx = stream_context_create(['ssl' => $sslOptions]);
 
     $upstream = @stream_socket_client(
         'tls://' . $upstreamHost . ':' . $upstreamPort,

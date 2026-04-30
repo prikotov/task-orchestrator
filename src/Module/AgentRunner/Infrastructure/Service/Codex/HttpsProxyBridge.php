@@ -247,13 +247,23 @@ final class HttpsProxyBridge
             $authHeader = 'Proxy-Authorization: Basic ' . $credentials;
         }
 
-        return [
+        $env = [
             'BRIDGE_UPSTREAM_HOST' => $this->upstreamHost,
             'BRIDGE_UPSTREAM_PORT' => (string) $this->upstreamPort,
             'BRIDGE_AUTH_HEADER' => $authHeader,
             'BRIDGE_CONNECT_TIMEOUT' => (string) $this->connectTimeout,
             'BRIDGE_HOST' => self::BRIDGE_HOST,
         ];
+
+        // Pass through TLS configuration (for testing with self-signed certs)
+        foreach (['BRIDGE_TLS_VERIFY', 'BRIDGE_CA_FILE'] as $var) {
+            $value = getenv($var);
+            if ($value !== false) {
+                $env[$var] = $value;
+            }
+        }
+
+        return $env;
     }
 
     /**
