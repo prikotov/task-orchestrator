@@ -55,14 +55,15 @@ src/Module/
 - `RunAgentServiceInterface` — интеграционный интерфейс запуска AI-агента (инкапсулирует retry)
 - Сервисы Chain: Audit, Dynamic, Session, Shared, Static, Budget, Prompt
 - Entity: `DynamicLoopExecution`, `StaticChainExecution`
-- VO: `ChainRunRequestVo`, `ChainRunResultVo`, `ChainRetryPolicyVo`, `ChainTurnResultVo`, `ChainDefinitionVo`, и др.
+- VO: `ChainDefinitionVo`, `SharedChainDefinitionVo`, `PromptConfigurationVo`, `DynamicLoopResultVo` (с `getCompletionReason()`), и др.
 - Enum: `ChainStepTypeEnum`, `ChainTypeEnum`
 - Exception: `OrchestratorException`, `ChainNotFoundException`, `RoleNotFoundException`
 
 **Application-слой:**
-- Use cases: `OrchestrateChainCommandHandler`, `RunAgentCommandHandler`, `GetRunnersQueryHandler`, `GenerateReportQueryHandler`
+- Use cases: `OrchestrateChainCommandHandler` (диспетчер стратегий, ~58 строк, 2 зависимости), `RunAgentCommandHandler`, `GetRunnersQueryHandler`, `GenerateReportQueryHandler`
+- Стратегии выполнения: `ExecutionStrategyInterface`, `StaticExecutionStrategy`, `DynamicExecutionStrategy`
+- Сервисы: `ExecuteStaticChainService`, `ExecuteStaticChainServiceInterface`, `DispatchRoundEventService`, `DispatchSessionCompletedEventService`
 - DTO: команды и результаты
-- Service: `ExecuteStaticChainService`, `DispatchRoundEventService`
 - Mapper: `ReportFormatMapperInterface`, `ReportJsonMapper`, `ReportTextMapper`
 
 **Integration-слой (ACL к AgentRunner):**
@@ -71,6 +72,39 @@ src/Module/
 
 **Infrastructure-слой:**
 - Сервисы Chain: `YamlChainLoader`, `ChainSessionLogger`, `QualityGateRunner`, и др.
+
+## ExecutionStrategy Pattern
+
+Оркестрация использует **Strategy** для разделения поведенческих путей static/dynamic цепочек. Паттерн введён в ADR-006.
+
+**Как работает:**
+
+1. `OrchestrateChainCommandHandler` — чистый диспетчер. Две зависимости: `ChainLoaderInterface` + `iterable<ExecutionStrategyInterface>` (tagged iterator).
+2. Стратегия определяется через `supports(ChainDefinitionVo): bool` — каждая проверяет тип цепочки.
+3. Найденная стратегия выполняет `execute()` или `resume()`.
+
+**Стратегии:**
+
+| Стратегия | Тип цепочки | Описание |
+|---|---|---|
+| `StaticExecutionStrategy` | static | Делегирует в `ExecuteStaticChainServiceInterface`. Resume не поддерживает. |
+| `DynamicExecutionStrategy` | dynamic | Полный цикл: session, context, loop, finalize, DTO-маппинг, event dispatch. |
+
+**DI-конфигурация:**
+
+```yaml
+# config/services.yaml
+services:
+    _instanceof:
+        ExecutionStrategyInterface:
+            tags: ['orchestrator.execution_strategy']
+
+    OrchestrateChainCommandHandler:
+        arguments:
+            $strategies: !tagged_iterator orchestrator.execution_strategy
+```
+
+**Почему Strategy, а не if/switch:** Handler не знает о типах цепочек. Новая стратегия — новый класс + тег, handler не меняется.
 
 ## Integration-слой между модулями
 
@@ -203,7 +237,6 @@ src/Module/Orchestrator/
 │   │   │   ├── Dynamic/
 │   │   │   │   ├── BuildDynamicContextServiceInterface.php
 │   │   │   │   ├── BuildDynamicContextService.php
-│   │   │   │   ├── ExecuteDynamicTurnService.php
 │   │   │   │   ├── FormatDynamicJournalServiceInterface.php
 │   │   │   │   ├── FormatDynamicJournalService.php
 │   │   │   │   ├── RecordDynamicRoundServiceInterface.php
@@ -221,7 +254,8 @@ src/Module/Orchestrator/
 │   │   │   │   ├── PromptFormatterInterface.php
 │   │   │   │   ├── QualityGateRunnerInterface.php
 │   │   │   │   ├── ResolveChainRunnerServiceInterface.php
-│   │   │   │   └── RoundCompletedNotifierInterface.php
+│   │   │   │   ├── RoundCompletedNotifierInterface.php
+│   │   │   │   └── SessionCompletedNotifierInterface.php
 │   │   │   └── Static/
 │   │   │       ├── CheckStaticBudgetServiceInterface.php
 │   │   │       ├── CheckStaticBudgetService.php
@@ -233,6 +267,7 @@ src/Module/Orchestrator/
 │   │       └── PromptProviderInterface.php
 │   └── ValueObject/
 │       ├── BudgetVo.php
+│       ├── ChainConfigViolationVo.php
 │       ├── ChainDefinitionVo.php
 │       ├── ChainRetryPolicyVo.php
 │       ├── ChainRunRequestVo.php
@@ -250,9 +285,11 @@ src/Module/Orchestrator/
 │       ├── FallbackAttemptVo.php
 │       ├── FallbackConfigVo.php
 │       ├── FixIterationGroupVo.php
+│       ├── PromptConfigurationVo.php
 │       ├── QualityGateResultVo.php
 │       ├── QualityGateVo.php
 │       ├── RoleConfigVo.php
+│       ├── SharedChainDefinitionVo.php
 │       ├── StaticChainResultVo.php
 │       ├── StaticProcessResultVo.php
 │       └── StaticStepResultVo.php
@@ -267,9 +304,13 @@ src/Module/Orchestrator/
 │   │   ├── ReportJsonMapper.php
 │   │   └── ReportTextMapper.php
 │   ├── Service/Chain/
+│   │   ├── DispatchRoundEventService.php
+│   │   ├── DispatchSessionCompletedEventService.php
+│   │   ├── DynamicExecutionStrategy.php
 │   │   ├── ExecuteStaticChainService.php
 │   │   ├── ExecuteStaticChainServiceInterface.php
-│   │   └── DispatchRoundEventService.php
+│   │   ├── ExecutionStrategyInterface.php
+│   │   └── StaticExecutionStrategy.php
 │   └── UseCase/
 │       ├── Command/
 │       │   ├── OrchestrateChain/
@@ -391,3 +432,9 @@ task_orchestrator:
 - Новый движок: создать класс, реализующий `AgentRunnerInterface`, зарегистрировать в `config/services.yaml` с тегом `agent.runner`
 
 Подробнее о retry и circuit breaker — в [Надёжность](reliability.md).
+
+## Deptrac
+
+Архитектурные правила зависимостей между слоями верифицируются через [Deptrac](https://github.com/qossmic/deptrac). Конфигурация — `depfile.yaml`. Результат: **0 violations**.
+
+Deptrac гарантирует, что Domain не зависит от Application/Infrastructure, Integration не нарушает границы, и слои соблюдаются.
