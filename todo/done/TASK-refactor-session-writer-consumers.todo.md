@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/session-writer-consumers
 pr: https://github.com/prikotov/task-orchestrator/pull/103
-status: review
+status: done
 ---
 
 # TASK-refactor-session-writer-consumers: Переключение 3 потребителей на ChainSessionWriterInterface

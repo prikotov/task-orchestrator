@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/inline-execute-dynamic-turn
 pr: https://github.com/prikotov/task-orchestrator/pull/101
-status: review
+status: done
 ---
 
 # TASK-refactor-inline-execute-dynamic-turn: Инлайнинг ExecuteDynamicTurnService в RunDynamicLoopService
