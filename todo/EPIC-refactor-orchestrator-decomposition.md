@@ -107,7 +107,7 @@ pr: https://github.com/prikotov/task-orchestrator/pull/98
 
 ### Фаза 4: Реализация P2 (P2, задачи по готовности)
 - [x] TASK-refactor-execution-strategy — ExecutionStrategyInterface + Static/Dynamic + CommandHandler rewrite (ADR-006) — PR #104
-- [ ] TASK-refactor-chain-definition-split — Расщепление ChainDefinitionVo (ADR-008)
+- [x] TASK-refactor-chain-definition-split — Расщепление ChainDefinitionVo (ADR-008) — PR #105
 
 ### Фаза 5: Валидация (P2)
 - [ ] Deptrac-конфигурация для контроля границ
