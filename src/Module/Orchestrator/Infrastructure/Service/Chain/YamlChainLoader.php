@@ -48,6 +48,7 @@ final class YamlChainLoader implements ChainLoaderInterface
      * Используется CLI-опцией --config для загрузки произвольного файла chains.yaml
      * без изменения Symfony-конфигурации.
      */
+    #[Override]
     public function overridePath(string $yamlPath): void
     {
         $this->yamlPath = $yamlPath;

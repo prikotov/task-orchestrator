@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain;
 
+use LogicException;
 use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
@@ -42,7 +43,7 @@ final readonly class StaticExecutionStrategy implements ExecutionStrategyInterfa
     #[Override]
     public function resume(ChainDefinitionVo $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        throw new \LogicException('Static chain does not support resume.');
+        throw new LogicException('Static chain does not support resume.');
     }
 
     #[Override]

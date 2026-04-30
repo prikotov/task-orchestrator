@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain;
 
+use LogicException;
 use Override;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Event\OrchestrateChain\OrchestrateSessionCompletedEvent;
@@ -104,7 +105,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
         $state = $this->sessionLogger->getResumedState();
 
         if ($state === null) {
-            throw new \LogicException("Failed to resume session from: {$resumeDir}");
+            throw new LogicException("Failed to resume session from: {$resumeDir}");
         }
 
         $this->sessionLogger->setBudget($chain->getBudget());
