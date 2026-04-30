@@ -9,7 +9,7 @@ epic: EPIC-refactor-orchestrator-decomposition
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/chain-definition-split
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/105
 status: review
 ---
 
