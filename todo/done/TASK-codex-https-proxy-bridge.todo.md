@@ -7,10 +7,10 @@ priority: P1
 depends_on: TASK-agent-runner-proxy
 epic:
 author: Бэкендер Левша (backend_developer_levsha)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер Левша (backend_developer_levsha)
+branch: task/codex-https-proxy-bridge
+pr: '#108'
+status: done
 ---
 
 # TASK-codex-https-proxy-bridge: PHP HTTPS→HTTP прокси-мост для CodexAgentRunner
@@ -60,14 +60,66 @@ status: todo
 - [ ] Внешние зависимости (только PHP stream sockets + OpenSSL)
 
 ## 4. Implementation Plan (План реализации)
-*Заполняется исполнителем перед стартом.*
 
-### Рекомендуемый подход
-1. Создать `HttpsProxyBridge` с использованием PHP `stream_socket_server` и `stream_socket_client` + `stream_context_set_option` для TLS.
-2. Метод `start(): string` — возвращает `http://127.0.0.1:<port>`; запускает TCP-сервер в отдельном процессе (fork или proc_open).
-3. Метод `stop(): void` — останавливает сервер.
-4. Основной цикл моста: `stream_socket_accept` → читать HTTP CONNECT → установить TLS к upstream → отправить CONNECT с auth → пересылать данные bidirectionally.
-5. Интеграция в `CodexAgentRunner::run()`: если `CODEX_HTTP_PROXY` содержит `https://`, стартовать мост, заменить URL на `http://127.0.0.1:<port>`, после завершения — остановить.
+### Reverse Briefing (подтверждение понимания задачи)
+
+Codex CLI использует reqwest 0.12.28, который не поддерживает HTTPS-схему для прокси.
+Upstream-прокси (например, `***:***`) принимает только TLS-соединения.
+Нужен локальный HTTP-прокси-мост на PHP, который:
+1. Слушает на `127.0.0.1:<random_port>` как обычный HTTP-прокси.
+2. Принимает CONNECT-запросы от codex.
+3. Устанавливает TLS-соединение с upstream HTTPS-прокси.
+4. Пересылает CONNECT-запрос с `Proxy-Authorization: Basic`.
+5. Проксирует данные bidirectionally между codex и целевым сервером через upstream.
+
+### Архитектурные решения
+
+1. **HttpsProxyBridge** — Infrastructure-сервис без интерфейса (внутренний для CodexAgentRunner, не доменный контракт).
+2. Запуск через `proc_open` (отдельный PHP-процесс), а не `pcntl_fork` — более надёжно и переносимо.
+3. Скрипт моста — inline PHP-код, передаваемый через `proc_open` как `php -r '...'` — avoids отдельного файла.
+4. Port assignment: `stream_socket_server('tcp://127.0.0.1:0')` — ОС назначит свободный порт.
+5. Communication parent↔child: bridge пишет port number в stdout при старте, parent читает.
+
+### Пошаговый план
+
+#### Step 1: HttpsProxyBridge (Infrastructure)
+- **Файл:** `src/Module/AgentRunner/Infrastructure/Service/Codex/HttpsProxyBridge.php`
+- **Класс:** `HttpsProxyBridge` (final, не readonly — содержит состояние процесса)
+- **Зависимости:** нет внешних (только PHP stream functions + pcntl для сигналов)
+- **API:**
+  - `__construct(string $upstreamProxyUrl)` — парсит URL, извлекает host/port/user/pass
+  - `start(): string` — запускает PHP-процесс моста, возвращает `http://127.0.0.1:<port>`
+  - `stop(): void` — отправляет SIGTERM дочернему процессу, ждет завершения
+  - `isRunning(): bool` — проверяет жив ли процесс
+  - `static parseUpstreamUrl(string $url): ?array` — парсит https://user:pass@host:port, возвращает компоненты или null
+- **Внутренний метод:** `buildBridgeScript(): string` — генерирует PHP-код моста
+
+#### Step 2: Интеграция в CodexAgentRunner
+- **Файл:** `src/Module/AgentRunner/Infrastructure/Service/Codex/CodexAgentRunner.php`
+- Изменения в `run()`:
+  1. Проверить `CODEX_HTTP_PROXY` на `https://` схему.
+  2. Если да — создать `HttpsProxyBridge`, вызвать `start()`, получить локальный URL.
+  3. Подставить локальный URL в env вместо оригинального.
+  4. Выполнить `process->run()`.
+  5. В `finally` — вызвать `bridge->stop()`.
+- Изменения в `buildProcessEnv()` — поддержка моста (передача локального URL).
+
+#### Step 3: Unit-тесты
+- **Файл:** `tests/Unit/Infrastructure/Service/AgentRunner/Codex/HttpsProxyBridgeTest.php`
+- Тест-кейсы:
+  1. `parseUpstreamUrl` — корректный HTTPS URL → компоненты
+  2. `parseUpstreamUrl` — HTTP URL → null (не нужен мост)
+  3. `parseUpstreamUrl` — URL без credentials → компоненты с пустым user/pass
+  4. `parseUpstreamUrl` — невалидный URL → null
+  5. `start()` — запускает процесс, возвращает `http://127.0.0.1:<port>`
+  6. `stop()` — корректно останавливает процесс
+  7. `stop()` — безопасен при повторном вызове (idempotent)
+  8. Интеграция в CodexAgentRunner — HTTPS-прокси активирует мост
+  9. Интеграция в CodexAgentRunner — HTTP-прокси НЕ активирует мост
+
+#### Step 4: Проверки
+- `vendor/bin/phpunit`
+- `vendor/bin/psalm`
 
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] `HttpsProxyBridge` запускается и корректно пересылает CONNECT-запросы через TLS
@@ -103,3 +155,5 @@ vendor/bin/psalm
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-28 | Бэкендер Левша | Создание задачи |
+| 2026-04-30 | Бэкендер Левша | Реализация (CR-01..CR-06 доработки после ревью Пуаро) |
+| 2026-04-30 | Тимлид Алекс | PR #108, статус done |
