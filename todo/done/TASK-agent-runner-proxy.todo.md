@@ -79,7 +79,7 @@ vendor/bin/psalm
 - Может потребоваться передача прокси через `-c` config override вместо env
 
 ## 8. Sources (Источники)
-- [TASK-orchestrator-codex-runner](done/TASK-orchestrator-codex-runner.todo.md) — реализация CodexAgentRunner
+- [TASK-orchestrator-codex-runner](TASK-orchestrator-codex-runner.todo.md) — реализация CodexAgentRunner
 - Codex CLI документация по конфигурации (`~/.codex/config.toml`)
 
 ## 9. Comments (Комментарии)

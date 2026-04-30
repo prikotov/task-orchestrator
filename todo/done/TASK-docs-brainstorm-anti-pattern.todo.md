@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Тех. писатель (Гермиона)
 branch: task/orchestrator-decomposition-epic
 pr: https://github.com/prikotov/task-orchestrator/pull/98
-status: review
+status: done
 ---
 
 # TASK-docs-brainstorm-anti-pattern: Добавить анти-паттерн симуляции brainstorm в SKILL.md
