@@ -156,13 +156,14 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 * Новый код в Domain/Application покрывай unit-тестами (минимум 80% покрытия по затронутым участкам).
 
-* **Ключевые инструменты:** PHPUnit, Psalm, PHP_CodeSniffer, Composer
+* **Ключевые инструменты:** PHPUnit, Psalm, PHP_CodeSniffer, Deptrac, Composer
 
 | Tool             | Configuration File | Purpose                           |
 |------------------|--------------------|-----------------------------------|
 | PHPUnit          | `phpunit.xml.dist` | Unit, integration tests           |
 | Psalm            | `psalm.xml`        | Static code analysis              |
 | PHP_CodeSniffer  | `phpcs.xml.dist`    | Code style validation             |
+| Deptrac          | `depfile.yaml`     | Architecture dependency analysis  |
 | Composer         | `composer.json`    | Dependency and security checks    |
 
 * Изменения без тестов, проверок и соблюдения архитектуры считаются некорректными.
@@ -172,6 +173,7 @@ AGENTS.md — обязательные правила для AI-агента в 
   - Unit-тесты: `vendor/bin/phpunit tests/Unit/`.
   - Integration-тесты: `vendor/bin/phpunit tests/Integration/`.
   - Psalm: `vendor/bin/psalm`.
+  - Deptrac: `vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress` или `make deptrac`.
   - PHPCS sniff-тесты: `php vendor/prikotov/coding-standard/bin/run-sniff-tests.php`.
 
 ---

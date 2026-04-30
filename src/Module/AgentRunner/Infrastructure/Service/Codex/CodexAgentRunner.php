@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex;
 
+use InvalidArgumentException;
 use Override;
 use Symfony\Component\Process\Process;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
@@ -75,7 +76,7 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
                 $command[] = $request->getModel();
             }
         } elseif ($command[0] !== 'codex' && !str_contains($command[0] ?? '', 'codex')) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'AgentRunRequestVo::$command must be either empty (runner default) or a full CLI command starting with "codex". '
                 . 'Got: %s',
                 implode(' ', $command),
@@ -284,7 +285,7 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
      */
     private function extractAppendFromRunnerArgs(array $runnerArgs): string
     {
-        for ($i = 0; $i < count($runnerArgs) - 1; $i++) {
+        for ($i = 0, $count = count($runnerArgs); $i < $count - 1; $i++) {
             if ($runnerArgs[$i] === '--append-system-prompt') {
                 return $this->readFileOrValue($runnerArgs[$i + 1]);
             }

@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject;
 
 use InvalidArgumentException;
 
-use function sprintf;
+
 
 /**
  * Value Object бюджетных ограничений для цепочки AI-агентов.
@@ -164,7 +164,7 @@ final readonly class BudgetVo
 
         $perRoleBudgets = [];
         foreach ($config['per_role'] ?? [] as $role => $roleConfig) {
-            if (\is_array($roleConfig)) {
+            if (is_array($roleConfig)) {
                 $perRoleBudgets[$role] = self::fromArray($roleConfig);
             }
         }

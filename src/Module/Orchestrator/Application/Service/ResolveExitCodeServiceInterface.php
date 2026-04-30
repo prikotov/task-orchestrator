@@ -18,7 +18,7 @@ interface ResolveExitCodeServiceInterface
     /**
      * Определяет exit code по типу исключения.
      */
-    public function resolveFromThrowable(\Throwable $e): OrchestrateExitCodeEnum;
+    public function resolveFromThrowable(\Throwable $throwable): OrchestrateExitCodeEnum;
 
     /**
      * Определяет exit code по результату оркестрации.

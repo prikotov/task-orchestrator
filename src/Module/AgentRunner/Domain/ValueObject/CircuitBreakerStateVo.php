@@ -7,8 +7,8 @@ namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject;
 use InvalidArgumentException;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Enum\CircuitStateEnum;
 
-use function sprintf;
-use function time;
+
+
 
 /**
  * Immutable Value Object состояния Circuit Breaker для Agent Runner.

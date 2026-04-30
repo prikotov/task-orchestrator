@@ -19,11 +19,11 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundExc
 final readonly class ResolveExitCodeService implements ResolveExitCodeServiceInterface
 {
     #[Override]
-    public function resolveFromThrowable(\Throwable $e): OrchestrateExitCodeEnum
+    public function resolveFromThrowable(\Throwable $throwable): OrchestrateExitCodeEnum
     {
         return match (true) {
-            $e instanceof ChainNotFoundException => OrchestrateExitCodeEnum::chainNotFound,
-            $e instanceof RoleNotFoundException => OrchestrateExitCodeEnum::invalidConfig,
+            $throwable instanceof ChainNotFoundException => OrchestrateExitCodeEnum::chainNotFound,
+            $throwable instanceof RoleNotFoundException => OrchestrateExitCodeEnum::invalidConfig,
             default => OrchestrateExitCodeEnum::chainFailed,
         };
     }
