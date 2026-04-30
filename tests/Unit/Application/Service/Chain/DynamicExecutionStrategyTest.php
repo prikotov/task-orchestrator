@@ -17,6 +17,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\Bui
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\SessionCompletedNotifierInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainSessionStateVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
@@ -31,6 +32,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     private BuildDynamicContextServiceInterface $contextBuilder;
     private ChainSessionLoggerInterface $sessionLogger;
     private AuditLoggerFactoryInterface $auditLoggerFactory;
+    private SessionCompletedNotifierInterface $sessionNotifier;
     private DynamicExecutionStrategy $strategy;
 
     protected function setUp(): void
@@ -39,6 +41,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $this->contextBuilder = new BuildDynamicContextService();
         $this->sessionLogger = $this->createMock(ChainSessionLoggerInterface::class);
         $this->auditLoggerFactory = $this->createMock(AuditLoggerFactoryInterface::class);
+        $this->sessionNotifier = $this->createMock(SessionCompletedNotifierInterface::class);
 
         $this->sessionLogger->method('startSession')->willReturn('/tmp/test-session');
         $this->sessionLogger->method('logInvocation');
@@ -55,6 +58,7 @@ final class DynamicExecutionStrategyTest extends TestCase
             $this->dynamicLoopRunner,
             $this->sessionLogger,
             $this->auditLoggerFactory,
+            $this->sessionNotifier,
         );
     }
 

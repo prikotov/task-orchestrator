@@ -30,4 +30,26 @@ final readonly class DynamicLoopResultVo
         public bool $maxTimeExceeded = false,
     ) {
     }
+
+    /**
+     * Определяет причину завершения dynamic-цикла.
+     *
+     * Бизнес-правило классификации: budget > maxTime > synthesis presence > interruption.
+     */
+    public function getCompletionReason(): string
+    {
+        if ($this->budgetExceeded) {
+            return 'budget_exceeded';
+        }
+
+        if ($this->maxTimeExceeded) {
+            return 'max_time_exceeded';
+        }
+
+        if ($this->synthesis !== null) {
+            return $this->maxRoundsReached ? 'max_rounds_reached' : 'facilitator_done';
+        }
+
+        return $this->interruptionReason ?? 'no_synthesis';
+    }
 }

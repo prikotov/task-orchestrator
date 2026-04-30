@@ -6,8 +6,6 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain;
 
 use LogicException;
 use Override;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Event\OrchestrateChain\OrchestrateSessionCompletedEvent;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
@@ -17,7 +15,9 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\Audit
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\SessionCompletedNotifierInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
 
@@ -40,7 +40,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
         private RunDynamicLoopServiceInterface $dynamicLoopRunner,
         private ChainSessionLoggerInterface $sessionLogger,
         private AuditLoggerFactoryInterface $auditLoggerFactory,
-        private ?EventDispatcherInterface $eventDispatcher = null,
+        private SessionCompletedNotifierInterface $sessionNotifier,
     ) {
     }
 
@@ -159,7 +159,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
 
     private function runDynamicLoop(
         ChainDefinitionVo $chain,
-        \TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo $context,
+        DynamicChainContextVo $context,
         int $startRound = 0,
         string $initialDiscussionHistory = '',
         string $initialFacilitatorJournal = '',
@@ -177,18 +177,11 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
 
     private function finalizeSession(DynamicLoopResultVo $loopResult, ?string $sessionDir = null): void
     {
-        $synthesis = $loopResult->synthesis;
-        $reason = $loopResult->budgetExceeded
-            ? 'budget_exceeded'
-            : ($loopResult->maxTimeExceeded
-                ? 'max_time_exceeded'
-                : ($synthesis !== null
-                    ? ($loopResult->maxRoundsReached ? 'max_rounds_reached' : 'facilitator_done')
-                    : ($loopResult->interruptionReason ?? 'no_synthesis')));
+        $reason = $loopResult->getCompletionReason();
 
-        if ($synthesis !== null) {
+        if ($loopResult->synthesis !== null) {
             $this->sessionLogger->completeSession(
-                $synthesis,
+                $loopResult->synthesis,
                 $loopResult->totalTime,
                 $loopResult->totalInputTokens,
                 $loopResult->totalOutputTokens,
@@ -196,7 +189,6 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
                 count($loopResult->roundResults),
                 $reason,
             );
-
             $this->dispatchCompletedEvent($loopResult, $sessionDir, $reason);
 
             return;
@@ -220,21 +212,22 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
 
     private function dispatchCompletedEvent(DynamicLoopResultVo $loopResult, ?string $sessionDir, string $reason): void
     {
-        $synthesis = $loopResult->synthesis;
-        $this->eventDispatcher?->dispatch(new OrchestrateSessionCompletedEvent(
-            status: $synthesis !== null ? 'completed' : 'interrupted',
+        $status = $loopResult->synthesis !== null ? 'completed' : 'interrupted';
+
+        $this->sessionNotifier->notifySessionCompleted(
+            status: $status,
             completionReason: $reason,
             totalRounds: count($loopResult->roundResults),
             totalTime: $loopResult->totalTime,
             totalInputTokens: $loopResult->totalInputTokens,
             totalOutputTokens: $loopResult->totalOutputTokens,
             totalCost: $loopResult->totalCost,
-            synthesis: $synthesis,
+            synthesis: $loopResult->synthesis,
             sessionDir: $sessionDir,
             budgetExceeded: $loopResult->budgetExceeded,
             budgetLimit: $loopResult->budgetLimit,
             budgetExceededRole: $loopResult->budgetExceededRole,
-        ));
+        );
     }
 
     private function toResultDto(DynamicLoopResultVo $loopResult, ?string $sessionDir): OrchestrateChainResultDto
