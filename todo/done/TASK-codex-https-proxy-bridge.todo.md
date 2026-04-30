@@ -9,8 +9,8 @@ epic:
 author: Бэкендер Левша (backend_developer_levsha)
 assignee: Бэкендер Левша (backend_developer_levsha)
 branch: task/codex-https-proxy-bridge
-pr:
-status: in_progress
+pr: '#108'
+status: done
 ---
 
 # TASK-codex-https-proxy-bridge: PHP HTTPS→HTTP прокси-мост для CodexAgentRunner
@@ -155,3 +155,5 @@ vendor/bin/psalm
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-28 | Бэкендер Левша | Создание задачи |
+| 2026-04-30 | Бэкендер Левша | Реализация (CR-01..CR-06 доработки после ревью Пуаро) |
+| 2026-04-30 | Тимлид Алекс | PR #108, статус done |
