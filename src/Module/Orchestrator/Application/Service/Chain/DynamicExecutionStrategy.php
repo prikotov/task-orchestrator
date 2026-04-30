@@ -51,18 +51,19 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
         $participants = $command->participants ?? $chain->getParticipants();
         $maxRounds = $command->maxRounds ?? $chain->getMaxRounds();
         $topic = $command->topic ?? $command->task;
-        $timeout = $command->timeout ?? $chain->getTimeout() ?? self::DEFAULT_DYNAMIC_TIMEOUT;
-        $maxTime = $command->maxTime ?? $chain->getMaxTime() ?? self::DEFAULT_DYNAMIC_MAX_TIME;
+        $shared = $chain->getSharedDefinition();
+        $timeout = $command->timeout ?? $shared->getTimeout() ?? self::DEFAULT_DYNAMIC_TIMEOUT;
+        $maxTime = $command->maxTime ?? $shared->getMaxTime() ?? self::DEFAULT_DYNAMIC_MAX_TIME;
 
         $sessionDir = $this->sessionLogger->startSession(
-            $chain->getName(),
+            $shared->getName(),
             $topic,
             $facilitatorRole,
             $participants,
             $maxRounds,
         );
         $auditLogger = $this->resolveAuditLogger($sessionDir, $command->noAuditLog);
-        $this->sessionLogger->setBudget($chain->getBudget());
+        $this->sessionLogger->setBudget($shared->getBudget());
         $this->sessionLogger->logInvocation(
             $this->contextBuilder->buildInvocation(
                 $chain,
@@ -108,8 +109,9 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
             throw new LogicException("Failed to resume session from: {$resumeDir}");
         }
 
-        $this->sessionLogger->setBudget($chain->getBudget());
-        $resumeTimeout = $command->timeout ?? $chain->getTimeout() ?? self::DEFAULT_DYNAMIC_TIMEOUT;
+        $shared = $chain->getSharedDefinition();
+        $this->sessionLogger->setBudget($shared->getBudget());
+        $resumeTimeout = $command->timeout ?? $shared->getTimeout() ?? self::DEFAULT_DYNAMIC_TIMEOUT;
 
         $invocation = $this->contextBuilder->buildInvocation(
             $chain,
@@ -133,7 +135,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
             $state->getTopic(),
             $command->workingDir,
             $resumeTimeout,
-            $command->maxTime ?? $chain->getMaxTime() ?? self::DEFAULT_DYNAMIC_MAX_TIME,
+            $command->maxTime ?? $shared->getMaxTime() ?? self::DEFAULT_DYNAMIC_MAX_TIME,
         );
 
         $loopResult = $this->runDynamicLoop(
@@ -152,7 +154,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     #[Override]
     public function supports(ChainDefinitionVo $chain): bool
     {
-        return $chain->getType() === ChainTypeEnum::dynamicType;
+        return $chain->getSharedDefinition()->getType() === ChainTypeEnum::dynamicType;
     }
 
     // ─── Private helpers ──────────────────────────────────────────────────

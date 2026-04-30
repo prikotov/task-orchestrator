@@ -14,11 +14,6 @@
         <PropertyNotSetInConstructor errorLevel="suppress" files="*Model.php" />
         <MissingConstructor errorLevel="suppress" files="*Model.php" />
         <ClassMustBeFinal errorLevel="suppress" files="*Model.php" />
-        <DeprecatedMethod errorLevel="suppress">
-            <errorLevel type="suppress">
-                <directory name="src/Module/Orchestrator/Application/Service/Chain" />
-            </errorLevel>
-        </DeprecatedMethod>
     </issueHandlers>
     <plugins>
         <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin"/>

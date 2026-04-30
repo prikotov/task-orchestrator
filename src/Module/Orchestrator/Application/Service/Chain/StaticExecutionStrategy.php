@@ -49,6 +49,6 @@ final readonly class StaticExecutionStrategy implements ExecutionStrategyInterfa
     #[Override]
     public function supports(ChainDefinitionVo $chain): bool
     {
-        return $chain->getType() === ChainTypeEnum::staticType;
+        return $chain->getSharedDefinition()->getType() === ChainTypeEnum::staticType;
     }
 }
