@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/prompt-configuration-vo
 pr: https://github.com/prikotov/task-orchestrator/pull/102
-status: review
+status: done
 ---
 
 # TASK-refactor-prompt-configuration-vo: PromptConfiguration VO для ChainDefinitionVo
