@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/execution-strategy-implementation
 pr: https://github.com/prikotov/task-orchestrator/pull/104
-status: review
+status: done
 ---
 
 # TASK-refactor-execution-strategy: ExecutionStrategyInterface + Static/Dynamic + CommandHandler rewrite
