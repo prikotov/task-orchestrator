@@ -30,6 +30,10 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunReques
  * Маркеры в command (chains.yaml):
  * - `@system-prompt` → путь к файлу (из systemPrompt или runnerArgs)
  * - `@append-system-prompt` → содержимое файла (с TOML-экранированием)
+ *
+ * Поддержка HTTPS-прокси через HttpsProxyBridge:
+ * Если CODEX_HTTP_PROXY содержит https:// схему, автоматически запускается
+ * локальный HTTP-прокси-мост, пересылающий CONNECT-запросы через TLS.
  */
 final readonly class CodexAgentRunner implements AgentRunnerInterface
 {
@@ -110,21 +114,46 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
             $process->setWorkingDirectory($request->getWorkingDir());
         }
 
+        // HTTPS-прокси мост: если CODEX_HTTP_PROXY содержит https:// схему,
+        // запускаем локальный HTTP-прокси-мост для пересылки через TLS.
+        // Ошибки запуска моста не должны бросать исключение из run() —
+        // возвращаем AgentResultVo::createFromError() по контракту AgentRunnerInterface.
+        $bridge = null;
+        try {
+            $bridge = $this->createBridgeIfNeeded();
+        } catch (\Throwable $e) {
+            return AgentResultVo::createFromError(
+                errorMessage: sprintf('Failed to start HTTPS proxy bridge: %s', $e->getMessage()),
+            );
+        }
+
         // Передача HTTP-прокси через env-переменные:
         // CODEX_HTTP_PROXY (приоритет) подменяет HTTPS_PROXY для codex-процесса.
         // Если CODEX_HTTP_PROXY не задан — Process наследует env родителя (HTTPS_PROXY, HTTP_PROXY).
         $codexProxy = getenv('CODEX_HTTP_PROXY');
         if ($codexProxy !== false && $codexProxy !== '') {
-            $process->setEnv($this->buildProcessEnv(getenv()));
+            $processEnv = $this->buildProcessEnv(getenv());
+
+            // Если мост запущен — подменяем HTTPS_PROXY на локальный URL моста
+            if ($bridge !== null) {
+                $processEnv['HTTPS_PROXY'] = $bridge->getLocalProxyUrl();
+                $processEnv['HTTP_PROXY'] = $bridge->getLocalProxyUrl();
+            }
+
+            $process->setEnv($processEnv);
         }
 
         try {
             $process->run();
         } catch (\Symfony\Component\Process\Exception\ProcessTimedOutException) {
+            $bridge?->stop();
+
             return AgentResultVo::createFromError(
                 errorMessage: sprintf('Agent timed out after %d seconds.', $request->getTimeout()),
                 timedOut: true,
             );
+        } finally {
+            $bridge?->stop();
         }
 
         if (!$process->isSuccessful()) {
@@ -167,10 +196,35 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
         $codexProxy = $currentEnv['CODEX_HTTP_PROXY'] ?? null;
 
         if ($codexProxy !== null && $codexProxy !== '') {
-            $currentEnv['HTTPS_PROXY'] = $codexProxy;
+            // Для HTTPS-прокси НЕ подменяем HTTPS_PROXY здесь — мост это сделает в run()
+            if (!str_starts_with($codexProxy, 'https://')) {
+                $currentEnv['HTTPS_PROXY'] = $codexProxy;
+            }
         }
 
         return $currentEnv;
+    }
+
+    /**
+     * Создаёт HttpsProxyBridge если CODEX_HTTP_PROXY содержит https:// схему.
+     *
+     * @return HttpsProxyBridge|null мост или null если HTTPS-прокси не нужен
+     */
+    public function createBridgeIfNeeded(): ?HttpsProxyBridge
+    {
+        $codexProxy = getenv('CODEX_HTTP_PROXY');
+        if ($codexProxy === false || $codexProxy === '') {
+            return null;
+        }
+
+        if (!str_starts_with($codexProxy, 'https://')) {
+            return null;
+        }
+
+        $bridge = new HttpsProxyBridge($codexProxy);
+        $bridge->start();
+
+        return $bridge;
     }
 
     /**

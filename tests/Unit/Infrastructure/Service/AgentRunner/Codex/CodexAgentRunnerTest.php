@@ -7,6 +7,7 @@ namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Codex;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexAgentRunner;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexJsonlParser;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -16,9 +17,22 @@ final class CodexAgentRunnerTest extends TestCase
 {
     private CodexAgentRunner $runner;
 
+    /** @var HttpsProxyBridge|null Мост для очистки в tearDown */
+    private ?HttpsProxyBridge $bridgeToCleanup = null;
+
     protected function setUp(): void
     {
         $this->runner = new CodexAgentRunner(new CodexJsonlParser());
+    }
+
+    protected function tearDown(): void
+    {
+        // Очистка моста если тест его создал
+        $this->bridgeToCleanup?->stop();
+        $this->bridgeToCleanup = null;
+
+        // Очистка env-переменной
+        putenv('CODEX_HTTP_PROXY');
     }
 
     // ──── getName / isAvailable ─────────────────────────────────────────
@@ -416,5 +430,67 @@ final class CodexAgentRunnerTest extends TestCase
 
         self::assertArrayNotHasKey('HTTPS_PROXY', $env);
         self::assertSame([], $env);
+    }
+
+    // ──── buildProcessEnv: HTTPS-прокси не подменяет HTTPS_PROXY напрямую ─
+
+    #[Test]
+    public function buildProcessEnvDoesNotOverrideForHttpsProxy(): void
+    {
+        $env = $this->runner->buildProcessEnv([
+            'HTTPS_PROXY' => 'http://existing-proxy:3128',
+            'CODEX_HTTP_PROXY' => 'https://user:pass@proxy.example.com:8080',
+        ]);
+
+        // HTTPS-прокси: мост подменит HTTPS_PROXY в run(), здесь не трогаем
+        self::assertSame('http://existing-proxy:3128', $env['HTTPS_PROXY']);
+    }
+
+    #[Test]
+    public function buildProcessEnvStillOverridesForHttpProxy(): void
+    {
+        $env = $this->runner->buildProcessEnv([
+            'HTTPS_PROXY' => 'http://old-proxy:3128',
+            'CODEX_HTTP_PROXY' => 'http://new-proxy:8080',
+        ]);
+
+        // HTTP-прокси: подменяем как раньше
+        self::assertSame('http://new-proxy:8080', $env['HTTPS_PROXY']);
+    }
+
+    // ──── createBridgeIfNeeded: HTTPS-прокси активирует мост ────────────
+
+    #[Test]
+    public function createBridgeIfNeededReturnsBridgeForHttpsProxy(): void
+    {
+        putenv('CODEX_HTTP_PROXY=https://user:pass@proxy.example.com:8080');
+
+        $bridge = $this->runner->createBridgeIfNeeded();
+
+        self::assertInstanceOf(HttpsProxyBridge::class, $bridge);
+        self::assertTrue($bridge->isRunning());
+        self::assertMatchesRegularExpression('#^http://127\.0\.0\.1:\d+$#', $bridge->getLocalProxyUrl());
+
+        // Сохраняем для очистки в tearDown
+        $this->bridgeToCleanup = $bridge;
+    }
+
+    #[Test]
+    public function createBridgeIfNeededReturnsNullForHttpProxy(): void
+    {
+        putenv('CODEX_HTTP_PROXY=http://proxy.example.com:8080');
+
+        $bridge = $this->runner->createBridgeIfNeeded();
+
+        self::assertNull($bridge);
+    }
+
+    #[Test]
+    public function createBridgeIfNeededReturnsNullWhenEnvNotSet(): void
+    {
+        // CODEX_HTTP_PROXY не установлен (tearDown очистит если был)
+        $bridge = $this->runner->createBridgeIfNeeded();
+
+        self::assertNull($bridge);
     }
 }
