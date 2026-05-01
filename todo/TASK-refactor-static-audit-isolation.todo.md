@@ -7,10 +7,10 @@ priority: P1
 depends_on:
 epic: EPIC-sprint-8-conditional-branching
 author: system_analyst_sherlock (Шерлок)
-assignee:
-branch:
+assignee: Бэкендер Левша
+branch: task/refactor-static-audit-isolation
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-static-audit-isolation: Audit isolation в StaticExecution
@@ -86,6 +86,20 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ## 9. Comments (Комментарии)
 Tech debt от архитектора Локи: StaticExecution Domain конструирует Orchestrator DTO (`ChainResultAuditDto`, `StepAuditStatusDto`). Это единственное нарушение границ модулей после Static split (Sprint 7). Должно быть устранено до ConditionalExecutionStrategy, иначе Conditional унаследует ту же проблему.
+
+## Инструкции для сабагента
+
+**Ветка:** task/refactor-static-audit-isolation (уже создана и активна)
+**PR:** уже создан (draft) из task/refactor-static-audit-isolation в task/epic-sprint-8-conditional-branching — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/refactor-static-audit-isolation`: `git checkout task/refactor-static-audit-isolation`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
