@@ -9,8 +9,8 @@ epic: EPIC-refactor-orchestrator-p3
 author: pi
 assignee: Бэкендер Левша
 branch: task/refactor-session-logger-split
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/115
+status: done
 ---
 
 # TASK-refactor-session-logger-split: Расщепление ChainSessionLogger
@@ -69,7 +69,7 @@ Roadmap Sprint 7. Выполняется параллельно с AI#16 (Shared
 ## Инструкции для сабагента
 
 **Ветка:** task/refactor-session-logger-split (уже создана и активна)
-**PR:** уже создан (draft) из task/refactor-session-logger-split в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/refactor-session-logger-split в task/epic-refactor-orchestrator-p3 — [PR #115](https://github.com/prikotov/task-orchestrator/pull/115)
 
 ### Порядок действий
 1. Переключись в ветку `task/refactor-session-logger-split`: `git checkout task/refactor-session-logger-split`
@@ -84,3 +84,4 @@ Roadmap Sprint 7. Выполняется параллельно с AI#16 (Shared
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-30 | pi | Создание задачи |
+
