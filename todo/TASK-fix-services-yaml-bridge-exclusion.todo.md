@@ -7,7 +7,7 @@ author: pi
 created: 2026-04-30
 branch: task/brainstorm-results-and-services-fix
 status: done
-pr: ""
+pr: https://github.com/prikotov/task-orchestrator/pull/110
 ---
 
 # Fix: bridge.php выполняется при загрузке DI-контейнера
