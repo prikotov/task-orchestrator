@@ -60,7 +60,7 @@ status: in_progress
 ## 4. Implementation Plan (План реализации)
 
 ### Sprint 5: Валидация P2
-- [ ] [TASK-chore-p2-integration-testing](TASK-chore-p2-integration-testing.todo.md) — Интеграционное тестирование Strategy pattern
+- [x] [TASK-chore-p2-integration-testing](TASK-chore-p2-integration-testing.todo.md) — Интеграционное тестирование Strategy pattern
 
 ### Sprint 2 (дополнительно): Аналитика
 - [x] [TASK-docs-domain-inventory](TASK-docs-domain-inventory.todo.md) — Инвентаризация Domain-слоя Orchestrator (AI#13)
