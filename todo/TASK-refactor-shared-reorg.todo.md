@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic: EPIC-refactor-orchestrator-p3
 author: pi
-assignee:
-branch:
+assignee: Бэкендер Левша
+branch: task/refactor-shared-reorg
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-shared-reorg: Переразложение Shared/ каталога
@@ -65,6 +65,20 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ## 9. Comments (Комментарии)
 Roadmap Sprint 7. Выполняется перед AI#17 (физический split Static).
+
+## Инструкции для сабагента
+
+**Ветка:** task/refactor-shared-reorg (уже создана и активна)
+**PR:** уже создан (draft) из task/refactor-shared-reorg в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/refactor-shared-reorg`: `git checkout task/refactor-shared-reorg`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `make check`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
