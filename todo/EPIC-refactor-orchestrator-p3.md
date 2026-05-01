@@ -72,7 +72,7 @@ status: in_progress
 ### Sprint 7: P3 Infrastructure + Static Split
 - [x] [TASK-refactor-session-logger-split](TASK-refactor-session-logger-split.todo.md) — Расщепление ChainSessionLogger (AI#15)
 - [x] [TASK-refactor-shared-reorg](TASK-refactor-shared-reorg.todo.md) — Переразложение Shared/ каталога (AI#16)
-- [ ] [TASK-refactor-static-execution-split](TASK-refactor-static-execution-split.todo.md) — Физический split StaticExecution (AI#17)
+- [x] [TASK-refactor-static-execution-split](TASK-refactor-static-execution-split.todo.md) — Физический split StaticExecution (AI#17)
 
 ## 5. Definition of Done (Критерии приёмки эпика)
 - [ ] Все 7 задач выполнены
