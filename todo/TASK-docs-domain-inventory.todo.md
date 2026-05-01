@@ -47,6 +47,7 @@ status: todo
 - [ ] Документ создан в `docs/releases/`
 - [ ] 100% покрытие Domain-файлов Orchestrator
 - [ ] Cross-reference таблица Static ↔ Dynamic заполнена
+- [ ] Обновить Roadmap: статус AI#13 `📋` → `✅ Done`, добавить ссылку на документ и PR (если есть)
 
 ## 6. Verification (Самопроверка)
 Аналитическая задача — `make check` не требуется.

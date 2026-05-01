@@ -54,6 +54,7 @@ status: todo
 - [ ] DynamicTurnResultVo → TurnContinueVo + TurnBreakVo
 - [ ] Unit-тесты ≥80% на цикл
 - [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [ ] Обновить Roadmap: статус AI#11 `📋` → `✅ Done`, добавить ссылку на задачу и PR
 
 ## 6. Verification (Самопроверка)
 ```bash

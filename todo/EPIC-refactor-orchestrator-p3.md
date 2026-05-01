@@ -79,6 +79,7 @@ status: todo
 - [ ] 3 модуля: AgentRunner, Orchestrator, StaticExecution — Deptrac green
 - [ ] Integration-паттерн задокументирован для G6-валидации
 - [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [ ] Roadmap: все AI# обновлены (`✅ Done` + ссылки на задачи/PR), чекбоксы Sprint 5–7 отмечены `[x]`
 
 ## 6. Risks and Dependencies (Риски и зависимости)
 - **R-6:** Integration-паттерн может не масштабироваться на Conditional Branching — Sprint 8 = точка валидации

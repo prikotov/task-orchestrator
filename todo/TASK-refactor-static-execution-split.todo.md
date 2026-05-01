@@ -55,6 +55,7 @@ status: todo
 - [ ] Integration-слой < 200 LOC
 - [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 - [ ] Критерий G6: Integration-паттерн задокументирован для проверки со второй стратегией
+- [ ] Обновить Roadmap: статус AI#17 `📋` → `✅ Done`, добавить ссылку на задачу и PR
 
 ## 6. Verification (Самопроверка)
 ```bash

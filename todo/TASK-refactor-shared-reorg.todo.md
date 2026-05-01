@@ -48,6 +48,7 @@ status: todo
 - [ ] Shared/ содержит только общие интерфейсы
 - [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 - [ ] Deptrac green
+- [ ] Обновить Roadmap: статус AI#16 `📋` → `✅ Done`, добавить ссылку на задачу и PR
 
 ## 6. Verification (Самопроверка)
 ```bash

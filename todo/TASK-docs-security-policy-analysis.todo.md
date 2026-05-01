@@ -48,6 +48,7 @@ status: todo
 - [ ] Документ создан в `docs/releases/` или `docs/adr/`
 - [ ] Ответ на OQ-3 roadmap дан
 - [ ] Триггер G4 (разные permission models?) оценён
+- [ ] Обновить Roadmap: статус AI#14 `📋` → `✅ Done`, добавить ссылку на документ и PR (если есть)
 
 ## 6. Verification (Самопроверка)
 Аналитическая задача — `make check` не требуется.

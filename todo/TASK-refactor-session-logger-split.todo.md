@@ -49,6 +49,7 @@ status: todo
 - [ ] 4 класса вместо ChainSessionLogger (536 LOC)
 - [ ] Ни один класс не превышает 300 LOC
 - [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [ ] Обновить Roadmap: статус AI#15 `📋` → `✅ Done`, добавить ссылку на задачу и PR
 
 ## 6. Verification (Самопроверка)
 ```bash

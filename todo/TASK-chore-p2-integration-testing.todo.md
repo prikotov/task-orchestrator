@@ -44,6 +44,7 @@ status: todo
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] ≥3 integration-теста проходят
 - [ ] `vendor/bin/phpunit` — зелёный
+- [ ] Обновить Roadmap: статус «Интеграционное тестирование P2» `📋` → `✅ Done`, добавить ссылку на задачу и PR
 
 ## 6. Verification (Самопроверка)
 ```bash
