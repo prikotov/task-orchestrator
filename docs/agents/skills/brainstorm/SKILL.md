@@ -65,7 +65,7 @@ description: >
 | `--topic`          |            | Тема (если отличается от аргумента task)     | текст                 | = task                               |
 | `--dry-run`        |            | Показать план без запуска                    | —                     | выкл                                 |
 | `--report-format`  |            | Формат отчёта                                | `text`, `json`, `none`| `text`                               |
-| `--report-file`    |            | Путь к файлу отчёта                          | путь                  | stdout                               |
+| `--report-file`    |            | Путь к файлу отчёта                          | путь                  | `var/sessions/brainstorm/<brainstorm-short-name>-%Y-%m-%d_%H-%M-%S.md` |
 | `--no-audit-log`   |            | Отключить audit-логирование                  | —                     | выкл                                 |
 | `--no-context-files`|           | Отключить загрузку AGENTS.md/CLAUDE.md       | —                     | выкл                                 |
 | `--resume`         |            | Путь к директории сессии для resume          | путь                  | —                                    |
