@@ -65,7 +65,7 @@ Roadmap Sprint 2, AI#13. Предшественник — brainstorm-прото�
 ## Инструкции для сабагента
 
 **Ветка:** task/docs-domain-inventory (уже создана и активна)
-**PR:** будет создан (draft) из task/docs-domain-inventory в task/epic-refactor-orchestrator-p3
+**PR:** уже создан (draft) из task/docs-domain-inventory в task/epic-refactor-orchestrator-p3 — [PR #111](https://github.com/prikotov/task-orchestrator/pull/111)
 
 ### Порядок действий
 1. Переключись в ветку `task/docs-domain-inventory`: `git checkout task/docs-domain-inventory`
