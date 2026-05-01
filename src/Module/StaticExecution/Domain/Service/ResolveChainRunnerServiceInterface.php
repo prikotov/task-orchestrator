@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static;
+namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
@@ -12,7 +12,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfi
 /**
  * Резолвит fallback runner при ошибке основного.
  *
- * Retry инкапсулирован в RunAgentServiceInterface — отдельный метод createRunnerWithRetry не нужен.
+ * Retry инкапсулирован в AgentRunnerPortInterface — отдельный метод createRunnerWithRetry не нужен.
  */
 interface ResolveChainRunnerServiceInterface
 {

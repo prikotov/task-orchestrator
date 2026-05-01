@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static;
+namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\StaticChainExecution;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Entity\StaticChainExecution;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
 
 /**
