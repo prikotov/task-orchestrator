@@ -16,6 +16,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfigVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
@@ -110,9 +111,11 @@ final class YamlChainLoader implements ChainLoaderInterface
     {
         $type = ChainTypeEnum::tryFrom($raw['type'] ?? 'static') ?? ChainTypeEnum::staticType;
 
-        return $type === ChainTypeEnum::dynamicType
-            ? $this->parseDynamicChain($name, $raw, $roles)
-            : $this->parseStaticChain($name, $raw, $roles);
+        return match (true) {
+            $type === ChainTypeEnum::dynamicType => $this->parseDynamicChain($name, $raw, $roles),
+            $type === ChainTypeEnum::conditionalType => $this->parseConditionalChain($name, $raw, $roles),
+            default => $this->parseStaticChain($name, $raw, $roles),
+        };
     }
 
     /**
@@ -127,11 +130,94 @@ final class YamlChainLoader implements ChainLoaderInterface
         $budget = $this->parseBudget($raw['budget'] ?? null);
         $chainNoContextFiles = (bool) ($raw['no_context_files'] ?? false);
 
-        $steps = array_values(array_map(
+        $steps = $this->parseSteps($name, $stepsData, $chainRetryPolicy, $chainNoContextFiles);
+        $fixIterations = $this->parseFixIterations($raw['fix_iterations'] ?? []);
+
+        // Auto-detect conditional: если хотя бы один шаг имеет when-выражение
+        $hasConditions = false;
+        foreach ($steps as $step) {
+            if ($step->hasCondition()) {
+                $hasConditions = true;
+                break;
+            }
+        }
+
+        if ($hasConditions) {
+            $this->validateWhenReferences($name, $steps);
+
+            return ChainDefinitionVo::createFromConditionalSteps(
+                name: $name,
+                description: $raw['description'] ?? '',
+                steps: $steps,
+                fixIterations: $fixIterations,
+                roles: $roles,
+                defaultRetryPolicy: $chainRetryPolicy,
+                budget: $budget,
+                timeout: $raw['timeout'] ?? null,
+            );
+        }
+
+        return ChainDefinitionVo::createFromSteps(
+            name: $name,
+            description: $raw['description'] ?? '',
+            steps: $steps,
+            fixIterations: $fixIterations,
+            roles: $roles,
+            defaultRetryPolicy: $chainRetryPolicy,
+            budget: $budget,
+            timeout: $raw['timeout'] ?? null,
+        );
+    }
+
+    /**
+     * Парсит conditional-цепочку (type: conditional в YAML).
+     *
+     * То же самое что static, но тип всегда conditional (явное указание).
+     *
+     * @param array<string, RoleConfigVo> $roles
+     */
+    private function parseConditionalChain(string $name, array $raw, array $roles): ChainDefinitionVo
+    {
+        $stepsData = $raw['steps'] ?? [];
+        $chainRetryPolicy = $this->parseRetryPolicy($raw['retry_policy'] ?? null);
+        $budget = $this->parseBudget($raw['budget'] ?? null);
+        $chainNoContextFiles = (bool) ($raw['no_context_files'] ?? false);
+
+        $steps = $this->parseSteps($name, $stepsData, $chainRetryPolicy, $chainNoContextFiles);
+        $fixIterations = $this->parseFixIterations($raw['fix_iterations'] ?? []);
+
+        $this->validateWhenReferences($name, $steps);
+
+        return ChainDefinitionVo::createFromConditionalSteps(
+            name: $name,
+            description: $raw['description'] ?? '',
+            steps: $steps,
+            fixIterations: $fixIterations,
+            roles: $roles,
+            defaultRetryPolicy: $chainRetryPolicy,
+            budget: $budget,
+            timeout: $raw['timeout'] ?? null,
+        );
+    }
+
+    /**
+     * Парсит список шагов цепочки (agent и quality_gate).
+     *
+     * @param list<array<string, mixed>> $stepsData
+     * @return list<ChainStepVo>
+     */
+    private function parseSteps(string $name, array $stepsData, ?ChainRetryPolicyVo $chainRetryPolicy, bool $chainNoContextFiles): array
+    {
+        return array_map(
             function (array $step) use ($name, $chainRetryPolicy, $chainNoContextFiles): ChainStepVo {
                 $stepType = ChainStepTypeEnum::tryFrom($step['type'] ?? '') ?? throw new InvalidArgumentException(
                     sprintf('Step "type" is required in chain "%s" (expected: agent or quality_gate).', $name),
                 );
+
+                // Парсим when-выражение (опционально)
+                $when = isset($step['when']) && is_string($step['when']) && $step['when'] !== ''
+                    ? ConditionExpressionVo::createFromExpression($step['when'])
+                    : null;
 
                 if ($stepType === ChainStepTypeEnum::qualityGate) {
                     $command = $step['command'] ?? null;
@@ -154,6 +240,7 @@ final class YamlChainLoader implements ChainLoaderInterface
                         label: $label,
                         timeoutSeconds: $step['timeout_seconds'] ?? 120,
                         name: $step['name'] ?? null,
+                        when: $when,
                     );
                 }
 
@@ -171,23 +258,73 @@ final class YamlChainLoader implements ChainLoaderInterface
                     retryPolicy: $stepRetryPolicy ?? $chainRetryPolicy,
                     name: $step['name'] ?? null,
                     noContextFiles: $stepNoContextFiles,
+                    when: $when,
                 );
             },
             $stepsData,
-        ));
-
-        $fixIterations = $this->parseFixIterations($raw['fix_iterations'] ?? []);
-
-        return ChainDefinitionVo::createFromSteps(
-            name: $name,
-            description: $raw['description'] ?? '',
-            steps: $steps,
-            fixIterations: $fixIterations,
-            roles: $roles,
-            defaultRetryPolicy: $chainRetryPolicy,
-            budget: $budget,
-            timeout: $raw['timeout'] ?? null,
         );
+    }
+
+    /**
+     * Валидирует when-выражения: path references (steps.<name>.*) должны ссылаться на существующие именованные шаги.
+     *
+     * @param list<ChainStepVo> $steps
+     *
+     * @throws InvalidArgumentException если when-ссылка указывает на несуществующий шаг
+     */
+    private function validateWhenReferences(string $name, array $steps): void
+    {
+        // Собираем map name → index
+        $nameMap = [];
+        foreach ($steps as $index => $step) {
+            $stepName = $step->getName();
+            if ($stepName !== null) {
+                $nameMap[$stepName] = $index;
+            }
+        }
+
+        // Проверяем when-ссылки
+        foreach ($steps as $index => $step) {
+            $when = $step->getWhen();
+            if ($when === null) {
+                continue;
+            }
+
+            if (!$when->referencesStep()) {
+                continue;
+            }
+
+            $referencedName = $when->getReferencedStepName();
+            if ($referencedName === null) {
+                throw new InvalidArgumentException(sprintf(
+                    'Chain "%s": step %d has invalid when-reference "%s".',
+                    $name,
+                    $index,
+                    $when->getPath(),
+                ));
+            }
+
+            if (!isset($nameMap[$referencedName])) {
+                throw new InvalidArgumentException(sprintf(
+                    'Chain "%s": step %d when-condition references unknown step name "%s".',
+                    $name,
+                    $index,
+                    $referencedName,
+                ));
+            }
+
+            // Запрещаем forward-ссылки: шаг может ссылаться только на предыдущие шаги
+            if ($nameMap[$referencedName] >= $index) {
+                throw new InvalidArgumentException(sprintf(
+                    'Chain "%s": step %d when-condition references step "%s" which is not yet executed (index %d >= %d).',
+                    $name,
+                    $index,
+                    $referencedName,
+                    $nameMap[$referencedName],
+                    $index,
+                ));
+            }
+        }
     }
 
     /**
