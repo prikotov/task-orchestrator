@@ -20,8 +20,8 @@ use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\Yam
 use TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainService;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\CheckStaticBudgetServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ExecuteStaticStepService;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\AgentRunnerPortInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\PromptFormatterPortInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunStaticChainService;
 
@@ -29,7 +29,7 @@ use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunStaticChain
  * Integration-тест: static chain end-to-end.
  *
  * Проверяет полный цикл: YAML-конфигурация → YamlChainLoader → OrchestrateChainCommandHandler
- * → StaticExecutionStrategy → RunStaticChainService → ExecuteStaticStepService → AgentRunnerPortInterface (stub)
+ * → StaticExecutionStrategy → RunStaticChainService → ExecuteStaticStepService → RunAgentServiceInterface (stub)
  * → OrchestrateChainResultDto.
  *
  * Внешние зависимости (AI-агент) подменяются стабом. Все внутренние слои — реальные объекты.
@@ -61,7 +61,7 @@ final class StaticChainIntegrationTest extends TestCase
         $budgetService->method('shouldBreakAfterStep')->willReturn(false);
 
         $runnerHelper = $this->createMock(ResolveChainRunnerServiceInterface::class);
-        $formatter = $this->createMock(PromptFormatterPortInterface::class);
+        $formatter = $this->createMock(FormatPromptServiceInterface::class);
         $formatter->method('buildStaticContext')->willReturnCallback(
             static fn(string $role, string $previousOutput, string $task): string => $previousOutput,
         );
