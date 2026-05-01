@@ -6,9 +6,9 @@ complexity: C3
 priority: P2
 author: pi
 assignee:
-branch:
+branch: task/epic-refactor-orchestrator-p3
 pr:
-status: todo
+status: in_progress
 ---
 
 # EPIC-refactor-orchestrator-p3: P3 Декомпозиция + Аналитика + Static Split

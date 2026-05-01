@@ -5,7 +5,7 @@ value: V3
 complexity: C3
 priority: P2
 depends_on: TASK-refactor-execution-strategy, TASK-refactor-chain-definition-split
-epic: EPIC-refactor-orchestrator-decomposition
+epic: EPIC-refactor-orchestrator-p3
 author: pi
 assignee:
 branch:
