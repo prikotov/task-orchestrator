@@ -121,3 +121,35 @@ chains:
     steps:
       - { type: agent, role: analyst, name: analyze }
       - { type: agent, role: failing_agent, name: failing_step }
+
+  # --- Conditional chains ---
+
+  conditional_with_quality_gate:
+    description: "Conditional chain: quality gate determines branching"
+    steps:
+      - { type: agent, role: analyst, name: analyze }
+      - { type: quality_gate, name: tests, command: "echo 'All tests passed'", label: "Run tests" }
+      - { type: agent, role: developer, name: implement, when: "steps.tests.passed == true" }
+      - { type: agent, role: analyst, name: skip_review, when: "steps.tests.passed == false" }
+
+  conditional_all_skip:
+    description: "Conditional chain where conditional steps are skipped"
+    steps:
+      - { type: quality_gate, name: lint, command: "exit 1", label: "Lint check" }
+      - { type: agent, role: developer, name: build, when: "steps.lint.passed == true" }
+
+  conditional_mixed:
+    description: "Conditional chain mixing unconditional and conditional steps"
+    steps:
+      - { type: agent, role: analyst, name: analyze }
+      - { type: quality_gate, name: check, command: "echo 'ok'", label: "Sanity check" }
+      - { type: agent, role: developer, name: implement, when: "steps.check.passed == true" }
+      - { type: agent, role: analyst, name: review }
+
+  conditional_explicit_type:
+    type: conditional
+    description: "Explicit type: conditional chain with when-conditions"
+    steps:
+      - { type: agent, role: analyst, name: analyze }
+      - { type: quality_gate, name: tests, command: "echo 'pass'", label: "Tests" }
+      - { type: agent, role: developer, name: implement, when: "steps.tests.passed == true" }
