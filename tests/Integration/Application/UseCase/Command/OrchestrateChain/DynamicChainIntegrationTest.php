@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\OrchestrateChain;
 
-use LogicException;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -15,12 +13,8 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\Orch
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\SessionCompletedNotifierInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
@@ -74,6 +68,11 @@ final class DynamicChainIntegrationTest extends TestCase
             $chainLoader,
             new \ArrayIterator([$dynamicStrategy]),
         );
+    }
+
+    protected function tearDown(): void
+    {
+        $this->stubSessionLogger->cleanup();
     }
 
     // --- Dynamic chain: single participant, synthesis produced ---
@@ -243,149 +242,5 @@ final class DynamicChainIntegrationTest extends TestCase
         // Assert
         self::assertNull($result->synthesis);
         self::assertCount(1, $result->roundResults);
-    }
-}
-
-/**
- * Стаб RunDynamicLoopServiceInterface.
- */
-final class StubDynamicLoopService implements RunDynamicLoopServiceInterface
-{
-    private ?DynamicLoopResultVo $result = null;
-
-    /** @var \Closure|null */
-    private $onExecuteCallback = null;
-
-    #[Override]
-    public function execute(
-        ChainDefinitionVo $chain,
-        DynamicChainContextVo $context,
-        int $startRound = 0,
-        string $initialDiscussionHistory = '',
-        string $initialFacilitatorJournal = '',
-        ?AuditLoggerInterface $auditLogger = null,
-    ): DynamicLoopResultVo {
-        if ($this->onExecuteCallback !== null) {
-            ($this->onExecuteCallback)($chain, $context, $startRound, $initialDiscussionHistory, $initialFacilitatorJournal);
-        }
-
-        if ($this->result === null) {
-            throw new LogicException('StubDynamicLoopService: no result set. Call setResult() first.');
-        }
-
-        return $this->result;
-    }
-
-    public function setResult(DynamicLoopResultVo $result): self
-    {
-        $this->result = $result;
-
-        return $this;
-    }
-
-    /**
-     * @param \Closure(ChainDefinitionVo, DynamicChainContextVo, int, string, string): void $callback
-     */
-    public function onExecute(\Closure $callback): self
-    {
-        $this->onExecuteCallback = $callback;
-
-        return $this;
-    }
-}
-
-/**
- * Стаб ChainSessionLoggerInterface.
- */
-final class StubSessionLogger implements ChainSessionLoggerInterface
-{
-    private ?string $sessionDir = null;
-
-    #[Override]
-    public function startSession(string $chainName, string $topic, string $facilitator, array $participants, int $maxRounds): string
-    {
-        $this->sessionDir = sys_get_temp_dir() . '/test_session_' . uniqid();
-        mkdir($this->sessionDir, 0777, true);
-
-        return $this->sessionDir;
-    }
-
-    #[Override]
-    public function logRound(int $step, int $round, string $role, bool $isFacilitator, string $systemPrompt, string $userPrompt, string $response, float $duration, int $inputTokens, int $outputTokens, float $cost, ?string $invocation = null): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function completeSession(?string $synthesis, float $totalTime, int $totalInputTokens, int $totalOutputTokens, float $totalCost, int $totalSteps, string $reason = 'facilitator_done'): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function setBudget(?BudgetVo $budget): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function interruptSession(string $reason = ''): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function updateSessionState(int $completedRounds): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function logInvocation(array $invocation): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function writeContextFile(string $name, string $content): string
-    {
-        $path = ($this->sessionDir ?? sys_get_temp_dir()) . '/' . $name;
-        file_put_contents($path, $content);
-
-        return $path;
-    }
-
-    #[Override]
-    public function writePromptFile(int $step, int $round, string $role, string $content, string $suffix): string
-    {
-        $filename = sprintf('step_%03d_round_%03d_%s%s', $step, $round, $role, $suffix);
-        $path = ($this->sessionDir ?? sys_get_temp_dir()) . '/' . $filename;
-        file_put_contents($path, $content);
-
-        return $path;
-    }
-
-    #[Override]
-    public function resumeSession(string $sessionDir): void
-    {
-        $this->sessionDir = $sessionDir;
-    }
-
-    #[Override]
-    public function getResumedState(): ?\TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainSessionStateVo
-    {
-        return null;
-    }
-
-    #[Override]
-    public function getResponseFilePaths(int $upToStep): array
-    {
-        return [];
-    }
-
-    #[Override]
-    public function getRoundFiles(): array
-    {
-        return [];
     }
 }

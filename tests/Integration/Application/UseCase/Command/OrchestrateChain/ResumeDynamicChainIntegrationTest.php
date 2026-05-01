@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\OrchestrateChain;
 
-use LogicException;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -15,15 +13,9 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\Orch
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\SessionCompletedNotifierInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainSessionStateVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader;
@@ -74,6 +66,11 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
             $chainLoader,
             new \ArrayIterator([$dynamicStrategy]),
         );
+    }
+
+    protected function tearDown(): void
+    {
+        $this->stubSessionLogger->cleanup();
     }
 
     // --- Resume: restores state and continues from last round ---
@@ -157,7 +154,7 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
             self::assertSame('History of rounds 1-3...', $this->stubLoopRunner->getCapturedHistory());
             self::assertSame('Journal of rounds 1-3...', $this->stubLoopRunner->getCapturedJournal());
         } finally {
-            @rmdir($resumeDir);
+            // tearDown() via cleanup() handles recursive deletion
         }
     }
 
@@ -190,194 +187,19 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
         $resumeDir = sys_get_temp_dir() . '/test_resume_params_' . uniqid();
         mkdir($resumeDir, 0777, true);
 
-        try {
-            // Act
-            $result = ($this->handler)(new OrchestrateChainCommand(
-                chainName: 'dynamic_simple',
-                task: 'Continue with state params',
-                resumeDir: $resumeDir,
-            ));
+        // Act
+        $result = ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'dynamic_simple',
+            task: 'Continue with state params',
+            resumeDir: $resumeDir,
+        ));
 
-            // Assert: context built from resumed state
-            $capturedContext = $this->stubLoopRunner->getCapturedContext();
-            self::assertNotNull($capturedContext);
-            self::assertSame('facilitator', $capturedContext->facilitatorRole);
-            self::assertSame(['participant', 'analyst'], $capturedContext->participants);
-            self::assertSame(15, $capturedContext->maxRounds);
-            self::assertSame('Original topic', $capturedContext->topic);
-        } finally {
-            @rmdir($resumeDir);
-        }
-    }
-}
-
-/**
- * Стаб RunDynamicLoopServiceInterface для resume-тестов.
- * Захватывает параметры вызова для проверок.
- */
-final class ResumeStubDynamicLoopService implements RunDynamicLoopServiceInterface
-{
-    private ?DynamicLoopResultVo $result = null;
-
-    private ?int $capturedStartRound = null;
-
-    private ?string $capturedHistory = null;
-
-    private ?string $capturedJournal = null;
-
-    private ?DynamicChainContextVo $capturedContext = null;
-
-    #[Override]
-    public function execute(
-        ChainDefinitionVo $chain,
-        DynamicChainContextVo $context,
-        int $startRound = 0,
-        string $initialDiscussionHistory = '',
-        string $initialFacilitatorJournal = '',
-        ?AuditLoggerInterface $auditLogger = null,
-    ): DynamicLoopResultVo {
-        $this->capturedContext = $context;
-        $this->capturedStartRound = $startRound;
-        $this->capturedHistory = $initialDiscussionHistory;
-        $this->capturedJournal = $initialFacilitatorJournal;
-
-        if ($this->result === null) {
-            throw new LogicException('ResumeStubDynamicLoopService: no result set.');
-        }
-
-        return $this->result;
-    }
-
-    public function setResult(DynamicLoopResultVo $result): self
-    {
-        $this->result = $result;
-
-        return $this;
-    }
-
-    public function getCapturedStartRound(): ?int
-    {
-        return $this->capturedStartRound;
-    }
-
-    public function getCapturedHistory(): ?string
-    {
-        return $this->capturedHistory;
-    }
-
-    public function getCapturedJournal(): ?string
-    {
-        return $this->capturedJournal;
-    }
-
-    public function getCapturedContext(): ?DynamicChainContextVo
-    {
-        return $this->capturedContext;
-    }
-}
-
-/**
- * Стаб ChainSessionLoggerInterface для resume-тестов.
- * Поддерживает задание resumedState.
- */
-final class ResumeStubSessionLogger implements ChainSessionLoggerInterface
-{
-    private ?ChainSessionStateVo $resumedState = null;
-
-    private ?string $sessionDir = null;
-
-    public function setResumedState(ChainSessionStateVo $state): self
-    {
-        $this->resumedState = $state;
-
-        return $this;
-    }
-
-    #[Override]
-    public function startSession(string $chainName, string $topic, string $facilitator, array $participants, int $maxRounds): string
-    {
-        $this->sessionDir = sys_get_temp_dir() . '/test_session_' . uniqid();
-        mkdir($this->sessionDir, 0777, true);
-
-        return $this->sessionDir;
-    }
-
-    #[Override]
-    public function logRound(int $step, int $round, string $role, bool $isFacilitator, string $systemPrompt, string $userPrompt, string $response, float $duration, int $inputTokens, int $outputTokens, float $cost, ?string $invocation = null): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function completeSession(?string $synthesis, float $totalTime, int $totalInputTokens, int $totalOutputTokens, float $totalCost, int $totalSteps, string $reason = 'facilitator_done'): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function setBudget(?BudgetVo $budget): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function interruptSession(string $reason = ''): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function updateSessionState(int $completedRounds): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function logInvocation(array $invocation): void
-    {
-        // no-op
-    }
-
-    #[Override]
-    public function writeContextFile(string $name, string $content): string
-    {
-        $path = ($this->sessionDir ?? sys_get_temp_dir()) . '/' . $name;
-        file_put_contents($path, $content);
-
-        return $path;
-    }
-
-    #[Override]
-    public function writePromptFile(int $step, int $round, string $role, string $content, string $suffix): string
-    {
-        $filename = sprintf('step_%03d_round_%03d_%s%s', $step, $round, $role, $suffix);
-        $path = ($this->sessionDir ?? sys_get_temp_dir()) . '/' . $filename;
-        file_put_contents($path, $content);
-
-        return $path;
-    }
-
-    #[Override]
-    public function resumeSession(string $sessionDir): void
-    {
-        $this->sessionDir = $sessionDir;
-    }
-
-    #[Override]
-    public function getResumedState(): ?ChainSessionStateVo
-    {
-        return $this->resumedState;
-    }
-
-    #[Override]
-    public function getResponseFilePaths(int $upToStep): array
-    {
-        return [];
-    }
-
-    #[Override]
-    public function getRoundFiles(): array
-    {
-        return [];
+        // Assert: context built from resumed state
+        $capturedContext = $this->stubLoopRunner->getCapturedContext();
+        self::assertNotNull($capturedContext);
+        self::assertSame('facilitator', $capturedContext->facilitatorRole);
+        self::assertSame(['participant', 'analyst'], $capturedContext->participants);
+        self::assertSame(15, $capturedContext->maxRounds);
+        self::assertSame('Original topic', $capturedContext->topic);
     }
 }
