@@ -9,8 +9,8 @@ epic: EPIC-refactor-orchestrator-p3
 author: pi
 assignee: Бэкендер Левша
 branch: task/refactor-static-execution-split
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/117
+status: done
 ---
 
 # TASK-refactor-static-execution-split: Физический split StaticExecution в отдельный модуль
