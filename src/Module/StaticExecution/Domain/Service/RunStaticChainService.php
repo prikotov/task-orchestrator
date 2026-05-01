@@ -2,23 +2,19 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static;
+namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\StepAuditStatusDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\StaticChainExecution;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticProcessResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticStepResultVo;
-
-
-
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Entity\StaticChainExecution;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticChainResultVo;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticProcessResultVo;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticStepResultVo;
 
 /**
  * Доменная логика выполнения static-цепочки: линейное выполнение шагов с итерациями и budget.
@@ -29,7 +25,6 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticStepRes
 final readonly class RunStaticChainService
 {
     public function __construct(
-        private RunAgentServiceInterface $agentRunner,
         private ExecuteStaticStepService $stepExecution,
         private CheckStaticBudgetServiceInterface $budgetService,
         private ?LoggerInterface $logger = null,

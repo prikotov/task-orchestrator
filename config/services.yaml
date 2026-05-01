@@ -51,24 +51,34 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLoggerFactory
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\QualityGateRunnerInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\QualityGateRunner
-
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Prompt\PromptProviderInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Prompt\RolePromptBuilder
 
   # --- Application Service alias ---
-  TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainService
-
   TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService
 
+  # --- StaticExecution module: Integration ACL adapters ---
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\AgentRunnerPortInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\AgentRunnerAdapter
+
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\PromptFormatterPortInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\PromptFormatterAdapter
+
+  # --- StaticExecution module: Domain/Infrastructure aliases ---
+  TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainServiceInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainService
+
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\QualityGateRunnerInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Infrastructure\Service\QualityGateRunner
+
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Infrastructure\Service\ResolveChainRunnerService
+
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\CheckStaticBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\CheckStaticBudgetService
 
   # --- Infrastructure Service alias ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\ResolveChainRunnerServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ResolveChainRunnerService
-
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopAgentServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\RunDynamicLoopAgentService
 
@@ -99,9 +109,6 @@ services:
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\CheckStaticBudgetServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\CheckStaticBudgetService
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RoundCompletedNotifierInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\DispatchRoundEventService
