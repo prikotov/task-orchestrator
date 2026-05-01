@@ -310,18 +310,18 @@ Roadmap покрывает два крупных направления:
 | #4 | ADR-006: ExecutionStrategy composition | P1 | Sprint 1 | ✅ Done — [ADR](../docs/adr/006-execution-strategy-composition.md) |
 | #5 | ADR-007: VO ACL Orchestrator ↔ AgentRunner | P1 | Sprint 1 | ✅ Done — [ADR](../docs/adr/007-vo-acl-boundary.md) |
 | #12 | Roadmap (этот документ) | P1 | Sprint 2 | ✅ Draft |
-| #13 | Инвентаризация Domain-слоя | P2 | Sprint 2 | 📋 [TASK](../todo/TASK-docs-domain-inventory.todo.md) |
-| #14 | Security Policy анализ | P2 | Sprint 2 | 📋 [TASK](../todo/TASK-docs-security-policy-analysis.todo.md) |
+| #13 | Инвентаризация Domain-слоя | P2 | Sprint 2 | ✅ Done — [Inventory](domain-inventory-orchestrator.md) [TASK](../todo/TASK-docs-domain-inventory.todo.md) |
+| #14 | Security Policy анализ | P2 | Sprint 2 | ✅ Done — [Analysis](security-policy-cross-cutting-analysis.md) [TASK](../todo/TASK-docs-security-policy-analysis.todo.md) |
 | #6 | ADR-008: Shared Kernel Contract | P2 | Sprint 3 | ✅ Done — [ADR](../docs/adr/008-shared-kernel-contract.md) |
 | #7 | ExecutionStrategyInterface + StaticExecutionStrategy | P2 | Sprint 3 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
 | #8 | DynamicExecutionStrategy | P2 | Sprint 3 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
 | #9 | CommandHandler rewrite | P2 | Sprint 4 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
 | #10 | P4: ChainDefinitionVo split | P2 | Sprint 4 | ✅ Done — [TASK](../todo/done/TASK-refactor-chain-definition-split.todo.md) PR #105 |
-| — | Интеграционное тестирование P2 | — | Sprint 5 | 📋 [TASK](../todo/TASK-chore-p2-integration-testing.todo.md) |
-| #11 | Декомпозиция RunDynamicLoopService | P3 | Sprint 6 | 📋 [TASK](../todo/TASK-refactor-dynamic-loop-decomposition.todo.md) |
-| #15 | Расщепление ChainSessionLogger | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-session-logger-split.todo.md) |
-| #16 | Переразложение Shared/ каталога | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-shared-reorg.todo.md) |
-| #17 | Физический split StaticExecution в отдельный модуль | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-static-execution-split.todo.md) |
+| — | Интеграционное тестирование P2 | — | Sprint 5 | ✅ Done — [TASK](../todo/TASK-chore-p2-integration-testing.todo.md) |
+| #11 | Декомпозиция RunDynamicLoopService | P3 | Sprint 6 | ✅ Done — [TASK](../todo/TASK-refactor-dynamic-loop-decomposition.todo.md) PR #114 |
+| #15 | Расщепление ChainSessionLogger | P3 | Sprint 7 | ✅ Done — [TASK](../todo/done/TASK-refactor-session-logger-split.todo.md) PR #115 |
+| #16 | Переразложение Shared/ каталога | P3 | Sprint 7 | ✅ Done — [TASK](../todo/TASK-refactor-shared-reorg.todo.md) PR #116 |
+| #17 | Физический split StaticExecution в отдельный модуль | P3 | Sprint 7 | ✅ Done — [TASK](../todo/done/TASK-refactor-static-execution-split.todo.md) PR #117 |
 | — | Conditional branching (`when:` + strategy) | Roadmap | Sprint 8 | 📋 Planned |
 | — | Security Policy (exec policy + permissions) | Roadmap | Sprint 9 | 📋 Planned |
 | — | Error classification + Typed I/O | Roadmap | Sprint 10 | 📋 Planned |

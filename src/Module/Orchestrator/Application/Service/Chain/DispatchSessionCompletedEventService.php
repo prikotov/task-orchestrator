@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain;
 use Override;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Event\OrchestrateChain\OrchestrateSessionCompletedEvent;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\SessionCompletedNotifierInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\SessionCompletedNotifierInterface;
 
 /**
  * Application-реализация: диспатчит OrchestrateSessionCompletedEvent через PSR EventDispatcher.
