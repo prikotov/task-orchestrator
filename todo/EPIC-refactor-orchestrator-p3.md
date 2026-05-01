@@ -67,7 +67,7 @@ status: in_progress
 - [x] [TASK-docs-security-policy-analysis](TASK-docs-security-policy-analysis.todo.md) — Security Policy анализ (AI#14)
 
 ### Sprint 6: P3 Decomposition
-- [ ] [TASK-refactor-dynamic-loop-decomposition](TASK-refactor-dynamic-loop-decomposition.todo.md) — Декомпозиция RunDynamicLoopService (AI#11)
+- [x] [TASK-refactor-dynamic-loop-decomposition](TASK-refactor-dynamic-loop-decomposition.todo.md) — Декомпозиция RunDynamicLoopService (AI#11)
 
 ### Sprint 7: P3 Infrastructure + Static Split
 - [ ] [TASK-refactor-session-logger-split](TASK-refactor-session-logger-split.todo.md) — Расщепление ChainSessionLogger (AI#15)
