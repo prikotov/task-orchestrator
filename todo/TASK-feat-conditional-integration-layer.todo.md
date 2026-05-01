@@ -112,7 +112,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 ## Инструкции для сабагента
 
 **Ветка:** task/feat-conditional-integration-layer (уже создана и активна)
-**PR:** уже создан (draft) из task/feat-conditional-integration-layer в task/epic-sprint-8-conditional-branching — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/feat-conditional-integration-layer в task/epic-sprint-8-conditional-branching — [PR #123](https://github.com/prikotov/task-orchestrator/pull/123)
 
 ### Порядок действий
 1. Переключись в ветку `task/feat-conditional-integration-layer`: `git checkout task/feat-conditional-integration-layer`
