@@ -7,7 +7,7 @@ priority: P1
 author: system_analyst_sherlock (Шерлок)
 assignee:
 branch: task/epic-sprint-8-conditional-branching
-pr: pending (epic branch → main)
+pr: https://github.com/prikotov/task-orchestrator/pull/124
 status: review
 ---
 
