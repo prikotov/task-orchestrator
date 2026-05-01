@@ -103,7 +103,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 ## Инструкции для сабагента
 
 **Ветка:** task/feat-conditional-execution-strategy (уже создана и активна)
-**PR:** уже создан (draft) из task/feat-conditional-execution-strategy в task/epic-sprint-8-conditional-branching — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/feat-conditional-execution-strategy в task/epic-sprint-8-conditional-branching — [PR #122](https://github.com/prikotov/task-orchestrator/pull/122)
 
 ### Порядок действий
 1. Переключись в ветку `task/feat-conditional-execution-strategy`: `git checkout task/feat-conditional-execution-strategy`
