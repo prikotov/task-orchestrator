@@ -9,8 +9,8 @@ epic: EPIC-refactor-orchestrator-p3
 author: pi
 assignee: Тестировщик Бэка Хаус
 branch: task/chore-p2-integration-testing
-pr:
-status: in_progress
+pr: PR #113
+status: done
 ---
 
 # TASK-chore-p2-integration-testing: Интеграционное тестирование Strategy pattern end-to-end
@@ -63,7 +63,7 @@ Roadmap Sprint 5 (буферный). Буфер для завершения P2 +
 ## Инструкции для сабагента
 
 **Ветка:** task/chore-p2-integration-testing (уже создана и активна)
-**PR:** уже создан (draft) из task/chore-p2-integration-testing в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/chore-p2-integration-testing в task/epic-refactor-orchestrator-p3 — [PR #113](https://github.com/prikotov/task-orchestrator/pull/113)
 
 ### Порядок действий
 1. Переключись в ветку `task/chore-p2-integration-testing`: `git checkout task/chore-p2-integration-testing`
@@ -78,3 +78,4 @@ Roadmap Sprint 5 (буферный). Буфер для завершения P2 +
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-30 | pi | Создание задачи |
+

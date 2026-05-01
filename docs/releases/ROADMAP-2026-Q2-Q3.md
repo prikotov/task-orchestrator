@@ -317,7 +317,7 @@ Roadmap покрывает два крупных направления:
 | #8 | DynamicExecutionStrategy | P2 | Sprint 3 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
 | #9 | CommandHandler rewrite | P2 | Sprint 4 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
 | #10 | P4: ChainDefinitionVo split | P2 | Sprint 4 | ✅ Done — [TASK](../todo/done/TASK-refactor-chain-definition-split.todo.md) PR #105 |
-| — | Интеграционное тестирование P2 | — | Sprint 5 | 📋 [TASK](../todo/TASK-chore-p2-integration-testing.todo.md) |
+| — | Интеграционное тестирование P2 | — | Sprint 5 | ✅ Done — [TASK](../todo/TASK-chore-p2-integration-testing.todo.md) |
 | #11 | Декомпозиция RunDynamicLoopService | P3 | Sprint 6 | 📋 [TASK](../todo/TASK-refactor-dynamic-loop-decomposition.todo.md) |
 | #15 | Расщепление ChainSessionLogger | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-session-logger-split.todo.md) |
 | #16 | Переразложение Shared/ каталога | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-shared-reorg.todo.md) |
