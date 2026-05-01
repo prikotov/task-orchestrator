@@ -6,8 +6,8 @@ namespace TaskOrchestrator\Common\Module\StaticExecution\Infrastructure\Service;
 
 use Override;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\AgentRunnerPortInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\PromptFormatterPortInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
@@ -23,8 +23,8 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfi
 final readonly class ResolveChainRunnerService implements ResolveChainRunnerServiceInterface
 {
     public function __construct(
-        private AgentRunnerPortInterface $agentRunner,
-        private PromptFormatterPortInterface $formatter,
+        private RunAgentServiceInterface $agentRunner,
+        private FormatPromptServiceInterface $formatter,
         private ?LoggerInterface $logger = null,
     ) {
     }
