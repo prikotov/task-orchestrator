@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\OrchestrateChain;
 
 use Override;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\AgentRunnerPortInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 
 /**
- * Стаб AgentRunnerPortInterface для integration-тестов.
+ * Стаб RunAgentServiceInterface для integration-тестов.
  *
  * Вместо реального AI-агента возвращает предзаданные результаты из очереди.
  * Позволяет тестировать полный путь через все слои без внешних зависимостей.
  */
-final class StubRunAgentService implements AgentRunnerPortInterface
+final class StubRunAgentService implements RunAgentServiceInterface
 {
     /** @var list<ChainRunResultVo> очередь результатов */
     private array $results = [];
