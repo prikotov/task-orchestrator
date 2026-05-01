@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Cha
 use Override;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ResolveChainRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
