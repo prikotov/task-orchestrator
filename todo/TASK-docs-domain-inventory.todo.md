@@ -10,7 +10,7 @@ author: pi
 assignee: Аналитик Шерлок
 branch: task/docs-domain-inventory
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-docs-domain-inventory: Инвентаризация Domain-слоя Orchestrator
