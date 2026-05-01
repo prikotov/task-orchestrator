@@ -7,10 +7,10 @@ priority: P2
 depends_on: TASK-refactor-execution-strategy, TASK-refactor-chain-definition-split
 epic: EPIC-refactor-orchestrator-p3
 author: pi
-assignee:
-branch:
+assignee: Бэкендер Левша
+branch: task/refactor-dynamic-loop-decomposition
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-dynamic-loop-decomposition: Декомпозиция RunDynamicLoopService
@@ -73,6 +73,20 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 Roadmap Sprint 6. Предусловие для Sprint 7 (split Static). Brainstorm #2 выявил: декомпозиция God-объектов даёт +LOC, но снижает когнитивную нагрузку.
+
+## Инструкции для сабагента
+
+**Ветка:** task/refactor-dynamic-loop-decomposition (уже создана и активна)
+**PR:** уже создан (draft) из task/refactor-dynamic-loop-decomposition в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/refactor-dynamic-loop-decomposition`: `git checkout task/refactor-dynamic-loop-decomposition`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `make check`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
