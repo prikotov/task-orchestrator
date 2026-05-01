@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared;
+namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
 /**
  * Callback-интерфейс для уведомления о завершении сессии оркестрации.

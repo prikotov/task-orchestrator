@@ -9,8 +9,8 @@ epic: EPIC-refactor-orchestrator-p3
 author: pi
 assignee: Бэкендер Левша
 branch: task/refactor-shared-reorg
-pr:
-status: in_progress
+pr: PR #116
+status: review
 ---
 
 # TASK-refactor-shared-reorg: Переразложение Shared/ каталога
@@ -69,7 +69,7 @@ Roadmap Sprint 7. Выполняется перед AI#17 (физический 
 ## Инструкции для сабагента
 
 **Ветка:** task/refactor-shared-reorg (уже создана и активна)
-**PR:** уже создан (draft) из task/refactor-shared-reorg в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/refactor-shared-reorg в task/epic-refactor-orchestrator-p3 — [PR #116](https://github.com/prikotov/task-orchestrator/pull/116)
 
 ### Порядок действий
 1. Переключись в ветку `task/refactor-shared-reorg`: `git checkout task/refactor-shared-reorg`
@@ -84,3 +84,4 @@ Roadmap Sprint 7. Выполняется перед AI#17 (физический 
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-30 | pi | Создание задачи |
+

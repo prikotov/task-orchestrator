@@ -33,7 +33,7 @@ services:
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunner
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface:
+  TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainLoaderInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface:
@@ -45,13 +45,13 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionReaderInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ChainSessionLogger
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\FacilitatorResponseParserInterface:
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FacilitatorResponseParserInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\FacilitatorResponseParserService
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLoggerFactory
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\QualityGateRunnerInterface:
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\QualityGateRunnerInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\QualityGateRunner
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Prompt\PromptProviderInterface:
@@ -66,7 +66,7 @@ services:
 
 
   # --- Infrastructure Service alias ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ResolveChainRunnerServiceInterface:
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\ResolveChainRunnerServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ResolveChainRunnerService
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopAgentServiceInterface:
@@ -103,7 +103,7 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\CheckStaticBudgetServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\CheckStaticBudgetService
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\RoundCompletedNotifierInterface:
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RoundCompletedNotifierInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\DispatchRoundEventService
 
   # Report format mappers

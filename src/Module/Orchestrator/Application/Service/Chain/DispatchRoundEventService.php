@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain;
 use Override;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Event\OrchestrateChain\OrchestrateRoundCompletedEvent;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\RoundCompletedNotifierInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RoundCompletedNotifierInterface;
 
 /**
  * Application-реализация: диспатчит OrchestrateRoundCompletedEvent через PSR EventDispatcher.

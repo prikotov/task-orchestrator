@@ -10,7 +10,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\StepAuditStatusDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\FacilitatorResponseParserInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FacilitatorResponseParserInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
