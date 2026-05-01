@@ -143,7 +143,7 @@ chains:
 - [x] [TASK-refactor-static-audit-isolation](TASK-refactor-static-audit-isolation.todo.md) — Audit isolation в StaticExecution (tech debt от Локи)
 - [x] [TASK-feat-conditional-yaml-dsl](TASK-feat-conditional-yaml-dsl.todo.md) — YAML DSL `when:` expressions
 - [x] [TASK-feat-conditional-execution-strategy](TASK-feat-conditional-execution-strategy.todo.md) — ConditionalExecutionStrategy
-- [ ] [TASK-feat-conditional-integration-layer](TASK-feat-conditional-integration-layer.todo.md) — Integration-слой для Conditional Branching
+- [x] [TASK-feat-conditional-integration-layer](TASK-feat-conditional-integration-layer.todo.md) — Integration-слой для Conditional Branching
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [ ] Все 4 задачи выполнены и протестированы
