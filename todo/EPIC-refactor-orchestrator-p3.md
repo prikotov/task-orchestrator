@@ -7,7 +7,7 @@ priority: P2
 author: pi
 assignee:
 branch: task/epic-refactor-orchestrator-p3
-pr: pending (epic branch → main)
+pr: https://github.com/prikotov/task-orchestrator/pull/118
 status: review
 ---
 
