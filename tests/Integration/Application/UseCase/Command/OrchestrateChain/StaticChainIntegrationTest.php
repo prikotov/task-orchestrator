@@ -8,26 +8,28 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainService;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\StaticExecutionStrategy;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\ResolveChainRunnerServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\CheckStaticBudgetServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\ExecuteStaticStepService;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\RunStaticChainService;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader;
+use TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainService;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\CheckStaticBudgetServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ExecuteStaticStepService;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\AgentRunnerPortInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\PromptFormatterPortInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunStaticChainService;
 
 /**
  * Integration-тест: static chain end-to-end.
  *
  * Проверяет полный цикл: YAML-конфигурация → YamlChainLoader → OrchestrateChainCommandHandler
- * → StaticExecutionStrategy → RunStaticChainService → ExecuteStaticStepService → RunAgentServiceInterface (stub)
+ * → StaticExecutionStrategy → RunStaticChainService → ExecuteStaticStepService → AgentRunnerPortInterface (stub)
  * → OrchestrateChainResultDto.
  *
  * Внешние зависимости (AI-агент) подменяются стабом. Все внутренние слои — реальные объекты.
@@ -59,7 +61,7 @@ final class StaticChainIntegrationTest extends TestCase
         $budgetService->method('shouldBreakAfterStep')->willReturn(false);
 
         $runnerHelper = $this->createMock(ResolveChainRunnerServiceInterface::class);
-        $formatter = $this->createMock(PromptFormatterInterface::class);
+        $formatter = $this->createMock(PromptFormatterPortInterface::class);
         $formatter->method('buildStaticContext')->willReturnCallback(
             static fn(string $role, string $previousOutput, string $task): string => $previousOutput,
         );
@@ -70,7 +72,6 @@ final class StaticChainIntegrationTest extends TestCase
             $formatter,
         );
         $runStaticChainService = new RunStaticChainService(
-            $this->stubAgent,
             $stepService,
             $budgetService,
         );
@@ -133,13 +134,11 @@ final class StaticChainIntegrationTest extends TestCase
     {
         // Arrange: 3 steps: analyst, implement, review
         // fix_iterations: implement ↔ review, max 2 iterations
-        // Logic: when review (last step in group) is reached, shouldRetryGroup triggers
-        // if iteration < max → jump back to implement (iteration 2)
         $this->stubAgent->pushSuccess('Analysis done', inputTokens: 50, outputTokens: 100, cost: 0.005);
-        // Iteration 1: implement + review (both succeed, but group triggers retry)
+        // Iteration 1: implement + review
         $this->stubAgent->pushSuccess('Implementation v1', inputTokens: 100, outputTokens: 200, cost: 0.01);
         $this->stubAgent->pushSuccess('Review v1: needs improvement', inputTokens: 80, outputTokens: 50, cost: 0.005);
-        // Iteration 2: implement + review (both succeed, max iterations reached)
+        // Iteration 2: implement + review
         $this->stubAgent->pushSuccess('Implementation v2 (improved)', inputTokens: 120, outputTokens: 250, cost: 0.015);
         $this->stubAgent->pushSuccess('Review v2: approved', inputTokens: 80, outputTokens: 50, cost: 0.005);
 
@@ -161,7 +160,7 @@ final class StaticChainIntegrationTest extends TestCase
         self::assertSame('developer', $result->stepResults[1]->role);
         self::assertSame('Implementation v1', $result->stepResults[1]->outputText);
 
-        // Step 3: review (iteration 1, triggers retry since iteration < max)
+        // Step 3: review (iteration 1, triggers retry)
         self::assertSame('analyst', $result->stepResults[2]->role);
         self::assertSame('Review v1: needs improvement', $result->stepResults[2]->outputText);
         self::assertFalse($result->stepResults[2]->isError);

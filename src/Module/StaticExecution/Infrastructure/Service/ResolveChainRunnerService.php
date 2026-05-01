@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
+namespace TaskOrchestrator\Common\Module\StaticExecution\Infrastructure\Service;
 
 use Override;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\ResolveChainRunnerServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\AgentRunnerPortInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\PromptFormatterPortInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
@@ -23,8 +23,8 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfi
 final readonly class ResolveChainRunnerService implements ResolveChainRunnerServiceInterface
 {
     public function __construct(
-        private RunAgentServiceInterface $agentRunner,
-        private PromptFormatterInterface $formatter,
+        private AgentRunnerPortInterface $agentRunner,
+        private PromptFormatterPortInterface $formatter,
         private ?LoggerInterface $logger = null,
     ) {
     }
