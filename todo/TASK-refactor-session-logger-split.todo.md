@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic: EPIC-refactor-orchestrator-p3
 author: pi
-assignee:
-branch:
+assignee: Бэкендер Левша
+branch: task/refactor-session-logger-split
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-session-logger-split: Расщепление ChainSessionLogger
@@ -65,6 +65,20 @@ vendor/bin/psalm
 
 ## 9. Comments (Комментарии)
 Roadmap Sprint 7. Выполняется параллельно с AI#16 (Shared/ reorg) перед физическим split Static (AI#17).
+
+## Инструкции для сабагента
+
+**Ветка:** task/refactor-session-logger-split (уже создана и активна)
+**PR:** уже создан (draft) из task/refactor-session-logger-split в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/refactor-session-logger-split`: `git checkout task/refactor-session-logger-split`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `make check`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
