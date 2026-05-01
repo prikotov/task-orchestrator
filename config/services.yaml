@@ -23,6 +23,7 @@ services:
       - '../src/Infrastructure/Symfony/'
       - '../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php'
       - '../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
+      - '../src/Module/AgentRunner/Infrastructure/Service/Codex/Resources/'
 
   # --- Integration Service alias (Interface → Implementation by convention service.md) ---
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface:
