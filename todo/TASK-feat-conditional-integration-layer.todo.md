@@ -7,10 +7,10 @@ priority: P1
 depends_on: TASK-feat-conditional-execution-strategy
 epic: EPIC-sprint-8-conditional-branching
 author: system_analyst_sherlock (Шерлок)
-assignee:
-branch:
+assignee: Бэкендер Левша
+branch: task/feat-conditional-integration-layer
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-conditional-integration-layer: Integration-слой для Conditional Branching
@@ -108,6 +108,20 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - Это задача — **точка валидации G6**: Integration-паттерн должен масштабироваться на 3-ю стратегию без God-interface. Если валидация провалена — это стратегический сигнал к пересмотру Integration-паттерна (brainstorm #2, решение #7).
 - Критерий успеха G6 (из протокола brainstorm #2): «Integration-слой для второй стратегии создан по тому же паттерну без God-interface на 15 методов». Для 3-й стратегии — тот же критерий.
 - Integration [`Service`](../../docs/conventions/core_patterns/service.md) — по конвенциям Integration Layer (координирует работу между модулями, реагирует на доменные события, не содержит бизнес-логики). НЕ Port/Adapter.
+
+## Инструкции для сабагента
+
+**Ветка:** task/feat-conditional-integration-layer (уже создана и активна)
+**PR:** уже создан (draft) из task/feat-conditional-integration-layer в task/epic-sprint-8-conditional-branching — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/feat-conditional-integration-layer`: `git checkout task/feat-conditional-integration-layer`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
