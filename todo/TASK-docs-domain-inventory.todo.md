@@ -5,7 +5,7 @@ value: V2
 complexity: C1
 priority: P1
 depends_on:
-epic: EPIC-refactor-orchestrator-decomposition
+epic: EPIC-refactor-orchestrator-p3
 author: pi
 assignee:
 branch:
