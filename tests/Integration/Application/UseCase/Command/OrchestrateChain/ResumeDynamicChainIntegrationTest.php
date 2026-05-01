@@ -14,7 +14,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\Orch
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\SessionCompletedNotifierInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\SessionCompletedNotifierInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainSessionStateVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared;
+namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;

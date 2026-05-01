@@ -14,9 +14,9 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\Static
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ResolveChainRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\CheckStaticBudgetServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\ExecuteStaticStepService;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\RunStaticChainService;
