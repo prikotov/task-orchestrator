@@ -7,10 +7,10 @@ priority: P1
 depends_on: TASK-refactor-static-audit-isolation, TASK-feat-conditional-yaml-dsl
 epic: EPIC-sprint-8-conditional-branching
 author: system_analyst_sherlock (Шерлок)
-assignee:
-branch:
+assignee: Бэкендер Левша
+branch: task/feat-conditional-execution-strategy
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-conditional-execution-strategy: ConditionalExecutionStrategy
@@ -99,6 +99,20 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - `ConditionalExecutionStrategy` логически ближе к `StaticExecutionStrategy` (линейное выполнение + ветвление), чем к `DynamicExecutionStrategy` (фасилитатор + участники). Можно было бы расширить StaticExecution, но ADR-006 фиксирует: каждая стратегия — отдельный класс.
 - Architecture decision: ConditionalExecutionStrategy live в `Orchestrator\Application\Service\Chain\` (как Static и Dynamic) или в отдельном модуле? Для MVP — в Orchestrator. Выделение в отдельный модуль — после G6 validation.
 - Resume не поддерживается в MVP. Conditional chain = один проход. Это ограничение зафиксировать в ADR-009.
+
+## Инструкции для сабагента
+
+**Ветка:** task/feat-conditional-execution-strategy (уже создана и активна)
+**PR:** уже создан (draft) из task/feat-conditional-execution-strategy в task/epic-sprint-8-conditional-branching — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/feat-conditional-execution-strategy`: `git checkout task/feat-conditional-execution-strategy`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
