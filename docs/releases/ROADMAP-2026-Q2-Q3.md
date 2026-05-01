@@ -320,7 +320,7 @@ Roadmap покрывает два крупных направления:
 | — | Интеграционное тестирование P2 | — | Sprint 5 | ✅ Done — [TASK](../todo/TASK-chore-p2-integration-testing.todo.md) |
 | #11 | Декомпозиция RunDynamicLoopService | P3 | Sprint 6 | ✅ Done — [TASK](../todo/TASK-refactor-dynamic-loop-decomposition.todo.md) PR #114 |
 | #15 | Расщепление ChainSessionLogger | P3 | Sprint 7 | ✅ Done — [TASK](../todo/done/TASK-refactor-session-logger-split.todo.md) PR #115 |
-| #16 | Переразложение Shared/ каталога | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-shared-reorg.todo.md) |
+| #16 | Переразложение Shared/ каталога | P3 | Sprint 7 | ✅ Done — [TASK](../todo/TASK-refactor-shared-reorg.todo.md) PR #116 |
 | #17 | Физический split StaticExecution в отдельный модуль | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-static-execution-split.todo.md) |
 | — | Conditional branching (`when:` + strategy) | Roadmap | Sprint 8 | 📋 Planned |
 | — | Security Policy (exec policy + permissions) | Roadmap | Sprint 9 | 📋 Planned |
