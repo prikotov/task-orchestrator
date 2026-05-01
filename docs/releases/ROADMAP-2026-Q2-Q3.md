@@ -311,7 +311,7 @@ Roadmap покрывает два крупных направления:
 | #5 | ADR-007: VO ACL Orchestrator ↔ AgentRunner | P1 | Sprint 1 | ✅ Done — [ADR](../docs/adr/007-vo-acl-boundary.md) |
 | #12 | Roadmap (этот документ) | P1 | Sprint 2 | ✅ Draft |
 | #13 | Инвентаризация Domain-слоя | P2 | Sprint 2 | ✅ Done — [Inventory](domain-inventory-orchestrator.md) [TASK](../todo/TASK-docs-domain-inventory.todo.md) |
-| #14 | Security Policy анализ | P2 | Sprint 2 | 📋 [TASK](../todo/TASK-docs-security-policy-analysis.todo.md) |
+| #14 | Security Policy анализ | P2 | Sprint 2 | ✅ Done — [Analysis](security-policy-cross-cutting-analysis.md) [TASK](../todo/TASK-docs-security-policy-analysis.todo.md) |
 | #6 | ADR-008: Shared Kernel Contract | P2 | Sprint 3 | ✅ Done — [ADR](../docs/adr/008-shared-kernel-contract.md) |
 | #7 | ExecutionStrategyInterface + StaticExecutionStrategy | P2 | Sprint 3 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
 | #8 | DynamicExecutionStrategy | P2 | Sprint 3 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
