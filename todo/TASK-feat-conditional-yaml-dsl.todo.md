@@ -116,7 +116,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 ## Инструкции для сабагента
 
 **Ветка:** task/feat-conditional-yaml-dsl (уже создана и активна)
-**PR:** уже создан (draft) из task/feat-conditional-yaml-dsl в task/epic-sprint-8-conditional-branching — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/feat-conditional-yaml-dsl в task/epic-sprint-8-conditional-branching — [PR #121](https://github.com/prikotov/task-orchestrator/pull/121)
 
 ### Порядок действий
 1. Переключись в ветку `task/feat-conditional-yaml-dsl`: `git checkout task/feat-conditional-yaml-dsl`
