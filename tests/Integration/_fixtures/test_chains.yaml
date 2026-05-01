@@ -84,16 +84,6 @@ chains:
         steps: [implement, review]
         max_iterations: 2
 
-  static_with_quality_gate:
-    description: "Static chain with quality gate"
-    steps:
-      - { type: agent, role: analyst, name: analyze }
-      - { type: agent, role: developer, name: implement }
-      - type: quality_gate
-        command: 'vendor/bin/phpcs'
-        label: 'PHP CodeSniffer'
-        timeout_seconds: 60
-
   dynamic_simple:
     type: dynamic
     description: "Simple dynamic chain for integration testing"
