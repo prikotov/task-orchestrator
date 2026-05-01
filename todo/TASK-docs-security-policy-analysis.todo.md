@@ -9,8 +9,8 @@ epic: EPIC-refactor-orchestrator-p3
 author: pi
 assignee: Архитектор Гэндальф
 branch: task/docs-security-policy-analysis
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/112
+status: done
 ---
 
 # TASK-docs-security-policy-analysis: Анализ Security Policy как cross-cutting concern
@@ -67,7 +67,7 @@ Roadmap Sprint 2, AI#14. Результат анализа — входные д
 ## Инструкции для сабагента
 
 **Ветка:** task/docs-security-policy-analysis (уже создана и активна)
-**PR:** уже создан (draft) из task/docs-security-policy-analysis в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/docs-security-policy-analysis в task/epic-refactor-orchestrator-p3 — [PR #112](https://github.com/prikotov/task-orchestrator/pull/112)
 
 ### Порядок действий
 1. Переключись в ветку `task/docs-security-policy-analysis`: `git checkout task/docs-security-policy-analysis`
@@ -82,3 +82,4 @@ Roadmap Sprint 2, AI#14. Результат анализа — входные д
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-04-30 | pi | Создание задачи |
+
