@@ -9,8 +9,8 @@ epic: EPIC-refactor-orchestrator-p3
 author: pi
 assignee: Тестировщик Бэка Хаус
 branch: task/chore-p2-integration-testing
-pr:
-status: in_progress
+pr: PR #113
+status: done
 ---
 
 # TASK-chore-p2-integration-testing: Интеграционное тестирование Strategy pattern end-to-end
