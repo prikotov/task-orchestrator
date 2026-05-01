@@ -9,8 +9,8 @@ epic: EPIC-refactor-orchestrator-p3
 author: pi
 assignee: Бэкендер Левша
 branch: task/refactor-shared-reorg
-pr:
-status: in_progress
+pr: PR #116
+status: review
 ---
 
 # TASK-refactor-shared-reorg: Переразложение Shared/ каталога
