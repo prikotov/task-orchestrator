@@ -9,8 +9,8 @@ epic: EPIC-refactor-orchestrator-p3
 author: pi
 assignee: Архитектор Гэндальф
 branch: task/docs-security-policy-analysis
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/112
+status: done
 ---
 
 # TASK-docs-security-policy-analysis: Анализ Security Policy как cross-cutting concern
