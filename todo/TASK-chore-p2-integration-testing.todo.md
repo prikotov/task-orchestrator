@@ -7,10 +7,10 @@ priority: P2
 depends_on: TASK-refactor-execution-strategy
 epic: EPIC-refactor-orchestrator-p3
 author: pi
-assignee:
-branch:
+assignee: Тестировщик Бэка Хаус
+branch: task/chore-p2-integration-testing
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-chore-p2-integration-testing: Интеграционное тестирование Strategy pattern end-to-end
@@ -59,6 +59,20 @@ vendor/bin/phpunit tests/Integration/
 
 ## 9. Comments (Комментарии)
 Roadmap Sprint 5 (буферный). Буфер для завершения P2 + валидация перед P3.
+
+## Инструкции для сабагента
+
+**Ветка:** task/chore-p2-integration-testing (уже создана и активна)
+**PR:** уже создан (draft) из task/chore-p2-integration-testing в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/chore-p2-integration-testing`: `git checkout task/chore-p2-integration-testing`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `make check`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
