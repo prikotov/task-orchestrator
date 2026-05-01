@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain;
+namespace TaskOrchestrator\Common\Module\StaticExecution\Infrastructure\Service;
 
 use Override;
 use Symfony\Component\Process\Process;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\QualityGateRunnerInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\QualityGateRunnerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateVo;
 

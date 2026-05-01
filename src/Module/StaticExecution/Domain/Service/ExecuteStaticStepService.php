@@ -2,21 +2,17 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static;
+namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\QualityGateRunnerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\ResolveChainRunnerServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\AgentRunnerPortInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\PromptFormatterPortInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackAttemptVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticStepResultVo;
-
-
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticStepResultVo;
 
 /**
  * Выполнение отдельного шага static-цепочки: agent-step, quality-gate, fallback.
@@ -29,9 +25,9 @@ final readonly class ExecuteStaticStepService
     private const string QUALITY_GATE_RUNNER_NAME = 'shell';
 
     public function __construct(
-        private RunAgentServiceInterface $agentRunner,
+        private AgentRunnerPortInterface $agentRunner,
         private ResolveChainRunnerServiceInterface $runnerHelper,
-        private PromptFormatterInterface $formatter,
+        private PromptFormatterPortInterface $formatter,
         private ?QualityGateRunnerInterface $qualityGateRunner = null,
         private ?LoggerInterface $logger = null,
     ) {

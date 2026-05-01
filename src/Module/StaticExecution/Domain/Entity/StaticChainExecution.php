@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity;
+namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Entity;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
