@@ -10,7 +10,7 @@ author: system_analyst_sherlock (Шерлок)
 assignee: Бэкендер Левша
 branch: task/feat-conditional-yaml-dsl
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-feat-conditional-yaml-dsl: YAML DSL `when:` expressions
@@ -79,16 +79,27 @@ status: in_progress
 - [ ] Execution logic (это TASK-feat-conditional-execution-strategy)
 
 ## 4. Implementation Plan (План реализации)
-*Заполняется исполнителем (агентом) перед стартом.*
-1. [ ] ...
+
+1. [x] Создать `ConditionOperatorEnum` (==, !=) — `Domain/Enum/ConditionOperatorEnum.php`
+2. [x] Создать `ConditionExpressionVo` — `Domain/ValueObject/ConditionExpressionVo.php`
+3. [x] Расширить `ChainTypeEnum` (+ `conditionalType = 'conditional'`)
+4. [x] Расширить `ChainStepVo` (+ `?ConditionExpressionVo $when`, `getWhen()`, `hasCondition()`)
+5. [x] Расширить `ChainDefinitionVo` (+ `createFromConditionalSteps()`, `isConditional()`)
+6. [x] Расширить `SharedChainDefinitionVo` (+ `isConditional()`)
+7. [x] Обновить `YamlChainLoader`: извлечь `parseSteps()`, парсинг `when:`, auto-detect conditional, `validateWhenReferences()`
+8. [x] Unit-тесты `ConditionExpressionVo` (19 тестов)
+9. [x] Unit-тесты `ChainStepVo` + `when` field (7 новых тестов)
+10. [x] Unit-тесты `ChainTypeEnum` + conditional case (1 новый тест)
+11. [x] Unit-тесты `YamlChainLoader` + `when:` parsing (11 новых тестов)
+12. [x] PHPUnit + Psalm — зелёные
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] `ConditionExpressionVo` создан в `Orchestrator\Domain\ValueObject\`
-- [ ] [`ChainStepVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) расширен полем `?ConditionExpressionVo $when`
-- [ ] [`YamlChainLoader`](../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php) парсит `when:` expressions
-- [ ] Обратная совместимость: существующие YAML-конфигурации парсятся корректно
-- [ ] Unit-тесты на parsing и validation
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] `ConditionExpressionVo` создан в `Orchestrator\Domain\ValueObject\`
+- [x] [`ChainStepVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) расширен полем `?ConditionExpressionVo $when`
+- [x] [`YamlChainLoader`](../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php) парсит `when:` expressions
+- [x] Обратная совместимость: существующие YAML-конфигурации парсятся корректно
+- [x] Unit-тесты на parsing и validation
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -116,7 +127,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 ## Инструкции для сабагента
 
 **Ветка:** task/feat-conditional-yaml-dsl (уже создана и активна)
-**PR:** уже создан (draft) из task/feat-conditional-yaml-dsl в task/epic-sprint-8-conditional-branching — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/feat-conditional-yaml-dsl в task/epic-sprint-8-conditional-branching — [PR #121](https://github.com/prikotov/task-orchestrator/pull/121)
 
 ### Порядок действий
 1. Переключись в ветку `task/feat-conditional-yaml-dsl`: `git checkout task/feat-conditional-yaml-dsl`
