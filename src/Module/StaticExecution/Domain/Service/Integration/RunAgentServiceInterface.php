@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port;
+namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 
 /**
- * Port: запуск AI-агента из модуля StaticExecution.
+ * Интеграционный сервис запуска AI-агента для StaticExecution Domain.
  *
- * ACL-интерфейс — изолирует StaticExecution Domain от Orchestrator Integration-порта.
- * Адаптер в StaticExecution\Integration делегирует в Orchestrator\RunAgentServiceInterface.
+ * Делегирует вызов в Orchestrator\Domain\Service\Integration\RunAgentServiceInterface.
+ * VO общие между модулями — mapper не нужен.
  */
-interface AgentRunnerPortInterface
+interface RunAgentServiceInterface
 {
     /**
      * Запускает агент с заданным запросом и опциональной retry-политикой.

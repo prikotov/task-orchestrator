@@ -58,12 +58,12 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService
 
-  # --- StaticExecution module: Integration ACL adapters ---
-  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\AgentRunnerPortInterface:
-    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\AgentRunnerAdapter
+  # --- StaticExecution module: Integration Service aliases ---
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\RunAgentServiceInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\AgentRunner\RunAgentService
 
-  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\PromptFormatterPortInterface:
-    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\PromptFormatterAdapter
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\FormatPromptServiceInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Prompt\FormatPromptService
 
   # --- StaticExecution module: Domain/Infrastructure aliases ---
   TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainServiceInterface:

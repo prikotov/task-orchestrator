@@ -2,20 +2,18 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\StaticExecution\Integration\Service;
+namespace TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Prompt;
 
 use Override;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port\PromptFormatterPortInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
 
 /**
- * ACL-адаптер: делегирует форматирование промптов в Orchestrator Shared-сервис.
+ * Интеграционный сервис: делегирует форматирование промптов в Orchestrator Shared-сервис.
  *
- * Изолирует StaticExecution Domain от Orchestrator PromptFormatterInterface.
- * Адаптер необходим для Deptrac: StaticExecution Domain не зависит
- * от Orchestrator Domain Service, только от собственного Port.
+ * Изолирует StaticExecution от Orchestrator PromptFormatterInterface.
  */
-final readonly class PromptFormatterAdapter implements PromptFormatterPortInterface
+final readonly class FormatPromptService implements FormatPromptServiceInterface
 {
     public function __construct(
         private PromptFormatterInterface $inner,

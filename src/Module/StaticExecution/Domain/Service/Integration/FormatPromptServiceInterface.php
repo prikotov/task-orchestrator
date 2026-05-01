@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Port;
+namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration;
 
 /**
- * Port: форматирование промптов для static-цепочки.
+ * Интеграционный сервис форматирования промптов для StaticExecution Domain.
  *
- * ACL-интерфейс — изолирует StaticExecution Domain от Orchestrator Shared-сервиса.
- * Адаптер в StaticExecution\Integration делегирует в Orchestrator\PromptFormatterInterface.
+ * Делегирует вызов в Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface.
+ * Работает только с примитивами и array — Orchestrator VO не импортирует.
  */
-interface PromptFormatterPortInterface
+interface FormatPromptServiceInterface
 {
     /**
      * Формирует контекст промпта шага static-цепочки от предыдущего агента.
