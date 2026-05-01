@@ -6,9 +6,9 @@ complexity: C3
 priority: P2
 author: pi
 assignee:
-branch:
-pr:
-status: todo
+branch: task/epic-refactor-orchestrator-p3
+pr: https://github.com/prikotov/task-orchestrator/pull/118
+status: review
 ---
 
 # EPIC-refactor-orchestrator-p3: P3 Декомпозиция + Аналитика + Static Split
@@ -41,16 +41,16 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] RunDynamicLoopService ≤ 200 LOC (координатор)
-- [ ] ChainSessionLogger расщеплён на 4 класса
-- [ ] Shared/ содержит только общие интерфейсы
-- [ ] StaticExecution — отдельный модуль, Deptrac green на 3 модулях
-- [ ] Integration-слой Orchestrator ↔ StaticExecution < 200 LOC
-- [ ] Domain-инвентаризация и Security-анализ завершены
+- [x] RunDynamicLoopService ≤ 200 LOC (координатор)
+- [x] ChainSessionLogger расщеплён на 4 класса
+- [x] Shared/ содержит только общие интерфейсы
+- [x] StaticExecution — отдельный модуль, Deptrac green на 3 модулях
+- [x] Integration-слой Orchestrator ↔ StaticExecution < 200 LOC
+- [x] Domain-инвентаризация и Security-анализ завершены
 
 ### 🟡 Should Have (Желательно)
-- [ ] Deptrac rules для Integration-слоя
-- [ ] Integration-тесты P2 Strategy pattern
+- [x] Deptrac rules для Integration-слоя
+- [x] Integration-тесты P2 Strategy pattern
 
 ### ⚫ Won't Have (Не будем делать)
 - [ ] Conditional Branching
@@ -60,26 +60,26 @@ status: todo
 ## 4. Implementation Plan (План реализации)
 
 ### Sprint 5: Валидация P2
-- [ ] [TASK-chore-p2-integration-testing](TASK-chore-p2-integration-testing.todo.md) — Интеграционное тестирование Strategy pattern
+- [x] [TASK-chore-p2-integration-testing](TASK-chore-p2-integration-testing.todo.md) — Интеграционное тестирование Strategy pattern
 
 ### Sprint 2 (дополнительно): Аналитика
-- [ ] [TASK-docs-domain-inventory](TASK-docs-domain-inventory.todo.md) — Инвентаризация Domain-слоя Orchestrator (AI#13)
-- [ ] [TASK-docs-security-policy-analysis](TASK-docs-security-policy-analysis.todo.md) — Security Policy анализ (AI#14)
+- [x] [TASK-docs-domain-inventory](TASK-docs-domain-inventory.todo.md) — Инвентаризация Domain-слоя Orchestrator (AI#13)
+- [x] [TASK-docs-security-policy-analysis](TASK-docs-security-policy-analysis.todo.md) — Security Policy анализ (AI#14)
 
 ### Sprint 6: P3 Decomposition
-- [ ] [TASK-refactor-dynamic-loop-decomposition](TASK-refactor-dynamic-loop-decomposition.todo.md) — Декомпозиция RunDynamicLoopService (AI#11)
+- [x] [TASK-refactor-dynamic-loop-decomposition](TASK-refactor-dynamic-loop-decomposition.todo.md) — Декомпозиция RunDynamicLoopService (AI#11)
 
 ### Sprint 7: P3 Infrastructure + Static Split
-- [ ] [TASK-refactor-session-logger-split](TASK-refactor-session-logger-split.todo.md) — Расщепление ChainSessionLogger (AI#15)
-- [ ] [TASK-refactor-shared-reorg](TASK-refactor-shared-reorg.todo.md) — Переразложение Shared/ каталога (AI#16)
-- [ ] [TASK-refactor-static-execution-split](TASK-refactor-static-execution-split.todo.md) — Физический split StaticExecution (AI#17)
+- [x] [TASK-refactor-session-logger-split](TASK-refactor-session-logger-split.todo.md) — Расщепление ChainSessionLogger (AI#15)
+- [x] [TASK-refactor-shared-reorg](TASK-refactor-shared-reorg.todo.md) — Переразложение Shared/ каталога (AI#16)
+- [x] [TASK-refactor-static-execution-split](TASK-refactor-static-execution-split.todo.md) — Физический split StaticExecution (AI#17)
 
 ## 5. Definition of Done (Критерии приёмки эпика)
-- [ ] Все 7 задач выполнены
-- [ ] 3 модуля: AgentRunner, Orchestrator, StaticExecution — Deptrac green
-- [ ] Integration-паттерн задокументирован для G6-валидации
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
-- [ ] Roadmap: все AI# обновлены (`✅ Done` + ссылки на задачи/PR), чекбоксы Sprint 5–7 отмечены `[x]`
+- [x] Все 7 задач выполнены
+- [x] 3 модуля: AgentRunner, Orchestrator, StaticExecution — Deptrac green
+- [x] Integration-паттерн задокументирован для G6-валидации
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] Roadmap: все AI# обновлены (`✅ Done` + ссылки на задачи/PR), чекбоксы Sprint 5–7 отмечены `[x]`
 
 ## 6. Risks and Dependencies (Риски и зависимости)
 - **R-6:** Integration-паттерн может не масштабироваться на Conditional Branching — Sprint 8 = точка валидации

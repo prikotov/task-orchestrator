@@ -8,7 +8,7 @@ use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionWriterInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\RoundCompletedNotifierInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RoundCompletedNotifierInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
 

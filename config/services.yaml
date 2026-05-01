@@ -33,7 +33,7 @@ services:
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunner
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface:
+  TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainLoaderInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface:
@@ -45,30 +45,40 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionReaderInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ChainSessionLogger
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\FacilitatorResponseParserInterface:
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FacilitatorResponseParserInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\FacilitatorResponseParserService
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLoggerFactory
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\QualityGateRunnerInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\QualityGateRunner
-
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Prompt\PromptProviderInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Prompt\RolePromptBuilder
 
   # --- Application Service alias ---
-  TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecuteStaticChainService
-
   TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService
 
+  # --- StaticExecution module: Integration Service aliases ---
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServiceInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\AgentRunner\RunAgentService
+
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Prompt\FormatPromptService
+
+  # --- StaticExecution module: Domain/Infrastructure aliases ---
+  TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainServiceInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainService
+
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\QualityGateRunnerInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Infrastructure\Service\QualityGateRunner
+
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Infrastructure\Service\ResolveChainRunnerService
+
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\CheckStaticBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\CheckStaticBudgetService
 
   # --- Infrastructure Service alias ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ResolveChainRunnerServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ResolveChainRunnerService
-
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopAgentServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\RunDynamicLoopAgentService
 
@@ -82,6 +92,15 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopService
 
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\ExecuteDynamicTurnServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\ExecuteDynamicTurnService
+
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetService
+
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FinalizeDynamicLoopServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FinalizeDynamicLoopService
+
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RecordDynamicRoundServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RecordDynamicRoundService
 
@@ -91,10 +110,7 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService
 
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\CheckStaticBudgetServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Static\CheckStaticBudgetService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\RoundCompletedNotifierInterface:
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RoundCompletedNotifierInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\DispatchRoundEventService
 
   # Report format mappers

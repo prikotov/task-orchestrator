@@ -11,7 +11,7 @@ use Symfony\Component\Yaml\Yaml;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
