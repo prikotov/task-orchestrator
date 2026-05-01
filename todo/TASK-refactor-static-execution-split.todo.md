@@ -7,10 +7,10 @@ priority: P2
 depends_on: TASK-refactor-shared-reorg, TASK-refactor-session-logger-split, TASK-refactor-dynamic-loop-decomposition
 epic: EPIC-refactor-orchestrator-p3
 author: pi
-assignee:
-branch:
+assignee: Бэкендер Левша
+branch: task/refactor-static-execution-split
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-static-execution-split: Физический split StaticExecution в отдельный модуль
@@ -75,6 +75,20 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ## 9. Comments (Комментарии)
 Roadmap Sprint 7 (вторая половина). Новая задача из brainstorm #2. Цель — не «Deptrac green», а валидация Integration-паттерна для масштабирования на ≥2 стратегии (G6). Sprint 8 (Conditional Branching) — точка валидации.
+
+## Инструкции для сабагента
+
+**Ветка:** task/refactor-static-execution-split (уже создана и активна)
+**PR:** уже создан (draft) из task/refactor-static-execution-split в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/refactor-static-execution-split`: `git checkout task/refactor-static-execution-split`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `make check`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
