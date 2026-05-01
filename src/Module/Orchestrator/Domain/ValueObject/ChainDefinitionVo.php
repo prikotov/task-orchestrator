@@ -114,6 +114,59 @@ final readonly class ChainDefinitionVo
     }
 
     /**
+     * Создаёт conditional-цепочку — статическую цепочку с условным ветвлением шагов.
+     *
+     * Шаги могут содержать optional ConditionExpressionVo (when-expressions).
+     * Цепочки без when на шагах остаются static, но если YAML содержит when:,
+     * загрузчик автоматически переключает тип на conditional.
+     *
+     * @param list<ChainStepVo> $steps
+     * @param list<FixIterationGroupVo> $fixIterations
+     * @param array<string, RoleConfigVo> $roles per-role конфигурация
+     */
+    public static function createFromConditionalSteps(
+        string $name,
+        string $description,
+        array $steps,
+        array $fixIterations = [],
+        array $roles = [],
+        ?ChainRetryPolicyVo $defaultRetryPolicy = null,
+        ?BudgetVo $budget = null,
+        ?int $timeout = null,
+    ): self {
+        if (count($steps) === 0) {
+            throw new InvalidArgumentException(
+                sprintf('Chain "%s" must have at least one step.', $name),
+            );
+        }
+
+        self::validateFixIterations($name, $steps, $fixIterations);
+
+        return new self(
+            name: $name,
+            description: $description,
+            type: ChainTypeEnum::conditionalType,
+            steps: $steps,
+            fixIterations: $fixIterations,
+            facilitator: null,
+            participants: [],
+            maxRounds: 10,
+            brainstormSystemPrompt: null,
+            facilitatorAppendPrompt: null,
+            facilitatorStartPrompt: null,
+            facilitatorContinuePrompt: null,
+            facilitatorFinalizePrompt: null,
+            participantAppendPrompt: null,
+            participantUserPrompt: null,
+            roles: $roles,
+            defaultRetryPolicy: $defaultRetryPolicy,
+            budget: $budget,
+            timeout: $timeout,
+            maxTime: null,
+        );
+    }
+
+    /**
      * Создаёт dynamic-цепочку с фасилитатором и участниками.
      *
      * @param list<string> $participants
@@ -387,6 +440,16 @@ final readonly class ChainDefinitionVo
     public function isDynamic(): bool
     {
         return $this->type === ChainTypeEnum::dynamicType;
+    }
+
+    /**
+     * Является ли цепочка условной (conditional)?
+     *
+     * Условная цепочка — это цепочка с шагами, имеющими when-выражения.
+     */
+    public function isConditional(): bool
+    {
+        return $this->type === ChainTypeEnum::conditionalType;
     }
 
     /**
