@@ -79,7 +79,7 @@ Roadmap Sprint 7 (вторая половина). Новая задача из b
 ## Инструкции для сабагента
 
 **Ветка:** task/refactor-static-execution-split (уже создана и активна)
-**PR:** уже создан (draft) из task/refactor-static-execution-split в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/refactor-static-execution-split в task/epic-refactor-orchestrator-p3 — [PR #117](https://github.com/prikotov/task-orchestrator/pull/117)
 
 ### Порядок действий
 1. Переключись в ветку `task/refactor-static-execution-split`: `git checkout task/refactor-static-execution-split`
