@@ -7,10 +7,10 @@ priority: P1
 depends_on:
 epic: EPIC-refactor-orchestrator-p3
 author: pi
-assignee:
-branch:
+assignee: Аналитик Шерлок
+branch: task/docs-domain-inventory
 pr:
-status: todo
+status: done
 ---
 
 # TASK-docs-domain-inventory: Инвентаризация Domain-слоя Orchestrator
@@ -61,6 +61,20 @@ status: todo
 
 ## 9. Comments (Комментарии)
 Roadmap Sprint 2, AI#13. Предшественник — brainstorm-протокол, где Шерлок уже провёл частичную инвентаризацию (cross-references = 0 между Static/ и Dynamic/, 3 кластера по LOC).
+
+## Инструкции для сабагента
+
+**Ветка:** task/docs-domain-inventory (уже создана и активна)
+**PR:** уже создан (draft) из task/docs-domain-inventory в task/epic-refactor-orchestrator-p3 — [PR #111](https://github.com/prikotov/task-orchestrator/pull/111)
+
+### Порядок действий
+1. Переключись в ветку `task/docs-domain-inventory`: `git checkout task/docs-domain-inventory`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `make check`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
