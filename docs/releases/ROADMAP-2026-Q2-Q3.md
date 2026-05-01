@@ -3,8 +3,10 @@
 **Статус:** Черновик (Draft)  
 **Владелец:** Шерлок (system_analyst_sherlock)  
 **Дата создания:** 2026-04-29  
+**Дата обновления:** 2026-04-30  
 **Источники:**
-- Протокол brainstorm: `var/sessions/brainstorm/2026-04-29_08-06-49/result.md`
+- Протокол brainstorm #1: `var/sessions/brainstorm/2026-04-29_08-06-49/result.md`
+- Протокол brainstorm #2 (декомпозиция на модули): `var/sessions/brainstorm/2026-04-30_16-02-26/result.md`
 - Исследование AI-agent фреймворков: `docs/research/agent-frameworks-summary.md`
 - Архитектура проекта: `docs/guide/architecture.md`
 
@@ -78,11 +80,11 @@ Roadmap покрывает два крупных направления:
 | **#5** | **ADR-007: VO ACL между Orchestrator и AgentRunner** — зафиксировать ACL как осознанное решение, порог пересмотра (>3 общих поля или typed I/O) | Гэндальф | 1 документ | 1 час |
 
 **Критерии готовности Sprint 1:**
-- [ ] `ExecuteDynamicTurnService.php` удалён
-- [ ] `PromptConfigurationVo` создан, `getPromptConfiguration()` работает, старые геттеры `@deprecated`
-- [ ] 3 сервиса инжектят `ChainSessionWriterInterface`
-- [ ] ADR-006 и ADR-007 записаны в `docs/adr/`
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] `ExecuteDynamicTurnService.php` удалён
+- [x] `PromptConfigurationVo` создан, `getPromptConfiguration()` работает, старые геттеры `@deprecated`
+- [x] 3 сервиса инжектят `ChainSessionWriterInterface`
+- [x] ADR-006 и ADR-007 записаны в `docs/adr/`
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 
 ---
 
@@ -98,11 +100,11 @@ Roadmap покрывает два крупных направления:
 | — | **Техдолг:** замена комментариев «дубликат» на «ACL boundary VO» в 4 парах VO (следствие ADR-007) | Левша | 8 файлов (комментарии) | 30 мин |
 
 **Критерии готовности Sprint 2:**
-- [ ] Roadmap создан в `docs/releases/`
+- [x] Roadmap создан в `docs/releases/`
 - [ ] Инвентаризация Domain-слоя завершена (100% покрытие)
 - [ ] Security Policy анализ завершён
 - [ ] Комментарии «дубликат» → «ACL boundary VO»
-- [ ] Все P1 задачи закрыты
+- [x] Все P1 задачи закрыты
 
 ---
 
@@ -119,11 +121,11 @@ Roadmap покрывает два крупных направления:
 **Зависимости:** AI#4 (ADR-006) должен быть завершён → ✅ Sprint 1
 
 **Критерии готовности Sprint 3:**
-- [ ] `ExecutionStrategyInterface` в Application-слое с методами `execute()`, `resume()`, `supports()`
-- [ ] `StaticExecutionStrategy` — thin wrapper, unit-тесты
-- [ ] `DynamicExecutionStrategy` — инкапсулирует dynamic path, unit-тесты
-- [ ] ADR-008 записан
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] `ExecutionStrategyInterface` в Application-слое с методами `execute()`, `resume()`, `supports()`
+- [x] `StaticExecutionStrategy` — thin wrapper, unit-тесты
+- [x] `DynamicExecutionStrategy` — инкапсулирует dynamic path, unit-тесты
+- [x] ADR-008 записан
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 
 ---
 
@@ -141,11 +143,11 @@ Roadmap покрывает два крупных направления:
 - AI#6 (ADR-008) → ✅ Sprint 3
 
 **Критерии готовности Sprint 4:**
-- [ ] `OrchestrateChainCommandHandler` — ~30 строк, 2 switch-точки устранены
-- [ ] Существующий тест (1095 строк) адаптирован/разделён
-- [ ] `ChainDefinitionInterface` + `StaticChainDefinitionInterface` + `DynamicChainDefinitionInterface` созданы
-- [ ] Все потребители обновлены
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] `OrchestrateChainCommandHandler` — 58 строк, 2 switch-точки устранены
+- [x] Существующий тест адаптирован
+- [x] `SharedChainDefinitionVo` создан (ChainDefinitionVo split)
+- [x] Все потребители обновлены
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 
 ---
 
@@ -191,18 +193,27 @@ Roadmap покрывает два крупных направления:
 
 ---
 
-### Sprint 7 (28 июля — 10 августа): P3 Infrastructure Cleanup
+### Sprint 7 (28 июля — 10 августа): P3 Infrastructure Cleanup + Physical Split Static
 
-> **Тема:** Завершение декомпозиции Infrastructure-слоя.
+> **Тема:** Завершение декомпозиции Infrastructure-слоя. Во второй половине спринта — физический split Static-стратегии в отдельный модуль как первая проверка Integration-паттерна.
 
 | AI# | Задача | Ответственный | Blast radius | Оценка |
 |---|---|---|---|---|
 | **#15** | **Расщепление ChainSessionLogger** — Writer (~280 LOC) + Reader (~60 LOC) + FileStorage (~60 LOC) + BudgetFormatter (~40 LOC). Интерфейсы не меняются | Левша | 1 → 4 класса | 1 день |
 | **#16** | **Переразложение Shared/ каталога** — Static-only → `Static/`, Dynamic-only → `Dynamic/`, ChainLoader → `Application/` | Левша | 6 интерфейсов | 0.5 дня |
+| **#17** | **Физический split StaticExecution в отдельный модуль** — перенос ~8 файлов (4 сервиса + 1 entity + 3 VO) в `src/Module/StaticExecution/`. Integration-слой (ACL, DTO mapping, cross-module wiring). Deptrac на двух модулях | Левша + Локи | ~15–20 файлов | 2 дня |
+
+**Зависимости для AI#17:**
+- ExecutionStrategyInterface (Sprint 3) → ✅
+- ChainDefinitionVo split (Sprint 4) → ✅
+- RunDynamicLoopService decomposition (Sprint 6) → ✅
+- Shared/ reorg (AI#16) → та же половина Sprint 7
 
 **Критерии готовности Sprint 7:**
 - [ ] 4 класса вместо ChainSessionLogger (536 LOC)
 - [ ] 6 интерфейсов перемещены в правильные namespace
+- [ ] StaticExecution — отдельный модуль, Deptrac green на двух модулях
+- [ ] Integration-слой между Orchestrator и StaticExecution работает
 - [ ] Все P3 задачи закрыты
 - [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 
@@ -210,7 +221,7 @@ Roadmap покрывает два крупных направления:
 
 ### Sprint 8 (11 августа — 24 августа): Conditional Branching
 
-> **Тема:** Первая roadmap-фича, требующая расширения YAML-chain DSL. Подтверждена 4+ фреймворками (LangGraph, Archon, Mastra AI, Agno).
+> **Тема:** Первая roadmap-фича, требующая расширения YAML-chain DSL. Подтверждена 4+ фреймворками (LangGraph, Archon, Mastra AI, Agno). **Вторая стратегия** в Integration-паттерне — валидация G6 (масштабируемость паттерна на ≥2 стратегии).
 
 | Задача | Описание | Источник | Оценка |
 |---|---|---|---|
@@ -233,7 +244,7 @@ Roadmap покрывает два крупных направления:
 
 ### Sprint 9 (25 августа — 07 сентября): Security Policy (Foundation)
 
-> **Тема:** Безопасность автономного выполнения — зреющий тренд (Codex, Copilot Cloud Agent, OpenHands SDK). Начало с exec policy (quick win).
+> **Тема:** Безопасность автономного выполнения — зреющий тренд (Codex, Copilot Cloud Agent, OpenHands SDK). Начало с exec policy (quick win). **SecurityPolicy — безусловный отдельный модуль** (консенсус brainstorm #2: все 4 участника).
 
 | Задача | Описание | Источник | Оценка |
 |---|---|---|---|
@@ -293,23 +304,24 @@ Roadmap покрывает два крупных направления:
 
 | AI# | Задача | Приоритет | Спринт | Статус |
 |---|---|---|---|---|
-| #1 | Инлайнинг ExecuteDynamicTurnService | P1 | Sprint 1 | 📋 Planned |
-| #2 | PromptConfiguration VO | P1 | Sprint 1 | 📋 Planned |
-| #3 | Переключение на ChainSessionWriterInterface | P1 | Sprint 1 | 📋 Planned |
-| #4 | ADR-006: ExecutionStrategy composition | P1 | Sprint 1 | 📋 Planned |
-| #5 | ADR-007: VO ACL Orchestrator ↔ AgentRunner | P1 | Sprint 1 | 📋 Planned |
+| #1 | Инлайнинг ExecuteDynamicTurnService | P1 | Sprint 1 | ✅ Done — [TASK](../todo/done/TASK-refactor-inline-execute-dynamic-turn.todo.md) PR #101 |
+| #2 | PromptConfiguration VO | P1 | Sprint 1 | ✅ Done — [TASK](../todo/done/TASK-refactor-prompt-configuration-vo.todo.md) PR #102 |
+| #3 | Переключение на ChainSessionWriterInterface | P1 | Sprint 1 | ✅ Done — [TASK](../todo/done/TASK-refactor-session-writer-consumers.todo.md) PR #103 |
+| #4 | ADR-006: ExecutionStrategy composition | P1 | Sprint 1 | ✅ Done — [ADR](../docs/adr/006-execution-strategy-composition.md) |
+| #5 | ADR-007: VO ACL Orchestrator ↔ AgentRunner | P1 | Sprint 1 | ✅ Done — [ADR](../docs/adr/007-vo-acl-boundary.md) |
 | #12 | Roadmap (этот документ) | P1 | Sprint 2 | ✅ Draft |
-| #13 | Инвентаризация Domain-слоя | P2 | Sprint 2 | 📋 Planned |
-| #14 | Security Policy анализ | P2 | Sprint 2 | 📋 Planned |
-| #7 | ExecutionStrategyInterface + StaticExecutionStrategy | P2 | Sprint 3 | 📋 Planned |
-| #8 | DynamicExecutionStrategy | P2 | Sprint 3 | 📋 Planned |
-| #6 | ADR-008: Shared Kernel Contract | P2 | Sprint 3 | 📋 Planned |
-| #9 | CommandHandler rewrite | P2 | Sprint 4 | 📋 Planned |
-| #10 | P4: ChainDefinitionVo split | P2 | Sprint 4 | 📋 Planned |
-| — | Интеграционное тестирование P2 | — | Sprint 5 | 📋 Planned |
-| #11 | Декомпозиция RunDynamicLoopService | P3 | Sprint 6 | 📋 Planned |
-| #15 | Расщепление ChainSessionLogger | P3 | Sprint 7 | 📋 Planned |
-| #16 | Переразложение Shared/ каталога | P3 | Sprint 7 | 📋 Planned |
+| #13 | Инвентаризация Domain-слоя | P2 | Sprint 2 | 📋 [TASK](../todo/TASK-docs-domain-inventory.todo.md) |
+| #14 | Security Policy анализ | P2 | Sprint 2 | 📋 [TASK](../todo/TASK-docs-security-policy-analysis.todo.md) |
+| #6 | ADR-008: Shared Kernel Contract | P2 | Sprint 3 | ✅ Done — [ADR](../docs/adr/008-shared-kernel-contract.md) |
+| #7 | ExecutionStrategyInterface + StaticExecutionStrategy | P2 | Sprint 3 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
+| #8 | DynamicExecutionStrategy | P2 | Sprint 3 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
+| #9 | CommandHandler rewrite | P2 | Sprint 4 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
+| #10 | P4: ChainDefinitionVo split | P2 | Sprint 4 | ✅ Done — [TASK](../todo/done/TASK-refactor-chain-definition-split.todo.md) PR #105 |
+| — | Интеграционное тестирование P2 | — | Sprint 5 | 📋 [TASK](../todo/TASK-chore-p2-integration-testing.todo.md) |
+| #11 | Декомпозиция RunDynamicLoopService | P3 | Sprint 6 | 📋 [TASK](../todo/TASK-refactor-dynamic-loop-decomposition.todo.md) |
+| #15 | Расщепление ChainSessionLogger | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-session-logger-split.todo.md) |
+| #16 | Переразложение Shared/ каталога | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-shared-reorg.todo.md) |
+| #17 | Физический split StaticExecution в отдельный модуль | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-static-execution-split.todo.md) |
 | — | Conditional branching (`when:` + strategy) | Roadmap | Sprint 8 | 📋 Planned |
 | — | Security Policy (exec policy + permissions) | Roadmap | Sprint 9 | 📋 Planned |
 | — | Error classification + Typed I/O | Roadmap | Sprint 10 | 📋 Planned |
@@ -417,7 +429,7 @@ graph TD
 | **OQ-3** | **Security Policy module — единственный roadmap-сценарий, где разделение Static/Dynamic создаёт проблему.** Cross-cutting concern зависит от обоих subdomain'ов. Если они в разных модулях → Shared Kernel разрастается. | Локи | До Sprint 9 | Влияет на архитектуру Security Policy |
 | **OQ-4** | **Инвентаризация Domain-слоя (57% модуля = 5643 строки) не проведена.** Static subdomain (770 строк, 4 сервиса), Entities (594 строки), Session/Audit (242 строки) — не анализировались. | Шерлок | Sprint 2 | Может вскрыть новые God-объекты или скрытые зависимости |
 | **OQ-5** | **DynamicTurnResultVo — discriminated union, не VO.** 6 полей, 13 точек создания, 3 семантические «фигуры» (Continue/Break/Completion). Конкретные VO-имена не утверждены (предложение: `TurnContinueVo` + `TurnBreakVo`). | Левша | До Sprint 6 | Блокирует AI#11 |
-| **OQ-6** | **Физическое разделение Static/Dynamic на модули** — решение принято (0 cross-imports = 2 bounded contexts), но сроки не определены. Триггер: бизнес-драйвер или Security Policy. | Владелец проекта | TBD | Может быть активирован в Sprint 9 |
+| **OQ-6** | **Физическое разделение Static/Dynamic на модули** — Static split запланирован на Sprint 7 (вторая половина). Dynamic остаётся в Orchestrator до стабилизации Integration-паттерна на ≥2 стратегиях (G6). Решение о Dynamic split — после Sprint 8 по результатам Conditional Branching. | Владелец проекта | Sprint 8 | Если Integration-паттерн треснет на Conditional Branching — Static merge обратно в Orchestrator |
 | **OQ-7** | **Loop с `until_bash` / `end_condition`** — усиление fix_iterations детерминированной проверкой завершения. Не включён в спринты — нужен ли? | Владелец проекта | До Sprint 10 | Если да → добавить в Sprint 10 |
 
 ### Риски
@@ -429,6 +441,7 @@ graph TD
 | **R-3** | **P3 → Roadmap-фичи overlap** — декомпозиция RunDynamicLoopService (Sprint 6) может пересечься с conditional branching (Sprint 8) по срокам | Низкая | Сдвиг Sprint 8 | Sprint 5 как буфер |
 | **R-4** | **Security Policy cross-cutting** — может потребовать architecture decision, замедляющего Sprint 9 | Средняя | Упрощение Security Policy до basic rules | Анализ Локи (Sprint 2) снижает риск |
 | **R-5** | **Typed I/O (JSON Schema)** — может потребовать значительных изменений в YAML-парсере и ChainLoader | Средняя | Упрощение или отложение | Сделать опциональным (opt-in per step) |
+| **R-6** | **Static split Integration-паттерн не масштабируется** — Integration-слой для Static (~1270 LOC, 4 зависимости от ChainDefinitionVo) может оказаться недостаточным для Conditional Branching (Sprint 8) | Средняя | Merge Static обратно в Orchestrator | Sprint 8 (Conditional Branching) — точка валидации G6. Если паттерн треснет — откат в Sprint 9 |
 
 ---
 
@@ -460,6 +473,57 @@ graph TD
 | **Docker-based sandboxing** | Безопасность | Q4 Sprint 4–5 | Container isolation для CI/CD |
 | **DAG orchestration** | Архитектура | Q1 2027 | Graph-based execution. Отдельный PR с обоснованием |
 | **Human-in-the-loop** | Архитектура | R&D | ⚠️ Ограничено в CLI |
+
+---
+
+## Результаты Brainstorm #2 (2026-04-30): Декомпозиция на модули
+
+> **Источник:** `var/sessions/brainstorm/2026-04-30_16-02-26/result.md`  
+> **Участники:** system_architect_gandalf, system_architect_loki, backend_developer_levsha, system_analyst_sherlock  
+> **Раундов:** 25 (~25 минут) | **Токены:** ↑307.6k ↓55.1k
+
+### Принятые решения (консенсус)
+
+| # | Решение | Кто инициировал |
+|---|---|---|
+| 1 | **SecurityPolicy — безусловный отдельный модуль** (Sprint 9). Cross-cutting concern с собственным Ubiquitous Language | Все 4 единогласно |
+| 2 | **Conditional branching, hooks, typed I/O, error handling, context management, parallel execution — развитие внутри Orchestrator** через ExecutionStrategy pattern | Все 4 единогласно |
+| 3 | **SubOrchestration (sub-agents) — вероятный отдельный модуль Q4**, решение после ADR в Sprint 11 | Гэндальф → все согласны |
+| 4 | **ExecutionStrategyInterface (Sprint 3) — первый шаг** | Все 4 |
+| 5 | **ChainDefinitionVo split (Sprint 4) — обязателен до любых физических split** | Все 4 |
+| 6 | **Внутренняя декомпозиция RunDynamicLoopService (Sprint 6)** | Все 4 |
+| 7 | **Физический split Static в Sprint 7 (вторая половина)** — после стабилизации контрактов из Sprint 3–4 | Левша + Шерлок, Локи принял компромисс |
+
+### Главное поле конфликта: КОГДА split Static
+
+| Участник | Срок | Аргумент |
+|---|---|---|
+| Локи | Sprint 5 | «Узнать дёшево», namespace-перемещение = реальная проверка |
+| Гэндальф | Q4 | Batch-extraction всех стратегий разом, стабильный Shared Kernel |
+| **Левша** | **Sprint 7** | Решение по данным, после внутренней декомпозиции, порог ≥6800 LOC |
+| **Шерлок** | **Sprint 7** | G3-стабильность + G6-валидация Integration-паттерна |
+
+**Итог:** компромисс — Sprint 7 (вторая половина). Принят Локи при условии: Sprint 8 (Conditional Branching) валидирует масштабируемость.
+
+### Ключевые инсайты
+
+1. **Static/ и Dynamic/ — 0 cross-imports** (эмпирический факт). Граница уже существует в коде.
+2. **Декомпозиция God-объектов РАСТЁТ в LOC** (+580 LOC от частичного расщепления RunDynamicLoopService). Прогноз «−650 LOC» Гэндальфа ошибочен.
+3. **SharedChainDefinitionVo существует, но нигде не используется как тип параметра** — подготовка без подключения.
+4. **Прогноз Domain LOC к концу Q3: ~7200** (Левша+Локи) — порог сработает после Sprint 8–9.
+
+### Триггеры для split (приняты командой)
+
+| Триггер | Порог | Смысл |
+|---|---|---|
+| G1 | Domain LOC ≥ 7000 | Модуль растёт даже при декомпозиции (пересмотрено с 7500) |
+| G2 | Shared Kernel > 12 файлов или ISP violation | Два bounded contexts принудительно склеены |
+| G3 | Контракты стабильны ≥3 спринтов | Можно доверять Integration-слою |
+| G4 | SecurityPolicy требует раздельных моделей | Static/Dynamic = разные permission models |
+| G5 | Скорость доставки фичи в Orchestrator ≥ 2× от AgentRunner | Когнитивная нагрузка убивает продуктивность |
+| G6 | Integration-паттерн работает для ≥2 стратегий | Проверка масштабируемости |
+
+**Критерий успеха split:** не «Deptrac green», а «Integration-слой для второй стратегии создан по тому же паттерну без God-interface на 15 методов».
 
 ---
 
