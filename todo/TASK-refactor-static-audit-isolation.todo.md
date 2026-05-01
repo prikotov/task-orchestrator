@@ -90,7 +90,7 @@ Tech debt от архитектора Локи: StaticExecution Domain конс�
 ## Инструкции для сабагента
 
 **Ветка:** task/refactor-static-audit-isolation (уже создана и активна)
-**PR:** уже создан (draft) из task/refactor-static-audit-isolation в task/epic-sprint-8-conditional-branching — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/refactor-static-audit-isolation в task/epic-sprint-8-conditional-branching — [PR #120](https://github.com/prikotov/task-orchestrator/pull/120)
 
 ### Порядок действий
 1. Переключись в ветку `task/refactor-static-audit-isolation`: `git checkout task/refactor-static-audit-isolation`
