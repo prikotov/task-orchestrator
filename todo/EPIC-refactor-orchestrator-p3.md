@@ -63,7 +63,7 @@ status: in_progress
 - [ ] [TASK-chore-p2-integration-testing](TASK-chore-p2-integration-testing.todo.md) — Интеграционное тестирование Strategy pattern
 
 ### Sprint 2 (дополнительно): Аналитика
-- [ ] [TASK-docs-domain-inventory](TASK-docs-domain-inventory.todo.md) — Инвентаризация Domain-слоя Orchestrator (AI#13)
+- [x] [TASK-docs-domain-inventory](TASK-docs-domain-inventory.todo.md) — Инвентаризация Domain-слоя Orchestrator (AI#13)
 - [ ] [TASK-docs-security-policy-analysis](TASK-docs-security-policy-analysis.todo.md) — Security Policy анализ (AI#14)
 
 ### Sprint 6: P3 Decomposition
