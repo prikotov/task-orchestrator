@@ -64,7 +64,7 @@ status: in_progress
 
 ### Sprint 2 (дополнительно): Аналитика
 - [x] [TASK-docs-domain-inventory](TASK-docs-domain-inventory.todo.md) — Инвентаризация Domain-слоя Orchestrator (AI#13)
-- [ ] [TASK-docs-security-policy-analysis](TASK-docs-security-policy-analysis.todo.md) — Security Policy анализ (AI#14)
+- [x] [TASK-docs-security-policy-analysis](TASK-docs-security-policy-analysis.todo.md) — Security Policy анализ (AI#14)
 
 ### Sprint 6: P3 Decomposition
 - [ ] [TASK-refactor-dynamic-loop-decomposition](TASK-refactor-dynamic-loop-decomposition.todo.md) — Декомпозиция RunDynamicLoopService (AI#11)
