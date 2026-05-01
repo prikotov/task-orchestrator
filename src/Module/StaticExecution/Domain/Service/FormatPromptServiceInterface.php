@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration;
+namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 
 /**
  * Интеграционный сервис форматирования промптов для StaticExecution Domain.
  *
- * Делегирует вызов в Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface.
+ * Делегирует вызов в Orchestrator\PromptFormatterInterface.
  * Работает только с примитивами и array — Orchestrator VO не импортирует.
  */
 interface FormatPromptServiceInterface

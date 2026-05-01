@@ -6,8 +6,8 @@ namespace TaskOrchestrator\Common\Module\StaticExecution\Infrastructure\Service;
 
 use Override;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\FormatPromptServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;

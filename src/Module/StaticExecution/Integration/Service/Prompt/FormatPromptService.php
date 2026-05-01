@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Prompt;
 
 use Override;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\FormatPromptServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
 
 /**

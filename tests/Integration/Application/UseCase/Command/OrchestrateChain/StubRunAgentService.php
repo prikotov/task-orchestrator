@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\OrchestrateChain;
 
 use Override;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;

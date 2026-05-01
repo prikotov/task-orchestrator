@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\FormatPromptServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
