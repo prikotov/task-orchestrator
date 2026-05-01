@@ -1,0 +1,133 @@
+roles:
+  analyst:
+    prompt_file: prompts/analyst.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - gpt-4o
+      - --system-prompt
+      - "@system-prompt"
+
+  developer:
+    prompt_file: prompts/developer.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - gpt-4o
+      - --system-prompt
+      - "@system-prompt"
+
+  facilitator:
+    prompt_file: prompts/facilitator.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - gpt-4o
+      - --system-prompt
+      - "@system-prompt"
+
+  participant:
+    prompt_file: prompts/participant.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - gpt-4o
+      - --system-prompt
+      - "@system-prompt"
+
+  failing_agent:
+    prompt_file: prompts/failing_agent.md
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --model
+      - gpt-4o
+      - --system-prompt
+      - "@system-prompt"
+
+chains:
+  static_simple:
+    description: "Simple static chain with two agent steps"
+    steps:
+      - { type: agent, role: analyst, name: analyze }
+      - { type: agent, role: developer, name: implement }
+
+  static_with_fix_iterations:
+    description: "Static chain with fix iterations"
+    steps:
+      - { type: agent, role: analyst, name: analyze }
+      - type: agent
+        role: developer
+        name: implement
+      - { type: agent, role: analyst, name: review }
+    fix_iterations:
+      - group: dev-review
+        steps: [implement, review]
+        max_iterations: 2
+
+  static_with_quality_gate:
+    description: "Static chain with quality gate"
+    steps:
+      - { type: agent, role: analyst, name: analyze }
+      - { type: agent, role: developer, name: implement }
+      - type: quality_gate
+        command: 'vendor/bin/phpcs'
+        label: 'PHP CodeSniffer'
+        timeout_seconds: 60
+
+  dynamic_simple:
+    type: dynamic
+    description: "Simple dynamic chain for integration testing"
+    timeout: 600
+    facilitator: facilitator
+    participants: [participant]
+    max_rounds: 5
+    prompts:
+      brainstorm_system: "You are a brainstorm facilitator."
+      facilitator_append: "Facilitator append: participants=%s"
+      facilitator_start: "Start discussion about: %s"
+      facilitator_continue: "Continue discussion: topic=%s journal=%s history=%s"
+      facilitator_finalize: "Finalize: topic=%s history=%s"
+      participant_append: "Participant append: role=%s"
+      participant_user: "Discuss: topic=%s context=%s"
+
+  dynamic_multi_participant:
+    type: dynamic
+    description: "Dynamic chain with multiple participants"
+    timeout: 600
+    facilitator: facilitator
+    participants: [participant, analyst]
+    max_rounds: 10
+    prompts:
+      brainstorm_system: "Multi-participant brainstorm system."
+      facilitator_append: "Fac: %s"
+      facilitator_start: "Start: %s"
+      facilitator_continue: "Cont: %s %s %s"
+      facilitator_finalize: "Final: %s %s"
+      participant_append: "Part: %s"
+      participant_user: "Ctx: %s %s"
+
+  static_error_scenario:
+    description: "Static chain where one step fails"
+    steps:
+      - { type: agent, role: analyst, name: analyze }
+      - { type: agent, role: failing_agent, name: failing_step }
