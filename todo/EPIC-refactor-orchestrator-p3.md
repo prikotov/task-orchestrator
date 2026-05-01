@@ -7,8 +7,8 @@ priority: P2
 author: pi
 assignee:
 branch: task/epic-refactor-orchestrator-p3
-pr:
-status: in_progress
+pr: pending (epic branch → main)
+status: review
 ---
 
 # EPIC-refactor-orchestrator-p3: P3 Декомпозиция + Аналитика + Static Split
@@ -41,16 +41,16 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] RunDynamicLoopService ≤ 200 LOC (координатор)
-- [ ] ChainSessionLogger расщеплён на 4 класса
-- [ ] Shared/ содержит только общие интерфейсы
-- [ ] StaticExecution — отдельный модуль, Deptrac green на 3 модулях
-- [ ] Integration-слой Orchestrator ↔ StaticExecution < 200 LOC
-- [ ] Domain-инвентаризация и Security-анализ завершены
+- [x] RunDynamicLoopService ≤ 200 LOC (координатор)
+- [x] ChainSessionLogger расщеплён на 4 класса
+- [x] Shared/ содержит только общие интерфейсы
+- [x] StaticExecution — отдельный модуль, Deptrac green на 3 модулях
+- [x] Integration-слой Orchestrator ↔ StaticExecution < 200 LOC
+- [x] Domain-инвентаризация и Security-анализ завершены
 
 ### 🟡 Should Have (Желательно)
-- [ ] Deptrac rules для Integration-слоя
-- [ ] Integration-тесты P2 Strategy pattern
+- [x] Deptrac rules для Integration-слоя
+- [x] Integration-тесты P2 Strategy pattern
 
 ### ⚫ Won't Have (Не будем делать)
 - [ ] Conditional Branching
@@ -75,11 +75,11 @@ status: in_progress
 - [x] [TASK-refactor-static-execution-split](TASK-refactor-static-execution-split.todo.md) — Физический split StaticExecution (AI#17)
 
 ## 5. Definition of Done (Критерии приёмки эпика)
-- [ ] Все 7 задач выполнены
-- [ ] 3 модуля: AgentRunner, Orchestrator, StaticExecution — Deptrac green
-- [ ] Integration-паттерн задокументирован для G6-валидации
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
-- [ ] Roadmap: все AI# обновлены (`✅ Done` + ссылки на задачи/PR), чекбоксы Sprint 5–7 отмечены `[x]`
+- [x] Все 7 задач выполнены
+- [x] 3 модуля: AgentRunner, Orchestrator, StaticExecution — Deptrac green
+- [x] Integration-паттерн задокументирован для G6-валидации
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] Roadmap: все AI# обновлены (`✅ Done` + ссылки на задачи/PR), чекбоксы Sprint 5–7 отмечены `[x]`
 
 ## 6. Risks and Dependencies (Риски и зависимости)
 - **R-6:** Integration-паттерн может не масштабироваться на Conditional Branching — Sprint 8 = точка валидации
