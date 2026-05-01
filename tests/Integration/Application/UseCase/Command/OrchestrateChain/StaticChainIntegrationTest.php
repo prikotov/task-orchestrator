@@ -20,8 +20,8 @@ use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\Yam
 use TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainService;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\CheckStaticBudgetServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ExecuteStaticStepService;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\FormatPromptServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunStaticChainService;
 

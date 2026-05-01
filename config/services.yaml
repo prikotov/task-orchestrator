@@ -59,10 +59,10 @@ services:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService
 
   # --- StaticExecution module: Integration Service aliases ---
-  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\RunAgentServiceInterface:
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServiceInterface:
     alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\AgentRunner\RunAgentService
 
-  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\Integration\FormatPromptServiceInterface:
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface:
     alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Prompt\FormatPromptService
 
   # --- StaticExecution module: Domain/Infrastructure aliases ---
