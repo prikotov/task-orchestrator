@@ -82,6 +82,15 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopService
 
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\ExecuteDynamicTurnServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\ExecuteDynamicTurnService
+
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetService
+
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FinalizeDynamicLoopServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FinalizeDynamicLoopService
+
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RecordDynamicRoundServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RecordDynamicRoundService
 
