@@ -120,7 +120,7 @@ QualityGateRunnerInterface::run(QualityGateVo)
 - **Общее ядро (Core Permission Model):** exec policy (rules filter), runner/tool/model restrictions. Реализуется через одни и те же interfaces.
 - **Различие в точках применения:** Static проверяет per-step, Dynamic — per-role/per-turn. Это не два разных permission models, а **два контекста применения одной модели**.
 
-**Вердикт по G4:** Триггер **НЕ срабатывает**. Static и Dynamic имеют **одну и ту же** permission model с разной granularity применения. Shared Kernel не разрастается — достаточно одного интерфейса `SecurityPolicyCheckInterface`, применяемого в разных точках.
+**Вердикт по G4:** Триггер **НЕ срабатывает**. Static и Dynamic имеют **одну и ту же** permission model с разной granularity применения. Shared Kernel не разрастается — достаточно двух интерфейсов (`ChainSecurityPolicyInterface` + `ExecPolicyInterface`), применяемых в разных точках (см. секцию 4.3).
 
 ---
 
