@@ -77,7 +77,7 @@ Roadmap Sprint 6. Предусловие для Sprint 7 (split Static). Brainst
 ## Инструкции для сабагента
 
 **Ветка:** task/refactor-dynamic-loop-decomposition (уже создана и активна)
-**PR:** уже создан (draft) из task/refactor-dynamic-loop-decomposition в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из task/refactor-dynamic-loop-decomposition в task/epic-refactor-orchestrator-p3 — [PR #114](https://github.com/prikotov/task-orchestrator/pull/114)
 
 ### Порядок действий
 1. Переключись в ветку `task/refactor-dynamic-loop-decomposition`: `git checkout task/refactor-dynamic-loop-decomposition`
