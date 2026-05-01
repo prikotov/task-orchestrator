@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\StepAuditStatusDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Entity\StaticChainExecution;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticChainAuditVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticChainResultVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticProcessResultVo;
+use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticStepAuditVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticStepResultVo;
 
 /**
@@ -39,7 +38,7 @@ final readonly class RunStaticChainService
         string $task,
         ?string $workingDir = null,
         int $timeout = 300,
-        ?AuditLoggerInterface $auditLogger = null,
+        ?StaticAuditServiceInterface $auditService = null,
         bool $noContextFiles = false,
     ): StaticChainResultVo {
         $steps = $chain->getSteps();
@@ -53,7 +52,7 @@ final readonly class RunStaticChainService
         /** @var list<StaticStepResultVo> $results */
         $results = [];
         $startTime = microtime(true);
-        $auditLogger?->logChainStart($chain->getSharedDefinition()->getName(), $task);
+        $auditService?->logChainStart($chain->getSharedDefinition()->getName(), $task);
 
         $stepCount = count($steps);
         while (!$execution->isComplete($stepCount)) {
@@ -68,7 +67,7 @@ final readonly class RunStaticChainService
                 $groupForStep,
                 $nameToIndexMap,
                 $results, // @psalm-suppress ArgumentTypeCoercion loop reassignment widens type
-                $auditLogger,
+                $auditService,
                 $noContextFiles,
             );
             if ($stepResult === null) {
@@ -88,7 +87,7 @@ final readonly class RunStaticChainService
             $startTime,
             $results, // @psalm-suppress ArgumentTypeCoercion loop reassignment widens type
             $execution,
-            $auditLogger,
+            $auditService,
         );
 
         return $result;
@@ -114,7 +113,7 @@ final readonly class RunStaticChainService
         array $groupForStep,
         array $nameToIndexMap,
         array $results,
-        ?AuditLoggerInterface $auditLogger,
+        ?StaticAuditServiceInterface $auditService,
         bool $noContextFiles = false,
     ): ?StaticProcessResultVo {
         $step = $steps[$execution->getStepIndex()];
@@ -134,7 +133,7 @@ final readonly class RunStaticChainService
             $timeout,
             $execution,
             $groupForStep,
-            $auditLogger,
+            $auditService,
             $stepIndex1,
             $role,
             $noContextFiles,
@@ -220,27 +219,25 @@ final readonly class RunStaticChainService
         int $timeout,
         StaticChainExecution $execution,
         array $groupForStep,
-        ?AuditLoggerInterface $auditLogger,
+        ?StaticAuditServiceInterface $auditService,
         int $stepIndex1,
         string $role,
         bool $noContextFiles = false,
     ): StaticStepResultVo {
         if ($step->isQualityGate()) {
-            $auditLogger?->logStepStart(
+            $auditService?->logStepStart(
                 $chain->getSharedDefinition()->getName(),
                 $stepIndex1,
                 $role,
                 'shell',
             );
             $stepResult = $this->stepExecution->runQualityGate($step);
-            $auditLogger?->logStepResult(
+            $auditService?->logStepResult(
                 $chain->getSharedDefinition()->getName(),
                 $stepIndex1,
                 $role,
                 'shell',
-                $this->stepExecution->createAgentResultFromStep(
-                    $stepResult,
-                ),
+                $stepResult,
                 $stepResult->duration * 1000.0,
             );
 
@@ -252,7 +249,7 @@ final readonly class RunStaticChainService
             ? $execution->getIterationNumber($iterationGroup->getGroup()) : null;
         $roleConfig = $chain->getSharedDefinition()->getRoleConfig($role);
         $runnerName = $step->getRunner();
-        $auditLogger?->logStepStart(
+        $auditService?->logStepStart(
             $chain->getSharedDefinition()->getName(),
             $stepIndex1,
             $role,
@@ -269,14 +266,12 @@ final readonly class RunStaticChainService
             $roleConfig,
             $noContextFiles,
         );
-        $auditLogger?->logStepResult(
+        $auditService?->logStepResult(
             $chain->getSharedDefinition()->getName(),
             $stepIndex1,
             $role,
             $runnerName,
-            $this->stepExecution->createAgentResultFromStep(
-                $stepResult,
-            ),
+            $stepResult,
             $stepResult->duration * 1000.0,
         );
 
@@ -291,9 +286,9 @@ final readonly class RunStaticChainService
         float $startTime,
         array $results,
         StaticChainExecution $execution,
-        ?AuditLoggerInterface $auditLogger,
+        ?StaticAuditServiceInterface $auditService,
     ): StaticChainResultVo {
-        $auditLogger?->logChainResult(new ChainResultAuditDto(
+        $auditService?->logChainResult(new StaticChainAuditVo(
             chainName: $chainName,
             totalDurationMs: (microtime(true) - $startTime) * 1000.0,
             totalInputTokens: $execution->getTotalInputTokens(),
@@ -302,7 +297,7 @@ final readonly class RunStaticChainService
             budgetExceeded: $execution->isBudgetExceeded(),
             stepsCount: count($results),
             stepStatuses: array_map(
-                static fn(StaticStepResultVo $step): StepAuditStatusDto => new StepAuditStatusDto($step->isError),
+                static fn(StaticStepResultVo $step): StaticStepAuditVo => new StaticStepAuditVo($step->isError),
                 $results,
             ),
         ));
