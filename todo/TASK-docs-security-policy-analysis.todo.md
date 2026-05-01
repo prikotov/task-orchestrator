@@ -7,10 +7,10 @@ priority: P1
 depends_on:
 epic: EPIC-refactor-orchestrator-p3
 author: pi
-assignee:
-branch:
+assignee: Архитектор Гэндальф
+branch: task/docs-security-policy-analysis
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-docs-security-policy-analysis: Анализ Security Policy как cross-cutting concern
@@ -63,6 +63,20 @@ status: todo
 
 ## 9. Comments (Комментарии)
 Roadmap Sprint 2, AI#14. Результат анализа — входные данные для Sprint 9 (Security Policy implementation).
+
+## Инструкции для сабагента
+
+**Ветка:** task/docs-security-policy-analysis (уже создана и активна)
+**PR:** уже создан (draft) из task/docs-security-policy-analysis в task/epic-refactor-orchestrator-p3 — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/docs-security-policy-analysis`: `git checkout task/docs-security-policy-analysis`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `make check`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
