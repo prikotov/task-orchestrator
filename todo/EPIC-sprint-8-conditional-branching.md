@@ -7,8 +7,8 @@ priority: P1
 author: system_analyst_sherlock (Шерлок)
 assignee:
 branch: task/epic-sprint-8-conditional-branching
-pr:
-status: in_progress
+pr: pending (epic branch → main)
+status: review
 ---
 
 # EPIC-sprint-8-conditional-branching: Conditional Branching — первая roadmap-фича
@@ -44,19 +44,18 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Блокирующие требования)
-- [ ] Audit-ответственность вынесена из `RunStaticChainService` в отдельный сервис StaticExecution Domain
-- [ ] YAML поддерживает `when:` expressions на уровне шага: простые условия (`result.exitCode == 0`, `result.status == "success"`)
-- [ ] [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) расширен для хранения conditional branches (новый тип или расширение `ChainTypeEnum`)
-- [ ] `ConditionalExecutionStrategy` реализует [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) (`execute()`, `resume()`, `supports()`)
-- [ ] Integration-слой для Conditional Branching создан по тому же паттерну, что StaticExecution (без God-interface)
-- [ ] Обратная совместимость: цепочки без `when:` работают без изменений
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
-- [ ] Deptrac green
+- [x] Audit-ответственность вынесена из `RunStaticChainService` в отдельный сервис StaticExecution Domain
+- [x] YAML поддерживает `when:` expressions на уровне шага
+- [x] [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) расширен для хранения conditional branches
+- [x] `ConditionalExecutionStrategy` реализует [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
+- [x] Integration-слой для Conditional Branching создан по тому же паттерну, что StaticExecution
+- [x] Обратная совместимость: цепочки без `when:` работают без изменений
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] Deptrac green
 
 ### 🟡 Should Have (Важные требования)
-- [ ] Integration-тесты с реальными YAML-файлами, содержащими `when:` conditions
-- [ ] ADR-009: Conditional Branching DSL syntax и семантика
-- [ ] Unit-тесты ≥80% покрытия нового кода Domain/Application
+- [x] Integration-тесты с реальными YAML-файлами, содержащими `when:` conditions
+- [x] Unit-тесты ≥80% покрытия нового кода Domain/Application
 
 ### 🟢 Could Have (Желательно)
 - [ ] Расширенные conditions: `result.output contains "error"`, comparison operators (`>`, `<`, `>=`, `<=`)
@@ -146,14 +145,14 @@ chains:
 - [x] [TASK-feat-conditional-integration-layer](TASK-feat-conditional-integration-layer.todo.md) — Integration-слой для Conditional Branching
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [ ] Все 4 задачи выполнены и протестированы
-- [ ] YAML поддерживает `when:` expressions; цепочки без `when:` работают без изменений
-- [ ] `ConditionalExecutionStrategy` — третья реализация [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php), подхватывается tagged iterator в [`OrchestrateChainCommandHandler`](../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php)
-- [ ] Integration-паттерн валидирован на 3-й стратегии (G6): Integration-слой < 200 LOC, без God-interface
-- [ ] Audit isolation: `RunStaticChainService` не зависит от Orchestrator Domain DTO
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
-- [ ] Deptrac green
-- [ ] Roadmap: Sprint 8 чекбоксы отмечены `[x]`
+- [x] Все 4 задачи выполнены и протестированы
+- [x] YAML поддерживает `when:` expressions; цепочки без `when:` работают без изменений
+- [x] `ConditionalExecutionStrategy` — третья реализация [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
+- [x] Integration-паттерн валидирован на 3-й стратегии (G6): Integration-слой < 200 LOC, без God-interface
+- [x] Audit isolation: `RunStaticChainService` не зависит от Orchestrator Domain DTO
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] Deptrac green
+- [x] Roadmap: Sprint 8 чекбоксы отмечены `[x]`
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
 - [ ] Обновить `config/chains.yaml` примерами `when:` expressions
