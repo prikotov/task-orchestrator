@@ -7,10 +7,10 @@ priority: P1
 depends_on: TASK-refactor-static-audit-isolation
 epic: EPIC-sprint-8-conditional-branching
 author: system_analyst_sherlock (Шерлок)
-assignee:
-branch:
+assignee: Бэкендер Левша
+branch: task/feat-conditional-yaml-dsl
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-conditional-yaml-dsl: YAML DSL `when:` expressions
@@ -112,6 +112,20 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - DSL syntax proposal основан на исследовании 4+ фреймворков: Archon (`when:`), Mastra AI (`.branch()`), LangGraph (conditional edges), Agno (Condition + Router). Выбран `when:` как наиболее declarative и YAML-friendly.
 - `when:` expression — это data (Value Object), не logic. Evaluation logic будет в ConditionalExecutionStrategy (следующая задача).
 - Решение: `conditional` — отдельный `ChainTypeEnum` или subtype `static`? Если conditional chain = static chain с optional `when:` на шагах, то отдельный тип не нужен. Но для `supports()` в ConditionalExecutionStrategy нужен критерий различения. Рекомендация: добавить `conditionalType` в enum.
+
+## Инструкции для сабагента
+
+**Ветка:** task/feat-conditional-yaml-dsl (уже создана и активна)
+**PR:** уже создан (draft) из task/feat-conditional-yaml-dsl в task/epic-sprint-8-conditional-branching — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/feat-conditional-yaml-dsl`: `git checkout task/feat-conditional-yaml-dsl`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
