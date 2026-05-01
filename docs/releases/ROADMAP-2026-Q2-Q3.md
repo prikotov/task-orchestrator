@@ -80,11 +80,11 @@ Roadmap покрывает два крупных направления:
 | **#5** | **ADR-007: VO ACL между Orchestrator и AgentRunner** — зафиксировать ACL как осознанное решение, порог пересмотра (>3 общих поля или typed I/O) | Гэндальф | 1 документ | 1 час |
 
 **Критерии готовности Sprint 1:**
-- [ ] `ExecuteDynamicTurnService.php` удалён
-- [ ] `PromptConfigurationVo` создан, `getPromptConfiguration()` работает, старые геттеры `@deprecated`
-- [ ] 3 сервиса инжектят `ChainSessionWriterInterface`
-- [ ] ADR-006 и ADR-007 записаны в `docs/adr/`
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] `ExecuteDynamicTurnService.php` удалён
+- [x] `PromptConfigurationVo` создан, `getPromptConfiguration()` работает, старые геттеры `@deprecated`
+- [x] 3 сервиса инжектят `ChainSessionWriterInterface`
+- [x] ADR-006 и ADR-007 записаны в `docs/adr/`
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 
 ---
 
@@ -100,11 +100,11 @@ Roadmap покрывает два крупных направления:
 | — | **Техдолг:** замена комментариев «дубликат» на «ACL boundary VO» в 4 парах VO (следствие ADR-007) | Левша | 8 файлов (комментарии) | 30 мин |
 
 **Критерии готовности Sprint 2:**
-- [ ] Roadmap создан в `docs/releases/`
+- [x] Roadmap создан в `docs/releases/`
 - [ ] Инвентаризация Domain-слоя завершена (100% покрытие)
 - [ ] Security Policy анализ завершён
 - [ ] Комментарии «дубликат» → «ACL boundary VO»
-- [ ] Все P1 задачи закрыты
+- [x] Все P1 задачи закрыты
 
 ---
 
@@ -121,11 +121,11 @@ Roadmap покрывает два крупных направления:
 **Зависимости:** AI#4 (ADR-006) должен быть завершён → ✅ Sprint 1
 
 **Критерии готовности Sprint 3:**
-- [ ] `ExecutionStrategyInterface` в Application-слое с методами `execute()`, `resume()`, `supports()`
-- [ ] `StaticExecutionStrategy` — thin wrapper, unit-тесты
-- [ ] `DynamicExecutionStrategy` — инкапсулирует dynamic path, unit-тесты
-- [ ] ADR-008 записан
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] `ExecutionStrategyInterface` в Application-слое с методами `execute()`, `resume()`, `supports()`
+- [x] `StaticExecutionStrategy` — thin wrapper, unit-тесты
+- [x] `DynamicExecutionStrategy` — инкапсулирует dynamic path, unit-тесты
+- [x] ADR-008 записан
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 
 ---
 
@@ -143,11 +143,11 @@ Roadmap покрывает два крупных направления:
 - AI#6 (ADR-008) → ✅ Sprint 3
 
 **Критерии готовности Sprint 4:**
-- [ ] `OrchestrateChainCommandHandler` — ~30 строк, 2 switch-точки устранены
-- [ ] Существующий тест (1095 строк) адаптирован/разделён
-- [ ] `ChainDefinitionInterface` + `StaticChainDefinitionInterface` + `DynamicChainDefinitionInterface` созданы
-- [ ] Все потребители обновлены
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] `OrchestrateChainCommandHandler` — 58 строк, 2 switch-точки устранены
+- [x] Существующий тест адаптирован
+- [x] `SharedChainDefinitionVo` создан (ChainDefinitionVo split)
+- [x] Все потребители обновлены
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 
 ---
 
@@ -304,24 +304,24 @@ Roadmap покрывает два крупных направления:
 
 | AI# | Задача | Приоритет | Спринт | Статус |
 |---|---|---|---|---|
-| #1 | Инлайнинг ExecuteDynamicTurnService | P1 | Sprint 1 | 📋 Planned |
-| #2 | PromptConfiguration VO | P1 | Sprint 1 | 📋 Planned |
-| #3 | Переключение на ChainSessionWriterInterface | P1 | Sprint 1 | 📋 Planned |
-| #4 | ADR-006: ExecutionStrategy composition | P1 | Sprint 1 | 📋 Planned |
-| #5 | ADR-007: VO ACL Orchestrator ↔ AgentRunner | P1 | Sprint 1 | 📋 Planned |
+| #1 | Инлайнинг ExecuteDynamicTurnService | P1 | Sprint 1 | ✅ Done — [TASK](../todo/done/TASK-refactor-inline-execute-dynamic-turn.todo.md) PR #101 |
+| #2 | PromptConfiguration VO | P1 | Sprint 1 | ✅ Done — [TASK](../todo/done/TASK-refactor-prompt-configuration-vo.todo.md) PR #102 |
+| #3 | Переключение на ChainSessionWriterInterface | P1 | Sprint 1 | ✅ Done — [TASK](../todo/done/TASK-refactor-session-writer-consumers.todo.md) PR #103 |
+| #4 | ADR-006: ExecutionStrategy composition | P1 | Sprint 1 | ✅ Done — [ADR](../docs/adr/006-execution-strategy-composition.md) |
+| #5 | ADR-007: VO ACL Orchestrator ↔ AgentRunner | P1 | Sprint 1 | ✅ Done — [ADR](../docs/adr/007-vo-acl-boundary.md) |
 | #12 | Roadmap (этот документ) | P1 | Sprint 2 | ✅ Draft |
-| #13 | Инвентаризация Domain-слоя | P2 | Sprint 2 | 📋 Planned |
-| #14 | Security Policy анализ | P2 | Sprint 2 | 📋 Planned |
-| #7 | ExecutionStrategyInterface + StaticExecutionStrategy | P2 | Sprint 3 | 📋 Planned |
-| #8 | DynamicExecutionStrategy | P2 | Sprint 3 | 📋 Planned |
-| #6 | ADR-008: Shared Kernel Contract | P2 | Sprint 3 | 📋 Planned |
-| #9 | CommandHandler rewrite | P2 | Sprint 4 | 📋 Planned |
-| #10 | P4: ChainDefinitionVo split | P2 | Sprint 4 | 📋 Planned |
-| — | Интеграционное тестирование P2 | — | Sprint 5 | 📋 Planned |
-| #11 | Декомпозиция RunDynamicLoopService | P3 | Sprint 6 | 📋 Planned |
-| #15 | Расщепление ChainSessionLogger | P3 | Sprint 7 | 📋 Planned |
-| #16 | Переразложение Shared/ каталога | P3 | Sprint 7 | 📋 Planned |
-| #17 | Физический split StaticExecution в отдельный модуль | P3 | Sprint 7 | 📋 Planned |
+| #13 | Инвентаризация Domain-слоя | P2 | Sprint 2 | 📋 [TASK](../todo/TASK-docs-domain-inventory.todo.md) |
+| #14 | Security Policy анализ | P2 | Sprint 2 | 📋 [TASK](../todo/TASK-docs-security-policy-analysis.todo.md) |
+| #6 | ADR-008: Shared Kernel Contract | P2 | Sprint 3 | ✅ Done — [ADR](../docs/adr/008-shared-kernel-contract.md) |
+| #7 | ExecutionStrategyInterface + StaticExecutionStrategy | P2 | Sprint 3 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
+| #8 | DynamicExecutionStrategy | P2 | Sprint 3 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
+| #9 | CommandHandler rewrite | P2 | Sprint 4 | ✅ Done — [TASK](../todo/done/TASK-refactor-execution-strategy.todo.md) PR #104 |
+| #10 | P4: ChainDefinitionVo split | P2 | Sprint 4 | ✅ Done — [TASK](../todo/done/TASK-refactor-chain-definition-split.todo.md) PR #105 |
+| — | Интеграционное тестирование P2 | — | Sprint 5 | 📋 [TASK](../todo/TASK-chore-p2-integration-testing.todo.md) |
+| #11 | Декомпозиция RunDynamicLoopService | P3 | Sprint 6 | 📋 [TASK](../todo/TASK-refactor-dynamic-loop-decomposition.todo.md) |
+| #15 | Расщепление ChainSessionLogger | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-session-logger-split.todo.md) |
+| #16 | Переразложение Shared/ каталога | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-shared-reorg.todo.md) |
+| #17 | Физический split StaticExecution в отдельный модуль | P3 | Sprint 7 | 📋 [TASK](../todo/TASK-refactor-static-execution-split.todo.md) |
 | — | Conditional branching (`when:` + strategy) | Roadmap | Sprint 8 | 📋 Planned |
 | — | Security Policy (exec policy + permissions) | Roadmap | Sprint 9 | 📋 Planned |
 | — | Error classification + Typed I/O | Roadmap | Sprint 10 | 📋 Planned |
