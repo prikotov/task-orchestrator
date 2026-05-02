@@ -6,6 +6,7 @@ namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateVo;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -185,5 +186,60 @@ final class ChainStepVoTest extends TestCase
         $this->expectExceptionMessage('Only quality_gate steps can be converted to QualityGateVo.');
 
         $step->toQualityGateVo();
+    }
+
+    // ── When-condition field ──────────────────────────────────────────────────
+
+    #[Test]
+    public function agentStepDefaultsWhenToNull(): void
+    {
+        $step = ChainStepVo::agent(role: 'developer');
+
+        self::assertNull($step->getWhen());
+        self::assertFalse($step->hasCondition());
+    }
+
+    #[Test]
+    public function agentStepAcceptsWhenExpression(): void
+    {
+        $when = ConditionExpressionVo::createFromExpression('steps.tests.passed == true');
+        $step = ChainStepVo::agent(
+            role: 'backend_developer',
+            name: 'deploy',
+            when: $when,
+        );
+
+        self::assertNotNull($step->getWhen());
+        self::assertSame('steps.tests.passed == true', $step->getWhen()->getRawExpression());
+        self::assertTrue($step->hasCondition());
+    }
+
+    #[Test]
+    public function qualityGateStepAcceptsWhenExpression(): void
+    {
+        $when = ConditionExpressionVo::createFromExpression('steps.lint.exitCode == 0');
+        $step = ChainStepVo::qualityGate(
+            command: 'make deploy',
+            label: 'Deploy',
+            when: $when,
+        );
+
+        self::assertNotNull($step->getWhen());
+        self::assertSame('steps.lint.exitCode == 0', $step->getWhen()->getRawExpression());
+        self::assertTrue($step->hasCondition());
+    }
+
+    #[Test]
+    public function constructorAcceptsWhenExpression(): void
+    {
+        $when = ConditionExpressionVo::createFromExpression('result.status != failed');
+        $step = new ChainStepVo(
+            type: ChainStepTypeEnum::agent,
+            role: 'deployer',
+            when: $when,
+        );
+
+        self::assertTrue($step->hasCondition());
+        self::assertSame('result.status', $step->getWhen()->getPath());
     }
 }

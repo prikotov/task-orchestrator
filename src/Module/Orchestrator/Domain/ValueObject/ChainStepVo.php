@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use LogicException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionExpressionVo;
 
 /**
  * Value Object одного шага цепочки оркестрации.
@@ -30,6 +31,7 @@ final readonly class ChainStepVo
      * @param string $label человекочитаемое название (обязательно для quality_gate, пустая строка для agent)
      * @param int $timeoutSeconds таймаут выполнения в секундах (default 120 для quality_gate)
      * @param bool $noContextFiles отключить автоматическую загрузку контекстных файлов проекта (AGENTS.md, CLAUDE.md)
+     * @param ConditionExpressionVo|null $when условное выражение выполнения шага (null = безусловное выполнение)
      */
     public function __construct(
         private ChainStepTypeEnum $type,
@@ -43,6 +45,7 @@ final readonly class ChainStepVo
         private string $label = '',
         private int $timeoutSeconds = 120,
         private bool $noContextFiles = false,
+        private ?ConditionExpressionVo $when = null,
     ) {
         if ($type === ChainStepTypeEnum::agent && ($role === null || $role === '')) {
             throw new InvalidArgumentException('Agent step must have a role.');
@@ -70,6 +73,7 @@ final readonly class ChainStepVo
         ?ChainRetryPolicyVo $retryPolicy = null,
         ?string $name = null,
         bool $noContextFiles = false,
+        ?ConditionExpressionVo $when = null,
     ): self {
         return new self(
             type: ChainStepTypeEnum::agent,
@@ -80,6 +84,7 @@ final readonly class ChainStepVo
             retryPolicy: $retryPolicy,
             name: $name,
             noContextFiles: $noContextFiles,
+            when: $when,
         );
     }
 
@@ -91,6 +96,7 @@ final readonly class ChainStepVo
         string $label,
         int $timeoutSeconds = 120,
         ?string $name = null,
+        ?ConditionExpressionVo $when = null,
     ): self {
         return new self(
             type: ChainStepTypeEnum::qualityGate,
@@ -98,6 +104,7 @@ final readonly class ChainStepVo
             label: $label,
             timeoutSeconds: $timeoutSeconds,
             name: $name,
+            when: $when,
         );
     }
 
@@ -157,6 +164,22 @@ final readonly class ChainStepVo
     public function getNoContextFiles(): bool
     {
         return $this->noContextFiles;
+    }
+
+    /**
+     * Возвращает условное выражение выполнения шага (null = безусловное выполнение).
+     */
+    public function getWhen(): ?ConditionExpressionVo
+    {
+        return $this->when;
+    }
+
+    /**
+     * Имеет ли шаг условие выполнения.
+     */
+    public function hasCondition(): bool
+    {
+        return $this->when !== null;
     }
 
     /**

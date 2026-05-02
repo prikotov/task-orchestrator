@@ -40,7 +40,7 @@ final readonly class StaticExecutionStrategy implements ExecutionStrategyInterfa
             $command->task,
             $command->workingDir,
             $command->timeout ?? self::DEFAULT_STATIC_TIMEOUT,
-            null, // static chains have no session-scoped audit log
+            null, // static chains have no session-scoped audit
             $command->noContextFiles,
         );
 
