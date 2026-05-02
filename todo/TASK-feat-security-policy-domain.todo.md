@@ -8,9 +8,9 @@ depends_on: TASK-docs-security-policy-adr
 epic: EPIC-sprint-9-security-policy
 author: system_analyst (Шерлок)
 assignee:
-branch:
-pr:
-status: todo
+branch: task/feat-security-policy-domain
+pr: 126
+status: done
 ---
 
 # TASK-feat-security-policy-domain: Domain слой модуля SecurityPolicy
@@ -34,21 +34,21 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Модуль `src/Module/SecurityPolicy/` создан с DDD-структурой каталогов
-- [ ] [`Enum`](../../docs/conventions/core_patterns/enum.md): `RuleActionEnum` (allow | deny), `RuleTargetEnum` (command | runner | tool | model | chain), `RuleSeverityEnum` (block | warn)
-- [ ] [`Entity`](../../docs/conventions/layers/domain/entity.md): `ExecRule` — декларативное правило с полями: id, action, target, pattern, severity, description, priority
-- [ ] [`Value Object`](../../docs/conventions/core_patterns/value-object.md): `ExecRuleId`, `RulePattern` (glob/regex/exact matching), `Permission` (resource + action), `PermissionSet` (набор permissions с deny-first логикой)
-- [ ] [`Exception`](../../docs/conventions/core_patterns/exception.md): `SecurityPolicyException` (базовый), `SecurityPolicyViolationException` (chain-level), `ExecPolicyViolationException` (exec-level, содержит violated rule info)
-- [ ] [`Service`](../../docs/conventions/core_patterns/service.md): `ExecPolicyCheckService` — проверяет команду/runner/tool/модель против набора ExecRule, возвращает первую violation или ok
-- [ ] [`Service`](../../docs/conventions/core_patterns/service.md): `SecurityPolicyService` — агрегирует chain-level checks + exec-level checks
-- [ ] Exec rules logic: **deny-first** — если хотя бы одно deny-правило совпадает → denied, даже если есть allow для более широкого паттерна. Priority ordering при конфликтах.
-- [ ] Rule matching: `RulePattern` поддерживает exact match, glob (`*`), prefix (`bash-*`)
-- [ ] Unit-тесты на все Entity, VO, Enum, Service ≥80% покрытия
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] Модуль `src/Module/SecurityPolicy/` создан с DDD-структурой каталогов
+- [x] [`Enum`](../../docs/conventions/core_patterns/enum.md): `RuleActionEnum` (allow | deny), `RuleTargetEnum` (command | runner | tool | model | chain), `RuleSeverityEnum` (block | warn)
+- [x] [`Entity`](../../docs/conventions/layers/domain/entity.md): `ExecRule` — декларативное правило с полями: id, action, target, pattern, severity, description, priority
+- [x] [`Value Object`](../../docs/conventions/core_patterns/value-object.md): `ExecRuleIdVo`, `RulePatternVo` (glob/regex/exact matching), `PermissionVo` (resource + action), `PermissionSetVo` (набор permissions с deny-first логикой)
+- [x] [`Exception`](../../docs/conventions/core_patterns/exception.md): `SecurityPolicyException` (базовый), `SecurityPolicyViolationException` (chain-level), `ExecPolicyViolationException` (exec-level, содержит violated rule info)
+- [x] [`Service`](../../docs/conventions/core_patterns/service.md): `ExecPolicyCheckService` — проверяет команду/runner/tool/модель против набора ExecRule, возвращает первую violation или ok
+- [x] [`Service`](../../docs/conventions/core_patterns/service.md): `SecurityPolicyService` — агрегирует chain-level checks + exec-level checks
+- [x] Exec rules logic: **deny-first** — если хотя бы одно deny-правило совпадает → denied, даже если есть allow для более широкого паттерна. Priority ordering при конфликтах.
+- [x] Rule matching: `RulePattern` поддерживает exact match, glob (`*`), prefix (`bash-*`)
+- [x] Unit-тесты на все Entity, VO, Enum, Service ≥80% покрытия
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 
 ### 🟡 Should Have (Желательно)
-- [ ] `RuleSeverityEnum::warn` — логирование без блокировки (separate violation type)
-- [ ] `ExecPolicyCheckService` возвращает detailed result (matched rules, reasons) для debug
+- [x] `RuleSeverityEnum::warn` — логирование без блокировки (separate violation type)
+- [x] `ExecPolicyCheckService` возвращает detailed result (matched rules, reasons) для debug
 
 ### 🟢 Could Have (Опционально)
 - [ ] Rule composition: AND/OR условия
@@ -63,25 +63,25 @@ status: todo
 - [ ] LLM-based rule evaluation (Guardian)
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Создать каталог `src/Module/SecurityPolicy/Domain/` с подкаталогами: Entity, Enum, Exception, Service, ValueObject
-2. [ ] Создать Enum'ы: `RuleActionEnum`, `RuleTargetEnum`, `RuleSeverityEnum`
-3. [ ] Создать Exception иерархию: `SecurityPolicyException` → `SecurityPolicyViolationException`, `ExecPolicyViolationException`
-4. [ ] Создать Value Object'ы: `ExecRuleId`, `RulePattern`, `Permission`, `PermissionSet`
-5. [ ] Создать Entity: `ExecRule`
-6. [ ] Создать Service: `ExecPolicyCheckService` — rule matching + deny-first logic
-7. [ ] Создать Service: `SecurityPolicyService` — агрегация checks
-8. [ ] Написать unit-тесты: `tests/Unit/Module/SecurityPolicy/Domain/`
-9. [ ] Проверить: `vendor/bin/phpunit`, `vendor/bin/psalm`
+1. [x] Создать каталог `src/Module/SecurityPolicy/Domain/` с подкаталогами: Entity, Enum, Exception, Service, ValueObject
+2. [x] Создать Enum'ы: `RuleActionEnum`, `RuleTargetEnum`, `RuleSeverityEnum`
+3. [x] Создать Exception иерархию: `SecurityPolicyException` → `SecurityPolicyViolationException`, `ExecPolicyViolationException`
+4. [x] Создать Value Object'ы: `ExecRuleIdVo`, `RulePatternVo`, `PermissionVo`, `PermissionSetVo`
+5. [x] Создать Entity: `ExecRule`
+6. [x] Создать Service: `ExecPolicyCheckService` — rule matching + deny-first logic
+7. [x] Создать Service: `SecurityPolicyService` — агрегация checks
+8. [x] Написать unit-тесты: `tests/Unit/Common/Module/SecurityPolicy/Domain/`
+9. [x] Проверить: `vendor/bin/phpunit`, `vendor/bin/psalm`
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Модуль SecurityPolicy/Domain содержит Enum, Entity, VO, Exception, Service
-- [ ] `ExecPolicyCheckService` корректно фильтрует по deny-first logic
-- [ ] `RulePattern` поддерживает exact, glob, prefix matching
-- [ ] `PermissionSet` реализует deny-first с priority ordering
-- [ ] `ExecPolicyViolationException` содержит violated rule info (rule id, pattern, target)
-- [ ] Unit-тесты ≥80% покрытия нового кода
-- [ ] `vendor/bin/phpunit` — зелёный
-- [ ] `vendor/bin/psalm` — зелёный
+- [x] Модуль SecurityPolicy/Domain содержит Enum, Entity, VO, Exception, Service
+- [x] `ExecPolicyCheckService` корректно фильтрует по deny-first logic
+- [x] `RulePattern` поддерживает exact, glob, prefix matching
+- [x] `PermissionSet` реализует deny-first с priority ordering
+- [x] `ExecPolicyViolationException` содержит violated rule info (rule id, pattern, target)
+- [x] Unit-тесты ≥80% покрытия нового кода
+- [x] `vendor/bin/phpunit` — зелёный
+- [x] `vendor/bin/psalm` — зелёный
 
 ## 6. Verification (Самопроверка)
 ```bash
