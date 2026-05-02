@@ -490,7 +490,7 @@ chains:
       - type: agent
         role: backend_developer_levsha
         name: implement
-        # post_step: "scripts/notify-slack.sh"   # пример: уведомление после шага
+        # post_step: "bin/notify_done.sh"          # пример: desktop-уведомление после шага
       - type: agent
         role: code_reviewer_backend_puaro
         name: review
