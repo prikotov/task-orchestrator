@@ -9,6 +9,7 @@ use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
@@ -16,8 +17,8 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\Bui
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\SessionCompletedNotifierInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
 
@@ -45,9 +46,11 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     }
 
     #[Override]
-    public function execute(ChainDefinitionVo $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function execute(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        $facilitatorRole = $command->facilitator ?? $chain->getFacilitator() ?? 'team_lead';
+        assert($chain instanceof DynamicChainDefinitionVo);
+
+        $facilitatorRole = $command->facilitator ?? $chain->getFacilitator();
         $participants = $command->participants ?? $chain->getParticipants();
         $maxRounds = $command->maxRounds ?? $chain->getMaxRounds();
         $topic = $command->topic ?? $command->task;
@@ -96,8 +99,10 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     }
 
     #[Override]
-    public function resume(ChainDefinitionVo $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function resume(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
+        assert($chain instanceof DynamicChainDefinitionVo);
+
         $resumeDir = $command->resumeDir;
         assert($resumeDir !== null);
 
@@ -152,15 +157,15 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     }
 
     #[Override]
-    public function supports(ChainDefinitionVo $chain): bool
+    public function supports(ChainDefinitionInterface $chain): bool
     {
-        return $chain->getSharedDefinition()->getType() === ChainTypeEnum::dynamicType;
+        return $chain->getType() === ChainTypeEnum::dynamicType;
     }
 
     // ─── Private helpers ──────────────────────────────────────────────────
 
     private function runDynamicLoop(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         int $startRound = 0,
         string $initialDiscussionHistory = '',

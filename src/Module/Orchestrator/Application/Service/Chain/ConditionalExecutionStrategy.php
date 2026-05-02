@@ -10,11 +10,12 @@ use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Condition\EvaluateConditionServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\ExecuteConditionalStepServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalStepResultVo;
 
 /**
@@ -37,8 +38,10 @@ final readonly class ConditionalExecutionStrategy implements ExecutionStrategyIn
     }
 
     #[Override]
-    public function execute(ChainDefinitionVo $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function execute(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
+        assert($chain instanceof ConditionalChainDefinitionVo);
+
         $steps = $chain->getSteps();
         $shared = $chain->getSharedDefinition();
         $timeout = $command->timeout ?? $shared->getTimeout() ?? self::DEFAULT_CONDITIONAL_TIMEOUT;
@@ -96,15 +99,15 @@ final readonly class ConditionalExecutionStrategy implements ExecutionStrategyIn
     }
 
     #[Override]
-    public function resume(ChainDefinitionVo $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function resume(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
         throw new LogicException('Conditional chain does not support resume.');
     }
 
     #[Override]
-    public function supports(ChainDefinitionVo $chain): bool
+    public function supports(ChainDefinitionInterface $chain): bool
     {
-        return $chain->getSharedDefinition()->getType() === ChainTypeEnum::conditionalType;
+        return $chain->getType() === ChainTypeEnum::conditionalType;
     }
 
     /**
@@ -116,7 +119,7 @@ final readonly class ConditionalExecutionStrategy implements ExecutionStrategyIn
     private function processStep(
         ChainStepVo $step,
         int $stepIndex,
-        ChainDefinitionVo $chain,
+        ConditionalChainDefinitionVo $chain,
         OrchestrateChainCommand $command,
         array $context,
         int $timeout,

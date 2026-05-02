@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain;
 
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainConfigViolationVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalChainDefinitionVo;
 
 /**
  * Domain Service: валидирует определение цепочки оркестрации.
@@ -25,22 +28,33 @@ final readonly class ChainDefinitionValidator
      *
      * @return list<ChainConfigViolationVo> пустой список = нарушений нет
      */
-    public function validate(ChainDefinitionVo $chain): array
+    public function validate(ChainDefinitionInterface $chain): array
     {
-        if ($chain->getSharedDefinition()->isDynamic()) {
+        if ($chain instanceof DynamicChainDefinitionVo) {
             return $this->validateDynamicChain($chain);
         }
 
-        return $this->validateStaticChain($chain);
+        if ($chain instanceof StaticChainDefinitionVo) {
+            return $this->validateStepBasedChain($chain);
+        }
+
+        if ($chain instanceof ConditionalChainDefinitionVo) {
+            return $this->validateStepBasedChain($chain);
+        }
+
+        return [];
     }
 
     /**
+     * Валидирует static/conditional-цепочку (step-based).
+     *
+     * @param StaticChainDefinitionVo|ConditionalChainDefinitionVo $chain
      * @return list<ChainConfigViolationVo>
      */
-    private function validateStaticChain(ChainDefinitionVo $chain): array
+    private function validateStepBasedChain(StaticChainDefinitionVo|ConditionalChainDefinitionVo $chain): array
     {
         $violations = [];
-        $name = $chain->getSharedDefinition()->getName();
+        $name = $chain->getName();
         $steps = $chain->getSteps();
 
         if ($steps === []) {
@@ -88,13 +102,13 @@ final readonly class ChainDefinitionValidator
     /**
      * @return list<ChainConfigViolationVo>
      */
-    private function validateDynamicChain(ChainDefinitionVo $chain): array
+    private function validateDynamicChain(DynamicChainDefinitionVo $chain): array
     {
         $violations = [];
-        $name = $chain->getSharedDefinition()->getName();
+        $name = $chain->getName();
 
         $facilitator = $chain->getFacilitator();
-        if ($facilitator === null || $facilitator === '') {
+        if ($facilitator === '') {
             $violations[] = new ChainConfigViolationVo(
                 chainName: $name,
                 field: 'facilitator',

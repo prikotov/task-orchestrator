@@ -11,8 +11,10 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\Orch
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -37,9 +39,9 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
 
         // Default supports(): static supports static, dynamic supports dynamic
         $this->staticStrategy->method('supports')
-            ->willReturnCallback(static fn(ChainDefinitionVo $chain): bool => !$chain->isDynamic());
+            ->willReturnCallback(static fn(ChainDefinitionInterface $chain): bool => !$chain->getSharedDefinition()->isDynamic());
         $this->dynamicStrategy->method('supports')
-            ->willReturnCallback(static fn(ChainDefinitionVo $chain): bool => $chain->isDynamic());
+            ->willReturnCallback(static fn(ChainDefinitionInterface $chain): bool => $chain->getSharedDefinition()->isDynamic());
 
         $this->handler = $this->createHandler();
     }
@@ -57,7 +59,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     #[Test]
     public function invokeDelegatesStaticChainToStaticStrategy(): void
     {
-        $chain = ChainDefinitionVo::createFromSteps(
+        $chain = StaticChainDefinitionVo::create(
             name: 'test',
             description: 'Test chain',
             steps: [
@@ -128,7 +130,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('No execution strategy found for chain "unknown".');
 
-        $chain = ChainDefinitionVo::createFromSteps(
+        $chain = StaticChainDefinitionVo::create(
             name: 'unknown',
             description: '',
             steps: [ChainStepVo::agent(role: 'role', runner: 'pi')],
@@ -158,8 +160,8 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         string $facilitator,
         array $participants,
         int $maxRounds = 10,
-    ): ChainDefinitionVo {
-        return ChainDefinitionVo::createFromDynamic(
+    ): DynamicChainDefinitionVo {
+        return DynamicChainDefinitionVo::create(
             name: $name,
             description: '',
             facilitator: $facilitator,
