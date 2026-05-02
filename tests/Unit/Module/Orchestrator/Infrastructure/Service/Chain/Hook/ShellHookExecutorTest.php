@@ -103,8 +103,8 @@ final class ShellHookExecutorTest extends TestCase
 
         self::assertFalse($result->isSuccess());
         self::assertTrue($result->isWarning());
-        // sh returns exit code 127 for non-existent files
-        self::assertSame(127, $result->getExitCode());
+        // sh returns non-zero exit code for non-existent files (127 on Linux, 2 on some systems)
+        self::assertNotSame(0, $result->getExitCode());
     }
 
     // ─── Stdout/stderr capture ────────────────────────────────────────
