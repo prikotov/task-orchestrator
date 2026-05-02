@@ -7,8 +7,8 @@ priority: P1
 author: system_analyst_sherlock (Шерлок)
 assignee:
 branch: task/epic-sprint-9-resilience-observability
-pr: pending
-status: in_progress
+pr: pending (epic branch → main)
+status: review
 ---
 
 # EPIC-sprint-9-resilience-observability: Sprint 9 — Resilience + Observability
@@ -50,16 +50,16 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Блокирующие требования)
-- [ ] Model failover: CB open → автоматически триггерит fallback runner (если сконфигурирован через [`FallbackConfigVo`](../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php))
-- [ ] Error classification: [`RetryingAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php) различает FATAL/TRANSIENT по exitCode/timeout, не retry на FATAL
-- [ ] `MetricsCollectorInterface` в Domain + in-memory реализация в Infrastructure
-- [ ] ADR: Dynamic split — решение принято и зафиксировано
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
-- [ ] Deptrac green
+- [x] Model failover: CB open → автоматически триггерит fallback runner (если сконфигурирован через [`FallbackConfigVo`](../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php))
+- [x] Error classification: [`RetryingAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php) различает FATAL/TRANSIENT по exitCode/timeout, не retry на FATAL
+- [x] `MetricsCollectorInterface` в Domain + in-memory реализация в Infrastructure
+- [x] ADR: Dynamic split — решение принято и зафиксировано
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] Deptrac green
 
 ### 🟡 Should Have (Важные требования)
-- [ ] Unit-тесты ≥80% покрытия нового кода
-- [ ] Интеграция MetricsCollector в существующие decorator'ы ([`RetryingAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php), [`CircuitBreakerAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php))
+- [x] Unit-тесты ≥80% покрытия нового кода
+- [x] Интеграция MetricsCollector в существующие decorator'ы ([`RetryingAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php), [`CircuitBreakerAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php))
 
 ### 🟢 Could Have (Желательно)
 - [ ] MetricsCollector: простые агрегации (avg duration per chain, error rate per runner)
@@ -132,20 +132,20 @@ flowchart TD
 
 Порядок задач — по зависимостям и pain level:
 
-- [ ] [TASK-feat-model-failover](TASK-feat-model-failover.todo.md) — Model failover: CB open → trigger fallback (pain 7/10, 1 день)
-- [ ] [TASK-feat-error-classification](TASK-feat-error-classification.todo.md) — Error classification: упрощённая по exitCode/timeout (pain 2/10, 0.5 дня)
-- [ ] [TASK-feat-metrics-collector](TASK-feat-metrics-collector.todo.md) — MetricsCollectorInterface + in-memory реализация (pain 5/10, 1 день)
-- [ ] [TASK-docs-dynamic-split-adr](TASK-docs-dynamic-split-adr.todo.md) — ADR: Dynamic split — решение (2 часа)
+- [x] [TASK-feat-model-failover](done/TASK-feat-model-failover.todo.md) — Model failover: CB open → trigger fallback (pain 7/10, 1 день) ✅
+- [x] [TASK-feat-error-classification](done/TASK-feat-error-classification.todo.md) — Error classification: упрощённая по exitCode/timeout (pain 2/10, 0.5 дня) ✅
+- [x] [TASK-feat-metrics-collector](done/TASK-feat-metrics-collector.todo.md) — MetricsCollectorInterface + in-memory реализация (pain 5/10, 1 день) ✅
+- [x] [TASK-docs-dynamic-split-adr](done/TASK-docs-dynamic-split-adr.todo.md) — ADR: Dynamic split — решение (2 часа) ✅
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [ ] Все задачи из **Must Have** выполнены и протестированы
-- [ ] CB open → fallback runner (если сконфигурирован через [`FallbackConfigVo`](../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php))
-- [ ] [`RetryingAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php) классифицирует ошибки по `exitCode`/`isTimedOut`/`isError` (FATAL/TRANSIENT)
-- [ ] `MetricsCollectorInterface` в Domain + in-memory реализация в Infrastructure
-- [ ] ADR Dynamic split записан в `docs/adr/`
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
-- [ ] Deptrac green
-- [ ] Roadmap: Sprint 9 чекбоксы отмечены
+- [x] Все задачи из **Must Have** выполнены и протестированы
+- [x] CB open → fallback runner (если сконфигурирован через [`FallbackConfigVo`](../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php))
+- [x] [`RetryingAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php) классифицирует ошибки по `exitCode`/`isTimedOut`/`isError` (FATAL/TRANSIENT)
+- [x] `MetricsCollectorInterface` в Domain + in-memory реализация в Infrastructure
+- [x] ADR Dynamic split записан в `docs/adr/`
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] Deptrac green
+- [x] Roadmap: Sprint 9 чекбоксы отмечены
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
 - [ ] Обновить `docs/guide/architecture.md` — Model failover, Error classification, MetricsCollector
