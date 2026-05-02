@@ -8,8 +8,10 @@ use Override;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\MetricsCollectorInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\ErrorClassificationVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
 use Throwable;
 
@@ -28,6 +30,7 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
         private AgentRunnerInterface $innerRunner,
         private RetryPolicyVo $retryPolicy,
         private LoggerInterface $logger,
+        private ?MetricsCollectorInterface $metrics = null,
     ) {
     }
 
@@ -50,18 +53,27 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
         $lastThrowable = null;
         /** @var AgentResultVo|null $lastResult */
         $lastResult = null;
+        $runnerName = $this->innerRunner->getName();
+        $startTime = microtime(true);
 
         while ($attempt <= $this->retryPolicy->getMaxRetries()) {
+            $this->metrics?->recordCounter('runner.attempt', 1, [
+                'runner' => $runnerName,
+                'attempt' => (string) ($attempt + 1),
+            ]);
+
             try {
                 $result = $this->innerRunner->run($request);
                 $lastResult = $result;
 
                 if (!$result->isError()) {
+                    $this->recordDuration($startTime, $runnerName, 'success');
+
                     if ($attempt > 0) {
                         $this->logger->info(
                             sprintf(
                                 '[RetryingAgentRunner] Runner "%s" succeeded on attempt %d.',
-                                $this->innerRunner->getName(),
+                                $runnerName,
                                 $attempt + 1,
                             ),
                         );
@@ -70,14 +82,39 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
                     return $result;
                 }
 
-                // Результат с ошибкой (не исключение) — тоже retry
+                // Результат с ошибкой — классифицируем
+                $classification = ErrorClassificationVo::classify($result);
+
+                if (!$classification->shouldRetry()) {
+                    $this->logger->warning(
+                        sprintf(
+                            '[RetryingAgentRunner] Runner "%s" fatal error (exitCode=%d), skipping retry.',
+                            $this->innerRunner->getName(),
+                            $result->getExitCode(),
+                        ),
+                    );
+
+                    return $result;
+                }
+
                 $lastThrowable = new RuntimeException(
                     $result->getErrorMessage() ?? 'Unknown agent error',
                 );
 
+                $this->metrics?->recordCounter('runner.error', 1, [
+                    'runner' => $runnerName,
+                    'attempt' => (string) ($attempt + 1),
+                ]);
+
                 $this->logRetryAttempt($attempt, $lastThrowable);
             } catch (Throwable $throwable) {
                 $lastThrowable = $throwable;
+
+                $this->metrics?->recordCounter('runner.error', 1, [
+                    'runner' => $runnerName,
+                    'attempt' => (string) ($attempt + 1),
+                ]);
+
                 $this->logRetryAttempt($attempt, $throwable);
             }
 
@@ -98,10 +135,12 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
             }
         }
 
+        $this->recordDuration($startTime, $runnerName, 'exhausted');
+
         $this->logger->warning(
             sprintf(
                 '[RetryingAgentRunner] Runner "%s" exhausted all %d attempts. Last error: %s',
-                $this->innerRunner->getName(),
+                $runnerName,
                 $this->retryPolicy->getMaxRetries() + 1,
                 $lastThrowable?->getMessage() ?? 'unknown',
             ),
@@ -132,5 +171,17 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
                 $throwable->getMessage(),
             ),
         );
+    }
+
+    /**
+     * Записывает timing-метрику общей длительности выполнения runner'а.
+     */
+    private function recordDuration(float $startTime, string $runnerName, string $result): void
+    {
+        $duration = microtime(true) - $startTime;
+        $this->metrics?->recordTiming('runner.duration', $duration, [
+            'runner' => $runnerName,
+            'result' => $result,
+        ]);
     }
 }
