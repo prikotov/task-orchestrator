@@ -10,7 +10,7 @@ author: system_analyst_sherlock (Шерлок)
 assignee: system_architect_gandalf
 branch:
 pr:
-status: todo
+status: done
 ---
 
 # TASK-docs-resume-adr: ADR: Resume для static цепочек

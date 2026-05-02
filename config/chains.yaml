@@ -438,6 +438,19 @@ chains:
   # ──────────────────────────────────────────────────────────────────────────
 
   # ──────────────────────────────────────────────────────────────────────────
+  # Post-step Hooks — shell-скрипт, выполняемый после завершения шага.
+  # Hook failure = warning (не прерывает цепочку). Timeout = 30 секунд.
+  # Context передаётся через env vars: HOOK_CHAIN_NAME, HOOK_STEP_NAME,
+  # HOOK_RUNNER, HOOK_ROLE, HOOK_EXIT_CODE, HOOK_DURATION.
+  #
+  # Пример:
+  #
+  #   - type: agent
+  #     role: backend_developer_levsha
+  #     name: implement
+  #     post_step: "scripts/notify-slack.sh"    # вызовется после завершения шага
+  #
+  # ──────────────────────────────────────────────────────────────────────────
   # Quality Gates — отдельный тип шага (type: quality_gate).
   # Выполняется как детерминированная shell-команда через Symfony Process.
   # Failed gate = warning (не прерывает цепочку).
@@ -477,6 +490,7 @@ chains:
       - type: agent
         role: backend_developer_levsha
         name: implement
+        # post_step: "scripts/notify-slack.sh"   # пример: уведомление после шага
       - type: agent
         role: code_reviewer_backend_puaro
         name: review
