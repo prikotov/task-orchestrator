@@ -10,6 +10,7 @@ use RuntimeException;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\ErrorClassificationVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
 use Throwable;
 
@@ -70,7 +71,21 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
                     return $result;
                 }
 
-                // Результат с ошибкой (не исключение) — тоже retry
+                // Результат с ошибкой — классифицируем
+                $classification = ErrorClassificationVo::classify($result);
+
+                if (!$classification->shouldRetry()) {
+                    $this->logger->warning(
+                        sprintf(
+                            '[RetryingAgentRunner] Runner "%s" fatal error (exitCode=%d), skipping retry.',
+                            $this->innerRunner->getName(),
+                            $result->getExitCode(),
+                        ),
+                    );
+
+                    return $result;
+                }
+
                 $lastThrowable = new RuntimeException(
                     $result->getErrorMessage() ?? 'Unknown agent error',
                 );
