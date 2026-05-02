@@ -83,14 +83,14 @@ except: print('peon')
         return 1
     fi
 
-    # Выбираем случайный звук для категории
+    # Берём первый (основной) звук для категории
     sound_file=$(python3 -c "
-import json, random, sys
+import json, sys
 try:
     m = json.load(open('$manifest'))
     sounds = m.get('categories', {}).get('$1', {}).get('sounds', [])
     if sounds:
-        print(random.choice(sounds)['file'])
+        print(sounds[0]['file'])
 except: pass
 " 2>/dev/null) || return 1
 
