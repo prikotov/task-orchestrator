@@ -8,25 +8,29 @@ use InvalidArgumentException;
 use Override;
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionExpressionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfigVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
 
 /**
  * Реализация ChainLoaderInterface — загрузка цепочек из YAML-файла.
  *
- * Поддерживает два типа цепочек:
+ * Поддерживает три типа цепочек:
  * - static (по умолчанию): фиксированные шаги
- * - dynamic: фасилитатор + участники.
+ * - dynamic: фасилитатор + участники
+ * - conditional: шаги с условным ветвлением (when-expressions).
  *
  * Также парсит секцию `roles` с per-role конфигурацией
  * (command, timeout, prompt_file, fallback) и `retry_policy` на уровне цепочки и шага.
@@ -35,7 +39,7 @@ final class YamlChainLoader implements ChainLoaderInterface
 {
     private string $yamlPath;
 
-    /** @var array<string, ChainDefinitionVo>|null */
+    /** @var array<string, ChainDefinitionInterface>|null */
     private ?array $chains = null;
 
     public function __construct(string $yamlPath)
@@ -57,7 +61,7 @@ final class YamlChainLoader implements ChainLoaderInterface
     }
 
     #[Override]
-    public function load(string $name): ChainDefinitionVo
+    public function load(string $name): ChainDefinitionInterface
     {
         $chains = $this->loadAll();
 
@@ -77,7 +81,7 @@ final class YamlChainLoader implements ChainLoaderInterface
     /**
      * Загружает и кэширует цепочки из YAML.
      *
-     * @return array<string, ChainDefinitionVo>
+     * @return array<string, ChainDefinitionInterface>
      */
     private function loadAll(): array
     {
@@ -103,11 +107,11 @@ final class YamlChainLoader implements ChainLoaderInterface
     }
 
     /**
-     * Маппит raw-массив из YAML в ChainDefinitionVo.
+     * Маппит raw-массив из YAML в специализированный ChainDefinitionInterface VO.
      *
      * @param array<string, RoleConfigVo> $roles
      */
-    private function parseChainDefinition(string $name, array $raw, array $roles): ChainDefinitionVo
+    private function parseChainDefinition(string $name, array $raw, array $roles): ChainDefinitionInterface
     {
         $type = ChainTypeEnum::tryFrom($raw['type'] ?? 'static') ?? ChainTypeEnum::staticType;
 
@@ -123,7 +127,7 @@ final class YamlChainLoader implements ChainLoaderInterface
      *
      * @param array<string, RoleConfigVo> $roles
      */
-    private function parseStaticChain(string $name, array $raw, array $roles): ChainDefinitionVo
+    private function parseStaticChain(string $name, array $raw, array $roles): ChainDefinitionInterface
     {
         $stepsData = $raw['steps'] ?? [];
         $chainRetryPolicy = $this->parseRetryPolicy($raw['retry_policy'] ?? null);
@@ -145,7 +149,7 @@ final class YamlChainLoader implements ChainLoaderInterface
         if ($hasConditions) {
             $this->validateWhenReferences($name, $steps);
 
-            return ChainDefinitionVo::createFromConditionalSteps(
+            return ConditionalChainDefinitionVo::create(
                 name: $name,
                 description: $raw['description'] ?? '',
                 steps: $steps,
@@ -157,7 +161,7 @@ final class YamlChainLoader implements ChainLoaderInterface
             );
         }
 
-        return ChainDefinitionVo::createFromSteps(
+        return StaticChainDefinitionVo::create(
             name: $name,
             description: $raw['description'] ?? '',
             steps: $steps,
@@ -176,7 +180,7 @@ final class YamlChainLoader implements ChainLoaderInterface
      *
      * @param array<string, RoleConfigVo> $roles
      */
-    private function parseConditionalChain(string $name, array $raw, array $roles): ChainDefinitionVo
+    private function parseConditionalChain(string $name, array $raw, array $roles): ChainDefinitionInterface
     {
         $stepsData = $raw['steps'] ?? [];
         $chainRetryPolicy = $this->parseRetryPolicy($raw['retry_policy'] ?? null);
@@ -188,7 +192,7 @@ final class YamlChainLoader implements ChainLoaderInterface
 
         $this->validateWhenReferences($name, $steps);
 
-        return ChainDefinitionVo::createFromConditionalSteps(
+        return ConditionalChainDefinitionVo::create(
             name: $name,
             description: $raw['description'] ?? '',
             steps: $steps,
@@ -332,7 +336,7 @@ final class YamlChainLoader implements ChainLoaderInterface
      *
      * @param array<string, RoleConfigVo> $roles
      */
-    private function parseDynamicChain(string $name, array $raw, array $roles): ChainDefinitionVo
+    private function parseDynamicChain(string $name, array $raw, array $roles): ChainDefinitionInterface
     {
         $participants = $raw['participants'] ?? [];
         if (count($participants) === 0) {
@@ -351,7 +355,7 @@ final class YamlChainLoader implements ChainLoaderInterface
         $prompts = $this->resolvePrompts($name, $raw);
         $budget = $this->parseBudget($raw['budget'] ?? null);
 
-        return ChainDefinitionVo::createFromDynamic(
+        return DynamicChainDefinitionVo::create(
             name: $name,
             description: $raw['description'] ?? '',
             facilitator: $facilitator,

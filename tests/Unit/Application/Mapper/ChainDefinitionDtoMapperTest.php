@@ -9,8 +9,10 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainStepDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ChainDefinitionDtoMapper;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
 
 #[CoversClass(ChainDefinitionDtoMapper::class)]
 final class ChainDefinitionDtoMapperTest extends TestCase
@@ -72,9 +74,9 @@ final class ChainDefinitionDtoMapperTest extends TestCase
 
     // ─── Helpers ───────────────────────────────────────────────────────────────
 
-    private function createStaticChainVo(string $name = 'test-static'): ChainDefinitionVo
+    private function createStaticChainVo(string $name = 'test-static'): ChainDefinitionInterface
     {
-        return ChainDefinitionVo::createFromSteps(
+        return StaticChainDefinitionVo::create(
             name: $name,
             description: 'Test static chain',
             steps: [
@@ -83,9 +85,9 @@ final class ChainDefinitionDtoMapperTest extends TestCase
         );
     }
 
-    private function createDynamicChainVo(string $name = 'test-dynamic'): ChainDefinitionVo
+    private function createDynamicChainVo(string $name = 'test-dynamic'): ChainDefinitionInterface
     {
-        return ChainDefinitionVo::createFromDynamic(
+        return DynamicChainDefinitionVo::create(
             name: $name,
             description: 'Test dynamic chain',
             facilitator: 'analyst',

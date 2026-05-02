@@ -149,14 +149,14 @@ YAML;
         self::assertSame('system_analyst', $chain->getFacilitator());
         self::assertSame(['architect', 'marketer', 'backend_developer'], $chain->getParticipants());
         self::assertSame(10, $chain->getMaxRounds());
-        self::assertEmpty($chain->getSteps());
-        self::assertSame('Base system prompt', $chain->getBrainstormSystemPrompt());
-        self::assertSame('Fac %s', $chain->getFacilitatorAppendPrompt());
-        self::assertSame('Start %s', $chain->getFacilitatorStartPrompt());
-        self::assertSame('Continue %s %s', $chain->getFacilitatorContinuePrompt());
-        self::assertSame('Final %s %s', $chain->getFacilitatorFinalizePrompt());
-        self::assertSame('Sys %s', $chain->getParticipantAppendPrompt());
-        self::assertSame('Context %s %s', $chain->getParticipantUserPrompt());
+        $prompts = $chain->getPromptConfiguration();
+        self::assertSame('Base system prompt', $prompts->getBrainstormSystemPrompt());
+        self::assertSame('Fac %s', $prompts->getFacilitatorAppendPrompt());
+        self::assertSame('Start %s', $prompts->getFacilitatorStartPrompt());
+        self::assertSame('Continue %s %s', $prompts->getFacilitatorContinuePrompt());
+        self::assertSame('Final %s %s', $prompts->getFacilitatorFinalizePrompt());
+        self::assertSame('Sys %s', $prompts->getParticipantAppendPrompt());
+        self::assertSame('Context %s %s', $prompts->getParticipantUserPrompt());
     }
 
     // --- Dynamic chain: inline prompts (backward compat) ---
@@ -169,13 +169,14 @@ YAML;
         self::assertSame('inline_prompts', $chain->getName());
         self::assertSame(ChainTypeEnum::dynamicType, $chain->getType());
         self::assertSame(5, $chain->getMaxRounds());
-        self::assertSame('Inline Base', $chain->getBrainstormSystemPrompt());
-        self::assertSame('Inline Fac %s', $chain->getFacilitatorAppendPrompt());
-        self::assertSame('Inline Start %s', $chain->getFacilitatorStartPrompt());
-        self::assertSame('Inline Cont %s %s', $chain->getFacilitatorContinuePrompt());
-        self::assertSame('Inline Final %s %s', $chain->getFacilitatorFinalizePrompt());
-        self::assertSame('Inline SysP %s', $chain->getParticipantAppendPrompt());
-        self::assertSame('Inline Ctx %s %s', $chain->getParticipantUserPrompt());
+        $prompts = $chain->getPromptConfiguration();
+        self::assertSame('Inline Base', $prompts->getBrainstormSystemPrompt());
+        self::assertSame('Inline Fac %s', $prompts->getFacilitatorAppendPrompt());
+        self::assertSame('Inline Start %s', $prompts->getFacilitatorStartPrompt());
+        self::assertSame('Inline Cont %s %s', $prompts->getFacilitatorContinuePrompt());
+        self::assertSame('Inline Final %s %s', $prompts->getFacilitatorFinalizePrompt());
+        self::assertSame('Inline SysP %s', $prompts->getParticipantAppendPrompt());
+        self::assertSame('Inline Ctx %s %s', $prompts->getParticipantUserPrompt());
     }
 
     // --- Error cases ---
@@ -394,8 +395,9 @@ YAML);
         try {
             $loader = new YamlChainLoader($fixturePath);
             $chain = $loader->load('dyn');
-            self::assertSame('not_a_file.txt', $chain->getBrainstormSystemPrompt());
-            self::assertSame('another_missing.txt', $chain->getFacilitatorStartPrompt());
+            $prompts = $chain->getPromptConfiguration();
+            self::assertSame('not_a_file.txt', $prompts->getBrainstormSystemPrompt());
+            self::assertSame('another_missing.txt', $prompts->getFacilitatorStartPrompt());
         } finally {
             unlink($fixturePath);
             rmdir($fixtureDir);

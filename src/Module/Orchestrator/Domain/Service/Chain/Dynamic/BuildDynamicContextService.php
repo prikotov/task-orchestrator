@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
 use Override;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\PromptConfigurationVo;
 
 /**
- * Создание DynamicChainContextVo из ChainDefinitionVo и параметров запуска.
+ * Создание DynamicChainContextVo из DynamicChainDefinitionVo и параметров запуска.
  */
 final readonly class BuildDynamicContextService implements BuildDynamicContextServiceInterface
 {
     /**
-     * Собирает DTO контекста dynamic-цепочки из ChainDefinitionVo и параметров CLI.
+     * Собирает DTO контекста dynamic-цепочки из DynamicChainDefinitionVo и параметров CLI.
      *
      * @param list<string> $participants
      */
     #[Override]
     public function buildContext(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         string $facilitatorRole,
         array $participants,
         int $maxRounds,
@@ -63,7 +63,7 @@ final readonly class BuildDynamicContextService implements BuildDynamicContextSe
      */
     #[Override]
     public function buildInvocation(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         string $task,
         int $timeout,
         ?string $workingDir,
@@ -75,7 +75,7 @@ final readonly class BuildDynamicContextService implements BuildDynamicContextSe
     ): array {
         $invocation = [
             'command' => 'bin/console app:agent:orchestrate',
-            'chain' => $chain->getSharedDefinition()->getName(),
+            'chain' => $chain->getName(),
             'task' => $this->maskText($task),
             'topic' => $this->maskText($effectiveTopic),
             'facilitator' => $effectiveFacilitator,

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 
 /**
- * Создание DynamicChainContextVo из ChainDefinitionVo и параметров запуска.
+ * Создание DynamicChainContextVo из DynamicChainDefinitionVo и параметров запуска.
  */
 interface BuildDynamicContextServiceInterface
 {
@@ -18,7 +18,7 @@ interface BuildDynamicContextServiceInterface
      * @param list<string> $participants
      */
     public function buildContext(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         string $facilitatorRole,
         array $participants,
         int $maxRounds,
@@ -36,7 +36,7 @@ interface BuildDynamicContextServiceInterface
      * @return array<string, mixed>
      */
     public function buildInvocation(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         string $task,
         int $timeout,
         ?string $workingDir,
