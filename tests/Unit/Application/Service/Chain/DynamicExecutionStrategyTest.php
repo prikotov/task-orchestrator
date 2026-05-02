@@ -18,7 +18,9 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\Bui
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\SessionCompletedNotifierInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainSessionStateVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
@@ -75,7 +77,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function supportsReturnsFalseForStaticChain(): void
     {
-        $chain = ChainDefinitionVo::createFromSteps(
+        $chain = StaticChainDefinitionVo::create(
             name: 'static',
             description: '',
             steps: [\TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo::agent(role: 'role', runner: 'pi')],
@@ -147,7 +149,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedContext = null;
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
-                ChainDefinitionVo $chain,
+                DynamicChainDefinitionVo $chain,
                 DynamicChainContextVo $context,
             ) use (
                 &$capturedContext,
@@ -193,7 +195,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTopic = null;
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
-                ChainDefinitionVo $chain,
+                DynamicChainDefinitionVo $chain,
                 DynamicChainContextVo $context,
             ) use (
                 &$capturedTopic,
@@ -356,7 +358,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
-                ChainDefinitionVo $c,
+                DynamicChainDefinitionVo $c,
                 DynamicChainContextVo $context,
             ) use (
                 &$capturedTimeout,
@@ -399,7 +401,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
-                ChainDefinitionVo $c,
+                DynamicChainDefinitionVo $c,
                 DynamicChainContextVo $context,
             ) use (
                 &$capturedTimeout,
@@ -442,7 +444,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
-                ChainDefinitionVo $c,
+                DynamicChainDefinitionVo $c,
                 DynamicChainContextVo $context,
             ) use (
                 &$capturedTimeout,
@@ -483,7 +485,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedLogger = null;
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                ChainDefinitionVo $c,
+                DynamicChainDefinitionVo $c,
                 DynamicChainContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
@@ -523,7 +525,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedLogger = 'not-null';
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                ChainDefinitionVo $c,
+                DynamicChainDefinitionVo $c,
                 DynamicChainContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
@@ -605,7 +607,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedJournal = '';
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                ChainDefinitionVo $c,
+                DynamicChainDefinitionVo $c,
                 DynamicChainContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
@@ -673,7 +675,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                ChainDefinitionVo $c,
+                DynamicChainDefinitionVo $c,
                 DynamicChainContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
@@ -733,7 +735,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                ChainDefinitionVo $c,
+                DynamicChainDefinitionVo $c,
                 DynamicChainContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
@@ -793,7 +795,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                ChainDefinitionVo $c,
+                DynamicChainDefinitionVo $c,
                 DynamicChainContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
@@ -852,7 +854,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         );
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                ChainDefinitionVo $c,
+                DynamicChainDefinitionVo $c,
                 DynamicChainContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
@@ -886,8 +888,8 @@ final class DynamicExecutionStrategyTest extends TestCase
         string $facilitator,
         array $participants,
         int $maxRounds = 10,
-    ): ChainDefinitionVo {
-        return ChainDefinitionVo::createFromDynamic(
+    ): DynamicChainDefinitionVo {
+        return DynamicChainDefinitionVo::create(
             name: $name,
             description: '',
             facilitator: $facilitator,
@@ -912,8 +914,8 @@ final class DynamicExecutionStrategyTest extends TestCase
         array $participants,
         int $timeout,
         int $maxRounds = 10,
-    ): ChainDefinitionVo {
-        return ChainDefinitionVo::createFromDynamic(
+    ): DynamicChainDefinitionVo {
+        return DynamicChainDefinitionVo::create(
             name: $name,
             description: '',
             facilitator: $facilitator,

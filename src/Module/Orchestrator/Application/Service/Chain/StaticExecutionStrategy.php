@@ -9,8 +9,9 @@ use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticChainResultVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticStepResultVo;
@@ -33,8 +34,10 @@ final readonly class StaticExecutionStrategy implements ExecutionStrategyInterfa
     }
 
     #[Override]
-    public function execute(ChainDefinitionVo $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function execute(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
+        assert($chain instanceof StaticChainDefinitionVo);
+
         $result = $this->staticChainExecutor->execute(
             $chain,
             $command->task,
@@ -48,15 +51,15 @@ final readonly class StaticExecutionStrategy implements ExecutionStrategyInterfa
     }
 
     #[Override]
-    public function resume(ChainDefinitionVo $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function resume(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
         throw new LogicException('Static chain does not support resume.');
     }
 
     #[Override]
-    public function supports(ChainDefinitionVo $chain): bool
+    public function supports(ChainDefinitionInterface $chain): bool
     {
-        return $chain->getSharedDefinition()->getType() === ChainTypeEnum::staticType;
+        return $chain->getType() === ChainTypeEnum::staticType;
     }
 
     /**

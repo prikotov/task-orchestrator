@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Entity\StaticChainExecution;
@@ -34,7 +34,7 @@ final readonly class RunStaticChainService
      * @return StaticChainResultVo
      */
     public function execute(
-        ChainDefinitionVo $chain,
+        StaticChainDefinitionVo $chain,
         string $task,
         ?string $workingDir = null,
         int $timeout = 300,
@@ -103,7 +103,7 @@ final readonly class RunStaticChainService
      * @param list<StaticStepResultVo> $results
      */
     private function processStep(
-        ChainDefinitionVo $chain,
+        StaticChainDefinitionVo $chain,
         string $task,
         ?string $workingDir,
         int $timeout,
@@ -213,7 +213,7 @@ final readonly class RunStaticChainService
      */
     private function executeStep(
         ChainStepVo $step,
-        ChainDefinitionVo $chain,
+        StaticChainDefinitionVo $chain,
         string $task,
         ?string $workingDir,
         int $timeout,

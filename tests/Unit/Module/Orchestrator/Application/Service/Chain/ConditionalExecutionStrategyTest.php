@@ -13,7 +13,9 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\Orch
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Condition\EvaluateConditionServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\ExecuteConditionalStepServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalStepResultVo;
@@ -48,7 +50,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
     public function testDoesNotSupportStaticChain(): void
     {
-        $chain = ChainDefinitionVo::createFromSteps(
+        $chain = StaticChainDefinitionVo::create(
             name: 'static-chain',
             description: 'test',
             steps: [ChainStepVo::agent(role: 'developer')],
@@ -442,18 +444,18 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
     // ─── Helpers ──────────────────────────────────────────────────────
 
-    private function createConditionalChain(array $steps): ChainDefinitionVo
+    private function createConditionalChain(array $steps): ConditionalChainDefinitionVo
     {
-        return ChainDefinitionVo::createFromConditionalSteps(
+        return ConditionalChainDefinitionVo::create(
             name: 'test-conditional-chain',
             description: 'test conditional chain',
             steps: $steps,
         );
     }
 
-    private function createDynamicChain(): ChainDefinitionVo
+    private function createDynamicChain(): DynamicChainDefinitionVo
     {
-        return ChainDefinitionVo::createFromDynamic(
+        return DynamicChainDefinitionVo::create(
             name: 'dynamic-chain',
             description: 'test',
             facilitator: 'team_lead',
