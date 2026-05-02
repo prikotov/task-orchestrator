@@ -7,10 +7,10 @@ priority: P2
 depends_on: TASK-feat-security-policy-infrastructure
 epic: EPIC-sprint-9-security-policy
 author: system_analyst (Шерлок)
-assignee:
-branch:
-pr:
-status: todo
+assignee: backend_developer (Левша)
+branch: task/feat-security-policy-yaml-dsl
+pr: '#129'
+status: done
 ---
 
 # TASK-feat-security-policy-yaml-dsl: YAML DSL `permissions:` block + Exec policy файл
@@ -39,14 +39,14 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Exec policy файл `config/security_policy.yaml` с default rules (banned prefixes, allowed runners)
-- [ ] `YamlExecRuleRepository` в SecurityPolicy Infrastructure — загружает ExecRule из YAML файла
-- [ ] `YamlExecRuleRepository` заменяет `InMemoryExecRuleRepository` в DI (или fallback: если файл не найден → InMemory defaults)
-- [ ] Unit-тесты на `YamlExecRuleRepository` — парсинг YAML в ExecRule entities
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] Exec policy файл `config/security_policy.yaml` с default rules (banned prefixes, allowed runners)
+- [x] `YamlExecRuleRepository` в SecurityPolicy Infrastructure — загружает ExecRule из YAML файла
+- [x] `YamlExecRuleRepository` заменяет `InMemoryExecRuleRepository` в DI (или fallback: если файл не найден → InMemory defaults)
+- [x] Unit-тесты на `YamlExecRuleRepository` — парсинг YAML в ExecRule entities
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 
 ### 🟡 Should Have (Желательно)
-- [ ] `permissions:` block в YAML-chain DSL:
+- [x] `permissions:` block в YAML-chain DSL:
     ```yaml
     chains:
       my-chain:
@@ -56,9 +56,9 @@ status: todo
           denied_commands: ['rm -rf', 'sudo']
           allowed_tools: ['file_read', 'file_write']
     ```
-- [ ] [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) расширен для хранения permissions config
+- [x] [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) расширен для хранения permissions config
 - [ ] `ChainSecurityPolicy` использует chain-specific permissions из `ChainDefinitionVo`
-- [ ] Обратная совместимость: цепочки без `permissions:` block работают с default policy
+- [x] Обратная совместимость: цепочки без `permissions:` block работают с default policy
 
 ### 🟢 Could Have (Опционально)
 - [ ] Per-step `permissions:` override в YAML
@@ -72,14 +72,14 @@ status: todo
 - [ ] UI для управления политиками
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Создать `config/security_policy.yaml` — default exec rules
-2. [ ] Создать `YamlExecRuleRepository` — YAML parsing → ExecRule[]
-3. [ ] Обновить DI wiring: `YamlExecRuleRepository` вместо `InMemoryExecRuleRepository`
-4. [ ] Написать unit-тесты на `YamlExecRuleRepository`
-5. [ ] (Should Have) Добавить `permissions:` в chain YAML schema
-6. [ ] (Should Have) Расширить `ChainDefinitionVo` для permissions
+1. [x] Создать `config/security_policy.yaml` — default exec rules
+2. [x] Создать `YamlExecRuleRepository` — YAML parsing → ExecRule[]
+3. [x] Обновить DI wiring: `YamlExecRuleRepository` вместо `InMemoryExecRuleRepository`
+4. [x] Написать unit-тесты на `YamlExecRuleRepository`
+5. [x] (Should Have) Добавить `permissions:` в chain YAML schema
+6. [x] (Should Have) Расширить `ChainDefinitionVo` для permissions
 7. [ ] (Should Have) Обновить `ChainSecurityPolicy` для chain-specific permissions
-8. [ ] Проверить: `vendor/bin/phpunit`, `vendor/bin/psalm`
+8. [x] Проверить: `vendor/bin/phpunit`, `vendor/bin/psalm`
 
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] `config/security_policy.yaml` содержит default rules (banned prefixes, allowed runners)
