@@ -8,7 +8,7 @@ author: system_analyst_sherlock (Шерлок)
 assignee:
 branch: task/epic-sprint-10-hooks-debt-cleanup
 pr: pending (epic branch → main)
-status: in_progress
+status: review
 ---
 
 # EPIC-sprint-10-hooks-debt-cleanup: Sprint 10 — Hooks + Debt Cleanup
@@ -48,18 +48,18 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Блокирующие требования)
-- [ ] Hooks system: `post_step` MVP — shell-скрипты выполняются после каждого шага через Symfony Process
-- [ ] Hook failure = warning, не failure цепочки
-- [ ] Hook timeout (30 секунд)
-- [ ] YAML DSL: `post_step` в chain step config (`post_step: "scripts/notify.sh"`, опционально)
-- [ ] ChainDefinitionVo split завершён — Static/Dynamic/Conditional sub-VO с общим ChainDefinitionInterface
-- [ ] ADR: Resume для static цепочек — паттерн checkpoint + resume зафиксирован
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
-- [ ] Deptrac green
+- [x] Hooks system: `post_step` MVP — shell-скрипты выполняются после каждого шага через Symfony Process
+- [x] Hook failure = warning, не failure цепочки
+- [x] Hook timeout (30 секунд)
+- [x] YAML DSL: `post_step` в chain step config (`post_step: "scripts/notify.sh"`, опционально)
+- [x] ChainDefinitionVo split завершён — Static/Dynamic/Conditional sub-VO с общим ChainDefinitionInterface
+- [x] ADR: Resume для static цепочек — паттерн checkpoint + resume зафиксирован
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] Deptrac green
 
 ### 🟡 Should Have (Важные требования)
-- [ ] Unit-тесты ≥80% покрытия нового кода
-- [ ] Hook stdout/stderr — в audit log
+- [x] Unit-тесты ≥80% покрытия нового кода
+- [x] Hook stdout/stderr — в audit log
 
 ### 🟢 Could Have (Желательно)
 - [ ] Hook pipeline: несколько post_step hooks на один шаг (массив в YAML)
@@ -121,20 +121,20 @@ sequenceDiagram
 
 Порядок задач — по зависимостям:
 
-- [ ] [TASK-refactor-chain-definition-split](TASK-refactor-chain-definition-split.todo.md) — ChainDefinitionVo split завершение (основа для hooks — step config изменится)
-- [ ] [TASK-feat-hooks-post-step](TASK-feat-hooks-post-step.todo.md) — Hooks system: post_step MVP (зависит от обновлённого ChainStepVo)
-- [ ] [TASK-docs-resume-adr](TASK-docs-resume-adr.todo.md) — ADR: Resume для static цепочек (ADR, не блокирует код)
+- [x] [TASK-refactor-chain-definition-split](done/TASK-refactor-chain-definition-split.todo.md) ✅ — ChainDefinitionVo split завершение (основа для hooks — step config изменится)
+- [x] [TASK-feat-hooks-post-step](done/TASK-feat-hooks-post-step.todo.md) ✅ — Hooks system: post_step MVP (зависит от обновлённого ChainStepVo)
+- [x] [TASK-docs-resume-adr](done/TASK-docs-resume-adr.todo.md) ✅ — ADR: Resume для static цепочек (ADR, не блокирует код)
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [ ] Все задачи из **Must Have** выполнены и протестированы
 - [ ] `post_step` hooks работают (shell-скрипты через Symfony Process, таймаут 30с)
-- [ ] Hook failure = warning в лог, не failure цепочки
-- [ ] Hook stdout/stderr — в audit log
+- [x] Hook failure = warning в лог, не failure цепочки
+- [x] Hook stdout/stderr — в audit log
 - [ ] [`ChainDefinitionVo`](../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) расщеплён на `StaticChainDefinitionVo`, `DynamicChainDefinitionVo`, `ConditionalChainDefinitionVo`
 - [ ] `ChainDefinitionInterface` введён и все стратегии типизированы через него
 - [ ] Resume ADR записан в `docs/adr/`
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
-- [ ] Deptrac green
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] Deptrac green
 - [ ] Roadmap: Sprint 10 чекбоксы отмечены
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
