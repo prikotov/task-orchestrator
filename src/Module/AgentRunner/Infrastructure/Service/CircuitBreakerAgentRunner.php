@@ -8,6 +8,7 @@ use Override;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Enum\CircuitStateEnum;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\MetricsCollectorInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\CircuitBreakerStateVo;
@@ -42,6 +43,7 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
         private readonly LoggerInterface $logger,
         private readonly ?AgentRunnerInterface $fallbackRunner = null,
         private readonly array $fallbackCommand = [],
+        private readonly ?MetricsCollectorInterface $metrics = null,
     ) {
     }
 
@@ -67,6 +69,10 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
         $effectiveState = $state->getEffectiveState();
 
         if ($effectiveState === CircuitStateEnum::open) {
+            $this->metrics?->recordCounter('cb.rejection', 1, [
+                'runner' => $runnerName,
+            ]);
+
             // Если fallback runner сконфигурирован — делегируем на него
             if ($this->fallbackRunner !== null) {
                 return $this->runFallback($request, $runnerName, $state);
@@ -218,12 +224,24 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
         $newEffective = $newState->getEffectiveState();
 
         if ($previousState === CircuitStateEnum::halfOpen && $newEffective === CircuitStateEnum::open) {
+            $this->metrics?->recordCounter('cb.state_change', 1, [
+                'runner' => $runnerName,
+                'from' => 'half_open',
+                'to' => 'open',
+            ]);
+
             $this->logger->warning(sprintf(
                 '[CircuitBreaker] Runner "%s": HalfOpen → Open (probe call failed). %s',
                 $runnerName,
                 $newState->toLogString(),
             ));
         } elseif ($previousState === CircuitStateEnum::closed && $newEffective === CircuitStateEnum::open) {
+            $this->metrics?->recordCounter('cb.state_change', 1, [
+                'runner' => $runnerName,
+                'from' => 'closed',
+                'to' => 'open',
+            ]);
+
             $this->logger->warning(sprintf(
                 '[CircuitBreaker] Runner "%s": Closed → Open (failure threshold reached). %s',
                 $runnerName,
@@ -237,6 +255,12 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
         $previousState = $state->getEffectiveState();
 
         if ($previousState === CircuitStateEnum::halfOpen) {
+            $this->metrics?->recordCounter('cb.state_change', 1, [
+                'runner' => $runnerName,
+                'from' => 'half_open',
+                'to' => 'closed',
+            ]);
+
             $this->logger->info(sprintf(
                 '[CircuitBreaker] Runner "%s": HalfOpen → Closed (probe call succeeded).',
                 $runnerName,
