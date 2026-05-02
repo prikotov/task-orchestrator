@@ -1,6 +1,6 @@
 #!/bin/sh
 # ──────────────────────────────────────────────────────────────────────────────
-# notify_done.sh — CESP-aware post_step hook для task-orchestrator
+# notify.sh — CESP-aware post_step hook для task-orchestrator
 #
 # Вызывается после завершения шага цепочки.
 # Отправляет desktop-уведомление + звук через peon-ping (CESP) или canberra.
@@ -26,7 +26,7 @@
 #   - type: agent
 #     role: backend_developer_levsha
 #     name: implement
-#     post_step: "bin/notify_done.sh"
+#     post_step: "bin/notify.sh"
 # ──────────────────────────────────────────────────────────────────────────────
 
 set -eu
