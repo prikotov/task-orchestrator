@@ -65,9 +65,13 @@ fi
 
 if command -v peon-ping >/dev/null 2>&1; then
     peon-ping "$cesp_event" 2>/dev/null || true
-# ─── Звук: fallback через canberra-gtk-play (только task.complete) ────────
-elif [ "$cesp_event" = "task.complete" ] && command -v canberra-gtk-play >/dev/null 2>&1; then
-    canberra-gtk-play -i complete 2>/dev/null || true
+# ─── Звук: fallback через canberra-gtk-play ──────────────────────────────
+elif command -v canberra-gtk-play >/dev/null 2>&1; then
+    if [ "$cesp_event" = "task.complete" ]; then
+        canberra-gtk-play -i complete 2>/dev/null || true
+    else
+        canberra-gtk-play -i dialog-error 2>/dev/null || true
+    fi
 fi
 
 # ─── Лог в stderr (подхватывается task-orchestrator в hook stdout/stderr) ─────
