@@ -14,7 +14,7 @@ chains:
       - type: agent
         role: backend_developer_levsha
         name: implement
-        post_step: "bin/notify_done.sh"    # вызовется после завершения шага
+        post_step: "bin/notify.sh"    # вызовется после завершения шага
 ```
 
 ## Env vars
@@ -31,7 +31,7 @@ Hook получает контекст через env vars:
 
 ## Desktop-уведомления со звуком
 
-В комплекте идёт `bin/notify_done.sh` — CESP-aware скрипт с звуками через peon-ping.
+В комплекте идёт `bin/notify.sh` — CESP-aware скрипт с звуками через peon-ping.
 
 ### Установка peon-ping
 
