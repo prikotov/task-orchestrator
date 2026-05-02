@@ -7,8 +7,8 @@ priority: P1
 author: system_analyst (Шерлок)
 assignee:
 branch: task/epic-sprint-9-security-policy
-pr:
-status: todo
+pr: pending (epic branch → main)
+status: in_progress
 ---
 
 # EPIC-sprint-9-security-policy: Security Policy (Foundation) — безопасность автономного выполнения
