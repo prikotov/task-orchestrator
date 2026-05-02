@@ -24,6 +24,7 @@ use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServic
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunStaticChainService;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Hook\HookExecutorInterface;
 
 /**
  * Integration-тест: static chain end-to-end.
@@ -71,9 +72,15 @@ final class StaticChainIntegrationTest extends TestCase
             $runnerHelper,
             $formatter,
         );
+        $hookExecutor = $this->createMock(HookExecutorInterface::class);
+        $hookExecutor->method('execute')->willReturn(
+            \TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\HookResultVo::skipped(),
+        );
+
         $runStaticChainService = new RunStaticChainService(
             $stepService,
             $budgetService,
+            $hookExecutor,
         );
         $staticChainExecutor = new ExecuteStaticChainService($runStaticChainService);
         $staticStrategy = new StaticExecutionStrategy($staticChainExecutor);
