@@ -118,4 +118,14 @@ final readonly class SharedChainDefinitionVo
     {
         return $this->type === ChainTypeEnum::dynamicType;
     }
+
+    /**
+     * Является ли цепочка условной (conditional)?
+     *
+     * Условная цепочка — это цепочка с шагами, имеющими when-выражения.
+     */
+    public function isConditional(): bool
+    {
+        return $this->type === ChainTypeEnum::conditionalType;
+    }
 }

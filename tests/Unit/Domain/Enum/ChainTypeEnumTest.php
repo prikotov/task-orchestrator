@@ -29,6 +29,13 @@ final class ChainTypeEnumTest extends TestCase
     {
         self::assertSame(ChainTypeEnum::staticType, ChainTypeEnum::tryFrom('static'));
         self::assertSame(ChainTypeEnum::dynamicType, ChainTypeEnum::tryFrom('dynamic'));
+        self::assertSame(ChainTypeEnum::conditionalType, ChainTypeEnum::tryFrom('conditional'));
         self::assertNull(ChainTypeEnum::tryFrom('unknown'));
+    }
+
+    #[Test]
+    public function conditionalTypeHasCorrectValue(): void
+    {
+        self::assertSame('conditional', ChainTypeEnum::conditionalType->value);
     }
 }

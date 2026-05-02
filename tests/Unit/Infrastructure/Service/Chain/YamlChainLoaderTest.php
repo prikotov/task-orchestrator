@@ -7,6 +7,7 @@ namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FallbackConfigVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
@@ -1714,5 +1715,360 @@ YAML);
 
         $chains = $this->loader->list();
         self::assertEmpty($chains);
+    }
+
+    // --- when-expression parsing tests ---
+
+    #[Test]
+    public function loadParsesWhenExpressionOnAgentStep(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_when_agent_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  cond:
+    steps:
+      - { type: agent, role: backend_developer, name: tests }
+      - type: agent
+        role: deployer
+        name: deploy
+        when: 'steps.tests.passed == true'
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('cond');
+
+            // Auto-detected as conditional
+            self::assertSame(ChainTypeEnum::conditionalType, $chain->getType());
+            self::assertTrue($chain->isConditional());
+
+            // Step 0: no condition
+            self::assertNull($chain->getSteps()[0]->getWhen());
+            self::assertFalse($chain->getSteps()[0]->hasCondition());
+
+            // Step 1: has condition
+            $when = $chain->getSteps()[1]->getWhen();
+            self::assertNotNull($when);
+            self::assertInstanceOf(ConditionExpressionVo::class, $when);
+            self::assertSame('steps.tests.passed == true', $when->getRawExpression());
+            self::assertSame('steps.tests.passed', $when->getPath());
+            self::assertTrue($chain->getSteps()[1]->hasCondition());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadParsesWhenExpressionOnQualityGateStep(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_when_qg_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  cond_qg:
+    steps:
+      - { type: agent, role: backend_dev, name: implement }
+      - { type: agent, role: qa, name: review }
+      - type: quality_gate
+        command: 'make deploy'
+        label: 'Deploy'
+        when: 'steps.review.passed == true'
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('cond_qg');
+
+            self::assertSame(ChainTypeEnum::conditionalType, $chain->getType());
+
+            // Quality gate step has when
+            $when = $chain->getSteps()[2]->getWhen();
+            self::assertNotNull($when);
+            self::assertSame('steps.review.passed', $when->getPath());
+            self::assertSame('review', $when->getReferencedStepName());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadExplicitConditionalType(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_explicit_cond_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  explicit:
+    type: conditional
+    steps:
+      - { type: agent, role: r1, name: step_a }
+      - type: agent
+        role: r2
+        name: step_b
+        when: 'steps.step_a.passed == true'
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('explicit');
+
+            self::assertSame(ChainTypeEnum::conditionalType, $chain->getType());
+            self::assertTrue($chain->isConditional());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadStaticChainWithoutWhenRemainsStatic(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_no_when_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, "chains:\n  plain:\n    steps:\n      - { type: agent, role: r1 }\n");
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('plain');
+
+            self::assertSame(ChainTypeEnum::staticType, $chain->getType());
+            self::assertFalse($chain->isConditional());
+            self::assertNull($chain->getSteps()[0]->getWhen());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadBackwardCompatExistingChainsWithoutWhen(): void
+    {
+        // Существующие цепочки из fixture (implement, analyze) не должны сломаться
+        $chain = $this->loader->load('implement');
+
+        self::assertSame(ChainTypeEnum::staticType, $chain->getType());
+        self::assertFalse($chain->isConditional());
+
+        foreach ($chain->getSteps() as $step) {
+            self::assertNull($step->getWhen());
+            self::assertFalse($step->hasCondition());
+        }
+    }
+
+    #[Test]
+    public function loadThrowsOnWhenReferencingUnknownStep(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_when_unknown_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  bad_ref:
+    steps:
+      - type: agent
+        role: r1
+        when: 'steps.nonexistent.passed == true'
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $this->expectException(\InvalidArgumentException::class);
+            $this->expectExceptionMessage('when-condition references unknown step name "nonexistent"');
+            $loader->load('bad_ref');
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadThrowsOnWhenForwardReference(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_when_fwd_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  fwd_ref:
+    steps:
+      - type: agent
+        role: r1
+        name: first
+        when: 'steps.second.passed == true'
+      - { type: agent, role: r2, name: second }
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $this->expectException(\InvalidArgumentException::class);
+            $this->expectExceptionMessage('not yet executed');
+            $loader->load('fwd_ref');
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadWhenSelfReferenceRejected(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_when_self_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  self_ref:
+    steps:
+      - type: agent
+        role: r1
+        name: myself
+        when: 'steps.myself.passed == true'
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $this->expectException(\InvalidArgumentException::class);
+            $this->expectExceptionMessage('not yet executed');
+            $loader->load('self_ref');
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadWhenWithNotEqualsOperator(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_when_ne_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  ne_cond:
+    steps:
+      - { type: agent, role: r1, name: lint }
+      - type: agent
+        role: r2
+        when: 'steps.lint.exitCode != 0'
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('ne_cond');
+
+            $when = $chain->getSteps()[1]->getWhen();
+            self::assertNotNull($when);
+            self::assertSame('!=', $when->getOperator()->value);
+            self::assertSame('0', $when->getExpectedValue());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadWhenWithResultPathNoStepValidation(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_when_result_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  result_cond:
+    steps:
+      - type: agent
+        role: r1
+        when: 'result.status == success'
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('result_cond');
+
+            self::assertSame(ChainTypeEnum::conditionalType, $chain->getType());
+
+            $when = $chain->getSteps()[0]->getWhen();
+            self::assertNotNull($when);
+            self::assertFalse($when->referencesStep());
+            self::assertNull($when->getReferencedStepName());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadThrowsOnInvalidWhenExpression(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_when_invalid_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  bad_expr:
+    steps:
+      - type: agent
+        role: r1
+        when: 'invalid expression no operator'
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $this->expectException(\InvalidArgumentException::class);
+            $this->expectExceptionMessage('Invalid condition expression');
+            $loader->load('bad_expr');
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadWhenWithMultipleConditionsOnDifferentSteps(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_when_multi_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  multi_cond:
+    steps:
+      - { type: agent, role: r1, name: step_a }
+      - type: agent
+        role: r2
+        name: step_b
+        when: 'steps.step_a.passed == true'
+      - type: agent
+        role: r3
+        when: 'steps.step_b.passed == true'
+YAML);
+
+        try {
+            $loader = new YamlChainLoader($fixturePath);
+            $chain = $loader->load('multi_cond');
+
+            self::assertSame(ChainTypeEnum::conditionalType, $chain->getType());
+
+            // step 0: unconditional
+            self::assertFalse($chain->getSteps()[0]->hasCondition());
+
+            // step 1: condition on step_a
+            self::assertTrue($chain->getSteps()[1]->hasCondition());
+            self::assertSame('step_a', $chain->getSteps()[1]->getWhen()->getReferencedStepName());
+
+            // step 2: condition on step_b
+            self::assertTrue($chain->getSteps()[2]->hasCondition());
+            self::assertSame('step_b', $chain->getSteps()[2]->getWhen()->getReferencedStepName());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
     }
 }

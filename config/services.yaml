@@ -65,6 +65,10 @@ services:
   TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface:
     alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Prompt\FormatPromptService
 
+  # --- StaticExecution module: Integration Service aliases ---
+  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\StaticAuditServiceInterface:
+    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Audit\StaticAuditService
+
   # --- StaticExecution module: Domain/Infrastructure aliases ---
   TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainServiceInterface:
     alias: TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainService
@@ -87,6 +91,14 @@ services:
 
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\PromptFormatterService
+
+  # --- ConditionalExecution: Integration Service alias ---
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\ExecuteConditionalStepServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ExecuteConditionalStepService
+
+  # --- ConditionalExecution: Domain Service alias ---
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Condition\EvaluateConditionServiceInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Condition\EvaluateConditionService
 
   # --- Domain Service alias (auto-discovery covers Domain/Service/) ---
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface:
