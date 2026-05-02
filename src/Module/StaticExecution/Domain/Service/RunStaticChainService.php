@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Hook\HookExecutorInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Entity\StaticChainExecution;
@@ -26,6 +27,7 @@ final readonly class RunStaticChainService
     public function __construct(
         private ExecuteStaticStepService $stepExecution,
         private CheckStaticBudgetServiceInterface $budgetService,
+        private HookExecutorInterface $hookExecutor,
         private ?LoggerInterface $logger = null,
     ) {
     }
@@ -34,7 +36,7 @@ final readonly class RunStaticChainService
      * @return StaticChainResultVo
      */
     public function execute(
-        ChainDefinitionVo $chain,
+        StaticChainDefinitionVo $chain,
         string $task,
         ?string $workingDir = null,
         int $timeout = 300,
@@ -103,7 +105,7 @@ final readonly class RunStaticChainService
      * @param list<StaticStepResultVo> $results
      */
     private function processStep(
-        ChainDefinitionVo $chain,
+        StaticChainDefinitionVo $chain,
         string $task,
         ?string $workingDir,
         int $timeout,
@@ -148,6 +150,9 @@ final readonly class RunStaticChainService
             $stepResult->duration,
             $role,
         );
+
+        // Execute post_step hook (if configured)
+        $this->executePostStepHook($step, $chain->getSharedDefinition()->getName(), $stepResult);
 
         return $this->handlePostStep(
             $execution,
@@ -213,7 +218,7 @@ final readonly class RunStaticChainService
      */
     private function executeStep(
         ChainStepVo $step,
-        ChainDefinitionVo $chain,
+        StaticChainDefinitionVo $chain,
         string $task,
         ?string $workingDir,
         int $timeout,
@@ -390,5 +395,39 @@ final readonly class RunStaticChainService
             $retryGroup->getMaxIterations(),
             $retryGroup->getGroup(),
         ));
+    }
+
+    /**
+     * Выполняет post_step hook, если шаг его имеет.
+     *
+     * Hook failure = warning в лог, не прерывает цепочку.
+     */
+    private function executePostStepHook(ChainStepVo $step, string $chainName, StaticStepResultVo $stepResult): void
+    {
+        $postStep = $step->getPostStep();
+        if ($postStep === null) {
+            return;
+        }
+
+        $hookContext = [
+            'chain_name' => $chainName,
+            'step_name' => $step->getName(),
+            'runner' => $step->isAgent() ? $step->getRunner() : 'shell',
+            'role' => $step->isAgent() ? ($step->getRole() ?? '') : 'quality_gate',
+            'exit_code' => $stepResult->exitCode,
+            'duration' => $stepResult->duration,
+        ];
+
+        $hookResult = $this->hookExecutor->execute($postStep, $hookContext);
+
+        if ($hookResult->isWarning()) {
+            $this->logger?->warning('Post-step hook failed (chain continues)', [
+                'chain' => $chainName,
+                'step' => $step->getName(),
+                'hook' => $postStep,
+                'reason' => $hookResult->getWarningReason(),
+                'exitCode' => $hookResult->getExitCode(),
+            ]);
+        }
     }
 }

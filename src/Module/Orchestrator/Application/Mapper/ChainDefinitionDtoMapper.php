@@ -6,41 +6,56 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper;
 
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainDefinitionDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainStepDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalChainDefinitionVo;
 
 /**
- * Маппинг Domain ChainDefinitionVo → Application ChainDefinitionDto.
+ * Маппинг Domain ChainDefinitionInterface → Application ChainDefinitionDto.
  */
 final readonly class ChainDefinitionDtoMapper
 {
-    public function map(ChainDefinitionVo $chain): ChainDefinitionDto
+    public function map(ChainDefinitionInterface $chain): ChainDefinitionDto
     {
         $steps = [];
-        foreach ($chain->getSteps() as $step) {
-            $roleConfig = $step->getRole() !== null ? $chain->getSharedDefinition()->getRoleConfig($step->getRole()) : null;
-            $fallbackRunner = $roleConfig?->getFallback()?->getRunnerName();
+        $facilitator = null;
+        $participants = [];
+        $maxRounds = 0;
 
-            $steps[] = new ChainStepDto(
-                role: $step->getRole(),
-                runner: $step->getRunner(),
-                label: $step->getLabel(),
-                isQualityGate: $step->isQualityGate(),
-                fallbackRunnerName: $fallbackRunner,
-            );
+        if ($chain instanceof StaticChainDefinitionVo || $chain instanceof ConditionalChainDefinitionVo) {
+            foreach ($chain->getSteps() as $step) {
+                $roleConfig = $step->getRole() !== null ? $chain->getSharedDefinition()->getRoleConfig($step->getRole()) : null;
+                $fallbackRunner = $roleConfig?->getFallback()?->getRunnerName();
+
+                $steps[] = new ChainStepDto(
+                    role: $step->getRole(),
+                    runner: $step->getRunner(),
+                    label: $step->getLabel(),
+                    isQualityGate: $step->isQualityGate(),
+                    fallbackRunnerName: $fallbackRunner,
+                );
+            }
+        }
+
+        if ($chain instanceof DynamicChainDefinitionVo) {
+            $facilitator = $chain->getFacilitator();
+            $participants = $chain->getParticipants();
+            $maxRounds = $chain->getMaxRounds();
         }
 
         return new ChainDefinitionDto(
-            name: $chain->getSharedDefinition()->getName(),
+            name: $chain->getName(),
             isDynamic: $chain->getSharedDefinition()->isDynamic(),
-            facilitator: $chain->getFacilitator(),
-            participants: $chain->getParticipants(),
-            maxRounds: $chain->getMaxRounds(),
+            facilitator: $facilitator,
+            participants: $participants,
+            maxRounds: $maxRounds,
             steps: $steps,
         );
     }
 
     /**
-     * @param array<string, ChainDefinitionVo> $chains
+     * @param array<string, ChainDefinitionInterface> $chains
      * @return array<string, ChainDefinitionDto>
      */
     public function mapList(array $chains): array

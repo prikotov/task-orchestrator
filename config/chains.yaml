@@ -438,6 +438,25 @@ chains:
   # ──────────────────────────────────────────────────────────────────────────
 
   # ──────────────────────────────────────────────────────────────────────────
+  # Post-step Hooks — shell-скрипт, выполняемый после завершения шага.
+  # Hook failure = warning (не прерывает цепочку). Timeout = 30 секунд.
+  # Context передаётся через env vars: HOOK_CHAIN_NAME, HOOK_STEP_NAME,
+  # HOOK_RUNNER, HOOK_ROLE, HOOK_EXIT_CODE, HOOK_DURATION.
+  #
+  # В комплекте идёт bin/notify.sh — desktop-уведомление + звук (CESP).
+  # Для голосовых уведомлений установите peon-ping и звуковой пакет:
+  #   curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/install.sh | bash
+  #   ~/.local/bin/peon packs install peon_ru && ~/.local/bin/peon packs use peon_ru
+  # Подробнее: docs/guide/hooks.md
+  #
+  # Пример:
+  #
+  #   - type: agent
+  #     role: backend_developer_levsha
+  #     name: implement
+  #     post_step: "bin/notify.sh"    # уведомление + звук после шага
+  #
+  # ──────────────────────────────────────────────────────────────────────────
   # Quality Gates — отдельный тип шага (type: quality_gate).
   # Выполняется как детерминированная shell-команда через Symfony Process.
   # Failed gate = warning (не прерывает цепочку).
@@ -477,6 +496,7 @@ chains:
       - type: agent
         role: backend_developer_levsha
         name: implement
+        # post_step: "bin/notify.sh"    # уведомление + звук (Орк: «Дело сделано!»)
       - type: agent
         role: code_reviewer_backend_puaro
         name: review

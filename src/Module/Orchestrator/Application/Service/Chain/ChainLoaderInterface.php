@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 
 /**
  * Контракт загрузки цепочек оркестрации.
@@ -16,12 +16,12 @@ interface ChainLoaderInterface
      *
      * @throws \TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\NotFoundExceptionInterface если цепочка не найдена
      */
-    public function load(string $name): ChainDefinitionVo;
+    public function load(string $name): ChainDefinitionInterface;
 
     /**
      * Возвращает все доступные цепочки.
      *
-     * @return array<string, ChainDefinitionVo>
+     * @return array<string, ChainDefinitionInterface>
      */
     public function list(): array;
 

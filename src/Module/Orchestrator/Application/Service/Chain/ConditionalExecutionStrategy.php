@@ -10,18 +10,20 @@ use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Hook\HookExecutorInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Condition\EvaluateConditionServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\ExecuteConditionalStepServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalStepResultVo;
 
 /**
  * Стратегия выполнения conditional-цепочки.
  *
  * Линейное выполнение шагов с условным ветвлением (when-expressions):
- * iterate steps → evaluate condition → execute/skip → collect results.
+ * iterate steps → evaluate condition → execute/skip → execute post_step hook → collect results.
  * Resume не поддерживается — LogicException.
  */
 final readonly class ConditionalExecutionStrategy implements ExecutionStrategyInterface
@@ -32,13 +34,16 @@ final readonly class ConditionalExecutionStrategy implements ExecutionStrategyIn
     public function __construct(
         private EvaluateConditionServiceInterface $conditionEvaluator,
         private ExecuteConditionalStepServiceInterface $stepExecutor,
+        private HookExecutorInterface $hookExecutor,
         private ?LoggerInterface $logger = null,
     ) {
     }
 
     #[Override]
-    public function execute(ChainDefinitionVo $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function execute(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
+        assert($chain instanceof ConditionalChainDefinitionVo);
+
         $steps = $chain->getSteps();
         $shared = $chain->getSharedDefinition();
         $timeout = $command->timeout ?? $shared->getTimeout() ?? self::DEFAULT_CONDITIONAL_TIMEOUT;
@@ -96,19 +101,19 @@ final readonly class ConditionalExecutionStrategy implements ExecutionStrategyIn
     }
 
     #[Override]
-    public function resume(ChainDefinitionVo $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function resume(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
         throw new LogicException('Conditional chain does not support resume.');
     }
 
     #[Override]
-    public function supports(ChainDefinitionVo $chain): bool
+    public function supports(ChainDefinitionInterface $chain): bool
     {
-        return $chain->getSharedDefinition()->getType() === ChainTypeEnum::conditionalType;
+        return $chain->getType() === ChainTypeEnum::conditionalType;
     }
 
     /**
-     * Обрабатывает один шаг: evaluate condition → execute or skip.
+     * Обрабатывает один шаг: evaluate condition → execute or skip → post_step hook.
      *
      * @param array<string, array{passed: bool, exitCode: int, status: string}> $context
      * @param list<StepResultDto> $previousResults
@@ -116,7 +121,7 @@ final readonly class ConditionalExecutionStrategy implements ExecutionStrategyIn
     private function processStep(
         ChainStepVo $step,
         int $stepIndex,
-        ChainDefinitionVo $chain,
+        ConditionalChainDefinitionVo $chain,
         OrchestrateChainCommand $command,
         array $context,
         int $timeout,
@@ -149,7 +154,46 @@ final readonly class ConditionalExecutionStrategy implements ExecutionStrategyIn
             $command->noContextFiles,
         );
 
-        return $this->toStepResultDto($result);
+        $stepResultDto = $this->toStepResultDto($result);
+
+        // Execute post_step hook (if configured)
+        $this->executePostStepHook($step, $chain->getName(), $stepResultDto);
+
+        return $stepResultDto;
+    }
+
+    /**
+     * Выполняет post_step hook, если шаг его имеет.
+     *
+     * Hook failure = warning в лог, не прерывает цепочку.
+     */
+    private function executePostStepHook(ChainStepVo $step, string $chainName, StepResultDto $stepResult): void
+    {
+        $postStep = $step->getPostStep();
+        if ($postStep === null) {
+            return;
+        }
+
+        $hookContext = [
+            'chain_name' => $chainName,
+            'step_name' => $step->getName(),
+            'runner' => $step->isAgent() ? $step->getRunner() : 'shell',
+            'role' => $step->isAgent() ? ($step->getRole() ?? '') : 'quality_gate',
+            'exit_code' => $stepResult->exitCode,
+            'duration' => $stepResult->duration,
+        ];
+
+        $hookResult = $this->hookExecutor->execute($postStep, $hookContext);
+
+        if ($hookResult->isWarning()) {
+            $this->logger?->warning('Post-step hook failed (chain continues)', [
+                'chain' => $chainName,
+                'step' => $step->getName(),
+                'hook' => $postStep,
+                'reason' => $hookResult->getWarningReason(),
+                'exitCode' => $hookResult->getExitCode(),
+            ]);
+        }
     }
 
     /**

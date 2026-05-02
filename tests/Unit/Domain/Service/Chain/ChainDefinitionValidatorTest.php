@@ -10,7 +10,13 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefinitionValidator;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainConfigViolationVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\SharedChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\PromptConfigurationVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
 
@@ -30,7 +36,7 @@ final class ChainDefinitionValidatorTest extends TestCase
     #[Test]
     public function staticChainWithValidStepsReturnsNoViolations(): void
     {
-        $chain = ChainDefinitionVo::createFromSteps(
+        $chain = StaticChainDefinitionVo::create(
             name: 'implement',
             description: 'Test',
             steps: [
@@ -161,7 +167,7 @@ final class ChainDefinitionValidatorTest extends TestCase
 
         $fixGroup = new FixIterationGroupVo('group1', ['step1', 'step2'], 3);
 
-        $chain = ChainDefinitionVo::createFromSteps(
+        $chain = StaticChainDefinitionVo::create(
             name: 'fix-valid',
             description: 'Test',
             steps: $steps,
@@ -178,7 +184,7 @@ final class ChainDefinitionValidatorTest extends TestCase
     #[Test]
     public function dynamicChainWithValidConfigReturnsNoViolations(): void
     {
-        $chain = ChainDefinitionVo::createFromDynamic(
+        $chain = DynamicChainDefinitionVo::create(
             name: 'brainstorm',
             description: 'Test',
             facilitator: 'analyst',
@@ -291,36 +297,26 @@ final class ChainDefinitionValidatorTest extends TestCase
     // ─── Helpers ───────────────────────────────────────────────────────────────────
 
     /**
-     * Создаёт static ChainDefinitionVo с пустым списком шагов.
+     * Создаёт StaticChainDefinitionVo с пустым списком шагов.
      * Использует reflection для обхода guard-проверки в фабричном методе.
      */
-    private function createStaticChainWithEmptySteps(string $name): ChainDefinitionVo
+    private function createStaticChainWithEmptySteps(string $name): ChainDefinitionInterface
     {
-        return $this->instantiateChainDefinition(
-            name: $name,
-            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum::staticType,
-            steps: [],
-            fixIterations: [],
-        );
+        return $this->instantiateStaticChain($name, []);
     }
 
     /**
-     * Создаёт static ChainDefinitionVo с заданными шагами через reflection.
+     * Создаёт StaticChainDefinitionVo с заданными шагами через reflection.
      *
      * @param list<ChainStepVo> $steps
      */
-    private function createStaticChainWithSteps(string $name, array $steps): ChainDefinitionVo
+    private function createStaticChainWithSteps(string $name, array $steps): ChainDefinitionInterface
     {
-        return $this->instantiateChainDefinition(
-            name: $name,
-            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum::staticType,
-            steps: $steps,
-            fixIterations: [],
-        );
+        return $this->instantiateStaticChain($name, $steps);
     }
 
     /**
-     * Создаёт static ChainDefinitionVo с шагами и fix_iterations через reflection.
+     * Создаёт StaticChainDefinitionVo с шагами и fix_iterations через reflection.
      *
      * @param list<ChainStepVo> $steps
      * @param list<FixIterationGroupVo> $fixIterations
@@ -329,77 +325,40 @@ final class ChainDefinitionValidatorTest extends TestCase
         string $name,
         array $steps,
         array $fixIterations,
-    ): ChainDefinitionVo {
-        return $this->instantiateChainDefinition(
-            name: $name,
-            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum::staticType,
-            steps: $steps,
-            fixIterations: $fixIterations,
-        );
+    ): ChainDefinitionInterface {
+        return $this->instantiateStaticChain($name, $steps, $fixIterations);
     }
 
     /**
-     * Создаёт dynamic ChainDefinitionVo с пустым facilitator через reflection.
+     * Создаёт DynamicChainDefinitionVo с пустым facilitator через reflection.
      */
-    private function createDynamicChainWithEmptyFacilitator(string $name): ChainDefinitionVo
+    private function createDynamicChainWithEmptyFacilitator(string $name): ChainDefinitionInterface
     {
-        return $this->instantiateChainDefinition(
-            name: $name,
-            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum::dynamicType,
-            steps: [],
-            fixIterations: [],
-            facilitator: '',
-            participants: ['dev'],
-            maxRounds: 5,
-        );
+        return $this->instantiateDynamicChain($name, '', ['dev'], 5);
     }
 
     /**
-     * Создаёт dynamic ChainDefinitionVo с пустыми participants через reflection.
+     * Создаёт DynamicChainDefinitionVo с пустыми participants через reflection.
      */
-    private function createDynamicChainWithEmptyParticipants(string $name): ChainDefinitionVo
+    private function createDynamicChainWithEmptyParticipants(string $name): ChainDefinitionInterface
     {
-        return $this->instantiateChainDefinition(
-            name: $name,
-            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum::dynamicType,
-            steps: [],
-            fixIterations: [],
-            facilitator: 'analyst',
-            participants: [],
-            maxRounds: 5,
-        );
+        return $this->instantiateDynamicChain($name, 'analyst', [], 5);
     }
 
     /**
-     * Создаёт dynamic ChainDefinitionVo с maxRounds < 1 через reflection.
+     * Создаёт DynamicChainDefinitionVo с maxRounds < 1 через reflection.
      */
-    private function createDynamicChainWithMaxRounds(string $name, int $maxRounds): ChainDefinitionVo
+    private function createDynamicChainWithMaxRounds(string $name, int $maxRounds): ChainDefinitionInterface
     {
-        return $this->instantiateChainDefinition(
-            name: $name,
-            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum::dynamicType,
-            steps: [],
-            fixIterations: [],
-            facilitator: 'analyst',
-            participants: ['dev'],
-            maxRounds: $maxRounds,
-        );
+        return $this->instantiateDynamicChain($name, 'analyst', ['dev'], $maxRounds);
     }
 
     /**
-     * Создаёт dynamic ChainDefinitionVo со всеми нарушениями через reflection.
+     * Создаёт DynamicChainDefinitionVo со всеми нарушениями через reflection.
      */
-    private function createDynamicChainFullyInvalid(string $name): ChainDefinitionVo
+    private function createDynamicChainFullyInvalid(string $name): ChainDefinitionInterface
     {
-        return $this->instantiateChainDefinition(
-            name: $name,
-            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum::dynamicType,
-            steps: [],
-            fixIterations: [],
-            facilitator: '',
-            participants: [],
-            maxRounds: 0,
-        );
+        return $this->instantiateDynamicChain($name, '', [], 0);
     }
 
     /**
@@ -463,38 +422,72 @@ final class ChainDefinitionValidatorTest extends TestCase
     }
 
     /**
-     * Инстанцирует ChainDefinitionVo через reflection для создания VO в «невалидном» состоянии.
+     * Инстанцирует StaticChainDefinitionVo через reflection для создания VO в «невалидном» состоянии.
      *
-     * Это нужно для тестирования Validator: VO создаётся минуя guard-проверки конструктора,
-     * чтобы Validator мог обнаружить нарушения.
+     * @param list<ChainStepVo> $steps
+     * @param list<FixIterationGroupVo> $fixIterations
      */
-    private function instantiateChainDefinition(
+    private function instantiateStaticChain(
         string $name,
-        \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum $type,
         array $steps,
-        array $fixIterations,
-        ?string $facilitator = null,
-        array $participants = [],
-        int $maxRounds = 10,
-    ): ChainDefinitionVo {
-        $ref = new ReflectionClass(ChainDefinitionVo::class);
-        /** @var ChainDefinitionVo $instance */
+        array $fixIterations = [],
+    ): ChainDefinitionInterface {
+        $ref = new ReflectionClass(StaticChainDefinitionVo::class);
+        /** @var StaticChainDefinitionVo $instance */
         $instance = $ref->newInstanceWithoutConstructor();
 
-        $nameProp = $ref->getProperty('name');
-        $nameProp->setValue($instance, $name);
+        $shared = new SharedChainDefinitionVo(
+            name: $name,
+            description: 'Test chain',
+            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum::staticType,
+            budget: null,
+            timeout: null,
+            maxTime: null,
+            roles: [],
+        );
 
-        $descriptionProp = $ref->getProperty('description');
-        $descriptionProp->setValue($instance, 'Test chain');
-
-        $typeProp = $ref->getProperty('type');
-        $typeProp->setValue($instance, $type);
+        $sharedProp = $ref->getProperty('shared');
+        $sharedProp->setValue($instance, $shared);
 
         $stepsProp = $ref->getProperty('steps');
         $stepsProp->setValue($instance, $steps);
 
         $fixIterationsProp = $ref->getProperty('fixIterations');
         $fixIterationsProp->setValue($instance, $fixIterations);
+
+        $defaultRetryPolicyProp = $ref->getProperty('defaultRetryPolicy');
+        $defaultRetryPolicyProp->setValue($instance, null);
+
+        return $instance;
+    }
+
+    /**
+     * Инстанцирует DynamicChainDefinitionVo через reflection для создания VO в «невалидном» состоянии.
+     *
+     * @param list<string> $participants
+     */
+    private function instantiateDynamicChain(
+        string $name,
+        string $facilitator,
+        array $participants,
+        int $maxRounds,
+    ): ChainDefinitionInterface {
+        $ref = new ReflectionClass(DynamicChainDefinitionVo::class);
+        /** @var DynamicChainDefinitionVo $instance */
+        $instance = $ref->newInstanceWithoutConstructor();
+
+        $shared = new SharedChainDefinitionVo(
+            name: $name,
+            description: 'Test chain',
+            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum::dynamicType,
+            budget: null,
+            timeout: null,
+            maxTime: null,
+            roles: [],
+        );
+
+        $sharedProp = $ref->getProperty('shared');
+        $sharedProp->setValue($instance, $shared);
 
         $facilitatorProp = $ref->getProperty('facilitator');
         $facilitatorProp->setValue($instance, $facilitator);
@@ -505,17 +498,19 @@ final class ChainDefinitionValidatorTest extends TestCase
         $maxRoundsProp = $ref->getProperty('maxRounds');
         $maxRoundsProp->setValue($instance, $maxRounds);
 
-        $rolesProp = $ref->getProperty('roles');
-        $rolesProp->setValue($instance, []);
+        $promptConfigProp = $ref->getProperty('promptConfiguration');
+        $promptConfigProp->setValue($instance, new PromptConfigurationVo(
+            brainstormSystemPrompt: 'sys',
+            facilitatorAppendPrompt: 'fa',
+            facilitatorStartPrompt: 'fs',
+            facilitatorContinuePrompt: 'fc',
+            facilitatorFinalizePrompt: 'ff',
+            participantAppendPrompt: 'pa',
+            participantUserPrompt: 'pu',
+        ));
 
-        $budgetProp = $ref->getProperty('budget');
-        $budgetProp->setValue($instance, null);
-
-        $timeoutProp = $ref->getProperty('timeout');
-        $timeoutProp->setValue($instance, null);
-
-        $maxTimeProp = $ref->getProperty('maxTime');
-        $maxTimeProp->setValue($instance, null);
+        $defaultRetryPolicyProp = $ref->getProperty('defaultRetryPolicy');
+        $defaultRetryPolicyProp->setValue($instance, null);
 
         return $instance;
     }

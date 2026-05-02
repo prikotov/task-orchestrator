@@ -13,8 +13,17 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationG
 /**
  * Value Object определения цепочки оркестрации.
  *
- * Immutable, содержит параметры цепочки.
- * Поддерживает два типа: static (линейные шаги) и dynamic (фасилитатор + участники).
+ * @deprecated Используйте специализированные sub-VO:
+ *     - StaticChainDefinitionVo для static-цепочек
+ *     - DynamicChainDefinitionVo для dynamic-цепочек
+ *     - ConditionalChainDefinitionVo для conditional-цепочек
+ * Все три реализуют ChainDefinitionInterface.
+ * Будет удалён в следующем мажорном релизе.
+ *
+ * @see \TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface
+ * @see \TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo
+ * @see \TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo
+ * @see \TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalChainDefinitionVo
  */
 final readonly class ChainDefinitionVo
 {

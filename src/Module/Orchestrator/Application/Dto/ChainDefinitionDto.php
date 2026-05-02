@@ -8,7 +8,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Application\Dto;
  * DTO определения цепочки оркестрации.
  *
  * Транспортный объект на границе Application ↔ Presentation.
- * Маппится из Domain VO ChainDefinitionVo в Infrastructure-адаптере.
+ * Маппится из Domain ChainDefinitionInterface в Infrastructure-адаптере.
  * Содержит только данные, необходимые Presentation-слою для отображения.
  */
 final readonly class ChainDefinitionDto
