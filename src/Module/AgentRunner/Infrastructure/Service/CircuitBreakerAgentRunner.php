@@ -14,10 +14,13 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\CircuitBreaker
 use Throwable;
 
 /**
- * Декоратор AgentRunnerInterface — реализует Circuit Breaker.
+ * Декоратор AgentRunnerInterface — реализует Circuit Breaker с опциональным fallback.
  *
  * Отслеживает ошибки внутреннего runner'а и при достижении порога
  * (failureThreshold) блокирует вызовы на resetTimeoutSeconds.
+ *
+ * При CB open: если сконфигурирован fallback runner — делегирует вызов на него
+ * (с подстановкой fallback command). Если fallback не задан — возвращает ошибку.
  *
  * Состояния: Closed → Open → HalfOpen → Closed.
  * State хранится in-memory (array), ключ — имя runner'а.
@@ -29,10 +32,16 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
     /** @var array<string, CircuitBreakerStateVo> in-memory хранилище состояний */
     private array $states = [];
 
+    /**
+     * @param list<string> $fallbackCommand CLI-команда fallback runner'а.
+     *        Если пуста — fallback runner получит request без изменения command.
+     */
     public function __construct(
         private readonly AgentRunnerInterface $innerRunner,
         private readonly CircuitBreakerStateVo $defaultState,
         private readonly LoggerInterface $logger,
+        private readonly ?AgentRunnerInterface $fallbackRunner = null,
+        private readonly array $fallbackCommand = [],
     ) {
     }
 
@@ -58,6 +67,11 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
         $effectiveState = $state->getEffectiveState();
 
         if ($effectiveState === CircuitStateEnum::open) {
+            // Если fallback runner сконфигурирован — делегируем на него
+            if ($this->fallbackRunner !== null) {
+                return $this->runFallback($request, $runnerName, $state);
+            }
+
             $this->logger->warning(sprintf(
                 '[CircuitBreaker] Runner "%s" is OPEN — call blocked. %s',
                 $runnerName,
@@ -91,6 +105,95 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
 
             throw $throwable;
         }
+    }
+
+    /**
+     * Делегирует вызов на fallback runner при CB open.
+     *
+     * Подставляет fallback command в request (если задана).
+     * Логирует факт fallback-вызова и его результат.
+     */
+    private function runFallback(AgentRunRequestVo $request, string $runnerName, CircuitBreakerStateVo $state): AgentResultVo
+    {
+        $fallbackRunner = $this->fallbackRunner;
+        assert($fallbackRunner !== null);
+        $fallbackName = $fallbackRunner->getName();
+
+        $this->logger->warning(sprintf(
+            '[CircuitBreaker] Runner "%s" is OPEN — delegating to fallback runner "%s". %s',
+            $runnerName,
+            $fallbackName,
+            $state->toLogString(),
+        ));
+
+        $fallbackRequest = $this->buildFallbackRequest($request);
+
+        try {
+            $result = $fallbackRunner->run($fallbackRequest);
+
+            if ($result->isError()) {
+                $this->logger->error(sprintf(
+                    '[CircuitBreaker] Fallback runner "%s" also failed for role "%s": %s',
+                    $fallbackName,
+                    $request->getRole(),
+                    $result->getErrorMessage() ?? 'unknown',
+                ));
+
+                return $result;
+            }
+
+            $this->logger->info(sprintf(
+                '[CircuitBreaker] Fallback runner "%s" succeeded for role "%s" (primary "%s" was OPEN).',
+                $fallbackName,
+                $request->getRole(),
+                $runnerName,
+            ));
+
+            return $result;
+        } catch (Throwable $throwable) {
+            $this->logger->error(sprintf(
+                '[CircuitBreaker] Fallback runner "%s" threw exception for role "%s": %s',
+                $fallbackName,
+                $request->getRole(),
+                $throwable->getMessage(),
+            ));
+
+            return AgentResultVo::createFromError(
+                errorMessage: sprintf(
+                    'Circuit breaker is open for runner "%s" and fallback runner "%s" threw exception: %s',
+                    $runnerName,
+                    $fallbackName,
+                    $throwable->getMessage(),
+                ),
+            );
+        }
+    }
+
+    /**
+     * Создаёт AgentRunRequestVo с fallback command вместо оригинальной.
+     *
+     * Если fallback command не задана — возвращает оригинальный request без изменений.
+     */
+    private function buildFallbackRequest(AgentRunRequestVo $request): AgentRunRequestVo
+    {
+        if ($this->fallbackCommand === []) {
+            return $request;
+        }
+
+        return new AgentRunRequestVo(
+            role: $request->getRole(),
+            task: $request->getTask(),
+            systemPrompt: $request->getSystemPrompt(),
+            previousContext: $request->getPreviousContext(),
+            model: $request->getModel(),
+            tools: $request->getTools(),
+            workingDir: $request->getWorkingDir(),
+            timeout: $request->getTimeout(),
+            maxContextLength: $request->getMaxContextLength(),
+            command: $this->fallbackCommand,
+            runnerArgs: $request->getRunnerArgs(),
+            noContextFiles: $request->getNoContextFiles(),
+        );
     }
 
     /**

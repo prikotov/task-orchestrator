@@ -131,10 +131,10 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         self::assertSame(3, $state->getFailureCount());
     }
 
-    // ─── Open state: вызовы блокируются ────────────────────────────────────
+    // ─── Open state: вызовы блокируются (без fallback) ─────────────────────
 
     #[Test]
-    public function openStateBlocksCallsAndReturnsError(): void
+    public function openStateBlocksCallsAndReturnsErrorWithoutFallback(): void
     {
         $errorResult = AgentResultVo::createFromError(errorMessage: 'Fail');
 
@@ -151,12 +151,358 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $runner->run($this->request);
         $runner->run($this->request); // → Open
 
-        // Теперь вызов блокируется
+        // Теперь вызов блокируется (нет fallback)
         $blockedResult = $runner->run($this->request);
 
         self::assertTrue($blockedResult->isError());
         self::assertStringContainsString('Circuit breaker is open', $blockedResult->getErrorMessage());
         self::assertStringContainsString('pi', $blockedResult->getErrorMessage());
+    }
+
+    // ─── Open state + fallback runner ──────────────────────────────────────
+
+    #[Test]
+    public function openStateDelegatesToFallbackRunner(): void
+    {
+        $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
+        $fallbackRunner->method('getName')->willReturn('codex');
+
+        $fallbackSuccessResult = AgentResultVo::createFromSuccess(outputText: 'Fallback OK');
+        $fallbackRunner->expects(self::once())->method('run')->willReturn($fallbackSuccessResult);
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+
+        $this->logger->method('warning');
+        $this->logger->method('info');
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+            $fallbackRunner,
+        );
+
+        // Доводим до Open (3 failures)
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        // CB open → fallback runner
+        $result = $runner->run($this->request);
+
+        self::assertFalse($result->isError());
+        self::assertSame('Fallback OK', $result->getOutputText());
+    }
+
+    #[Test]
+    public function openStateDelegatesToFallbackWithCustomCommand(): void
+    {
+        $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
+        $fallbackRunner->method('getName')->willReturn('codex');
+
+        $fallbackSuccessResult = AgentResultVo::createFromSuccess(outputText: 'Codex OK');
+        $fallbackCommand = ['codex', '--model', 'gpt-4o', '--full-auto'];
+
+        // Проверяем, что fallback runner получает request с fallback command
+        $fallbackRunner->expects(self::once())->method('run')
+            ->willReturnCallback(function (AgentRunRequestVo $request) use ($fallbackSuccessResult) {
+                // Fallback runner получает fallback command, а не оригинальную
+                self::assertSame(['codex', '--model', 'gpt-4o', '--full-auto'], $request->getCommand());
+
+                return $fallbackSuccessResult;
+            });
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+
+        $this->logger->method('warning');
+        $this->logger->method('info');
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+            $fallbackRunner,
+            $fallbackCommand,
+        );
+
+        // Доводим до Open
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        $result = $runner->run($this->request);
+
+        self::assertFalse($result->isError());
+        self::assertSame('Codex OK', $result->getOutputText());
+    }
+
+    #[Test]
+    public function openStateFallbackRunnerFailsGracefully(): void
+    {
+        $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
+        $fallbackRunner->method('getName')->willReturn('codex');
+
+        $fallbackErrorResult = AgentResultVo::createFromError(errorMessage: 'Codex also failed');
+        $fallbackRunner->method('run')->willReturn($fallbackErrorResult);
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+
+        $this->logger->method('warning');
+        $this->logger->method('error');
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+            $fallbackRunner,
+        );
+
+        // Доводим до Open
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        $result = $runner->run($this->request);
+
+        self::assertTrue($result->isError());
+        self::assertSame('Codex also failed', $result->getErrorMessage());
+    }
+
+    #[Test]
+    public function openStateFallbackRunnerExceptionReturnsError(): void
+    {
+        $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
+        $fallbackRunner->method('getName')->willReturn('codex');
+        $fallbackRunner->method('run')->willThrowException(new RuntimeException('Connection refused'));
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+
+        $this->logger->method('warning');
+        $this->logger->method('error');
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+            $fallbackRunner,
+        );
+
+        // Доводим до Open
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        $result = $runner->run($this->request);
+
+        self::assertTrue($result->isError());
+        self::assertStringContainsString('Circuit breaker is open', $result->getErrorMessage());
+        self::assertStringContainsString('codex', $result->getErrorMessage());
+        self::assertStringContainsString('Connection refused', $result->getErrorMessage());
+    }
+
+    #[Test]
+    public function openStateFallbackPreservesOtherRequestFields(): void
+    {
+        $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
+        $fallbackRunner->method('getName')->willReturn('codex');
+
+        $fallbackSuccessResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $fallbackCommand = ['codex', '--model', 'gpt-4o'];
+
+        $customRequest = new AgentRunRequestVo(
+            role: 'analyst',
+            task: 'review code',
+            systemPrompt: 'You are a code reviewer',
+            previousContext: 'previous data',
+            model: 'claude-3',
+            tools: 'tool1,tool2',
+            workingDir: '/tmp/work',
+            timeout: 120,
+            maxContextLength: 30000,
+            command: ['pi', '--mode', 'json'],
+            runnerArgs: ['--verbose'],
+            noContextFiles: true,
+        );
+
+        $fallbackRunner->expects(self::once())->method('run')
+            ->willReturnCallback(function (AgentRunRequestVo $request) use ($fallbackSuccessResult) {
+                // command заменена на fallback command
+                self::assertSame(['codex', '--model', 'gpt-4o'], $request->getCommand());
+                // Остальные поля сохранены
+                self::assertSame('analyst', $request->getRole());
+                self::assertSame('review code', $request->getTask());
+                self::assertSame('You are a code reviewer', $request->getSystemPrompt());
+                self::assertSame('previous data', $request->getPreviousContext());
+                self::assertSame('claude-3', $request->getModel());
+                self::assertSame('tool1,tool2', $request->getTools());
+                self::assertSame('/tmp/work', $request->getWorkingDir());
+                self::assertSame(120, $request->getTimeout());
+                self::assertSame(30000, $request->getMaxContextLength());
+                self::assertSame(['--verbose'], $request->getRunnerArgs());
+                self::assertTrue($request->getNoContextFiles());
+
+                return $fallbackSuccessResult;
+            });
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+
+        $this->logger->method('warning');
+        $this->logger->method('info');
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+            $fallbackRunner,
+            $fallbackCommand,
+        );
+
+        // Доводим до Open
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        $result = $runner->run($customRequest);
+
+        self::assertFalse($result->isError());
+    }
+
+    #[Test]
+    public function openStateFallbackWithoutCustomCommandUsesOriginalRequest(): void
+    {
+        $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
+        $fallbackRunner->method('getName')->willReturn('codex');
+
+        $fallbackSuccessResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $originalRequest = new AgentRunRequestVo(
+            role: 'test',
+            task: 'do work',
+            command: ['pi', '--mode', 'json'],
+        );
+
+        // fallbackCommand = [] → request передаётся без изменений
+        $fallbackRunner->expects(self::once())->method('run')
+            ->willReturnCallback(function (AgentRunRequestVo $request) use ($fallbackSuccessResult) {
+                // command НЕ заменена (fallbackCommand пустая)
+                self::assertSame(['pi', '--mode', 'json'], $request->getCommand());
+
+                return $fallbackSuccessResult;
+            });
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+
+        $this->logger->method('warning');
+        $this->logger->method('info');
+
+        // fallbackCommand не передана (default = [])
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+            $fallbackRunner,
+        );
+
+        // Доводим до Open
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        $runner->run($originalRequest);
+    }
+
+    #[Test]
+    public function openStateFallbackLogsWarningAndSuccess(): void
+    {
+        $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
+        $fallbackRunner->method('getName')->willReturn('codex');
+        $fallbackRunner->method('run')->willReturn(
+            AgentResultVo::createFromSuccess(outputText: 'OK'),
+        );
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+
+        // Ожидаем: 1 warning (Closed → Open) + 1 warning (delegating to fallback) + 1 info (fallback succeeded)
+        $warningCalls = [];
+        $infoCalls = [];
+
+        $this->logger->method('warning')
+            ->willReturnCallback(function (string $message) use (&$warningCalls) {
+                $warningCalls[] = $message;
+            });
+        $this->logger->method('info')
+            ->willReturnCallback(function (string $message) use (&$infoCalls) {
+                $infoCalls[] = $message;
+            });
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+            $fallbackRunner,
+        );
+
+        // Доводим до Open
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        $runner->run($this->request);
+
+        // Проверяем лог-сообщения
+        self::assertCount(2, $warningCalls);
+        self::assertStringContainsString('Closed → Open', $warningCalls[0]);
+        self::assertStringContainsString('delegating to fallback', $warningCalls[1]);
+        self::assertStringContainsString('codex', $warningCalls[1]);
+
+        self::assertCount(1, $infoCalls);
+        self::assertStringContainsString('succeeded', $infoCalls[0]);
+        self::assertStringContainsString('codex', $infoCalls[0]);
+    }
+
+    #[Test]
+    public function openStateFallbackLogsErrorWhenFallbackFails(): void
+    {
+        $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
+        $fallbackRunner->method('getName')->willReturn('codex');
+        $fallbackRunner->method('run')->willReturn(
+            AgentResultVo::createFromError(errorMessage: 'Codex error'),
+        );
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+
+        $errorCalls = [];
+        $this->logger->method('warning');
+        $this->logger->method('error')
+            ->willReturnCallback(function (string $message) use (&$errorCalls) {
+                $errorCalls[] = $message;
+            });
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+            $fallbackRunner,
+        );
+
+        // Доводим до Open
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        $runner->run($this->request);
+
+        self::assertCount(1, $errorCalls);
+        self::assertStringContainsString('also failed', $errorCalls[0]);
+        self::assertStringContainsString('codex', $errorCalls[0]);
     }
 
     // ─── HalfOpen → Closed при успехе ──────────────────────────────────────
@@ -336,7 +682,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $state = $runner->getCircuitState('pi');
         self::assertSame(CircuitStateEnum::open, $state->getState());
 
-        // 4: заблокирован (Open)
+        // 4: заблокирован (Open, нет fallback)
         $blocked = $runner->run($this->request);
         self::assertTrue($blocked->isError());
         self::assertStringContainsString('Circuit breaker is open', $blocked->getErrorMessage());
@@ -365,5 +711,36 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $finalState = $runner2->getCircuitState('pi');
         self::assertSame(CircuitStateEnum::closed, $finalState->getState());
         self::assertSame(0, $finalState->getFailureCount());
+    }
+
+    // ─── Обратная совместимость: конструктор без fallback ──────────────────
+
+    #[Test]
+    public function constructorWithoutFallbackMaintainsBackwardCompatibility(): void
+    {
+        $errorResult = AgentResultVo::createFromError(errorMessage: 'Fail');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn($errorResult);
+
+        $this->logger->method('warning');
+
+        // Конструктор только с 3 обязательными параметрами (как раньше)
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+        );
+
+        // Доводим до Open
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        // Open → ошибка как раньше (нет fallback)
+        $result = $runner->run($this->request);
+
+        self::assertTrue($result->isError());
+        self::assertStringContainsString('Circuit breaker is open', $result->getErrorMessage());
     }
 }
