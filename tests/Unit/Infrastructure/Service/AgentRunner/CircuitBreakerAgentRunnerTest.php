@@ -9,6 +9,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterfa
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\CircuitBreakerStateVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Metrics\InMemoryMetricsCollector;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\CircuitBreakerAgentRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -742,5 +743,203 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         self::assertTrue($result->isError());
         self::assertStringContainsString('Circuit breaker is open', $result->getErrorMessage());
+    }
+
+    // ─── Metrics integration ─────────────────────────────────────────────
+
+    #[Test]
+    public function recordsCbStateChangeWhenClosedToOpen(): void
+    {
+        $errorResult = AgentResultVo::createFromError(errorMessage: 'Fail');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn($errorResult);
+
+        $this->logger->method('warning');
+
+        $metrics = new InMemoryMetricsCollector();
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+            metrics: $metrics,
+        );
+
+        // failureThreshold = 3
+        $runner->run($this->request); // failure 1
+        $runner->run($this->request); // failure 2
+        $runner->run($this->request); // failure 3 → Open
+
+        // state_change counter: Closed → Open recorded once
+        $counters = $metrics->getCounters();
+        self::assertArrayHasKey('cb.state_change', $counters);
+        $stateChangeKey = 'from=closed,runner=pi,to=open';
+        self::assertArrayHasKey($stateChangeKey, $counters['cb.state_change']);
+        self::assertSame(1, $counters['cb.state_change'][$stateChangeKey]);
+    }
+
+    #[Test]
+    public function recordsCbRejectionWhenCallBlocked(): void
+    {
+        $errorResult = AgentResultVo::createFromError(errorMessage: 'Fail');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn($errorResult);
+
+        $this->logger->method('warning');
+
+        $metrics = new InMemoryMetricsCollector();
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+            metrics: $metrics,
+        );
+
+        // Доводим до Open
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        // CB open — вызов блокируется
+        $runner->run($this->request);
+
+        // rejection counter recorded
+        $counters = $metrics->getCounters();
+        self::assertArrayHasKey('cb.rejection', $counters);
+        self::assertSame(1, $counters['cb.rejection']['runner=pi']);
+    }
+
+    #[Test]
+    public function recordsCbStateChangeWhenHalfOpenToOpen(): void
+    {
+        $pastTime = time() - 120;
+
+        $openState = new CircuitBreakerStateVo(
+            state: CircuitStateEnum::open,
+            failureCount: 3,
+            failureThreshold: 3,
+            resetTimeoutSeconds: 60,
+            lastFailureAt: $pastTime,
+        );
+
+        $errorResult = AgentResultVo::createFromError(errorMessage: 'Still broken');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn($errorResult);
+
+        $this->logger->method('warning');
+
+        $metrics = new InMemoryMetricsCollector();
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $openState,
+            $this->logger,
+            metrics: $metrics,
+        );
+
+        $runner->run($this->request);
+
+        // HalfOpen → Open state change recorded
+        $counters = $metrics->getCounters();
+        self::assertArrayHasKey('cb.state_change', $counters);
+        $stateChangeKey = 'from=half_open,runner=pi,to=open';
+        self::assertArrayHasKey($stateChangeKey, $counters['cb.state_change']);
+        self::assertSame(1, $counters['cb.state_change'][$stateChangeKey]);
+    }
+
+    #[Test]
+    public function recordsCbStateChangeWhenHalfOpenToClosed(): void
+    {
+        $pastTime = time() - 120;
+
+        $openState = new CircuitBreakerStateVo(
+            state: CircuitStateEnum::open,
+            failureCount: 3,
+            failureThreshold: 3,
+            resetTimeoutSeconds: 60,
+            lastFailureAt: $pastTime,
+        );
+
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn($successResult);
+
+        $this->logger->method('info');
+
+        $metrics = new InMemoryMetricsCollector();
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $openState,
+            $this->logger,
+            metrics: $metrics,
+        );
+
+        $runner->run($this->request);
+
+        // HalfOpen → Closed state change recorded
+        $counters = $metrics->getCounters();
+        self::assertArrayHasKey('cb.state_change', $counters);
+        $stateChangeKey = 'from=half_open,runner=pi,to=closed';
+        self::assertArrayHasKey($stateChangeKey, $counters['cb.state_change']);
+        self::assertSame(1, $counters['cb.state_change'][$stateChangeKey]);
+    }
+
+    #[Test]
+    public function recordsMultipleRejectionsWhenCbIsOpen(): void
+    {
+        $errorResult = AgentResultVo::createFromError(errorMessage: 'Fail');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn($errorResult);
+
+        $this->logger->method('warning');
+
+        $metrics = new InMemoryMetricsCollector();
+
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+            metrics: $metrics,
+        );
+
+        // Доводим до Open
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        // 3 rejection'а подряд
+        $runner->run($this->request);
+        $runner->run($this->request);
+        $runner->run($this->request);
+
+        $counters = $metrics->getCounters();
+        self::assertSame(3, $counters['cb.rejection']['runner=pi']);
+    }
+
+    #[Test]
+    public function worksssWithoutMetricsCollector(): void
+    {
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn($successResult);
+
+        // Metrics = null (default)
+        $runner = new CircuitBreakerAgentRunner(
+            $this->innerRunner,
+            $this->defaultState,
+            $this->logger,
+        );
+
+        $result = $runner->run($this->request);
+
+        self::assertFalse($result->isError());
     }
 }
