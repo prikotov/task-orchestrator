@@ -179,7 +179,7 @@ Orchestrator Application → Orchestrator Domain (interfaces) ✅
 
 Порядок задач — по зависимостям:
 
-- [ ] [TASK-docs-security-policy-adr](TASK-docs-security-policy-adr.todo.md) — ADR-010: Security Policy Architecture
+- [x] [TASK-docs-security-policy-adr](done/TASK-docs-security-policy-adr.todo.md) — ADR-010: Security Policy Architecture ✅
 - [ ] [TASK-feat-security-policy-domain](TASK-feat-security-policy-domain.todo.md) — Domain слой модуля SecurityPolicy
 - [ ] [TASK-feat-security-policy-ports](TASK-feat-security-policy-ports.todo.md) — Ports (interfaces) в Orchestrator Domain
 - [ ] [TASK-feat-security-policy-infrastructure](TASK-feat-security-policy-infrastructure.todo.md) — Infrastructure реализация ports + Decorators

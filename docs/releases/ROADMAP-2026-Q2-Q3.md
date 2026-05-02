@@ -323,7 +323,7 @@ Roadmap покрывает два крупных направления:
 | #16 | Переразложение Shared/ каталога | P3 | Sprint 7 | ✅ Done — [TASK](../todo/TASK-refactor-shared-reorg.todo.md) PR #116 |
 | #17 | Физический split StaticExecution в отдельный модуль | P3 | Sprint 7 | ✅ Done — [TASK](../todo/done/TASK-refactor-static-execution-split.todo.md) PR #117 |
 | — | Conditional branching (`when:` + strategy) | Roadmap | Sprint 8 | 📋 Planned |
-| — | Security Policy (exec policy + permissions) | Roadmap | Sprint 9 | 📋 Planned |
+| — | Security Policy (exec policy + permissions) | Roadmap | Sprint 9 | 📋 Planned — [ADR-010](../docs/adr/010-security-policy-architecture.md) |
 | — | Error classification + Typed I/O | Roadmap | Sprint 10 | 📋 Planned |
 | — | Hooks + Sub-agents (design) | Roadmap | Sprint 11 | 📋 Planned |
 

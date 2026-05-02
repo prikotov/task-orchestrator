@@ -10,7 +10,7 @@ author: system_analyst (Шерлок)
 assignee:
 branch:
 pr:
-status: todo
+status: done
 ---
 
 # TASK-docs-security-policy-adr: ADR-010 — Security Policy Architecture
