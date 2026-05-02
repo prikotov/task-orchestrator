@@ -42,15 +42,18 @@ curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/install.sh 
 ### Установка русскоязычных звуковых пакетов
 
 ```bash
-# Дед Борис (рекомендуется) — ворчливый дед комментирует ваш код
-~/.local/bin/peon packs install boris_ru
-~/.local/bin/peon packs use boris_ru
-
-# Орк-Батрак (Warcraft III)
+# Орк-Батрак (рекомендуется) — Warcraft III
 ~/.local/bin/peon packs install peon_ru
+~/.local/bin/peon packs use peon_ru
 
 # Крестьянин (Warcraft III)
 ~/.local/bin/peon packs install peasant_ru
+
+# Дед Борис (AI-generated)
+~/.local/bin/peon packs install boris_ru
+
+# Строитель Высших Эльфов (Warcraft III)
+~/.local/bin/peon packs install high_elf_builder_ru
 
 # Артас Рыцарь Смерти (Warcraft III)
 ~/.local/bin/peon packs install arthas_ru
