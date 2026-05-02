@@ -59,8 +59,8 @@ Roadmap покрывает два крупных направления:
 | **Sprint 6** | 14 июля — 27 июля | P3: RunDynamicLoopService | Декомпозиция на LoopOrchestrator + TurnExecutor + BudgetChecker + Finalizer |
 | **Sprint 7** | 28 июля — 10 августа | P3: Infrastructure cleanup | ChainSessionLogger split, Shared/ reorg, DynamicTurnResultVo split |
 | **Sprint 8** | 11 августа — 24 августа | Conditional branching | YAML DSL расширение, ExecutionStrategy для conditional, `when:` expressions |
-| **Sprint 9** | 08 сентября — 21 сентября | Error handling + Typed I/O | Error classification (FATAL/TRANSIENT/UNKNOWN), JSON Schema per step |
-| **Sprint 10** | 22 сентября — 05 октября | Hooks + Sub-agents (design) | Hooks system (pre/post step), Sub-agent pattern (design + ADR) |
+| **Sprint 9** | 08 сентября — 21 сентября | Resilience + Observability | Model failover (CB→fallback), Error classification (упрощённая), MetricsCollector, ADR Dynamic split |
+| **Sprint 10** | 22 сентября — 05 октября | Hooks + Debt Cleanup | Hooks post_step MVP, ChainDefinitionVo split завершение, Resume ADR |
 
 ---
 
@@ -241,39 +241,71 @@ Roadmap покрывает два крупных направления:
 
 ---
 
-### Sprint 9 (08 сентября — 21 сентября): Error Handling + Typed I/O
+### Sprint 9 (08 сентября — 21 сентября): Resilience + Observability
 
-> **Тема:** Интеллектуальная обработка ошибок + типизированные схемы данных — повышение надёжности цепочек.
+> **Тема:** Повышение отказоустойчивости цепочек и закладка observability-фундамента. Рекомендовано Локи: модель failover — реальная боль (pain 7/10), metrics — упущенная потребность, error classification — дешёвое улучшение.
+>
+> **Источник:** [`docs/research/loki-roadmap-review-2026-05.md`](../research/loki-roadmap-review-2026-05.md)
 
-| Задача | Описание | Источник | Оценка |
-|---|---|---|---|
-| **Error classification** | FATAL → не retry, TRANSIENT → retry с backoff, UNKNOWN → консервативный подход. Интеграция с `RetryingAgentRunner` | Archon, OpenClaw, Codex | 1 день |
-| **Stuck / Loop detection** | Обнаружение зацикливания в fix_iterations: повторяющиеся действия, повторяющиеся ошибки | Crush, OpenHands SDK, Paperclip AI | 1 день |
-| **Typed I/O per step (JSON Schema)** | Схемы валидации входных/выходных данных каждого шага. Fail-fast при невалидном input | Mastra AI, LangGraph, Archon | 1.5 дня |
+| # | Задача | Оценка | Pain |
+|---|--------|--------|------|
+| **1** | **Model failover: CB open → trigger fallback** | 1 день | 7/10 |
+| **2** | **Error classification: упрощённая по exitCode/timeout** | 0.5 дня | 2/10 |
+| **3** | **MetricsCollectorInterface + in-memory реализация** | 1 день | 5/10 |
+| **4** | **ADR: Dynamic split — решение** | 2 часа | — |
+
+#### Описание задач
+
+**Задача 1: Model failover (CB open → trigger fallback)**
+`CircuitBreakerAgentRunner` при open-состоянии блокирует вызов и возвращает ошибку — цепочка падает. `FallbackConfigVo` уже существует (другой runner), но CB и fallback не связаны. Нужно: CB open → автоматически триггерить fallback runner, если сконфигурирован. Это wiring существующего кода, не новая архитектура.
+
+**Задача 2: Error classification (упрощённая)**
+`RetryingAgentRunner` retry-all без разбора. Добавить классификацию по `AgentResultVo`-полям (`exitCode`, `isTimedOut`, `isError`): TRANSIENT → retry, FATAL → не retry. Минимальная реализация (~30 строк в `RetryingAgentRunner`).
+
+**Задача 3: MetricsCollectorInterface**
+Observability gap — `AuditLoggerInterface` пишет в JSONL, но нет способа агрегировать метрики (какая цепочка дольше, какая роль дороже, какой runner чаще падает). Добавить `MetricsCollectorInterface` в Domain с in-memory реализацией в Infrastructure. Hook-система (Sprint 10) будет использовать его.
+
+**Задача 4: ADR Dynamic split**
+OQ-6 открыт: остаётся ли Dynamic в Orchestrator навсегда или планируется split? Sprint 8 завершён, Conditional Branching валидировал Integration-паттерн — пора принимать решение.
 
 **Критерии готовности Sprint 9:**
-- [ ] `RetryingAgentRunner` классифицирует ошибки (FATAL/TRANSIENT/UNKNOWN)
-- [ ] Loop detection работает для fix_iterations
-- [ ] JSON Schema валидация на границах шагов (опционально)
+- [ ] CB open → fallback runner (если сконфигурирован)
+- [ ] `RetryingAgentRunner` классифицирует ошибки по `exitCode`/`isTimedOut`/`isError` (FATAL/TRANSIENT)
+- [ ] `MetricsCollectorInterface` в Domain + in-memory реализация в Infrastructure
+- [ ] ADR Dynamic split записан
 - [ ] Unit + Integration тесты
 
 ---
 
-### Sprint 10 (22 сентября — 05 октября): Hooks + Sub-agents (Design)
+### Sprint 10 (22 сентября — 05 октября): Hooks + Debt Cleanup
 
-> **Тема:** Hooks system (pre/post step execution) и дизайн sub-agent pattern — закладка фундамента для Q4.
+> **Тема:** Hooks MVP для observability + завершение технического долга (ChainDefinitionVo split). Рекомендовано Локи: post_step hooks — реальная боль (pain 6/10), God-VO — долг от Sprint 4.
+>
+> **Источник:** [`docs/research/loki-roadmap-review-2026-05.md`](../research/loki-roadmap-review-2026-05.md)
 
-| Задача | Описание | Источник | Оценка |
-|---|---|---|---|
-| **Hooks system** | Shell-скрипты pre/post step execution. Декларативная альтернатива decorator pattern | Claude Code, OpenHands SDK, Codex | 1.5 дня |
-| **Sub-agent pattern: ADR + design** | «Chain внутри chain» с изолированным контекстом. ADR фиксирует паттерн. Реализация — Q4 | Claude Code, Codex, OpenHands SDK | 1 день (дизайн) |
-| **Model failover с cooldown** | При недоступности модели → переключение на fallback. Дополнение к circuit breaker | OpenClaw, Archon, Paperclip AI | 0.5 дня |
+| # | Задача | Оценка | Pain |
+|---|--------|--------|------|
+| **1** | **Hooks system: post_step MVP** | 1.5 дня | 6/10 |
+| **2** | **ChainDefinitionVo завершение split** | 1.5 дня | 4/10 |
+| **3** | **Resume для static цепочек: ADR** | 0.5 дня | — |
+
+#### Описание задач
+
+**Задача 1: Hooks post_step MVP**
+Только `post_step` hooks (observability/notification), не `pre_step` control flow. `pre_step` — это conditional branching (уже есть через `when:`). Hook = shell-скрипт через Symfony Process с таймаутом 30с. Hook failure = warning, не failure цепочки. Hook stdout/stderr — в audit log.
+
+**Задача 2: ChainDefinitionVo split завершение**
+God-VO 483 LOC, 17 параметров, 3 фабричных метода (`createFromSteps`, `createFromDynamic`, `createFromConditionalSteps`). Создать `StaticChainDefinitionVo`, `DynamicChainDefinitionVo`, `ConditionalChainDefinitionVo` с общим `ChainDefinitionInterface`. Заложено в ADR-008 (Shared Kernel Contract), но не реализовано. Sprint 4 создал `SharedChainDefinitionVo`, но оригинальный `ChainDefinitionVo` не стал легче.
+
+**Задача 3: Resume для static цепочек ADR**
+Static/Conditional стратегии не поддерживают resume — падение на 8-м из 10 шагов = всё сначала. Для дорогих LLM-вызовов ($0.50–2.00 за шаг) это реальная потеря. ADR фиксирует паттерн checkpoint + resume для static/conditional. Реализация — Q4.
 
 **Критерии готовности Sprint 10:**
-- [ ] Hooks system работает (pre/post shell-скрипты)
-- [ ] Sub-agent ADR записан, дизайн утверждён
-- [ ] Model failover реализован
-- [ ] Unit-тесты на hooks pipeline
+- [ ] `post_step` hooks работают (shell-скрипты через Symfony Process, таймаут 30с)
+- [ ] Hook failure = warning в лог, не failure цепочки
+- [ ] `ChainDefinitionVo` расщеплён на `StaticChainDefinitionVo`, `DynamicChainDefinitionVo`, `ConditionalChainDefinitionVo`
+- [ ] Resume ADR записан
+- [ ] Unit-тесты на hooks pipeline + split VO
 
 ---
 
@@ -301,8 +333,16 @@ Roadmap покрывает два крупных направления:
 | #17 | Физический split StaticExecution в отдельный модуль | P3 | Sprint 7 | ✅ Done — [TASK](../todo/done/TASK-refactor-static-execution-split.todo.md) PR #117 |
 | — | Conditional branching (`when:` + strategy) | Roadmap | Sprint 8 | ✅ Done |
 | — | ~~Security Policy (exec policy + permissions)~~ | Roadmap | — | ❌ Cancelled — security theater: правила проверяют текст промпта, но не видят реальные shell-команды внутри сессии |
-| — | Error classification + Typed I/O | Roadmap | Sprint 9 | 📋 Planned |
-| — | Hooks + Sub-agents (design) | Roadmap | Sprint 10 | 📋 Planned |
+| — | Model failover: CB open → trigger fallback | Roadmap | Sprint 9 | 📋 Planned |
+| — | Error classification (упрощённая по exitCode/timeout) | Roadmap | Sprint 9 | 📋 Planned |
+| — | MetricsCollectorInterface + in-memory реализация | Roadmap | Sprint 9 | 📋 Planned |
+| — | ADR: Dynamic split — решение | Roadmap | Sprint 9 | 📋 Planned |
+| — | Hooks system: post_step MVP | Roadmap | Sprint 10 | 📋 Planned |
+| — | ChainDefinitionVo завершение split | Roadmap | Sprint 10 | 📋 Planned |
+| — | Resume для static цепочек: ADR | Roadmap | Sprint 10 | 📋 Planned |
+| — | ~~Loop detection (fix_iterations)~~ | Roadmap | — | ❌ Cancelled — `maxIterations` уже ограничивает циклы; LLM-text similarity unreliable; pain 0/10. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
+| — | ~~Typed I/O per step (JSON Schema)~~ | Roadmap | — | ❌ Cancelled — нет structured output между шагами, строить не на чем; pain 1/10. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
+| — | ~~Sub-agent pattern: ADR + design~~ | Roadmap | — | ❌ Cancelled — speculative ADR без опыта эксплуатации conditional chains; отложено до Q4. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
 
 ---
 
@@ -314,12 +354,12 @@ Roadmap покрывает два крупных направления:
 |---|---|---|---|---|
 | **Conditional branching** | Кластер 3: Оркестрация | Sprint 8 | Archon (`when:`), Mastra AI (`.branch()`), LangGraph (conditional edges), Agno (Condition + Router) | Подтверждена 4+ проектами. Реализуема через ExecutionStrategyInterface |
 | ~~**Security policy**~~ | Кластер 2: Безопасность | — | Codex (exec policy + Guardian + Docker sandbox), Claude Code (permissions), Copilot Cloud Agent (policy engine) | ❌ **Cancelled:** security theater — правила проверяют текст промпта, но не видят реальные shell-команды внутри сессии. Контроль доступа — через OS sandbox при необходимости |
-| **Error classification** | Кластер 1: Обработка ошибок | Sprint 9 | Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (6 категорий), Codex (Guardian) | Интеграция с `RetryingAgentRunner`. Не тратить retry на неисправимые ошибки |
-| **Typed I/O** | Кластер 3: Оркестрация | Sprint 9 | Mastra AI (Zod), LangGraph (TypedDict), Archon (JSON Schema) | JSON Schema валидация на границах шагов. Опционально для backward compat |
-| **Hooks system** | Кластер 3: Оркестрация | Sprint 10 | Claude Code (20+ events), OpenHands SDK (6 lifecycle events), Codex (hooks) | Shell-скрипты pre/post step. Декларативная альтернатива decorator pattern |
-| **Sub-agents** | Кластер 3: Оркестрация | Sprint 10 (design), Q4 (impl) | Claude Code (Task tool), Codex (spawn/wait), OpenHands SDK (DelegateTool) | «Chain внутри chain» с изолированным контекстом. Требует ADR |
-| **Loop detection** | Кластер 1: Обработка ошибок | Sprint 9 | Crush (window-based), OpenHands SDK (4+1), Paperclip AI (evidence-based) | Защита от зацикливания в fix_iterations |
-| **Model failover** | Кластер 1: Обработка ошибок | Sprint 10 | OpenClaw (per-profile), Archon (fallbackModel), Paperclip AI (escalation) | Дополнение к circuit breaker: CB → cascade protection, failover → switching |
+| **Error classification** | Кластер 1: Обработка ошибок | Sprint 9 | RetryingAgentRunner, AgentResultVo | Упрощённая классификация по `exitCode`/`isTimedOut`/`isError`. ~30 строк, не парсинг текста |
+| ~~**Typed I/O**~~ | Кластер 3: Оркестрация | — | Mastra AI (Zod), LangGraph (TypedDict), Archon (JSON Schema) | ❌ **Cancelled:** нет structured output между шагами (`outputText` — сырой текст), JSON Schema не на что накладывать. Отложено до Q4 2026 / Q1 2027. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
+| **Hooks system** | Кластер 3: Оркестрация | Sprint 10 | Claude Code (20+ events), OpenHands SDK (6 lifecycle events), Codex (hooks) | MVP: только `post_step` hooks (observability/notification). `pre_step` = conditional branching (уже есть через `when:`) |
+| ~~**Sub-agents**~~ | Кластер 3: Оркестрация | — | Claude Code (Task tool), Codex (spawn/wait), OpenHands SDK (DelegateTool) | ❌ **Cancelled (Q3):** speculative ADR без опыта эксплуатации conditional chains. Отложено до Q4 Sprint 1. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
+| ~~**Loop detection**~~ | Кластер 1: Обработка ошибок | — | Crush (window-based), OpenHands SDK (4+1), Paperclip AI (evidence-based) | ❌ **Cancelled:** `maxIterations` уже ограничивает циклы; LLM-text similarity unreliable; проблема качества модели, не оркестратора. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
+| **Model failover** | Кластер 1: Обработка ошибок | Sprint 9 | OpenClaw (per-profile), Archon (fallbackModel), Paperclip AI (escalation) | CB open → автоматически триггерить fallback runner. Wiring существующих CB + FallbackConfigVo, не новая архитектура. Pain 7/10 |
 | **Parallel execution** | Кластер 3: Оркестрация | Q4 2026 | Archon (DAG layers), Mastra AI (`.parallel()`), pi_agent_rust (read-only tools) | Требует DAG foundation. `ChainStepVo` nullable-поля: `?array $dependsOn`, `?string $parallelGroup` |
 | **Auto-compaction** | Кластер 4: Контекст | Q4 2026 | Crush, OpenHands SDK, Mastra AI, Claude Code, Codex (6/13 проектов) | LLM-суммаризация при context overflow. Для длинных dynamic loops |
 | **DAG orchestration** | Кластер 5: Архитектура | Q1 2027 | LangGraph (StateGraph), Archon (DAG + topological layers) | Самый гибкий подход, высокий порог входа. Отдельный PR с обоснованием |
@@ -368,6 +408,19 @@ graph TD
         CB["Conditional branching + ConditionalStrategy"]
     end
 
+    subgraph "Sprint 9 — Resilience + Observability"
+        S9T1["Model failover: CB→fallback"]
+        S9T2["Error classification (упрощённая)"]
+        S9T3["MetricsCollectorInterface"]
+        S9T4["ADR: Dynamic split"]
+    end
+
+    subgraph "Sprint 10 — Hooks + Debt Cleanup"
+        S10T1["Hooks: post_step MVP"]
+        S10T2["ChainDefinitionVo split завершение"]
+        S10T3["Resume ADR (static/conditional)"]
+    end
+
     AI4 --> AI7
     AI7 --> AI8
     AI8 --> AI9
@@ -379,12 +432,25 @@ graph TD
     AI11 --> AI15
     AI10 --> AI16
 
+    CB --> S9T1
+    CB --> S9T3
+    S9T3 --> S10T1
+    AI10 --> S10T2
+    S9T1 --> S10T3
+
     style AI2 fill:#4CAF50,color:#fff
     style AI1 fill:#4CAF50,color:#fff
     style AI3 fill:#4CAF50,color:#fff
     style AI4 fill:#4CAF50,color:#fff
     style AI5 fill:#4CAF50,color:#fff
     style CB fill:#2196F3,color:#fff
+    style S9T1 fill:#FF9800,color:#fff
+    style S9T2 fill:#FF9800,color:#fff
+    style S9T3 fill:#FF9800,color:#fff
+    style S9T4 fill:#FF9800,color:#fff
+    style S10T1 fill:#FF9800,color:#fff
+    style S10T2 fill:#FF9800,color:#fff
+    style S10T3 fill:#FF9800,color:#fff
 ```
 
 ---
@@ -400,7 +466,7 @@ graph TD
 | **OQ-3** | ~~**Security Policy module — единственный roadmap-сценарий, где разделение Static/Dynamic создаёт проблему.**~~ Cross-cutting concern зависит от обоих subdomain'ов. | — | — | ✅ **Resolved:** Security Policy отменён. Контроль доступа решается через OS sandbox при необходимости |
 | **OQ-4** | **Инвентаризация Domain-слоя (57% модуля = 5643 строки) не проведена.** Static subdomain (770 строк, 4 сервиса), Entities (594 строки), Session/Audit (242 строки) — не анализировались. | Шерлок | Sprint 2 | Может вскрыть новые God-объекты или скрытые зависимости |
 | **OQ-5** | **DynamicTurnResultVo — discriminated union, не VO.** 6 полей, 13 точек создания, 3 семантические «фигуры» (Continue/Break/Completion). Конкретные VO-имена не утверждены (предложение: `TurnContinueVo` + `TurnBreakVo`). | Левша | До Sprint 6 | Блокирует AI#11 |
-| **OQ-6** | **Физическое разделение Static/Dynamic на модули** — Static split запланирован на Sprint 7 (вторая половина). Dynamic остаётся в Orchestrator до стабилизации Integration-паттерна на ≥2 стратегиях (G6). Решение о Dynamic split — после Sprint 8 по результатам Conditional Branching. | Владелец проекта | Sprint 8 | Если Integration-паттерн треснет на Conditional Branching — Static merge обратно в Orchestrator |
+| **OQ-6** | **Физическое разделение Static/Dynamic на модули** — Static split запланирован на Sprint 7 (вторая половина). Dynamic остаётся в Orchestrator до стабилизации Integration-паттерна на ≥2 стратегиях (G6). Решение о Dynamic split — после Sprint 8 по результатам Conditional Branching. | Владелец проекта | Sprint 9 (ADR) | Sprint 8 завершён, Conditional Branching валидировал Integration-паттерн. **ADR запланирован на Sprint 9, задача 4.** Если Integration-паттерн треснет — Static merge обратно в Orchestrator |
 | **OQ-7** | **Loop с `until_bash` / `end_condition`** — усиление fix_iterations детерминированной проверкой завершения. Не включён в спринты — нужен ли? | Владелец проекта | До Sprint 10 | Если да → добавить в Sprint 10 |
 
 ### Риски
@@ -411,7 +477,7 @@ graph TD
 | **R-2** | **Conditional branching YAML DSL** — выбор синтаксиса может стать предметом длительных обсуждений | Средняя | Задержка Sprint 8 | Зафиксировать DSL в ADR до Sprint 8 |
 | **R-3** | **P3 → Roadmap-фичи overlap** — декомпозиция RunDynamicLoopService (Sprint 6) может пересечься с conditional branching (Sprint 8) по срокам | Низкая | Сдвиг Sprint 8 | Sprint 5 как буфер |
 | **R-4** | ~~**Security Policy cross-cutting** — может потребовать architecture decision, замедляющего Sprint 9~~ | — | — | ✅ **Resolved:** Security Policy отменён |
-| **R-5** | **Typed I/O (JSON Schema)** — может потребовать значительных изменений в YAML-парсере и ChainLoader | Средняя | Упрощение или отложение | Сделать опциональным (opt-in per step) |
+| **R-5** | ~~**Typed I/O (JSON Schema)** — может потребовать значительных изменений в YAML-парсере и ChainLoader~~ | — | — | ✅ **Resolved:** Typed I/O отменён. Нет structured output между шагами, строить не на чем. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
 | **R-6** | **Static split Integration-паттерн не масштабируется** — Integration-слой для Static (~1270 LOC, 4 зависимости от ChainDefinitionVo) может оказаться недостаточным для Conditional Branching (Sprint 8) | Средняя | Merge Static обратно в Orchestrator | Sprint 8 (Conditional Branching) валидировал паттерн ✅ |
 
 ---
@@ -425,8 +491,8 @@ graph TD
 | **M3: P2 Complete** | Sprint 5 | ~13 июля | Все P2 задачи закрыты. Архитектурная документация обновлена |
 | **M4: God-Objects Eliminated** | Sprint 7 | ~10 августа | RunDynamicLoopService декомпозирован. ChainSessionLogger расщеплён |
 | **M5: Conditional Branching** | Sprint 8 | ~24 августа | YAML `when:` expressions работают. Integration-тесты проходят |
-| **M6: Intelligent Error Handling** | Sprint 9 | ~21 сентября | Error classification + Loop detection интегрированы |
-| **M7: Q3 Complete** | Sprint 10 | ~05 октября | Hooks system работает. Sub-agent ADR утверждён. Roadmap Q4 готов |
+| **M6: Resilience + Observability** | Sprint 9 | ~21 сентября | Model failover работает (CB→fallback). Error classification интегрирована. MetricsCollector доступен |
+| **M7: Q3 Complete** | Sprint 10 | ~05 октября | Hooks post_step MVP работает. ChainDefinitionVo расщеплён. Resume ADR утверждён. Roadmap Q4 готов |
 
 ---
 
@@ -437,9 +503,9 @@ graph TD
 | Фича | Кластер | Предварительный спринт | Примечание |
 |---|---|---|---|
 | **Parallel execution** | Оркестрация | Q4 Sprint 1–2 | Требует `?array $dependsOn` и `?string $parallelGroup` на `ChainStepVo` |
-| **Sub-agents (implementation)** | Оркестрация | Q4 Sprint 2–3 | «Chain внутри chain» с изолированным контекстом |
+| **Sub-agents (implementation)** | Оркестрация | Q4 Sprint 2–3 | «Chain внутри chain» с изолированным контекстом. ADR отложен до Q4 Sprint 1 |
 | **Auto-compaction / summarization** | Контекст | Q4 Sprint 3–4 | LLM-суммаризация при context overflow |
-| **Model failover с cooldown** | Обработка ошибок | Q4 Sprint 1 | Из Sprint 10 — если не успеем |
+| ~~**Model failover с cooldown**~~ | Обработка ошибок | — | ✅ **Перенесено в Sprint 9** как «CB open → trigger fallback». Wiring существующих CB + FallbackConfigVo |
 | **Docker-based sandboxing** | Безопасность | Q4 Sprint 4–5 | **Приоритет повышен:** единственный реальный механизм контроля доступа после отмены Security Policy. Container isolation для CI/CD |
 | **DAG orchestration** | Архитектура | Q1 2027 | Graph-based execution. Отдельный PR с обоснованием |
 | **Human-in-the-loop** | Архитектура | R&D | ⚠️ Ограничено в CLI |
@@ -522,4 +588,4 @@ graph TD
 |------|-------|----------|
 | 2026-04-29 | Шерлок | Черновик roadmap создан |
 | 2026-04-30 | Шерлок | Добавлены результаты Brainstorm #2, триггеры для split, ключевые инсайты |
-| 2026-05-02 | Гермиона | **Security Policy отменён** (❌ Cancelled). Sprint 9 (Security Policy) удалён, спринты перенумерованы (10→9, 11→10). Sprint 8 (Conditional Branching) — ✅ Done. Веха M6 удалена, M7→M6, M8→M7. Docker-based sandboxing: приоритет повышен. OQ-3, R-4 — закрыты. R-6 — обновлён. G4, Brainstorm #2 Decision 1 — помечены неактуальными |
+| 2026-05-02 | Гермиона | **Sprint 9–10 переписаны по рекомендациям Локи** ([`docs/research/loki-roadmap-review-2026-05.md`](../research/loki-roadmap-review-2026-05.md)). Sprint 9: Resilience + Observability (Model failover, Error classification упрощённая, MetricsCollector, ADR Dynamic split). Sprint 10: Hooks + Debt Cleanup (post_step MVP, ChainDefinitionVo split завершение, Resume ADR). Loop detection, Typed I/O, Sub-agent ADR — ❌ Cancelled. Вехи M6/M7 обновлены. OQ-6 — решение перенесено в Sprint 9. R-5 закрыт |
