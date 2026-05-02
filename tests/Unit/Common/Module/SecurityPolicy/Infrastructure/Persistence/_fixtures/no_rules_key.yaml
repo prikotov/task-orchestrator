@@ -1,0 +1,3 @@
+default_policy: allow
+# No rules key at all
+something_else: true

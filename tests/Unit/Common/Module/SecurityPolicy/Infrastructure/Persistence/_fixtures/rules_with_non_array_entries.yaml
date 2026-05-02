@@ -1,0 +1,9 @@
+rules:
+  - "just a string, not an array"
+  - target: command
+    pattern: "valid*"
+    type: glob
+    action: allow
+    severity: block
+
+  - 42

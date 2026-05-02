@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\SecurityPolicy\Domain\Exception\ExecPolicyViolationException;
 use TaskOrchestrator\Common\Module\SecurityPolicy\Domain\Service\ExecPolicyCheckService;
 use TaskOrchestrator\Common\Module\SecurityPolicy\Domain\Service\SecurityPolicyServiceInterface;
+use TaskOrchestrator\Common\Module\SecurityPolicy\Infrastructure\Persistence\YamlExecRuleRepository;
 use TaskOrchestrator\Common\Module\SecurityPolicy\Infrastructure\Service\DefaultSecurityPolicyFactory;
 
 #[CoversClass(DefaultSecurityPolicyFactory::class)]
@@ -19,12 +20,16 @@ final class DefaultSecurityPolicyFactoryTest extends TestCase
 
     protected function setUp(): void
     {
+        // Используем путь к несуществующему файлу → fallback на hardcoded defaults
+        $yamlRepository = new YamlExecRuleRepository('/nonexistent/security_policy.yaml');
+
         $this->factory = new DefaultSecurityPolicyFactory(
             execPolicyCheckService: new ExecPolicyCheckService(),
+            yamlExecRuleRepository: $yamlRepository,
         );
     }
 
-    // ─── create: default rules ─────────────────────────────────────────
+    // ─── create: default rules (fallback) ───────────────────────────────
 
     #[Test]
     public function createReturnsSecurityPolicyServiceInterface(): void
@@ -132,5 +137,45 @@ final class DefaultSecurityPolicyFactoryTest extends TestCase
         $service->checkShellCommand('cat README.md');
 
         $this->assertTrue(true);
+    }
+
+    // ─── create: YAML rules loading ─────────────────────────────────────
+
+    #[Test]
+    public function createLoadsRulesFromYamlWhenFileExists(): void
+    {
+        $yamlRepository = new YamlExecRuleRepository(
+            __DIR__ . '/../Persistence/_fixtures/valid_security_policy.yaml',
+        );
+
+        $factory = new DefaultSecurityPolicyFactory(
+            execPolicyCheckService: new ExecPolicyCheckService(),
+            yamlExecRuleRepository: $yamlRepository,
+        );
+
+        $service = $factory->create();
+
+        // YAML contains deny-bash-c rule
+        $this->expectException(ExecPolicyViolationException::class);
+        $service->checkRunnerCommand('openai', 'bash -c something');
+    }
+
+    #[Test]
+    public function createYamlRulesDenyLocalShellRunner(): void
+    {
+        $yamlRepository = new YamlExecRuleRepository(
+            __DIR__ . '/../Persistence/_fixtures/valid_security_policy.yaml',
+        );
+
+        $factory = new DefaultSecurityPolicyFactory(
+            execPolicyCheckService: new ExecPolicyCheckService(),
+            yamlExecRuleRepository: $yamlRepository,
+        );
+
+        $service = $factory->create();
+
+        // YAML contains deny runner local-shell rule
+        $this->expectException(ExecPolicyViolationException::class);
+        $service->checkRunnerCommand('local-shell', 'safe task');
     }
 }

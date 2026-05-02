@@ -1,0 +1,18 @@
+default_policy: allow
+
+rules:
+  - target: command
+    pattern: "rm -rf*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "No ID rule 1"
+
+  - target: command
+    pattern: "sudo*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "No ID rule 2"

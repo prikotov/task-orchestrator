@@ -1,0 +1,6 @@
+rules:
+  - target: command
+    pattern: "test*"
+    type: glob
+    action: deny
+    # no severity specified — should default to block

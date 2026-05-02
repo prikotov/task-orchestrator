@@ -173,6 +173,11 @@ services:
   TaskOrchestrator\Common\Module\SecurityPolicy\Domain\Service\SecurityPolicyServiceInterface:
     factory: ['@TaskOrchestrator\Common\Module\SecurityPolicy\Infrastructure\Service\DefaultSecurityPolicyFactory', 'create']
 
+  # --- SecurityPolicy module: YamlExecRuleRepository ---
+  TaskOrchestrator\Common\Module\SecurityPolicy\Infrastructure\Persistence\YamlExecRuleRepository:
+    arguments:
+      $yamlPath: '%kernel.project_dir%/config/security_policy.yaml'
+
   # --- SecurityPolicy module: Infrastructure Service (ports) aliases ---
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Security\CheckChainSecurityServiceInterface:
     alias: TaskOrchestrator\Common\Module\SecurityPolicy\Infrastructure\Orchestrator\ChainSecurityPolicy

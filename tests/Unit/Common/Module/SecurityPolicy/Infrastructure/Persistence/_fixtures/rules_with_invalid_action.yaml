@@ -1,0 +1,12 @@
+rules:
+  - target: command
+    pattern: "rm*"
+    type: glob
+    action: invalid_action
+    severity: block
+
+  - target: command
+    pattern: "sudo*"
+    type: glob
+    action: deny
+    severity: block

@@ -1,0 +1,7 @@
+rules:
+  - target: command
+    pattern: "test*"
+    type: glob
+    action: deny
+    severity: block
+    # no priority specified — should default to 0
