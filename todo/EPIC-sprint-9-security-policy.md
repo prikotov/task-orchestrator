@@ -8,7 +8,7 @@ author: system_analyst (Шерлок)
 assignee:
 branch: task/epic-sprint-9-security-policy
 pr: pending (epic branch → main)
-status: in_progress
+status: review
 ---
 
 # EPIC-sprint-9-security-policy: Security Policy (Foundation) — безопасность автономного выполнения
@@ -53,21 +53,21 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Блокирующие требования)
-- [ ] ADR-010: Security Policy Architecture — зафиксирована модель rules → permissions → execution
-- [ ] Модуль `SecurityPolicy` (`src/Module/SecurityPolicy/`) с Domain слоем: [`Entity`](../docs/conventions/layers/domain/entity.md) (ExecRule), [`Value Object`](../docs/conventions/core_patterns/value-object.md) (Permission, RuleId, RuleAction), [`Enum`](../docs/conventions/core_patterns/enum.md) (RuleType, PermissionAction)
-- [ ] `ExecPolicyInterface` (port в Orchestrator Domain) + реализация в SecurityPolicy Infrastructure
-- [ ] `ChainSecurityPolicyInterface` (port в Orchestrator Domain) + реализация в SecurityPolicy Infrastructure
-- [ ] Domain [`Exception`](../docs/conventions/core_patterns/exception.md): `SecurityPolicyViolationException`, `ExecPolicyViolationException`
-- [ ] `SecurityPolicyRunAgentDecorator` — decorator для [`RunAgentServiceInterface`](../src/Module/Orchestrator/Domain/Service/Integration/RunAgentServiceInterface.php)
-- [ ] Unit-тесты на все rule-типы ≥80% покрытия Domain/Application
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
-- [ ] Deptrac green
+- [x] ADR-010: Security Policy Architecture — зафиксирована модель rules → permissions → execution
+- [x] Модуль `SecurityPolicy` (`src/Module/SecurityPolicy/`) с Domain слоем: [`Entity`](../docs/conventions/layers/domain/entity.md) (ExecRule), [`Value Object`](../docs/conventions/core_patterns/value-object.md) (Permission, RuleId, RuleAction), [`Enum`](../docs/conventions/core_patterns/enum.md) (RuleType, PermissionAction)
+- [x] `CheckExecPolicyServiceInterface` (port в Orchestrator Domain) + реализация в SecurityPolicy Infrastructure
+- [x] `CheckChainSecurityServiceInterface` (port в Orchestrator Domain) + реализация в SecurityPolicy Infrastructure
+- [x] Domain [`Exception`](../docs/conventions/core_patterns/exception.md): `SecurityPolicyViolationException`, `ExecPolicyViolationException`
+- [x] `SecurityPolicyRunAgentDecorator` — decorator для [`RunAgentServiceInterface`](../src/Module/Orchestrator/Domain/Service/Integration/RunAgentServiceInterface.php)
+- [x] Unit-тесты на все rule-типы ≥80% покрытия Domain/Application
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
+- [x] Deptrac green
 
 ### 🟡 Should Have (Важные требования)
-- [ ] `SecurityPolicyExecutionStrategyDecorator` — decorator для [`ExecutionStrategyInterface`](../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
-- [ ] YAML DSL: `permissions:` block в chain configuration
-- [ ] Exec policy файл: внешний файл с rules (аналог Codex `.rules`)
-- [ ] Integration-тесты с реальными YAML-chain конфигурациями
+- [x] `SecurityPolicyExecutionStrategyDecorator` — decorator для [`ExecutionStrategyInterface`](../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
+- [x] YAML DSL: `permissions:` block в chain configuration
+- [x] Exec policy файл: внешний файл с rules (аналог Codex `.rules`)
+- [x] Integration-тесты с реальными YAML-chain конфигурациями
 
 ### 🟢 Could Have (Желательно)
 - [ ] Configurable rule severity: warn vs deny (блокировка vs логирование)
@@ -180,11 +180,11 @@ Orchestrator Application → Orchestrator Domain (interfaces) ✅
 Порядок задач — по зависимостям:
 
 - [x] [TASK-docs-security-policy-adr](done/TASK-docs-security-policy-adr.todo.md) — ADR-010: Security Policy Architecture ✅
-- [ ] [TASK-feat-security-policy-domain](TASK-feat-security-policy-domain.todo.md) — Domain слой модуля SecurityPolicy
-- [ ] [TASK-feat-security-policy-ports](TASK-feat-security-policy-ports.todo.md) — Ports (interfaces) в Orchestrator Domain
+- [ ] [TASK-feat-security-policy-domain](done/TASK-feat-security-policy-domain.todo.md) — Domain слой модуля SecurityPolicy ✅
+- [ ] [TASK-feat-security-policy-ports](done/TASK-feat-security-policy-ports.todo.md) — Ports (interfaces) в Orchestrator Domain ✅
 - [x] [TASK-feat-security-policy-infrastructure](TASK-feat-security-policy-infrastructure.todo.md) — Infrastructure реализация ports + Decorators ✅
-- [ ] [TASK-feat-security-policy-yaml-dsl](TASK-feat-security-policy-yaml-dsl.todo.md) — YAML DSL `permissions:` block + Exec policy файл
-- [ ] [TASK-test-security-policy-integration](TASK-test-security-policy-integration.todo.md) — Integration тесты end-to-end
+- [ ] [TASK-feat-security-policy-yaml-dsl](done/TASK-feat-security-policy-yaml-dsl.todo.md) — YAML DSL `permissions:` block + Exec policy файл ✅
+- [ ] [TASK-test-security-policy-integration](done/TASK-test-security-policy-integration.todo.md) — Integration тесты end-to-end ✅
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [ ] ADR-010 записан в `docs/adr/`
