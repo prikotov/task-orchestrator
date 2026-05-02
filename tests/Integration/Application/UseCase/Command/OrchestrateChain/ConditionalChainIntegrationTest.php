@@ -29,6 +29,8 @@ use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ExecuteStaticS
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunStaticChainService;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Hook\HookExecutorInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\HookResultVo;
 
 /**
  * Integration-тест: conditional chain end-to-end.
@@ -83,9 +85,13 @@ final class ConditionalChainIntegrationTest extends TestCase
             $this->conditionalAgent,
             $promptFormatter,
         );
+        $hookExecutor = $this->createMock(HookExecutorInterface::class);
+        $hookExecutor->method('execute')->willReturn(HookResultVo::skipped());
+
         $conditionalStrategy = new ConditionalExecutionStrategy(
             $conditionEvaluator,
             $stepExecutor,
+            $hookExecutor,
         );
 
         // --- Static strategy wiring (for backwards compatibility test) ---
@@ -103,7 +109,7 @@ final class ConditionalChainIntegrationTest extends TestCase
             $runnerHelper,
             $formatter,
         );
-        $runStaticChainService = new RunStaticChainService($staticStepService, $budgetService);
+        $runStaticChainService = new RunStaticChainService($staticStepService, $budgetService, $hookExecutor);
         $staticChainExecutor = new ExecuteStaticChainService($runStaticChainService);
         $staticStrategy = new StaticExecutionStrategy($staticChainExecutor);
 

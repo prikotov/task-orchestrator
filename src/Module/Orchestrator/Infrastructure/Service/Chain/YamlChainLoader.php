@@ -223,6 +223,11 @@ final class YamlChainLoader implements ChainLoaderInterface
                     ? ConditionExpressionVo::createFromExpression($step['when'])
                     : null;
 
+                // Парсим post_step hook (опционально)
+                $postStep = isset($step['post_step']) && is_string($step['post_step']) && $step['post_step'] !== ''
+                    ? $step['post_step']
+                    : null;
+
                 if ($stepType === ChainStepTypeEnum::qualityGate) {
                     $command = $step['command'] ?? null;
                     $label = $step['label'] ?? null;
@@ -245,6 +250,7 @@ final class YamlChainLoader implements ChainLoaderInterface
                         timeoutSeconds: $step['timeout_seconds'] ?? 120,
                         name: $step['name'] ?? null,
                         when: $when,
+                        postStep: $postStep,
                     );
                 }
 
@@ -263,6 +269,7 @@ final class YamlChainLoader implements ChainLoaderInterface
                     name: $step['name'] ?? null,
                     noContextFiles: $stepNoContextFiles,
                     when: $when,
+                    postStep: $postStep,
                 );
             },
             $stepsData,
