@@ -111,10 +111,15 @@ final class YamlChainLoader implements ChainLoaderInterface
     {
         $type = ChainTypeEnum::tryFrom($raw['type'] ?? 'static') ?? ChainTypeEnum::staticType;
 
+        // Извлекаем permissions block из YAML (raw array, парсинг — в Infrastructure)
+        $permissionsConfig = isset($raw['permissions']) && is_array($raw['permissions']) && $raw['permissions'] !== []
+            ? $raw['permissions']
+            : null;
+
         return match (true) {
-            $type === ChainTypeEnum::dynamicType => $this->parseDynamicChain($name, $raw, $roles),
-            $type === ChainTypeEnum::conditionalType => $this->parseConditionalChain($name, $raw, $roles),
-            default => $this->parseStaticChain($name, $raw, $roles),
+            $type === ChainTypeEnum::dynamicType => $this->parseDynamicChain($name, $raw, $roles, $permissionsConfig),
+            $type === ChainTypeEnum::conditionalType => $this->parseConditionalChain($name, $raw, $roles, $permissionsConfig),
+            default => $this->parseStaticChain($name, $raw, $roles, $permissionsConfig),
         };
     }
 
@@ -122,8 +127,9 @@ final class YamlChainLoader implements ChainLoaderInterface
      * Парсит static-цепочку (обратная совместимость).
      *
      * @param array<string, RoleConfigVo> $roles
+     * @param array<string, mixed>|null $permissionsConfig raw permissions block
      */
-    private function parseStaticChain(string $name, array $raw, array $roles): ChainDefinitionVo
+    private function parseStaticChain(string $name, array $raw, array $roles, ?array $permissionsConfig = null): ChainDefinitionVo
     {
         $stepsData = $raw['steps'] ?? [];
         $chainRetryPolicy = $this->parseRetryPolicy($raw['retry_policy'] ?? null);
@@ -154,6 +160,7 @@ final class YamlChainLoader implements ChainLoaderInterface
                 defaultRetryPolicy: $chainRetryPolicy,
                 budget: $budget,
                 timeout: $raw['timeout'] ?? null,
+                permissionsConfig: $permissionsConfig,
             );
         }
 
@@ -166,6 +173,7 @@ final class YamlChainLoader implements ChainLoaderInterface
             defaultRetryPolicy: $chainRetryPolicy,
             budget: $budget,
             timeout: $raw['timeout'] ?? null,
+            permissionsConfig: $permissionsConfig,
         );
     }
 
@@ -175,8 +183,9 @@ final class YamlChainLoader implements ChainLoaderInterface
      * То же самое что static, но тип всегда conditional (явное указание).
      *
      * @param array<string, RoleConfigVo> $roles
+     * @param array<string, mixed>|null $permissionsConfig raw permissions block
      */
-    private function parseConditionalChain(string $name, array $raw, array $roles): ChainDefinitionVo
+    private function parseConditionalChain(string $name, array $raw, array $roles, ?array $permissionsConfig = null): ChainDefinitionVo
     {
         $stepsData = $raw['steps'] ?? [];
         $chainRetryPolicy = $this->parseRetryPolicy($raw['retry_policy'] ?? null);
@@ -197,6 +206,7 @@ final class YamlChainLoader implements ChainLoaderInterface
             defaultRetryPolicy: $chainRetryPolicy,
             budget: $budget,
             timeout: $raw['timeout'] ?? null,
+            permissionsConfig: $permissionsConfig,
         );
     }
 
@@ -331,8 +341,9 @@ final class YamlChainLoader implements ChainLoaderInterface
      * Парсит dynamic-цепочку.
      *
      * @param array<string, RoleConfigVo> $roles
+     * @param array<string, mixed>|null $permissionsConfig raw permissions block
      */
-    private function parseDynamicChain(string $name, array $raw, array $roles): ChainDefinitionVo
+    private function parseDynamicChain(string $name, array $raw, array $roles, ?array $permissionsConfig = null): ChainDefinitionVo
     {
         $participants = $raw['participants'] ?? [];
         if (count($participants) === 0) {
@@ -368,6 +379,7 @@ final class YamlChainLoader implements ChainLoaderInterface
             budget: $budget,
             timeout: $raw['timeout'] ?? null,
             maxTime: $raw['max_time'] ?? null,
+            permissionsConfig: $permissionsConfig,
         );
     }
 

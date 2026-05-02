@@ -1,0 +1,47 @@
+default_policy: allow
+
+rules:
+  - id: deny-bash-c
+    target: command
+    pattern: "bash -c*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "Deny inline bash execution"
+
+  - id: deny-rm-rf
+    target: command
+    pattern: "rm -rf /*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "Deny recursive force delete from root"
+
+  - id: deny-rm-rf-no-preserve
+    target: command
+    pattern: "rm -rf * --no-preserve-root*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "Deny recursive force delete with no-preserve-root"
+
+  - id: deny-sudo
+    target: command
+    pattern: "sudo*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "Deny sudo commands"
+
+  - id: deny-local-shell
+    target: runner
+    pattern: "local-shell"
+    type: exact
+    action: deny
+    severity: block
+    priority: 50
+    description: "Deny local-shell runner"

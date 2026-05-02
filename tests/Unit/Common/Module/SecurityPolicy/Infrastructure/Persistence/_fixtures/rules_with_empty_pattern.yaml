@@ -1,0 +1,12 @@
+rules:
+  - target: command
+    pattern: ""
+    type: glob
+    action: deny
+    severity: block
+
+  - target: command
+    pattern: "valid-pattern"
+    type: glob
+    action: deny
+    severity: block

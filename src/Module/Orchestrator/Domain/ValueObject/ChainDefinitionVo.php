@@ -39,6 +39,7 @@ final readonly class ChainDefinitionVo
      * @param BudgetVo|null $budget бюджетные ограничения цепочки (null = безлимит)
      * @param int|null $timeout таймаут цепочки в секундах (null = использовать CLI --timeout или default)
      * @param int|null $maxTime максимальное суммарное время выполнения цепочки в секундах (null = безлимит)
+     * @param array<string, mixed>|null $permissionsConfig raw permissions block из YAML (парсится в Infrastructure)
      */
     private function __construct(
         private string $name,
@@ -61,6 +62,7 @@ final readonly class ChainDefinitionVo
         private ?BudgetVo $budget = null,
         private ?int $timeout = null,
         private ?int $maxTime = null,
+        private ?array $permissionsConfig = null,
     ) {
     }
 
@@ -70,6 +72,7 @@ final readonly class ChainDefinitionVo
      * @param list<ChainStepVo> $steps
      * @param list<FixIterationGroupVo> $fixIterations
      * @param array<string, RoleConfigVo> $roles per-role конфигурация
+     * @param array<string, mixed>|null $permissionsConfig raw permissions block из YAML
      */
     public static function createFromSteps(
         string $name,
@@ -80,6 +83,7 @@ final readonly class ChainDefinitionVo
         ?ChainRetryPolicyVo $defaultRetryPolicy = null,
         ?BudgetVo $budget = null,
         ?int $timeout = null,
+        ?array $permissionsConfig = null,
     ): self {
         if (count($steps) === 0) {
             throw new InvalidArgumentException(
@@ -110,6 +114,7 @@ final readonly class ChainDefinitionVo
             budget: $budget,
             timeout: $timeout,
             maxTime: null,
+            permissionsConfig: $permissionsConfig,
         );
     }
 
@@ -123,6 +128,7 @@ final readonly class ChainDefinitionVo
      * @param list<ChainStepVo> $steps
      * @param list<FixIterationGroupVo> $fixIterations
      * @param array<string, RoleConfigVo> $roles per-role конфигурация
+     * @param array<string, mixed>|null $permissionsConfig raw permissions block из YAML
      */
     public static function createFromConditionalSteps(
         string $name,
@@ -133,6 +139,7 @@ final readonly class ChainDefinitionVo
         ?ChainRetryPolicyVo $defaultRetryPolicy = null,
         ?BudgetVo $budget = null,
         ?int $timeout = null,
+        ?array $permissionsConfig = null,
     ): self {
         if (count($steps) === 0) {
             throw new InvalidArgumentException(
@@ -163,6 +170,7 @@ final readonly class ChainDefinitionVo
             budget: $budget,
             timeout: $timeout,
             maxTime: null,
+            permissionsConfig: $permissionsConfig,
         );
     }
 
@@ -171,6 +179,7 @@ final readonly class ChainDefinitionVo
      *
      * @param list<string> $participants
      * @param array<string, RoleConfigVo> $roles per-role конфигурация
+     * @param array<string, mixed>|null $permissionsConfig raw permissions block из YAML
      */
     public static function createFromDynamic(
         string $name,
@@ -190,6 +199,7 @@ final readonly class ChainDefinitionVo
         ?BudgetVo $budget = null,
         ?int $timeout = null,
         ?int $maxTime = null,
+        ?array $permissionsConfig = null,
     ): self {
         if ($facilitator === '') {
             throw new InvalidArgumentException(
@@ -238,6 +248,7 @@ final readonly class ChainDefinitionVo
             budget: $budget,
             timeout: $timeout,
             maxTime: $maxTime,
+            permissionsConfig: $permissionsConfig,
         );
     }
 
@@ -488,6 +499,19 @@ final readonly class ChainDefinitionVo
     public function getMaxTime(): ?int
     {
         return $this->maxTime;
+    }
+
+    /**
+     * Возвращает raw permissions config из YAML (permissions: block).
+     *
+     * Парсинг в PermissionSetVo выполняется в Infrastructure слое
+     * (YamlPermissionsBlockParser) — ChainDefinitionVo не зависит от SecurityPolicy.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function getPermissionsConfig(): ?array
+    {
+        return $this->permissionsConfig;
     }
 
     /**

@@ -14,44 +14,48 @@ use TaskOrchestrator\Common\Module\SecurityPolicy\Domain\Service\SecurityPolicyS
 use TaskOrchestrator\Common\Module\SecurityPolicy\Domain\ValueObject\ExecRuleIdVo;
 use TaskOrchestrator\Common\Module\SecurityPolicy\Domain\ValueObject\PermissionSetVo;
 use TaskOrchestrator\Common\Module\SecurityPolicy\Domain\ValueObject\RulePatternVo;
+use TaskOrchestrator\Common\Module\SecurityPolicy\Infrastructure\Persistence\YamlExecRuleRepository;
 
 /**
- * Фабрика для создания SecurityPolicyService с default rules (Sprint 9).
+ * Фабрика для создания SecurityPolicyService с default rules.
  *
- * Создаёт SecurityPolicyService с hardcoded набором ExecRule:
- * - banned prefixes: bash -c, rm -rf /, sudo
- * - allowed runners: all by default (no runner restrictions)
- * - no tool restrictions by default
- *
+ * Загружает exec rules из YAML файла (через YamlExecRuleRepository).
+ * Если YAML файл не найден или не содержит rules — fallback на hardcoded defaults.
  * PermissionSet: allow-by-default (все цепочки и runner'ы разрешены,
  * exec rules фильтруют только опасные команды).
  *
- * В Task 5 (YAML DSL) будет добавлен YamlExecRuleRepository,
- * и factory будет заменена на YAML-based provider.
- *
- * @todo Sprint 10+ — заменить hardcoded rules на YAML-based loading (Task 5)
+ * @see YamlExecRuleRepository
+ * @see SecurityPolicyService
  */
 final readonly class DefaultSecurityPolicyFactory
 {
     public function __construct(
         private ExecPolicyCheckServiceInterface $execPolicyCheckService,
+        private YamlExecRuleRepository $yamlExecRuleRepository,
     ) {
     }
 
     /**
-     * Создаёт SecurityPolicyService с default security rules.
+     * Создаёт SecurityPolicyService с security rules из YAML или default fallback.
      */
     public function create(): SecurityPolicyServiceInterface
     {
+        $execRules = $this->yamlExecRuleRepository->loadRules();
+
+        // Fallback: если YAML не содержит rules — используем hardcoded defaults
+        if ($execRules === []) {
+            $execRules = $this->createDefaultRules();
+        }
+
         return new SecurityPolicyService(
             execPolicyCheckService: $this->execPolicyCheckService,
-            execRules: $this->createDefaultRules(),
+            execRules: $execRules,
             permissionSet: $this->createDefaultPermissionSet(),
         );
     }
 
     /**
-     * Создаёт default exec rules для Sprint 9.
+     * Создаёт default exec rules (fallback при отсутствии YAML файла).
      *
      * @return list<ExecRule>
      */

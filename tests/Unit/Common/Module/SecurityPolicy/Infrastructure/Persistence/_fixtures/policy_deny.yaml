@@ -1,0 +1,8 @@
+default_policy: deny
+
+rules:
+  - target: command
+    pattern: "*"
+    type: glob
+    action: allow
+    severity: block

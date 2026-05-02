@@ -1,0 +1,55 @@
+# Security Policy — default exec rules для всех цепочек.
+#
+# Формат:
+#   default_policy: deny | allow — default action при отсутствии совпадений
+#   rules: список ExecRule (target, pattern, type, action, severity, priority, description)
+#
+# Загружается YamlExecRuleRepository при создании SecurityPolicyService.
+# Если файл не найден — fallback на hardcoded defaults (DefaultSecurityPolicyFactory).
+
+default_policy: allow  # allow-by-default: exec rules фильтруют только опасные команды
+
+rules:
+  # --- Banned command prefixes (high priority) ---
+
+  - target: command
+    pattern: "bash -c*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: 'Deny inline bash execution via "bash -c"'
+
+  - target: command
+    pattern: "rm -rf /*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "Deny recursive force delete from root"
+
+  - target: command
+    pattern: "rm -rf * --no-preserve-root*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "Deny recursive force delete with no-preserve-root"
+
+  - target: command
+    pattern: "sudo*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "Deny sudo commands"
+
+  # --- Allow-all catch-all (low priority) ---
+
+  - target: command
+    pattern: "*"
+    type: glob
+    action: allow
+    severity: block
+    priority: -1000
+    description: "Default allow for all commands"
