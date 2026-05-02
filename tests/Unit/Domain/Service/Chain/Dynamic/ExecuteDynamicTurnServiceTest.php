@@ -19,7 +19,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\Rec
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopAgentServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainTurnResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicBudgetCheckVo;
@@ -445,13 +445,13 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         string $name,
         string $facilitator,
         array $participants,
-    ): ChainDefinitionVo {
+    ): DynamicChainDefinitionVo {
         $roles = [];
         foreach (array_merge([$facilitator], $participants) as $role) {
             $roles[$role] = new RoleConfigVo(command: ['pi', '--model', 'gpt-4'], timeout: 60);
         }
 
-        return ChainDefinitionVo::createFromDynamic(
+        return DynamicChainDefinitionVo::create(
             name: $name,
             description: '',
             facilitator: $facilitator,

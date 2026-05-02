@@ -8,8 +8,8 @@ use LogicException;
 use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
 
 /**
@@ -26,7 +26,7 @@ class StubDynamicLoopService implements RunDynamicLoopServiceInterface
 
     #[Override]
     public function execute(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         int $startRound = 0,
         string $initialDiscussionHistory = '',
@@ -54,7 +54,7 @@ class StubDynamicLoopService implements RunDynamicLoopServiceInterface
     /**
      * Устанавливает callback, вызываемый при execute() для захвата параметров.
      *
-     * @param \Closure(ChainDefinitionVo, DynamicChainContextVo, int, string, string): void $callback
+     * @param \Closure(DynamicChainDefinitionVo, DynamicChainContextVo, int, string, string): void $callback
      */
     public function onExecute(\Closure $callback): self
     {
