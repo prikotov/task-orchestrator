@@ -10,7 +10,7 @@ author: system_analyst_sherlock (Шерлок)
 assignee: backend_developer_levsha
 branch:
 pr:
-status: todo
+status: done
 ---
 
 # TASK-feat-hooks-post-step: Hooks system: post_step MVP

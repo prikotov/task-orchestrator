@@ -10,7 +10,7 @@ author: system_analyst_sherlock (Шерлок)
 assignee: backend_developer_levsha
 branch:
 pr:
-status: todo
+status: done
 ---
 
 # TASK-refactor-chain-definition-split: ChainDefinitionVo split завершение
