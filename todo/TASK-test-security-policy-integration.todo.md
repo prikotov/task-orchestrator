@@ -7,10 +7,10 @@ priority: P1
 depends_on: TASK-feat-security-policy-infrastructure, TASK-feat-security-policy-yaml-dsl
 epic: EPIC-sprint-9-security-policy
 author: system_analyst (Шерлок)
-assignee:
-branch:
-pr:
-status: todo
+assignee: backend_developer (Левша)
+branch: task/test-security-policy-integration
+pr: '130'
+status: done
 ---
 
 # TASK-test-security-policy-integration: Integration тесты Security Policy end-to-end
@@ -33,16 +33,16 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Integration test: exec policy violation — banned command (`bash -c ...`) → `ExecPolicyViolationException`
-- [ ] Integration test: runner not allowed — chain с `allowed_runners: [pi]`, runner = `codex` → `ExecPolicyViolationException`
-- [ ] Integration test: chain execution blocked — chain-level deny → `SecurityPolicyViolationException`
-- [ ] Integration test: successful execution — все checks pass → no exception
-- [ ] Integration test: fallback to default rules — exec policy file missing → InMemory defaults applied
-- [ ] Тесты используют реальные YAML-файлы (fixtures в `tests/Fixtures/`)
-- [ ] `vendor/bin/phpunit` — зелёный
+- [x] Integration test: exec policy violation — banned command (`bash -c ...`) → `ExecPolicyViolationException`
+- [x] Integration test: runner not allowed — chain с `allowed_runners: [pi]`, runner = `codex` → `ExecPolicyViolationException`
+- [x] Integration test: chain execution blocked — chain-level deny → `SecurityPolicyViolationException`
+- [x] Integration test: successful execution — все checks pass → no exception
+- [x] Integration test: fallback to default rules — exec policy file missing → InMemory defaults applied
+- [x] Тесты используют реальные YAML-файлы (fixtures в `tests/Integration/_fixtures/`)
+- [x] `vendor/bin/phpunit` — зелёный
 
 ### 🟡 Should Have (Желательно)
-- [ ] Integration test: YAML `permissions:` block — chain-specific permissions override global policy
+- [x] Integration test: YAML `permissions:` block — chain-specific permissions override global policy
 - [ ] Integration test: decorator ordering — SecurityPolicy → Retry → CircuitBreaker (verify SecurityPolicy is outermost)
 - [ ] Integration test: `RuleSeverity::warn` → logged but not blocked
 
@@ -56,23 +56,23 @@ status: todo
 - [ ] Symfony kernel testing
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Создать каталог `tests/Integration/Module/SecurityPolicy/`
-2. [ ] Создать YAML fixtures: `tests/Fixtures/security_policy.yaml` (test rules)
-3. [ ] Создать YAML chain fixtures с `permissions:` block
-4. [ ] Написать integration test: exec policy violation (banned command)
-5. [ ] Написать integration test: runner not allowed
-6. [ ] Написать integration test: chain-level deny
-7. [ ] Написать integration test: successful execution
-8. [ ] Написать integration test: fallback to defaults
-9. [ ] (Should Have) Написать integration test: chain-specific permissions
-10. [ ] Проверить: `vendor/bin/phpunit tests/Integration/`
+1. [x] Создать каталог `tests/Integration/Module/SecurityPolicy/`
+2. [x] Создать YAML fixtures: `tests/Integration/_fixtures/test_security_policy.yaml` (test rules)
+3. [x] Создать YAML chain fixtures с `permissions:` block
+4. [x] Написать integration test: exec policy violation (banned command)
+5. [x] Написать integration test: runner not allowed
+6. [x] Написать integration test: chain-level deny
+7. [x] Написать integration test: successful execution
+8. [x] Написать integration test: fallback to defaults
+9. [x] (Should Have) Написать integration test: chain-specific permissions
+10. [x] Проверить: `vendor/bin/phpunit tests/Integration/`
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Все Must Have integration tests проходят
-- [ ] Тесты используют реальные YAML fixtures (не mocks для YAML parsing)
-- [ ] Каждый тест проверяет конкретный violation type с конкретным exception message
-- [ ] Tests изолированы — не влияют друг на друга
-- [ ] `vendor/bin/phpunit` — зелёный
+- [x] Все Must Have integration tests проходят
+- [x] Тесты используют реальные YAML fixtures (не mocks для YAML parsing)
+- [x] Каждый тест проверяет конкретный violation type с конкретным exception message
+- [x] Tests изолированы — не влияют друг на друга
+- [x] `vendor/bin/phpunit` — зелёный
 
 ## 6. Verification (Самопроверка)
 ```bash
