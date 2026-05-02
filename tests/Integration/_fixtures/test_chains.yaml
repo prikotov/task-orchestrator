@@ -153,3 +153,36 @@ chains:
       - { type: agent, role: analyst, name: analyze }
       - { type: quality_gate, name: tests, command: "echo 'pass'", label: "Tests" }
       - { type: agent, role: developer, name: implement, when: "steps.tests.passed == true" }
+
+  # --- Chains with permissions block for security policy integration tests ---
+
+  static_with_permissions_allow:
+    description: "Static chain with permissions: allow only pi runner"
+    steps:
+      - { type: agent, role: analyst, name: analyze }
+      - { type: agent, role: developer, name: implement }
+    permissions:
+      runners:
+        allow: [pi]
+      severity: block
+
+  static_with_permissions_deny_chain:
+    description: "Static chain denied at chain level"
+    steps:
+      - { type: agent, role: analyst, name: analyze }
+    permissions:
+      chains:
+        deny: [static_with_permissions_deny_chain]
+      severity: block
+
+  conditional_with_permissions:
+    type: conditional
+    description: "Conditional chain with permissions block"
+    steps:
+      - { type: agent, role: analyst, name: analyze }
+      - { type: quality_gate, name: check, command: "echo 'ok'", label: "Check" }
+      - { type: agent, role: developer, name: implement, when: "steps.check.passed == true" }
+    permissions:
+      runners:
+        allow: [pi]
+      severity: block
