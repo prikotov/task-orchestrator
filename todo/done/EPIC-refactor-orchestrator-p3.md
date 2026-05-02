@@ -8,7 +8,7 @@ author: pi
 assignee:
 branch: task/epic-refactor-orchestrator-p3
 pr: https://github.com/prikotov/task-orchestrator/pull/118
-status: review
+status: done
 ---
 
 # EPIC-refactor-orchestrator-p3: P3 Декомпозиция + Аналитика + Static Split

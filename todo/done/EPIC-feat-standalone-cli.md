@@ -7,7 +7,7 @@ complexity: C4
 priority: P1
 author: Бэкендер (Левша)
 assignee: Тимлид (Алекс)
-status: in_progress
+status: done
 branch: epic/feat-standalone-cli
 pr:
 ---

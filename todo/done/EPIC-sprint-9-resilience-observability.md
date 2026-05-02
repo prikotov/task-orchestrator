@@ -8,7 +8,7 @@ author: system_analyst_sherlock (Шерлок)
 assignee:
 branch: task/epic-sprint-9-resilience-observability
 pr: pending (epic branch → main)
-status: review
+status: done
 ---
 
 # EPIC-sprint-9-resilience-observability: Sprint 9 — Resilience + Observability
