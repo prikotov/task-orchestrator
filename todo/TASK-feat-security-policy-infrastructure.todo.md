@@ -8,9 +8,9 @@ depends_on: TASK-feat-security-policy-domain, TASK-feat-security-policy-ports
 epic: EPIC-sprint-9-security-policy
 author: system_analyst (Шерлок)
 assignee:
-branch:
-pr:
-status: todo
+branch: task/feat-security-policy-infrastructure
+pr: 128
+status: done
 ---
 
 # TASK-feat-security-policy-infrastructure: Infrastructure реализация ports + Decorators

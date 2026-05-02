@@ -24,6 +24,8 @@ services:
       - '../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php'
       - '../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
       - '../src/Module/AgentRunner/Infrastructure/Service/Codex/Resources/'
+      - '../src/Module/SecurityPolicy/Infrastructure/Orchestrator/SecurityPolicyRunAgentDecorator.php'
+      - '../src/Module/SecurityPolicy/Infrastructure/Orchestrator/SecurityPolicyExecutionStrategyDecorator.php'
 
   # --- Integration Service alias (Interface → Implementation by convention service.md) ---
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface:
@@ -163,3 +165,34 @@ services:
     arguments:
       $chainsSessionDir: '%task_orchestrator.chains_session_dir%'
       $basePath: '%task_orchestrator.base_path%'
+
+  # --- SecurityPolicy module: Domain Service aliases ---
+  TaskOrchestrator\Common\Module\SecurityPolicy\Domain\Service\ExecPolicyCheckServiceInterface:
+    alias: TaskOrchestrator\Common\Module\SecurityPolicy\Domain\Service\ExecPolicyCheckService
+
+  TaskOrchestrator\Common\Module\SecurityPolicy\Domain\Service\SecurityPolicyServiceInterface:
+    factory: ['@TaskOrchestrator\Common\Module\SecurityPolicy\Infrastructure\Service\DefaultSecurityPolicyFactory', 'create']
+
+  # --- SecurityPolicy module: Infrastructure Service (ports) aliases ---
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Security\CheckChainSecurityServiceInterface:
+    alias: TaskOrchestrator\Common\Module\SecurityPolicy\Infrastructure\Orchestrator\ChainSecurityPolicy
+
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Security\CheckExecPolicyServiceInterface:
+    alias: TaskOrchestrator\Common\Module\SecurityPolicy\Infrastructure\Orchestrator\ExecPolicyCheck
+
+  # --- SecurityPolicy module: Decorators ---
+  TaskOrchestrator\Common\Module\SecurityPolicy\Infrastructure\Orchestrator\SecurityPolicyRunAgentDecorator:
+    decorates: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface
+    decoration_on_invalid: ignore
+    decoration_priority: 10
+    arguments:
+      $decoratedService: '@.inner'
+      $execPolicy: '@TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Security\CheckExecPolicyServiceInterface'
+
+  TaskOrchestrator\Common\Module\SecurityPolicy\Infrastructure\Orchestrator\SecurityPolicyExecutionStrategyDecorator:
+    decorates: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecutionStrategyInterface
+    decoration_on_invalid: ignore
+    decoration_priority: 10
+    arguments:
+      $decoratedStrategy: '@.inner'
+      $chainSecurityPolicy: '@TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Security\CheckChainSecurityServiceInterface'
