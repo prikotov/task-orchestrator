@@ -6,8 +6,8 @@ namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\Orchest
 
 use Override;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
 
 /**
@@ -29,7 +29,7 @@ final class ResumeStubDynamicLoopService extends StubDynamicLoopService
 
     #[Override]
     public function execute(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         int $startRound = 0,
         string $initialDiscussionHistory = '',

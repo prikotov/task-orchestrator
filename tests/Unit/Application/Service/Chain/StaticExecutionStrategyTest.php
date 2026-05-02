@@ -11,8 +11,10 @@ use TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteSt
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\StaticExecutionStrategy;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticChainResultVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticStepResultVo;
 use LogicException;
@@ -87,7 +89,7 @@ final class StaticExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->staticChainExecutor->method('execute')
             ->willReturnCallback(function (
-                ChainDefinitionVo $c,
+                StaticChainDefinitionVo $c,
                 string $t,
                 ?string $w,
                 int $timeout,
@@ -114,7 +116,7 @@ final class StaticExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->staticChainExecutor->method('execute')
             ->willReturnCallback(function (
-                ChainDefinitionVo $c,
+                StaticChainDefinitionVo $c,
                 string $t,
                 ?string $w,
                 int $timeout,
@@ -140,7 +142,7 @@ final class StaticExecutionStrategyTest extends TestCase
         $capturedNoContextFiles = null;
         $this->staticChainExecutor->method('execute')
             ->willReturnCallback(function (
-                ChainDefinitionVo $c,
+                StaticChainDefinitionVo $c,
                 string $t,
                 ?string $w,
                 int $timeout,
@@ -169,7 +171,7 @@ final class StaticExecutionStrategyTest extends TestCase
         $capturedLogger = 'not-null';
         $this->staticChainExecutor->method('execute')
             ->willReturnCallback(function (
-                ChainDefinitionVo $c,
+                StaticChainDefinitionVo $c,
                 string $t,
                 ?string $w,
                 int $timeout,
@@ -306,9 +308,9 @@ final class StaticExecutionStrategyTest extends TestCase
         );
     }
 
-    private function createStaticChain(): ChainDefinitionVo
+    private function createStaticChain(): ChainDefinitionInterface
     {
-        return ChainDefinitionVo::createFromSteps(
+        return StaticChainDefinitionVo::create(
             name: 'static-test',
             description: 'Test static chain',
             steps: [
@@ -317,9 +319,9 @@ final class StaticExecutionStrategyTest extends TestCase
         );
     }
 
-    private function createDynamicChain(): ChainDefinitionVo
+    private function createDynamicChain(): ChainDefinitionInterface
     {
-        return ChainDefinitionVo::createFromDynamic(
+        return DynamicChainDefinitionVo::create(
             name: 'dynamic-test',
             description: '',
             facilitator: 'facilitator',

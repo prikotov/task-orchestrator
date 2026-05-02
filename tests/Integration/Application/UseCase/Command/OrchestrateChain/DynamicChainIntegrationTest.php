@@ -15,8 +15,8 @@ use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\Orch
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\SessionCompletedNotifierInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader;
@@ -161,7 +161,7 @@ final class DynamicChainIntegrationTest extends TestCase
             synthesis: 'Done',
             maxRoundsReached: false,
         ));
-        $this->stubLoopRunner->onExecute(static function (ChainDefinitionVo $chain, DynamicChainContextVo $context) use (&$capturedContext): void {
+        $this->stubLoopRunner->onExecute(static function (DynamicChainDefinitionVo $chain, DynamicChainContextVo $context) use (&$capturedContext): void {
             $capturedContext = $context;
         });
 

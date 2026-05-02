@@ -14,7 +14,7 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\Fin
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FormatDynamicJournalServiceInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FacilitatorResponseParserInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainTurnResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
@@ -203,9 +203,9 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
         );
     }
 
-    private function createChain(): ChainDefinitionVo
+    private function createChain(): DynamicChainDefinitionVo
     {
-        return ChainDefinitionVo::createFromDynamic(
+        return DynamicChainDefinitionVo::create(
             name: 'test',
             description: '',
             facilitator: 'facilitator',

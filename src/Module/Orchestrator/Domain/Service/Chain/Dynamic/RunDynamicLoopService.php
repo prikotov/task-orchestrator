@@ -9,8 +9,8 @@ use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\TurnBreakVo;
 
@@ -46,7 +46,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
     #[Override]
     public function execute(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         int $startRound = 0,
         string $initialDiscussionHistory = '',
@@ -61,7 +61,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         $budget = $chain->getSharedDefinition()->getBudget();
         $startTime = microtime(true);
 
-        $auditLogger?->logChainStart($chain->getSharedDefinition()->getName(), $context->topic);
+        $auditLogger?->logChainStart($chain->getName(), $context->topic);
 
         while ($execution->getParticipantRounds() < $context->maxRounds) {
             if ($this->shouldReserveForFinalize($context->maxTime, $startTime)) {
@@ -96,7 +96,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
         $auditLogger?->logChainResult(
             $this->finalizer->buildChainAuditDto(
-                $chain->getSharedDefinition()->getName(),
+                $chain->getName(),
                 $startTime,
                 $execution,
             ),
@@ -139,7 +139,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
     }
 
     private function finalizeIfNeeded(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,

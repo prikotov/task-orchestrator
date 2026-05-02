@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Comman
 use LogicException;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
 
 /**
  * UseCase оркестрации цепочки AI-агентов.
@@ -43,7 +43,7 @@ class OrchestrateChainCommandHandler
     /**
      * Определяет стратегию выполнения по определению цепочки.
      */
-    private function resolveStrategy(ChainDefinitionVo $chain): ExecutionStrategyInterface
+    private function resolveStrategy(ChainDefinitionInterface $chain): ExecutionStrategyInterface
     {
         foreach ($this->strategies as $strategy) {
             if ($strategy->supports($chain)) {
@@ -52,7 +52,7 @@ class OrchestrateChainCommandHandler
         }
 
         throw new LogicException(
-            sprintf('No execution strategy found for chain "%s".', $chain->getSharedDefinition()->getName()),
+            sprintf('No execution strategy found for chain "%s".', $chain->getName()),
         );
     }
 }

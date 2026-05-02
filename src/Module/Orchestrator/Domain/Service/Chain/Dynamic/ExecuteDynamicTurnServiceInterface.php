@@ -7,9 +7,9 @@ namespace TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynam
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainTurnResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorResponseVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\TurnBreakVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\TurnContinueVo;
@@ -23,7 +23,7 @@ interface ExecuteDynamicTurnServiceInterface
      * Выполняет полный facilitator turn (agent call + journal + budget + error handling).
      */
     public function runFacilitatorTurn(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?BudgetVo $budget,
@@ -34,7 +34,7 @@ interface ExecuteDynamicTurnServiceInterface
      * Выполняет полный participant turn (agent call + journal + budget + error handling).
      */
     public function runParticipantTurn(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?BudgetVo $budget,
@@ -49,7 +49,7 @@ interface ExecuteDynamicTurnServiceInterface
      * @return array{ChainTurnResultVo, FacilitatorResponseVo}
      */
     public function runFacilitatorStep(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
@@ -59,7 +59,7 @@ interface ExecuteDynamicTurnServiceInterface
      * Запускает participant agent step (низкоуровневый вызов).
      */
     public function runParticipantStep(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
@@ -71,7 +71,7 @@ interface ExecuteDynamicTurnServiceInterface
      * Запускает finalize agent step (низкоуровневый вызов).
      */
     public function runFinalizeStep(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,

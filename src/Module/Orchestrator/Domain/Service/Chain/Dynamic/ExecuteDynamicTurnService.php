@@ -10,9 +10,9 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecuti
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainTurnResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorResponseVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorTurnResultVo;
@@ -51,7 +51,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
      */
     #[Override]
     public function runFacilitatorTurn(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?BudgetVo $budget,
@@ -129,7 +129,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
      */
     #[Override]
     public function runParticipantTurn(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?BudgetVo $budget,
@@ -220,7 +220,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
      */
     #[Override]
     public function runFacilitatorStep(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
@@ -306,7 +306,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
      */
     #[Override]
     public function runParticipantStep(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
@@ -368,7 +368,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
      */
     #[Override]
     public function runFinalizeStep(
-        ChainDefinitionVo $chain,
+        DynamicChainDefinitionVo $chain,
         DynamicChainContextVo $context,
         DynamicLoopExecution $execution,
         ?AuditLoggerInterface $auditLogger,
