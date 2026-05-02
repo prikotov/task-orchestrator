@@ -1,0 +1,69 @@
+# Security Policy fixture для integration-тестов.
+#
+# Содержит exec rules для проверки полного цикла:
+# YAML loading → ExecRule parsing → ExecPolicyCheckService → SecurityPolicyService → Decorators.
+
+default_policy: allow
+
+rules:
+  # --- Banned command prefixes (high priority) ---
+
+  - id: deny-bash-c
+    target: command
+    pattern: "bash -c*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: 'Deny inline bash execution via "bash -c"'
+
+  - id: deny-rm-rf
+    target: command
+    pattern: "rm -rf /*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "Deny recursive force delete from root"
+
+  - id: deny-sudo
+    target: command
+    pattern: "sudo*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "Deny sudo commands"
+
+  # --- Runner restrictions ---
+
+  - id: deny-local-shell-runner
+    target: runner
+    pattern: "local-shell"
+    type: exact
+    action: deny
+    severity: block
+    priority: 50
+    description: "Deny local-shell runner"
+
+  # --- Tool restrictions ---
+
+  - id: deny-bash-tool
+    target: tool
+    pattern: "bash -c*"
+    type: glob
+    action: deny
+    severity: block
+    priority: 100
+    description: "Deny bash tools with inline execution"
+
+  # --- Allow-all catch-all (low priority) ---
+
+  - id: allow-all-command
+    target: command
+    pattern: "*"
+    type: glob
+    action: allow
+    severity: block
+    priority: -1000
+    description: "Default allow for all commands"
