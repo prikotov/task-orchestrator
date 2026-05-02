@@ -8,7 +8,7 @@ author: system_analyst_sherlock (Шерлок)
 assignee:
 branch: task/epic-sprint-8-conditional-branching
 pr: https://github.com/prikotov/task-orchestrator/pull/124
-status: review
+status: done
 ---
 
 # EPIC-sprint-8-conditional-branching: Conditional Branching — первая roadmap-фича

@@ -1,9 +1,10 @@
 # Roadmap 2026 Q2–Q3: Декомпозиция Orchestrator + Расширение оркестрации
 
-**Статус:** Черновик (Draft)  
+**Статус:** ✅ Completed (Все 10 спринтов выполнены)  
 **Владелец:** Шерлок (system_analyst_sherlock)  
 **Дата создания:** 2026-04-29  
-**Дата обновления:** 2026-05-02  
+**Дата обновления:** 2026-05-02
+**Дата закрытия:** 2026-05-02  
 **Источники:**
 - Протокол brainstorm #1: `var/sessions/brainstorm/2026-04-29_08-06-49/result.md`
 - Протокол brainstorm #2 (декомпозиция на модули): `var/sessions/brainstorm/2026-04-30_16-02-26/result.md`
@@ -333,13 +334,13 @@ Static/Conditional стратегии не поддерживают resume — �
 | #17 | Физический split StaticExecution в отдельный модуль | P3 | Sprint 7 | ✅ Done — [TASK](../todo/done/TASK-refactor-static-execution-split.todo.md) PR #117 |
 | — | Conditional branching (`when:` + strategy) | Roadmap | Sprint 8 | ✅ Done |
 | — | ~~Security Policy (exec policy + permissions)~~ | Roadmap | — | ❌ Cancelled — security theater: правила проверяют текст промпта, но не видят реальные shell-команды внутри сессии |
-| — | Model failover: CB open → trigger fallback | Roadmap | Sprint 9 | 📋 Planned |
-| — | Error classification (упрощённая по exitCode/timeout) | Roadmap | Sprint 9 | 📋 Planned |
-| — | MetricsCollectorInterface + in-memory реализация | Roadmap | Sprint 9 | 📋 Planned |
-| — | ADR: Dynamic split — решение | Roadmap | Sprint 9 | 📋 Planned |
-| — | Hooks system: post_step MVP | Roadmap | Sprint 10 | 📋 Planned |
-| — | ChainDefinitionVo завершение split | Roadmap | Sprint 10 | 📋 Planned |
-| — | Resume для static цепочек: ADR | Roadmap | Sprint 10 | 📋 Planned |
+| — | Model failover: CB open → trigger fallback | Roadmap | Sprint 9 | ✅ Done |
+| — | Error classification (упрощённая по exitCode/timeout) | Roadmap | Sprint 9 | ✅ Done |
+| — | MetricsCollectorInterface + in-memory реализация | Roadmap | Sprint 9 | ✅ Done |
+| — | ADR: Dynamic split — решение | Roadmap | Sprint 9 | ✅ Done |
+| — | Hooks system: post_step MVP | Roadmap | Sprint 10 | ✅ Done |
+| — | ChainDefinitionVo завершение split | Roadmap | Sprint 10 | ✅ Done |
+| — | Resume для static цепочек: ADR | Roadmap | Sprint 10 | ✅ Done |
 | — | ~~Loop detection (fix_iterations)~~ | Roadmap | — | ❌ Cancelled — `maxIterations` уже ограничивает циклы; LLM-text similarity unreliable; pain 0/10. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
 | — | ~~Typed I/O per step (JSON Schema)~~ | Roadmap | — | ❌ Cancelled — нет structured output между шагами, строить не на чем; pain 1/10. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
 | — | ~~Sub-agent pattern: ADR + design~~ | Roadmap | — | ❌ Cancelled — speculative ADR без опыта эксплуатации conditional chains; отложено до Q4. [Обоснование](../research/loki-roadmap-review-2026-05.md) |

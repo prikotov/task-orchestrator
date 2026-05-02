@@ -8,7 +8,7 @@ author: system_analyst_sherlock (Шерлок)
 assignee:
 branch: task/epic-sprint-10-hooks-debt-cleanup
 pr: pending (epic branch → main)
-status: review
+status: done
 ---
 
 # EPIC-sprint-10-hooks-debt-cleanup: Sprint 10 — Hooks + Debt Cleanup
