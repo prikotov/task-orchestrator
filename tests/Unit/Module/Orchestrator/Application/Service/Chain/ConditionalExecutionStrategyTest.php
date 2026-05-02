@@ -19,11 +19,14 @@ use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainD
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalStepResultVo;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Hook\HookExecutorInterface;
+use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\HookResultVo;
 
 final class ConditionalExecutionStrategyTest extends TestCase
 {
     private EvaluateConditionServiceInterface&MockObject $conditionEvaluator;
     private ExecuteConditionalStepServiceInterface&MockObject $stepExecutor;
+    private HookExecutorInterface&MockObject $hookExecutor;
     private LoggerInterface&MockObject $logger;
     private ConditionalExecutionStrategy $strategy;
 
@@ -31,11 +34,16 @@ final class ConditionalExecutionStrategyTest extends TestCase
     {
         $this->conditionEvaluator = $this->createMock(EvaluateConditionServiceInterface::class);
         $this->stepExecutor = $this->createMock(ExecuteConditionalStepServiceInterface::class);
+        $this->hookExecutor = $this->createMock(HookExecutorInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+
+        // По умолчанию hook executor возвращает skipped (hook не сконфигурирован)
+        $this->hookExecutor->method('execute')->willReturn(HookResultVo::skipped());
 
         $this->strategy = new ConditionalExecutionStrategy(
             $this->conditionEvaluator,
             $this->stepExecutor,
+            $this->hookExecutor,
             $this->logger,
         );
     }

@@ -32,6 +32,7 @@ final readonly class ChainStepVo
      * @param int $timeoutSeconds таймаут выполнения в секундах (default 120 для quality_gate)
      * @param bool $noContextFiles отключить автоматическую загрузку контекстных файлов проекта (AGENTS.md, CLAUDE.md)
      * @param ConditionExpressionVo|null $when условное выражение выполнения шага (null = безусловное выполнение)
+     * @param string|null $postStep путь к post_step hook-скрипту (null = hook не сконфигурирован)
      */
     public function __construct(
         private ChainStepTypeEnum $type,
@@ -46,6 +47,7 @@ final readonly class ChainStepVo
         private int $timeoutSeconds = 120,
         private bool $noContextFiles = false,
         private ?ConditionExpressionVo $when = null,
+        private ?string $postStep = null,
     ) {
         if ($type === ChainStepTypeEnum::agent && ($role === null || $role === '')) {
             throw new InvalidArgumentException('Agent step must have a role.');
@@ -74,6 +76,7 @@ final readonly class ChainStepVo
         ?string $name = null,
         bool $noContextFiles = false,
         ?ConditionExpressionVo $when = null,
+        ?string $postStep = null,
     ): self {
         return new self(
             type: ChainStepTypeEnum::agent,
@@ -85,6 +88,7 @@ final readonly class ChainStepVo
             name: $name,
             noContextFiles: $noContextFiles,
             when: $when,
+            postStep: $postStep,
         );
     }
 
@@ -97,6 +101,7 @@ final readonly class ChainStepVo
         int $timeoutSeconds = 120,
         ?string $name = null,
         ?ConditionExpressionVo $when = null,
+        ?string $postStep = null,
     ): self {
         return new self(
             type: ChainStepTypeEnum::qualityGate,
@@ -105,6 +110,7 @@ final readonly class ChainStepVo
             timeoutSeconds: $timeoutSeconds,
             name: $name,
             when: $when,
+            postStep: $postStep,
         );
     }
 
@@ -180,6 +186,22 @@ final readonly class ChainStepVo
     public function hasCondition(): bool
     {
         return $this->when !== null;
+    }
+
+    /**
+     * Возвращает путь к post_step hook-скрипту (null = hook не сконфигурирован).
+     */
+    public function getPostStep(): ?string
+    {
+        return $this->postStep;
+    }
+
+    /**
+     * Имеет ли шаг сконфигурированный post_step hook.
+     */
+    public function hasPostStep(): bool
+    {
+        return $this->postStep !== null;
     }
 
     /**

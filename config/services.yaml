@@ -96,6 +96,10 @@ services:
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\ExecuteConditionalStepServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ExecuteConditionalStepService
 
+  # --- Hook Executor: Interface → Implementation alias ---
+  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Hook\HookExecutorInterface:
+    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\Hook\ShellHookExecutor
+
   # --- ConditionalExecution: Domain Service alias ---
   TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Condition\EvaluateConditionServiceInterface:
     alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Condition\EvaluateConditionService
