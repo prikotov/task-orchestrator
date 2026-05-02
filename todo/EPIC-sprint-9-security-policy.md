@@ -182,7 +182,7 @@ Orchestrator Application → Orchestrator Domain (interfaces) ✅
 - [x] [TASK-docs-security-policy-adr](done/TASK-docs-security-policy-adr.todo.md) — ADR-010: Security Policy Architecture ✅
 - [ ] [TASK-feat-security-policy-domain](TASK-feat-security-policy-domain.todo.md) — Domain слой модуля SecurityPolicy
 - [ ] [TASK-feat-security-policy-ports](TASK-feat-security-policy-ports.todo.md) — Ports (interfaces) в Orchestrator Domain
-- [ ] [TASK-feat-security-policy-infrastructure](TASK-feat-security-policy-infrastructure.todo.md) — Infrastructure реализация ports + Decorators
+- [x] [TASK-feat-security-policy-infrastructure](TASK-feat-security-policy-infrastructure.todo.md) — Infrastructure реализация ports + Decorators ✅
 - [ ] [TASK-feat-security-policy-yaml-dsl](TASK-feat-security-policy-yaml-dsl.todo.md) — YAML DSL `permissions:` block + Exec policy файл
 - [ ] [TASK-test-security-policy-integration](TASK-test-security-policy-integration.todo.md) — Integration тесты end-to-end
 

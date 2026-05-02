@@ -1,0 +1,449 @@
+# Deptrac — DDD project on Symfony
+#
+# Implements deterministic verification of architectural rules from docs/conventions/.
+#
+# See README.md for layer descriptions and dependency rules.
+
+deptrac:
+  paths:
+    - ./src
+    - ./apps
+
+  exclude_files:
+    - '#.*tests.*#'
+
+  formatters:
+    graphviz:
+      groups:
+        AgentRunner:
+          - AgentRunnerDomain
+          - AgentRunnerApplication
+          - AgentRunnerInfrastructure
+          - AgentRunnerIntegration
+        Orchestrator:
+          - OrchestratorDomain
+          - OrchestratorApplication
+          - OrchestratorInfrastructure
+          - OrchestratorIntegration
+        StaticExecution:
+          - StaticExecutionDomain
+          - StaticExecutionApplication
+          - StaticExecutionInfrastructure
+          - StaticExecutionIntegration
+        SecurityPolicy:
+          - SecurityPolicyDomain
+          - SecurityPolicyApplication
+          - SecurityPolicyInfrastructure
+
+  layers:
+    # --- AgentRunner module ---
+
+    - name: AgentRunnerDomain
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\AgentRunner\\Domain\\.*
+
+    - name: AgentRunnerApplication
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\AgentRunner\\Application\\.*
+          must_not:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\AgentRunner\\Application\\.*Dto$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\AgentRunner\\Application\\.*Command$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\AgentRunner\\Application\\.*CommandHandler$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\AgentRunner\\Application\\.*Query$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\AgentRunner\\Application\\.*QueryHandler$
+
+    - name: AgentRunnerInfrastructure
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\AgentRunner\\Infrastructure\\.*
+
+    - name: AgentRunnerIntegration
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\AgentRunner\\Integration\\.*
+
+    # --- Orchestrator module ---
+
+    - name: OrchestratorDomain
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Domain\\.*
+          must_not:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Domain\\ValueObject\\.*Vo$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Domain\\Enum\\.*
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Domain\\.*Dto$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Domain\\Service\\Integration\\.*
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Domain\\Service\\Chain\\Audit\\.*
+
+    - name: OrchestratorDomainVo
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Domain\\(Entity\\)?ValueObject\\.*Vo$
+
+    - name: OrchestratorDomainEnum
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Domain\\Enum\\.*
+
+    - name: OrchestratorDomainDto
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Domain\\.*Dto$
+
+    - name: OrchestratorApplication
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Application\\.*
+          must_not:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Application\\.*Dto$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Application\\Enum\\.*
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Application\\UseCase\\Command\\.*\\.*Command$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Application\\UseCase\\Command\\.*\\.*CommandHandler$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Application\\UseCase\\Query\\.*\\.*Query$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Application\\UseCase\\Query\\.*\\.*QueryHandler$
+
+    - name: OrchestratorApplicationDto
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Application\\.*Dto$
+
+    - name: OrchestratorApplicationEnum
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Application\\Enum\\.*
+
+    - name: OrchestratorInfrastructure
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Infrastructure\\(?!Model|Listener).*$
+
+    - name: OrchestratorIntegration
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Integration\\.*
+          must_not:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Integration\\.*Dto$
+
+    # --- StaticExecution module ---
+
+    - name: StaticExecutionDomain
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\StaticExecution\\Domain\\.*
+          must_not:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\StaticExecution\\Domain\\ValueObject\\.*Vo$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\StaticExecution\\Domain\\.*Dto$
+
+    - name: StaticExecutionDomainVo
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\StaticExecution\\Domain\\(Entity\\)?ValueObject\\.*Vo$
+
+    - name: StaticExecutionApplication
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\StaticExecution\\Application\\.*
+
+    - name: StaticExecutionInfrastructure
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\StaticExecution\\Infrastructure\\.*
+
+    - name: OrchestratorDomainIntegrationServices
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Domain\\Service\\Integration\\.*
+
+    - name: OrchestratorDomainAuditServices
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Domain\\Service\\Chain\\Audit\\.*
+
+    - name: StaticExecutionIntegration
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\StaticExecution\\Integration\\.*
+
+    # --- SecurityPolicy module ---
+
+    - name: SecurityPolicyDomain
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\SecurityPolicy\\Domain\\.*
+          must_not:
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\SecurityPolicy\\Domain\\ValueObject\\.*Vo$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\SecurityPolicy\\Domain\\Enum\\.*$
+            - type: classLike
+              value: ^TaskOrchestrator\\Common\\Module\\SecurityPolicy\\Domain\\Entity\\.*$
+
+    - name: SecurityPolicyDomainVo
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\SecurityPolicy\\Domain\\ValueObject\\.*Vo$
+
+    - name: SecurityPolicyDomainEnum
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\SecurityPolicy\\Domain\\Enum\\.*$
+
+    - name: SecurityPolicyDomainEntity
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\SecurityPolicy\\Domain\\Entity\\.*$
+
+    - name: SecurityPolicyApplication
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\SecurityPolicy\\Application\\.*
+
+    - name: SecurityPolicyInfrastructure
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\SecurityPolicy\\Infrastructure\\.*
+
+    # --- Presentation layer ---
+
+    - name: Presentation
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Console\\Module\\.*
+
+    # --- Fine-grained: shared DTO/VO/Enum ---
+
+    - name: OrchestratorApplicationCommonDto
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\Orchestrator\\Application\\UseCase\\Command\\OrchestrateChain\\.*Dto$
+
+    - name: DomainEnum
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Domain\\Enum\\.*
+
+    - name: DomainDto
+      collectors:
+        - type: classLike
+          value: ^TaskOrchestrator\\Common\\Module\\.*\\Domain\\.*Dto$
+
+  ruleset:
+    # --- Shared VO/Enum/DTO: freely reference each other ---
+    OrchestratorDomainVo:
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
+      - OrchestratorDomainDto
+      - OrchestratorDomain
+      - OrchestratorDomainIntegrationServices
+      - OrchestratorDomainAuditServices
+    OrchestratorDomainEnum:
+      - OrchestratorDomainEnum
+    OrchestratorDomainDto:
+      - OrchestratorDomainDto
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
+    OrchestratorApplicationDto:
+      - OrchestratorApplicationDto
+      - OrchestratorApplicationEnum
+    OrchestratorApplicationEnum:
+      - OrchestratorApplicationEnum
+    OrchestratorApplicationCommonDto:
+      - OrchestratorApplicationCommonDto
+      - OrchestratorApplicationEnum
+    DomainEnum:
+      - DomainEnum
+    DomainDto:
+      - DomainDto
+      - OrchestratorDomainVo
+      - DomainEnum
+
+    # --- AgentRunner module ---
+    AgentRunnerDomain:
+      - AgentRunnerDomain
+      - OrchestratorDomainEnum
+    AgentRunnerApplication:
+      - AgentRunnerApplication
+      - AgentRunnerDomain
+    AgentRunnerInfrastructure:
+      - AgentRunnerInfrastructure
+      - AgentRunnerDomain
+      - AgentRunnerApplication
+    AgentRunnerIntegration:
+      - AgentRunnerDomain
+      - AgentRunnerApplication
+
+    # --- Orchestrator module ---
+    OrchestratorDomainIntegrationServices:
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
+    OrchestratorDomainAuditServices:
+      - OrchestratorDomainVo
+      - OrchestratorDomainDto
+      - DomainDto
+    OrchestratorDomain:
+      - OrchestratorDomain
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
+      - OrchestratorDomainDto
+      - DomainEnum
+      - DomainDto
+      - OrchestratorApplicationDto
+      - OrchestratorApplicationEnum
+      - OrchestratorApplicationCommonDto
+      - SecurityPolicyDomain
+    OrchestratorApplication:
+      - OrchestratorApplication
+      - OrchestratorDomain
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
+      - OrchestratorDomainDto
+      - DomainEnum
+      - DomainDto
+      - OrchestratorApplicationDto
+      - OrchestratorApplicationEnum
+      - OrchestratorApplicationCommonDto
+      - StaticExecutionApplication
+      - StaticExecutionDomainVo
+      - OrchestratorDomainIntegrationServices
+      - OrchestratorDomainAuditServices
+    OrchestratorInfrastructure:
+      - OrchestratorInfrastructure
+      - OrchestratorDomain
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
+      - OrchestratorDomainDto
+      - DomainEnum
+      - DomainDto
+      - OrchestratorApplication
+      - OrchestratorDomainIntegrationServices
+      - OrchestratorDomainAuditServices
+    OrchestratorIntegration:
+      - OrchestratorIntegration
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
+      - OrchestratorDomainDto
+      - DomainEnum
+      - DomainDto
+      - AgentRunnerApplication
+      - AgentRunnerDomain
+
+    # --- StaticExecution module ---
+    StaticExecutionDomain:
+      - StaticExecutionDomain
+      - StaticExecutionDomainVo
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
+      - DomainEnum
+      - DomainDto
+      - OrchestratorDomainIntegrationServices
+    StaticExecutionDomainVo:
+      - StaticExecutionDomainVo
+    StaticExecutionApplication:
+      - StaticExecutionApplication
+      - StaticExecutionDomain
+      - StaticExecutionDomainVo
+      - OrchestratorDomainVo
+      - OrchestratorDomain
+    StaticExecutionInfrastructure:
+      - StaticExecutionInfrastructure
+      - StaticExecutionDomain
+      - StaticExecutionDomainVo
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
+      - OrchestratorDomainDto
+      - DomainEnum
+      - DomainDto
+    StaticExecutionIntegration:
+      - StaticExecutionIntegration
+      - StaticExecutionDomain
+      - StaticExecutionDomainVo
+      - OrchestratorDomain
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
+      - OrchestratorDomainDto
+      - DomainEnum
+      - DomainDto
+      - OrchestratorDomainIntegrationServices
+      - OrchestratorDomainAuditServices
+
+    # --- SecurityPolicy module ---
+    SecurityPolicyDomain:
+      - SecurityPolicyDomain
+      - SecurityPolicyDomainVo
+      - SecurityPolicyDomainEnum
+      - SecurityPolicyDomainEntity
+      - DomainEnum
+    SecurityPolicyDomainVo:
+      - SecurityPolicyDomainVo
+      - SecurityPolicyDomainEnum
+      - SecurityPolicyDomainEntity
+      - DomainEnum
+    SecurityPolicyDomainEnum:
+      - SecurityPolicyDomainEnum
+    SecurityPolicyDomainEntity:
+      - SecurityPolicyDomainEntity
+      - SecurityPolicyDomainVo
+      - SecurityPolicyDomainEnum
+      - DomainEnum
+    SecurityPolicyApplication:
+      - SecurityPolicyApplication
+      - SecurityPolicyDomain
+      - SecurityPolicyDomainVo
+      - SecurityPolicyDomainEnum
+      - SecurityPolicyDomainEntity
+    SecurityPolicyInfrastructure:
+      - SecurityPolicyInfrastructure
+      - SecurityPolicyDomain
+      - SecurityPolicyDomainVo
+      - SecurityPolicyDomainEnum
+      - SecurityPolicyDomainEntity
+      - DomainEnum
+      - OrchestratorDomain
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
+      - OrchestratorDomainIntegrationServices
+      - OrchestratorApplication
+      - OrchestratorApplicationCommonDto
+      - OrchestratorApplicationDto
+
+    # --- Presentation ---
+    Presentation:
+      - OrchestratorApplication
+      - OrchestratorApplicationDto
+      - OrchestratorApplicationCommonDto
+      - OrchestratorApplicationEnum
+      - OrchestratorDomainVo
+      - OrchestratorDomainEnum
