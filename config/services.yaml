@@ -136,6 +136,9 @@ services:
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService
 
+  TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\MetricsCollectorInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Metrics\InMemoryMetricsCollector
+
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\RetryableRunnerFactory
 

@@ -8,6 +8,7 @@ use Override;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\MetricsCollectorInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
 
@@ -21,6 +22,7 @@ final readonly class RetryableRunnerFactory implements RetryableRunnerFactoryInt
 {
     public function __construct(
         private ?LoggerInterface $logger = null,
+        private ?MetricsCollectorInterface $metrics = null,
     ) {
     }
 
@@ -37,6 +39,7 @@ final readonly class RetryableRunnerFactory implements RetryableRunnerFactoryInt
             $runner,
             $retryPolicy,
             $this->logger ?? new NullLogger(),
+            $this->metrics,
         );
     }
 }

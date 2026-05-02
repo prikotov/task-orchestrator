@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\MetricsCollectorInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Metrics\InMemoryMetricsCollector;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\RetryingAgentRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -266,5 +268,339 @@ final class RetryingAgentRunnerTest extends TestCase
 
         self::assertFalse($result->isError());
         self::assertFalse($result->isTimedOut());
+    }
+
+    // ─── error classification: FATAL ────────────────────────────────────
+
+    #[Test]
+    public function doesNotRetryOnFatalExitCode(): void
+    {
+        $fatalResult = AgentResultVo::createFromError(
+            errorMessage: 'Process crash',
+            exitCode: 137,
+        );
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::once())
+            ->method('run')
+            ->willReturn($fatalResult);
+
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger);
+
+        $result = $runner->run($this->request);
+
+        self::assertTrue($result->isError());
+        self::assertSame(137, $result->getExitCode());
+        self::assertSame('Process crash', $result->getErrorMessage());
+    }
+
+    #[Test]
+    public function doesNotRetryOnFatalExitCode100(): void
+    {
+        $fatalResult = AgentResultVo::createFromError(
+            errorMessage: 'Segmentation fault',
+            exitCode: 100,
+        );
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::once())
+            ->method('run')
+            ->willReturn($fatalResult);
+
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger);
+
+        $result = $runner->run($this->request);
+
+        self::assertTrue($result->isError());
+        self::assertSame(100, $result->getExitCode());
+    }
+
+    #[Test]
+    public function doesNotRetryOnFatalExitCode255(): void
+    {
+        $fatalResult = AgentResultVo::createFromError(
+            errorMessage: 'Invalid API key',
+            exitCode: 255,
+        );
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::once())
+            ->method('run')
+            ->willReturn($fatalResult);
+
+        $policy = new RetryPolicyVo(maxRetries: 5, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger);
+
+        $result = $runner->run($this->request);
+
+        self::assertTrue($result->isError());
+        self::assertSame(255, $result->getExitCode());
+    }
+
+    // ─── error classification: TRANSIENT (backward compatibility) ────────
+
+    #[Test]
+    public function retriesOnTransientExitCode1(): void
+    {
+        $transientResult = AgentResultVo::createFromError(
+            errorMessage: 'Rate limit',
+            exitCode: 1,
+        );
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::exactly(2))
+            ->method('run')
+            ->willReturnOnConsecutiveCalls($transientResult, $successResult);
+
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger);
+
+        $result = $runner->run($this->request);
+
+        self::assertFalse($result->isError());
+        self::assertSame('OK', $result->getOutputText());
+    }
+
+    #[Test]
+    public function retriesOnTimedOutResult(): void
+    {
+        $timedOutResult = AgentResultVo::createFromError(
+            errorMessage: 'Agent timed out',
+            timedOut: true,
+        );
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::exactly(2))
+            ->method('run')
+            ->willReturnOnConsecutiveCalls($timedOutResult, $successResult);
+
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger);
+
+        $result = $runner->run($this->request);
+
+        self::assertFalse($result->isError());
+    }
+
+    // ─── error classification: UNKNOWN (retry conservatively) ────────────
+
+    #[Test]
+    public function retriesOnUnknownExitCode0WithError(): void
+    {
+        $unknownResult = AgentResultVo::createFromError(
+            errorMessage: 'Anomaly',
+            exitCode: 0,
+        );
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::exactly(2))
+            ->method('run')
+            ->willReturnOnConsecutiveCalls($unknownResult, $successResult);
+
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger);
+
+        $result = $runner->run($this->request);
+
+        self::assertFalse($result->isError());
+    }
+
+    #[Test]
+    public function logsWarningOnFatalClassification(): void
+    {
+        $fatalResult = AgentResultVo::createFromError(
+            errorMessage: 'Process crash',
+            exitCode: 137,
+        );
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::once())
+            ->method('run')
+            ->willReturn($fatalResult);
+
+        $this->logger
+            ->expects(self::once())
+            ->method('warning')
+            ->with(self::stringContains('fatal error'));
+
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger);
+
+        $runner->run($this->request);
+    }
+
+    // ─── Metrics integration ────────────────────────────────────────────
+
+    #[Test]
+    public function recordsAttemptCounterOnEachAttempt(): void
+    {
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn($successResult);
+
+        $metrics = new InMemoryMetricsCollector();
+
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger, $metrics);
+
+        $runner->run($this->request);
+
+        // Одна попытка, один attempt counter
+        self::assertSame(1, $metrics->getCounterTotal('runner.attempt'));
+        $counters = $metrics->getCounters();
+        self::assertArrayHasKey('attempt=1,runner=pi', $counters['runner.attempt']);
+    }
+
+    #[Test]
+    public function recordsAttemptCounterForMultipleAttempts(): void
+    {
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::exactly(2))
+            ->method('run')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new RuntimeException('Fail')),
+                $successResult,
+            );
+
+        $metrics = new InMemoryMetricsCollector();
+
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger, $metrics);
+
+        $runner->run($this->request);
+
+        // Две попытки
+        self::assertSame(2, $metrics->getCounterTotal('runner.attempt'));
+        $counters = $metrics->getCounters();
+        self::assertSame(1, $counters['runner.attempt']['attempt=1,runner=pi']);
+        self::assertSame(1, $counters['runner.attempt']['attempt=2,runner=pi']);
+    }
+
+    #[Test]
+    public function recordsErrorCounterOnException(): void
+    {
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::exactly(2))
+            ->method('run')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new RuntimeException('Fail')),
+                $successResult,
+            );
+
+        $metrics = new InMemoryMetricsCollector();
+
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger, $metrics);
+
+        $runner->run($this->request);
+
+        // 1 error counter (первая попытка)
+        self::assertSame(1, $metrics->getCounterTotal('runner.error'));
+    }
+
+    #[Test]
+    public function recordsErrorCounterOnErrorResult(): void
+    {
+        $errorResult = AgentResultVo::createFromError(errorMessage: 'API error');
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::exactly(2))
+            ->method('run')
+            ->willReturnOnConsecutiveCalls($errorResult, $successResult);
+
+        $metrics = new InMemoryMetricsCollector();
+
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger, $metrics);
+
+        $runner->run($this->request);
+
+        // 1 error counter
+        self::assertSame(1, $metrics->getCounterTotal('runner.error'));
+    }
+
+    #[Test]
+    public function recordsDurationOnSuccess(): void
+    {
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn($successResult);
+
+        $metrics = new InMemoryMetricsCollector();
+
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger, $metrics);
+
+        $runner->run($this->request);
+
+        // Длительность записана
+        $timings = $metrics->getTimings();
+        self::assertArrayHasKey('runner.duration', $timings);
+        $durationValues = $timings['runner.duration'];
+        self::assertCount(1, $durationValues);
+        // Проверяем что result=success
+        self::assertArrayHasKey('result=success,runner=pi', $durationValues);
+        self::assertGreaterThan(0.0, $durationValues['result=success,runner=pi'][0]);
+    }
+
+    #[Test]
+    public function recordsDurationOnExhausted(): void
+    {
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner
+            ->expects(self::exactly(2))
+            ->method('run')
+            ->willThrowException(new RuntimeException('Fail'));
+
+        $metrics = new InMemoryMetricsCollector();
+
+        $policy = new RetryPolicyVo(maxRetries: 1, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger, $metrics);
+
+        $runner->run($this->request);
+
+        // Длительность записана с result=exhausted
+        $timings = $metrics->getTimings();
+        self::assertArrayHasKey('runner.duration', $timings);
+        self::assertArrayHasKey('result=exhausted,runner=pi', $timings['runner.duration']);
+    }
+
+    #[Test]
+    public function worksWithoutMetricsCollector(): void
+    {
+        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+
+        $this->innerRunner->method('getName')->willReturn('pi');
+        $this->innerRunner->method('run')->willReturn($successResult);
+
+        // Metrics = null (default)
+        $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
+        $runner = new RetryingAgentRunner($this->innerRunner, $policy, $this->logger);
+
+        $result = $runner->run($this->request);
+
+        self::assertFalse($result->isError());
     }
 }
