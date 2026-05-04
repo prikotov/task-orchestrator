@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Command\OrchestrateChain;
 
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ExecutionStrategyInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
@@ -26,14 +26,14 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(DynamicExecutionStrategy::class)]
 final class OrchestrateChainCommandHandlerTest extends TestCase
 {
-    private ChainLoaderInterface $chainLoader;
+    private ChainDefinitionProviderInterface $chainProvider;
     private ExecutionStrategyInterface $staticStrategy;
     private ExecutionStrategyInterface $dynamicStrategy;
     private OrchestrateChainCommandHandler $handler;
 
     protected function setUp(): void
     {
-        $this->chainLoader = $this->createMock(ChainLoaderInterface::class);
+        $this->chainProvider = $this->createMock(ChainDefinitionProviderInterface::class);
         $this->staticStrategy = $this->createMock(ExecutionStrategyInterface::class);
         $this->dynamicStrategy = $this->createMock(ExecutionStrategyInterface::class);
 
@@ -49,7 +49,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     private function createHandler(): OrchestrateChainCommandHandler
     {
         return new OrchestrateChainCommandHandler(
-            $this->chainLoader,
+            $this->chainProvider,
             [$this->staticStrategy, $this->dynamicStrategy],
         );
     }
@@ -67,7 +67,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             ],
         );
 
-        $this->chainLoader->method('load')->with('test')->willReturn($chain);
+        $this->chainProvider->method('loadChainDefinition')->with('test')->willReturn($chain);
 
         $staticResult = new OrchestrateChainResultDto();
         $this->staticStrategy->method('execute')->willReturn($staticResult);
@@ -85,7 +85,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     {
         $chain = $this->createDynamicChain('brainstorm', 'facilitator', ['participant']);
 
-        $this->chainLoader->method('load')->with('brainstorm')->willReturn($chain);
+        $this->chainProvider->method('loadChainDefinition')->with('brainstorm')->willReturn($chain);
 
         $dynamicResult = new OrchestrateChainResultDto(
             synthesis: 'Result',
@@ -106,7 +106,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     {
         $chain = $this->createDynamicChain('brainstorm', 'facilitator', ['participant']);
 
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('loadChainDefinition')->willReturn($chain);
 
         $resumeResult = new OrchestrateChainResultDto(
             synthesis: 'Resumed result',
@@ -136,11 +136,11 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             steps: [ChainStepVo::agent(role: 'role', runner: 'pi')],
         );
 
-        $this->chainLoader->method('load')->willReturn($chain);
+        $this->chainProvider->method('loadChainDefinition')->willReturn($chain);
 
         // Both strategies return false for supports()
         $handler = new OrchestrateChainCommandHandler(
-            $this->chainLoader,
+            $this->chainProvider,
             [], // empty strategies
         );
 

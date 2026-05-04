@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Contract\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface;
@@ -87,7 +87,7 @@ final class StaticChainIntegrationTest extends TestCase
         $staticStrategy = new StaticExecutionStrategy($staticChainExecutor, $definitionMapper);
 
         $this->handler = new OrchestrateChainCommandHandler(
-            $this->chainLoader,
+            $definitionMapper,
             new \ArrayIterator([$staticStrategy]),
         );
     }

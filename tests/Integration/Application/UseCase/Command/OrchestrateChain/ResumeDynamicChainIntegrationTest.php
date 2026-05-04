@@ -19,6 +19,8 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSes
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapper;
+use TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapper;
 
 /**
  * Integration-тест: resume dynamic chain end-to-end.
@@ -50,6 +52,7 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
         $this->stubSessionLogger = new ResumeStubSessionLogger();
 
         $contextBuilder = new BuildDynamicContextService();
+        $configMapper = new DynamicLoopDefinitionMapper();
         $auditFactory = $this->createMock(DynamicLoopAuditLoggerFactoryInterface::class);
         $sessionNotifier = $this->createMock(SessionCompletedNotifierInterface::class);
         $sessionNotifier->method('notifySessionCompleted');
@@ -58,12 +61,14 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
             contextBuilder: $contextBuilder,
             dynamicLoopRunner: $this->stubLoopRunner,
             sessionLogger: $this->stubSessionLogger,
+            configMapper: $configMapper,
             auditLoggerFactory: $auditFactory,
             sessionNotifier: $sessionNotifier,
         );
 
+        $chainDefinitionProvider = new ChainExecutionDefinitionMapper($chainLoader);
         $this->handler = new OrchestrateChainCommandHandler(
-            $chainLoader,
+            $chainDefinitionProvider,
             new \ArrayIterator([$dynamicStrategy]),
         );
     }
