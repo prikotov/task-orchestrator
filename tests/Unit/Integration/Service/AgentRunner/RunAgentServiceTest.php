@@ -15,10 +15,10 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterfa
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunRequestVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Integration\Service\AgentRunner\AgentDtoMapper;
-use TaskOrchestrator\Common\Module\ChainDefinition\Integration\Service\AgentRunner\RunAgentService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\AgentDtoMapper;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\RunAgentService;
 
 #[CoversClass(RunAgentService::class)]
 final class RunAgentServiceTest extends TestCase

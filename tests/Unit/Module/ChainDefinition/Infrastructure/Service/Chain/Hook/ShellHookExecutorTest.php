@@ -8,8 +8,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\HookResultVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\Hook\ShellHookExecutor;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\Hook\ShellHookExecutor;
 
 #[CoversClass(ShellHookExecutor::class)]
 final class ShellHookExecutorTest extends TestCase

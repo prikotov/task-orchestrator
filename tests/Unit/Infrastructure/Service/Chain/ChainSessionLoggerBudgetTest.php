@@ -8,7 +8,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBud
 use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionBudgetFormatter;
 use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionFileStorage;
 use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\ChainSessionWriter;
+use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionWriter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

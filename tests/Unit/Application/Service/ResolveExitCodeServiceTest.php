@@ -7,10 +7,10 @@ namespace TaskOrchestrator\Tests\Unit\Application\Service;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Enum\OrchestrateExitCodeEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\ResolveExitCodeService;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\StepResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\OrchestrateExitCodeEnum;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeService;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\StepResultDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\ChainNotFoundException;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\RoleNotFoundException;
 

@@ -8,23 +8,23 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\StaticExecutionStrategy;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Shared\PromptFormatterInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStaticStepService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunStaticChainService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticChainResultVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader;
-use TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainService;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\CheckStaticBudgetServiceInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ExecuteStaticStepService;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunStaticChainService;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Hook\HookExecutorInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapper;
 
 /**
  * Integration-тест: static chain end-to-end.
@@ -74,7 +74,7 @@ final class StaticChainIntegrationTest extends TestCase
         );
         $hookExecutor = $this->createMock(HookExecutorInterface::class);
         $hookExecutor->method('execute')->willReturn(
-            \TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\HookResultVo::skipped(),
+            HookResultVo::skipped(),
         );
 
         $runStaticChainService = new RunStaticChainService(
@@ -83,7 +83,8 @@ final class StaticChainIntegrationTest extends TestCase
             $hookExecutor,
         );
         $staticChainExecutor = new ExecuteStaticChainService($runStaticChainService);
-        $staticStrategy = new StaticExecutionStrategy($staticChainExecutor);
+        $definitionMapper = new ChainExecutionDefinitionMapper($this->chainLoader);
+        $staticStrategy = new StaticExecutionStrategy($staticChainExecutor, $definitionMapper);
 
         $this->handler = new OrchestrateChainCommandHandler(
             $this->chainLoader,

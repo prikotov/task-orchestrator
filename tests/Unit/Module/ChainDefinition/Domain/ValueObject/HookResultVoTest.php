@@ -7,7 +7,7 @@ namespace Tests\Unit\Module\ChainDefinition\Domain\ValueObject;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\HookResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
 
 #[CoversClass(HookResultVo::class)]
 final class HookResultVoTest extends TestCase

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service;
 
 use Override;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Prompt\PromptProviderInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\PromptProviderInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FacilitatorResponseParserInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopAgentServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionWriterInterface;
@@ -245,7 +245,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
      */
     private function runViaAgentRunner(DynamicLoopRunRequestVo $request): DynamicLoopRunResultVo
     {
-        $chainRequest = new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunRequestVo(
+        $chainRequest = new \TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo(
             role: $request->getRole(),
             task: $request->getTask(),
             systemPrompt: $request->getSystemPrompt(),

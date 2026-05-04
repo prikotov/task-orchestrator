@@ -8,8 +8,8 @@ use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunn
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler as AgentRunnerGetRunnersQueryHandler;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\GetRunners\GetRunnersQuery;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQuery;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

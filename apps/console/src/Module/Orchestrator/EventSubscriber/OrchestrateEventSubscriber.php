@@ -9,8 +9,8 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Event\OrchestrateChain\OrchestrateRoundCompletedEvent;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Event\OrchestrateChain\OrchestrateSessionCompletedEvent;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Event\OrchestrateChain\OrchestrateRoundCompletedEvent;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Event\OrchestrateChain\OrchestrateSessionCompletedEvent;
 
 /**
  * Подписчик событий оркестрации — вывод прогресса в консоль.

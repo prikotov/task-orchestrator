@@ -8,19 +8,19 @@ use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ConditionalExecutionStrategy;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ConditionalExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Condition\EvaluateConditionServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\ExecuteConditionalStepServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ExecuteConditionalStepServiceInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalStepResultVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Hook\HookExecutorInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\HookResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionalStepResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
 
 final class ConditionalExecutionStrategyTest extends TestCase
 {

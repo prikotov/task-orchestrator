@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Comm
 
 use LogicException;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ExecutionStrategyInterface;
 
 /**

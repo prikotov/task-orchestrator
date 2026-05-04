@@ -6,10 +6,10 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Application\Service;
 
 use LogicException;
 use Override;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ExecutionStrategyInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto as ChainDynamicRoundResultDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ExecutionStrategyInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto as ChainDynamicRoundResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\DynamicLoop\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\OrchestrateChain;
 
 use Override;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunRequestVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 
 /**
  * Стаб RunAgentServiceInterface для integration-тестов.

@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Tests\Unit\Common\Module\StaticExecution\Integration\Service\Audit;
+namespace TaskOrchestrator\Tests\Unit\Common\Module\ChainExecution\Integration\Service\Audit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Dto\StepAuditStatusDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunResultVo;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticChainAuditVo;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticStepAuditVo;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticStepResultVo;
-use TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Audit\StaticAuditService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\ChainResultAuditDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\StepAuditStatusDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Audit\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticChainAuditVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepAuditVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\Audit\StaticAuditService;
 
 /**
  * Unit-тест StaticAuditService: проверяет маппинг StaticExecution VO → Orchestrator DTO.
