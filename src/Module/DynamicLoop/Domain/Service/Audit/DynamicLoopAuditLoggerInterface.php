@@ -13,6 +13,9 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundRe
  * Port/Adapter: DynamicLoop.Domain определяет свой Port (интерфейс),
  * Infrastructure предоставляет один Adapter (JsonlAuditLogger),
  * реализующий и этот интерфейс, и AuditLoggerInterface из ChainDefinition.
+ *
+ * Методы logChainStart/logStepStart — общие с AuditLoggerInterface (одинаковая сигнатура).
+ * Методы logDynamicStepResult/logDynamicChainResult — уникальные (DynamicRoundResultVo вместо ChainRunResultVo).
  */
 interface DynamicLoopAuditLoggerInterface
 {
@@ -29,7 +32,7 @@ interface DynamicLoopAuditLoggerInterface
     /**
      * Логирует результат шага dynamic-цикла.
      */
-    public function logStepResult(
+    public function logDynamicStepResult(
         string $chainName,
         int $stepNumber,
         string $role,
@@ -41,5 +44,5 @@ interface DynamicLoopAuditLoggerInterface
     /**
      * Логирует финальный результат dynamic-цикла.
      */
-    public function logChainResult(DynamicLoopAuditDto $audit): void;
+    public function logDynamicChainResult(DynamicLoopAuditDto $audit): void;
 }

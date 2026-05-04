@@ -83,7 +83,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
         $this->finalizer->formatFinalJournal($execution);
 
-        $auditLogger?->logChainResult(
+        $auditLogger?->logDynamicChainResult(
             $this->finalizer->buildChainAuditDto(
                 $chain->getName(),
                 $startTime,

@@ -107,4 +107,32 @@ final readonly class DynamicLoopBudgetVo
 
         return $spent >= ($this->maxCostTotal * $threshold) && $spent <= $this->maxCostTotal;
     }
+
+    /**
+     * Создаёт бюджет из массива конфигурации (YAML-параметры).
+     *
+     * @param array{
+     *     max_cost_total?: float|int|null,
+     *     max_cost_per_step?: float|int|null,
+     *     per_role?: array<string, array{max_cost_total?: float|int|null, max_cost_per_step?: float|int|null}|mixed>
+     * } $config
+     */
+    public static function fromArray(array $config): self
+    {
+        $maxCostTotal = $config['max_cost_total'] ?? null;
+        $maxCostPerStep = $config['max_cost_per_step'] ?? null;
+
+        $perRoleBudgets = [];
+        foreach ($config['per_role'] ?? [] as $role => $roleConfig) {
+            if (is_array($roleConfig)) {
+                $perRoleBudgets[$role] = self::fromArray($roleConfig);
+            }
+        }
+
+        return new self(
+            maxCostTotal: $maxCostTotal !== null ? (float) $maxCostTotal : null,
+            maxCostPerStep: $maxCostPerStep !== null ? (float) $maxCostPerStep : null,
+            perRoleBudgets: $perRoleBudgets,
+        );
+    }
 }

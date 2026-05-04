@@ -55,7 +55,7 @@ final readonly class RecordDynamicRoundService implements RecordDynamicRoundServ
             synthesis: $synthesis,
         );
 
-        $auditLogger?->logStepResult(
+        $auditLogger?->logDynamicStepResult(
             $chainName,
             $step,
             $role,
