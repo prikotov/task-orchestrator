@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static;
 
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\FormatPromptServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo;

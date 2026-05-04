@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ConditionOperatorEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionService;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionExpressionVo;
 
 final class EvaluateConditionServiceTest extends TestCase
 {

@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentResultDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\AgentDtoMapper;
@@ -98,7 +98,7 @@ final class AgentDtoMapperTest extends TestCase
     public function mapToRunAgentCommandWithEnabledRetryPolicy(): void
     {
         $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code', runnerName: 'pi');
-        $retryPolicy = new ChainRetryPolicyVo(
+        $retryPolicy = new ExecutionRetryPolicyVo(
             maxRetries: 5,
             initialDelayMs: 500,
             maxDelayMs: 60000,
@@ -117,7 +117,7 @@ final class AgentDtoMapperTest extends TestCase
     public function mapToRunAgentCommandWithDisabledRetryPolicy(): void
     {
         $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code', runnerName: 'pi');
-        $retryPolicy = ChainRetryPolicyVo::disabled();
+        $retryPolicy = ExecutionRetryPolicyVo::disabled();
 
         $result = $this->mapper->mapToRunAgentCommand($vo, $retryPolicy);
 

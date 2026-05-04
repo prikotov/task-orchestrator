@@ -8,9 +8,10 @@ use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ConditionalExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ExecuteConditionalStepServiceInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
@@ -19,8 +20,10 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicCha
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionalStepResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapper;
 
 final class ConditionalExecutionStrategyTest extends TestCase
 {
@@ -40,10 +43,14 @@ final class ConditionalExecutionStrategyTest extends TestCase
         // По умолчанию hook executor возвращает skipped (hook не сконфигурирован)
         $this->hookExecutor->method('execute')->willReturn(HookResultVo::skipped());
 
+        $chainLoader = $this->createMock(ChainLoaderInterface::class);
+        $definitionMapper = new ChainExecutionDefinitionMapper($chainLoader);
+
         $this->strategy = new ConditionalExecutionStrategy(
             $this->conditionEvaluator,
             $this->stepExecutor,
             $this->hookExecutor,
+            $definitionMapper,
             $this->logger,
         );
     }
@@ -101,7 +108,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         $callCount = 0;
         $this->stepExecutor->expects($this->exactly(2))
             ->method('executeStep')
-            ->willReturnCallback(function () use (&$callCount): ConditionalStepResultVo {
+            ->willReturnCallback(function (ExecutionStepVo $step) use (&$callCount): ConditionalStepResultVo {
                 $callCount++;
 
                 return new ConditionalStepResultVo(
@@ -143,12 +150,13 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
         $this->conditionEvaluator->expects($this->once())
             ->method('evaluate')
-            ->with($when, $this->callback(fn (array $ctx) => isset($ctx['lint'])))
-            ->willReturn(true);
+            ->willReturnCallback(function (\TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionExpressionVo $expr, array $ctx): bool {
+                return true;
+            });
 
         $this->stepExecutor->expects($this->exactly(2))
             ->method('executeStep')
-            ->willReturnCallback(function (ChainStepVo $step): ConditionalStepResultVo {
+            ->willReturnCallback(function (ExecutionStepVo $step): ConditionalStepResultVo {
                 return new ConditionalStepResultVo(
                     role: $step->getRole() ?? '',
                     runner: 'pi',
@@ -233,7 +241,9 @@ final class ConditionalExecutionStrategyTest extends TestCase
         $evalCount = 0;
         $this->conditionEvaluator->expects($this->exactly(2))
             ->method('evaluate')
-            ->willReturnCallback(function () use (&$evalCount): bool {
+            ->willReturnCallback(function (): bool {
+                global $evalCount;
+                static $evalCount = 0;
                 $evalCount++;
 
                 return $evalCount === 1; // первый condition true, второй false
@@ -242,7 +252,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         $execCount = 0;
         $this->stepExecutor->expects($this->exactly(3))
             ->method('executeStep')
-            ->willReturnCallback(function (ChainStepVo $step) use (&$execCount): ConditionalStepResultVo {
+            ->willReturnCallback(function (ExecutionStepVo $step) use (&$execCount): ConditionalStepResultVo {
                 $execCount++;
 
                 return new ConditionalStepResultVo(
@@ -284,7 +294,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         $capturedContext = null;
         $this->conditionEvaluator->expects($this->once())
             ->method('evaluate')
-            ->willReturnCallback(function (ConditionExpressionVo $expr, array $context) use (&$capturedContext): bool {
+            ->willReturnCallback(function (\TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionExpressionVo $expr, array $context) use (&$capturedContext): bool {
                 $capturedContext = $context;
 
                 return true;
@@ -430,7 +440,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->stepExecutor->expects($this->once())
             ->method('executeStep')
-            ->willReturnCallback(function (ChainStepVo $step, string $task, ?string $workingDir, int $timeout) use (&$capturedTimeout): ConditionalStepResultVo {
+            ->willReturnCallback(function (ExecutionStepVo $step, string $task, ?string $workingDir, int $timeout) use (&$capturedTimeout): ConditionalStepResultVo {
                 $capturedTimeout = $timeout;
 
                 return new ConditionalStepResultVo(

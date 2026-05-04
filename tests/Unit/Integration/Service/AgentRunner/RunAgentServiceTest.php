@@ -7,17 +7,10 @@ namespace TaskOrchestrator\Tests\Unit\Integration\Service\AgentRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommand;
-use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
-use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentResultDto;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\AgentDtoMapper;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\RunAgentService;
 
 #[CoversClass(RunAgentService::class)]
@@ -31,26 +24,22 @@ final class RunAgentServiceTest extends TestCase
     }
 
     #[Test]
-    public function runDelegatesToRunAgentHandler(): void
+    public function runDelegatesToInnerService(): void
     {
-        $runner = $this->createMock(AgentRunnerInterface::class);
-        $runner->method('run')->willReturn(AgentResultVo::createFromSuccess(
+        $expectedResult = ChainRunResultVo::createFromSuccess(
             outputText: 'Code written',
             inputTokens: 100,
             outputTokens: 50,
             cost: 0.01,
-            model: 'gpt-4',
-            turns: 1,
-        ));
+        );
 
-        $registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
-        $registry->method('get')->with('pi')->willReturn($runner);
+        $inner = $this->createMock(RunAgentServiceInterface::class);
+        $inner->expects($this->once())
+            ->method('run')
+            ->with($this->request, null)
+            ->willReturn($expectedResult);
 
-        $retryFactory = $this->createMock(RetryableRunnerFactoryInterface::class);
-        $handler = new RunAgentCommandHandler($registry, $retryFactory);
-        $mapper = new AgentDtoMapper();
-
-        $service = new RunAgentService($handler, $mapper);
+        $service = new RunAgentService($inner);
         $result = $service->run($this->request);
 
         self::assertFalse($result->isError());
@@ -59,25 +48,18 @@ final class RunAgentServiceTest extends TestCase
     }
 
     #[Test]
-    public function runWithRetryPolicyPassesRetryParams(): void
+    public function runPassesRetryPolicyToInnerService(): void
     {
-        $retryPolicy = new ChainRetryPolicyVo(maxRetries: 3);
+        $retryPolicy = new ExecutionRetryPolicyVo(maxRetries: 3);
+        $expectedResult = ChainRunResultVo::createFromSuccess(outputText: 'Retried OK');
 
-        $retryRunner = $this->createMock(AgentRunnerInterface::class);
-        $retryRunner->method('run')->willReturn(AgentResultVo::createFromSuccess(outputText: 'Retried OK'));
+        $inner = $this->createMock(RunAgentServiceInterface::class);
+        $inner->expects($this->once())
+            ->method('run')
+            ->with($this->request, $retryPolicy)
+            ->willReturn($expectedResult);
 
-        $runner = $this->createMock(AgentRunnerInterface::class);
-
-        $registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
-        $registry->method('get')->with('pi')->willReturn($runner);
-
-        $retryFactory = $this->createMock(RetryableRunnerFactoryInterface::class);
-        $retryFactory->method('createRetryableRunner')->willReturn($retryRunner);
-
-        $handler = new RunAgentCommandHandler($registry, $retryFactory);
-        $mapper = new AgentDtoMapper();
-
-        $service = new RunAgentService($handler, $mapper);
+        $service = new RunAgentService($inner);
         $result = $service->run($this->request, $retryPolicy);
 
         self::assertFalse($result->isError());
@@ -85,52 +67,21 @@ final class RunAgentServiceTest extends TestCase
     }
 
     #[Test]
-    public function runMapsErrorResult(): void
+    public function runReturnsErrorResultFromInnerService(): void
     {
-        $runner = $this->createMock(AgentRunnerInterface::class);
-        $runner->method('run')->willReturn(AgentResultVo::createFromError(
+        $expectedResult = ChainRunResultVo::createFromError(
             errorMessage: 'Timeout',
-            exitCode: 124,
-        ));
+            timedOut: true,
+        );
 
-        $registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
-        $registry->method('get')->with('pi')->willReturn($runner);
+        $inner = $this->createMock(RunAgentServiceInterface::class);
+        $inner->method('run')->willReturn($expectedResult);
 
-        $retryFactory = $this->createMock(RetryableRunnerFactoryInterface::class);
-        $handler = new RunAgentCommandHandler($registry, $retryFactory);
-        $mapper = new AgentDtoMapper();
-
-        $service = new RunAgentService($handler, $mapper);
+        $service = new RunAgentService($inner);
         $result = $service->run($this->request);
 
         self::assertTrue($result->isError());
         self::assertSame('Timeout', $result->getErrorMessage());
-        self::assertSame(124, $result->getExitCode());
-    }
-
-    #[Test]
-    public function runUsesRunnerNameFromVo(): void
-    {
-        $runner = $this->createMock(AgentRunnerInterface::class);
-        $runner->method('run')->willReturn(AgentResultVo::createFromSuccess(outputText: 'OK'));
-
-        $capturedRunnerName = null;
-        $registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
-        $registry->method('get')
-            ->willReturnCallback(function (string $name) use ($runner, &$capturedRunnerName): AgentRunnerInterface {
-                $capturedRunnerName = $name;
-
-                return $runner;
-            });
-
-        $retryFactory = $this->createMock(RetryableRunnerFactoryInterface::class);
-        $handler = new RunAgentCommandHandler($registry, $retryFactory);
-        $mapper = new AgentDtoMapper();
-
-        $request = new ChainRunRequestVo(role: 'dev', task: 'Test', runnerName: 'codex');
-        $service = new RunAgentService($handler, $mapper);
-        $service->run($request);
-
-        self::assertSame('codex', $capturedRunnerName);
+        self::assertTrue($result->isTimedOut());
     }
 }

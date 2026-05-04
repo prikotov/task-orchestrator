@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service;
 
 use Override;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\FormatPromptServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo;

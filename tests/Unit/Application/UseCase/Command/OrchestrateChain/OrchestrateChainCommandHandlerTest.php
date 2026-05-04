@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Command\OrchestrateChain;
 
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;

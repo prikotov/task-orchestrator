@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static;
 
 /**
  * Интеграционный сервис форматирования промптов для StaticExecution Domain.

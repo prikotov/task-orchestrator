@@ -11,8 +11,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\Stat
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStaticChainConfigVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticChainResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapper;
@@ -31,18 +30,8 @@ final class StaticExecutionStrategyTest extends TestCase
     protected function setUp(): void
     {
         $this->staticChainExecutor = $this->createMock(ExecuteStaticChainServiceInterface::class);
-        $mapper = $this->createMock(ChainExecutionDefinitionMapper::class);
-        $mapper->method('mapStaticChain')->willReturn(
-            new ExecutionStaticChainConfigVo(
-                name: 'static-test',
-                steps: [],
-                budget: null,
-                timeout: 300,
-                maxTime: null,
-                roles: [],
-                retryPolicy: null,
-            ),
-        );
+        $chainLoader = $this->createMock(ChainLoaderInterface::class);
+        $mapper = new ChainExecutionDefinitionMapper($chainLoader);
         $this->strategy = new StaticExecutionStrategy($this->staticChainExecutor, $mapper);
     }
 

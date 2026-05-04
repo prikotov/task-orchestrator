@@ -11,8 +11,8 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\OrchestrateEx
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\StepResultDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\ChainNotFoundException;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\RoleNotFoundException;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Exception\ChainNotFoundException;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Exception\RoleNotFoundException;
 
 #[CoversClass(ResolveExitCodeService::class)]
 final class ResolveExitCodeServiceTest extends TestCase

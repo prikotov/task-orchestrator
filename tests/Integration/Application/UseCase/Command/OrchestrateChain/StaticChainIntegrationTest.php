@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface;

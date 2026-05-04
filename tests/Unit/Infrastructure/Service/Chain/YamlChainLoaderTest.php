@@ -9,7 +9,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\ChainNotFoun
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FallbackConfigVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader;
 use PHPUnit\Framework\Attributes\CoversClass;

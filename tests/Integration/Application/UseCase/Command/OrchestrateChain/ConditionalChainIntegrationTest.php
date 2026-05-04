@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ConditionalExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService;
@@ -82,14 +82,16 @@ final class ConditionalChainIntegrationTest extends TestCase
             static fn(string $role, string $previousOutput, string $task): string => $previousOutput,
         );
 
-        $stepExecutor = $this->createMock(ExecuteConditionalStepServiceInterface::class);
+        $stepExecutor = new StubConditionalStepExecutor();
         $hookExecutor = $this->createMock(HookExecutorInterface::class);
         $hookExecutor->method('execute')->willReturn(HookResultVo::skipped());
 
+        $conditionalDefinitionMapper = new ChainExecutionDefinitionMapper($this->chainLoader);
         $conditionalStrategy = new ConditionalExecutionStrategy(
             $conditionEvaluator,
             $stepExecutor,
             $hookExecutor,
+            $conditionalDefinitionMapper,
         );
 
         // --- Static strategy wiring (for backwards compatibility test) ---
