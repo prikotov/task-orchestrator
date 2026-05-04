@@ -2,7 +2,7 @@
 /composer.lock
 /phpunit.xml
 /.phpunit.result.cache
-/depfile.yaml
+#depfile.yaml
 /.deptrac.cache
 /.idea/
 /.vscode/
