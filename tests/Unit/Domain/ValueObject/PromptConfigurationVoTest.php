@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
 use InvalidArgumentException;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\PromptConfigurationVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\PromptConfigurationVo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

@@ -13,25 +13,25 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainConfigViolationDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainDefinitionDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainStepDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\LoadChain\LoadChainQuery;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\LoadChain\LoadChainQueryHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\LoadChain\LoadChainResult;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQuery;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQueryHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigResult;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportResult;
-use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainConfigViolationDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainDefinitionDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainStepDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\OrchestrateExitCodeEnum;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeService;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadChain\LoadChainQuery;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadChain\LoadChainQueryHandler;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadChain\LoadChainResult;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQuery;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQueryHandler;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigResult;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportResult;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\OrchestrateCommand;
 
 #[CoversClass(OrchestrateCommand::class)]
@@ -238,7 +238,7 @@ YAML);
 
         try {
             $chainLoader = new YamlChainLoader('/nonexistent/default.yaml');
-            $mapper = new \TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ChainDefinitionDtoMapper();
+            $mapper = new \TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainDefinitionDtoMapper();
             $loadHandler = new LoadChainQueryHandler($chainLoader, $mapper);
 
             $command = new OrchestrateCommand(
@@ -291,8 +291,8 @@ YAML);
 
         try {
             $chainLoader = new YamlChainLoader('/nonexistent/default.yaml');
-            $chainValidator = new \TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefinitionValidator();
-            $violationMapper = new \TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ChainConfigViolationDtoMapper();
+            $chainValidator = new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidator();
+            $violationMapper = new \TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainConfigViolationDtoMapper();
             $validateHandler = new ValidateChainConfigQueryHandler($chainLoader, $chainValidator, $violationMapper);
 
             $command = new OrchestrateCommand(

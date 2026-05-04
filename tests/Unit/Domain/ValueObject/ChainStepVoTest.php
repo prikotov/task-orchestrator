@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionExpressionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainStepTypeEnum;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\QualityGateVo;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -33,7 +33,7 @@ final class ChainStepVoTest extends TestCase
         self::assertNull($step->getModel());
         self::assertNull($step->getRetryPolicy());
         self::assertNull($step->getName());
-        self::assertFalse($step->getNoContextFiles());
+        self::assertFalse($step->hasNoContextFiles());
         self::assertTrue($step->isAgent());
         self::assertFalse($step->isQualityGate());
     }
@@ -82,7 +82,7 @@ final class ChainStepVoTest extends TestCase
             noContextFiles: true,
         );
 
-        self::assertTrue($step->getNoContextFiles());
+        self::assertTrue($step->hasNoContextFiles());
     }
 
     #[Test]
@@ -90,7 +90,7 @@ final class ChainStepVoTest extends TestCase
     {
         $step = ChainStepVo::agent(role: 'developer');
 
-        self::assertFalse($step->getNoContextFiles());
+        self::assertFalse($step->hasNoContextFiles());
     }
 
     // ── Quality gate step: constructor ───────────────────────────────────────
@@ -110,7 +110,7 @@ final class ChainStepVoTest extends TestCase
         self::assertSame('make lint-php', $step->getCommand());
         self::assertSame('Lint', $step->getLabel());
         self::assertSame(60, $step->getTimeoutSeconds());
-        self::assertFalse($step->getNoContextFiles());
+        self::assertFalse($step->hasNoContextFiles());
         self::assertTrue($step->isQualityGate());
         self::assertFalse($step->isAgent());
     }

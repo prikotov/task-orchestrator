@@ -7,12 +7,12 @@ namespace TaskOrchestrator\Tests\Unit\Application\Mapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainStepDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ChainDefinitionDtoMapper;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainStepDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainDefinitionDtoMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
 
 #[CoversClass(ChainDefinitionDtoMapper::class)]
 final class ChainDefinitionDtoMapperTest extends TestCase

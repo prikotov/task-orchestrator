@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\SharedChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\SharedChainDefinitionVo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

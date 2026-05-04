@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\OrchestrateChain;
 
 use Override;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopResultVo;
 
 /**
  * Стаб RunDynamicLoopServiceInterface для resume-тестов.
@@ -25,16 +25,16 @@ final class ResumeStubDynamicLoopService extends StubDynamicLoopService
 
     private ?string $capturedJournal = null;
 
-    private ?DynamicChainContextVo $capturedContext = null;
+    private ?DynamicLoopContextVo $capturedContext = null;
 
     #[Override]
     public function execute(
-        DynamicChainDefinitionVo $chain,
-        DynamicChainContextVo $context,
+        DynamicLoopConfigVo $chain,
+        DynamicLoopContextVo $context,
         int $startRound = 0,
         string $initialDiscussionHistory = '',
         string $initialFacilitatorJournal = '',
-        ?AuditLoggerInterface $auditLogger = null,
+        ?DynamicLoopAuditLoggerInterface $auditLogger = null,
     ): DynamicLoopResultVo {
         $this->capturedContext = $context;
         $this->capturedStartRound = $startRound;
@@ -59,7 +59,7 @@ final class ResumeStubDynamicLoopService extends StubDynamicLoopService
         return $this->capturedJournal;
     }
 
-    public function getCapturedContext(): ?DynamicChainContextVo
+    public function getCapturedContext(): ?DynamicLoopContextVo
     {
         return $this->capturedContext;
     }

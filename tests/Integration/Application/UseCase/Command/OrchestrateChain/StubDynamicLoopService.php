@@ -6,11 +6,11 @@ namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\Orchest
 
 use LogicException;
 use Override;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopResultVo;
 
 /**
  * Стаб RunDynamicLoopServiceInterface для integration-тестов.
@@ -26,12 +26,12 @@ class StubDynamicLoopService implements RunDynamicLoopServiceInterface
 
     #[Override]
     public function execute(
-        DynamicChainDefinitionVo $chain,
-        DynamicChainContextVo $context,
+        DynamicLoopConfigVo $chain,
+        DynamicLoopContextVo $context,
         int $startRound = 0,
         string $initialDiscussionHistory = '',
         string $initialFacilitatorJournal = '',
-        ?AuditLoggerInterface $auditLogger = null,
+        ?DynamicLoopAuditLoggerInterface $auditLogger = null,
     ): DynamicLoopResultVo {
         if ($this->onExecuteCallback !== null) {
             ($this->onExecuteCallback)($chain, $context, $startRound, $initialDiscussionHistory, $initialFacilitatorJournal);
@@ -54,7 +54,7 @@ class StubDynamicLoopService implements RunDynamicLoopServiceInterface
     /**
      * Устанавливает callback, вызываемый при execute() для захвата параметров.
      *
-     * @param \Closure(DynamicChainDefinitionVo, DynamicChainContextVo, int, string, string): void $callback
+     * @param \Closure(DynamicLoopConfigVo, DynamicLoopContextVo, int, string, string): void $callback
      */
     public function onExecute(\Closure $callback): self
     {

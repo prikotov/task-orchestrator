@@ -17,7 +17,7 @@
 
 ## BLIND_SPOT: FallbackConfig Vo — не error-specific
 
-В разделе 3.3 документ утверждает: «Наш `FallbackConfigVo` не переключает на альтернативный runner». Это правда, но неполная. Реальный `FallbackConfigVo` в коде (`src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php`) — это просто список CLI-аргументов (`command: list<string>`). Там **нет даже типа ошибки** — fallback вызывается при любом сбое. Agno разделяет `on_error` / `on_rate_limit` / `on_context_overflow` — это качественно другая модель.
+В разделе 3.3 документ утверждает: «Наш `FallbackConfigVo` не переключает на альтернативный runner». Это правда, но неполная. Реальный `FallbackConfigVo` в коде (`src/Module/ChainDefinition/Domain/ValueObject/FallbackConfigVo.php`) — это просто список CLI-аргументов (`command: list<string>`). Там **нет даже типа ошибки** — fallback вызывается при любом сбое. Agno разделяет `on_error` / `on_rate_limit` / `on_context_overflow` — это качественно другая модель.
 
 Документ описывает разрыв, но не формулирует **domain model** для error-specific fallback: какие типы ошибок мы вообще можем классифицировать (rate limit ≠ timeout ≠ malformed output ≠ context overflow)? Без этой модели реализация «P2 error-specific fallback» начнётся с неправильной абстракции.
 

@@ -54,9 +54,9 @@
 **Файл:** `src/Module/StaticExecution/Domain/Service/Port/AgentRunnerPortInterface.php`
 
 ```php
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunRequestVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunResultVo;
 
 interface AgentRunnerPortInterface
 {
@@ -121,7 +121,7 @@ StaticExecutionDomain:
 
 ```php
 // RunStaticChainService.php (StaticExecution Domain)
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Audit\AuditLoggerInterface;
 ```
 
 StaticExecution Domain **уже** напрямую зависит от `AuditLoggerInterface` из Orchestrator Domain. Port-интерфейсы не обеспечивают изоляции, которую они заявляют.

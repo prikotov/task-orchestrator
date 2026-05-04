@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+
+namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Chain\Audit;
+
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\ChainResultAuditDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
+
+/**
+ * Интерфейс JSONL audit-логгера оркестратора AI-агентов.
+ *
+ * Логирует события выполнения цепочки (start/result шагов и цепочки)
+ * в append-only JSONL-файл для воспроизводимости и анализа.
+ *
+ * Реализация — Infrastructure-слой (запись на диск).
+ *
+ * Расположен в Contract (а не Service), чтобы ServiceContractDependencyRule
+ * не считал его cross-module сервисом при реализации в других модулях (Port/Adapter).
+ */
+interface AuditLoggerInterface
+{
+    /**
+     * Логирует старт цепочки.
+     */
+    public function logChainStart(string $chainName, string $task): void;
+
+    /**
+     * Логирует старт шага (перед вызовом runner'а).
+     */
+    public function logStepStart(string $chainName, int $stepNumber, string $role, string $runner): void;
+
+    /**
+     * Логирует результат шага (после вызова runner'а).
+     *
+     * Для agent-шагов передаётся реальный ChainRunResultVo.
+     * Для quality_gate-шагов — синтетический ChainRunResultVo (isError=false, tokens=0, cost=0).
+     */
+    public function logStepResult(
+        string $chainName,
+        int $stepNumber,
+        string $role,
+        string $runner,
+        ChainRunResultVo $result,
+        float $durationMs,
+    ): void;
+
+    /**
+     * Логирует финальный результат цепочки.
+     */
+    public function logChainResult(ChainResultAuditDto $audit): void;
+}

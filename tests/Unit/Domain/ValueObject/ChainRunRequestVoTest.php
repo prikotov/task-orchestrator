@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ final class ChainRunRequestVoTest extends TestCase
     {
         $vo = new ChainRunRequestVo(role: 'test', task: 'task');
 
-        self::assertFalse($vo->getNoContextFiles());
+        self::assertFalse($vo->hasNoContextFiles());
     }
 
     #[Test]
@@ -29,7 +29,7 @@ final class ChainRunRequestVoTest extends TestCase
             noContextFiles: true,
         );
 
-        self::assertTrue($vo->getNoContextFiles());
+        self::assertTrue($vo->hasNoContextFiles());
     }
 
     #[Test]
@@ -45,7 +45,7 @@ final class ChainRunRequestVoTest extends TestCase
         $result = $vo->withTruncatedContext();
 
         self::assertNotSame($vo, $result);
-        self::assertTrue($result->getNoContextFiles());
+        self::assertTrue($result->hasNoContextFiles());
     }
 
     #[Test]
@@ -61,7 +61,7 @@ final class ChainRunRequestVoTest extends TestCase
         $result = $vo->withTruncatedContext();
 
         self::assertNotSame($vo, $result);
-        self::assertFalse($result->getNoContextFiles());
+        self::assertFalse($result->hasNoContextFiles());
     }
 
     #[Test]
@@ -71,7 +71,7 @@ final class ChainRunRequestVoTest extends TestCase
         $result = $vo->withTruncatedContext();
 
         self::assertSame($vo, $result);
-        self::assertFalse($result->getNoContextFiles());
+        self::assertFalse($result->hasNoContextFiles());
     }
 
     #[Test]
