@@ -8,9 +8,9 @@ depends_on:
 epic: EPIC-refactor-responsibility-decomposition
 author: Аналитик (Шерлок)
 assignee: Бэкендер (Левша)
-branch:
+branch: task/refactor-namespace-chain-definition
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-namespace-chain-definition: Механический rename Orchestrator → ChainDefinition
