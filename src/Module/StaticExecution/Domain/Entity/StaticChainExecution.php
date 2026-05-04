@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Entity;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 
 /**
  * In-memory сущность выполнения static-цепочки.

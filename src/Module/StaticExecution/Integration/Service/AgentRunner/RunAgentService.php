@@ -6,10 +6,10 @@ namespace TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Age
 
 use Override;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface as OrchestratorRunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\RunAgentServiceInterface as OrchestratorRunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunRequestVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunResultVo;
 
 /**
  * Интеграционный сервис: делегирует запуск AI-агента в Orchestrator.

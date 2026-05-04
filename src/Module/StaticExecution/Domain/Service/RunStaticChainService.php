@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Hook\HookExecutorInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Hook\HookExecutorInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Entity\StaticChainExecution;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticChainAuditVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticChainResultVo;
@@ -175,7 +175,7 @@ final readonly class RunStaticChainService
      */
     private function handlePostStep(
         StaticChainExecution $execution,
-        ?\TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo $budget,
+        ?\TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo $budget,
         string $budgetRole,
         StaticStepResultVo $stepResult,
         ChainStepVo $step,

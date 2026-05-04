@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\QualityGateResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\QualityGateVo;
 
 /**
  * Интерфейс выполнения quality gate.

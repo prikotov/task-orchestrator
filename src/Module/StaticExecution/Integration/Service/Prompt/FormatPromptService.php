@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Pro
 
 use Override;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Shared\PromptFormatterInterface;
 
 /**
  * Интеграционный сервис: делегирует форматирование промптов в Orchestrator Shared-сервис.
