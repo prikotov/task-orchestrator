@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Domain\Entity;
 
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Entity\DynamicLoopExecution;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

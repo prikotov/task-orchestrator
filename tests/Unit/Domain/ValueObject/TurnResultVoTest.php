@@ -7,8 +7,8 @@ namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\TurnBreakVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\TurnContinueVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnBreakVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnContinueVo;
 
 #[CoversClass(TurnContinueVo::class)]
 #[CoversClass(TurnBreakVo::class)]
@@ -67,7 +67,7 @@ final class TurnResultVoTest extends TestCase
     #[Test]
     public function turnBreakVoHoldsBudgetResult(): void
     {
-        $budgetCheck = new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicBudgetCheckVo(
+        $budgetCheck = new \TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetCheckVo(
             shouldBreak: true,
             budgetExceeded: true,
             budgetLimit: 5.0,

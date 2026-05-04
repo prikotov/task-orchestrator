@@ -7,7 +7,8 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Com
 /**
  * DTO результата одного раунда динамической цепочки.
  *
- * Используется для логирования каждого раунда: кто выступал, сколько заняло.
+ * Используется в OrchestrateChainResultDto для представления round-результатов.
+ * Общий DTO — создаётся DynamicExecutionStrategy из DynamicRoundResultVo.
  */
 final readonly class DynamicRoundResultDto
 {

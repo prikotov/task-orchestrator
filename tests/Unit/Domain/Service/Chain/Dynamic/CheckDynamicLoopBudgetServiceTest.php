@@ -7,12 +7,11 @@ namespace TaskOrchestrator\Tests\Unit\Domain\Service\Chain\Dynamic;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Entity\DynamicLoopExecution;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Budget\CheckDynamicBudgetServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetService;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetService;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicBudgetCheckVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetCheckVo;
 
 #[CoversClass(CheckDynamicLoopBudgetService::class)]
 final class CheckDynamicLoopBudgetServiceTest extends TestCase

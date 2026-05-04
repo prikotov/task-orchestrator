@@ -19,10 +19,12 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynam
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\SessionCompletedNotifierInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapper;
 
 /**
  * Стратегия выполнения dynamic-цепочки.
@@ -168,9 +170,17 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
 
     private function extractConfig(ChainDefinitionInterface $chain): DynamicLoopConfigVo
     {
-        assert($chain instanceof DynamicLoopConfigVo);
+        if ($chain instanceof DynamicLoopConfigVo) {
+            return $chain;
+        }
 
-        return $chain;
+        if ($chain instanceof DynamicChainDefinitionVo) {
+            return (new DynamicLoopDefinitionMapper())->map($chain);
+        }
+
+        throw new LogicException(
+            sprintf('Expected DynamicLoopConfigVo or DynamicChainDefinitionVo, got %s', $chain::class),
+        );
     }
 
     private function runDynamicLoop(

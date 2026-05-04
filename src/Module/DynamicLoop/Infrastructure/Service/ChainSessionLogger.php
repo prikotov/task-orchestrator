@@ -27,7 +27,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSes
  * @see ChainSessionFileStorage
  * @see ChainSessionBudgetFormatter
  */
-final class ChainSessionLogger implements ChainSessionLoggerInterface
+final class ChainSessionLogger implements DynamicLoopSessionLoggerInterface
 {
     private readonly ChainSessionWriter $writer;
 
@@ -131,7 +131,7 @@ final class ChainSessionLogger implements ChainSessionLoggerInterface
     }
 
     #[Override]
-    public function getResumedState(): ?ChainSessionStateVo
+    public function getResumedState(): ?DynamicLoopSessionStateVo
     {
         return $this->writer->getResumedState();
     }

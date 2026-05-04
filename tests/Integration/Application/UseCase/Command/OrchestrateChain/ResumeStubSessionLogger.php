@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\OrchestrateChain;
 
 use Override;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainSessionStateVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSessionStateVo;
 
 /**
- * Стаб ChainSessionLoggerInterface для resume-тестов.
+ * Стаб DynamicLoopSessionLoggerInterface для resume-тестов.
  *
  * Расширяет базовый StubSessionLogger, добавляя поддержку задаваемого
- * ChainSessionStateVo для имитации возобновлённой сессии.
+ * DynamicLoopSessionStateVo для имитации возобновлённой сессии.
  */
 final class ResumeStubSessionLogger extends StubSessionLogger
 {
-    private ?ChainSessionStateVo $resumedState = null;
+    private ?DynamicLoopSessionStateVo $resumedState = null;
 
-    public function setResumedState(ChainSessionStateVo $state): self
+    public function setResumedState(DynamicLoopSessionStateVo $state): self
     {
         $this->resumedState = $state;
 
@@ -25,7 +25,7 @@ final class ResumeStubSessionLogger extends StubSessionLogger
     }
 
     #[Override]
-    public function getResumedState(): ?ChainSessionStateVo
+    public function getResumedState(): ?DynamicLoopSessionStateVo
     {
         return $this->resumedState;
     }

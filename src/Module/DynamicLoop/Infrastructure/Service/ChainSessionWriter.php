@@ -29,7 +29,7 @@ final class ChainSessionWriter
     /** @var array<string, mixed> */
     private array $invocation = [];
     private ?DynamicLoopBudgetVo $budget = null;
-    private ?ChainSessionStateVo $resumedState = null;
+    private ?DynamicLoopSessionStateVo $resumedState = null;
 
     public function __construct(
         private readonly ChainSessionFileStorage $storage,
@@ -192,7 +192,7 @@ final class ChainSessionWriter
 
     public function getBasePath(): string { return $this->basePath; }
 
-    public function getResumedState(): ?ChainSessionStateVo { return $this->resumedState; }
+    public function getResumedState(): ?DynamicLoopSessionStateVo { return $this->resumedState; }
 
     // --- Internal ---
 

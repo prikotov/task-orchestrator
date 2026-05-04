@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain;
+namespace TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service;
 
 use Override;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FacilitatorResponseParserInterface;
