@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\OrchestrateChain;
 
 use Override;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainSessionStateVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainSessionStateVo;
 
 /**
  * Стаб ChainSessionLoggerInterface для resume-тестов.

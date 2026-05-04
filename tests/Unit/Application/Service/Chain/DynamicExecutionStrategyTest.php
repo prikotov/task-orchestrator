@@ -8,24 +8,24 @@ use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\DynamicExecutionStrategy;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\SessionCompletedNotifierInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainSessionStateVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\PromptConfigurationVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\DynamicExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Audit\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\BuildDynamicContextService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\SessionCompletedNotifierInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainSessionStateVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicLoopResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicRoundResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\PromptConfigurationVo;
 
 #[CoversClass(DynamicExecutionStrategy::class)]
 final class DynamicExecutionStrategyTest extends TestCase
@@ -80,7 +80,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $chain = StaticChainDefinitionVo::create(
             name: 'static',
             description: '',
-            steps: [\TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo::agent(role: 'role', runner: 'pi')],
+            steps: [\TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo::agent(role: 'role', runner: 'pi')],
         );
 
         self::assertFalse($this->strategy->supports($chain));

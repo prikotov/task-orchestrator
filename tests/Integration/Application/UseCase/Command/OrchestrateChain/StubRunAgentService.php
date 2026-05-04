@@ -6,9 +6,9 @@ namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\Orchest
 
 use Override;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRetryPolicyVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunRequestVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunRequestVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunResultVo;
 
 /**
  * Стаб RunAgentServiceInterface для integration-тестов.

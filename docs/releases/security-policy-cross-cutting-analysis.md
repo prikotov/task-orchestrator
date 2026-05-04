@@ -25,7 +25,7 @@
 
 ## 2. Текущая архитектура: точки входа для Security Policy
 
-На основе анализа текущей кодовой базы `src/Module/Orchestrator/` выявлены **6 точек**, где Security Policy должен вмешиваться в процесс выполнения:
+На основе анализа текущей кодовой базы `src/Module/ChainDefinition/` выявлены **6 точек**, где Security Policy должен вмешиваться в процесс выполнения:
 
 ### 2.1. Точка 1: CommandHandler — вход в оркестрацию
 
@@ -174,7 +174,7 @@ Security Policy естественно ложится в тот же патте�
 Интерфейсы определяются в **Orchestrator Domain** (как port), реализуются в **SecurityPolicy module Infrastructure**:
 
 ```php
-// src/Module/Orchestrator/Domain/Service/Security/
+// src/Module/ChainDefinition/Domain/Service/Security/
 
 /**
  * Проверка security policy перед выполнением цепочки.

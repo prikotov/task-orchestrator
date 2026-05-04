@@ -13,20 +13,20 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Dto\ChainDefinitionDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\LoadChain\LoadChainQuery;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\LoadChain\LoadChainQueryHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQuery;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQueryHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigResult;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainDefinitionDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Enum\OrchestrateExitCodeEnum;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Enum\ReportFormatEnum;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\ResolveExitCodeServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadChain\LoadChainQuery;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadChain\LoadChainQueryHandler;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQuery;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQueryHandler;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigResult;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
 
 #[AsCommand(
     name: 'app:agent:orchestrate',

@@ -8,9 +8,9 @@ depends_on:
 epic: EPIC-refactor-responsibility-decomposition
 author: Аналитик (Шерлок)
 assignee: Бэкендер (Левша)
-branch:
+branch: task/refactor-namespace-chain-definition
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-namespace-chain-definition: Механический rename Orchestrator → ChainDefinition
@@ -160,6 +160,20 @@ php vendor/prikotov/coding-standard/bin/run-sniff-tests.php
 
 ### Почему не переименовываем apps/console/src/Module/Orchestrator/
 Presentation-слой не входит в scope декомпозиции. Директория и namespace `TaskOrchestrator\Console\Module\Orchestrator\` в apps/console — это presentation-обёртка, которая будет обновлена при отдельной задаче (или оставлена как есть — naming convention presentation не обязан совпадать с module naming).
+
+## Инструкции для сабагента
+
+**Ветка:** task/refactor-namespace-chain-definition (уже создана и активна)
+**PR:** уже создан (draft) из task/refactor-namespace-chain-definition в refactor/responsibility-decomposition — [PR #147](https://github.com/prikotov/task-orchestrator/pull/147)
+
+### Порядок действий
+1. Переключись в ветку `task/refactor-namespace-chain-definition`: `git checkout task/refactor-namespace-chain-definition`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready 147`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

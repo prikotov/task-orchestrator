@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\StaticExecution\Domain\Service;
 use Override;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Entity\StaticChainExecution;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 
 /**
  * Проверка бюджетных ограничений static-цепочки.

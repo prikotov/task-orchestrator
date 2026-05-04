@@ -8,26 +8,26 @@ use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Entity\DynamicLoopExecution;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Budget\CheckDynamicBudgetServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetService;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\ExecuteDynamicTurnService;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FormatDynamicJournalServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RecordDynamicRoundServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopAgentServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainTurnResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicBudgetCheckVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FacilitatorResponseVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\RoleConfigVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\TurnBreakVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\TurnContinueVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Entity\DynamicLoopExecution;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Budget\CheckDynamicBudgetServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Audit\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\ExecuteDynamicTurnService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\FormatDynamicJournalServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\RecordDynamicRoundServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\RunDynamicLoopAgentServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainTurnResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicBudgetCheckVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainContextVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FacilitatorResponseVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\TurnBreakVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\TurnContinueVo;
 
 #[CoversClass(ExecuteDynamicTurnService::class)]
 final class ExecuteDynamicTurnServiceTest extends TestCase
@@ -484,7 +484,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
             maxTime: null,
             timeout: 600,
             workingDir: '/tmp/test',
-            promptConfiguration: new \TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\PromptConfigurationVo(
+            promptConfiguration: new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\PromptConfigurationVo(
                 brainstormSystemPrompt: 'sys',
                 facilitatorAppendPrompt: 'fac_append %s',
                 facilitatorStartPrompt: 'start %s',

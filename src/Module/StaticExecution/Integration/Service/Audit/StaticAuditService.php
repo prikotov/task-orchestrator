@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Audit;
 
 use Override;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\StepAuditStatusDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Dto\ChainResultAuditDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Dto\StepAuditStatusDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Audit\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\StaticAuditServiceInterface;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticChainAuditVo;
 use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticStepResultVo;

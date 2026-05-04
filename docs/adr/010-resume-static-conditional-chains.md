@@ -17,7 +17,7 @@
 - `StaticExecutionStrategy::resume()` → `LogicException('Static chain does not support resume.')`
 - `ConditionalExecutionStrategy::resume()` → `LogicException('Conditional chain does not support resume.')`
 
-Только `DynamicExecutionStrategy` реализует resume через [`ChainSessionLoggerInterface`](../../src/Module/Orchestrator/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) — JSONL-based checkpoint/session mechanism.
+Только `DynamicExecutionStrategy` реализует resume через [`ChainSessionLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) — JSONL-based checkpoint/session mechanism.
 
 **Финансовая боль:** цепочка из 10 шагов, падение на 8-м → все результаты теряются. При стоимости LLM-вызова $0.50–$2.00 за шаг это потеря $3.50–$14.00 на каждый failed run.
 
@@ -25,12 +25,12 @@
 
 | Компонент | Назначение | Используется в |
 |-----------|------------|----------------|
-| [`ExecutionStrategyInterface::resume()`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) | Контракт resume | Dynamic ✅, Static ❌, Conditional ❌ |
-| [`OrchestrateChainCommand::$resumeDir`](../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommand.php) | Путь к директории с checkpoint | Dynamic ✅ |
-| [`OrchestrateChainCommandHandler`](../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php) | Диспетчер: `resumeDir !== null` → `resume()` | Все стратегии |
-| [`ChainSessionLoggerInterface`](../../src/Module/Orchestrator/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) | JSONL session lifecycle (start/logRound/complete/resume) | Dynamic |
-| [`ChainSessionStateVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainSessionStateVo.php) | VO восстановленного состояния | Dynamic |
-| [`AuditLoggerInterface`](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) | JSONL audit: logStepStart, logStepResult | Dynamic |
+| [`ExecutionStrategyInterface::resume()`](../../src/Module/ChainDefinition/Application/Service/Chain/ExecutionStrategyInterface.php) | Контракт resume | Dynamic ✅, Static ❌, Conditional ❌ |
+| [`OrchestrateChainCommand::$resumeDir`](../../src/Module/ChainDefinition/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommand.php) | Путь к директории с checkpoint | Dynamic ✅ |
+| [`OrchestrateChainCommandHandler`](../../src/Module/ChainDefinition/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php) | Диспетчер: `resumeDir !== null` → `resume()` | Все стратегии |
+| [`ChainSessionLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) | JSONL session lifecycle (start/logRound/complete/resume) | Dynamic |
+| [`ChainSessionStateVo`](../../src/Module/ChainDefinition/Domain/ValueObject/ChainSessionStateVo.php) | VO восстановленного состояния | Dynamic |
+| [`AuditLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Audit/AuditLoggerInterface.php) | JSONL audit: logStepStart, logStepResult | Dynamic |
 | [`StaticChainExecution`](../../src/Module/StaticExecution/Domain/Entity/StaticChainExecution.php) | In-memory mutable state | Static (no persistence) |
 | [`StaticAuditServiceInterface`](../../src/Module/StaticExecution/Domain/Service/StaticAuditServiceInterface.php) | Audit для static цепочек | Static (optional) |
 
@@ -159,7 +159,7 @@ sequenceDiagram
 
 #### 1. Новый Domain VO: `StaticCheckpointStateVo`
 
-В `src/Module/Orchestrator/Domain/ValueObject/`:
+В `src/Module/ChainDefinition/Domain/ValueObject/`:
 
 ```
 StaticCheckpointStateVo {
@@ -179,7 +179,7 @@ StaticCheckpointStateVo {
 
 #### 2. Новый Domain интерфейс: `CheckpointWriterInterface` / `CheckpointReaderInterface`
 
-В `src/Module/Orchestrator/Domain/Service/Chain/Checkpoint/`:
+В `src/Module/ChainDefinition/Domain/Service/Chain/Checkpoint/`:
 
 ```php
 interface CheckpointWriterInterface {
@@ -302,7 +302,7 @@ interface CheckpointReaderInterface {
 - [ADR-006: ExecutionStrategy Composition](006-execution-strategy-composition.md) — архитектурный контракт стратегий
 - [ADR-008: Shared Kernel Contract](008-shared-kernel-contract.md) — общий kernel для модулей
 - [ADR-009: Dynamic остаётся в Orchestrator](009-dynamic-split-decision.md) — почему Dynamic не выделен в отдельный модуль
-- [ExecutionStrategyInterface](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — контракт `resume()`
-- [ChainSessionLoggerInterface](../../src/Module/Orchestrator/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) — reference implementation JSONL session
+- [ExecutionStrategyInterface](../../src/Module/ChainDefinition/Application/Service/Chain/ExecutionStrategyInterface.php) — контракт `resume()`
+- [ChainSessionLoggerInterface](../../src/Module/ChainDefinition/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) — reference implementation JSONL session
 - [StaticChainExecution](../../src/Module/StaticExecution/Domain/Entity/StaticChainExecution.php) — in-memory state static-цепочки
 - [RunStaticChainService](../../src/Module/StaticExecution/Domain/Service/RunStaticChainService.php) — цикл выполнения static-цепочки

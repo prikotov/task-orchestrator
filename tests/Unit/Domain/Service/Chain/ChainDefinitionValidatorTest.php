@@ -8,17 +8,17 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\ChainDefinitionValidator;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainConfigViolationVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\SharedChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\PromptConfigurationVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\FixIterationGroupVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidator;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainConfigViolationVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\SharedChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\PromptConfigurationVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 
 #[CoversClass(ChainDefinitionValidator::class)]
 final class ChainDefinitionValidatorTest extends TestCase
@@ -371,7 +371,7 @@ final class ChainDefinitionValidatorTest extends TestCase
         $step = $ref->newInstanceWithoutConstructor();
 
         $typeProp = $ref->getProperty('type');
-        $typeProp->setValue($step, \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum::agent);
+        $typeProp->setValue($step, \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainStepTypeEnum::agent);
 
         $roleProp = $ref->getProperty('role');
         $roleProp->setValue($step, '');
@@ -389,7 +389,7 @@ final class ChainDefinitionValidatorTest extends TestCase
         $step = $ref->newInstanceWithoutConstructor();
 
         $typeProp = $ref->getProperty('type');
-        $typeProp->setValue($step, \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum::qualityGate);
+        $typeProp->setValue($step, \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainStepTypeEnum::qualityGate);
 
         $commandProp = $ref->getProperty('command');
         $commandProp->setValue($step, '');
@@ -410,7 +410,7 @@ final class ChainDefinitionValidatorTest extends TestCase
         $step = $ref->newInstanceWithoutConstructor();
 
         $typeProp = $ref->getProperty('type');
-        $typeProp->setValue($step, \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum::qualityGate);
+        $typeProp->setValue($step, \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainStepTypeEnum::qualityGate);
 
         $commandProp = $ref->getProperty('command');
         $commandProp->setValue($step, 'vendor/bin/phpunit');
@@ -439,7 +439,7 @@ final class ChainDefinitionValidatorTest extends TestCase
         $shared = new SharedChainDefinitionVo(
             name: $name,
             description: 'Test chain',
-            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum::staticType,
+            type: \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum::staticType,
             budget: null,
             timeout: null,
             maxTime: null,
@@ -479,7 +479,7 @@ final class ChainDefinitionValidatorTest extends TestCase
         $shared = new SharedChainDefinitionVo(
             name: $name,
             description: 'Test chain',
-            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum::dynamicType,
+            type: \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum::dynamicType,
             budget: null,
             timeout: null,
             maxTime: null,
