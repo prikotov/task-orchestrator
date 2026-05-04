@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
 use InvalidArgumentException;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ConditionOperatorEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionExpressionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ConditionOperatorEnum;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

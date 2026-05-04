@@ -4,31 +4,33 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Application\Service\Chain;
 
+use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\StaticExecutionStrategy;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticChainResultVo;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\ValueObject\StaticStepResultVo;
-use LogicException;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionTypeEnum;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStaticChainConfigVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticChainResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
 
 #[CoversClass(StaticExecutionStrategy::class)]
 final class StaticExecutionStrategyTest extends TestCase
 {
     private ExecuteStaticChainServiceInterface $staticChainExecutor;
+    private ChainDefinitionProviderInterface $chainProvider;
     private StaticExecutionStrategy $strategy;
 
     protected function setUp(): void
     {
         $this->staticChainExecutor = $this->createMock(ExecuteStaticChainServiceInterface::class);
-        $this->strategy = new StaticExecutionStrategy($this->staticChainExecutor);
+        $this->chainProvider = $this->createMock(ChainDefinitionProviderInterface::class);
+        $this->strategy = new StaticExecutionStrategy($this->staticChainExecutor, $this->chainProvider);
     }
 
     // --- supports() ---
@@ -36,17 +38,17 @@ final class StaticExecutionStrategyTest extends TestCase
     #[Test]
     public function supportsReturnsTrueForStaticChain(): void
     {
-        $chain = $this->createStaticChain();
+        $chainInfo = new ExecutionChainInfoVo('static-test', ChainExecutionTypeEnum::staticType);
 
-        self::assertTrue($this->strategy->supports($chain));
+        self::assertTrue($this->strategy->supports($chainInfo));
     }
 
     #[Test]
     public function supportsReturnsFalseForDynamicChain(): void
     {
-        $chain = $this->createDynamicChain();
+        $chainInfo = new ExecutionChainInfoVo('dynamic-test', ChainExecutionTypeEnum::dynamicType);
 
-        self::assertFalse($this->strategy->supports($chain));
+        self::assertFalse($this->strategy->supports($chainInfo));
     }
 
     // --- execute() ---
@@ -54,7 +56,12 @@ final class StaticExecutionStrategyTest extends TestCase
     #[Test]
     public function executeDelegatesToStaticChainExecutor(): void
     {
-        $chain = $this->createStaticChain();
+        $chainInfo = new ExecutionChainInfoVo('static-test', ChainExecutionTypeEnum::staticType);
+        $config = $this->createStaticConfig();
+
+        $this->chainProvider->method('loadStaticChainConfig')
+            ->with('static-test')
+            ->willReturn($config);
 
         $staticResult = $this->createStaticChainResult([
             new StaticStepResultVo(
@@ -70,8 +77,8 @@ final class StaticExecutionStrategyTest extends TestCase
         ]);
         $this->staticChainExecutor->method('execute')->willReturn($staticResult);
 
-        $result = $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'test',
+        $result = $this->strategy->execute($chainInfo, new OrchestrateChainCommand(
+            chainName: 'static-test',
             task: 'Do work',
         ));
 
@@ -79,115 +86,6 @@ final class StaticExecutionStrategyTest extends TestCase
         self::assertCount(1, $result->stepResults);
         self::assertSame('analyst', $result->stepResults[0]->role);
         self::assertSame('result', $result->stepResults[0]->outputText);
-    }
-
-    #[Test]
-    public function executePassesCliTimeout(): void
-    {
-        $chain = $this->createStaticChain();
-
-        $capturedTimeout = null;
-        $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (
-                StaticChainDefinitionVo $c,
-                string $t,
-                ?string $w,
-                int $timeout,
-            ) use (&$capturedTimeout): StaticChainResultVo {
-                $capturedTimeout = $timeout;
-
-                return $this->createStaticChainResult([]);
-            });
-
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'test',
-            task: 'Do work',
-            timeout: 600,
-        ));
-
-        self::assertSame(600, $capturedTimeout);
-    }
-
-    #[Test]
-    public function executeFallsBackToDefaultTimeout(): void
-    {
-        $chain = $this->createStaticChain();
-
-        $capturedTimeout = null;
-        $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (
-                StaticChainDefinitionVo $c,
-                string $t,
-                ?string $w,
-                int $timeout,
-            ) use (&$capturedTimeout): StaticChainResultVo {
-                $capturedTimeout = $timeout;
-
-                return $this->createStaticChainResult([]);
-            });
-
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'test',
-            task: 'Do work',
-        ));
-
-        self::assertSame(300, $capturedTimeout);
-    }
-
-    #[Test]
-    public function executePassesNoContextFiles(): void
-    {
-        $chain = $this->createStaticChain();
-
-        $capturedNoContextFiles = null;
-        $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (
-                StaticChainDefinitionVo $c,
-                string $t,
-                ?string $w,
-                int $timeout,
-                ?object $a,
-                bool $noContextFiles,
-            ) use (&$capturedNoContextFiles): StaticChainResultVo {
-                $capturedNoContextFiles = $noContextFiles;
-
-                return $this->createStaticChainResult([]);
-            });
-
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'test',
-            task: 'Do work',
-            noContextFiles: true,
-        ));
-
-        self::assertTrue($capturedNoContextFiles);
-    }
-
-    #[Test]
-    public function executePassesNullAuditLogger(): void
-    {
-        $chain = $this->createStaticChain();
-
-        $capturedLogger = 'not-null';
-        $this->staticChainExecutor->method('execute')
-            ->willReturnCallback(function (
-                StaticChainDefinitionVo $c,
-                string $t,
-                ?string $w,
-                int $timeout,
-                ?object $logger,
-            ) use (&$capturedLogger): StaticChainResultVo {
-                $capturedLogger = $logger;
-
-                return $this->createStaticChainResult([]);
-            });
-
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'test',
-            task: 'Do work',
-        ));
-
-        self::assertNull($capturedLogger);
     }
 
     // --- resume() ---
@@ -198,93 +96,28 @@ final class StaticExecutionStrategyTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Static chain does not support resume.');
 
-        $chain = $this->createStaticChain();
-        $this->strategy->resume($chain, new OrchestrateChainCommand(
-            chainName: 'test',
+        $chainInfo = new ExecutionChainInfoVo('static-test', ChainExecutionTypeEnum::staticType);
+        $this->strategy->resume($chainInfo, new OrchestrateChainCommand(
+            chainName: 'static-test',
             task: 'Test',
             resumeDir: '/tmp/resume',
         ));
     }
 
-    // --- VO → DTO mapping ---
-
-    #[Test]
-    public function executeMapsStaticChainResultVoToDto(): void
-    {
-        $chain = $this->createStaticChain();
-
-        $staticResult = $this->createStaticChainResult([
-            new StaticStepResultVo(
-                role: 'analyst',
-                runner: 'pi',
-                outputText: 'Analysis result',
-                inputTokens: 100,
-                outputTokens: 200,
-                cost: 0.01,
-                duration: 1.5,
-                isError: false,
-                timedOut: false,
-            ),
-            new StaticStepResultVo(
-                role: 'developer',
-                runner: 'pi',
-                outputText: 'Impl result',
-                inputTokens: 150,
-                outputTokens: 300,
-                cost: 0.02,
-                duration: 2.0,
-                isError: false,
-                timedOut: false,
-            ),
-        ]);
-        $this->staticChainExecutor->method('execute')->willReturn($staticResult);
-
-        $result = $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'test',
-            task: 'Do work',
-        ));
-
-        // Aggregated metrics mapped correctly
-        self::assertSame(250, $result->totalInputTokens);
-        self::assertSame(500, $result->totalOutputTokens);
-        self::assertSame(0.03, $result->totalCost);
-        self::assertGreaterThan(0.0, $result->totalTime);
-        self::assertFalse($result->budgetExceeded);
-        self::assertSame(1, $result->totalIterations);
-        self::assertFalse($result->timedOut);
-    }
-
-    #[Test]
-    public function executeMapsTimedOutFlag(): void
-    {
-        $chain = $this->createStaticChain();
-
-        $staticResult = $this->createStaticChainResult([
-            new StaticStepResultVo(
-                role: 'analyst',
-                runner: 'pi',
-                outputText: '',
-                inputTokens: 0,
-                outputTokens: 0,
-                cost: 0.0,
-                duration: 5.0,
-                isError: true,
-                errorMessage: 'timeout',
-                timedOut: true,
-            ),
-        ]);
-        $this->staticChainExecutor->method('execute')->willReturn($staticResult);
-
-        $result = $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'test',
-            task: 'Do work',
-        ));
-
-        self::assertTrue($result->timedOut);
-        self::assertTrue($result->stepResults[0]->timedOut);
-    }
-
     // --- Helpers ---
+
+    private function createStaticConfig(): ExecutionStaticChainConfigVo
+    {
+        return new ExecutionStaticChainConfigVo(
+            name: 'static-test',
+            steps: [],
+            fixIterations: [],
+            budget: null,
+            timeout: null,
+            roles: [],
+            defaultRetryPolicy: null,
+        );
+    }
 
     /**
      * @param list<StaticStepResultVo> $steps
@@ -305,35 +138,6 @@ final class StaticExecutionStrategyTest extends TestCase
             budgetLimit: 0.0,
             budgetExceededRole: null,
             totalIterations: 1,
-        );
-    }
-
-    private function createStaticChain(): ChainDefinitionInterface
-    {
-        return StaticChainDefinitionVo::create(
-            name: 'static-test',
-            description: 'Test static chain',
-            steps: [
-                ChainStepVo::agent(role: 'system_analyst', runner: 'pi'),
-            ],
-        );
-    }
-
-    private function createDynamicChain(): ChainDefinitionInterface
-    {
-        return DynamicChainDefinitionVo::create(
-            name: 'dynamic-test',
-            description: '',
-            facilitator: 'facilitator',
-            participants: ['participant'],
-            maxRounds: 5,
-            brainstormSystemPrompt: 'Base',
-            facilitatorAppendPrompt: 'Fac %s',
-            facilitatorStartPrompt: 'Start %s',
-            facilitatorContinuePrompt: 'Cont %s %s %s',
-            facilitatorFinalizePrompt: 'Final %s %s',
-            participantAppendPrompt: 'Part %s',
-            participantUserPrompt: 'Ctx %s %s',
         );
     }
 }

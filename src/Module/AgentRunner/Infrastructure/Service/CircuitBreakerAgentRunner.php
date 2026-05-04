@@ -198,7 +198,7 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
             maxContextLength: $request->getMaxContextLength(),
             command: $this->fallbackCommand,
             runnerArgs: $request->getRunnerArgs(),
-            noContextFiles: $request->getNoContextFiles(),
+            noContextFiles: $request->hasNoContextFiles(),
         );
     }
 

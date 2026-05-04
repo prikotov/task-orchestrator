@@ -2,7 +2,7 @@
 
 **Роль:** Архитектор Локи (system_architect_loki)
 **Дата:** 2026-04-25
-**Объект:** `src/Module/Orchestrator/Application/Service/ValidateChainConfigService.php` и его зависимости
+**Объект:** `src/Module/ChainDefinition/Application/Service/ValidateChainConfigService.php` и его зависимости
 **Задача:** Анализ нарушения слоистой архитектуры — корректность расположения сервиса в Application-слое
 
 ---

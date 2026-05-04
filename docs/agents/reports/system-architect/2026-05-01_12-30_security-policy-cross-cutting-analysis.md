@@ -2,7 +2,7 @@
 
 **Роль:** Архитектор Гэндальф  
 **Дата:** 2026-05-01  
-**Объект:** `src/Module/Orchestrator/` — Static/Dynamic стратегии, ExecutionStrategy, RunAgentService, QualityGateRunner  
+**Объект:** `src/Module/ChainDefinition/` — Static/Dynamic стратегии, ExecutionStrategy, RunAgentService, QualityGateRunner  
 **Задача:** [TASK-docs-security-policy-analysis](../../../todo/TASK-docs-security-policy-analysis.todo.md)
 
 ---

@@ -4,7 +4,7 @@
 **Аналитик:** Шерлок (system_analyst_sherlock)
 **Задача:** [TASK-docs-domain-inventory](../../todo/TASK-docs-domain-inventory.todo.md)
 **Epic:** EPIC-refactor-orchestrator-p3
-**Объект:** `src/Module/Orchestrator/Domain/`
+**Объект:** `src/Module/ChainDefinition/Domain/`
 
 ---
 

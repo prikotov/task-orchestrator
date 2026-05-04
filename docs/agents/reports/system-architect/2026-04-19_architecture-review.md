@@ -84,7 +84,7 @@ Orchestrator Domain (RunAgentServiceInterface)
 
 ### 🔴 GetRunners обходит Integration-слой
 
-**Файл:** `src/Module/Orchestrator/Application/UseCase/Query/GetRunners/GetRunnersQueryHandler.php`
+**Файл:** `src/Module/ChainDefinition/Application/UseCase/Query/GetRunners/GetRunnersQueryHandler.php`
 **Строки:** 7-8, 25-35
 
 ```php
@@ -127,7 +127,7 @@ Handler **напрямую** инжектит `AgentRunnerGetRunnersQueryHandler
 
 ### 🟡 `RunDynamicLoopAgentServiceInterface` — 14+ параметров
 
-**Файл:** `src/Module/Orchestrator/Domain/Service/Chain/Dynamic/RunDynamicLoopAgentServiceInterface.php`
+**Файл:** `src/Module/ChainDefinition/Domain/Service/Chain/Dynamic/RunDynamicLoopAgentServiceInterface.php`
 
 Метод `runFacilitator()` принимает 14 скалярных параметров. Методы `runParticipant()` и `runFacilitatorFinalize()` — по 13-14. Это снижает читаемость и поддерживаемость.
 

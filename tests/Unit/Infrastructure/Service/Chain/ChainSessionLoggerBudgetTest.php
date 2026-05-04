@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ChainSessionBudgetFormatter;
-use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ChainSessionFileStorage;
-use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ChainSessionLogger;
-use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ChainSessionWriter;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionBudgetFormatter;
+use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionFileStorage;
+use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger;
+use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionWriter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ChainSessionLogger::class)]
 #[CoversClass(ChainSessionWriter::class)]
 #[CoversClass(ChainSessionBudgetFormatter::class)]
-#[CoversClass(BudgetVo::class)]
+#[CoversClass(DynamicLoopBudgetVo::class)]
 final class ChainSessionLoggerBudgetTest extends TestCase
 {
     private string $tmpDir;
@@ -36,7 +36,7 @@ final class ChainSessionLoggerBudgetTest extends TestCase
     #[Test]
     public function sessionJsonContainsBudgetWhenSet(): void
     {
-        $budget = new BudgetVo(maxCostTotal: 5.0, maxCostPerStep: 1.5);
+        $budget = new DynamicLoopBudgetVo(maxCostTotal: 5.0, maxCostPerStep: 1.5);
 
         $sessionDir = $this->logger->startSession(
             chainName: 'test_chain',
@@ -73,7 +73,7 @@ final class ChainSessionLoggerBudgetTest extends TestCase
     #[Test]
     public function interruptSessionWithBudgetExceededContainsBudgetDetails(): void
     {
-        $budget = new BudgetVo(maxCostTotal: 3.0, maxCostPerStep: null);
+        $budget = new DynamicLoopBudgetVo(maxCostTotal: 3.0, maxCostPerStep: null);
 
         $sessionDir = $this->logger->startSession(
             chainName: 'test_chain',
@@ -134,7 +134,7 @@ final class ChainSessionLoggerBudgetTest extends TestCase
         self::assertNull($dataBefore['budget']);
 
         // После setBudget — заполнен
-        $this->logger->setBudget(new BudgetVo(maxCostTotal: 10.0, maxCostPerStep: 2.0));
+        $this->logger->setBudget(new DynamicLoopBudgetVo(maxCostTotal: 10.0, maxCostPerStep: 2.0));
         $dataAfter = $this->readSessionJson($sessionDir);
         self::assertEquals(10.0, $dataAfter['budget']['max_cost_total']);
         self::assertEquals(2.0, $dataAfter['budget']['max_cost_per_step']);
@@ -143,9 +143,9 @@ final class ChainSessionLoggerBudgetTest extends TestCase
     #[Test]
     public function sessionJsonContainsPerRoleBudgetWhenSet(): void
     {
-        $analystBudget = new BudgetVo(maxCostTotal: 3.0, maxCostPerStep: 1.0);
-        $devBudget = new BudgetVo(maxCostTotal: 5.0);
-        $budget = new BudgetVo(maxCostTotal: 10.0, perRoleBudgets: ['analyst' => $analystBudget, 'developer' => $devBudget]);
+        $analystBudget = new DynamicLoopBudgetVo(maxCostTotal: 3.0, maxCostPerStep: 1.0);
+        $devBudget = new DynamicLoopBudgetVo(maxCostTotal: 5.0);
+        $budget = new DynamicLoopBudgetVo(maxCostTotal: 10.0, perRoleBudgets: ['analyst' => $analystBudget, 'developer' => $devBudget]);
 
         $sessionDir = $this->logger->startSession(
             chainName: 'test_chain',
@@ -175,8 +175,8 @@ final class ChainSessionLoggerBudgetTest extends TestCase
     #[Test]
     public function interruptSessionWithPerRoleBudgetExceededContainsPerRoleInfo(): void
     {
-        $analystBudget = new BudgetVo(maxCostTotal: 3.0);
-        $budget = new BudgetVo(maxCostTotal: 10.0, perRoleBudgets: ['analyst' => $analystBudget]);
+        $analystBudget = new DynamicLoopBudgetVo(maxCostTotal: 3.0);
+        $budget = new DynamicLoopBudgetVo(maxCostTotal: 10.0, perRoleBudgets: ['analyst' => $analystBudget]);
 
         $sessionDir = $this->logger->startSession(
             chainName: 'test_chain',

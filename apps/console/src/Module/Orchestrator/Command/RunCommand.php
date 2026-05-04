@@ -11,9 +11,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\RunAgent\RunAgentCommand;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\RunAgent\RunAgentResultDto;
 
 #[AsCommand(
     name: 'app:agent:run',

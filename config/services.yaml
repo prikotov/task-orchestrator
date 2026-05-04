@@ -7,7 +7,7 @@ services:
   _instanceof:
     TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
       tags: ['agent.runner']
-    TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ExecutionStrategyInterface:
+    TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface:
       tags: ['orchestrator.execution_strategy']
 
   # --- Auto-discovery (Application + Infrastructure, Domain исключён) ---
@@ -25,118 +25,144 @@ services:
       - '../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
       - '../src/Module/AgentRunner/Infrastructure/Service/Codex/Resources/'
 
-  # --- Integration Service alias (Interface → Implementation by convention service.md) ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Integration\RunAgentServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Integration\Service\AgentRunner\RunAgentService
+  # ─── DynamicLoop module ─────────────────────────────────────────────
 
-  # --- Явные alias: Interface → Implementation (по конвенции service.md) ---
+  # Domain Service aliases
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\ExecuteDynamicTurnServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\ExecuteDynamicTurnService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FinalizeDynamicLoopServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FinalizeDynamicLoopService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RecordDynamicRoundServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RecordDynamicRoundService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FormatDynamicJournalServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FormatDynamicJournalService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RoundCompletedNotifierInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DispatchRoundEventService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopAgentServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\RunDynamicLoopAgentService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FacilitatorResponseParserInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\FacilitatorResponseParserService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Budget\CheckDynamicLoopBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\CheckDynamicBudgetService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Shared\DynamicLoopPromptFormatterInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\PromptFormatterService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerFactoryInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\JsonlAuditLoggerFactory
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionWriterInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionReaderInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DynamicExecutionStrategy:
+    tags: ['orchestrator.execution_strategy']
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration\ChainDefinitionProviderInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapper
+
+  # Infrastructure Service parameters
+  TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger:
+    arguments:
+      $chainsSessionDir: '%task_orchestrator.chains_session_dir%'
+      $basePath: '%task_orchestrator.base_path%'
+
+  # ─── ChainDefinition module ─────────────────────────────────────────
+
+  # Integration Service alias (Interface → Implementation)
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Contract\Chain\ChainLoaderInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader
+
+  # Parameters
+  TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader:
+    arguments:
+      $yamlPath: '%task_orchestrator.chains_yaml%'
+
+  # ─── ChainExecution module ───────────────────────────────────────────
+
+  # Domain Service aliases
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Agent\RunAgentServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\RunAgentService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Prompt\PromptProviderInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Prompt\RolePromptBuilder
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Shared\PromptFormatterInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\PromptFormatterService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ExecuteConditionalStepServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\ExecuteConditionalStepService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\Hook\ShellHookExecutor
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionService
+
+  # Static services (from merged StaticExecution module)
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunAgentServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\RunAgentService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\Prompt\FormatPromptService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\StaticAuditServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\Audit\StaticAuditService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\QualityGate\QualityGateRunner
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Agent\ResolveChainRunnerService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetService
+
+  # Report format mappers
+  TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\ReportResultFactory:
+    arguments:
+      $mappers:
+        text: '@TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportTextMapper'
+        json: '@TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportJsonMapper'
+
+  # Parameters
+  TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Prompt\RolePromptBuilder:
+    arguments:
+      $rolesDir: '%task_orchestrator.roles_dir%'
+      $basePath: '%task_orchestrator.base_path%'
+
+  # ─── AgentRunner module ─────────────────────────────────────────────
+
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunner
 
-  TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ChainLoaderInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ChainSessionLogger
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionWriterInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ChainSessionLogger
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionReaderInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ChainSessionLogger
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FacilitatorResponseParserInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\FacilitatorResponseParserService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLoggerFactory
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Prompt\PromptProviderInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Prompt\RolePromptBuilder
-
-  # --- Application Service alias ---
-  TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService
-
-  # --- StaticExecution module: Integration Service aliases ---
-  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunAgentServiceInterface:
-    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\AgentRunner\RunAgentService
-
-  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface:
-    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Prompt\FormatPromptService
-
-  # --- StaticExecution module: Integration Service aliases ---
-  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\StaticAuditServiceInterface:
-    alias: TaskOrchestrator\Common\Module\StaticExecution\Integration\Service\Audit\StaticAuditService
-
-  # --- StaticExecution module: Domain/Infrastructure aliases ---
-  TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainServiceInterface:
-    alias: TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainService
-
-  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\QualityGateRunnerInterface:
-    alias: TaskOrchestrator\Common\Module\StaticExecution\Infrastructure\Service\QualityGateRunner
-
-  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface:
-    alias: TaskOrchestrator\Common\Module\StaticExecution\Infrastructure\Service\ResolveChainRunnerService
-
-  TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\CheckStaticBudgetServiceInterface:
-    alias: TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\CheckStaticBudgetService
-
-  # --- Infrastructure Service alias ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopAgentServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\RunDynamicLoopAgentService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Budget\CheckDynamicBudgetServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\CheckDynamicBudgetService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Shared\PromptFormatterInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\PromptFormatterService
-
-  # --- ConditionalExecution: Integration Service alias ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\ExecuteConditionalStepServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ExecuteConditionalStepService
-
-  # --- Hook Executor: Interface → Implementation alias ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Hook\HookExecutorInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\Hook\ShellHookExecutor
-
-  # --- ConditionalExecution: Domain Service alias ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Condition\EvaluateConditionServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Condition\EvaluateConditionService
-
-  # --- Domain Service alias (auto-discovery covers Domain/Service/) ---
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RunDynamicLoopService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\ExecuteDynamicTurnServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\ExecuteDynamicTurnService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FinalizeDynamicLoopServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FinalizeDynamicLoopService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RecordDynamicRoundServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RecordDynamicRoundService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FormatDynamicJournalServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FormatDynamicJournalService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService
-
-  TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\RoundCompletedNotifierInterface:
-    alias: TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\DispatchRoundEventService
-
-  # Report format mappers
-  TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\ReportResultFactory:
-    arguments:
-      $mappers:
-        text: '@TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ReportTextMapper'
-        json: '@TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ReportJsonMapper'
-
-  # --- AgentRunner module services ---
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService
 
@@ -146,27 +172,13 @@ services:
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\RetryableRunnerFactory
 
-  # --- Registry с tagged iterator ---
+  # Registry с tagged iterator
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService:
     arguments:
       $runners: !tagged_iterator agent.runner
 
-  # --- CommandHandler: tagged strategies ---
-  TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler:
+  # ─── CommandHandler: tagged strategies ──────────────────────────────
+
+  TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler:
     arguments:
       $strategies: !tagged_iterator orchestrator.execution_strategy
-
-  # --- Параметры путей (через bundle configuration) ---
-  TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Prompt\RolePromptBuilder:
-    arguments:
-      $rolesDir: '%task_orchestrator.roles_dir%'
-      $basePath: '%task_orchestrator.base_path%'
-
-  TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader:
-    arguments:
-      $yamlPath: '%task_orchestrator.chains_yaml%'
-
-  TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\ChainSessionLogger:
-    arguments:
-      $chainsSessionDir: '%task_orchestrator.chains_session_dir%'
-      $basePath: '%task_orchestrator.base_path%'

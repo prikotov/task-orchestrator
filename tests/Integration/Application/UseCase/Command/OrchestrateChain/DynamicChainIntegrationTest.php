@@ -8,18 +8,20 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\DynamicExecutionStrategy;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\BuildDynamicContextService;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\SessionCompletedNotifierInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicLoopResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicRoundResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\YamlChainLoader;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapper;
+use TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DynamicExecutionStrategy;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerFactoryInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextService;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\SessionCompletedNotifierInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapper;
 
 /**
  * Integration-тест: dynamic chain end-to-end.
@@ -51,8 +53,9 @@ final class DynamicChainIntegrationTest extends TestCase
         $this->stubSessionLogger = new StubSessionLogger();
 
         $contextBuilder = new BuildDynamicContextService();
+        $configMapper = new DynamicLoopDefinitionMapper($chainLoader);
 
-        $auditFactory = $this->createMock(AuditLoggerFactoryInterface::class);
+        $auditFactory = $this->createMock(DynamicLoopAuditLoggerFactoryInterface::class);
         $sessionNotifier = $this->createMock(SessionCompletedNotifierInterface::class);
         $sessionNotifier->method('notifySessionCompleted');
 
@@ -60,12 +63,14 @@ final class DynamicChainIntegrationTest extends TestCase
             contextBuilder: $contextBuilder,
             dynamicLoopRunner: $this->stubLoopRunner,
             sessionLogger: $this->stubSessionLogger,
+            chainProvider: $configMapper,
             auditLoggerFactory: $auditFactory,
             sessionNotifier: $sessionNotifier,
         );
 
+        $chainDefinitionProvider = new ChainExecutionDefinitionMapper($chainLoader);
         $this->handler = new OrchestrateChainCommandHandler(
-            $chainLoader,
+            $chainDefinitionProvider,
             new \ArrayIterator([$dynamicStrategy]),
         );
     }
@@ -161,7 +166,7 @@ final class DynamicChainIntegrationTest extends TestCase
             synthesis: 'Done',
             maxRoundsReached: false,
         ));
-        $this->stubLoopRunner->onExecute(static function (DynamicChainDefinitionVo $chain, DynamicChainContextVo $context) use (&$capturedContext): void {
+        $this->stubLoopRunner->onExecute(static function (DynamicLoopConfigVo $chain, DynamicLoopContextVo $context) use (&$capturedContext): void {
             $capturedContext = $context;
         });
 

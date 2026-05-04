@@ -6,10 +6,10 @@ namespace TaskOrchestrator\Tests\Unit\Domain\Exception;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\AgentException;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\NotFoundExceptionInterface as AgentRunnerNotFoundExceptionInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\NotFoundExceptionInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\OrchestratorException;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\ChainNotFoundException;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\NotFoundExceptionInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\OrchestratorException;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\RoleNotFoundException;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Exception\RunnerNotFoundException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;

@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Integration\Application\UseCase\Command\OrchestrateChain;
 
 use Override;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainSessionStateVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSessionStateVo;
 
 /**
- * Стаб ChainSessionLoggerInterface для integration-тестов.
+ * Стаб DynamicLoopSessionLoggerInterface для integration-тестов.
  *
  * Создаёт реальную временную директорию для session-логов.
  * Вызывай cleanup() в tearDown() теста для предотвращения утечки /tmp.
  */
-class StubSessionLogger implements ChainSessionLoggerInterface
+class StubSessionLogger implements DynamicLoopSessionLoggerInterface
 {
     protected ?string $sessionDir = null;
 
@@ -41,7 +41,7 @@ class StubSessionLogger implements ChainSessionLoggerInterface
     }
 
     #[Override]
-    public function setBudget(?BudgetVo $budget): void
+    public function setBudget(?DynamicLoopBudgetVo $budget): void
     {
         // no-op
     }
@@ -90,7 +90,7 @@ class StubSessionLogger implements ChainSessionLoggerInterface
     }
 
     #[Override]
-    public function getResumedState(): ?ChainSessionStateVo
+    public function getResumedState(): ?DynamicLoopSessionStateVo
     {
         return null;
     }

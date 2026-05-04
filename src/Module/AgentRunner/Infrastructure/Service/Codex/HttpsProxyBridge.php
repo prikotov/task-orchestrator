@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex;
 
+use InvalidArgumentException;
+use RuntimeException;
+
 /**
  * PHP HTTPS→HTTP прокси-мост для CodexAgentRunner.
  *
@@ -61,7 +64,7 @@ final class HttpsProxyBridge
     ) {
         $parsed = self::parseUpstreamUrl($upstreamProxyUrl);
         if ($parsed === null) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('Invalid upstream HTTPS proxy URL: %s', $upstreamProxyUrl),
             );
         }
@@ -91,7 +94,7 @@ final class HttpsProxyBridge
      *
      * @return string Локальный URL моста (http://127.0.0.1:<port>)
      *
-     * @throws \RuntimeException если не удалось запустить мост или прочитать порт
+     * @throws RuntimeException если не удалось запустить мост или прочитать порт
      */
     public function start(): string
     {
@@ -111,7 +114,7 @@ final class HttpsProxyBridge
         $process = proc_open($command, $descriptors, $pipes, null, $env);
 
         if ($process === false) {
-            throw new \RuntimeException('Failed to start HTTPS proxy bridge process.');
+            throw new RuntimeException('Failed to start HTTPS proxy bridge process.');
         }
 
         $this->process = $process;
@@ -128,7 +131,7 @@ final class HttpsProxyBridge
 
         if ($portLine === null) {
             $this->killProcess();
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'HTTPS proxy bridge failed to start: could not read port from stdout.',
             );
         }

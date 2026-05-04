@@ -211,7 +211,7 @@ src/Module/AgentRunner/
 ### Orchestrator
 
 ```
-src/Module/Orchestrator/
+src/Module/ChainDefinition/
 ├── Domain/
 │   ├── Dto/
 │   │   ├── ChainResultAuditDto.php                      # параметры logChainResult

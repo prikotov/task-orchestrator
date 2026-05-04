@@ -2,7 +2,7 @@
 
 **Роль:** Архитектор Локи
 **Дата:** 2026-04-30
-**Объект:** `src/Module/Orchestrator/Application/Service/Chain/DynamicExecutionStrategy.php` (293 строки)
+**Объект:** `src/Module/ChainDefinition/Application/Service/Chain/DynamicExecutionStrategy.php` (293 строки)
 **Задача:** Архитектурное ревью — placement, DDD-чистота, альтернативы
 
 ---

@@ -7,8 +7,8 @@ namespace TaskOrchestrator\Tests\Unit\Application\Mapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Mapper\ChainConfigViolationDtoMapper;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainConfigViolationVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainConfigViolationDtoMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainConfigViolationVo;
 
 #[CoversClass(ChainConfigViolationDtoMapper::class)]
 final class ChainConfigViolationDtoMapperTest extends TestCase

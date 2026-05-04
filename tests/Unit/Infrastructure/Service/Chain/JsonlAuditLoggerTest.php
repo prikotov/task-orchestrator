@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Dto\StepAuditStatusDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainRunResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\JsonlAuditLogger;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\ChainResultAuditDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\StepAuditStatusDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\JsonlAuditLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

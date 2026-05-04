@@ -38,7 +38,7 @@ Agent runner "codex" not found.
 2. Проверьте, что класс не исключён из auto-discovery в `config/services.yaml`. Тег `agent.runner` автоматически назначается через `_instanceof`:
    ```yaml
    _instanceof:
-     TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface:
+     TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\AgentRunner\AgentRunnerInterface:
        tags: ['agent.runner']
    ```
 
@@ -272,7 +272,7 @@ Quality gate "PHP CodeSniffer" failed (exit code 1)
 
 **Симптом:**
 ```
-The service "TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Prompt\RolePromptBuilder" has a dependency on a non-existent parameter "task_orchestrator.roles_dir".
+The service "TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Prompt\RolePromptBuilder" has a dependency on a non-existent parameter "task_orchestrator.roles_dir".
 ```
 
 **Причина:** `TaskOrchestratorBundle` не зарегистрирован в приложении, или параметры bundle не сконфигурированы.
@@ -349,9 +349,9 @@ cat var/log/agent_audit.jsonl | python3 -m json.tool
 
 | Исключение | Полный класс | Когда возникает |
 |---|---|---|
-| `RunnerNotFoundException` | `TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RunnerNotFoundException` | Runner не найден в реестре (`AgentRunnerRegistryService::get()`) |
-| `ChainNotFoundException` | `TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException` | Цепочка не найдена в YAML (`YamlChainLoader::load()`) |
-| `RoleNotFoundException` | `TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException` | Файл роли не найден (`RolePromptBuilder::getPrompt()`) |
+| `RunnerNotFoundException` | `TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\RunnerNotFoundException` | Runner не найден в реестре (`AgentRunnerRegistryService::get()`) |
+| `ChainNotFoundException` | `TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\ChainNotFoundException` | Цепочка не найдена в YAML (`YamlChainLoader::load()`) |
+| `RoleNotFoundException` | `TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\RoleNotFoundException` | Файл роли не найден (`RolePromptBuilder::getPrompt()`) |
 | `InvalidArgumentException` | `\InvalidArgumentException` | Некорректная конфигурация YAML: отсутствует `type`, `role`, `command` в шаге и т.д. |
 | `ProcessTimedOutException` | `Symfony\Process\Exception\ProcessTimedOutException` | Превышен таймаут Symfony Process — перехватывается в `PiAgentRunner::run()` |
 | `RuntimeException` | `\RuntimeException` | Невозможно прочитать файл промпта (`YamlChainLoader::readFile()`) |

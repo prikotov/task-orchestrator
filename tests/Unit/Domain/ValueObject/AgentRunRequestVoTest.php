@@ -118,7 +118,7 @@ final class AgentRunRequestVoTest extends TestCase
     {
         $vo = new AgentRunRequestVo(role: 'test', task: 'test');
 
-        self::assertFalse($vo->getNoContextFiles());
+        self::assertFalse($vo->hasNoContextFiles());
     }
 
     #[Test]
@@ -133,6 +133,6 @@ final class AgentRunRequestVoTest extends TestCase
         );
         $result = $vo->withTruncatedContext();
 
-        self::assertTrue($result->getNoContextFiles());
+        self::assertTrue($result->hasNoContextFiles());
     }
 }

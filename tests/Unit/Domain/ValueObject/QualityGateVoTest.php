@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\QualityGateVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\QualityGateVo;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
