@@ -150,7 +150,7 @@ DynamicLoop → ChainExecution = FORBIDDEN
 ## 5. Implementation Plan (План реализации)
 
 ### PR#1: Namespace-миграция Orchestrator → ChainDefinition
-- [ ] [TASK-refactor-namespace-chain-definition](TASK-refactor-namespace-chain-definition.todo.md) — Механический rename `Orchestrator` → `ChainDefinition` во всех файлах, тестах, services.yaml, docs. Без изменения логики. `StaticExecution` пока ссылается на старый namespace — правим импорты. **Не зависит от других задач — выполняется первой.**
+- [x] [TASK-refactor-namespace-chain-definition](done/TASK-refactor-namespace-chain-definition.todo.md) — Механический rename `Orchestrator` → `ChainDefinition` во всех файлах, тестах, services.yaml, docs. Без изменения логики. `StaticExecution` пока ссылается на старый namespace — правим импорты. **Не зависит от других задач — выполняется первой.**
 
 ### PR#2: Выделение DynamicLoop
 - [ ] [TASK-refactor-extract-dynamic-loop](TASK-refactor-extract-dynamic-loop.todo.md) — Создать модуль `DynamicLoop`, перенести все Dynamic-специфичные файлы (entity, VO, сервисы, infrastructure, стратегии). Создать Integration-маппер DynamicLoop ← ChainDefinition. Создать DynamicLoopAuditLoggerInterface. Обновить services.yaml. **Зависит от PR#1. ~600 LOC новых файлов.**
