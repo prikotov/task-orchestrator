@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration;
 
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 
 /**
  * Интеграционный сервис запуска AI-агента для Orchestrator Domain.

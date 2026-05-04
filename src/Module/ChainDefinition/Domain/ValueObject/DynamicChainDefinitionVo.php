@@ -129,7 +129,7 @@ final readonly class DynamicChainDefinitionVo implements ChainDefinitionInterfac
     /**
      * Является ли цепочка динамической?
      */
-    #[\Override]
+    #[Override]
     public function isDynamic(): bool
     {
         return $this->shared->isDynamic();
@@ -138,31 +138,31 @@ final readonly class DynamicChainDefinitionVo implements ChainDefinitionInterfac
     /**
      * Является ли цепочка условной (conditional)?
      */
-    #[\Override]
+    #[Override]
     public function isConditional(): bool
     {
         return $this->shared->isConditional();
     }
 
-    #[\Override]
+    #[Override]
     public function getDescription(): string
     {
         return $this->shared->getDescription();
     }
 
-    #[\Override]
+    #[Override]
     public function getTimeout(): ?int
     {
         return $this->shared->getTimeout();
     }
 
-    #[\Override]
+    #[Override]
     public function getMaxTime(): ?int
     {
         return $this->shared->getMaxTime();
     }
 
-    #[\Override]
+    #[Override]
     public function getBudget(): ?BudgetVo
     {
         return $this->shared->getBudget();
@@ -197,13 +197,13 @@ final readonly class DynamicChainDefinitionVo implements ChainDefinitionInterfac
     /**
      * Возвращает политику retry по умолчанию для цепочки.
      */
-    #[\Override]
+    #[Override]
     public function getDefaultRetryPolicy(): ?ChainRetryPolicyVo
     {
         return $this->defaultRetryPolicy;
     }
 
-    #[\Override]
+    #[Override]
     public function getRoleConfig(string $role): ?RoleConfigVo
     {
         return $this->shared->getRoleConfig($role);
@@ -212,7 +212,7 @@ final readonly class DynamicChainDefinitionVo implements ChainDefinitionInterfac
     /**
      * @return array<string, RoleConfigVo>
      */
-    #[\Override]
+    #[Override]
     public function getRoles(): array
     {
         return $this->shared->getRoles();

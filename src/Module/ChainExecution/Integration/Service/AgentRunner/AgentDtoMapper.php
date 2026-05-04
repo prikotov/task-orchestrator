@@ -6,9 +6,9 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\Agen
 
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommand;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentResultDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 
 /**
  * Маппер между Orchestrator Domain VO и AgentRunner Application DTO.
@@ -25,33 +25,33 @@ final readonly class AgentDtoMapper
      * Маппит Orchestrator ChainRunRequestVo → AgentRunner Application RunAgentCommand.
      */
     public function mapToRunAgentCommand(
-        ChainRunRequestVo $vo,
+        ChainRunRequestVo $valueObject,
         ?ExecutionRetryPolicyVo $retryPolicy = null,
     ): RunAgentCommand {
-        $runnerName = $vo->getRunnerName();
-        if (($runnerName === null || $runnerName === '') && $vo->getCommand() !== []) {
-            $runnerName = $vo->getCommand()[0];
+        $runnerName = $valueObject->getRunnerName();
+        if (($runnerName === null || $runnerName === '') && $valueObject->getCommand() !== []) {
+            $runnerName = $valueObject->getCommand()[0];
         }
         $runnerName = $runnerName ?? '';
 
         return new RunAgentCommand(
             runnerName: $runnerName,
-            role: $vo->getRole(),
-            task: $vo->getTask(),
-            systemPrompt: $vo->getSystemPrompt(),
-            previousContext: $vo->getPreviousContext(),
-            model: $vo->getModel(),
-            tools: $vo->getTools(),
-            workingDir: $vo->getWorkingDir(),
-            timeout: $vo->getTimeout(),
-            maxContextLength: $vo->getMaxContextLength(),
-            command: $vo->getCommand(),
-            runnerArgs: $vo->getRunnerArgs(),
+            role: $valueObject->getRole(),
+            task: $valueObject->getTask(),
+            systemPrompt: $valueObject->getSystemPrompt(),
+            previousContext: $valueObject->getPreviousContext(),
+            model: $valueObject->getModel(),
+            tools: $valueObject->getTools(),
+            workingDir: $valueObject->getWorkingDir(),
+            timeout: $valueObject->getTimeout(),
+            maxContextLength: $valueObject->getMaxContextLength(),
+            command: $valueObject->getCommand(),
+            runnerArgs: $valueObject->getRunnerArgs(),
             retryMaxRetries: $retryPolicy?->isEnabled() ? $retryPolicy->getMaxRetries() : null,
             retryInitialDelayMs: $retryPolicy?->getInitialDelayMs() ?? 1000,
             retryMaxDelayMs: $retryPolicy?->getMaxDelayMs() ?? 30000,
             retryMultiplier: $retryPolicy?->getMultiplier() ?? 2.0,
-            noContextFiles: $vo->getNoContextFiles(),
+            noContextFiles: $valueObject->hasNoContextFiles(),
         );
     }
 

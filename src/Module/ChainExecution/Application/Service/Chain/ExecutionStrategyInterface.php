@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain;
 
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 
 /**
  * Стратегия выполнения цепочки оркестрации.

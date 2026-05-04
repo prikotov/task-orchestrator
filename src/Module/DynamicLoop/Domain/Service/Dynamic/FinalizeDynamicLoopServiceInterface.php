@@ -7,8 +7,8 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Dto\DynamicLoopAuditDto;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
 
 /**
  * Финализация dynamic-цикла: finalize turn, форматирование журнала, аудит.

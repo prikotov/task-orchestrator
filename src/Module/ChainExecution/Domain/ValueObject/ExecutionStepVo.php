@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject;
 
-use InvalidArgumentException;
+use LogicException;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
 
 /**
@@ -82,7 +82,7 @@ final readonly class ExecutionStepVo
         return $this->timeoutSeconds;
     }
 
-    public function getNoContextFiles(): bool
+    public function hasNoContextFiles(): bool
     {
         return $this->noContextFiles;
     }
@@ -120,12 +120,12 @@ final readonly class ExecutionStepVo
     /**
      * Преобразует quality_gate-шаг в ExecutionQualityGateVo.
      *
-     * @throws \LogicException если шаг не является quality_gate
+     * @throws LogicException если шаг не является quality_gate
      */
     public function toQualityGateVo(): ExecutionQualityGateVo
     {
         if (!$this->isQualityGate()) {
-            throw new \LogicException('Only quality_gate steps can be converted to ExecutionQualityGateVo.');
+            throw new LogicException('Only quality_gate steps can be converted to ExecutionQualityGateVo.');
         }
 
         return new ExecutionQualityGateVo(

@@ -17,7 +17,7 @@ final class ChainRunRequestVoTest extends TestCase
     {
         $vo = new ChainRunRequestVo(role: 'test', task: 'task');
 
-        self::assertFalse($vo->getNoContextFiles());
+        self::assertFalse($vo->hasNoContextFiles());
     }
 
     #[Test]
@@ -29,7 +29,7 @@ final class ChainRunRequestVoTest extends TestCase
             noContextFiles: true,
         );
 
-        self::assertTrue($vo->getNoContextFiles());
+        self::assertTrue($vo->hasNoContextFiles());
     }
 
     #[Test]
@@ -45,7 +45,7 @@ final class ChainRunRequestVoTest extends TestCase
         $result = $vo->withTruncatedContext();
 
         self::assertNotSame($vo, $result);
-        self::assertTrue($result->getNoContextFiles());
+        self::assertTrue($result->hasNoContextFiles());
     }
 
     #[Test]
@@ -61,7 +61,7 @@ final class ChainRunRequestVoTest extends TestCase
         $result = $vo->withTruncatedContext();
 
         self::assertNotSame($vo, $result);
-        self::assertFalse($result->getNoContextFiles());
+        self::assertFalse($result->hasNoContextFiles());
     }
 
     #[Test]
@@ -71,7 +71,7 @@ final class ChainRunRequestVoTest extends TestCase
         $result = $vo->withTruncatedContext();
 
         self::assertSame($vo, $result);
-        self::assertFalse($result->getNoContextFiles());
+        self::assertFalse($result->hasNoContextFiles());
     }
 
     #[Test]

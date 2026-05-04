@@ -15,15 +15,15 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChai
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ConditionOperatorEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionBudgetVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionConditionalChainConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFixIterationGroupVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRoleConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRoleConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStaticChainConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionExpressionVo;
 
 /**
  * Integration-маппер: ChainDefinition.Domain VO → ChainExecution.Domain VO.
@@ -120,7 +120,7 @@ final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionPr
             command: $step->getCommand(),
             label: $step->getLabel(),
             timeoutSeconds: $step->getTimeoutSeconds(),
-            noContextFiles: $step->getNoContextFiles(),
+            noContextFiles: $step->hasNoContextFiles(),
             when: $conditionVo,
             postStep: $step->getPostStep(),
         );

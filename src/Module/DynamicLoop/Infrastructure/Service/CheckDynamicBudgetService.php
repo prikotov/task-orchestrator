@@ -8,8 +8,8 @@ use Override;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Budget\CheckDynamicLoopBudgetServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionWriterInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetCheckVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 
 /**
  * Проверяет бюджет после раунда dynamic-цикла.

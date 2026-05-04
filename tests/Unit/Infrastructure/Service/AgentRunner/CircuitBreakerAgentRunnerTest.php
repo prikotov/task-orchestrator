@@ -344,7 +344,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
                 self::assertSame(120, $request->getTimeout());
                 self::assertSame(30000, $request->getMaxContextLength());
                 self::assertSame(['--verbose'], $request->getRunnerArgs());
-                self::assertTrue($request->getNoContextFiles());
+                self::assertTrue($request->hasNoContextFiles());
 
                 return $fallbackSuccessResult;
             });

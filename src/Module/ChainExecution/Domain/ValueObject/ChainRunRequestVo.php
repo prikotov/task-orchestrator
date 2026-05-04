@@ -111,7 +111,7 @@ final readonly class ChainRunRequestVo
     /**
      * Отключена ли автоматическая загрузка контекстных файлов проекта.
      */
-    public function getNoContextFiles(): bool
+    public function hasNoContextFiles(): bool
     {
         return $this->noContextFiles;
     }

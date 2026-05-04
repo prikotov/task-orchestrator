@@ -7,6 +7,7 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service;
 use Override;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\PromptProviderInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FacilitatorResponseParserInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopAgentServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionWriterInterface;
@@ -14,7 +15,6 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Shared\DynamicLoop
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunRequestVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorResponseVo;
 
 /**
  * Запускает агентов (facilitator/participant) в dynamic-цикле.
@@ -245,7 +245,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
      */
     private function runViaAgentRunner(DynamicLoopRunRequestVo $request): DynamicLoopRunResultVo
     {
-        $chainRequest = new \TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo(
+        $chainRequest = new ChainRunRequestVo(
             role: $request->getRole(),
             task: $request->getTask(),
             systemPrompt: $request->getSystemPrompt(),
@@ -258,7 +258,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             command: $request->getCommand(),
             runnerArgs: $request->getRunnerArgs(),
             runnerName: $request->getRunnerName(),
-            noContextFiles: $request->getNoContextFiles(),
+            noContextFiles: $request->hasNoContextFiles(),
         );
 
         $chainResult = $this->agentRunner->run($chainRequest->withTruncatedContext());

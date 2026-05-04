@@ -1376,9 +1376,9 @@ YAML);
             $chain = $loader->load('nc_step');
 
             // r1: no_context_files = true
-            self::assertTrue($chain->getSteps()[0]->getNoContextFiles());
+            self::assertTrue($chain->getSteps()[0]->hasNoContextFiles());
             // r2: no_context_files = false (default)
-            self::assertFalse($chain->getSteps()[1]->getNoContextFiles());
+            self::assertFalse($chain->getSteps()[1]->hasNoContextFiles());
         } finally {
             unlink($fixturePath);
             rmdir($fixtureDir);
@@ -1405,8 +1405,8 @@ YAML);
             $chain = $loader->load('nc_chain');
 
             // Оба шага наследуют no_context_files от цепочки
-            self::assertTrue($chain->getSteps()[0]->getNoContextFiles());
-            self::assertTrue($chain->getSteps()[1]->getNoContextFiles());
+            self::assertTrue($chain->getSteps()[0]->hasNoContextFiles());
+            self::assertTrue($chain->getSteps()[1]->hasNoContextFiles());
         } finally {
             unlink($fixturePath);
             rmdir($fixtureDir);
@@ -1433,9 +1433,9 @@ YAML);
             $chain = $loader->load('nc_override');
 
             // r1: наследует true от цепочки
-            self::assertTrue($chain->getSteps()[0]->getNoContextFiles());
+            self::assertTrue($chain->getSteps()[0]->hasNoContextFiles());
             // r2: переопределено на false
-            self::assertFalse($chain->getSteps()[1]->getNoContextFiles());
+            self::assertFalse($chain->getSteps()[1]->hasNoContextFiles());
         } finally {
             unlink($fixturePath);
             rmdir($fixtureDir);
@@ -1454,7 +1454,7 @@ YAML);
             $loader = new YamlChainLoader($fixturePath);
             $chain = $loader->load('plain');
 
-            self::assertFalse($chain->getSteps()[0]->getNoContextFiles());
+            self::assertFalse($chain->getSteps()[0]->hasNoContextFiles());
         } finally {
             unlink($fixturePath);
             rmdir($fixtureDir);

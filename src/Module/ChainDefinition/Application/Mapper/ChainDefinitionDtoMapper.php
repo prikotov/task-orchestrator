@@ -7,9 +7,9 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainDefinitionDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainStepDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
 
 /**
  * Маппинг Domain ChainDefinitionInterface → Application ChainDefinitionDto.

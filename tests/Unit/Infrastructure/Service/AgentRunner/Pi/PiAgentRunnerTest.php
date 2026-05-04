@@ -272,7 +272,7 @@ final class PiAgentRunnerTest extends TestCase
             noContextFiles: true,
         );
 
-        self::assertTrue($request->getNoContextFiles());
+        self::assertTrue($request->hasNoContextFiles());
     }
 
     #[Test]
@@ -283,6 +283,6 @@ final class PiAgentRunnerTest extends TestCase
             task: 'task',
         );
 
-        self::assertFalse($request->getNoContextFiles());
+        self::assertFalse($request->hasNoContextFiles());
     }
 }

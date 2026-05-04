@@ -95,7 +95,7 @@ final readonly class PiAgentRunner implements AgentRunnerInterface
         }
 
         // No context files — отключить загрузку AGENTS.md / CLAUDE.md
-        if ($request->getNoContextFiles() && !in_array('-nc', $command, true) && !in_array('-no-context-files', $command, true)) {
+        if ($request->hasNoContextFiles() && !in_array('-nc', $command, true) && !in_array('-no-context-files', $command, true)) {
             $command[] = '-nc';
         }
 

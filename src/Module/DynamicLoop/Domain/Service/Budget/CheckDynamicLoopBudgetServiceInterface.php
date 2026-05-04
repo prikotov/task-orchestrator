@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Budget;
 
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetCheckVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 
 /**
  * Проверяет бюджет после раунда dynamic-цикла.

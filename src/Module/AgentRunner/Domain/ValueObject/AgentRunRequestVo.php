@@ -98,7 +98,7 @@ final readonly class AgentRunRequestVo
     /**
      * Отключена ли автоматическая загрузка контекстных файлов проекта.
      */
-    public function getNoContextFiles(): bool
+    public function hasNoContextFiles(): bool
     {
         return $this->noContextFiles;
     }

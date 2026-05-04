@@ -98,7 +98,7 @@ final readonly class DynamicLoopRunRequestVo
         return $this->runnerName;
     }
 
-    public function getNoContextFiles(): bool
+    public function hasNoContextFiles(): bool
     {
         return $this->noContextFiles;
     }

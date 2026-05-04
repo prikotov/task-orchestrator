@@ -72,7 +72,7 @@ final readonly class ExecuteConditionalStepService implements ExecuteConditional
             timeout: $roleConfig?->getTimeout() ?? $timeout,
             command: $roleConfig?->getCommand() ?? [],
             runnerName: $runnerName,
-            noContextFiles: $noContextFiles || $step->getNoContextFiles(),
+            noContextFiles: $noContextFiles || $step->hasNoContextFiles(),
         );
 
         $start = microtime(true);

@@ -10,7 +10,6 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunReq
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRoleConfigVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\FallbackAttemptVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
@@ -65,7 +64,7 @@ final readonly class ExecuteStaticStepService
             timeout: $roleConfig?->getTimeout() ?? $timeout,
             command: $roleConfig?->getCommand() ?? [],
             runnerName: $runnerName,
-            noContextFiles: $noContextFiles || $step->getNoContextFiles(),
+            noContextFiles: $noContextFiles || $step->hasNoContextFiles(),
         );
 
         $start = microtime(true);
