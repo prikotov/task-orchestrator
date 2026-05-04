@@ -7,24 +7,24 @@ namespace TaskOrchestrator\Tests\Unit\Domain\Service\Chain\Dynamic;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Entity\DynamicLoopExecution;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Budget\CheckDynamicBudgetServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetService;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicBudgetCheckVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetService;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Budget\CheckDynamicLoopBudgetServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetCheckVo;
 
 #[CoversClass(CheckDynamicLoopBudgetService::class)]
 final class CheckDynamicLoopBudgetServiceTest extends TestCase
 {
-    private CheckDynamicBudgetServiceInterface $budgetChecker;
-    private ChainSessionLoggerInterface $sessionLogger;
+    private CheckDynamicLoopBudgetServiceInterface $budgetChecker;
+    private DynamicLoopSessionLoggerInterface $sessionLogger;
     private CheckDynamicLoopBudgetService $service;
 
     protected function setUp(): void
     {
-        $this->budgetChecker = $this->createMock(CheckDynamicBudgetServiceInterface::class);
-        $this->sessionLogger = $this->createMock(ChainSessionLoggerInterface::class);
+        $this->budgetChecker = $this->createMock(CheckDynamicLoopBudgetServiceInterface::class);
+        $this->sessionLogger = $this->createMock(DynamicLoopSessionLoggerInterface::class);
         $this->service = new CheckDynamicLoopBudgetService(
             $this->budgetChecker,
             $this->sessionLogger,
@@ -49,7 +49,7 @@ final class CheckDynamicLoopBudgetServiceTest extends TestCase
     public function checkAndApplyDelegatesToBudgetChecker(): void
     {
         $execution = new DynamicLoopExecution();
-        $budget = new BudgetVo(maxCostTotal: 10.0);
+        $budget = new DynamicLoopBudgetVo(maxCostTotal: 10.0);
         $budgetCheck = new DynamicBudgetCheckVo(
             shouldBreak: false,
             warning80Triggered: false,
@@ -76,7 +76,7 @@ final class CheckDynamicLoopBudgetServiceTest extends TestCase
     public function checkAndApplyMarksWarning80WhenTriggered(): void
     {
         $execution = new DynamicLoopExecution();
-        $budget = new BudgetVo(maxCostTotal: 10.0);
+        $budget = new DynamicLoopBudgetVo(maxCostTotal: 10.0);
         $budgetCheck = new DynamicBudgetCheckVo(
             shouldBreak: false,
             warning80Triggered: true,
@@ -95,7 +95,7 @@ final class CheckDynamicLoopBudgetServiceTest extends TestCase
     public function checkAndApplyWritesJournalWhenWarningMessage(): void
     {
         $execution = new DynamicLoopExecution();
-        $budget = new BudgetVo(maxCostTotal: 10.0);
+        $budget = new DynamicLoopBudgetVo(maxCostTotal: 10.0);
         $budgetCheck = new DynamicBudgetCheckVo(
             shouldBreak: false,
             warningMessage: '80% budget warning',
@@ -115,7 +115,7 @@ final class CheckDynamicLoopBudgetServiceTest extends TestCase
     public function checkAndApplyReturnsBreakResultWhenBudgetExceeded(): void
     {
         $execution = new DynamicLoopExecution();
-        $budget = new BudgetVo(maxCostTotal: 10.0);
+        $budget = new DynamicLoopBudgetVo(maxCostTotal: 10.0);
         $budgetCheck = new DynamicBudgetCheckVo(
             shouldBreak: true,
             budgetExceeded: true,
@@ -137,7 +137,7 @@ final class CheckDynamicLoopBudgetServiceTest extends TestCase
     public function checkAndApplyDoesNotWriteWhenNoWarningMessage(): void
     {
         $execution = new DynamicLoopExecution();
-        $budget = new BudgetVo(maxCostTotal: 10.0);
+        $budget = new DynamicLoopBudgetVo(maxCostTotal: 10.0);
         $budgetCheck = new DynamicBudgetCheckVo(
             shouldBreak: false,
             warningMessage: '',

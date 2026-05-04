@@ -8,26 +8,24 @@ use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Entity\DynamicLoopExecution;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Budget\CheckDynamicBudgetServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetService;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\CheckDynamicLoopBudgetServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\ExecuteDynamicTurnService;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\FormatDynamicJournalServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\RecordDynamicRoundServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\RunDynamicLoopAgentServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunResultVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainTurnResultVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicBudgetCheckVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainContextVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FacilitatorResponseVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\TurnBreakVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\TurnContinueVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\ExecuteDynamicTurnService;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FormatDynamicJournalServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RecordDynamicRoundServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopAgentServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetCheckVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRoleConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPromptConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorResponseVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnBreakVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnContinueVo;
 
 #[CoversClass(ExecuteDynamicTurnService::class)]
 final class ExecuteDynamicTurnServiceTest extends TestCase
@@ -35,7 +33,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     private RunDynamicLoopAgentServiceInterface $agentRunner;
     private RecordDynamicRoundServiceInterface $roundRecorder;
     private FormatDynamicJournalServiceInterface $journal;
-    private ChainSessionLoggerInterface $sessionLogger;
+    private DynamicLoopSessionLoggerInterface $sessionLogger;
     private CheckDynamicLoopBudgetServiceInterface $budgetChecker;
     private ExecuteDynamicTurnService $service;
 
@@ -44,7 +42,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         $this->agentRunner = $this->createMock(RunDynamicLoopAgentServiceInterface::class);
         $this->roundRecorder = $this->createMock(RecordDynamicRoundServiceInterface::class);
         $this->journal = $this->createMock(FormatDynamicJournalServiceInterface::class);
-        $this->sessionLogger = $this->createMock(ChainSessionLoggerInterface::class);
+        $this->sessionLogger = $this->createMock(DynamicLoopSessionLoggerInterface::class);
         $this->budgetChecker = $this->createMock(CheckDynamicLoopBudgetServiceInterface::class);
 
         $this->service = new ExecuteDynamicTurnService(
@@ -61,7 +59,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function resolveRunnerReturnsFirstCommandElement(): void
     {
-        $config = new RoleConfigVo(command: ['pi', '--model', 'gpt-4'], timeout: 60);
+        $config = new DynamicLoopRoleConfigVo(command: ['pi', '--model', 'gpt-4'], timeout: 60);
 
         self::assertSame('pi', ExecuteDynamicTurnService::resolveRunner($config));
     }
@@ -78,7 +76,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function resolveRunnerThrowsOnEmptyCommand(): void
     {
-        $config = new RoleConfigVo(command: [], timeout: 60);
+        $config = new DynamicLoopRoleConfigVo(command: [], timeout: 60);
 
         $this->expectException(LogicException::class);
 
@@ -88,7 +86,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function resolveRunnerThrowsOnEmptyFirstElement(): void
     {
-        $config = new RoleConfigVo(command: ['', '--model'], timeout: 60);
+        $config = new DynamicLoopRoleConfigVo(command: ['', '--model'], timeout: 60);
 
         $this->expectException(LogicException::class);
 
@@ -100,7 +98,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function runFacilitatorTurnReturnsContinueWhenNextRole(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['architect']);
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
         $context = $this->createContext('facilitator', ['architect']);
         $execution = new DynamicLoopExecution();
         $execution->advanceStep();
@@ -129,7 +127,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function runFacilitatorTurnReturnsBreakOnBudgetExceeded(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['architect']);
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
         $context = $this->createContext('facilitator', ['architect']);
         $execution = new DynamicLoopExecution();
         $execution->advanceStep();
@@ -153,7 +151,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         $this->budgetChecker->method('checkAndApply')->willReturn($budgetCheck);
 
         $result = $this->service->runFacilitatorTurn(
-            $chain, $context, $execution, new BudgetVo(maxCostTotal: 5.0), null,
+            $chain, $context, $execution, new DynamicLoopBudgetVo(maxCostTotal: 5.0), null,
         );
 
         self::assertInstanceOf(TurnBreakVo::class, $result);
@@ -164,7 +162,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function runFacilitatorTurnReturnsBreakOnAgentError(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['architect']);
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
         $context = $this->createContext('facilitator', ['architect']);
         $execution = new DynamicLoopExecution();
         $execution->advanceStep();
@@ -193,7 +191,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function runFacilitatorTurnReturnsBreakWithSynthesisWhenDone(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['architect']);
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
         $context = $this->createContext('facilitator', ['architect']);
         $execution = new DynamicLoopExecution();
         $execution->advanceStep();
@@ -221,7 +219,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function runFacilitatorTurnReturnsTimeoutBreak(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['architect']);
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
         $context = $this->createContext('facilitator', ['architect']);
         $execution = new DynamicLoopExecution();
         $execution->advanceStep();
@@ -252,7 +250,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function runParticipantTurnReturnsContinueWhenNoNextRole(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['architect']);
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
         $context = $this->createContext('facilitator', ['architect']);
         $execution = new DynamicLoopExecution();
 
@@ -267,7 +265,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function runParticipantTurnReturnsContinueWhenRoleNotInParticipants(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['architect']);
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
         $context = $this->createContext('facilitator', ['architect']);
         $execution = new DynamicLoopExecution();
 
@@ -281,7 +279,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function runParticipantTurnReturnsContinueWhenMaxRoundsExceeded(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['architect']);
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
         $context = $this->createContext('facilitator', ['architect'], maxRounds: 0);
         $execution = new DynamicLoopExecution();
 
@@ -295,7 +293,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function runParticipantTurnReturnsBreakOnBudgetExceeded(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['architect']);
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
         $context = $this->createContext('facilitator', ['architect']);
         $execution = new DynamicLoopExecution();
 
@@ -314,7 +312,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         $this->budgetChecker->method('checkAndApply')->willReturn($budgetCheck);
 
         $result = $this->service->runParticipantTurn(
-            $chain, $context, $execution, new BudgetVo(maxCostTotal: 1.0), null, 'architect', null,
+            $chain, $context, $execution, new DynamicLoopBudgetVo(maxCostTotal: 1.0), null, 'architect', null,
         );
 
         self::assertInstanceOf(TurnBreakVo::class, $result);
@@ -324,7 +322,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function runParticipantTurnReturnsBreakOnAgentError(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['architect']);
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
         $context = $this->createContext('facilitator', ['architect']);
         $execution = new DynamicLoopExecution();
 
@@ -350,7 +348,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function runParticipantTurnReturnsContinueOnSuccess(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['architect']);
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
         $context = $this->createContext('facilitator', ['architect']);
         $execution = new DynamicLoopExecution();
 
@@ -377,13 +375,13 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function toRoundResultVoMapsAllFields(): void
     {
-        $agentResult = ChainRunResultVo::createFromSuccess(
+        $agentResult = DynamicLoopRunResultVo::createFromSuccess(
             outputText: 'Hello',
             inputTokens: 100,
             outputTokens: 50,
             cost: 0.05,
         );
-        $turnResult = new ChainTurnResultVo(
+        $turnResult = new DynamicLoopTurnResultVo(
             agentResult: $agentResult,
             duration: 2.5,
             userPrompt: 'prompt',
@@ -409,10 +407,10 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
 
     // ─── Helpers ───────────────────────────────────────────────────────
 
-    private function createSuccessTurnResult(string $output): ChainTurnResultVo
+    private function createSuccessTurnResult(string $output): DynamicLoopTurnResultVo
     {
-        return new ChainTurnResultVo(
-            agentResult: ChainRunResultVo::createFromSuccess(
+        return new DynamicLoopTurnResultVo(
+            agentResult: DynamicLoopRunResultVo::createFromSuccess(
                 outputText: $output,
                 inputTokens: 100,
                 outputTokens: 50,
@@ -422,18 +420,18 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         );
     }
 
-    private function createErrorTurnResult(string $errorMessage): ChainTurnResultVo
+    private function createErrorTurnResult(string $errorMessage): DynamicLoopTurnResultVo
     {
-        return new ChainTurnResultVo(
-            agentResult: ChainRunResultVo::createFromError($errorMessage),
+        return new DynamicLoopTurnResultVo(
+            agentResult: DynamicLoopRunResultVo::createFromError($errorMessage),
             duration: 1.0,
         );
     }
 
-    private function createTimedOutTurnResult(): ChainTurnResultVo
+    private function createTimedOutTurnResult(): DynamicLoopTurnResultVo
     {
-        return new ChainTurnResultVo(
-            agentResult: ChainRunResultVo::createFromError('Timed out', timedOut: true),
+        return new DynamicLoopTurnResultVo(
+            agentResult: DynamicLoopRunResultVo::createFromError('Timed out', timedOut: true),
             duration: 60.0,
         );
     }
@@ -441,30 +439,32 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     /**
      * @param list<string> $participants
      */
-    private function createDynamicChain(
+    private function createDynamicConfig(
         string $name,
         string $facilitator,
         array $participants,
-    ): DynamicChainDefinitionVo {
+    ): DynamicLoopConfigVo {
         $roles = [];
         foreach (array_merge([$facilitator], $participants) as $role) {
-            $roles[$role] = new RoleConfigVo(command: ['pi', '--model', 'gpt-4'], timeout: 60);
+            $roles[$role] = new DynamicLoopRoleConfigVo(command: ['pi', '--model', 'gpt-4'], timeout: 60);
         }
 
-        return DynamicChainDefinitionVo::create(
+        return DynamicLoopConfigVo::create(
             name: $name,
             description: '',
             facilitator: $facilitator,
             participants: $participants,
             maxRounds: 10,
-            brainstormSystemPrompt: 'sys',
-            facilitatorAppendPrompt: 'fac_append %s',
-            facilitatorStartPrompt: 'start %s',
-            facilitatorContinuePrompt: 'cont %s %s %s',
-            facilitatorFinalizePrompt: 'final %s %s',
-            participantAppendPrompt: 'part_append %s',
-            participantUserPrompt: 'ctx %s %s',
-            roles: $roles,
+            promptConfiguration: new DynamicLoopPromptConfigVo(
+                brainstormSystemPrompt: 'sys',
+                facilitatorAppendPrompt: 'fac_append %s',
+                facilitatorStartPrompt: 'start %s',
+                facilitatorContinuePrompt: 'cont %s %s %s',
+                facilitatorFinalizePrompt: 'final %s %s',
+                participantAppendPrompt: 'part_append %s',
+                participantUserPrompt: 'ctx %s %s',
+            ),
+            roleConfigs: $roles,
         );
     }
 
@@ -475,16 +475,13 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         string $facilitator,
         array $participants,
         int $maxRounds = 10,
-    ): DynamicChainContextVo {
-        return new DynamicChainContextVo(
-            topic: 'Test topic',
+    ): DynamicLoopContextVo {
+        return new DynamicLoopContextVo(
             facilitatorRole: $facilitator,
             participants: $participants,
             maxRounds: $maxRounds,
-            maxTime: null,
-            timeout: 600,
-            workingDir: '/tmp/test',
-            promptConfiguration: new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\PromptConfigurationVo(
+            topic: 'Test topic',
+            promptConfiguration: new DynamicLoopPromptConfigVo(
                 brainstormSystemPrompt: 'sys',
                 facilitatorAppendPrompt: 'fac_append %s',
                 facilitatorStartPrompt: 'start %s',
@@ -493,6 +490,8 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
                 participantAppendPrompt: 'part_append %s',
                 participantUserPrompt: 'ctx %s %s',
             ),
+            workingDir: '/tmp/test',
+            timeout: 600,
         );
     }
 }

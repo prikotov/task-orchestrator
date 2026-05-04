@@ -8,32 +8,34 @@ use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\DynamicExecutionStrategy;
+use TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DynamicExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Audit\AuditLoggerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\BuildDynamicContextService;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\BuildDynamicContextServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\RunDynamicLoopServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\SessionCompletedNotifierInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerFactoryInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextService;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\SessionCompletedNotifierInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainSessionStateVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainContextVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicLoopResultVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicRoundResultVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\PromptConfigurationVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSessionStateVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPromptConfigVo;
 
 #[CoversClass(DynamicExecutionStrategy::class)]
 final class DynamicExecutionStrategyTest extends TestCase
 {
     private RunDynamicLoopServiceInterface $dynamicLoopRunner;
     private BuildDynamicContextServiceInterface $contextBuilder;
-    private ChainSessionLoggerInterface $sessionLogger;
-    private AuditLoggerFactoryInterface $auditLoggerFactory;
+    private DynamicLoopSessionLoggerInterface $sessionLogger;
+    private DynamicLoopAuditLoggerFactoryInterface $auditLoggerFactory;
     private SessionCompletedNotifierInterface $sessionNotifier;
     private DynamicExecutionStrategy $strategy;
 
@@ -41,8 +43,8 @@ final class DynamicExecutionStrategyTest extends TestCase
     {
         $this->dynamicLoopRunner = $this->createMock(RunDynamicLoopServiceInterface::class);
         $this->contextBuilder = new BuildDynamicContextService();
-        $this->sessionLogger = $this->createMock(ChainSessionLoggerInterface::class);
-        $this->auditLoggerFactory = $this->createMock(AuditLoggerFactoryInterface::class);
+        $this->sessionLogger = $this->createMock(DynamicLoopSessionLoggerInterface::class);
+        $this->auditLoggerFactory = $this->createMock(DynamicLoopAuditLoggerFactoryInterface::class);
         $this->sessionNotifier = $this->createMock(SessionCompletedNotifierInterface::class);
 
         $this->sessionLogger->method('startSession')->willReturn('/tmp/test-session');
@@ -149,8 +151,8 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedContext = null;
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
-                DynamicChainDefinitionVo $chain,
-                DynamicChainContextVo $context,
+                DynamicLoopConfigVo $config,
+                DynamicLoopContextVo $context,
             ) use (
                 &$capturedContext,
                 $loopResult,
@@ -195,8 +197,8 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTopic = null;
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
-                DynamicChainDefinitionVo $chain,
-                DynamicChainContextVo $context,
+                DynamicLoopConfigVo $config,
+                DynamicLoopContextVo $context,
             ) use (
                 &$capturedTopic,
                 $loopResult,
@@ -358,8 +360,8 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
-                DynamicChainDefinitionVo $c,
-                DynamicChainContextVo $context,
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $context,
             ) use (
                 &$capturedTimeout,
                 $loopResult,
@@ -401,8 +403,8 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
-                DynamicChainDefinitionVo $c,
-                DynamicChainContextVo $context,
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $context,
             ) use (
                 &$capturedTimeout,
                 $loopResult,
@@ -444,8 +446,8 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')->willReturnCallback(
             function (
-                DynamicChainDefinitionVo $c,
-                DynamicChainContextVo $context,
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $context,
             ) use (
                 &$capturedTimeout,
                 $loopResult,
@@ -470,7 +472,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     public function executeCreatesAuditLoggerFromSessionDir(): void
     {
         $sessionDir = '/tmp/test-session';
-        $auditLogger = $this->createMock(AuditLoggerInterface::class);
+        $auditLogger = $this->createMock(DynamicLoopAuditLoggerInterface::class);
 
         $chain = $this->createDynamicChain(
             name: 'audit-dynamic',
@@ -485,12 +487,12 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedLogger = null;
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                DynamicChainDefinitionVo $c,
-                DynamicChainContextVo $ctx,
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
                 string $journal = '',
-                ?AuditLoggerInterface $logger = null,
+                ?DynamicLoopAuditLoggerInterface $logger = null,
             ) use (&$capturedLogger): DynamicLoopResultVo {
                 $capturedLogger = $logger;
 
@@ -525,12 +527,12 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedLogger = 'not-null';
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                DynamicChainDefinitionVo $c,
-                DynamicChainContextVo $ctx,
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
                 string $journal = '',
-                ?AuditLoggerInterface $logger = null,
+                ?DynamicLoopAuditLoggerInterface $logger = null,
             ) use (&$capturedLogger): DynamicLoopResultVo {
                 $capturedLogger = $logger;
 
@@ -579,7 +581,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     {
         $chain = $this->createDynamicChain('brainstorm', 'facilitator', ['participant'], 5);
 
-        $state = new ChainSessionStateVo(
+        $state = new DynamicLoopSessionStateVo(
             topic: 'Resumed topic',
             facilitator: 'facilitator',
             participants: ['participant'],
@@ -607,12 +609,12 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedJournal = '';
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                DynamicChainDefinitionVo $c,
-                DynamicChainContextVo $ctx,
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
                 string $journal = '',
-                ?AuditLoggerInterface $auditLogger = null,
+                ?DynamicLoopAuditLoggerInterface $auditLogger = null,
             ) use (
                 &$capturedStartRound,
                 &$capturedHistory,
@@ -649,7 +651,7 @@ final class DynamicExecutionStrategyTest extends TestCase
             timeout: 600,
         );
 
-        $state = new ChainSessionStateVo(
+        $state = new DynamicLoopSessionStateVo(
             topic: 'Resumed topic',
             facilitator: 'facilitator',
             participants: ['participant'],
@@ -675,12 +677,12 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                DynamicChainDefinitionVo $c,
-                DynamicChainContextVo $ctx,
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
                 string $journal = '',
-                ?AuditLoggerInterface $auditLogger = null,
+                ?DynamicLoopAuditLoggerInterface $auditLogger = null,
             ) use (
                 &$capturedTimeout,
                 $loopResult,
@@ -709,7 +711,7 @@ final class DynamicExecutionStrategyTest extends TestCase
             timeout: 600,
         );
 
-        $state = new ChainSessionStateVo(
+        $state = new DynamicLoopSessionStateVo(
             topic: 'Resumed topic',
             facilitator: 'facilitator',
             participants: ['participant'],
@@ -735,12 +737,12 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                DynamicChainDefinitionVo $c,
-                DynamicChainContextVo $ctx,
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
                 string $journal = '',
-                ?AuditLoggerInterface $auditLogger = null,
+                ?DynamicLoopAuditLoggerInterface $auditLogger = null,
             ) use (
                 &$capturedTimeout,
                 $loopResult,
@@ -769,7 +771,7 @@ final class DynamicExecutionStrategyTest extends TestCase
             participants: ['participant'],
         );
 
-        $state = new ChainSessionStateVo(
+        $state = new DynamicLoopSessionStateVo(
             topic: 'Resumed topic',
             facilitator: 'facilitator',
             participants: ['participant'],
@@ -795,12 +797,12 @@ final class DynamicExecutionStrategyTest extends TestCase
         $capturedTimeout = null;
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                DynamicChainDefinitionVo $c,
-                DynamicChainContextVo $ctx,
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
                 string $journal = '',
-                ?AuditLoggerInterface $auditLogger = null,
+                ?DynamicLoopAuditLoggerInterface $auditLogger = null,
             ) use (
                 &$capturedTimeout,
                 $loopResult,
@@ -824,7 +826,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     {
         $chain = $this->createDynamicChain('brainstorm', 'facilitator', ['participant'], 5);
 
-        $state = new ChainSessionStateVo(
+        $state = new DynamicLoopSessionStateVo(
             topic: 'Resumed topic',
             facilitator: 'facilitator',
             participants: ['participant'],
@@ -837,7 +839,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $this->sessionLogger->method('resumeSession');
         $this->sessionLogger->method('getResumedState')->willReturn($state);
 
-        $auditLogger = $this->createMock(AuditLoggerInterface::class);
+        $auditLogger = $this->createMock(DynamicLoopAuditLoggerInterface::class);
         $this->auditLoggerFactory->method('create')
             ->with('/tmp/resume-dir/audit.jsonl')
             ->willReturn($auditLogger);
@@ -854,12 +856,12 @@ final class DynamicExecutionStrategyTest extends TestCase
         );
         $this->dynamicLoopRunner->method('execute')
             ->willReturnCallback(function (
-                DynamicChainDefinitionVo $c,
-                DynamicChainContextVo $ctx,
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
                 int $startRound = 0,
                 string $history = '',
                 string $journal = '',
-                ?AuditLoggerInterface $logger = null,
+                ?DynamicLoopAuditLoggerInterface $logger = null,
             ) use (
                 &$capturedLogger,
                 $loopResult,

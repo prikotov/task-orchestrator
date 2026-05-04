@@ -7,27 +7,27 @@ namespace TaskOrchestrator\Tests\Unit\Domain\Service\Chain\Dynamic;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Entity\DynamicLoopExecution;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\ExecuteDynamicTurnServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\FinalizeDynamicLoopService;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\FormatDynamicJournalServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Session\ChainSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\FacilitatorResponseParserInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunResultVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainTurnResultVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainContextVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FacilitatorResponseVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\PromptConfigurationVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Dto\DynamicLoopAuditDto;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\ExecuteDynamicTurnServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FinalizeDynamicLoopService;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FormatDynamicJournalServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FacilitatorResponseParserInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRoleConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPromptConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorResponseVo;
 
 #[CoversClass(FinalizeDynamicLoopService::class)]
 final class FinalizeDynamicLoopServiceTest extends TestCase
 {
     private ExecuteDynamicTurnServiceInterface $turnExecutor;
     private FormatDynamicJournalServiceInterface $journal;
-    private ChainSessionLoggerInterface $sessionLogger;
+    private DynamicLoopSessionLoggerInterface $sessionLogger;
     private FacilitatorResponseParserInterface $facParser;
     private FinalizeDynamicLoopService $service;
 
@@ -35,7 +35,7 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
     {
         $this->turnExecutor = $this->createMock(ExecuteDynamicTurnServiceInterface::class);
         $this->journal = $this->createMock(FormatDynamicJournalServiceInterface::class);
-        $this->sessionLogger = $this->createMock(ChainSessionLoggerInterface::class);
+        $this->sessionLogger = $this->createMock(DynamicLoopSessionLoggerInterface::class);
         $this->facParser = $this->createMock(FacilitatorResponseParserInterface::class);
         $this->service = new FinalizeDynamicLoopService(
             $this->turnExecutor,
@@ -50,7 +50,7 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
     #[Test]
     public function executeFinalizeTurnAdvancesStepAndRound(): void
     {
-        $chain = $this->createChain();
+        $chain = $this->createConfig();
         $context = $this->createContext();
         $execution = new DynamicLoopExecution();
 
@@ -73,7 +73,7 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
     #[Test]
     public function executeFinalizeTurnSetsSynthesisFromParsedResponse(): void
     {
-        $chain = $this->createChain();
+        $chain = $this->createConfig();
         $context = $this->createContext();
         $execution = new DynamicLoopExecution();
 
@@ -92,7 +92,7 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
     #[Test]
     public function executeFinalizeTurnFallsBackToRawTextWhenNoSynthesis(): void
     {
-        $chain = $this->createChain();
+        $chain = $this->createConfig();
         $context = $this->createContext();
         $execution = new DynamicLoopExecution();
 
@@ -112,7 +112,7 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
     #[Test]
     public function executeFinalizeTurnWritesJournalEntry(): void
     {
-        $chain = $this->createChain();
+        $chain = $this->createConfig();
         $context = $this->createContext();
         $execution = new DynamicLoopExecution();
 
@@ -167,7 +167,7 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
 
         $dto = $this->service->buildChainAuditDto('test_chain', $startTime, $execution);
 
-        self::assertInstanceOf(ChainResultAuditDto::class, $dto);
+        self::assertInstanceOf(DynamicLoopAuditDto::class, $dto);
         self::assertSame('test_chain', $dto->chainName);
         self::assertGreaterThanOrEqual(5000.0, $dto->totalDurationMs);
         self::assertSame(0, $dto->stepsCount);
@@ -190,10 +190,10 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
 
     // ─── Helpers ───────────────────────────────────────────────────────
 
-    private function createSuccessTurnResult(string $output): ChainTurnResultVo
+    private function createSuccessTurnResult(string $output): DynamicLoopTurnResultVo
     {
-        return new ChainTurnResultVo(
-            agentResult: ChainRunResultVo::createFromSuccess(
+        return new DynamicLoopTurnResultVo(
+            agentResult: DynamicLoopRunResultVo::createFromSuccess(
                 outputText: $output,
                 inputTokens: 200,
                 outputTokens: 100,
@@ -203,38 +203,15 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
         );
     }
 
-    private function createChain(): DynamicChainDefinitionVo
+    private function createConfig(): DynamicLoopConfigVo
     {
-        return DynamicChainDefinitionVo::create(
+        return DynamicLoopConfigVo::create(
             name: 'test',
             description: '',
             facilitator: 'facilitator',
             participants: ['architect'],
             maxRounds: 10,
-            brainstormSystemPrompt: 'sys',
-            facilitatorAppendPrompt: 'fac_append %s',
-            facilitatorStartPrompt: 'start %s',
-            facilitatorContinuePrompt: 'cont %s %s %s',
-            facilitatorFinalizePrompt: 'final %s %s',
-            participantAppendPrompt: 'part_append %s',
-            participantUserPrompt: 'ctx %s %s',
-            roles: [
-                'facilitator' => new RoleConfigVo(command: ['pi', '--model', 'gpt-4'], timeout: 60),
-            ],
-        );
-    }
-
-    private function createContext(): DynamicChainContextVo
-    {
-        return new DynamicChainContextVo(
-            topic: 'Test topic',
-            facilitatorRole: 'facilitator',
-            participants: ['architect'],
-            maxRounds: 10,
-            maxTime: null,
-            timeout: 600,
-            workingDir: '/tmp/test',
-            promptConfiguration: new PromptConfigurationVo(
+            promptConfiguration: new DynamicLoopPromptConfigVo(
                 brainstormSystemPrompt: 'sys',
                 facilitatorAppendPrompt: 'fac_append %s',
                 facilitatorStartPrompt: 'start %s',
@@ -243,6 +220,30 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
                 participantAppendPrompt: 'part_append %s',
                 participantUserPrompt: 'ctx %s %s',
             ),
+            roleConfigs: [
+                'facilitator' => new DynamicLoopRoleConfigVo(command: ['pi', '--model', 'gpt-4'], timeout: 60),
+            ],
+        );
+    }
+
+    private function createContext(): DynamicLoopContextVo
+    {
+        return new DynamicLoopContextVo(
+            facilitatorRole: 'facilitator',
+            participants: ['architect'],
+            maxRounds: 10,
+            topic: 'Test topic',
+            promptConfiguration: new DynamicLoopPromptConfigVo(
+                brainstormSystemPrompt: 'sys',
+                facilitatorAppendPrompt: 'fac_append %s',
+                facilitatorStartPrompt: 'start %s',
+                facilitatorContinuePrompt: 'cont %s %s %s',
+                facilitatorFinalizePrompt: 'final %s %s',
+                participantAppendPrompt: 'part_append %s',
+                participantUserPrompt: 'ctx %s %s',
+            ),
+            workingDir: '/tmp/test',
+            timeout: 600,
         );
     }
 }

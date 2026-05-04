@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\ChainSessionFileStorage;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\ChainSessionLogger;
+use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionFileStorage;
+use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\ChainSessionReader;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\ChainSessionWriter;
 use PHPUnit\Framework\Attributes\CoversClass;
