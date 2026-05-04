@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition;
 
+use Override;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
@@ -39,6 +40,7 @@ final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionPr
     ) {
     }
 
+    #[Override]
     public function loadStaticChainConfig(string $chainName): ExecutionStaticChainConfigVo
     {
         $chain = $this->chainLoader->load($chainName);
@@ -47,6 +49,7 @@ final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionPr
         return $this->mapStaticChain($chain);
     }
 
+    #[Override]
     public function loadConditionalChainConfig(string $chainName): ExecutionConditionalChainConfigVo
     {
         $chain = $this->chainLoader->load($chainName);

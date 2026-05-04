@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\Agen
 
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommand;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentResultDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 
@@ -26,7 +26,7 @@ final readonly class AgentDtoMapper
      */
     public function mapToRunAgentCommand(
         ChainRunRequestVo $vo,
-        ?ChainRetryPolicyVo $retryPolicy = null,
+        ?ExecutionRetryPolicyVo $retryPolicy = null,
     ): RunAgentCommand {
         $runnerName = $vo->getRunnerName();
         if (($runnerName === null || $runnerName === '') && $vo->getCommand() !== []) {

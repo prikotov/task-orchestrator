@@ -248,7 +248,7 @@ final class StaticChainExecution
      * @techdebt 2026-04-09: retry всегда, пока iteration < max.
      * Реализовать анализ вывода reviewer (regex/classifier) для условного retry.
      */
-    public function shouldRetryGroup(?ExecutionExecutionFixIterationGroupVo $group): bool
+    public function shouldRetryGroup(?ExecutionFixIterationGroupVo $group): bool
     {
         if ($group === null) {
             return false;

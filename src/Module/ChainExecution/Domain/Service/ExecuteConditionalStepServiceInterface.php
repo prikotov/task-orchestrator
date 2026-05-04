@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service;
 
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionalStepResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRoleConfigVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 
 /**
  * Integration Service: выполнение одного шага conditional-цепочки.
@@ -20,12 +20,12 @@ interface ExecuteConditionalStepServiceInterface
      * Выполняет один шаг conditional-цепочки (agent или quality gate).
      */
     public function executeStep(
-        ChainStepVo $step,
+        ExecutionStepVo $step,
         string $task,
         ?string $workingDir,
         int $timeout,
         ?string $previousContext,
-        ?RoleConfigVo $roleConfig,
+        ?ExecutionRoleConfigVo $roleConfig,
         bool $noContextFiles,
     ): ConditionalStepResultVo;
 }

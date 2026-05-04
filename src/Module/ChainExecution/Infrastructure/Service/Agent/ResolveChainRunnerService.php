@@ -6,13 +6,13 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service;
 
 use Override;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\FormatPromptServiceInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ResolveChainRunnerServiceInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\FallbackConfigVo;
 
 /**
  * Резолвит fallback runner при ошибке основного.
@@ -31,10 +31,10 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
 
     #[Override]
     public function tryFallbackRunner(
-        FallbackConfigVo $fallbackConfig,
+        ExecutionFallbackConfigVo $fallbackConfig,
         string $role,
         string $primaryRunnerName,
-        ?ChainRetryPolicyVo $retryPolicy,
+        ?ExecutionRetryPolicyVo $retryPolicy,
         ChainRunRequestVo $primaryRequest,
         ?string $promptFile = null,
     ): ?ChainRunResultVo {

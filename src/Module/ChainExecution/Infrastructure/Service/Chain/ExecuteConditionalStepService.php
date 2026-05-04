@@ -11,9 +11,9 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ExecuteConditio
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionalStepResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRoleConfigVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 
 /**
  * Infrastructure Service: выполнение одного шага conditional-цепочки.
@@ -33,12 +33,12 @@ final readonly class ExecuteConditionalStepService implements ExecuteConditional
 
     #[Override]
     public function executeStep(
-        ChainStepVo $step,
+        ExecutionStepVo $step,
         string $task,
         ?string $workingDir,
         int $timeout,
         ?string $previousContext,
-        ?RoleConfigVo $roleConfig,
+        ?ExecutionRoleConfigVo $roleConfig,
         bool $noContextFiles,
     ): ConditionalStepResultVo {
         return $step->isQualityGate()
@@ -47,12 +47,12 @@ final readonly class ExecuteConditionalStepService implements ExecuteConditional
     }
 
     private function runAgentStep(
-        ChainStepVo $step,
+        ExecutionStepVo $step,
         string $task,
         ?string $workingDir,
         int $timeout,
         ?string $previousContext,
-        ?RoleConfigVo $roleConfig,
+        ?ExecutionRoleConfigVo $roleConfig,
         bool $noContextFiles,
     ): ConditionalStepResultVo {
         $role = $step->getRole() ?? '';
@@ -82,7 +82,7 @@ final readonly class ExecuteConditionalStepService implements ExecuteConditional
         return $this->toStepResult($role, $runnerName, $result, $duration);
     }
 
-    private function runQualityGate(ChainStepVo $step): ConditionalStepResultVo
+    private function runQualityGate(ExecutionStepVo $step): ConditionalStepResultVo
     {
         $command = $step->getCommand();
         $label = $step->getLabel();

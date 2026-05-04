@@ -11,6 +11,9 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject;
  */
 final readonly class ExecutionRoleConfigVo
 {
+    /**
+     * @param list<string> $command
+     */
     public function __construct(
         private array $command = [],
         private ?int $timeout = null,
