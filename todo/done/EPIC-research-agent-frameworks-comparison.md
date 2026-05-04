@@ -86,6 +86,10 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 - [x] [TASK-research-paperclip-ai](TASK-research-paperclip-ai.todo.md) — Paperclip AI
 - [x] [TASK-research-agentcraft](TASK-research-agentcraft.todo.md) — AgentCraft
 
+### Этап 1c: Дополнительные исследования (2026-05-04)
+
+- [ ] [TASK-research-sandcastle](../TASK-research-sandcastle.todo.md) — Sandcastle (Matt Pocock)
+
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
 - [x] [TASK-research-agent-frameworks-summary](done/TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
