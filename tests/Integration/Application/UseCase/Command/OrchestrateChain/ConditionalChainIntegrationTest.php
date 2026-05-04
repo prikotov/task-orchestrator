@@ -9,28 +9,29 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ConditionalExecutionStrategy;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\StaticExecutionStrategy;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Shared\PromptFormatterInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Condition\EvaluateConditionService;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Condition\EvaluateConditionServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\ExecuteConditionalStepServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunResultVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\ExecuteConditionalStepService;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ConditionalExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Shared\PromptFormatterInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ExecuteConditionalStepServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStaticStepService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunStaticChainService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\ConditionalStepService;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader;
-use TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainService;
-use TaskOrchestrator\Common\Module\StaticExecution\Application\Service\ExecuteStaticChainServiceInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\CheckStaticBudgetServiceInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ExecuteStaticStepService;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\FormatPromptServiceInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\ResolveChainRunnerServiceInterface;
-use TaskOrchestrator\Common\Module\StaticExecution\Domain\Service\RunStaticChainService;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Hook\HookExecutorInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\HookResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapper;
 
 /**
  * Integration-тест: conditional chain end-to-end.
@@ -55,7 +56,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\HookResult
 #[CoversClass(OrchestrateChainCommandHandler::class)]
 #[CoversClass(ConditionalExecutionStrategy::class)]
 #[CoversClass(EvaluateConditionService::class)]
-#[CoversClass(ExecuteConditionalStepService::class)]
+#[CoversClass(ConditionalStepService::class)]
 #[CoversClass(YamlChainLoader::class)]
 final class ConditionalChainIntegrationTest extends TestCase
 {
@@ -81,17 +82,16 @@ final class ConditionalChainIntegrationTest extends TestCase
             static fn(string $role, string $previousOutput, string $task): string => $previousOutput,
         );
 
-        $stepExecutor = new ExecuteConditionalStepService(
-            $this->conditionalAgent,
-            $promptFormatter,
-        );
+        $stepExecutor = new StubConditionalStepExecutor();
         $hookExecutor = $this->createMock(HookExecutorInterface::class);
         $hookExecutor->method('execute')->willReturn(HookResultVo::skipped());
 
+        $conditionalDefinitionMapper = new ChainExecutionDefinitionMapper($this->chainLoader);
         $conditionalStrategy = new ConditionalExecutionStrategy(
             $conditionEvaluator,
             $stepExecutor,
             $hookExecutor,
+            $conditionalDefinitionMapper,
         );
 
         // --- Static strategy wiring (for backwards compatibility test) ---
@@ -111,7 +111,8 @@ final class ConditionalChainIntegrationTest extends TestCase
         );
         $runStaticChainService = new RunStaticChainService($staticStepService, $budgetService, $hookExecutor);
         $staticChainExecutor = new ExecuteStaticChainService($runStaticChainService);
-        $staticStrategy = new StaticExecutionStrategy($staticChainExecutor);
+        $definitionMapper = new ChainExecutionDefinitionMapper($this->chainLoader);
+        $staticStrategy = new StaticExecutionStrategy($staticChainExecutor, $definitionMapper);
 
         // --- Handler with both strategies ---
         $this->handler = new OrchestrateChainCommandHandler(

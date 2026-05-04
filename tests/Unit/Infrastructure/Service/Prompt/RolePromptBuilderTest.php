@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Prompt;
 
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\RoleNotFoundException;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Prompt\RolePromptBuilder;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Exception\RoleNotFoundException;
+use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Prompt\RolePromptBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

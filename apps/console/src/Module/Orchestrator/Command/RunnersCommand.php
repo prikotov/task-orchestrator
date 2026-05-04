@@ -10,9 +10,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\GetRunners\GetRunnersQuery;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\GetRunners\RunnerDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQuery;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\RunnerDto;
 
 #[AsCommand(
     name: 'app:agent:runners',

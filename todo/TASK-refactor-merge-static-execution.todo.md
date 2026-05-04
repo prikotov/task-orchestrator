@@ -8,9 +8,9 @@ depends_on: TASK-refactor-namespace-chain-definition
 epic: EPIC-refactor-responsibility-decomposition
 author: Аналитик (Шерлок)
 assignee: Бэкендер (Левша)
-branch:
+branch: task/refactor-merge-static-execution
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-merge-static-execution: Вливание StaticExecution в ChainExecution

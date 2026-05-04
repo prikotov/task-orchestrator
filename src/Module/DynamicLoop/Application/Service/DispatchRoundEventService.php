@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Application\Service;
 
 use Override;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Event\OrchestrateChain\OrchestrateRoundCompletedEvent;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Event\OrchestrateChain\OrchestrateRoundCompletedEvent;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RoundCompletedNotifierInterface;
 
 /**
