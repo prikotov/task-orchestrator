@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Agent;
 
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 
 /**
- * Интеграционный сервис запуска AI-агента для Orchestrator Domain.
+ * Интеграционный порт запуска AI-агента для Orchestrator Domain.
  *
  * Инкапсулирует вызов агента и retry-политику.
  * Реализация маппит VO и делегирует в конкретный движок AI-агента.
+ *
+ * Расположен в Contract (а не Service), чтобы ServiceContractDependencyRule
+ * не считал его cross-module сервисом при реализации в других модулях (Port/Adapter).
  */
 interface RunAgentServiceInterface
 {

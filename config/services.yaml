@@ -7,7 +7,7 @@ services:
   _instanceof:
     TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
       tags: ['agent.runner']
-    TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ExecutionStrategyInterface:
+    TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface:
       tags: ['orchestrator.execution_strategy']
 
   # --- Auto-discovery (Application + Infrastructure, Domain исключён) ---
@@ -88,7 +88,7 @@ services:
   # ─── ChainDefinition module ─────────────────────────────────────────
 
   # Integration Service alias (Interface → Implementation)
-  TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface:
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Contract\Chain\ChainLoaderInterface:
     alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader
 
   # Parameters
@@ -99,10 +99,10 @@ services:
   # ─── ChainExecution module ───────────────────────────────────────────
 
   # Domain Service aliases
-  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\RunAgentServiceInterface:
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Agent\RunAgentServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\RunAgentService
 
-  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\PromptProviderInterface:
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Prompt\PromptProviderInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Prompt\RolePromptBuilder
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Shared\PromptFormatterInterface:

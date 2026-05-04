@@ -9,13 +9,14 @@ use Override;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\StepResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\ChainConfigMapperInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticChainResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapper;
 
 /**
  * Стратегия выполнения static-цепочки.
@@ -30,7 +31,7 @@ final readonly class StaticExecutionStrategy implements ExecutionStrategyInterfa
 
     public function __construct(
         private ExecuteStaticChainServiceInterface $staticChainExecutor,
-        private ChainExecutionDefinitionMapper $definitionMapper,
+        private ChainConfigMapperInterface $definitionMapper,
     ) {
     }
 

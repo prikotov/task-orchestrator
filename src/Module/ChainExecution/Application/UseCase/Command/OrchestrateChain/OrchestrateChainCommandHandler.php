@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain;
 
 use LogicException;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ExecutionStrategyInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
 
 /**
  * UseCase оркестрации цепочки AI-агентов.
@@ -18,11 +18,11 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\Exec
 class OrchestrateChainCommandHandler
 {
     /**
-     * @param ChainLoaderInterface $chainLoader загрузчик определения цепочки
+     * @param ChainDefinitionProviderInterface $chainProvider провайдер определения цепочки
      * @param iterable<ExecutionStrategyInterface> $strategies зарегистрированные стратегии выполнения
      */
     public function __construct(
-        private ChainLoaderInterface $chainLoader,
+        private ChainDefinitionProviderInterface $chainProvider,
         private iterable $strategies,
     ) {
     }
@@ -32,7 +32,7 @@ class OrchestrateChainCommandHandler
      */
     public function __invoke(OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        $chain = $this->chainLoader->load($command->chainName);
+        $chain = $this->chainProvider->loadChainDefinition($command->chainName);
         $strategy = $this->resolveStrategy($chain);
 
         return $command->resumeDir !== null

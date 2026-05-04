@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition;
 
+use Override;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\DynamicLoopConfigMapperInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPromptConfigVo;
@@ -20,11 +22,12 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRol
  *
  * ACL (Anti-Corruption Layer) на границе модулей.
  */
-final readonly class DynamicLoopDefinitionMapper
+final readonly class DynamicLoopDefinitionMapper implements DynamicLoopConfigMapperInterface
 {
     /**
      * Маппит DynamicChainDefinitionVo → DynamicLoopConfigVo.
      */
+    #[Override]
     public function map(DynamicChainDefinitionVo $chain): DynamicLoopConfigVo
     {
         $shared = $chain->getSharedDefinition();

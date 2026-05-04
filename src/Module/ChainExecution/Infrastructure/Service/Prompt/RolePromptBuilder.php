@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Prompt;
 
 use Override;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Prompt\PromptProviderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Exception\RoleNotFoundException;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\PromptProviderInterface;
 
 /**
  * Реализация PromptProviderInterface — чтение .md файлов ролей из директории.

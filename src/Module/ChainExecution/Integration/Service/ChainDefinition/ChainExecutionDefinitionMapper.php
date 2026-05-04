@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition;
 
 use Override;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
@@ -14,6 +15,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfig
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ConditionOperatorEnum;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\ChainConfigMapperInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionBudgetVo;
@@ -33,11 +35,17 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionSt
  *
  * ACL (Anti-Corruption Layer) на границе модулей.
  */
-final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionProviderInterface
+final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionProviderInterface, ChainConfigMapperInterface
 {
     public function __construct(
-        private \TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ChainLoaderInterface $chainLoader,
+        private \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Contract\Chain\ChainLoaderInterface $chainLoader,
     ) {
+    }
+
+    #[Override]
+    public function loadChainDefinition(string $chainName): ChainDefinitionInterface
+    {
+        return $this->chainLoader->load($chainName);
     }
 
     #[Override]
@@ -61,6 +69,7 @@ final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionPr
     /**
      * Маппит StaticChainDefinitionVo → ExecutionStaticChainConfigVo.
      */
+    #[Override]
     public function mapStaticChain(StaticChainDefinitionVo $chain): ExecutionStaticChainConfigVo
     {
         $shared = $chain->getSharedDefinition();
@@ -79,6 +88,7 @@ final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionPr
     /**
      * Маппит ConditionalChainDefinitionVo → ExecutionConditionalChainConfigVo.
      */
+    #[Override]
     public function mapConditionalChain(ConditionalChainDefinitionVo $chain): ExecutionConditionalChainConfigVo
     {
         $shared = $chain->getSharedDefinition();

@@ -9,7 +9,7 @@ use Override;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ExecutionStrategyInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto as ChainDynamicRoundResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
@@ -18,12 +18,12 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopA
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\SessionCompletedNotifierInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\DynamicLoopConfigMapperInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapper;
 
 /**
  * Стратегия выполнения dynamic-цепочки.
@@ -31,7 +31,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefiniti
  * Инкапсулирует фасилитаторный цикл: session start/resume,
  * context build, loop run, finalize, DTO mapping, event dispatch.
  *
- * DynamicLoopConfigVo получается через DynamicLoopDefinitionMapper (Integration).
+ * DynamicLoopConfigVo получается через DynamicLoopConfigMapperInterface (Domain).
  */
 final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterface
 {
@@ -45,6 +45,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
         private BuildDynamicContextServiceInterface $contextBuilder,
         private RunDynamicLoopServiceInterface $dynamicLoopRunner,
         private DynamicLoopSessionLoggerInterface $sessionLogger,
+        private DynamicLoopConfigMapperInterface $configMapper,
         private DynamicLoopAuditLoggerFactoryInterface $auditLoggerFactory,
         private SessionCompletedNotifierInterface $sessionNotifier,
     ) {
@@ -174,7 +175,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
         }
 
         if ($chain instanceof DynamicChainDefinitionVo) {
-            return (new DynamicLoopDefinitionMapper())->map($chain);
+            return $this->configMapper->map($chain);
         }
 
         throw new LogicException(
