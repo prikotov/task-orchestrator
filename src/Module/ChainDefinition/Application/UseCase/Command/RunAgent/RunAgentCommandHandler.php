@@ -1,0 +1,59 @@
+<?php
+
+declare(strict_types=1);
+
+namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunAgent;
+
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Prompt\PromptProviderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRunRequestVo;
+
+/**
+ * UseCase запуска одного AI-агента.
+ *
+ * CommandHandler — запускает внешние процессы (I/O).
+ */
+final readonly class RunAgentCommandHandler
+{
+    public function __construct(
+        private RunAgentServiceInterface $agentRunner,
+        private PromptProviderInterface $promptProvider,
+    ) {
+    }
+
+    /**
+     * Запускает одного агента с указанной ролью и задачей.
+     */
+    public function __invoke(RunAgentCommand $command): RunAgentResultDto
+    {
+        $systemPrompt = $this->promptProvider->getPrompt($command->role);
+
+        $request = new ChainRunRequestVo(
+            role: $command->role,
+            task: $command->task,
+            systemPrompt: $systemPrompt,
+            model: $command->model,
+            tools: $command->tools,
+            workingDir: $command->workingDir,
+            timeout: $command->timeout,
+            runnerName: $command->runner ?? 'pi',
+            noContextFiles: $command->noContextFiles,
+        );
+
+        $result = $this->agentRunner->run($request->withTruncatedContext());
+
+        return new RunAgentResultDto(
+            outputText: $result->getOutputText(),
+            inputTokens: $result->getInputTokens(),
+            outputTokens: $result->getOutputTokens(),
+            cacheReadTokens: $result->getCacheReadTokens(),
+            cacheWriteTokens: $result->getCacheWriteTokens(),
+            cost: $result->getCost(),
+            exitCode: $result->getExitCode(),
+            model: $result->getModel(),
+            turns: $result->getTurns(),
+            isError: $result->isError(),
+            errorMessage: $result->getErrorMessage(),
+        );
+    }
+}
