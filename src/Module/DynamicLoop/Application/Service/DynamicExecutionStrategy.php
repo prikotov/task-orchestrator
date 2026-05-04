@@ -7,12 +7,11 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Application\Service;
 use LogicException;
 use Override;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ExecutionStrategyInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto as ChainDynamicRoundResultDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Audit\AuditLoggerFactoryInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Audit\AuditLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerFactoryInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
@@ -250,7 +249,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
 
         $chainTimedOut = array_any(
             $roundDtos,
-            static fn(DynamicRoundResultDto $round): bool => $round->timedOut,
+            static fn(ChainDynamicRoundResultDto $round): bool => $round->timedOut,
         );
 
         return new OrchestrateChainResultDto(
@@ -272,12 +271,12 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     /**
      * @param list<DynamicRoundResultVo> $roundVos
      *
-     * @return list<DynamicRoundResultDto>
+     * @return list<ChainDynamicRoundResultDto>
      */
     private function toRoundResultDtos(array $roundVos): array
     {
         return array_map(
-            static fn(DynamicRoundResultVo $roundVo): DynamicRoundResultDto => new DynamicRoundResultDto(
+            static fn(DynamicRoundResultVo $roundVo): ChainDynamicRoundResultDto => new ChainDynamicRoundResultDto(
                 round: $roundVo->round,
                 role: $roundVo->role,
                 isFacilitator: $roundVo->isFacilitator,

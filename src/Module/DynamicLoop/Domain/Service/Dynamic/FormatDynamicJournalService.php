@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Chain\Dynamic;
+namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic;
 
 use Override;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorTurnResultVo;

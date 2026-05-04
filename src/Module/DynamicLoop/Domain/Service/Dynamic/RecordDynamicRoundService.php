@@ -8,7 +8,6 @@ use Override;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionWriterInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
 
 /**
@@ -60,7 +59,7 @@ final readonly class RecordDynamicRoundService implements RecordDynamicRoundServ
             $step,
             $role,
             $runnerName,
-            $this->createDynamicAgentResult($roundResult),
+            $roundResult,
             $roundResult->duration * 1000.0,
         );
 
@@ -79,19 +78,5 @@ final readonly class RecordDynamicRoundService implements RecordDynamicRoundServ
             $roundResult->invocation,
         );
         $this->sessionWriter->updateSessionState($step);
-    }
-
-    private function createDynamicAgentResult(DynamicRoundResultVo $roundResult): DynamicLoopRunResultVo
-    {
-        if ($roundResult->isError) {
-            return DynamicLoopRunResultVo::createFromError($roundResult->errorMessage ?? 'unknown');
-        }
-
-        return DynamicLoopRunResultVo::createFromSuccess(
-            $roundResult->outputText,
-            $roundResult->inputTokens,
-            $roundResult->outputTokens,
-            cost: $roundResult->cost,
-        );
     }
 }

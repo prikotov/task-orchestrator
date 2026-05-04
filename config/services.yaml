@@ -25,6 +25,64 @@ services:
       - '../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
       - '../src/Module/AgentRunner/Infrastructure/Service/Codex/Resources/'
 
+  # --- DynamicLoop module: Domain Service aliases ---
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\ExecuteDynamicTurnServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\ExecuteDynamicTurnService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FinalizeDynamicLoopServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FinalizeDynamicLoopService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RecordDynamicRoundServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RecordDynamicRoundService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FormatDynamicJournalServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FormatDynamicJournalService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RoundCompletedNotifierInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DispatchRoundEventService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopAgentServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\RunDynamicLoopAgentService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FacilitatorResponseParserInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\FacilitatorResponseParserService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Budget\CheckDynamicLoopBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\CheckDynamicBudgetService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Shared\DynamicLoopPromptFormatterInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\PromptFormatterService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerFactoryInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\JsonlAuditLoggerFactory
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionWriterInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionReaderInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DynamicExecutionStrategy:
+    tags: ['orchestrator.execution_strategy']
+
+  # --- DynamicLoop module: Infrastructure Service parameters ---
+  TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger:
+    arguments:
+      $chainsSessionDir: '%task_orchestrator.chains_session_dir%'
+      $basePath: '%task_orchestrator.base_path%'
+
   # --- Integration Service alias (Interface → Implementation by convention service.md) ---
   TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\RunAgentServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainDefinition\Integration\Service\AgentRunner\RunAgentService
@@ -84,10 +142,10 @@ services:
 
   # --- Infrastructure Service alias ---
   TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\RunDynamicLoopAgentServiceInterface:
-    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\RunDynamicLoopAgentService
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\RunDynamicLoopAgentService
 
   TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Budget\CheckDynamicBudgetServiceInterface:
-    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\CheckDynamicBudgetService
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\CheckDynamicBudgetService
 
   TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Shared\PromptFormatterInterface:
     alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\PromptFormatterService

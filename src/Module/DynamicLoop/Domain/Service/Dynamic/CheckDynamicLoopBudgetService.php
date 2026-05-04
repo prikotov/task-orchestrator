@@ -17,7 +17,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetC
 final readonly class CheckDynamicLoopBudgetService implements CheckDynamicLoopBudgetServiceInterface
 {
     public function __construct(
-        private CheckDynamicLoopBudgetServiceInterface $budgetChecker,
+        private \TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Budget\CheckDynamicLoopBudgetServiceInterface $budgetChecker,
         private DynamicLoopSessionLoggerInterface $sessionLogger,
     ) {
     }
