@@ -9,8 +9,8 @@ epic: EPIC-refactor-responsibility-decomposition
 author: Аналитик (Шерлок)
 assignee: Бэкендер (Левша)
 branch: task/refactor-extract-dynamic-loop
-pr:
-status: in_progress
+pr: '#148'
+status: done
 ---
 
 # TASK-refactor-extract-dynamic-loop: Выделение модуля DynamicLoop из ChainDefinition

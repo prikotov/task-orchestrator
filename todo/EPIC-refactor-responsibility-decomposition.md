@@ -153,7 +153,7 @@ DynamicLoop → ChainExecution = FORBIDDEN
 - [x] [TASK-refactor-namespace-chain-definition](done/TASK-refactor-namespace-chain-definition.todo.md) — Механический rename `Orchestrator` → `ChainDefinition` во всех файлах, тестах, services.yaml, docs. Без изменения логики. `StaticExecution` пока ссылается на старый namespace — правим импорты. **Не зависит от других задач — выполняется первой.**
 
 ### PR#2: Выделение DynamicLoop
-- [ ] [TASK-refactor-extract-dynamic-loop](TASK-refactor-extract-dynamic-loop.todo.md) — Создать модуль `DynamicLoop`, перенести все Dynamic-специфичные файлы (entity, VO, сервисы, infrastructure, стратегии). Создать Integration-маппер DynamicLoop ← ChainDefinition. Создать DynamicLoopAuditLoggerInterface. Обновить services.yaml. **Зависит от PR#1. ~600 LOC новых файлов.**
+- [x] [TASK-refactor-extract-dynamic-loop](done/TASK-refactor-extract-dynamic-loop.todo.md) — Создать модуль `DynamicLoop`, перенести все Dynamic-специфичные файлы (entity, VO, сервисы, infrastructure, стратегии). Создать Integration-маппер DynamicLoop ← ChainDefinition. Создать DynamicLoopAuditLoggerInterface. Обновить services.yaml. **Зависит от PR#1. ~600 LOC новых файлов.**
 
 ### PR#3: Вливание StaticExecution + Integration-мапперы
 - [ ] [TASK-refactor-merge-static-execution](TASK-refactor-merge-static-execution.todo.md) — Влить StaticExecution в ChainExecution. Перенести файлы, обновить namespace. Создать Integration-маппер ChainExecution ← ChainDefinition (Definition VO → Execution VO). Удалить старый модуль StaticExecution. Обновить services.yaml. **Зависит от PR#1. Рекомендуется после PR#2. ~1110 LOC новых файлов.**
