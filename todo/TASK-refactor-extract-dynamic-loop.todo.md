@@ -8,9 +8,9 @@ depends_on: TASK-refactor-namespace-chain-definition
 epic: EPIC-refactor-responsibility-decomposition
 author: Аналитик (Шерлок)
 assignee: Бэкендер (Левша)
-branch:
+branch: task/refactor-extract-dynamic-loop
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-extract-dynamic-loop: Выделение модуля DynamicLoop из ChainDefinition
@@ -305,6 +305,19 @@ ADR-009 принял решение «Dynamic остаётся в Orchestrator»
 - `DynamicLoopDefinitionMapper` — ~180 LOC (маппинг ChainDefinition VO → DynamicLoop VO)
 - `DynamicLoopAuditLoggerInterface` — ~30 LOC
 - Итого новых файлов: ~600 LOC
+
+## Инструкции для сабагента
+
+**Ветка:** task/refactor-extract-dynamic-loop (уже создана и активна)
+**PR:** будет создан после реализации
+
+### Порядок действий
+1. Переключись в ветку `task/refactor-extract-dynamic-loop`: `git checkout task/refactor-extract-dynamic-loop`
+2. Реализуй задачу согласно описанию в todo/TASK-refactor-extract-dynamic-loop.todo.md
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
