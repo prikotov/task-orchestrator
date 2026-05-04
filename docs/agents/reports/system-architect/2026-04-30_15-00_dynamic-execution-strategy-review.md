@@ -2,7 +2,7 @@
 
 **Роль:** Архитектор Гэндальф
 **Дата:** 2026-04-30
-**Объект:** `src/Module/Orchestrator/Application/Service/Chain/DynamicExecutionStrategy.php` (293 строки)
+**Объект:** `src/Module/ChainDefinition/Application/Service/Chain/DynamicExecutionStrategy.php` (293 строки)
 **Задача:** Архитектурный аудит: правильность слоя, DDD-соответствие, необходимость расщепления
 
 ---
@@ -152,7 +152,7 @@ Application: DispatchRoundEventService (implementation, wraps PSR EventDispatche
 В методе `runDynamicLoop()` используется full-qualified class name вместо import:
 
 ```php
-    \TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainContextVo $context,
+    \TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainContextVo $context,
 ```
 
 **Рекомендация:** Добавить `use`-импорт в заголовок файла.

@@ -2,7 +2,7 @@
 
 **Роль:** Аналитик Шерлок (system_analyst_sherlock)
 **Дата:** 2026-05-01
-**Объект:** `src/Module/Orchestrator/Domain/` (66 файлов, 5 964 LOC)
+**Объект:** `src/Module/ChainDefinition/Domain/` (66 файлов, 5 964 LOC)
 **Задача:** [TASK-docs-domain-inventory](../../../todo/TASK-docs-domain-inventory.todo.md)
 
 ---

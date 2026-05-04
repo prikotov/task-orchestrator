@@ -27,11 +27,11 @@ Orchestrator спроектирован для расширения без из�
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\AgentRunner\Codex;
+namespace TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\AgentRunner\Codex;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\AgentRunner\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\AgentResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\AgentRunRequestVo;
 use Override;
 use Symfony\Component\Process\Process;
 
@@ -115,7 +115,7 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
 ```yaml
 services:
   _instanceof:
-    TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\AgentRunner\AgentRunnerInterface:
+    TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\AgentRunner\AgentRunnerInterface:
       tags: ['agent.runner']
 ```
 
@@ -163,7 +163,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Codex;
 
-use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\AgentRunner\Codex\CodexAgentRunner;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\AgentRunner\Codex\CodexAgentRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
