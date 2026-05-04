@@ -6,19 +6,18 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Application\Service;
 
 use LogicException;
 use Override;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto as ChainDynamicRoundResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionTypeEnum;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerFactoryInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\SessionCompletedNotifierInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\DynamicLoopConfigMapperInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration\ChainDefinitionProviderInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
@@ -31,7 +30,10 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundRe
  * Инкапсулирует фасилитаторный цикл: session start/resume,
  * context build, loop run, finalize, DTO mapping, event dispatch.
  *
- * DynamicLoopConfigVo получается через DynamicLoopConfigMapperInterface (Domain).
+ * DynamicLoopConfigVo получается через ChainDefinitionProviderInterface (Domain).
+ *
+ * @todo cross-module dependency: DynamicLoop implements ChainExecution interface.
+ *       Fix in separate task (Group 3-4).
  */
 final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterface
 {
@@ -45,16 +47,16 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
         private BuildDynamicContextServiceInterface $contextBuilder,
         private RunDynamicLoopServiceInterface $dynamicLoopRunner,
         private DynamicLoopSessionLoggerInterface $sessionLogger,
-        private DynamicLoopConfigMapperInterface $configMapper,
+        private ChainDefinitionProviderInterface $chainProvider,
         private DynamicLoopAuditLoggerFactoryInterface $auditLoggerFactory,
         private SessionCompletedNotifierInterface $sessionNotifier,
     ) {
     }
 
     #[Override]
-    public function execute(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function execute(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        $config = $this->extractConfig($chain);
+        $config = $this->chainProvider->loadDynamicChainConfig($chainInfo->name);
 
         $facilitatorRole = $command->facilitator ?? $config->getFacilitator();
         $participants = $command->participants ?? $config->getParticipants();
@@ -104,9 +106,9 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     }
 
     #[Override]
-    public function resume(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function resume(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        $config = $this->extractConfig($chain);
+        $config = $this->chainProvider->loadDynamicChainConfig($chainInfo->name);
 
         $resumeDir = $command->resumeDir;
         assert($resumeDir !== null);
@@ -161,27 +163,12 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     }
 
     #[Override]
-    public function supports(ChainDefinitionInterface $chain): bool
+    public function supports(ExecutionChainInfoVo $chainInfo): bool
     {
-        return $chain->getType() === ChainTypeEnum::dynamicType;
+        return $chainInfo->type === ChainExecutionTypeEnum::dynamicType;
     }
 
     // ─── Private helpers ──────────────────────────────────────────────────
-
-    private function extractConfig(ChainDefinitionInterface $chain): DynamicLoopConfigVo
-    {
-        if ($chain instanceof DynamicLoopConfigVo) {
-            return $chain;
-        }
-
-        if ($chain instanceof DynamicChainDefinitionVo) {
-            return $this->configMapper->map($chain);
-        }
-
-        throw new LogicException(
-            sprintf('Expected DynamicLoopConfigVo or DynamicChainDefinitionVo, got %s', $chain::class),
-        );
-    }
 
     private function runDynamicLoop(
         DynamicLoopConfigVo $chain,

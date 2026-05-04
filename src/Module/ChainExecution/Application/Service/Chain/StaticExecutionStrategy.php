@@ -6,15 +6,14 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chai
 
 use LogicException;
 use Override;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\StepResultDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\ChainConfigMapperInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionTypeEnum;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticChainResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
 
@@ -22,7 +21,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepR
  * Стратегия выполнения static-цепочки.
  *
  * Делегирует линейное выполнение шагов в ExecuteStaticChainServiceInterface.
- * Маппит StaticChainDefinitionVo → ExecutionStaticChainConfigVo на границе Application/Domain.
+ * Конфигурация загружается через ChainDefinitionProviderInterface по имени цепочки.
  * Resume не поддерживается — брошено LogicException.
  */
 final readonly class StaticExecutionStrategy implements ExecutionStrategyInterface
@@ -31,16 +30,14 @@ final readonly class StaticExecutionStrategy implements ExecutionStrategyInterfa
 
     public function __construct(
         private ExecuteStaticChainServiceInterface $staticChainExecutor,
-        private ChainConfigMapperInterface $definitionMapper,
+        private ChainDefinitionProviderInterface $chainProvider,
     ) {
     }
 
     #[Override]
-    public function execute(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function execute(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        assert($chain instanceof StaticChainDefinitionVo);
-
-        $config = $this->definitionMapper->mapStaticChain($chain);
+        $config = $this->chainProvider->loadStaticChainConfig($chainInfo->name);
 
         $result = $this->staticChainExecutor->execute(
             $config,
@@ -55,15 +52,15 @@ final readonly class StaticExecutionStrategy implements ExecutionStrategyInterfa
     }
 
     #[Override]
-    public function resume(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function resume(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
         throw new LogicException('Static chain does not support resume.');
     }
 
     #[Override]
-    public function supports(ChainDefinitionInterface $chain): bool
+    public function supports(ExecutionChainInfoVo $chainInfo): bool
     {
-        return $chain->getType() === ChainTypeEnum::staticType;
+        return $chainInfo->type === ChainExecutionTypeEnum::staticType;
     }
 
     /**

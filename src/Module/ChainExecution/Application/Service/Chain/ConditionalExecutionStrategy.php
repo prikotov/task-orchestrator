@@ -7,18 +7,17 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chai
 use LogicException;
 use Override;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\StepResultDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\ChainConfigMapperInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ExecuteConditionalStepServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionalStepResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionConditionalChainConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 
@@ -26,6 +25,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionSt
  * Стратегия выполнения conditional-цепочки.
  *
  * Линейное выполнение шагов с условным ветвлением (when-expressions).
+ * Конфигурация загружается через ChainDefinitionProviderInterface по имени цепочки.
  * Resume не поддерживается — LogicException.
  */
 final readonly class ConditionalExecutionStrategy implements ExecutionStrategyInterface
@@ -36,17 +36,15 @@ final readonly class ConditionalExecutionStrategy implements ExecutionStrategyIn
         private EvaluateConditionServiceInterface $conditionEvaluator,
         private ExecuteConditionalStepServiceInterface $stepExecutor,
         private HookExecutorInterface $hookExecutor,
-        private ChainConfigMapperInterface $definitionMapper,
+        private ChainDefinitionProviderInterface $chainProvider,
         private ?LoggerInterface $logger = null,
     ) {
     }
 
     #[Override]
-    public function execute(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function execute(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        assert($chain instanceof ConditionalChainDefinitionVo);
-
-        $config = $this->definitionMapper->mapConditionalChain($chain);
+        $config = $this->chainProvider->loadConditionalChainConfig($chainInfo->name);
         $steps = $config->steps;
         $timeout = $command->timeout ?? $config->timeout ?? self::DEFAULT_CONDITIONAL_TIMEOUT;
 
@@ -102,16 +100,18 @@ final readonly class ConditionalExecutionStrategy implements ExecutionStrategyIn
     }
 
     #[Override]
-    public function resume(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto
+    public function resume(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
         throw new LogicException('Conditional chain does not support resume.');
     }
 
     #[Override]
-    public function supports(ChainDefinitionInterface $chain): bool
+    public function supports(ExecutionChainInfoVo $chainInfo): bool
     {
-        return $chain->getType() === ChainTypeEnum::conditionalType;
+        return $chainInfo->type === ChainExecutionTypeEnum::conditionalType;
     }
+
+    // ─── Private helpers ──────────────────────────────────────────────────
 
     /**
      * @param array<string, array{passed: bool, exitCode: int, status: string}> $context

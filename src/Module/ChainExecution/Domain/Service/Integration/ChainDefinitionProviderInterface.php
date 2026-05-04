@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration;
 
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionConditionalChainConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStaticChainConfigVo;
 
@@ -17,11 +17,11 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionSt
 interface ChainDefinitionProviderInterface
 {
     /**
-     * Загружает определение цепочки по имени.
+     * Загружает идентификацию цепочки по имени.
      *
-     * Возвращает ChainDefinitionInterface из ChainDefinition-модуля.
+     * Возвращает ChainExecution-собственный VO (без зависимости от ChainDefinition.Domain).
      */
-    public function loadChainDefinition(string $chainName): ChainDefinitionInterface;
+    public function loadChainInfo(string $chainName): ExecutionChainInfoVo;
 
     /**
      * Загружает конфигурацию static-цепочки по имени.

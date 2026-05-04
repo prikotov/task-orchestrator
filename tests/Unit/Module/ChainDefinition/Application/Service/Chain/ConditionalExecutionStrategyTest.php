@@ -8,28 +8,26 @@ use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Contract\Chain\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ConditionalExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionTypeEnum;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ExecuteConditionalStepServiceInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionalStepResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionExpressionVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionConditionalChainConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapper;
 
 final class ConditionalExecutionStrategyTest extends TestCase
 {
     private EvaluateConditionServiceInterface&MockObject $conditionEvaluator;
     private ExecuteConditionalStepServiceInterface&MockObject $stepExecutor;
     private HookExecutorInterface&MockObject $hookExecutor;
+    private ChainDefinitionProviderInterface&MockObject $chainProvider;
     private LoggerInterface&MockObject $logger;
     private ConditionalExecutionStrategy $strategy;
 
@@ -38,19 +36,17 @@ final class ConditionalExecutionStrategyTest extends TestCase
         $this->conditionEvaluator = $this->createMock(EvaluateConditionServiceInterface::class);
         $this->stepExecutor = $this->createMock(ExecuteConditionalStepServiceInterface::class);
         $this->hookExecutor = $this->createMock(HookExecutorInterface::class);
+        $this->chainProvider = $this->createMock(ChainDefinitionProviderInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         // По умолчанию hook executor возвращает skipped (hook не сконфигурирован)
         $this->hookExecutor->method('execute')->willReturn(HookResultVo::skipped());
 
-        $chainLoader = $this->createMock(ChainLoaderInterface::class);
-        $definitionMapper = new ChainExecutionDefinitionMapper($chainLoader);
-
         $this->strategy = new ConditionalExecutionStrategy(
             $this->conditionEvaluator,
             $this->stepExecutor,
             $this->hookExecutor,
-            $definitionMapper,
+            $this->chainProvider,
             $this->logger,
         );
     }
@@ -59,49 +55,49 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
     public function testSupportsConditionalChain(): void
     {
-        $chain = $this->createConditionalChain([ChainStepVo::agent(role: 'developer')]);
-        $this->assertTrue($this->strategy->supports($chain));
+        $chainInfo = new ExecutionChainInfoVo('test', ChainExecutionTypeEnum::conditionalType);
+        $this->assertTrue($this->strategy->supports($chainInfo));
     }
 
     public function testDoesNotSupportStaticChain(): void
     {
-        $chain = StaticChainDefinitionVo::create(
-            name: 'static-chain',
-            description: 'test',
-            steps: [ChainStepVo::agent(role: 'developer')],
-        );
-        $this->assertFalse($this->strategy->supports($chain));
+        $chainInfo = new ExecutionChainInfoVo('test', ChainExecutionTypeEnum::staticType);
+        $this->assertFalse($this->strategy->supports($chainInfo));
     }
 
     public function testDoesNotSupportDynamicChain(): void
     {
-        $chain = $this->createDynamicChain();
-        $this->assertFalse($this->strategy->supports($chain));
+        $chainInfo = new ExecutionChainInfoVo('test', ChainExecutionTypeEnum::dynamicType);
+        $this->assertFalse($this->strategy->supports($chainInfo));
     }
 
     // ─── resume() ─────────────────────────────────────────────────────
 
     public function testResumeThrowsLogicException(): void
     {
-        $chain = $this->createConditionalChain([ChainStepVo::agent(role: 'developer')]);
+        $chainInfo = new ExecutionChainInfoVo('test', ChainExecutionTypeEnum::conditionalType);
         $command = $this->createCommand();
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Conditional chain does not support resume.');
 
-        $this->strategy->resume($chain, $command);
+        $this->strategy->resume($chainInfo, $command);
     }
 
     // ─── execute() — no conditions ────────────────────────────────────
 
     public function testExecuteStepsWithoutConditions(): void
     {
-        $steps = [
-            ChainStepVo::agent(role: 'developer', name: 'dev'),
-            ChainStepVo::agent(role: 'reviewer', name: 'rev'),
-        ];
-        $chain = $this->createConditionalChain($steps);
+        $chainInfo = new ExecutionChainInfoVo('test-chain', ChainExecutionTypeEnum::conditionalType);
         $command = $this->createCommand();
+
+        $config = $this->createConfigFromSteps([
+            $this->createExecutionStep(role: 'developer', name: 'dev'),
+            $this->createExecutionStep(role: 'reviewer', name: 'rev'),
+        ]);
+        $this->chainProvider->method('loadConditionalChainConfig')
+            ->with('test-chain')
+            ->willReturn($config);
 
         $this->conditionEvaluator->expects($this->never())->method('evaluate');
 
@@ -123,7 +119,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
                 );
             });
 
-        $result = $this->strategy->execute($chain, $command);
+        $result = $this->strategy->execute($chainInfo, $command);
 
         $this->assertCount(2, $result->stepResults);
         $this->assertFalse($result->stepResults[0]->skipped);
@@ -140,13 +136,17 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
     public function testExecuteStepsWithConditionsAllTrue(): void
     {
-        $when = ConditionExpressionVo::createFromExpression('steps.lint.passed == true');
-        $steps = [
-            ChainStepVo::agent(role: 'linter', name: 'lint'),
-            ChainStepVo::agent(role: 'developer', name: 'dev', when: $when),
-        ];
-        $chain = $this->createConditionalChain($steps);
+        $chainInfo = new ExecutionChainInfoVo('test-chain', ChainExecutionTypeEnum::conditionalType);
         $command = $this->createCommand();
+
+        $when = ConditionExpressionVo::createFromExpression('steps.lint.passed == true');
+        $config = $this->createConfigFromSteps([
+            $this->createExecutionStep(role: 'linter', name: 'lint'),
+            $this->createExecutionStep(role: 'developer', name: 'dev', when: $when),
+        ]);
+        $this->chainProvider->method('loadConditionalChainConfig')
+            ->with('test-chain')
+            ->willReturn($config);
 
         $this->conditionEvaluator->expects($this->once())
             ->method('evaluate')
@@ -170,7 +170,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
                 );
             });
 
-        $result = $this->strategy->execute($chain, $command);
+        $result = $this->strategy->execute($chainInfo, $command);
 
         $this->assertCount(2, $result->stepResults);
         $this->assertFalse($result->stepResults[0]->skipped);
@@ -181,13 +181,17 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
     public function testExecuteStepSkippedWhenConditionFalse(): void
     {
-        $when = ConditionExpressionVo::createFromExpression('steps.lint.passed == true');
-        $steps = [
-            ChainStepVo::agent(role: 'linter', name: 'lint'),
-            ChainStepVo::agent(role: 'developer', name: 'dev', when: $when),
-        ];
-        $chain = $this->createConditionalChain($steps);
+        $chainInfo = new ExecutionChainInfoVo('test-chain', ChainExecutionTypeEnum::conditionalType);
         $command = $this->createCommand();
+
+        $when = ConditionExpressionVo::createFromExpression('steps.lint.passed == true');
+        $config = $this->createConfigFromSteps([
+            $this->createExecutionStep(role: 'linter', name: 'lint'),
+            $this->createExecutionStep(role: 'developer', name: 'dev', when: $when),
+        ]);
+        $this->chainProvider->method('loadConditionalChainConfig')
+            ->with('test-chain')
+            ->willReturn($config);
 
         $this->conditionEvaluator->expects($this->once())
             ->method('evaluate')
@@ -211,7 +215,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         // Логируем skipped
         $this->logger->expects($this->once())->method('info');
 
-        $result = $this->strategy->execute($chain, $command);
+        $result = $this->strategy->execute($chainInfo, $command);
 
         $this->assertCount(2, $result->stepResults);
         $this->assertFalse($result->stepResults[0]->skipped);
@@ -227,23 +231,25 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
     public function testExecuteMixedConditions(): void
     {
+        $chainInfo = new ExecutionChainInfoVo('test-chain', ChainExecutionTypeEnum::conditionalType);
+        $command = $this->createCommand();
+
         $whenDev = ConditionExpressionVo::createFromExpression('steps.lint.passed == true');
         $whenDeploy = ConditionExpressionVo::createFromExpression('steps.tests.passed == true');
-        $steps = [
-            ChainStepVo::agent(role: 'linter', name: 'lint'),
-            ChainStepVo::agent(role: 'developer', name: 'dev', when: $whenDev),
-            ChainStepVo::qualityGate(command: 'run-tests.sh', label: 'tests', name: 'tests'),
-            ChainStepVo::agent(role: 'deployer', name: 'deploy', when: $whenDeploy),
-        ];
-        $chain = $this->createConditionalChain($steps);
-        $command = $this->createCommand();
+        $config = $this->createConfigFromSteps([
+            $this->createExecutionStep(role: 'linter', name: 'lint'),
+            $this->createExecutionStep(role: 'developer', name: 'dev', when: $whenDev),
+            $this->createExecutionStep(role: null, name: 'tests', isAgent: false),
+            $this->createExecutionStep(role: 'deployer', name: 'deploy', when: $whenDeploy),
+        ]);
+        $this->chainProvider->method('loadConditionalChainConfig')
+            ->with('test-chain')
+            ->willReturn($config);
 
         $evalCount = 0;
         $this->conditionEvaluator->expects($this->exactly(2))
             ->method('evaluate')
-            ->willReturnCallback(function (): bool {
-                global $evalCount;
-                static $evalCount = 0;
+            ->willReturnCallback(function () use (&$evalCount): bool {
                 $evalCount++;
 
                 return $evalCount === 1; // первый condition true, второй false
@@ -270,7 +276,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
                 );
             });
 
-        $result = $this->strategy->execute($chain, $command);
+        $result = $this->strategy->execute($chainInfo, $command);
 
         $this->assertCount(4, $result->stepResults);
         $this->assertFalse($result->stepResults[0]->skipped);  // lint — unconditional
@@ -283,13 +289,17 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
     public function testContextPropagatedToConditionEvaluator(): void
     {
-        $when = ConditionExpressionVo::createFromExpression('steps.lint.passed == true');
-        $steps = [
-            ChainStepVo::agent(role: 'linter', name: 'lint'),
-            ChainStepVo::agent(role: 'developer', name: 'dev', when: $when),
-        ];
-        $chain = $this->createConditionalChain($steps);
+        $chainInfo = new ExecutionChainInfoVo('test-chain', ChainExecutionTypeEnum::conditionalType);
         $command = $this->createCommand();
+
+        $when = ConditionExpressionVo::createFromExpression('steps.lint.passed == true');
+        $config = $this->createConfigFromSteps([
+            $this->createExecutionStep(role: 'linter', name: 'lint'),
+            $this->createExecutionStep(role: 'developer', name: 'dev', when: $when),
+        ]);
+        $this->chainProvider->method('loadConditionalChainConfig')
+            ->with('test-chain')
+            ->willReturn($config);
 
         $capturedContext = null;
         $this->conditionEvaluator->expects($this->once())
@@ -315,7 +325,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
                 exitCode: 0,
             ));
 
-        $this->strategy->execute($chain, $command);
+        $this->strategy->execute($chainInfo, $command);
 
         $this->assertNotNull($capturedContext);
         $this->assertArrayHasKey('lint', $capturedContext);
@@ -328,13 +338,17 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
     public function testQualityGateSkippedWhenConditionFalse(): void
     {
-        $when = ConditionExpressionVo::createFromExpression('steps.lint.passed == true');
-        $steps = [
-            ChainStepVo::agent(role: 'linter', name: 'lint'),
-            ChainStepVo::qualityGate(command: 'run-deploy-check.sh', label: 'deploy-check', name: 'deploy', when: $when),
-        ];
-        $chain = $this->createConditionalChain($steps);
+        $chainInfo = new ExecutionChainInfoVo('test-chain', ChainExecutionTypeEnum::conditionalType);
         $command = $this->createCommand();
+
+        $when = ConditionExpressionVo::createFromExpression('steps.lint.passed == true');
+        $config = $this->createConfigFromSteps([
+            $this->createExecutionStep(role: 'linter', name: 'lint'),
+            $this->createExecutionStep(role: null, name: 'deploy', isAgent: false, when: $when),
+        ]);
+        $this->chainProvider->method('loadConditionalChainConfig')
+            ->with('test-chain')
+            ->willReturn($config);
 
         $this->conditionEvaluator->expects($this->once())
             ->method('evaluate')
@@ -355,7 +369,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
                 exitCode: 1,
             ));
 
-        $result = $this->strategy->execute($chain, $command);
+        $result = $this->strategy->execute($chainInfo, $command);
 
         $this->assertCount(2, $result->stepResults);
         $this->assertFalse($result->stepResults[0]->skipped);
@@ -368,9 +382,15 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
     public function testExecuteSingleStepNoCondition(): void
     {
-        $steps = [ChainStepVo::agent(role: 'developer', name: 'dev')];
-        $chain = $this->createConditionalChain($steps);
+        $chainInfo = new ExecutionChainInfoVo('test-chain', ChainExecutionTypeEnum::conditionalType);
         $command = $this->createCommand();
+
+        $config = $this->createConfigFromSteps([
+            $this->createExecutionStep(role: 'developer', name: 'dev'),
+        ]);
+        $this->chainProvider->method('loadConditionalChainConfig')
+            ->with('test-chain')
+            ->willReturn($config);
 
         $this->conditionEvaluator->expects($this->never())->method('evaluate');
 
@@ -387,7 +407,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
                 isError: false,
             ));
 
-        $result = $this->strategy->execute($chain, $command);
+        $result = $this->strategy->execute($chainInfo, $command);
 
         $this->assertCount(1, $result->stepResults);
         $this->assertFalse($result->stepResults[0]->skipped);
@@ -398,11 +418,15 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
     public function testExecuteWithTimedOutStep(): void
     {
-        $steps = [
-            ChainStepVo::agent(role: 'developer', name: 'dev'),
-        ];
-        $chain = $this->createConditionalChain($steps);
+        $chainInfo = new ExecutionChainInfoVo('test-chain', ChainExecutionTypeEnum::conditionalType);
         $command = $this->createCommand();
+
+        $config = $this->createConfigFromSteps([
+            $this->createExecutionStep(role: 'developer', name: 'dev'),
+        ]);
+        $this->chainProvider->method('loadConditionalChainConfig')
+            ->with('test-chain')
+            ->willReturn($config);
 
         $this->stepExecutor->expects($this->once())
             ->method('executeStep')
@@ -419,7 +443,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
                 timedOut: true,
             ));
 
-        $result = $this->strategy->execute($chain, $command);
+        $result = $this->strategy->execute($chainInfo, $command);
 
         $this->assertTrue($result->timedOut);
         $this->assertTrue($result->stepResults[0]->timedOut);
@@ -429,13 +453,19 @@ final class ConditionalExecutionStrategyTest extends TestCase
 
     public function testCustomTimeoutFromCommand(): void
     {
-        $steps = [ChainStepVo::agent(role: 'developer', name: 'dev')];
-        $chain = $this->createConditionalChain($steps);
+        $chainInfo = new ExecutionChainInfoVo('test-chain', ChainExecutionTypeEnum::conditionalType);
         $command = new OrchestrateChainCommand(
             chainName: 'test-chain',
             task: 'test task',
             timeout: 600,
         );
+
+        $config = $this->createConfigFromSteps([
+            $this->createExecutionStep(role: 'developer', name: 'dev'),
+        ]);
+        $this->chainProvider->method('loadConditionalChainConfig')
+            ->with('test-chain')
+            ->willReturn($config);
 
         $capturedTimeout = null;
         $this->stepExecutor->expects($this->once())
@@ -455,37 +485,49 @@ final class ConditionalExecutionStrategyTest extends TestCase
                 );
             });
 
-        $this->strategy->execute($chain, $command);
+        $this->strategy->execute($chainInfo, $command);
 
         $this->assertSame(600, $capturedTimeout);
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────
 
-    private function createConditionalChain(array $steps): ConditionalChainDefinitionVo
-    {
-        return ConditionalChainDefinitionVo::create(
-            name: 'test-conditional-chain',
-            description: 'test conditional chain',
-            steps: $steps,
+    private function createExecutionStep(
+        ?string $role = null,
+        ?string $name = null,
+        bool $isAgent = true,
+        ?ConditionExpressionVo $when = null,
+    ): ExecutionStepVo {
+        return new ExecutionStepVo(
+            type: $isAgent
+                ? \TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum::agent
+                : \TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum::qualityGate,
+            role: $role,
+            runner: $isAgent ? 'pi' : 'shell',
+            tools: null,
+            model: null,
+            retryPolicy: null,
+            name: $name,
+            command: $isAgent ? '' : 'echo test',
+            label: '',
+            timeoutSeconds: 120,
+            noContextFiles: false,
+            when: $when,
+            postStep: null,
         );
     }
 
-    private function createDynamicChain(): DynamicChainDefinitionVo
+    /**
+     * @param list<ExecutionStepVo> $steps
+     */
+    private function createConfigFromSteps(array $steps): ExecutionConditionalChainConfigVo
     {
-        return DynamicChainDefinitionVo::create(
-            name: 'dynamic-chain',
-            description: 'test',
-            facilitator: 'team_lead',
-            participants: ['developer'],
-            maxRounds: 3,
-            brainstormSystemPrompt: 'system',
-            facilitatorAppendPrompt: 'fac-append',
-            facilitatorStartPrompt: 'fac-start',
-            facilitatorContinuePrompt: 'fac-continue',
-            facilitatorFinalizePrompt: 'fac-finalize',
-            participantAppendPrompt: 'part-append',
-            participantUserPrompt: 'part-user',
+        return new ExecutionConditionalChainConfigVo(
+            name: 'test-chain',
+            steps: $steps,
+            budget: null,
+            timeout: null,
+            roles: [],
         );
     }
 

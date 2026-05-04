@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Command\OrchestrateChain;
 
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DynamicExecutionStrategy;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionTypeEnum;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
 
 #[CoversClass(OrchestrateChainCommandHandler::class)]
 #[CoversClass(OrchestrateChainCommand::class)]
-#[CoversClass(StaticExecutionStrategy::class)]
-#[CoversClass(DynamicExecutionStrategy::class)]
 final class OrchestrateChainCommandHandlerTest extends TestCase
 {
     private ChainDefinitionProviderInterface $chainProvider;
@@ -39,9 +33,9 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
 
         // Default supports(): static supports static, dynamic supports dynamic
         $this->staticStrategy->method('supports')
-            ->willReturnCallback(static fn(ChainDefinitionInterface $chain): bool => !$chain->getSharedDefinition()->isDynamic());
+            ->willReturnCallback(static fn(ExecutionChainInfoVo $chainInfo): bool => $chainInfo->type === ChainExecutionTypeEnum::staticType);
         $this->dynamicStrategy->method('supports')
-            ->willReturnCallback(static fn(ChainDefinitionInterface $chain): bool => $chain->getSharedDefinition()->isDynamic());
+            ->willReturnCallback(static fn(ExecutionChainInfoVo $chainInfo): bool => $chainInfo->type === ChainExecutionTypeEnum::dynamicType);
 
         $this->handler = $this->createHandler();
     }
@@ -59,15 +53,9 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     #[Test]
     public function invokeDelegatesStaticChainToStaticStrategy(): void
     {
-        $chain = StaticChainDefinitionVo::create(
-            name: 'test',
-            description: 'Test chain',
-            steps: [
-                ChainStepVo::agent(role: 'system_analyst', runner: 'pi'),
-            ],
-        );
+        $chainInfo = new ExecutionChainInfoVo('test', ChainExecutionTypeEnum::staticType);
 
-        $this->chainProvider->method('loadChainDefinition')->with('test')->willReturn($chain);
+        $this->chainProvider->method('loadChainInfo')->with('test')->willReturn($chainInfo);
 
         $staticResult = new OrchestrateChainResultDto();
         $this->staticStrategy->method('execute')->willReturn($staticResult);
@@ -83,9 +71,9 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     #[Test]
     public function invokeDelegatesDynamicChainToDynamicStrategy(): void
     {
-        $chain = $this->createDynamicChain('brainstorm', 'facilitator', ['participant']);
+        $chainInfo = new ExecutionChainInfoVo('brainstorm', ChainExecutionTypeEnum::dynamicType);
 
-        $this->chainProvider->method('loadChainDefinition')->with('brainstorm')->willReturn($chain);
+        $this->chainProvider->method('loadChainInfo')->with('brainstorm')->willReturn($chainInfo);
 
         $dynamicResult = new OrchestrateChainResultDto(
             synthesis: 'Result',
@@ -104,9 +92,9 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     #[Test]
     public function invokeCallsResumeWhenResumeDirIsSet(): void
     {
-        $chain = $this->createDynamicChain('brainstorm', 'facilitator', ['participant']);
+        $chainInfo = new ExecutionChainInfoVo('brainstorm', ChainExecutionTypeEnum::dynamicType);
 
-        $this->chainProvider->method('loadChainDefinition')->willReturn($chain);
+        $this->chainProvider->method('loadChainInfo')->willReturn($chainInfo);
 
         $resumeResult = new OrchestrateChainResultDto(
             synthesis: 'Resumed result',
@@ -130,13 +118,9 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('No execution strategy found for chain "unknown".');
 
-        $chain = StaticChainDefinitionVo::create(
-            name: 'unknown',
-            description: '',
-            steps: [ChainStepVo::agent(role: 'role', runner: 'pi')],
-        );
+        $chainInfo = new ExecutionChainInfoVo('unknown', ChainExecutionTypeEnum::staticType);
 
-        $this->chainProvider->method('loadChainDefinition')->willReturn($chain);
+        $this->chainProvider->method('loadChainInfo')->willReturn($chainInfo);
 
         // Both strategies return false for supports()
         $handler = new OrchestrateChainCommandHandler(
@@ -148,32 +132,5 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
             chainName: 'unknown',
             task: 'Test',
         ));
-    }
-
-    // --- Helpers ---
-
-    /**
-     * @param list<string> $participants
-     */
-    private function createDynamicChain(
-        string $name,
-        string $facilitator,
-        array $participants,
-        int $maxRounds = 10,
-    ): DynamicChainDefinitionVo {
-        return DynamicChainDefinitionVo::create(
-            name: $name,
-            description: '',
-            facilitator: $facilitator,
-            participants: $participants,
-            maxRounds: $maxRounds,
-            brainstormSystemPrompt: 'Base system prompt',
-            facilitatorAppendPrompt: 'Fac append %s',
-            facilitatorStartPrompt: 'Start %s',
-            facilitatorContinuePrompt: 'Cont %s %s %s',
-            facilitatorFinalizePrompt: 'Final %s %s',
-            participantAppendPrompt: 'Part append %s',
-            participantUserPrompt: 'Ctx %s %s',
-        );
     }
 }

@@ -8,37 +8,33 @@ use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DynamicExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionTypeEnum;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DynamicExecutionStrategy;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerFactoryInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextService;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopServiceInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\DynamicLoopConfigMapperInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\SessionCompletedNotifierInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapper;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSessionStateVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopResultVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration\ChainDefinitionProviderInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPromptConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSessionStateVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
 
 #[CoversClass(DynamicExecutionStrategy::class)]
 final class DynamicExecutionStrategyTest extends TestCase
 {
     private RunDynamicLoopServiceInterface $dynamicLoopRunner;
-    private BuildDynamicContextServiceInterface $contextBuilder;
+    private BuildDynamicContextService $contextBuilder;
     private DynamicLoopSessionLoggerInterface $sessionLogger;
     private DynamicLoopAuditLoggerFactoryInterface $auditLoggerFactory;
     private SessionCompletedNotifierInterface $sessionNotifier;
+    private ChainDefinitionProviderInterface $chainProvider;
     private DynamicExecutionStrategy $strategy;
 
     protected function setUp(): void
@@ -48,6 +44,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $this->sessionLogger = $this->createMock(DynamicLoopSessionLoggerInterface::class);
         $this->auditLoggerFactory = $this->createMock(DynamicLoopAuditLoggerFactoryInterface::class);
         $this->sessionNotifier = $this->createMock(SessionCompletedNotifierInterface::class);
+        $this->chainProvider = $this->createMock(ChainDefinitionProviderInterface::class);
 
         $this->sessionLogger->method('startSession')->willReturn('/tmp/test-session');
         $this->sessionLogger->method('logInvocation');
@@ -63,7 +60,7 @@ final class DynamicExecutionStrategyTest extends TestCase
             $this->contextBuilder,
             $this->dynamicLoopRunner,
             $this->sessionLogger,
-            new DynamicLoopDefinitionMapper(),
+            $this->chainProvider,
             $this->auditLoggerFactory,
             $this->sessionNotifier,
         );
@@ -74,21 +71,17 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function supportsReturnsTrueForDynamicChain(): void
     {
-        $chain = $this->createDynamicChain('test', 'facilitator', ['participant']);
+        $chainInfo = new ExecutionChainInfoVo('test', ChainExecutionTypeEnum::dynamicType);
 
-        self::assertTrue($this->strategy->supports($chain));
+        self::assertTrue($this->strategy->supports($chainInfo));
     }
 
     #[Test]
     public function supportsReturnsFalseForStaticChain(): void
     {
-        $chain = StaticChainDefinitionVo::create(
-            name: 'static',
-            description: '',
-            steps: [\TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo::agent(role: 'role', runner: 'pi')],
-        );
+        $chainInfo = new ExecutionChainInfoVo('test', ChainExecutionTypeEnum::staticType);
 
-        self::assertFalse($this->strategy->supports($chain));
+        self::assertFalse($this->strategy->supports($chainInfo));
     }
 
     // --- execute() ---
@@ -96,12 +89,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function executeRunsDynamicLoopWithFacilitatorDone(): void
     {
-        $chain = $this->createDynamicChain(
-            name: 'brainstorm',
-            facilitator: 'system_analyst',
-            participants: ['architect', 'marketer'],
-            maxRounds: 10,
-        );
+        $this->setUpDynamicConfig('brainstorm');
 
         $loopResult = new DynamicLoopResultVo(
             roundResults: [
@@ -119,10 +107,13 @@ final class DynamicExecutionStrategyTest extends TestCase
 
         $this->dynamicLoopRunner->method('execute')->willReturn($loopResult);
 
-        $result = $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'brainstorm',
-            task: 'Design a new system',
-        ));
+        $result = $this->strategy->execute(
+            new ExecutionChainInfoVo('brainstorm', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'brainstorm',
+                task: 'Design a new system',
+            ),
+        );
 
         self::assertCount(3, $result->roundResults);
         self::assertEmpty($result->stepResults);
@@ -134,12 +125,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function executeUsesQueryOverrides(): void
     {
-        $chain = $this->createDynamicChain(
-            name: 'dyn-override',
-            facilitator: 'default_facilitator',
-            participants: ['default_participant'],
-            maxRounds: 20,
-        );
+        $this->setUpDynamicConfig('dyn-override');
 
         $loopResult = new DynamicLoopResultVo(
             roundResults: [],
@@ -166,12 +152,15 @@ final class DynamicExecutionStrategyTest extends TestCase
             },
         );
 
-        $result = $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'dyn-override',
-            task: 'Test',
-            facilitator: 'custom_facilitator',
-            maxRounds: 2,
-        ));
+        $result = $this->strategy->execute(
+            new ExecutionChainInfoVo('dyn-override', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'dyn-override',
+                task: 'Test',
+                facilitator: 'custom_facilitator',
+                maxRounds: 2,
+            ),
+        );
 
         self::assertSame('Quick summary', $result->synthesis);
         self::assertSame('custom_facilitator', $capturedContext->facilitatorRole);
@@ -181,11 +170,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function executeWithTopicOverride(): void
     {
-        $chain = $this->createDynamicChain(
-            name: 'dyn-topic',
-            facilitator: 'facilitator',
-            participants: ['participant'],
-        );
+        $this->setUpDynamicConfig('dyn-topic');
 
         $loopResult = new DynamicLoopResultVo(
             roundResults: [],
@@ -212,11 +197,14 @@ final class DynamicExecutionStrategyTest extends TestCase
             },
         );
 
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'dyn-topic',
-            task: 'task text',
-            topic: 'Custom topic',
-        ));
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('dyn-topic', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'dyn-topic',
+                task: 'task text',
+                topic: 'Custom topic',
+            ),
+        );
 
         self::assertSame('Custom topic', $capturedTopic);
     }
@@ -224,12 +212,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function executeStartsAndFinalizesSession(): void
     {
-        $chain = $this->createDynamicChain(
-            name: 'brainstorm',
-            facilitator: 'system_analyst',
-            participants: ['architect'],
-            maxRounds: 5,
-        );
+        $this->setUpDynamicConfig('brainstorm');
 
         $loopResult = new DynamicLoopResultVo(
             roundResults: [],
@@ -256,10 +239,13 @@ final class DynamicExecutionStrategyTest extends TestCase
                 $completeSessionCalled = true;
             });
 
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'brainstorm',
-            task: 'Test',
-        ));
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('brainstorm', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'brainstorm',
+                task: 'Test',
+            ),
+        );
 
         self::assertTrue($startSessionCalled);
         self::assertTrue($completeSessionCalled);
@@ -268,11 +254,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function executeInterruptsSessionWhenNoSynthesis(): void
     {
-        $chain = $this->createDynamicChain(
-            name: 'interrupt',
-            facilitator: 'facilitator',
-            participants: ['participant'],
-        );
+        $this->setUpDynamicConfig('interrupt');
 
         $loopResult = new DynamicLoopResultVo(
             roundResults: [
@@ -295,10 +277,13 @@ final class DynamicExecutionStrategyTest extends TestCase
                 $interruptCalled = true;
             });
 
-        $result = $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'interrupt',
-            task: 'Test',
-        ));
+        $result = $this->strategy->execute(
+            new ExecutionChainInfoVo('interrupt', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'interrupt',
+                task: 'Test',
+            ),
+        );
 
         self::assertTrue($interruptCalled);
         self::assertNull($result->synthesis);
@@ -307,7 +292,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function executeLogsInvocation(): void
     {
-        $chain = $this->createDynamicChain('brainstorm', 'system_analyst', ['architect'], 1);
+        $this->setUpDynamicConfig('brainstorm', 1);
 
         $loopResult = new DynamicLoopResultVo(
             roundResults: [],
@@ -327,11 +312,14 @@ final class DynamicExecutionStrategyTest extends TestCase
                 $logCapture = $inv;
             });
 
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'brainstorm',
-            task: 'Design a system',
-            timeout: 60,
-        ));
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('brainstorm', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'brainstorm',
+                task: 'Design a system',
+                timeout: 60,
+            ),
+        );
 
         self::assertNotNull($logCapture);
         self::assertSame('Design a system', $logCapture['task']);
@@ -343,12 +331,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function executeUsesChainTimeoutWhenNoCliOverride(): void
     {
-        $chain = $this->createDynamicChainWithTimeout(
-            name: 'timed_chain',
-            facilitator: 'facilitator',
-            participants: ['participant'],
-            timeout: 600,
-        );
+        $this->setUpDynamicConfig('timed_chain', timeout: 600);
 
         $loopResult = new DynamicLoopResultVo(
             roundResults: [],
@@ -375,10 +358,13 @@ final class DynamicExecutionStrategyTest extends TestCase
             },
         );
 
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'timed_chain',
-            task: 'Test',
-        ));
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('timed_chain', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'timed_chain',
+                task: 'Test',
+            ),
+        );
 
         self::assertSame(600, $capturedTimeout);
     }
@@ -386,12 +372,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function executeCliTimeoutOverridesChain(): void
     {
-        $chain = $this->createDynamicChainWithTimeout(
-            name: 'timed_chain',
-            facilitator: 'facilitator',
-            participants: ['participant'],
-            timeout: 600,
-        );
+        $this->setUpDynamicConfig('timed_chain', timeout: 600);
 
         $loopResult = new DynamicLoopResultVo(
             roundResults: [],
@@ -418,11 +399,14 @@ final class DynamicExecutionStrategyTest extends TestCase
             },
         );
 
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'timed_chain',
-            task: 'Test',
-            timeout: 300,
-        ));
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('timed_chain', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'timed_chain',
+                task: 'Test',
+                timeout: 300,
+            ),
+        );
 
         self::assertSame(300, $capturedTimeout);
     }
@@ -430,11 +414,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function executeDefaultsTo600WhenNoTimeoutAnyWhere(): void
     {
-        $chain = $this->createDynamicChain(
-            name: 'no_timeout',
-            facilitator: 'facilitator',
-            participants: ['participant'],
-        );
+        $this->setUpDynamicConfig('no_timeout');
 
         $loopResult = new DynamicLoopResultVo(
             roundResults: [],
@@ -461,10 +441,13 @@ final class DynamicExecutionStrategyTest extends TestCase
             },
         );
 
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'no_timeout',
-            task: 'Test',
-        ));
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('no_timeout', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'no_timeout',
+                task: 'Test',
+            ),
+        );
 
         self::assertSame(600, $capturedTimeout);
     }
@@ -477,11 +460,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         $sessionDir = '/tmp/test-session';
         $auditLogger = $this->createMock(DynamicLoopAuditLoggerInterface::class);
 
-        $chain = $this->createDynamicChain(
-            name: 'audit-dynamic',
-            facilitator: 'facilitator',
-            participants: ['participant'],
-        );
+        $this->setUpDynamicConfig('audit-dynamic');
 
         $this->auditLoggerFactory->method('create')
             ->with($sessionDir . '/audit.jsonl')
@@ -510,10 +489,13 @@ final class DynamicExecutionStrategyTest extends TestCase
                 );
             });
 
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'audit-dynamic',
-            task: 'Test',
-        ));
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('audit-dynamic', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'audit-dynamic',
+                task: 'Test',
+            ),
+        );
 
         self::assertSame($auditLogger, $capturedLogger);
     }
@@ -521,11 +503,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function executeWithNoAuditLogPassesNull(): void
     {
-        $chain = $this->createDynamicChain(
-            name: 'audit-disabled',
-            facilitator: 'facilitator',
-            participants: ['participant'],
-        );
+        $this->setUpDynamicConfig('audit-disabled');
 
         $capturedLogger = 'not-null';
         $this->dynamicLoopRunner->method('execute')
@@ -550,11 +528,14 @@ final class DynamicExecutionStrategyTest extends TestCase
                 );
             });
 
-        $this->strategy->execute($chain, new OrchestrateChainCommand(
-            chainName: 'audit-disabled',
-            task: 'Test',
-            noAuditLog: true,
-        ));
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('audit-disabled', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'audit-disabled',
+                task: 'Test',
+                noAuditLog: true,
+            ),
+        );
 
         self::assertNull($capturedLogger);
     }
@@ -567,22 +548,25 @@ final class DynamicExecutionStrategyTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Failed to resume session');
 
-        $chain = $this->createDynamicChain('test', 'facilitator', ['participant']);
+        $this->setUpDynamicConfig('test');
 
         $this->sessionLogger->method('resumeSession');
         $this->sessionLogger->method('getResumedState')->willReturn(null);
 
-        $this->strategy->resume($chain, new OrchestrateChainCommand(
-            chainName: 'test',
-            task: 'Test',
-            resumeDir: '/tmp/resume-dir',
-        ));
+        $this->strategy->resume(
+            new ExecutionChainInfoVo('test', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'test',
+                task: 'Test',
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
     }
 
     #[Test]
     public function resumeResumesWithState(): void
     {
-        $chain = $this->createDynamicChain('brainstorm', 'facilitator', ['participant'], 5);
+        $this->setUpDynamicConfig('brainstorm', 5);
 
         $state = new DynamicLoopSessionStateVo(
             topic: 'Resumed topic',
@@ -631,11 +615,14 @@ final class DynamicExecutionStrategyTest extends TestCase
                 return $loopResult;
             });
 
-        $result = $this->strategy->resume($chain, new OrchestrateChainCommand(
-            chainName: 'brainstorm',
-            task: 'Test',
-            resumeDir: '/tmp/resume-dir',
-        ));
+        $result = $this->strategy->resume(
+            new ExecutionChainInfoVo('brainstorm', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'brainstorm',
+                task: 'Test',
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
 
         self::assertSame('Resumed result', $result->synthesis);
         self::assertSame('/tmp/resume-dir', $result->sessionDir);
@@ -647,12 +634,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function resumeUsesChainTimeoutWhenNoCliOverride(): void
     {
-        $chain = $this->createDynamicChainWithTimeout(
-            name: 'timed_chain',
-            facilitator: 'facilitator',
-            participants: ['participant'],
-            timeout: 600,
-        );
+        $this->setUpDynamicConfig('timed_chain', timeout: 600);
 
         $state = new DynamicLoopSessionStateVo(
             topic: 'Resumed topic',
@@ -695,11 +677,14 @@ final class DynamicExecutionStrategyTest extends TestCase
                 return $loopResult;
             });
 
-        $this->strategy->resume($chain, new OrchestrateChainCommand(
-            chainName: 'timed_chain',
-            task: 'Test',
-            resumeDir: '/tmp/resume-dir',
-        ));
+        $this->strategy->resume(
+            new ExecutionChainInfoVo('timed_chain', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'timed_chain',
+                task: 'Test',
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
 
         self::assertSame(600, $capturedTimeout);
     }
@@ -707,12 +692,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function resumeCliTimeoutOverridesChainTimeout(): void
     {
-        $chain = $this->createDynamicChainWithTimeout(
-            name: 'timed_chain',
-            facilitator: 'facilitator',
-            participants: ['participant'],
-            timeout: 600,
-        );
+        $this->setUpDynamicConfig('timed_chain', timeout: 600);
 
         $state = new DynamicLoopSessionStateVo(
             topic: 'Resumed topic',
@@ -755,12 +735,15 @@ final class DynamicExecutionStrategyTest extends TestCase
                 return $loopResult;
             });
 
-        $this->strategy->resume($chain, new OrchestrateChainCommand(
-            chainName: 'timed_chain',
-            task: 'Test',
-            timeout: 300,
-            resumeDir: '/tmp/resume-dir',
-        ));
+        $this->strategy->resume(
+            new ExecutionChainInfoVo('timed_chain', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'timed_chain',
+                task: 'Test',
+                timeout: 300,
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
 
         self::assertSame(300, $capturedTimeout);
     }
@@ -768,11 +751,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function resumeFallsBackTo600WhenNoTimeoutAnywhere(): void
     {
-        $chain = $this->createDynamicChain(
-            name: 'no_timeout',
-            facilitator: 'facilitator',
-            participants: ['participant'],
-        );
+        $this->setUpDynamicConfig('no_timeout');
 
         $state = new DynamicLoopSessionStateVo(
             topic: 'Resumed topic',
@@ -815,11 +794,14 @@ final class DynamicExecutionStrategyTest extends TestCase
                 return $loopResult;
             });
 
-        $this->strategy->resume($chain, new OrchestrateChainCommand(
-            chainName: 'no_timeout',
-            task: 'Test',
-            resumeDir: '/tmp/resume-dir',
-        ));
+        $this->strategy->resume(
+            new ExecutionChainInfoVo('no_timeout', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'no_timeout',
+                task: 'Test',
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
 
         self::assertSame(600, $capturedTimeout);
     }
@@ -827,7 +809,7 @@ final class DynamicExecutionStrategyTest extends TestCase
     #[Test]
     public function resumeCreatesAuditLoggerFromResumeDir(): void
     {
-        $chain = $this->createDynamicChain('brainstorm', 'facilitator', ['participant'], 5);
+        $this->setUpDynamicConfig('brainstorm', 5);
 
         $state = new DynamicLoopSessionStateVo(
             topic: 'Resumed topic',
@@ -874,66 +856,49 @@ final class DynamicExecutionStrategyTest extends TestCase
                 return $loopResult;
             });
 
-        $this->strategy->resume($chain, new OrchestrateChainCommand(
-            chainName: 'brainstorm',
-            task: 'Test',
-            resumeDir: '/tmp/resume-dir',
-        ));
+        $this->strategy->resume(
+            new ExecutionChainInfoVo('brainstorm', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'brainstorm',
+                task: 'Test',
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
 
         self::assertSame($auditLogger, $capturedLogger);
     }
 
     // --- Helpers ---
 
-    /**
-     * @param list<string> $participants
-     */
-    private function createDynamicChain(
+    private function setUpDynamicConfig(
         string $name,
-        string $facilitator,
-        array $participants,
         int $maxRounds = 10,
-    ): DynamicChainDefinitionVo {
-        return DynamicChainDefinitionVo::create(
+        ?int $timeout = null,
+    ): void {
+        $config = new DynamicLoopConfigVo(
             name: $name,
             description: '',
-            facilitator: $facilitator,
-            participants: $participants,
-            maxRounds: $maxRounds,
-            brainstormSystemPrompt: 'Base system prompt',
-            facilitatorAppendPrompt: 'Fac append %s',
-            facilitatorStartPrompt: 'Start %s',
-            facilitatorContinuePrompt: 'Cont %s %s %s',
-            facilitatorFinalizePrompt: 'Final %s %s',
-            participantAppendPrompt: 'Part append %s',
-            participantUserPrompt: 'Ctx %s %s',
-        );
-    }
-
-    /**
-     * @param list<string> $participants
-     */
-    private function createDynamicChainWithTimeout(
-        string $name,
-        string $facilitator,
-        array $participants,
-        int $timeout,
-        int $maxRounds = 10,
-    ): DynamicChainDefinitionVo {
-        return DynamicChainDefinitionVo::create(
-            name: $name,
-            description: '',
-            facilitator: $facilitator,
-            participants: $participants,
-            maxRounds: $maxRounds,
-            brainstormSystemPrompt: 'Base system prompt',
-            facilitatorAppendPrompt: 'Fac append %s',
-            facilitatorStartPrompt: 'Start %s',
-            facilitatorContinuePrompt: 'Cont %s %s %s',
-            facilitatorFinalizePrompt: 'Final %s %s',
-            participantAppendPrompt: 'Part append %s',
-            participantUserPrompt: 'Ctx %s %s',
+            budget: null,
             timeout: $timeout,
+            maxTime: null,
+            roleConfigs: [],
+            facilitator: 'system_analyst',
+            participants: ['architect'],
+            maxRounds: $maxRounds,
+            promptConfiguration: new DynamicLoopPromptConfigVo(
+                brainstormSystemPrompt: 'Base system prompt',
+                facilitatorAppendPrompt: 'Fac append %s',
+                facilitatorStartPrompt: 'Start %s',
+                facilitatorContinuePrompt: 'Cont %s %s %s',
+                facilitatorFinalizePrompt: 'Final %s %s',
+                participantAppendPrompt: 'Part append %s',
+                participantUserPrompt: 'Ctx %s %s',
+            ),
+            defaultRetryPolicy: null,
         );
+
+        $this->chainProvider->method('loadDynamicChainConfig')
+            ->with($name)
+            ->willReturn($config);
     }
 }

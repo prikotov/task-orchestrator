@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain;
 
 use LogicException;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
 
 /**
  * UseCase оркестрации цепочки AI-агентов.
  *
- * Чистый диспетчер: загружает цепочку, определяет стратегию выполнения,
+ * Чистый диспетчер: загружает идентификацию цепочки, определяет стратегию выполнения,
  * делегирует execute/resume. Поведенческая логика инкапсулирована в стратегиях.
  */
 class OrchestrateChainCommandHandler
@@ -32,27 +32,27 @@ class OrchestrateChainCommandHandler
      */
     public function __invoke(OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        $chain = $this->chainProvider->loadChainDefinition($command->chainName);
-        $strategy = $this->resolveStrategy($chain);
+        $chainInfo = $this->chainProvider->loadChainInfo($command->chainName);
+        $strategy = $this->resolveStrategy($chainInfo);
 
         return $command->resumeDir !== null
-            ? $strategy->resume($chain, $command)
-            : $strategy->execute($chain, $command);
+            ? $strategy->resume($chainInfo, $command)
+            : $strategy->execute($chainInfo, $command);
     }
 
     /**
-     * Определяет стратегию выполнения по определению цепочки.
+     * Определяет стратегию выполнения по идентификации цепочки.
      */
-    private function resolveStrategy(ChainDefinitionInterface $chain): ExecutionStrategyInterface
+    private function resolveStrategy(ExecutionChainInfoVo $chainInfo): ExecutionStrategyInterface
     {
         foreach ($this->strategies as $strategy) {
-            if ($strategy->supports($chain)) {
+            if ($strategy->supports($chainInfo)) {
                 return $strategy;
             }
         }
 
         throw new LogicException(
-            sprintf('No execution strategy found for chain "%s".', $chain->getName()),
+            sprintf('No execution strategy found for chain "%s".', $chainInfo->name),
         );
     }
 }

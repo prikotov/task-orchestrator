@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain;
 
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
 
 /**
  * Стратегия выполнения цепочки оркестрации.
@@ -24,15 +24,15 @@ interface ExecutionStrategyInterface
     /**
      * Выполняет цепочку с нуля.
      */
-    public function execute(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto;
+    public function execute(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto;
 
     /**
      * Возобновляет прерванную цепочку.
      */
-    public function resume(ChainDefinitionInterface $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto;
+    public function resume(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto;
 
     /**
      * Определяет, поддерживает ли стратегия данную цепочку.
      */
-    public function supports(ChainDefinitionInterface $chain): bool;
+    public function supports(ExecutionChainInfoVo $chainInfo): bool;
 }

@@ -79,6 +79,9 @@ services:
   TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DynamicExecutionStrategy:
     tags: ['orchestrator.execution_strategy']
 
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration\ChainDefinitionProviderInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapper
+
   # Infrastructure Service parameters
   TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger:
     arguments:

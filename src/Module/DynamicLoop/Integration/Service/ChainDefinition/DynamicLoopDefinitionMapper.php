@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition;
 
 use Override;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Contract\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\DynamicLoopConfigMapperInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration\ChainDefinitionProviderInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPromptConfigVo;
@@ -22,8 +24,22 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRol
  *
  * ACL (Anti-Corruption Layer) на границе модулей.
  */
-final readonly class DynamicLoopDefinitionMapper implements DynamicLoopConfigMapperInterface
+final readonly class DynamicLoopDefinitionMapper implements DynamicLoopConfigMapperInterface, ChainDefinitionProviderInterface
 {
+    public function __construct(
+        private ChainLoaderInterface $chainLoader,
+    ) {
+    }
+
+    #[Override]
+    public function loadDynamicChainConfig(string $chainName): DynamicLoopConfigVo
+    {
+        $chain = $this->chainLoader->load($chainName);
+        assert($chain instanceof DynamicChainDefinitionVo);
+
+        return $this->map($chain);
+    }
+
     /**
      * Маппит DynamicChainDefinitionVo → DynamicLoopConfigVo.
      */
