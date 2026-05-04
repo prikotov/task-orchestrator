@@ -6,7 +6,8 @@ complexity: C4
 priority: P1
 author: Тимлид Алекс
 assignee: Бэкендер Левша
-status: todo
+status: in_progress
+branch: refactor/responsibility-decomposition
 pr:
 ---
 
