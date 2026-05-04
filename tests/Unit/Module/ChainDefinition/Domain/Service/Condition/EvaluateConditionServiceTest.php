@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Module\Orchestrator\Domain\Service\Condition;
+namespace Tests\Unit\Module\ChainDefinition\Domain\Service\Condition;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ConditionOperatorEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Condition\EvaluateConditionService;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionExpressionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ConditionOperatorEnum;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Condition\EvaluateConditionService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo;
 
 final class EvaluateConditionServiceTest extends TestCase
 {

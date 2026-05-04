@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Module\Orchestrator\Domain\ValueObject;
+namespace Tests\Unit\Module\ChainDefinition\Domain\ValueObject;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
 
 #[CoversClass(ChainStepVo::class)]
 final class ChainStepVoPostStepTest extends TestCase
@@ -68,7 +68,7 @@ final class ChainStepVoPostStepTest extends TestCase
     public function constructorWithPostStep(): void
     {
         $step = new ChainStepVo(
-            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum::agent,
+            type: \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainStepTypeEnum::agent,
             role: 'analyst',
             postStep: 'scripts/hook.sh',
         );
@@ -81,7 +81,7 @@ final class ChainStepVoPostStepTest extends TestCase
     public function constructorWithNullPostStep(): void
     {
         $step = new ChainStepVo(
-            type: \TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainStepTypeEnum::agent,
+            type: \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainStepTypeEnum::agent,
             role: 'analyst',
             postStep: null,
         );

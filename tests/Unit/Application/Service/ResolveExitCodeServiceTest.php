@@ -7,12 +7,12 @@ namespace TaskOrchestrator\Tests\Unit\Application\Service;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\OrchestrateExitCodeEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\ResolveExitCodeService;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\StepResultDto;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\ChainNotFoundException;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Exception\RoleNotFoundException;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Enum\OrchestrateExitCodeEnum;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\ResolveExitCodeService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\StepResultDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\ChainNotFoundException;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\RoleNotFoundException;
 
 #[CoversClass(ResolveExitCodeService::class)]
 final class ResolveExitCodeServiceTest extends TestCase

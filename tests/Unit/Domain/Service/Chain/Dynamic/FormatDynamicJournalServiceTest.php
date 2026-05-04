@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Dynamic\FormatDynamicJournalService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Dynamic\FormatDynamicJournalService;
 
 #[CoversClass(FormatDynamicJournalService::class)]
 final class FormatDynamicJournalServiceTest extends TestCase

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Module\Orchestrator\Infrastructure\Service\Chain\Hook;
+namespace Tests\Unit\Module\ChainDefinition\Infrastructure\Service\Chain\Hook;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\HookResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Infrastructure\Service\Chain\Hook\ShellHookExecutor;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\HookResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\Hook\ShellHookExecutor;
 
 #[CoversClass(ShellHookExecutor::class)]
 final class ShellHookExecutorTest extends TestCase

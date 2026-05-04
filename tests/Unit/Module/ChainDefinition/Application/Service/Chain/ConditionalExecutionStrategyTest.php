@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Module\Orchestrator\Application\Service\Chain;
+namespace Tests\Unit\Module\ChainDefinition\Application\Service\Chain;
 
 use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Service\Chain\ConditionalExecutionStrategy;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Condition\EvaluateConditionServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\ExecuteConditionalStepServiceInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\StaticChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionExpressionVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\ConditionalStepResultVo;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\Service\Chain\Hook\HookExecutorInterface;
-use TaskOrchestrator\Common\Module\Orchestrator\Domain\ValueObject\HookResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\Service\Chain\ConditionalExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Condition\EvaluateConditionServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\ExecuteConditionalStepServiceInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalStepResultVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\Hook\HookExecutorInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\HookResultVo;
 
 final class ConditionalExecutionStrategyTest extends TestCase
 {
