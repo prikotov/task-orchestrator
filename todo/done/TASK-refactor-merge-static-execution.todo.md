@@ -9,8 +9,8 @@ epic: EPIC-refactor-responsibility-decomposition
 author: Аналитик (Шерлок)
 assignee: Бэкендер (Левша)
 branch: task/refactor-merge-static-execution
-pr:
-status: in_progress
+pr: '#149'
+status: done
 ---
 
 # TASK-refactor-merge-static-execution: Вливание StaticExecution в ChainExecution

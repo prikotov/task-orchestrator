@@ -156,7 +156,7 @@ DynamicLoop → ChainExecution = FORBIDDEN
 - [x] [TASK-refactor-extract-dynamic-loop](done/TASK-refactor-extract-dynamic-loop.todo.md) — Создать модуль `DynamicLoop`, перенести все Dynamic-специфичные файлы (entity, VO, сервисы, infrastructure, стратегии). Создать Integration-маппер DynamicLoop ← ChainDefinition. Создать DynamicLoopAuditLoggerInterface. Обновить services.yaml. **Зависит от PR#1. ~600 LOC новых файлов.**
 
 ### PR#3: Вливание StaticExecution + Integration-мапперы
-- [ ] [TASK-refactor-merge-static-execution](TASK-refactor-merge-static-execution.todo.md) — Влить StaticExecution в ChainExecution. Перенести файлы, обновить namespace. Создать Integration-маппер ChainExecution ← ChainDefinition (Definition VO → Execution VO). Удалить старый модуль StaticExecution. Обновить services.yaml. **Зависит от PR#1. Рекомендуется после PR#2. ~1110 LOC новых файлов.**
+- [x] [TASK-refactor-merge-static-execution](done/TASK-refactor-merge-static-execution.todo.md) — Влить StaticExecution в ChainExecution. Перенести файлы, обновить namespace. Создать Integration-маппер ChainExecution ← ChainDefinition (Definition VO → Execution VO). Удалить старый модуль StaticExecution. Обновить services.yaml. **Зависит от PR#1. Рекомендуется после PR#2. ~1110 LOC новых файлов.**
 
 ### PR#4: Deptrac + документация
 - [ ] [TASK-refactor-deptrac-decomposition-rules](TASK-refactor-deptrac-decomposition-rules.todo.md) — Создать depfile.yaml с правилами для ChainDefinition, ChainExecution, DynamicLoop, AgentRunner. Обновить ADR (суперседировать ADR-009, создать ADR-011), architecture.md. **Зависит от PR#2 и PR#3. Только конфигурация и документация.**
