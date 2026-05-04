@@ -12,9 +12,11 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRun
 /**
  * Форматирует промпты и собирает артефакты запуска агентов в цепочке.
  */
-final readonly class PromptFormatterService implements PromptFormatterInterface
+final readonly class PromptFormatterService implements DynamicLoopPromptFormatterInterface
 {
-    #[Override]
+    /**
+     * @internal Статический контекст — не входит в DynamicLoopPromptFormatterInterface.
+     */
     public function buildStaticContext(
         string $role,
         string $previousOutput,
@@ -105,7 +107,7 @@ final readonly class PromptFormatterService implements PromptFormatterInterface
 
     #[Override]
     public function buildAgentInvocation(
-        ChainRunRequestVo $request,
+        DynamicLoopRunRequestVo $request,
         string $userPromptFile,
     ): string {
         $command = $request->getCommand();

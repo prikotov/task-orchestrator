@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Application\Mapper;
 
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ReportJsonMapper;
-use TaskOrchestrator\Common\Module\DynamicLoop\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\OrchestrateChain\StepResultDto;
 use PHPUnit\Framework\Attributes\CoversClass;

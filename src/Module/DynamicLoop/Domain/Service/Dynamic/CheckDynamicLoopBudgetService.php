@@ -14,7 +14,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetC
 /**
  * Проверка и контроль бюджета dynamic-цикла.
  */
-final readonly class CheckDynamicLoopBudgetService implements CheckDynamicLoopBudgetServiceInterface
+final readonly class CheckDynamicLoopBudgetService implements \TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetServiceInterface
 {
     public function __construct(
         private \TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Budget\CheckDynamicLoopBudgetServiceInterface $budgetChecker,

@@ -16,7 +16,7 @@ final class ChainSessionBudgetFormatter
      *
      * @return array{max_cost_total: float|null, max_cost_per_step: float|null, per_role?: array<string, array{max_cost_total: float|null, max_cost_per_step: float|null}>}
      */
-    public function buildBudgetData(BudgetVo $budget): array
+    public function buildBudgetData(DynamicLoopBudgetVo $budget): array
     {
         $data = [
             'max_cost_total' => $budget->getMaxCostTotal(),
@@ -36,7 +36,7 @@ final class ChainSessionBudgetFormatter
     /**
      * Форматирует per-role бюджетную информацию для result.md.
      */
-    public function formatPerRoleBudgetInfo(BudgetVo $budget): string
+    public function formatPerRoleBudgetInfo(DynamicLoopBudgetVo $budget): string
     {
         if (!$budget->hasRoleBudgets()) {
             return '';

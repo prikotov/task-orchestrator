@@ -61,7 +61,10 @@ final readonly class DynamicLoopDefinitionMapper
 
         $perRoleBudgets = [];
         foreach ($budget->getPerRoleBudgets() as $role => $roleBudget) {
-            $perRoleBudgets[$role] = $this->mapBudget($roleBudget);
+            $mapped = $this->mapBudget($roleBudget);
+            if ($mapped !== null) {
+                $perRoleBudgets[$role] = $mapped;
+            }
         }
 
         return new DynamicLoopBudgetVo(

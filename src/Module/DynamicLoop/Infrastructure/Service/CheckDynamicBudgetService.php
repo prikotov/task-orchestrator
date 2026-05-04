@@ -14,10 +14,10 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetC
 /**
  * Проверяет бюджет после раунда dynamic-цикла.
  */
-final readonly class CheckDynamicBudgetService implements CheckDynamicBudgetServiceInterface
+final readonly class CheckDynamicBudgetService implements CheckDynamicLoopBudgetServiceInterface
 {
     public function __construct(
-        private ChainSessionWriterInterface $sessionWriter,
+        private DynamicLoopSessionWriterInterface $sessionWriter,
         private ?LoggerInterface $logger = null,
     ) {
     }
