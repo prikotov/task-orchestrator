@@ -24,7 +24,7 @@ final readonly class ShellHookExecutor implements HookExecutorInterface
     private const int HOOK_TIMEOUT = 30;
 
     public function __construct(
-        private LoggerInterface $logger,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -33,7 +33,7 @@ final readonly class ShellHookExecutor implements HookExecutorInterface
     {
         $startTime = microtime(true);
 
-        $this->logger->info('Hook execution started', [
+        $this->logger?->info('Hook execution started', [
             'script' => $scriptPath,
             'context' => $context,
         ]);
@@ -54,21 +54,21 @@ final readonly class ShellHookExecutor implements HookExecutorInterface
 
             // Логируем stdout/stderr
             if ($stdout !== '') {
-                $this->logger->info('Hook stdout', [
+                $this->logger?->info('Hook stdout', [
                     'script' => $scriptPath,
                     'stdout' => $stdout,
                 ]);
             }
 
             if ($stderr !== '') {
-                $this->logger->warning('Hook stderr', [
+                $this->logger?->warning('Hook stderr', [
                     'script' => $scriptPath,
                     'stderr' => $stderr,
                 ]);
             }
 
             if ($exitCode !== 0) {
-                $this->logger->warning('Hook failed with non-zero exit code', [
+                $this->logger?->warning('Hook failed with non-zero exit code', [
                     'script' => $scriptPath,
                     'exitCode' => $exitCode,
                     'stdout' => $stdout,
@@ -87,7 +87,7 @@ final readonly class ShellHookExecutor implements HookExecutorInterface
                 );
             }
 
-            $this->logger->info('Hook executed successfully', [
+            $this->logger?->info('Hook executed successfully', [
                 'script' => $scriptPath,
                 'duration' => $duration,
             ]);
@@ -101,7 +101,7 @@ final readonly class ShellHookExecutor implements HookExecutorInterface
         } catch (ProcessTimedOutException $e) {
             $duration = microtime(true) - $startTime;
 
-            $this->logger->warning('Hook timed out', [
+            $this->logger?->warning('Hook timed out', [
                 'script' => $scriptPath,
                 'timeout' => self::HOOK_TIMEOUT,
                 'duration' => $duration,
@@ -119,7 +119,7 @@ final readonly class ShellHookExecutor implements HookExecutorInterface
         } catch (\Throwable $e) {
             $duration = microtime(true) - $startTime;
 
-            $this->logger->warning('Hook execution failed with exception', [
+            $this->logger?->warning('Hook execution failed with exception', [
                 'script' => $scriptPath,
                 'exception' => $e->getMessage(),
                 'duration' => $duration,

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Agent;
 
 use Override;
 use Psr\Log\LoggerInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Agent\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo;
