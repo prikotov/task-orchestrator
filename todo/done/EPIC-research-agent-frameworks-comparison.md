@@ -89,6 +89,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 ### Этап 1c: Дополнительные исследования (2026-05-04)
 
 - [ ] [TASK-research-sandcastle](../TASK-research-sandcastle.todo.md) — Sandcastle (Matt Pocock)
+- [ ] [TASK-research-hermes-agent](../TASK-research-hermes-agent.todo.md) — Hermes Agent (Nous Research)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
