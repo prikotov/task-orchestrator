@@ -74,7 +74,7 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
         );
 
         try {
-            $result = $this->agentRunner->run($fallbackRequest->toTruncatedContext(), $retryPolicy);
+            $result = $this->agentRunner->run($this->truncateRequestContext($fallbackRequest), $retryPolicy);
 
             if ($result->isError()) {
                 $this->logger?->error(sprintf(
@@ -104,5 +104,31 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
 
             return null;
         }
+    }
+
+    private function truncateRequestContext(ChainRunRequestVo $request): ChainRunRequestVo
+    {
+        $context = $request->getPreviousContext();
+        $maxLength = $request->getMaxContextLength();
+
+        if ($context === null || strlen($context) <= $maxLength) {
+            return $request;
+        }
+
+        return new ChainRunRequestVo(
+            role: $request->getRole(),
+            task: $request->getTask(),
+            systemPrompt: $request->getSystemPrompt(),
+            previousContext: substr($context, -$maxLength),
+            model: $request->getModel(),
+            tools: $request->getTools(),
+            workingDir: $request->getWorkingDir(),
+            timeout: $request->getTimeout(),
+            maxContextLength: $maxLength,
+            command: $request->getCommand(),
+            runnerArgs: $request->getRunnerArgs(),
+            runnerName: $request->getRunnerName(),
+            noContextFiles: $request->hasNoContextFiles(),
+        );
     }
 }

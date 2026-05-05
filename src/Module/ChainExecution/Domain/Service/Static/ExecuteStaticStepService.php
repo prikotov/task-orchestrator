@@ -69,7 +69,8 @@ final readonly class ExecuteStaticStepService
         );
 
         $start = microtime(true);
-        $result = $this->agentRunner->run($request->toTruncatedContext(), $step->getRetryPolicy());
+        $request = $this->truncateRequestContext($request);
+        $result = $this->agentRunner->run($request, $step->getRetryPolicy());
         $duration = microtime(true) - $start;
 
         $fallbackRunnerUsed = null;
@@ -219,6 +220,32 @@ final readonly class ExecuteStaticStepService
                 ? $fallbackConfig->getRunnerName()
                 : null,
             timedOut: $fallbackResult?->isTimedOut() ?? false,
+        );
+    }
+
+    private function truncateRequestContext(ChainRunRequestVo $request): ChainRunRequestVo
+    {
+        $context = $request->getPreviousContext();
+        $maxLength = $request->getMaxContextLength();
+
+        if ($context === null || strlen($context) <= $maxLength) {
+            return $request;
+        }
+
+        return new ChainRunRequestVo(
+            role: $request->getRole(),
+            task: $request->getTask(),
+            systemPrompt: $request->getSystemPrompt(),
+            previousContext: substr($context, -$maxLength),
+            model: $request->getModel(),
+            tools: $request->getTools(),
+            workingDir: $request->getWorkingDir(),
+            timeout: $request->getTimeout(),
+            maxContextLength: $maxLength,
+            command: $request->getCommand(),
+            runnerArgs: $request->getRunnerArgs(),
+            runnerName: $request->getRunnerName(),
+            noContextFiles: $request->hasNoContextFiles(),
         );
     }
 }

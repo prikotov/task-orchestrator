@@ -151,16 +151,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.4.0",
+            "version": "v0.4.2",
             "source": {
                 "type": "git",
                 "url": "git@github.com:prikotov/coding-standard.git",
-                "reference": "ffaa19cff0c6587455aa4a757d3b0ddd0b59536a"
+                "reference": "1c9601d2fb22099398c5a0dbdd53a20b66e7470e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/ffaa19cff0c6587455aa4a757d3b0ddd0b59536a",
-                "reference": "ffaa19cff0c6587455aa4a757d3b0ddd0b59536a",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/1c9601d2fb22099398c5a0dbdd53a20b66e7470e",
+                "reference": "1c9601d2fb22099398c5a0dbdd53a20b66e7470e",
                 "shasum": ""
             },
             "require": {
@@ -227,7 +227,7 @@
                 "phpcs",
                 "sniffs"
             ],
-            "time": "2026-05-05T13:10:24+00:00"
+            "time": "2026-05-05T15:29:14+00:00"
         },
         {
             "name": "psr/container",

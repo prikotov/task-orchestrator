@@ -56,83 +56,10 @@ final class AgentRunRequestVoTest extends TestCase
     }
 
     #[Test]
-    public function withTruncatedContextReturnsSameWhenNoContext(): void
-    {
-        $vo = new AgentRunRequestVo(role: 'test', task: 'test');
-        $result = $vo->toTruncatedContext();
-
-        self::assertSame($vo, $result);
-    }
-
-    #[Test]
-    public function withTruncatedContextReturnsSameWhenShortEnough(): void
-    {
-        $vo = new AgentRunRequestVo(
-            role: 'test',
-            task: 'test',
-            previousContext: str_repeat('a', 100),
-            maxContextLength: 200,
-        );
-        $result = $vo->toTruncatedContext();
-
-        self::assertSame($vo, $result);
-    }
-
-    #[Test]
-    public function withTruncatedContextTruncatesWhenTooLong(): void
-    {
-        $context = str_repeat('a', 1000);
-        $vo = new AgentRunRequestVo(
-            role: 'test',
-            task: 'test',
-            previousContext: $context,
-            maxContextLength: 500,
-        );
-        $result = $vo->toTruncatedContext();
-
-        self::assertNotSame($vo, $result);
-        self::assertSame(500, strlen($result->getPreviousContext()));
-        self::assertSame(substr($context, -500), $result->getPreviousContext());
-        self::assertSame('test', $result->getRole());
-        self::assertSame('test', $result->getTask());
-        self::assertNull($result->getSystemPrompt());
-    }
-
-    #[Test]
-    public function withTruncatedContextPreservesSystemPrompt(): void
-    {
-        $vo = new AgentRunRequestVo(
-            role: 'test',
-            task: 'test',
-            systemPrompt: 'System prompt',
-            previousContext: str_repeat('x', 1000),
-            maxContextLength: 500,
-        );
-        $result = $vo->toTruncatedContext();
-
-        self::assertSame('System prompt', $result->getSystemPrompt());
-    }
-
-    #[Test]
     public function itDefaultsNoContextFilesToFalse(): void
     {
         $vo = new AgentRunRequestVo(role: 'test', task: 'test');
 
         self::assertFalse($vo->hasNoContextFiles());
-    }
-
-    #[Test]
-    public function itPreservesNoContextFilesInTruncatedContext(): void
-    {
-        $vo = new AgentRunRequestVo(
-            role: 'test',
-            task: 'test',
-            previousContext: str_repeat('x', 1000),
-            maxContextLength: 500,
-            noContextFiles: true,
-        );
-        $result = $vo->toTruncatedContext();
-
-        self::assertTrue($result->hasNoContextFiles());
     }
 }

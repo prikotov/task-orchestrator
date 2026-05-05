@@ -76,7 +76,8 @@ final readonly class ExecuteConditionalStepService implements ExecuteConditional
         );
 
         $start = microtime(true);
-        $result = $this->agentRunner->run($request->toTruncatedContext(), $step->getRetryPolicy());
+        $request = $this->truncateRequestContext($request);
+        $result = $this->agentRunner->run($request, $step->getRetryPolicy());
         $duration = microtime(true) - $start;
 
         return $this->toStepResult($role, $runnerName, $result, $duration);
@@ -133,6 +134,32 @@ final readonly class ExecuteConditionalStepService implements ExecuteConditional
             isError: $result->isError(),
             errorMessage: $result->getErrorMessage(),
             timedOut: $result->isTimedOut(),
+        );
+    }
+
+    private function truncateRequestContext(ChainRunRequestVo $request): ChainRunRequestVo
+    {
+        $context = $request->getPreviousContext();
+        $maxLength = $request->getMaxContextLength();
+
+        if ($context === null || strlen($context) <= $maxLength) {
+            return $request;
+        }
+
+        return new ChainRunRequestVo(
+            role: $request->getRole(),
+            task: $request->getTask(),
+            systemPrompt: $request->getSystemPrompt(),
+            previousContext: substr($context, -$maxLength),
+            model: $request->getModel(),
+            tools: $request->getTools(),
+            workingDir: $request->getWorkingDir(),
+            timeout: $request->getTimeout(),
+            maxContextLength: $maxLength,
+            command: $request->getCommand(),
+            runnerArgs: $request->getRunnerArgs(),
+            runnerName: $request->getRunnerName(),
+            noContextFiles: $request->hasNoContextFiles(),
         );
     }
 }

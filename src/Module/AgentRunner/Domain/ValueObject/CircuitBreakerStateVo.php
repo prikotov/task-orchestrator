@@ -75,40 +75,40 @@ final readonly class CircuitBreakerStateVo
      * HalfOpen: одна ошибка → сразу Open.
      * Open: не должен вызываться (вызовы блокируются).
      */
-    public function toRecordedFailure(): self
+    public static function createFromRecordedFailure(self $state): self
     {
         $now = time();
-        $effectiveState = $this->getEffectiveState();
+        $effectiveState = $state->getEffectiveState();
 
         return match ($effectiveState) {
-            CircuitStateEnum::closed => ($this->failureCount + 1 >= $this->failureThreshold)
+            CircuitStateEnum::closed => ($state->failureCount + 1 >= $state->failureThreshold)
                 ? new self(
                     state: CircuitStateEnum::open,
-                    failureCount: $this->failureCount + 1,
-                    failureThreshold: $this->failureThreshold,
-                    resetTimeoutSeconds: $this->resetTimeoutSeconds,
+                    failureCount: $state->failureCount + 1,
+                    failureThreshold: $state->failureThreshold,
+                    resetTimeoutSeconds: $state->resetTimeoutSeconds,
                     lastFailureAt: $now,
                 )
                 : new self(
                     state: CircuitStateEnum::closed,
-                    failureCount: $this->failureCount + 1,
-                    failureThreshold: $this->failureThreshold,
-                    resetTimeoutSeconds: $this->resetTimeoutSeconds,
+                    failureCount: $state->failureCount + 1,
+                    failureThreshold: $state->failureThreshold,
+                    resetTimeoutSeconds: $state->resetTimeoutSeconds,
                     lastFailureAt: $now,
                 ),
             CircuitStateEnum::halfOpen => new self(
                 state: CircuitStateEnum::open,
-                failureCount: $this->failureCount + 1,
-                failureThreshold: $this->failureThreshold,
-                resetTimeoutSeconds: $this->resetTimeoutSeconds,
+                failureCount: $state->failureCount + 1,
+                failureThreshold: $state->failureThreshold,
+                resetTimeoutSeconds: $state->resetTimeoutSeconds,
                 lastFailureAt: $now,
             ),
             CircuitStateEnum::open => new self(
                 state: CircuitStateEnum::open,
-                failureCount: $this->failureCount,
-                failureThreshold: $this->failureThreshold,
-                resetTimeoutSeconds: $this->resetTimeoutSeconds,
-                lastFailureAt: $this->lastFailureAt,
+                failureCount: $state->failureCount,
+                failureThreshold: $state->failureThreshold,
+                resetTimeoutSeconds: $state->resetTimeoutSeconds,
+                lastFailureAt: $state->lastFailureAt,
             ),
         };
     }
@@ -120,19 +120,19 @@ final readonly class CircuitBreakerStateVo
      * HalfOpen: переход в Closed с полной сброской.
      * Open: не должен вызываться (вызовы блокируются).
      */
-    public function toRecordedSuccess(): self
+    public static function createFromRecordedSuccess(self $state): self
     {
-        $effectiveState = $this->getEffectiveState();
+        $effectiveState = $state->getEffectiveState();
 
         return match ($effectiveState) {
             CircuitStateEnum::closed, CircuitStateEnum::halfOpen => new self(
                 state: CircuitStateEnum::closed,
                 failureCount: 0,
-                failureThreshold: $this->failureThreshold,
-                resetTimeoutSeconds: $this->resetTimeoutSeconds,
+                failureThreshold: $state->failureThreshold,
+                resetTimeoutSeconds: $state->resetTimeoutSeconds,
                 lastFailureAt: null,
             ),
-            CircuitStateEnum::open => $this,
+            CircuitStateEnum::open => $state,
         };
     }
 

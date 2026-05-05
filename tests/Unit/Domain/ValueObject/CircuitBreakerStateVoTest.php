@@ -62,7 +62,7 @@ final class CircuitBreakerStateVoTest extends TestCase
     {
         $vo = new CircuitBreakerStateVo(failureThreshold: 5);
 
-        $newVo = $vo->toRecordedFailure();
+        $newVo = CircuitBreakerStateVo::createFromRecordedFailure($vo);
 
         self::assertSame(CircuitStateEnum::closed, $newVo->getState());
         self::assertSame(1, $newVo->getFailureCount());
@@ -79,7 +79,7 @@ final class CircuitBreakerStateVoTest extends TestCase
             resetTimeoutSeconds: 60,
         );
 
-        $newVo = $vo->toRecordedFailure();
+        $newVo = CircuitBreakerStateVo::createFromRecordedFailure($vo);
 
         self::assertSame(CircuitStateEnum::open, $newVo->getState());
         self::assertSame(5, $newVo->getFailureCount());
@@ -96,7 +96,7 @@ final class CircuitBreakerStateVoTest extends TestCase
             resetTimeoutSeconds: 60,
         );
 
-        $newVo = $vo->toRecordedFailure();
+        $newVo = CircuitBreakerStateVo::createFromRecordedFailure($vo);
 
         self::assertSame(CircuitStateEnum::closed, $newVo->getState());
         self::assertSame(4, $newVo->getFailureCount());
@@ -115,7 +115,7 @@ final class CircuitBreakerStateVoTest extends TestCase
             lastFailureAt: time(),
         );
 
-        $newVo = $vo->toRecordedFailure();
+        $newVo = CircuitBreakerStateVo::createFromRecordedFailure($vo);
 
         // В Open состоянии recordFailure не меняет состояние
         self::assertSame(CircuitStateEnum::open, $newVo->getState());
@@ -140,7 +140,7 @@ final class CircuitBreakerStateVoTest extends TestCase
 
         self::assertTrue($vo->isHalfOpen());
 
-        $newVo = $vo->toRecordedFailure();
+        $newVo = CircuitBreakerStateVo::createFromRecordedFailure($vo);
 
         self::assertSame(CircuitStateEnum::open, $newVo->getState());
         self::assertSame(6, $newVo->getFailureCount());
@@ -161,7 +161,7 @@ final class CircuitBreakerStateVoTest extends TestCase
             lastFailureAt: time(),
         );
 
-        $newVo = $vo->toRecordedSuccess();
+        $newVo = CircuitBreakerStateVo::createFromRecordedSuccess($vo);
 
         self::assertSame(CircuitStateEnum::closed, $newVo->getState());
         self::assertSame(0, $newVo->getFailureCount());
@@ -182,7 +182,7 @@ final class CircuitBreakerStateVoTest extends TestCase
 
         self::assertTrue($vo->isHalfOpen());
 
-        $newVo = $vo->toRecordedSuccess();
+        $newVo = CircuitBreakerStateVo::createFromRecordedSuccess($vo);
 
         self::assertSame(CircuitStateEnum::closed, $newVo->getState());
         self::assertSame(0, $newVo->getFailureCount());
@@ -200,7 +200,7 @@ final class CircuitBreakerStateVoTest extends TestCase
             lastFailureAt: time(),
         );
 
-        $newVo = $vo->toRecordedSuccess();
+        $newVo = CircuitBreakerStateVo::createFromRecordedSuccess($vo);
 
         self::assertSame(CircuitStateEnum::open, $newVo->getState());
         self::assertSame(5, $newVo->getFailureCount());
@@ -320,11 +320,11 @@ final class CircuitBreakerStateVoTest extends TestCase
         self::assertSame(CircuitStateEnum::closed, $vo->getEffectiveState());
 
         // Step 2: Closed → после N failures → Open
-        $vo = $vo->toRecordedFailure(); // 1
+        $vo = CircuitBreakerStateVo::createFromRecordedFailure($vo); // 1
         self::assertSame(CircuitStateEnum::closed, $vo->getState());
-        $vo = $vo->toRecordedFailure(); // 2
+        $vo = CircuitBreakerStateVo::createFromRecordedFailure($vo); // 2
         self::assertSame(CircuitStateEnum::closed, $vo->getState());
-        $vo = $vo->toRecordedFailure(); // 3 → Open
+        $vo = CircuitBreakerStateVo::createFromRecordedFailure($vo); // 3 → Open
         self::assertSame(CircuitStateEnum::open, $vo->getState());
         self::assertTrue($vo->isOpen());
 
@@ -341,7 +341,7 @@ final class CircuitBreakerStateVoTest extends TestCase
         self::assertSame(CircuitStateEnum::halfOpen, $vo->getEffectiveState());
 
         // Step 4: HalfOpen → success → Closed
-        $vo = $vo->toRecordedSuccess();
+        $vo = CircuitBreakerStateVo::createFromRecordedSuccess($vo);
         self::assertSame(CircuitStateEnum::closed, $vo->getState());
         self::assertSame(0, $vo->getFailureCount());
     }
@@ -363,7 +363,7 @@ final class CircuitBreakerStateVoTest extends TestCase
 
         self::assertTrue($vo->isHalfOpen());
 
-        $vo = $vo->toRecordedFailure();
+        $vo = CircuitBreakerStateVo::createFromRecordedFailure($vo);
 
         self::assertSame(CircuitStateEnum::open, $vo->getState());
         self::assertSame(6, $vo->getFailureCount());
@@ -422,7 +422,7 @@ final class CircuitBreakerStateVoTest extends TestCase
     {
         $original = new CircuitBreakerStateVo(failureThreshold: 5);
 
-        $modified = $original->toRecordedFailure();
+        $modified = CircuitBreakerStateVo::createFromRecordedFailure($original);
 
         self::assertNotSame($original, $modified);
         self::assertSame(0, $original->getFailureCount());
@@ -437,7 +437,7 @@ final class CircuitBreakerStateVoTest extends TestCase
             failureThreshold: 5,
         );
 
-        $modified = $original->toRecordedSuccess();
+        $modified = CircuitBreakerStateVo::createFromRecordedSuccess($original);
 
         self::assertNotSame($original, $modified);
         self::assertSame(3, $original->getFailureCount());

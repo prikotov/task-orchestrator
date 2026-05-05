@@ -116,30 +116,5 @@ final readonly class ChainRunRequestVo
         return $this->noContextFiles;
     }
 
-    /**
-     * Возвращает новый VO с обрезанным previousContext по maxContextLength.
-     * Обрезка происходит с конца (оставляются самые свежие данные).
-     */
-    public function toTruncatedContext(): self
-    {
-        if ($this->previousContext === null || strlen($this->previousContext) <= $this->maxContextLength) {
-            return $this;
-        }
 
-        return new self(
-            role: $this->role,
-            task: $this->task,
-            systemPrompt: $this->systemPrompt,
-            previousContext: substr($this->previousContext, -$this->maxContextLength),
-            model: $this->model,
-            tools: $this->tools,
-            workingDir: $this->workingDir,
-            timeout: $this->timeout,
-            maxContextLength: $this->maxContextLength,
-            command: $this->command,
-            runnerArgs: $this->runnerArgs,
-            runnerName: $this->runnerName,
-            noContextFiles: $this->noContextFiles,
-        );
-    }
 }
