@@ -42,7 +42,7 @@ final class ChainRunRequestVoTest extends TestCase
             maxContextLength: 500,
             noContextFiles: true,
         );
-        $result = $vo->withTruncatedContext();
+        $result = $vo->toTruncatedContext();
 
         self::assertNotSame($vo, $result);
         self::assertTrue($result->hasNoContextFiles());
@@ -58,7 +58,7 @@ final class ChainRunRequestVoTest extends TestCase
             maxContextLength: 500,
             noContextFiles: false,
         );
-        $result = $vo->withTruncatedContext();
+        $result = $vo->toTruncatedContext();
 
         self::assertNotSame($vo, $result);
         self::assertFalse($result->hasNoContextFiles());
@@ -68,7 +68,7 @@ final class ChainRunRequestVoTest extends TestCase
     public function withTruncatedContextReturnsSameInstanceWhenContextIsNull(): void
     {
         $vo = new ChainRunRequestVo(role: 'test', task: 'task');
-        $result = $vo->withTruncatedContext();
+        $result = $vo->toTruncatedContext();
 
         self::assertSame($vo, $result);
         self::assertFalse($result->hasNoContextFiles());
@@ -83,7 +83,7 @@ final class ChainRunRequestVoTest extends TestCase
             previousContext: 'short context',
             maxContextLength: 50000,
         );
-        $result = $vo->withTruncatedContext();
+        $result = $vo->toTruncatedContext();
 
         self::assertSame($vo, $result);
     }

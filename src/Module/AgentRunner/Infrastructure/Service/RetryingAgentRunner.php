@@ -83,7 +83,7 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
                 }
 
                 // Результат с ошибкой — классифицируем
-                $classification = ErrorClassificationVo::classify($result);
+                $classification = ErrorClassificationVo::createFromClassification($result);
 
                 if (!$classification->shouldRetry()) {
                     $this->logger->warning(

@@ -103,7 +103,7 @@ final readonly class DynamicLoopRunRequestVo
         return $this->noContextFiles;
     }
 
-    public function withTruncatedContext(): self
+    public function toTruncatedContext(): self
     {
         if ($this->previousContext === null || strlen($this->previousContext) <= $this->maxContextLength) {
             return $this;

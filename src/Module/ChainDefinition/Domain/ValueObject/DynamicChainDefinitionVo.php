@@ -33,6 +33,7 @@ final readonly class DynamicChainDefinitionVo implements ChainDefinitionInterfac
      * @param PromptConfigurationVo $promptConfiguration конфигурация промптов
      * @param ChainRetryPolicyVo|null $defaultRetryPolicy политика retry по умолчанию
      */
+    // phpcs:ignore
     public function __construct(
         private SharedChainDefinitionVo $shared,
         private string $facilitator,
@@ -49,7 +50,7 @@ final readonly class DynamicChainDefinitionVo implements ChainDefinitionInterfac
      * @param list<string> $participants
      * @param array<string, RoleConfigVo> $roles per-role конфигурация
      */
-    public static function create(
+    public static function createFromDynamic(
         string $name,
         string $description,
         string $facilitator,

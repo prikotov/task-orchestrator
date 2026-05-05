@@ -24,6 +24,7 @@ use InvalidArgumentException;
  */
 final readonly class ChainRetryPolicyVo
 {
+    // phpcs:ignore
     public function __construct(
         private int $maxRetries = 3,
         private int $initialDelayMs = 1000,
@@ -98,7 +99,7 @@ final readonly class ChainRetryPolicyVo
     /**
      * Создаёт политику с выключенным retry (0 попыток).
      */
-    public static function disabled(): self
+    public static function createFromDisabled(): self
     {
         return new self(maxRetries: 0);
     }
@@ -108,7 +109,7 @@ final readonly class ChainRetryPolicyVo
      *
      * @param array{max_retries?: int, initial_delay_ms?: int, max_delay_ms?: int, multiplier?: float} $config
      */
-    public static function fromArray(array $config): self
+    public static function createFromArray(array $config): self
     {
         return new self(
             maxRetries: $config['max_retries'] ?? 3,

@@ -69,7 +69,7 @@ final readonly class ExecuteStaticStepService
         );
 
         $start = microtime(true);
-        $result = $this->agentRunner->run($request->withTruncatedContext(), $step->getRetryPolicy());
+        $result = $this->agentRunner->run($request->toTruncatedContext(), $step->getRetryPolicy());
         $duration = microtime(true) - $start;
 
         $fallbackRunnerUsed = null;

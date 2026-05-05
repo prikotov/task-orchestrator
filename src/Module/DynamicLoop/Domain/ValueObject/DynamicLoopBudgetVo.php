@@ -20,6 +20,7 @@ final readonly class DynamicLoopBudgetVo
     /**
      * @param array<string, DynamicLoopBudgetVo> $perRoleBudgets лимиты по ролям (ключ = имя роли)
      */
+    // phpcs:ignore
     public function __construct(
         private ?float $maxCostTotal = null,
         private ?float $maxCostPerStep = null,
@@ -117,7 +118,7 @@ final readonly class DynamicLoopBudgetVo
      *     per_role?: array<string, array{max_cost_total?: float|int|null, max_cost_per_step?: float|int|null}|mixed>
      * } $config
      */
-    public static function fromArray(array $config): self
+    public static function createFromArray(array $config): self
     {
         $maxCostTotal = $config['max_cost_total'] ?? null;
         $maxCostPerStep = $config['max_cost_per_step'] ?? null;
@@ -125,7 +126,7 @@ final readonly class DynamicLoopBudgetVo
         $perRoleBudgets = [];
         foreach ($config['per_role'] ?? [] as $role => $roleConfig) {
             if (is_array($roleConfig)) {
-                $perRoleBudgets[$role] = self::fromArray($roleConfig);
+                $perRoleBudgets[$role] = self::createFromArray($roleConfig);
             }
         }
 

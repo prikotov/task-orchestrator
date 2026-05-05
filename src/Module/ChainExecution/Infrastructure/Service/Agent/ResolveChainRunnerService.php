@@ -74,7 +74,7 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
         );
 
         try {
-            $result = $this->agentRunner->run($fallbackRequest->withTruncatedContext(), $retryPolicy);
+            $result = $this->agentRunner->run($fallbackRequest->toTruncatedContext(), $retryPolicy);
 
             if ($result->isError()) {
                 $this->logger?->error(sprintf(

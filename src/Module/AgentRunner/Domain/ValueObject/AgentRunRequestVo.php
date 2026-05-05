@@ -107,7 +107,7 @@ final readonly class AgentRunRequestVo
      * Возвращает новый VO с обрезанным previousContext по maxContextLength.
      * Обрезка происходит с конца (оставляются самые свежие данные).
      */
-    public function withTruncatedContext(): self
+    public function toTruncatedContext(): self
     {
         if ($this->previousContext === null || strlen($this->previousContext) <= $this->maxContextLength) {
             return $this;

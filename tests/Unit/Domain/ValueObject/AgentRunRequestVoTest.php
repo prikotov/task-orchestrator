@@ -59,7 +59,7 @@ final class AgentRunRequestVoTest extends TestCase
     public function withTruncatedContextReturnsSameWhenNoContext(): void
     {
         $vo = new AgentRunRequestVo(role: 'test', task: 'test');
-        $result = $vo->withTruncatedContext();
+        $result = $vo->toTruncatedContext();
 
         self::assertSame($vo, $result);
     }
@@ -73,7 +73,7 @@ final class AgentRunRequestVoTest extends TestCase
             previousContext: str_repeat('a', 100),
             maxContextLength: 200,
         );
-        $result = $vo->withTruncatedContext();
+        $result = $vo->toTruncatedContext();
 
         self::assertSame($vo, $result);
     }
@@ -88,7 +88,7 @@ final class AgentRunRequestVoTest extends TestCase
             previousContext: $context,
             maxContextLength: 500,
         );
-        $result = $vo->withTruncatedContext();
+        $result = $vo->toTruncatedContext();
 
         self::assertNotSame($vo, $result);
         self::assertSame(500, strlen($result->getPreviousContext()));
@@ -108,7 +108,7 @@ final class AgentRunRequestVoTest extends TestCase
             previousContext: str_repeat('x', 1000),
             maxContextLength: 500,
         );
-        $result = $vo->withTruncatedContext();
+        $result = $vo->toTruncatedContext();
 
         self::assertSame('System prompt', $result->getSystemPrompt());
     }
@@ -131,7 +131,7 @@ final class AgentRunRequestVoTest extends TestCase
             maxContextLength: 500,
             noContextFiles: true,
         );
-        $result = $vo->withTruncatedContext();
+        $result = $vo->toTruncatedContext();
 
         self::assertTrue($result->hasNoContextFiles());
     }

@@ -34,7 +34,7 @@ final readonly class RunAgentCommandHandler
         $runner = $this->applyRetry($runner, $command);
 
         $request = $this->buildRequest($command);
-        $result = $runner->run($request->withTruncatedContext());
+        $result = $runner->run($request->toTruncatedContext());
 
         return new RunAgentResultDto(
             outputText: $result->getOutputText(),

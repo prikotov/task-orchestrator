@@ -76,18 +76,18 @@ final class ChainDefinitionDtoMapperTest extends TestCase
 
     private function createStaticChainVo(string $name = 'test-static'): ChainDefinitionInterface
     {
-        return StaticChainDefinitionVo::create(
+        return StaticChainDefinitionVo::createFromSteps(
             name: $name,
             description: 'Test static chain',
             steps: [
-                ChainStepVo::agent(role: 'agent', runner: 'pi'),
+                ChainStepVo::createFromAgent(role: 'agent', runner: 'pi'),
             ],
         );
     }
 
     private function createDynamicChainVo(string $name = 'test-dynamic'): ChainDefinitionInterface
     {
-        return DynamicChainDefinitionVo::create(
+        return DynamicChainDefinitionVo::createFromDynamic(
             name: $name,
             description: 'Test dynamic chain',
             facilitator: 'analyst',

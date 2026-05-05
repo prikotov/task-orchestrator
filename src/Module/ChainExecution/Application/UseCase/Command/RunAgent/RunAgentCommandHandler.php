@@ -40,7 +40,7 @@ final readonly class RunAgentCommandHandler
             noContextFiles: $command->noContextFiles,
         );
 
-        $result = $this->agentRunner->run($request->withTruncatedContext());
+        $result = $this->agentRunner->run($request->toTruncatedContext());
 
         return new RunAgentResultDto(
             outputText: $result->getOutputText(),

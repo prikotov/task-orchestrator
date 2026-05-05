@@ -32,7 +32,7 @@ final readonly class StaticStepResultVo
     ) {
     }
 
-    public function withIterationWarning(): self
+    public function toIterationWarning(): self
     {
         return new self(
             role: $this->role,

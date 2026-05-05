@@ -449,7 +449,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
             $roles[$role] = new DynamicLoopRoleConfigVo(command: ['pi', '--model', 'gpt-4'], timeout: 60);
         }
 
-        return DynamicLoopConfigVo::create(
+        return DynamicLoopConfigVo::createFromDynamic(
             name: $name,
             description: '',
             facilitator: $facilitator,

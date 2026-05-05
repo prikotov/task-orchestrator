@@ -72,7 +72,7 @@ final class StaticChainIntegrationTest extends TestCase
         );
         $hookExecutor = $this->createMock(HookExecutorInterface::class);
         $hookExecutor->method('execute')->willReturn(
-            HookResultVo::skipped(),
+            HookResultVo::createFromSkipped(),
         );
 
         $runStaticChainService = new RunStaticChainService(

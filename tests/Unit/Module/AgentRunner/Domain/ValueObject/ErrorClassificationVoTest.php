@@ -25,7 +25,7 @@ final class ErrorClassificationVoTest extends TestCase
             timedOut: true,
         );
 
-        $classification = ErrorClassificationVo::classify($result);
+        $classification = ErrorClassificationVo::createFromClassification($result);
 
         self::assertSame(ErrorClassificationEnum::transient, $classification->getClassification());
         self::assertTrue($classification->shouldRetry());
@@ -41,7 +41,7 @@ final class ErrorClassificationVoTest extends TestCase
             exitCode: 100,
         );
 
-        $classification = ErrorClassificationVo::classify($result);
+        $classification = ErrorClassificationVo::createFromClassification($result);
 
         self::assertSame(ErrorClassificationEnum::fatal, $classification->getClassification());
         self::assertFalse($classification->shouldRetry());
@@ -55,7 +55,7 @@ final class ErrorClassificationVoTest extends TestCase
             exitCode: 137,
         );
 
-        $classification = ErrorClassificationVo::classify($result);
+        $classification = ErrorClassificationVo::createFromClassification($result);
 
         self::assertSame(ErrorClassificationEnum::fatal, $classification->getClassification());
         self::assertFalse($classification->shouldRetry());
@@ -69,7 +69,7 @@ final class ErrorClassificationVoTest extends TestCase
             exitCode: 255,
         );
 
-        $classification = ErrorClassificationVo::classify($result);
+        $classification = ErrorClassificationVo::createFromClassification($result);
 
         self::assertSame(ErrorClassificationEnum::fatal, $classification->getClassification());
         self::assertFalse($classification->shouldRetry());
@@ -85,7 +85,7 @@ final class ErrorClassificationVoTest extends TestCase
             exitCode: 0,
         );
 
-        $classification = ErrorClassificationVo::classify($result);
+        $classification = ErrorClassificationVo::createFromClassification($result);
 
         self::assertSame(ErrorClassificationEnum::unknown, $classification->getClassification());
         self::assertTrue($classification->shouldRetry());
@@ -101,7 +101,7 @@ final class ErrorClassificationVoTest extends TestCase
             exitCode: 1,
         );
 
-        $classification = ErrorClassificationVo::classify($result);
+        $classification = ErrorClassificationVo::createFromClassification($result);
 
         self::assertSame(ErrorClassificationEnum::transient, $classification->getClassification());
         self::assertTrue($classification->shouldRetry());
@@ -115,7 +115,7 @@ final class ErrorClassificationVoTest extends TestCase
             exitCode: 2,
         );
 
-        $classification = ErrorClassificationVo::classify($result);
+        $classification = ErrorClassificationVo::createFromClassification($result);
 
         self::assertSame(ErrorClassificationEnum::transient, $classification->getClassification());
         self::assertTrue($classification->shouldRetry());
@@ -129,7 +129,7 @@ final class ErrorClassificationVoTest extends TestCase
             exitCode: 99,
         );
 
-        $classification = ErrorClassificationVo::classify($result);
+        $classification = ErrorClassificationVo::createFromClassification($result);
 
         self::assertSame(ErrorClassificationEnum::transient, $classification->getClassification());
     }
@@ -145,7 +145,7 @@ final class ErrorClassificationVoTest extends TestCase
             timedOut: true,
         );
 
-        $classification = ErrorClassificationVo::classify($result);
+        $classification = ErrorClassificationVo::createFromClassification($result);
 
         self::assertSame(ErrorClassificationEnum::transient, $classification->getClassification());
         self::assertTrue($classification->shouldRetry());
@@ -158,7 +158,7 @@ final class ErrorClassificationVoTest extends TestCase
     {
         $result = AgentResultVo::createFromSuccess(outputText: 'OK');
 
-        $classification = ErrorClassificationVo::classify($result);
+        $classification = ErrorClassificationVo::createFromClassification($result);
 
         self::assertSame(ErrorClassificationEnum::transient, $classification->getClassification());
     }
@@ -170,7 +170,7 @@ final class ErrorClassificationVoTest extends TestCase
     {
         $throwable = new RuntimeException('Connection refused');
 
-        $classification = ErrorClassificationVo::classifyFromException($throwable);
+        $classification = ErrorClassificationVo::createFromClassException($throwable);
 
         self::assertSame(ErrorClassificationEnum::transient, $classification->getClassification());
         self::assertTrue($classification->shouldRetry());
@@ -181,10 +181,10 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function equalsReturnsTrueForSameClassification(): void
     {
-        $a = ErrorClassificationVo::classify(
+        $a = ErrorClassificationVo::createFromClassification(
             AgentResultVo::createFromError(errorMessage: 'x', exitCode: 1),
         );
-        $b = ErrorClassificationVo::classify(
+        $b = ErrorClassificationVo::createFromClassification(
             AgentResultVo::createFromError(errorMessage: 'y', exitCode: 2),
         );
 
@@ -194,10 +194,10 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function equalsReturnsFalseForDifferentClassification(): void
     {
-        $transient = ErrorClassificationVo::classify(
+        $transient = ErrorClassificationVo::createFromClassification(
             AgentResultVo::createFromError(errorMessage: 'x', exitCode: 1),
         );
-        $fatal = ErrorClassificationVo::classify(
+        $fatal = ErrorClassificationVo::createFromClassification(
             AgentResultVo::createFromError(errorMessage: 'y', exitCode: 100),
         );
 

@@ -328,7 +328,7 @@ final readonly class RunStaticChainService
         $lastIndex = count($results) - 1;
         $last = $results[$lastIndex];
         if (!$last->iterationWarning) {
-            $results[$lastIndex] = $last->withIterationWarning();
+            $results[$lastIndex] = $last->toIterationWarning();
         }
 
         return $results;

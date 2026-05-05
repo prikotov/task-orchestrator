@@ -80,7 +80,7 @@ final class ConditionalChainIntegrationTest extends TestCase
 
         $stepExecutor = new StubConditionalStepExecutor();
         $hookExecutor = $this->createMock(HookExecutorInterface::class);
-        $hookExecutor->method('execute')->willReturn(HookResultVo::skipped());
+        $hookExecutor->method('execute')->willReturn(HookResultVo::createFromSkipped());
 
         $conditionalDefinitionMapper = new ChainExecutionDefinitionMapper($this->chainLoader);
         $conditionalStrategy = new ConditionalExecutionStrategy(

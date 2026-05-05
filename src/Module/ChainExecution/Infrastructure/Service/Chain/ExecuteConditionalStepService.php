@@ -76,7 +76,7 @@ final readonly class ExecuteConditionalStepService implements ExecuteConditional
         );
 
         $start = microtime(true);
-        $result = $this->agentRunner->run($request->withTruncatedContext(), $step->getRetryPolicy());
+        $result = $this->agentRunner->run($request->toTruncatedContext(), $step->getRetryPolicy());
         $duration = microtime(true) - $start;
 
         return $this->toStepResult($role, $runnerName, $result, $duration);

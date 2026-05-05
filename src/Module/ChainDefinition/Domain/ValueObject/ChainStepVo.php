@@ -34,6 +34,7 @@ final readonly class ChainStepVo
      * @param ConditionExpressionVo|null $when условное выражение выполнения шага (null = безусловное выполнение)
      * @param string|null $postStep путь к post_step hook-скрипту (null = hook не сконфигурирован)
      */
+    // phpcs:ignore
     public function __construct(
         private ChainStepTypeEnum $type,
         private ?string $role = null,
@@ -67,7 +68,7 @@ final readonly class ChainStepVo
     /**
      * Фабричный метод для создания agent-шага.
      */
-    public static function agent(
+    public static function createFromAgent(
         string $role,
         string $runner = 'pi',
         ?string $tools = null,
@@ -95,7 +96,7 @@ final readonly class ChainStepVo
     /**
      * Фабричный метод для создания quality_gate-шага.
      */
-    public static function qualityGate(
+    public static function createFromQualityGate(
         string $command,
         string $label,
         int $timeoutSeconds = 120,

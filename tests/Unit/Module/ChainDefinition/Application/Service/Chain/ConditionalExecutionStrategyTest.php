@@ -40,7 +40,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
 
         // По умолчанию hook executor возвращает skipped (hook не сконфигурирован)
-        $this->hookExecutor->method('execute')->willReturn(HookResultVo::skipped());
+        $this->hookExecutor->method('execute')->willReturn(HookResultVo::createFromSkipped());
 
         $this->strategy = new ConditionalExecutionStrategy(
             $this->conditionEvaluator,

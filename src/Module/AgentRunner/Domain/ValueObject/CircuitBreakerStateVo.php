@@ -22,6 +22,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\Enum\CircuitStateEnum;
  */
 final readonly class CircuitBreakerStateVo
 {
+    // phpcs:ignore
     public function __construct(
         private CircuitStateEnum $state = CircuitStateEnum::closed,
         private int $failureCount = 0,
@@ -74,7 +75,7 @@ final readonly class CircuitBreakerStateVo
      * HalfOpen: одна ошибка → сразу Open.
      * Open: не должен вызываться (вызовы блокируются).
      */
-    public function recordFailure(): self
+    public function toRecordedFailure(): self
     {
         $now = time();
         $effectiveState = $this->getEffectiveState();
@@ -119,7 +120,7 @@ final readonly class CircuitBreakerStateVo
      * HalfOpen: переход в Closed с полной сброской.
      * Open: не должен вызываться (вызовы блокируются).
      */
-    public function recordSuccess(): self
+    public function toRecordedSuccess(): self
     {
         $effectiveState = $this->getEffectiveState();
 
@@ -181,7 +182,7 @@ final readonly class CircuitBreakerStateVo
      *
      * @param array{failure_threshold?: int, reset_timeout_seconds?: int} $config
      */
-    public static function fromArray(array $config): self
+    public static function createFromArray(array $config): self
     {
         return new self(
             failureThreshold: $config['failure_threshold'] ?? 5,

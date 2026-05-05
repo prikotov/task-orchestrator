@@ -137,7 +137,7 @@ final class BudgetVoTest extends TestCase
     #[Test]
     public function fromArrayCreatesBudgetWithBothLimits(): void
     {
-        $vo = BudgetVo::fromArray([
+        $vo = BudgetVo::createFromArray([
             'max_cost_total' => 5.0,
             'max_cost_per_step' => 2.0,
         ]);
@@ -149,7 +149,7 @@ final class BudgetVoTest extends TestCase
     #[Test]
     public function fromArrayCreatesBudgetWithIntegerValues(): void
     {
-        $vo = BudgetVo::fromArray([
+        $vo = BudgetVo::createFromArray([
             'max_cost_total' => 10,
             'max_cost_per_step' => 3,
         ]);
@@ -161,7 +161,7 @@ final class BudgetVoTest extends TestCase
     #[Test]
     public function fromArrayCreatesUnlimitedBudgetFromEmptyArray(): void
     {
-        $vo = BudgetVo::fromArray([]);
+        $vo = BudgetVo::createFromArray([]);
 
         self::assertTrue($vo->isUnlimited());
     }
@@ -169,7 +169,7 @@ final class BudgetVoTest extends TestCase
     #[Test]
     public function fromArrayCreatesBudgetWithOnlyTotal(): void
     {
-        $vo = BudgetVo::fromArray(['max_cost_total' => 7.5]);
+        $vo = BudgetVo::createFromArray(['max_cost_total' => 7.5]);
 
         self::assertSame(7.5, $vo->getMaxCostTotal());
         self::assertNull($vo->getMaxCostPerStep());
@@ -178,7 +178,7 @@ final class BudgetVoTest extends TestCase
     #[Test]
     public function fromArrayCreatesBudgetWithOnlyStepLimit(): void
     {
-        $vo = BudgetVo::fromArray(['max_cost_per_step' => 1.0]);
+        $vo = BudgetVo::createFromArray(['max_cost_per_step' => 1.0]);
 
         self::assertNull($vo->getMaxCostTotal());
         self::assertSame(1.0, $vo->getMaxCostPerStep());
@@ -187,7 +187,7 @@ final class BudgetVoTest extends TestCase
     #[Test]
     public function fromArrayHandlesNullValues(): void
     {
-        $vo = BudgetVo::fromArray([
+        $vo = BudgetVo::createFromArray([
             'max_cost_total' => null,
             'max_cost_per_step' => null,
         ]);
@@ -286,7 +286,7 @@ final class BudgetVoTest extends TestCase
     #[Test]
     public function fromArrayParsesPerRoleBudgets(): void
     {
-        $vo = BudgetVo::fromArray([
+        $vo = BudgetVo::createFromArray([
             'max_cost_total' => 5.0,
             'per_role' => [
                 'dev' => ['max_cost_total' => 2.0],
@@ -304,7 +304,7 @@ final class BudgetVoTest extends TestCase
     #[Test]
     public function fromArrayIgnoresNonArrayPerRoleEntries(): void
     {
-        $vo = BudgetVo::fromArray([
+        $vo = BudgetVo::createFromArray([
             'per_role' => [
                 'dev' => ['max_cost_total' => 2.0],
                 'bad' => 'not_an_array',

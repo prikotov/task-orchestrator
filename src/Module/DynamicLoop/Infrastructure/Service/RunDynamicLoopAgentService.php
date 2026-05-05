@@ -261,7 +261,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             noContextFiles: $request->hasNoContextFiles(),
         );
 
-        $chainResult = $this->agentRunner->run($chainRequest->withTruncatedContext());
+        $chainResult = $this->agentRunner->run($chainRequest->toTruncatedContext());
 
         if ($chainResult->isError()) {
             return DynamicLoopRunResultVo::createFromError(

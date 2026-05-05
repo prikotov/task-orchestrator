@@ -205,7 +205,7 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
 
     private function createConfig(): DynamicLoopConfigVo
     {
-        return DynamicLoopConfigVo::create(
+        return DynamicLoopConfigVo::createFromDynamic(
             name: 'test',
             description: '',
             facilitator: 'facilitator',

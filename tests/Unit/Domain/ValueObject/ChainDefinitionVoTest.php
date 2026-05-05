@@ -27,8 +27,8 @@ final class ChainDefinitionVoTest extends TestCase
     public function createFromStepsCreatesStaticVo(): void
     {
         $steps = [
-            ChainStepVo::agent(role: 'system_analyst', runner: 'pi'),
-            ChainStepVo::agent(role: 'backend_developer'),
+            ChainStepVo::createFromAgent(role: 'system_analyst', runner: 'pi'),
+            ChainStepVo::createFromAgent(role: 'backend_developer'),
         ];
 
         $vo = ChainDefinitionVo::createFromSteps(
@@ -164,7 +164,7 @@ final class ChainDefinitionVoTest extends TestCase
         $vo = ChainDefinitionVo::createFromSteps(
             name: 'test',
             description: 'Test',
-            steps: [ChainStepVo::agent(role: 'system_analyst')],
+            steps: [ChainStepVo::createFromAgent(role: 'system_analyst')],
             roles: $roles,
         );
 
@@ -209,7 +209,7 @@ final class ChainDefinitionVoTest extends TestCase
         $vo = ChainDefinitionVo::createFromSteps(
             name: 'test',
             description: '',
-            steps: [ChainStepVo::agent(role: 'r')],
+            steps: [ChainStepVo::createFromAgent(role: 'r')],
         );
 
         self::assertSame([], $vo->getRoles());
@@ -223,7 +223,7 @@ final class ChainDefinitionVoTest extends TestCase
         $vo = ChainDefinitionVo::createFromSteps(
             name: 'retry_chain',
             description: 'Chain with retry',
-            steps: [ChainStepVo::agent(role: 'r')],
+            steps: [ChainStepVo::createFromAgent(role: 'r')],
             defaultRetryPolicy: $retryPolicy,
         );
 
@@ -238,7 +238,7 @@ final class ChainDefinitionVoTest extends TestCase
         $vo = ChainDefinitionVo::createFromSteps(
             name: 'no_retry',
             description: '',
-            steps: [ChainStepVo::agent(role: 'r')],
+            steps: [ChainStepVo::createFromAgent(role: 'r')],
         );
 
         self::assertNull($vo->getDefaultRetryPolicy());
@@ -296,7 +296,7 @@ final class ChainDefinitionVoTest extends TestCase
     {
         $stepPolicy = new ChainRetryPolicyVo(maxRetries: 1);
 
-        $step = ChainStepVo::agent(
+        $step = ChainStepVo::createFromAgent(
             role: 'retry_role',
             retryPolicy: $stepPolicy,
         );
@@ -308,7 +308,7 @@ final class ChainDefinitionVoTest extends TestCase
     #[Test]
     public function chainStepVoWithoutRetryPolicyReturnsNull(): void
     {
-        $step = ChainStepVo::agent(role: 'plain_role');
+        $step = ChainStepVo::createFromAgent(role: 'plain_role');
 
         self::assertNull($step->getRetryPolicy());
     }
@@ -319,7 +319,7 @@ final class ChainDefinitionVoTest extends TestCase
         $vo = ChainDefinitionVo::createFromSteps(
             name: 'timed',
             description: '',
-            steps: [ChainStepVo::agent(role: 'r1')],
+            steps: [ChainStepVo::createFromAgent(role: 'r1')],
             timeout: 600,
         );
 
@@ -332,7 +332,7 @@ final class ChainDefinitionVoTest extends TestCase
         $vo = ChainDefinitionVo::createFromSteps(
             name: 'untimed',
             description: '',
-            steps: [ChainStepVo::agent(role: 'r1')],
+            steps: [ChainStepVo::createFromAgent(role: 'r1')],
         );
 
         self::assertNull($vo->getTimeout());
@@ -430,7 +430,7 @@ final class ChainDefinitionVoTest extends TestCase
         $vo = ChainDefinitionVo::createFromSteps(
             name: 'static_no_maxtime',
             description: '',
-            steps: [ChainStepVo::agent(role: 'r1')],
+            steps: [ChainStepVo::createFromAgent(role: 'r1')],
         );
 
         self::assertNull($vo->getMaxTime());
@@ -442,7 +442,7 @@ final class ChainDefinitionVoTest extends TestCase
         $vo = ChainDefinitionVo::createFromSteps(
             name: 'test',
             description: 'Test chain',
-            steps: [ChainStepVo::agent(role: 'r1')],
+            steps: [ChainStepVo::createFromAgent(role: 'r1')],
         );
 
         $shared = $vo->getSharedDefinition();
@@ -501,7 +501,7 @@ final class ChainDefinitionVoTest extends TestCase
         $vo = ChainDefinitionVo::createFromSteps(
             name: 'minimal',
             description: '',
-            steps: [ChainStepVo::agent(role: 'r1')],
+            steps: [ChainStepVo::createFromAgent(role: 'r1')],
         );
 
         $shared = $vo->getSharedDefinition();

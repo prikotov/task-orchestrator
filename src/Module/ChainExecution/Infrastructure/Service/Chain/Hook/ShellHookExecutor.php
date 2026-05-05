@@ -76,7 +76,7 @@ final readonly class ShellHookExecutor implements HookExecutorInterface
                     'duration' => $duration,
                 ]);
 
-                return HookResultVo::warning(
+                return HookResultVo::createFromWarning(
                     command: $scriptPath,
                     exitCode: $exitCode,
                     stdout: $stdout,
@@ -92,7 +92,7 @@ final readonly class ShellHookExecutor implements HookExecutorInterface
                 'duration' => $duration,
             ]);
 
-            return HookResultVo::success(
+            return HookResultVo::createFromSuccess(
                 command: $scriptPath,
                 stdout: $stdout,
                 stderr: $stderr,
@@ -107,7 +107,7 @@ final readonly class ShellHookExecutor implements HookExecutorInterface
                 'duration' => $duration,
             ]);
 
-            return HookResultVo::warning(
+            return HookResultVo::createFromWarning(
                 command: $scriptPath,
                 exitCode: -1,
                 stdout: '',
@@ -125,7 +125,7 @@ final readonly class ShellHookExecutor implements HookExecutorInterface
                 'duration' => $duration,
             ]);
 
-            return HookResultVo::warning(
+            return HookResultVo::createFromWarning(
                 command: $scriptPath,
                 exitCode: -1,
                 stdout: '',
