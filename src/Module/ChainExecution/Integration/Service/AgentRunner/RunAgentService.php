@@ -5,28 +5,32 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner;
 
 use Override;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Agent\RunAgentServiceInterface as OrchestratorRunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunAgentServiceInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Agent\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 
 /**
- * Интеграционный сервис: делегирует запуск AI-агента в Orchestrator.
+ * Integration-адаптер: маппит VO → DTO и вызывает AgentRunner Use Case.
  *
- * VO общие между модулями — mapper не нужен.
- * Изолирует StaticExecution от конкретного Orchestrator Integration-слоя.
+ * ACL (Anti-Corruption Layer): ChainExecution не зависит от AgentRunner Domain напрямую,
+ * только от AgentRunner Application (Command Handler).
  */
 final readonly class RunAgentService implements RunAgentServiceInterface
 {
     public function __construct(
-        private OrchestratorRunAgentServiceInterface $inner,
+        private RunAgentCommandHandler $agentRunner,
+        private AgentDtoMapper $mapper,
     ) {
     }
 
     #[Override]
     public function run(ChainRunRequestVo $request, ?ExecutionRetryPolicyVo $retryPolicy = null): ChainRunResultVo
     {
-        return $this->inner->run($request, $retryPolicy);
+        $command = $this->mapper->mapToRunAgentCommand($request, $retryPolicy);
+        $result = ($this->agentRunner)($command);
+
+        return $this->mapper->mapFromRunAgentResultDto($result);
     }
 }

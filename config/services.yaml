@@ -124,9 +124,6 @@ services:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionService
 
   # Static services (from merged StaticExecution module)
-  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunAgentServiceInterface:
-    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\RunAgentService
-
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\Prompt\FormatPromptService
 
