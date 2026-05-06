@@ -17,7 +17,7 @@ final class ChainStepVoPostStepTest extends TestCase
     #[Test]
     public function agentStepWithPostStep(): void
     {
-        $step = ChainStepVo::createFromAgent(
+        $step = ChainStepVo::createAgent(
             role: 'developer',
             postStep: 'scripts/notify.sh',
         );
@@ -29,7 +29,7 @@ final class ChainStepVoPostStepTest extends TestCase
     #[Test]
     public function agentStepWithoutPostStep(): void
     {
-        $step = ChainStepVo::createFromAgent(role: 'developer');
+        $step = ChainStepVo::createAgent(role: 'developer');
 
         self::assertFalse($step->hasPostStep());
         self::assertNull($step->getPostStep());
@@ -40,7 +40,7 @@ final class ChainStepVoPostStepTest extends TestCase
     #[Test]
     public function qualityGateStepWithPostStep(): void
     {
-        $step = ChainStepVo::createFromQualityGate(
+        $step = ChainStepVo::createQualityGate(
             command: 'vendor/bin/phpcs',
             label: 'PHPCS',
             postStep: 'scripts/log-quality.sh',
@@ -53,7 +53,7 @@ final class ChainStepVoPostStepTest extends TestCase
     #[Test]
     public function qualityGateStepWithoutPostStep(): void
     {
-        $step = ChainStepVo::createFromQualityGate(
+        $step = ChainStepVo::createQualityGate(
             command: 'vendor/bin/phpcs',
             label: 'PHPCS',
         );

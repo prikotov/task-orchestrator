@@ -84,7 +84,7 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
                 $state->toLogString(),
             ));
 
-            return AgentResultVo::createFromError(
+            return AgentResultVo::createError(
                 errorMessage: sprintf(
                     'Circuit breaker is open for runner "%s". %s',
                     $runnerName,
@@ -164,7 +164,7 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
                 $throwable->getMessage(),
             ));
 
-            return AgentResultVo::createFromError(
+            return AgentResultVo::createError(
                 errorMessage: sprintf(
                     'Circuit breaker is open for runner "%s" and fallback runner "%s" threw exception: %s',
                     $runnerName,

@@ -78,13 +78,13 @@ final readonly class StaticAuditService implements StaticAuditServiceInterface
     private function mapToChainRunResult(StaticStepResultVo $stepResult): ChainRunResultVo
     {
         if ($stepResult->isError) {
-            return ChainRunResultVo::createFromError(
+            return ChainRunResultVo::createError(
                 $stepResult->errorMessage ?? 'unknown',
                 timedOut: $stepResult->timedOut,
             );
         }
 
-        return ChainRunResultVo::createFromSuccess(
+        return ChainRunResultVo::createSuccess(
             $stepResult->outputText,
             $stepResult->inputTokens,
             $stepResult->outputTokens,

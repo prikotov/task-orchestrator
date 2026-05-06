@@ -80,7 +80,7 @@ final class ChainDefinitionDtoMapperTest extends TestCase
             name: $name,
             description: 'Test static chain',
             steps: [
-                ChainStepVo::createFromAgent(role: 'agent', runner: 'pi'),
+                ChainStepVo::createAgent(role: 'agent', runner: 'pi'),
             ],
         );
     }

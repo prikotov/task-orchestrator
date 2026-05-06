@@ -55,7 +55,7 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
         $execution = new DynamicLoopExecution();
 
         $turnResult = $this->createSuccessTurnResult('Final synthesis');
-        $facResponse = FacilitatorResponseVo::createFromDone('Final synthesis');
+        $facResponse = FacilitatorResponseVo::createDone('Final synthesis');
 
         $this->turnExecutor->method('runFinalizeStep')->willReturn($turnResult);
         $this->sessionLogger->method('writeContextFile');
@@ -78,7 +78,7 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
         $execution = new DynamicLoopExecution();
 
         $turnResult = $this->createSuccessTurnResult('{"synthesis":"Parsed result"}');
-        $facResponse = FacilitatorResponseVo::createFromDone('Parsed result');
+        $facResponse = FacilitatorResponseVo::createDone('Parsed result');
 
         $this->turnExecutor->method('runFinalizeStep')->willReturn($turnResult);
         $this->sessionLogger->method('writeContextFile');
@@ -97,8 +97,8 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
         $execution = new DynamicLoopExecution();
 
         $turnResult = $this->createSuccessTurnResult('Raw synthesis text');
-        // createFromNextRole returns FacilitatorResponseVo with getSynthesis() = null
-        $facResponse = FacilitatorResponseVo::createFromNextRole('architect');
+        // createNextRole returns FacilitatorResponseVo with getSynthesis() = null
+        $facResponse = FacilitatorResponseVo::createNextRole('architect');
 
         $this->turnExecutor->method('runFinalizeStep')->willReturn($turnResult);
         $this->sessionLogger->method('writeContextFile');
@@ -117,7 +117,7 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
         $execution = new DynamicLoopExecution();
 
         $turnResult = $this->createSuccessTurnResult('Result');
-        $facResponse = FacilitatorResponseVo::createFromDone('Result');
+        $facResponse = FacilitatorResponseVo::createDone('Result');
 
         $this->turnExecutor->method('runFinalizeStep')->willReturn($turnResult);
         $this->facParser->method('parse')->willReturn($facResponse);
@@ -193,7 +193,7 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
     private function createSuccessTurnResult(string $output): DynamicLoopTurnResultVo
     {
         return new DynamicLoopTurnResultVo(
-            agentResult: DynamicLoopRunResultVo::createFromSuccess(
+            agentResult: DynamicLoopRunResultVo::createSuccess(
                 outputText: $output,
                 inputTokens: 200,
                 outputTokens: 100,

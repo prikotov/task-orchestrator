@@ -61,14 +61,14 @@ final readonly class AgentDtoMapper
     public function mapFromRunAgentResultDto(RunAgentResultDto $dto): ChainRunResultVo
     {
         if ($dto->isError) {
-            return ChainRunResultVo::createFromError(
+            return ChainRunResultVo::createError(
                 errorMessage: $dto->errorMessage ?? 'unknown',
                 exitCode: $dto->exitCode,
                 timedOut: $dto->timedOut,
             );
         }
 
-        return ChainRunResultVo::createFromSuccess(
+        return ChainRunResultVo::createSuccess(
             outputText: $dto->outputText,
             inputTokens: $dto->inputTokens,
             outputTokens: $dto->outputTokens,

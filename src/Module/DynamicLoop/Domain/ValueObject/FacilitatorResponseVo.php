@@ -47,7 +47,7 @@ final readonly class FacilitatorResponseVo
     /**
      * Создаёт ответ «продолжить с указанной ролью».
      */
-    public static function createFromNextRole(string $role, ?string $challenge = null): self
+    public static function createNextRole(string $role, ?string $challenge = null): self
     {
         return new self(done: false, nextRole: $role, synthesis: null, challenge: $challenge);
     }
@@ -55,7 +55,7 @@ final readonly class FacilitatorResponseVo
     /**
      * Создаёт ответ «завершить с synthesis».
      */
-    public static function createFromDone(string $synthesis): self
+    public static function createDone(string $synthesis): self
     {
         return new self(done: true, nextRole: null, synthesis: $synthesis);
     }

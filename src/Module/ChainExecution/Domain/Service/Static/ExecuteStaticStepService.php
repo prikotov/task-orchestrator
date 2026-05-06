@@ -89,11 +89,11 @@ final readonly class ExecuteStaticStepService
             $fallbackRunnerUsed = $fallbackResult->fallbackRunnerName;
             if ($fallbackResult->fallbackRunnerName !== null) {
                 $result = $fallbackResult->isError
-                    ? ChainRunResultVo::createFromError(
+                    ? ChainRunResultVo::createError(
                         $fallbackResult->errorMessage ?? 'unknown',
                         timedOut: $fallbackResult->timedOut,
                     )
-                    : ChainRunResultVo::createFromSuccess(
+                    : ChainRunResultVo::createSuccess(
                         $fallbackResult->outputText,
                         $fallbackResult->inputTokens,
                         $fallbackResult->outputTokens,
@@ -174,13 +174,13 @@ final readonly class ExecuteStaticStepService
         StaticStepResultVo $stepResult,
     ): ChainRunResultVo {
         if ($stepResult->isError) {
-            return ChainRunResultVo::createFromError(
+            return ChainRunResultVo::createError(
                 $stepResult->errorMessage ?? 'unknown',
                 timedOut: $stepResult->timedOut,
             );
         }
 
-        return ChainRunResultVo::createFromSuccess(
+        return ChainRunResultVo::createSuccess(
             $stepResult->outputText,
             $stepResult->inputTokens,
             $stepResult->outputTokens,

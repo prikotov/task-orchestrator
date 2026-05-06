@@ -35,7 +35,7 @@ final class RunAgentCommandHandlerTest extends TestCase
     #[Test]
     public function invokeRunsAgentWithCorrectRoleAndPrompt(): void
     {
-        $expectedResult = ChainRunResultVo::createFromSuccess(
+        $expectedResult = ChainRunResultVo::createSuccess(
             outputText: 'Analysis complete',
             inputTokens: 100,
         );
@@ -70,7 +70,7 @@ final class RunAgentCommandHandlerTest extends TestCase
     #[Test]
     public function invokePassesOptionsToRequest(): void
     {
-        $expectedResult = ChainRunResultVo::createFromSuccess(outputText: 'ok');
+        $expectedResult = ChainRunResultVo::createSuccess(outputText: 'ok');
 
         $this->promptProvider->method('getPrompt')->willReturn('prompt');
 
@@ -99,7 +99,7 @@ final class RunAgentCommandHandlerTest extends TestCase
     #[Test]
     public function invokeUsesCustomRunner(): void
     {
-        $expectedResult = ChainRunResultVo::createFromSuccess(outputText: 'codex result');
+        $expectedResult = ChainRunResultVo::createSuccess(outputText: 'codex result');
 
         $this->promptProvider->method('getPrompt')->willReturn('prompt');
 
@@ -124,7 +124,7 @@ final class RunAgentCommandHandlerTest extends TestCase
     #[Test]
     public function invokeMapsErrorResult(): void
     {
-        $expectedResult = ChainRunResultVo::createFromError('Agent crashed', 1);
+        $expectedResult = ChainRunResultVo::createError('Agent crashed', 1);
 
         $this->promptProvider->method('getPrompt')->willReturn('prompt');
         $this->agentRunner->method('run')->willReturn($expectedResult);

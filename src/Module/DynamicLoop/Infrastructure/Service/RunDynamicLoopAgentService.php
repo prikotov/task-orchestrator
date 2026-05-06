@@ -264,14 +264,14 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         $chainResult = $this->agentRunner->run($this->truncateRequestContext($chainRequest));
 
         if ($chainResult->isError()) {
-            return DynamicLoopRunResultVo::createFromError(
+            return DynamicLoopRunResultVo::createError(
                 errorMessage: $chainResult->getErrorMessage() ?? 'unknown',
                 exitCode: $chainResult->getExitCode(),
                 timedOut: $chainResult->isTimedOut(),
             );
         }
 
-        return DynamicLoopRunResultVo::createFromSuccess(
+        return DynamicLoopRunResultVo::createSuccess(
             outputText: $chainResult->getOutputText(),
             inputTokens: $chainResult->getInputTokens(),
             outputTokens: $chainResult->getOutputTokens(),

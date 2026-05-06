@@ -68,7 +68,7 @@ final readonly class ChainStepVo
     /**
      * Фабричный метод для создания agent-шага.
      */
-    public static function createFromAgent(
+    public static function createAgent(
         string $role,
         string $runner = 'pi',
         ?string $tools = null,
@@ -96,7 +96,7 @@ final readonly class ChainStepVo
     /**
      * Фабричный метод для создания quality_gate-шага.
      */
-    public static function createFromQualityGate(
+    public static function createQualityGate(
         string $command,
         string $label,
         int $timeoutSeconds = 120,

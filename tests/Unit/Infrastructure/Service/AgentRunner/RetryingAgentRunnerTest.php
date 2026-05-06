@@ -38,7 +38,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function returnsSuccessOnFirstAttempt(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->expects(self::once())->method('run')->willReturn($successResult);
@@ -55,7 +55,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function retriesOnExceptionAndSucceedsOnSecondAttempt(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'Recovered');
+        $successResult = AgentResultVo::createSuccess(outputText: 'Recovered');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -78,8 +78,8 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function retriesOnErrorResultAndSucceedsOnNextAttempt(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'API rate limit');
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'Done');
+        $errorResult = AgentResultVo::createError(errorMessage: 'API rate limit');
+        $successResult = AgentResultVo::createSuccess(outputText: 'Done');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -118,7 +118,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function returnsErrorAfterAllAttemptsExhaustedFromErrorResult(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'Model overloaded');
+        $errorResult = AgentResultVo::createError(errorMessage: 'Model overloaded');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -179,7 +179,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function logsWarningOnRetryAttempt(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -206,7 +206,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function propagatesTimedOutFromInnerRunnerErrorResult(): void
     {
-        $timedOutResult = AgentResultVo::createFromError(
+        $timedOutResult = AgentResultVo::createError(
             errorMessage: 'Agent timed out after 30 seconds.',
             timedOut: true,
         );
@@ -229,7 +229,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function doesNotSetTimedOutWhenInnerErrorIsNotTimeout(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'API rate limit');
+        $errorResult = AgentResultVo::createError(errorMessage: 'API rate limit');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -249,11 +249,11 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function retrySucceedsAfterTimeoutClearsTimedOut(): void
     {
-        $timedOutResult = AgentResultVo::createFromError(
+        $timedOutResult = AgentResultVo::createError(
             errorMessage: 'Agent timed out',
             timedOut: true,
         );
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'Recovered');
+        $successResult = AgentResultVo::createSuccess(outputText: 'Recovered');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -275,7 +275,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function doesNotRetryOnFatalExitCode(): void
     {
-        $fatalResult = AgentResultVo::createFromError(
+        $fatalResult = AgentResultVo::createError(
             errorMessage: 'Process crash',
             exitCode: 137,
         );
@@ -299,7 +299,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function doesNotRetryOnFatalExitCode100(): void
     {
-        $fatalResult = AgentResultVo::createFromError(
+        $fatalResult = AgentResultVo::createError(
             errorMessage: 'Segmentation fault',
             exitCode: 100,
         );
@@ -322,7 +322,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function doesNotRetryOnFatalExitCode255(): void
     {
-        $fatalResult = AgentResultVo::createFromError(
+        $fatalResult = AgentResultVo::createError(
             errorMessage: 'Invalid API key',
             exitCode: 255,
         );
@@ -347,11 +347,11 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function retriesOnTransientExitCode1(): void
     {
-        $transientResult = AgentResultVo::createFromError(
+        $transientResult = AgentResultVo::createError(
             errorMessage: 'Rate limit',
             exitCode: 1,
         );
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -371,11 +371,11 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function retriesOnTimedOutResult(): void
     {
-        $timedOutResult = AgentResultVo::createFromError(
+        $timedOutResult = AgentResultVo::createError(
             errorMessage: 'Agent timed out',
             timedOut: true,
         );
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -396,11 +396,11 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function retriesOnUnknownExitCode0WithError(): void
     {
-        $unknownResult = AgentResultVo::createFromError(
+        $unknownResult = AgentResultVo::createError(
             errorMessage: 'Anomaly',
             exitCode: 0,
         );
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -419,7 +419,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function logsWarningOnFatalClassification(): void
     {
-        $fatalResult = AgentResultVo::createFromError(
+        $fatalResult = AgentResultVo::createError(
             errorMessage: 'Process crash',
             exitCode: 137,
         );
@@ -446,7 +446,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function recordsAttemptCounterOnEachAttempt(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($successResult);
@@ -467,7 +467,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function recordsAttemptCounterForMultipleAttempts(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -495,7 +495,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function recordsErrorCounterOnException(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -520,8 +520,8 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function recordsErrorCounterOnErrorResult(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'API error');
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $errorResult = AgentResultVo::createError(errorMessage: 'API error');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner
@@ -543,7 +543,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function recordsDurationOnSuccess(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($successResult);
@@ -590,7 +590,7 @@ final class RetryingAgentRunnerTest extends TestCase
     #[Test]
     public function worksWithoutMetricsCollector(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($successResult);

@@ -47,7 +47,7 @@ final class StubRunAgentService implements RunAgentServiceInterface
         int $outputTokens = 0,
         float $cost = 0.0,
     ): self {
-        $this->results[] = ChainRunResultVo::createFromSuccess(
+        $this->results[] = ChainRunResultVo::createSuccess(
             outputText: $outputText,
             inputTokens: $inputTokens,
             outputTokens: $outputTokens,
@@ -62,7 +62,7 @@ final class StubRunAgentService implements RunAgentServiceInterface
      */
     public function pushError(string $errorMessage, int $exitCode = 1): self
     {
-        $this->results[] = ChainRunResultVo::createFromError(
+        $this->results[] = ChainRunResultVo::createError(
             errorMessage: $errorMessage,
             exitCode: $exitCode,
         );
@@ -75,7 +75,7 @@ final class StubRunAgentService implements RunAgentServiceInterface
      */
     public function pushTimeout(string $errorMessage = 'Agent timed out'): self
     {
-        $this->results[] = ChainRunResultVo::createFromError(
+        $this->results[] = ChainRunResultVo::createError(
             errorMessage: $errorMessage,
             timedOut: true,
         );

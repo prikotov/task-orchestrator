@@ -20,7 +20,7 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function timedOutResultClassifiedAsTransient(): void
     {
-        $result = AgentResultVo::createFromError(
+        $result = AgentResultVo::createError(
             errorMessage: 'Agent timed out',
             timedOut: true,
         );
@@ -36,7 +36,7 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function exitCode100ClassifiedAsFatal(): void
     {
-        $result = AgentResultVo::createFromError(
+        $result = AgentResultVo::createError(
             errorMessage: 'Process crash',
             exitCode: 100,
         );
@@ -50,7 +50,7 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function exitCode137ClassifiedAsFatal(): void
     {
-        $result = AgentResultVo::createFromError(
+        $result = AgentResultVo::createError(
             errorMessage: 'SIGKILL',
             exitCode: 137,
         );
@@ -64,7 +64,7 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function exitCode255ClassifiedAsFatal(): void
     {
-        $result = AgentResultVo::createFromError(
+        $result = AgentResultVo::createError(
             errorMessage: 'Invalid API key',
             exitCode: 255,
         );
@@ -80,7 +80,7 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function exitCode0WithErrorClassifiedAsUnknown(): void
     {
-        $result = AgentResultVo::createFromError(
+        $result = AgentResultVo::createError(
             errorMessage: 'Anomaly',
             exitCode: 0,
         );
@@ -96,7 +96,7 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function exitCode1ClassifiedAsTransient(): void
     {
-        $result = AgentResultVo::createFromError(
+        $result = AgentResultVo::createError(
             errorMessage: 'Rate limit exceeded',
             exitCode: 1,
         );
@@ -110,7 +110,7 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function exitCode2ClassifiedAsTransient(): void
     {
-        $result = AgentResultVo::createFromError(
+        $result = AgentResultVo::createError(
             errorMessage: 'Connection refused',
             exitCode: 2,
         );
@@ -124,7 +124,7 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function exitCode99ClassifiedAsTransient(): void
     {
-        $result = AgentResultVo::createFromError(
+        $result = AgentResultVo::createError(
             errorMessage: 'Some error',
             exitCode: 99,
         );
@@ -139,7 +139,7 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function timedOutWithHighExitCodeStillTransient(): void
     {
-        $result = AgentResultVo::createFromError(
+        $result = AgentResultVo::createError(
             errorMessage: 'Timeout before crash',
             exitCode: 137,
             timedOut: true,
@@ -156,7 +156,7 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function successResultClassifiedAsTransient(): void
     {
-        $result = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $result = AgentResultVo::createSuccess(outputText: 'OK');
 
         $classification = ErrorClassificationVo::createFromClassification($result);
 
@@ -182,10 +182,10 @@ final class ErrorClassificationVoTest extends TestCase
     public function equalsReturnsTrueForSameClassification(): void
     {
         $a = ErrorClassificationVo::createFromClassification(
-            AgentResultVo::createFromError(errorMessage: 'x', exitCode: 1),
+            AgentResultVo::createError(errorMessage: 'x', exitCode: 1),
         );
         $b = ErrorClassificationVo::createFromClassification(
-            AgentResultVo::createFromError(errorMessage: 'y', exitCode: 2),
+            AgentResultVo::createError(errorMessage: 'y', exitCode: 2),
         );
 
         self::assertTrue($a->equals($b)); // both TRANSIENT
@@ -195,10 +195,10 @@ final class ErrorClassificationVoTest extends TestCase
     public function equalsReturnsFalseForDifferentClassification(): void
     {
         $transient = ErrorClassificationVo::createFromClassification(
-            AgentResultVo::createFromError(errorMessage: 'x', exitCode: 1),
+            AgentResultVo::createError(errorMessage: 'x', exitCode: 1),
         );
         $fatal = ErrorClassificationVo::createFromClassification(
-            AgentResultVo::createFromError(errorMessage: 'y', exitCode: 100),
+            AgentResultVo::createError(errorMessage: 'y', exitCode: 100),
         );
 
         self::assertFalse($transient->equals($fatal));

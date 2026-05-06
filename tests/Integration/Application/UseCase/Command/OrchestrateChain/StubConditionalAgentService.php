@@ -29,7 +29,7 @@ final class StubConditionalAgentService implements RunAgentServiceInterface
         }
 
         // Default: successful result
-        return ChainRunResultVo::createFromSuccess(
+        return ChainRunResultVo::createSuccess(
             outputText: 'Default agent output',
             inputTokens: 100,
             outputTokens: 200,

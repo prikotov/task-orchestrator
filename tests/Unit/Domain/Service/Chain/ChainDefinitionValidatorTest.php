@@ -40,8 +40,8 @@ final class ChainDefinitionValidatorTest extends TestCase
             name: 'implement',
             description: 'Test',
             steps: [
-                ChainStepVo::createFromAgent(role: 'dev'),
-                ChainStepVo::createFromQualityGate(command: 'vendor/bin/phpunit', label: 'Unit tests'),
+                ChainStepVo::createAgent(role: 'dev'),
+                ChainStepVo::createQualityGate(command: 'vendor/bin/phpunit', label: 'Unit tests'),
             ],
         );
 
@@ -137,8 +137,8 @@ final class ChainDefinitionValidatorTest extends TestCase
     public function fixIterationsReferenceUnknownStepReturnsViolation(): void
     {
         $steps = [
-            ChainStepVo::createFromAgent(role: 'dev', name: 'step1'),
-            ChainStepVo::createFromAgent(role: 'qa', name: 'step2'),
+            ChainStepVo::createAgent(role: 'dev', name: 'step1'),
+            ChainStepVo::createAgent(role: 'qa', name: 'step2'),
         ];
 
         // Группа ссылается на несуществующий шаг 'step_unknown'
@@ -161,8 +161,8 @@ final class ChainDefinitionValidatorTest extends TestCase
     public function fixIterationsWithValidReferencesReturnsNoViolations(): void
     {
         $steps = [
-            ChainStepVo::createFromAgent(role: 'dev', name: 'step1'),
-            ChainStepVo::createFromAgent(role: 'qa', name: 'step2'),
+            ChainStepVo::createAgent(role: 'dev', name: 'step1'),
+            ChainStepVo::createAgent(role: 'qa', name: 'step2'),
         ];
 
         $fixGroup = new FixIterationGroupVo('group1', ['step1', 'step2'], 3);
@@ -269,7 +269,7 @@ final class ChainDefinitionValidatorTest extends TestCase
     #[Test]
     public function stepFieldPathUsesZeroBasedIndex(): void
     {
-        $validStep = ChainStepVo::createFromAgent(role: 'ok');
+        $validStep = ChainStepVo::createAgent(role: 'ok');
         $badStep = $this->createAgentStepWithoutRole();
 
         $chain = $this->createStaticChainWithSteps('indexed', [$validStep, $badStep]);

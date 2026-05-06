@@ -244,7 +244,7 @@ final class YamlChainLoader implements ChainLoaderInterface
                         );
                     }
 
-                    return ChainStepVo::createFromQualityGate(
+                    return ChainStepVo::createQualityGate(
                         command: $command,
                         label: $label,
                         timeoutSeconds: $step['timeout_seconds'] ?? 120,
@@ -258,7 +258,7 @@ final class YamlChainLoader implements ChainLoaderInterface
                 $stepRetryPolicy = $this->parseRetryPolicy($step['retry_policy'] ?? null);
                 $stepNoContextFiles = (bool) ($step['no_context_files'] ?? $chainNoContextFiles);
 
-                return ChainStepVo::createFromAgent(
+                return ChainStepVo::createAgent(
                     role: $step['role'] ?? throw new InvalidArgumentException(
                         sprintf('Agent step "role" is required in chain "%s".', $name),
                     ),
