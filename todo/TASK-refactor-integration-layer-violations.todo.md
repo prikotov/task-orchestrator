@@ -9,8 +9,8 @@ epic: EPIC-refactor-responsibility-decomposition
 author: Тимлид Алекс
 assignee: Бэкендер Левша
 branch: task/refactor-integration-layer-violations
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/154
+status: review
 ---
 
 # TASK-refactor-integration-layer-violations: Перенос классов в Integration-слой для устранения 10 Deptrac-violations
