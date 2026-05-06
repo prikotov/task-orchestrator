@@ -75,7 +75,7 @@ final readonly class CircuitBreakerStateVo
      * HalfOpen: одна ошибка → сразу Open.
      * Open: не должен вызываться (вызовы блокируются).
      */
-    public static function createFromRecordedFailure(self $state): self
+    public static function createRecordedFailure(self $state): self
     {
         $now = time();
         $effectiveState = $state->getEffectiveState();
@@ -120,7 +120,7 @@ final readonly class CircuitBreakerStateVo
      * HalfOpen: переход в Closed с полной сброской.
      * Open: не должен вызываться (вызовы блокируются).
      */
-    public static function createFromRecordedSuccess(self $state): self
+    public static function createRecordedSuccess(self $state): self
     {
         $effectiveState = $state->getEffectiveState();
 

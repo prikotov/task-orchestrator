@@ -218,7 +218,7 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
     private function handleFailure(string $runnerName, CircuitBreakerStateVo $state): void
     {
         $previousState = $state->getEffectiveState();
-        $newState = CircuitBreakerStateVo::createFromRecordedFailure($state);
+        $newState = CircuitBreakerStateVo::createRecordedFailure($state);
         $this->states[$runnerName] = $newState;
 
         $newEffective = $newState->getEffectiveState();
@@ -267,6 +267,6 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
             ));
         }
 
-        $this->states[$runnerName] = CircuitBreakerStateVo::createFromRecordedSuccess($state);
+        $this->states[$runnerName] = CircuitBreakerStateVo::createRecordedSuccess($state);
     }
 }

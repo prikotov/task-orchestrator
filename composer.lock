@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "39454cb00422ba634012004fe7b2a7e7",
+    "content-hash": "41bbae04f3c4bb57d54d2dea15dae570",
     "packages": [
         {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
@@ -151,16 +151,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.4.2",
+            "version": "v0.5.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:prikotov/coding-standard.git",
-                "reference": "1c9601d2fb22099398c5a0dbdd53a20b66e7470e"
+                "reference": "7ea65e810ec0fe39601e9d8a945ab3b607df7029"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/1c9601d2fb22099398c5a0dbdd53a20b66e7470e",
-                "reference": "1c9601d2fb22099398c5a0dbdd53a20b66e7470e",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/7ea65e810ec0fe39601e9d8a945ab3b607df7029",
+                "reference": "7ea65e810ec0fe39601e9d8a945ab3b607df7029",
                 "shasum": ""
             },
             "require": {
@@ -227,7 +227,7 @@
                 "phpcs",
                 "sniffs"
             ],
-            "time": "2026-05-05T15:29:14+00:00"
+            "time": "2026-05-06T05:28:10+00:00"
         },
         {
             "name": "psr/container",
