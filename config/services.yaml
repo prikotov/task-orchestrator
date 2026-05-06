@@ -111,8 +111,6 @@ services:
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Shared\PromptFormatterInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\PromptFormatterService
 
-  TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeServiceInterface:
-    alias: TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeService
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ExecuteConditionalStepServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\ExecuteConditionalStepService

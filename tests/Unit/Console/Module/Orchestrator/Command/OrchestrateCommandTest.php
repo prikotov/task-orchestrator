@@ -17,8 +17,6 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainConfigVi
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainDefinitionDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainStepDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\OrchestrateExitCodeEnum;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeService;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
@@ -42,7 +40,6 @@ final class OrchestrateCommandTest extends TestCase
     private LoadChainQueryHandler&MockObject $loadChainHandler;
     private ValidateChainConfigQueryHandler&MockObject $validateChainConfigHandler;
     private LockFactory $lockFactory;
-    private ResolveExitCodeServiceInterface $exitCodeResolver;
 
     #[Override]
     protected function setUp(): void
@@ -52,7 +49,6 @@ final class OrchestrateCommandTest extends TestCase
         $this->loadChainHandler = $this->createMock(LoadChainQueryHandler::class);
         $this->validateChainConfigHandler = $this->createMock(ValidateChainConfigQueryHandler::class);
         $this->lockFactory = new LockFactory(new FlockStore());
-        $this->exitCodeResolver = new ResolveExitCodeService();
     }
 
     // ─── Basic execution ───────────────────────────────────────────────────────
@@ -89,7 +85,6 @@ final class OrchestrateCommandTest extends TestCase
             $this->loadChainHandler,
             $this->validateChainConfigHandler,
             $this->lockFactory,
-            $this->exitCodeResolver,
         );
 
         $app = new Application();
@@ -247,7 +242,6 @@ YAML);
                 $loadHandler,
                 $this->validateChainConfigHandler,
                 $this->lockFactory,
-                $this->exitCodeResolver,
             );
 
             $application = new Application();
@@ -301,7 +295,6 @@ YAML);
                 $this->loadChainHandler,
                 $validateHandler,
                 $this->lockFactory,
-                $this->exitCodeResolver,
             );
 
             $application = new Application();
@@ -390,7 +383,6 @@ YAML);
             $this->loadChainHandler,
             $this->validateChainConfigHandler,
             $this->lockFactory,
-            $this->exitCodeResolver,
         );
 
         $application = new Application();

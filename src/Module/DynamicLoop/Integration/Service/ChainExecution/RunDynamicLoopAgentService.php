@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service;
+namespace TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution;
 
 use Override;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Agent\RunAgentServiceInterface;
@@ -19,9 +19,12 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTur
 /**
  * Запускает агентов (facilitator/participant) в dynamic-цикле.
  *
- * Использует RunAgentServiceInterface из ChainDefinition.Domain\Service\Integration
+ * Использует RunAgentServiceInterface из ChainExecution.Domain.Contract
  * для реального запуска агента через AgentRunner.
  * Маппит DynamicLoop VO → ChainRunRequestVo для совместимости.
+ *
+ * Расположен в Integration-слое, т.к. обращается к контрактам ChainExecution.Domain.Contract
+ * (разрешено: Integration → foreign Domain через контракты).
  */
 final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentServiceInterface
 {
