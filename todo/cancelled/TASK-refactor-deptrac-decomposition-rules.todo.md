@@ -9,7 +9,7 @@ epic: EPIC-refactor-responsibility-decomposition
 author: Аналитик (Шерлок)
 assignee: Бэкендер (Левша)
 branch:
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/153
 status: cancelled
 ---
 
