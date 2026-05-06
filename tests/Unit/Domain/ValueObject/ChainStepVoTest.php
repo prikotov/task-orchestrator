@@ -61,7 +61,7 @@ final class ChainStepVoTest extends TestCase
     #[Test]
     public function agentFactoryCreatesAgentStep(): void
     {
-        $step = ChainStepVo::agent(
+        $step = ChainStepVo::createAgent(
             role: 'backend_developer',
             runner: 'codex',
             name: 'implement',
@@ -77,7 +77,7 @@ final class ChainStepVoTest extends TestCase
     #[Test]
     public function agentFactoryCreatesAgentStepWithNoContextFiles(): void
     {
-        $step = ChainStepVo::agent(
+        $step = ChainStepVo::createAgent(
             role: 'backend_developer',
             noContextFiles: true,
         );
@@ -88,7 +88,7 @@ final class ChainStepVoTest extends TestCase
     #[Test]
     public function agentFactoryDefaultsNoContextFilesToFalse(): void
     {
-        $step = ChainStepVo::agent(role: 'developer');
+        $step = ChainStepVo::createAgent(role: 'developer');
 
         self::assertFalse($step->hasNoContextFiles());
     }
@@ -144,7 +144,7 @@ final class ChainStepVoTest extends TestCase
     #[Test]
     public function qualityGateFactoryCreatesGateStep(): void
     {
-        $step = ChainStepVo::qualityGate(
+        $step = ChainStepVo::createQualityGate(
             command: 'make tests-unit',
             label: 'Unit Tests',
             timeoutSeconds: 120,
@@ -163,7 +163,7 @@ final class ChainStepVoTest extends TestCase
     #[Test]
     public function toQualityGateVoReturnsCorrectVo(): void
     {
-        $step = ChainStepVo::qualityGate(
+        $step = ChainStepVo::createQualityGate(
             command: 'make lint-php',
             label: 'Lint',
             timeoutSeconds: 60,
@@ -180,7 +180,7 @@ final class ChainStepVoTest extends TestCase
     #[Test]
     public function toQualityGateVoThrowsForAgentStep(): void
     {
-        $step = ChainStepVo::agent(role: 'developer');
+        $step = ChainStepVo::createAgent(role: 'developer');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Only quality_gate steps can be converted to QualityGateVo.');
@@ -193,7 +193,7 @@ final class ChainStepVoTest extends TestCase
     #[Test]
     public function agentStepDefaultsWhenToNull(): void
     {
-        $step = ChainStepVo::agent(role: 'developer');
+        $step = ChainStepVo::createAgent(role: 'developer');
 
         self::assertNull($step->getWhen());
         self::assertFalse($step->hasCondition());
@@ -203,7 +203,7 @@ final class ChainStepVoTest extends TestCase
     public function agentStepAcceptsWhenExpression(): void
     {
         $when = ConditionExpressionVo::createFromExpression('steps.tests.passed == true');
-        $step = ChainStepVo::agent(
+        $step = ChainStepVo::createAgent(
             role: 'backend_developer',
             name: 'deploy',
             when: $when,
@@ -218,7 +218,7 @@ final class ChainStepVoTest extends TestCase
     public function qualityGateStepAcceptsWhenExpression(): void
     {
         $when = ConditionExpressionVo::createFromExpression('steps.lint.exitCode == 0');
-        $step = ChainStepVo::qualityGate(
+        $step = ChainStepVo::createQualityGate(
             command: 'make deploy',
             label: 'Deploy',
             when: $when,

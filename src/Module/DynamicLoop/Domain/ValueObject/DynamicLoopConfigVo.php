@@ -34,6 +34,7 @@ final readonly class DynamicLoopConfigVo
      * @param DynamicLoopPromptConfigVo $promptConfiguration конфигурация промптов
      * @param DynamicLoopRetryPolicyVo|null $defaultRetryPolicy политика retry
      */
+    // phpcs:ignore
     public function __construct(
         private string $name,
         private string $description,
@@ -55,7 +56,7 @@ final readonly class DynamicLoopConfigVo
      * @param list<string> $participants
      * @param array<string, DynamicLoopRoleConfigVo> $roleConfigs
      */
-    public static function create(
+    public static function createFromDynamic(
         string $name,
         string $description,
         string $facilitator,

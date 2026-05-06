@@ -261,17 +261,17 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             noContextFiles: $request->hasNoContextFiles(),
         );
 
-        $chainResult = $this->agentRunner->run($chainRequest->withTruncatedContext());
+        $chainResult = $this->agentRunner->run($this->truncateRequestContext($chainRequest));
 
         if ($chainResult->isError()) {
-            return DynamicLoopRunResultVo::createFromError(
+            return DynamicLoopRunResultVo::createError(
                 errorMessage: $chainResult->getErrorMessage() ?? 'unknown',
                 exitCode: $chainResult->getExitCode(),
                 timedOut: $chainResult->isTimedOut(),
             );
         }
 
-        return DynamicLoopRunResultVo::createFromSuccess(
+        return DynamicLoopRunResultVo::createSuccess(
             outputText: $chainResult->getOutputText(),
             inputTokens: $chainResult->getInputTokens(),
             outputTokens: $chainResult->getOutputTokens(),
@@ -280,6 +280,32 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             cost: $chainResult->getCost(),
             model: $chainResult->getModel(),
             turns: $chainResult->getTurns(),
+        );
+    }
+
+    private function truncateRequestContext(ChainRunRequestVo $request): ChainRunRequestVo
+    {
+        $context = $request->getPreviousContext();
+        $maxLength = $request->getMaxContextLength();
+
+        if ($context === null || strlen($context) <= $maxLength) {
+            return $request;
+        }
+
+        return new ChainRunRequestVo(
+            role: $request->getRole(),
+            task: $request->getTask(),
+            systemPrompt: $request->getSystemPrompt(),
+            previousContext: substr($context, -$maxLength),
+            model: $request->getModel(),
+            tools: $request->getTools(),
+            workingDir: $request->getWorkingDir(),
+            timeout: $request->getTimeout(),
+            maxContextLength: $maxLength,
+            command: $request->getCommand(),
+            runnerArgs: $request->getRunnerArgs(),
+            runnerName: $request->getRunnerName(),
+            noContextFiles: $request->hasNoContextFiles(),
         );
     }
 }

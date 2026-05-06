@@ -28,7 +28,7 @@ final readonly class HookResultVo
     /**
      * Создаёт успешный результат hook (exit code 0).
      */
-    public static function success(
+    public static function createSuccess(
         string $command,
         string $stdout,
         string $stderr,
@@ -51,7 +51,7 @@ final readonly class HookResultVo
      *
      * Hook failure не прерывает цепочку — только warning.
      */
-    public static function warning(
+    public static function createWarning(
         string $command,
         int $exitCode,
         string $stdout,
@@ -76,7 +76,7 @@ final readonly class HookResultVo
     /**
      * Создаёт результат «hook не сконфигурирован» (skipped).
      */
-    public static function skipped(): self
+    public static function createSkipped(): self
     {
         return new self(
             command: '',

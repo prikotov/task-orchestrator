@@ -17,7 +17,7 @@ final class HookResultVoTest extends TestCase
     #[Test]
     public function successCreatesSuccessfulResult(): void
     {
-        $result = HookResultVo::success(
+        $result = HookResultVo::createSuccess(
             command: 'scripts/notify.sh',
             stdout: 'OK',
             stderr: '',
@@ -41,7 +41,7 @@ final class HookResultVoTest extends TestCase
     #[Test]
     public function warningCreatesWarningResultWithExitCode(): void
     {
-        $result = HookResultVo::warning(
+        $result = HookResultVo::createWarning(
             command: 'scripts/notify.sh',
             exitCode: 1,
             stdout: 'partial output',
@@ -66,7 +66,7 @@ final class HookResultVoTest extends TestCase
     #[Test]
     public function warningCreatesTimeoutResult(): void
     {
-        $result = HookResultVo::warning(
+        $result = HookResultVo::createWarning(
             command: 'scripts/slow.sh',
             exitCode: 137,
             stdout: '',
@@ -90,7 +90,7 @@ final class HookResultVoTest extends TestCase
     #[Test]
     public function skippedCreatesSkippedResult(): void
     {
-        $result = HookResultVo::skipped();
+        $result = HookResultVo::createSkipped();
 
         self::assertSame('', $result->getCommand());
         self::assertSame(0, $result->getExitCode());
@@ -109,7 +109,7 @@ final class HookResultVoTest extends TestCase
     #[Test]
     public function successWithEmptyOutput(): void
     {
-        $result = HookResultVo::success(
+        $result = HookResultVo::createSuccess(
             command: 'scripts/silent.sh',
             stdout: '',
             stderr: '',
@@ -124,7 +124,7 @@ final class HookResultVoTest extends TestCase
     #[Test]
     public function warningWithNegativeExitCode(): void
     {
-        $result = HookResultVo::warning(
+        $result = HookResultVo::createWarning(
             command: 'scripts/broken.sh',
             exitCode: -1,
             stdout: '',

@@ -80,7 +80,7 @@ final class ConditionalChainIntegrationTest extends TestCase
 
         $stepExecutor = new StubConditionalStepExecutor();
         $hookExecutor = $this->createMock(HookExecutorInterface::class);
-        $hookExecutor->method('execute')->willReturn(HookResultVo::skipped());
+        $hookExecutor->method('execute')->willReturn(HookResultVo::createSkipped());
 
         $conditionalDefinitionMapper = new ChainExecutionDefinitionMapper($this->chainLoader);
         $conditionalStrategy = new ConditionalExecutionStrategy(
@@ -129,7 +129,7 @@ final class ConditionalChainIntegrationTest extends TestCase
         // Steps: analyze (agent) → tests (quality_gate: echo) → implement (when: tests.passed == true) → skip_review (when: tests.passed == false)
         // Quality gate "echo 'All tests passed'" → exit code 0 → passed = true
         $this->conditionalAgent->setResult(
-            ChainRunResultVo::createFromSuccess('Analysis result', 50, 100, cost: 0.005),
+            ChainRunResultVo::createSuccess('Analysis result', 50, 100, cost: 0.005),
         );
 
         // Act
@@ -175,7 +175,7 @@ final class ConditionalChainIntegrationTest extends TestCase
         // Steps: lint (quality_gate: exit 1) → build (when: steps.lint.passed == true)
         // Quality gate "exit 1" → passed = false → build skipped
         $this->conditionalAgent->setResult(
-            ChainRunResultVo::createFromSuccess('Build result', 100, 200, cost: 0.01),
+            ChainRunResultVo::createSuccess('Build result', 100, 200, cost: 0.01),
         );
 
         // Act
@@ -210,7 +210,7 @@ final class ConditionalChainIntegrationTest extends TestCase
         // Arrange: conditional_mixed
         // Steps: analyze (agent) → check (quality_gate: echo 'ok') → implement (when: check.passed == true) → review (unconditional)
         $this->conditionalAgent->setResult(
-            ChainRunResultVo::createFromSuccess('Implementation done', 200, 400, cost: 0.02),
+            ChainRunResultVo::createSuccess('Implementation done', 200, 400, cost: 0.02),
         );
 
         // Act
@@ -250,7 +250,7 @@ final class ConditionalChainIntegrationTest extends TestCase
         // Arrange: conditional_explicit_type
         // type: conditional, steps: analyze → tests (quality_gate) → implement (when: tests.passed == true)
         $this->conditionalAgent->setResult(
-            ChainRunResultVo::createFromSuccess('Explicit type result', 300, 600, cost: 0.03),
+            ChainRunResultVo::createSuccess('Explicit type result', 300, 600, cost: 0.03),
         );
 
         // Act

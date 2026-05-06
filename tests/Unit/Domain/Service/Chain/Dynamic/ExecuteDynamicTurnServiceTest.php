@@ -105,7 +105,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         $execution->advanceRound();
 
         $turnResult = $this->createSuccessTurnResult('response');
-        $facResponse = FacilitatorResponseVo::createFromNextRole('architect', 'challenge text');
+        $facResponse = FacilitatorResponseVo::createNextRole('architect', 'challenge text');
 
         $this->agentRunner->method('runFacilitator')->willReturn([$turnResult, $facResponse]);
         $this->roundRecorder->method('record');
@@ -134,7 +134,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         $execution->advanceRound();
 
         $turnResult = $this->createSuccessTurnResult('response');
-        $facResponse = FacilitatorResponseVo::createFromNextRole('architect');
+        $facResponse = FacilitatorResponseVo::createNextRole('architect');
 
         $budgetCheck = new DynamicBudgetCheckVo(
             shouldBreak: true,
@@ -169,7 +169,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         $execution->advanceRound();
 
         $turnResult = $this->createErrorTurnResult('Agent crashed');
-        $facResponse = FacilitatorResponseVo::createFromNextRole('architect');
+        $facResponse = FacilitatorResponseVo::createNextRole('architect');
 
         $this->agentRunner->method('runFacilitator')->willReturn([$turnResult, $facResponse]);
         $this->roundRecorder->method('record');
@@ -198,7 +198,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         $execution->advanceRound();
 
         $turnResult = $this->createSuccessTurnResult('{"done":true,"synthesis":"Final answer"}');
-        $facResponse = FacilitatorResponseVo::createFromDone('Final answer');
+        $facResponse = FacilitatorResponseVo::createDone('Final answer');
 
         $this->agentRunner->method('runFacilitator')->willReturn([$turnResult, $facResponse]);
         $this->roundRecorder->method('record');
@@ -226,7 +226,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         $execution->advanceRound();
 
         $turnResult = $this->createTimedOutTurnResult();
-        $facResponse = FacilitatorResponseVo::createFromNextRole('architect');
+        $facResponse = FacilitatorResponseVo::createNextRole('architect');
 
         $this->agentRunner->method('runFacilitator')->willReturn([$turnResult, $facResponse]);
         $this->roundRecorder->method('record');
@@ -375,7 +375,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     #[Test]
     public function toRoundResultVoMapsAllFields(): void
     {
-        $agentResult = DynamicLoopRunResultVo::createFromSuccess(
+        $agentResult = DynamicLoopRunResultVo::createSuccess(
             outputText: 'Hello',
             inputTokens: 100,
             outputTokens: 50,
@@ -410,7 +410,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     private function createSuccessTurnResult(string $output): DynamicLoopTurnResultVo
     {
         return new DynamicLoopTurnResultVo(
-            agentResult: DynamicLoopRunResultVo::createFromSuccess(
+            agentResult: DynamicLoopRunResultVo::createSuccess(
                 outputText: $output,
                 inputTokens: 100,
                 outputTokens: 50,
@@ -423,7 +423,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     private function createErrorTurnResult(string $errorMessage): DynamicLoopTurnResultVo
     {
         return new DynamicLoopTurnResultVo(
-            agentResult: DynamicLoopRunResultVo::createFromError($errorMessage),
+            agentResult: DynamicLoopRunResultVo::createError($errorMessage),
             duration: 1.0,
         );
     }
@@ -431,7 +431,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     private function createTimedOutTurnResult(): DynamicLoopTurnResultVo
     {
         return new DynamicLoopTurnResultVo(
-            agentResult: DynamicLoopRunResultVo::createFromError('Timed out', timedOut: true),
+            agentResult: DynamicLoopRunResultVo::createError('Timed out', timedOut: true),
             duration: 60.0,
         );
     }
@@ -449,7 +449,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
             $roles[$role] = new DynamicLoopRoleConfigVo(command: ['pi', '--model', 'gpt-4'], timeout: 60);
         }
 
-        return DynamicLoopConfigVo::create(
+        return DynamicLoopConfigVo::createFromDynamic(
             name: $name,
             description: '',
             facilitator: $facilitator,

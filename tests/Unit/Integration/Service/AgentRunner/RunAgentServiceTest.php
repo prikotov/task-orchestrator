@@ -35,7 +35,7 @@ final class RunAgentServiceTest extends TestCase
     #[Test]
     public function runDelegatesToCommandHandlerAndMapsResult(): void
     {
-        $agentResult = AgentResultVo::createFromSuccess(
+        $agentResult = AgentResultVo::createSuccess(
             outputText: 'Code written',
             inputTokens: 100,
             outputTokens: 50,
@@ -56,7 +56,7 @@ final class RunAgentServiceTest extends TestCase
     public function runPassesRetryPolicyThroughMapper(): void
     {
         $retryPolicy = new ExecutionRetryPolicyVo(maxRetries: 3);
-        $agentResult = AgentResultVo::createFromSuccess(outputText: 'Retried OK');
+        $agentResult = AgentResultVo::createSuccess(outputText: 'Retried OK');
 
         $service = $this->createService($agentResult);
         $result = $service->run($this->request, $retryPolicy);
@@ -68,7 +68,7 @@ final class RunAgentServiceTest extends TestCase
     #[Test]
     public function runReturnsErrorResultFromHandler(): void
     {
-        $agentResult = AgentResultVo::createFromError(
+        $agentResult = AgentResultVo::createError(
             errorMessage: 'Timeout',
             timedOut: true,
         );

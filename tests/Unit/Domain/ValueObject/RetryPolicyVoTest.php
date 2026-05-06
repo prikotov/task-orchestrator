@@ -58,7 +58,7 @@ final class RetryPolicyVoTest extends TestCase
     #[Test]
     public function disabledCreatesPolicyWithZeroRetries(): void
     {
-        $vo = RetryPolicyVo::disabled();
+        $vo = RetryPolicyVo::createDisabled();
 
         self::assertSame(0, $vo->getMaxRetries());
         self::assertFalse($vo->isEnabled());
@@ -113,7 +113,7 @@ final class RetryPolicyVoTest extends TestCase
     #[Test]
     public function fromArrayCreatesPolicyWithProvidedValues(): void
     {
-        $vo = RetryPolicyVo::fromArray([
+        $vo = RetryPolicyVo::createFromArray([
             'max_retries' => 5,
             'initial_delay_ms' => 200,
             'max_delay_ms' => 10000,
@@ -129,7 +129,7 @@ final class RetryPolicyVoTest extends TestCase
     #[Test]
     public function fromArrayUsesDefaultsForMissingKeys(): void
     {
-        $vo = RetryPolicyVo::fromArray([]);
+        $vo = RetryPolicyVo::createFromArray([]);
 
         self::assertSame(3, $vo->getMaxRetries());
         self::assertSame(1000, $vo->getInitialDelayMs());
@@ -140,7 +140,7 @@ final class RetryPolicyVoTest extends TestCase
     #[Test]
     public function fromArrayUsesPartialOverrides(): void
     {
-        $vo = RetryPolicyVo::fromArray(['max_retries' => 7]);
+        $vo = RetryPolicyVo::createFromArray(['max_retries' => 7]);
 
         self::assertSame(7, $vo->getMaxRetries());
         self::assertSame(1000, $vo->getInitialDelayMs());

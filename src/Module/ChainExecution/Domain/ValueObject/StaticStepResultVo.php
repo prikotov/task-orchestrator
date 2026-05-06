@@ -32,25 +32,5 @@ final readonly class StaticStepResultVo
     ) {
     }
 
-    public function withIterationWarning(): self
-    {
-        return new self(
-            role: $this->role,
-            runner: $this->runner,
-            outputText: $this->outputText,
-            inputTokens: $this->inputTokens,
-            outputTokens: $this->outputTokens,
-            cost: $this->cost,
-            duration: $this->duration,
-            isError: $this->isError,
-            errorMessage: $this->errorMessage,
-            fallbackRunnerUsed: $this->fallbackRunnerUsed,
-            iterationNumber: $this->iterationNumber,
-            iterationWarning: true,
-            passed: $this->passed,
-            exitCode: $this->exitCode,
-            label: $this->label,
-            timedOut: $this->timedOut,
-        );
-    }
+
 }

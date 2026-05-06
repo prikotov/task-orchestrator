@@ -121,14 +121,14 @@ final readonly class PiAgentRunner implements AgentRunnerInterface
         try {
             $process->run();
         } catch (\Symfony\Component\Process\Exception\ProcessTimedOutException) {
-            return AgentResultVo::createFromError(
+            return AgentResultVo::createError(
                 errorMessage: sprintf('Agent timed out after %d seconds.', $request->getTimeout()),
                 timedOut: true,
             );
         }
 
         if (!$process->isSuccessful()) {
-            return AgentResultVo::createFromError(
+            return AgentResultVo::createError(
                 $process->getErrorOutput() ?: sprintf('pi exited with code %d.', $process->getExitCode() ?? 1),
                 $process->getExitCode() ?? 1,
             );
@@ -136,7 +136,7 @@ final readonly class PiAgentRunner implements AgentRunnerInterface
 
         $parsed = $this->parser->parse($process->getOutput());
 
-        return AgentResultVo::createFromSuccess(
+        return AgentResultVo::createSuccess(
             outputText: $parsed['outputText'],
             inputTokens: $parsed['inputTokens'],
             outputTokens: $parsed['outputTokens'],

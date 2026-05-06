@@ -117,12 +117,12 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
         // HTTPS-прокси мост: если CODEX_HTTP_PROXY содержит https:// схему,
         // запускаем локальный HTTP-прокси-мост для пересылки через TLS.
         // Ошибки запуска моста не должны бросать исключение из run() —
-        // возвращаем AgentResultVo::createFromError() по контракту AgentRunnerInterface.
+        // возвращаем AgentResultVo::createError() по контракту AgentRunnerInterface.
         $bridge = null;
         try {
             $bridge = $this->createBridgeIfNeeded();
         } catch (\Throwable $e) {
-            return AgentResultVo::createFromError(
+            return AgentResultVo::createError(
                 errorMessage: sprintf('Failed to start HTTPS proxy bridge: %s', $e->getMessage()),
             );
         }
@@ -148,7 +148,7 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
         } catch (\Symfony\Component\Process\Exception\ProcessTimedOutException) {
             $bridge?->stop();
 
-            return AgentResultVo::createFromError(
+            return AgentResultVo::createError(
                 errorMessage: sprintf('Agent timed out after %d seconds.', $request->getTimeout()),
                 timedOut: true,
             );
@@ -157,7 +157,7 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
         }
 
         if (!$process->isSuccessful()) {
-            return AgentResultVo::createFromError(
+            return AgentResultVo::createError(
                 $process->getErrorOutput() ?: sprintf('codex exited with code %d.', $process->getExitCode() ?? 1),
                 $process->getExitCode() ?? 1,
             );
@@ -165,7 +165,7 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
 
         $parsed = $this->parser->parse($process->getOutput());
 
-        return AgentResultVo::createFromSuccess(
+        return AgentResultVo::createSuccess(
             outputText: $parsed['outputText'],
             inputTokens: $parsed['inputTokens'],
             outputTokens: $parsed['outputTokens'],

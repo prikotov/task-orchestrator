@@ -36,12 +36,12 @@ final class ChainDefinitionValidatorTest extends TestCase
     #[Test]
     public function staticChainWithValidStepsReturnsNoViolations(): void
     {
-        $chain = StaticChainDefinitionVo::create(
+        $chain = StaticChainDefinitionVo::createFromSteps(
             name: 'implement',
             description: 'Test',
             steps: [
-                ChainStepVo::agent(role: 'dev'),
-                ChainStepVo::qualityGate(command: 'vendor/bin/phpunit', label: 'Unit tests'),
+                ChainStepVo::createAgent(role: 'dev'),
+                ChainStepVo::createQualityGate(command: 'vendor/bin/phpunit', label: 'Unit tests'),
             ],
         );
 
@@ -137,8 +137,8 @@ final class ChainDefinitionValidatorTest extends TestCase
     public function fixIterationsReferenceUnknownStepReturnsViolation(): void
     {
         $steps = [
-            ChainStepVo::agent(role: 'dev', name: 'step1'),
-            ChainStepVo::agent(role: 'qa', name: 'step2'),
+            ChainStepVo::createAgent(role: 'dev', name: 'step1'),
+            ChainStepVo::createAgent(role: 'qa', name: 'step2'),
         ];
 
         // Группа ссылается на несуществующий шаг 'step_unknown'
@@ -161,13 +161,13 @@ final class ChainDefinitionValidatorTest extends TestCase
     public function fixIterationsWithValidReferencesReturnsNoViolations(): void
     {
         $steps = [
-            ChainStepVo::agent(role: 'dev', name: 'step1'),
-            ChainStepVo::agent(role: 'qa', name: 'step2'),
+            ChainStepVo::createAgent(role: 'dev', name: 'step1'),
+            ChainStepVo::createAgent(role: 'qa', name: 'step2'),
         ];
 
         $fixGroup = new FixIterationGroupVo('group1', ['step1', 'step2'], 3);
 
-        $chain = StaticChainDefinitionVo::create(
+        $chain = StaticChainDefinitionVo::createFromSteps(
             name: 'fix-valid',
             description: 'Test',
             steps: $steps,
@@ -184,7 +184,7 @@ final class ChainDefinitionValidatorTest extends TestCase
     #[Test]
     public function dynamicChainWithValidConfigReturnsNoViolations(): void
     {
-        $chain = DynamicChainDefinitionVo::create(
+        $chain = DynamicChainDefinitionVo::createFromDynamic(
             name: 'brainstorm',
             description: 'Test',
             facilitator: 'analyst',
@@ -269,7 +269,7 @@ final class ChainDefinitionValidatorTest extends TestCase
     #[Test]
     public function stepFieldPathUsesZeroBasedIndex(): void
     {
-        $validStep = ChainStepVo::agent(role: 'ok');
+        $validStep = ChainStepVo::createAgent(role: 'ok');
         $badStep = $this->createAgentStepWithoutRole();
 
         $chain = $this->createStaticChainWithSteps('indexed', [$validStep, $badStep]);

@@ -26,11 +26,11 @@ final readonly class FacilitatorResponseParserService implements FacilitatorResp
         $json = $this->extractJson($llmText);
 
         if ($json === null) {
-            return FacilitatorResponseVo::createFromDone($llmText);
+            return FacilitatorResponseVo::createDone($llmText);
         }
 
         if (isset($json['done']) && (bool)$json['done']) {
-            return FacilitatorResponseVo::createFromDone(
+            return FacilitatorResponseVo::createDone(
                 $this->normalizeSynthesis($json['synthesis'] ?? null, $llmText),
             );
         }
@@ -40,10 +40,10 @@ final readonly class FacilitatorResponseParserService implements FacilitatorResp
                 ? $json['challenge']
                 : null;
 
-            return FacilitatorResponseVo::createFromNextRole($json['next_role'], $challenge);
+            return FacilitatorResponseVo::createNextRole($json['next_role'], $challenge);
         }
 
-        return FacilitatorResponseVo::createFromDone($llmText);
+        return FacilitatorResponseVo::createDone($llmText);
     }
 
     /**

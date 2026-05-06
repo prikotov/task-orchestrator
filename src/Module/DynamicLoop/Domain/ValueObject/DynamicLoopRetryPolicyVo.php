@@ -13,6 +13,7 @@ use InvalidArgumentException;
  */
 final readonly class DynamicLoopRetryPolicyVo
 {
+    // phpcs:ignore
     public function __construct(
         private int $maxRetries = 3,
         private int $initialDelayMs = 1000,
@@ -69,7 +70,7 @@ final readonly class DynamicLoopRetryPolicyVo
         return min($delay, $this->maxDelayMs);
     }
 
-    public static function disabled(): self
+    public static function createDisabled(): self
     {
         return new self(maxRetries: 0);
     }

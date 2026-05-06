@@ -33,7 +33,7 @@ final readonly class ChainRunResultVo
     /**
      * Создаёт успешный результат.
      */
-    public static function createFromSuccess(
+    public static function createSuccess(
         string $outputText,
         int $inputTokens = 0,
         int $outputTokens = 0,
@@ -61,7 +61,7 @@ final readonly class ChainRunResultVo
     /**
      * Создаёт результат с ошибкой.
      */
-    public static function createFromError(
+    public static function createError(
         string $errorMessage,
         int $exitCode = 1,
         bool $timedOut = false,

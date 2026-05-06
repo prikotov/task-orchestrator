@@ -62,7 +62,7 @@ final readonly class ConditionExpressionVo
             ));
         }
 
-        if (!self::isValidPath($path)) {
+        if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)+$/', $path) !== 1) {
             throw new InvalidArgumentException(sprintf(
                 'Invalid condition path: "%s". Expected format: segments.separated.by.dots (alphanumeric, underscores).',
                 $path,
@@ -87,7 +87,7 @@ final readonly class ConditionExpressionVo
     /**
      * Создаёт VO из компонентов (для использования в маппере).
      */
-    public static function fromComponents(
+    public static function createFromComponents(
         string $rawExpression,
         string $path,
         ConditionOperatorEnum $operator,
@@ -142,8 +142,4 @@ final readonly class ConditionExpressionVo
         return $this->rawExpression === $other->rawExpression;
     }
 
-    private static function isValidPath(string $path): bool
-    {
-        return preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)+$/', $path) === 1;
-    }
 }

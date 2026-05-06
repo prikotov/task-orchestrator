@@ -30,6 +30,7 @@ final readonly class StaticChainDefinitionVo implements ChainDefinitionInterface
      * @param list<FixIterationGroupVo> $fixIterations группы итераций фикса
      * @param ChainRetryPolicyVo|null $defaultRetryPolicy политика retry по умолчанию для шагов
      */
+    // phpcs:ignore
     public function __construct(
         private SharedChainDefinitionVo $shared,
         private array $steps,
@@ -45,7 +46,7 @@ final readonly class StaticChainDefinitionVo implements ChainDefinitionInterface
      * @param list<FixIterationGroupVo> $fixIterations
      * @param array<string, RoleConfigVo> $roles per-role конфигурация
      */
-    public static function create(
+    public static function createFromSteps(
         string $name,
         string $description,
         array $steps,
@@ -61,7 +62,42 @@ final readonly class StaticChainDefinitionVo implements ChainDefinitionInterface
             );
         }
 
-        self::validateFixIterations($name, $steps, $fixIterations);
+        if ($fixIterations !== []) {
+            $nameMap = [];
+            foreach ($steps as $index => $step) {
+                $stepName = $step->getName();
+                if ($stepName !== null) {
+                    $nameMap[$stepName] = $index;
+                }
+            }
+            $allGroupStepNames = [];
+            foreach ($fixIterations as $group) {
+                foreach ($group->getStepNames() as $stepName) {
+                    if (!isset($nameMap[$stepName])) {
+                        throw new InvalidArgumentException(
+                            sprintf(
+                                'Chain "%s": fix iteration group "%s" references unknown step name "%s".',
+                                $name,
+                                $group->getGroup(),
+                                $stepName,
+                            ),
+                        );
+                    }
+                    if (isset($allGroupStepNames[$stepName])) {
+                        throw new InvalidArgumentException(
+                            sprintf(
+                                'Chain "%s": step name "%s" belongs to multiple fix iteration groups ("%s" and "%s").',
+                                $name,
+                                $stepName,
+                                $allGroupStepNames[$stepName],
+                                $group->getGroup(),
+                            ),
+                        );
+                    }
+                    $allGroupStepNames[$stepName] = $group->getGroup();
+                }
+            }
+        }
 
         return new self(
             shared: new SharedChainDefinitionVo(
@@ -179,55 +215,4 @@ final readonly class StaticChainDefinitionVo implements ChainDefinitionInterface
         return $this->shared->getRoles();
     }
 
-    /**
-     * Валидирует fix_iterations: все stepNames должны существовать среди шагов,
-     * имена шагов в группе не должны пересекаться между группами.
-     *
-     * @param list<ChainStepVo> $steps
-     * @param list<FixIterationGroupVo> $fixIterations
-     */
-    private static function validateFixIterations(string $name, array $steps, array $fixIterations): void
-    {
-        if ($fixIterations === []) {
-            return;
-        }
-
-        $nameMap = [];
-        foreach ($steps as $index => $step) {
-            $stepName = $step->getName();
-            if ($stepName !== null) {
-                $nameMap[$stepName] = $index;
-            }
-        }
-
-        $allGroupStepNames = [];
-        foreach ($fixIterations as $group) {
-            foreach ($group->getStepNames() as $stepName) {
-                if (!isset($nameMap[$stepName])) {
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            'Chain "%s": fix iteration group "%s" references unknown step name "%s".',
-                            $name,
-                            $group->getGroup(),
-                            $stepName,
-                        ),
-                    );
-                }
-
-                if (isset($allGroupStepNames[$stepName])) {
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            'Chain "%s": step name "%s" belongs to multiple fix iteration groups ("%s" and "%s").',
-                            $name,
-                            $stepName,
-                            $allGroupStepNames[$stepName],
-                            $group->getGroup(),
-                        ),
-                    );
-                }
-
-                $allGroupStepNames[$stepName] = $group->getGroup();
-            }
-        }
-    }
 }
