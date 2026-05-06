@@ -70,7 +70,7 @@ final readonly class DynamicLoopRetryPolicyVo
         return min($delay, $this->maxDelayMs);
     }
 
-    public static function createFromDisabled(): self
+    public static function createDisabled(): self
     {
         return new self(maxRetries: 0);
     }

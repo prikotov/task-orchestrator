@@ -58,7 +58,7 @@ final class RetryPolicyVoTest extends TestCase
     #[Test]
     public function disabledCreatesPolicyWithZeroRetries(): void
     {
-        $vo = RetryPolicyVo::createFromDisabled();
+        $vo = RetryPolicyVo::createDisabled();
 
         self::assertSame(0, $vo->getMaxRetries());
         self::assertFalse($vo->isEnabled());

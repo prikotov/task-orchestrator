@@ -117,7 +117,7 @@ final class AgentDtoMapperTest extends TestCase
     public function mapToRunAgentCommandWithDisabledRetryPolicy(): void
     {
         $vo = new ChainRunRequestVo(role: 'dev', task: 'Write code', runnerName: 'pi');
-        $retryPolicy = ExecutionRetryPolicyVo::createFromDisabled();
+        $retryPolicy = ExecutionRetryPolicyVo::createDisabled();
 
         $result = $this->mapper->mapToRunAgentCommand($vo, $retryPolicy);
 

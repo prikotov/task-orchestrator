@@ -99,7 +99,7 @@ final readonly class ChainRetryPolicyVo
     /**
      * Создаёт политику с выключенным retry (0 попыток).
      */
-    public static function createFromDisabled(): self
+    public static function createDisabled(): self
     {
         return new self(maxRetries: 0);
     }
