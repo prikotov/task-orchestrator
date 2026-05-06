@@ -10,9 +10,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQuery;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQueryHandlerInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\RunnerDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQuery;
+use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
+use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersResultDto;
 
 #[AsCommand(
     name: 'app:agent:runners',
@@ -21,7 +21,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetR
 final class RunnersCommand extends Command
 {
     public function __construct(
-        private readonly GetRunnersQueryHandlerInterface $runnersHandler,
+        private readonly GetRunnersQueryHandler $runnersHandler,
     ) {
         parent::__construct();
     }
@@ -31,17 +31,16 @@ final class RunnersCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        /** @var list<RunnerDto> $runners */
-        $runners = ($this->runnersHandler)(new GetRunnersQuery());
+        $result = ($this->runnersHandler)(new GetRunnersQuery());
 
-        if (count($runners) === 0) {
+        if (count($result->runners) === 0) {
             $io->warning('Нет зарегистрированных движков.');
 
             return Command::SUCCESS;
         }
 
         $rows = [];
-        foreach ($runners as $runner) {
+        foreach ($result->runners as $runner) {
             $rows[] = [
                 $runner->name,
                 $runner->isAvailable ? '✓ Available' : '✗ Unavailable',
