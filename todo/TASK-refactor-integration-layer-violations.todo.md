@@ -7,10 +7,10 @@ priority: P1
 depends_on: TASK-refactor-crossmodule-deptrac-rule
 epic: EPIC-refactor-responsibility-decomposition
 author: Тимлид Алекс
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер Левша
+branch: task/refactor-integration-layer-violations
+pr: https://github.com/prikotov/task-orchestrator/pull/154
+status: review
 ---
 
 # TASK-refactor-integration-layer-violations: Перенос классов в Integration-слой для устранения 10 Deptrac-violations

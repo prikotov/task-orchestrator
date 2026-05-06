@@ -2,11 +2,12 @@
 #
 # Imports shared layers and rules from prikotov/coding-standard.
 # Add project-specific overrides below (skip_violations, extra layers, etc).
+#
+# Note: skip_violations does NOT apply to custom Deptrac subscribers (CrossModuleDomainRule,
+# ServiceContractDependencyRule) — they bypass EventHelper.
 
 imports:
   - vendor/prikotov/coding-standard/config/deptrac/depfile.yaml
 
 deptrac:
-  # Project-specific violations to skip.
-  # Remove entries as you fix them.
   skip_violations: {}
