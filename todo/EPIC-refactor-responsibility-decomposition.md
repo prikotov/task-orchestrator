@@ -54,11 +54,11 @@ pr:
 - [ ] CLI-команда `app:agent:orchestrate` работает для static/dynamic/conditional
 
 ### 🟡 Should Have (Важные требования)
-- [ ] Обновлены ADR (новый ADR на декомпозицию)
+- [ ] Обновлены ADR (новый ADR на Shared Kernel-контракты)
 - [ ] Обновлена документация (docs/guide/architecture.md)
 
 ### 🟢 Could Have (Желательно)
-- [ ] Deptrac-правила для новых модулей (depfile.yaml)
+- [ ] Удаление существующего `@todo`-исключения в `CrossModuleDomainRule` (Command → foreign Repository/Entity)
 
 ### ⚫ Won't Have (Не в этот раз)
 - Удаление ChainDefinitionVo (legacy-монолит)
@@ -158,8 +158,14 @@ DynamicLoop → ChainExecution = FORBIDDEN
 ### PR#3: Вливание StaticExecution + Integration-мапперы
 - [x] [TASK-refactor-merge-static-execution](done/TASK-refactor-merge-static-execution.todo.md) — Влить StaticExecution в ChainExecution. Перенести файлы, обновить namespace. Создать Integration-маппер ChainExecution ← ChainDefinition (Definition VO → Execution VO). Удалить старый модуль StaticExecution. Обновить services.yaml. **Зависит от PR#1. Рекомендуется после PR#2. ~1110 LOC новых файлов.**
 
-### PR#4: Deptrac + документация
-- [ ] [TASK-refactor-deptrac-decomposition-rules](TASK-refactor-deptrac-decomposition-rules.todo.md) — Создать depfile.yaml с правилами для ChainDefinition, ChainExecution, DynamicLoop, AgentRunner. Обновить ADR (суперседировать ADR-009, создать ADR-011), architecture.md. **Зависит от PR#2 и PR#3. Только конфигурация и документация.**
+### PR#4: Deptrac — корректировка правил (coding-standard)
+- [ ] [TASK-refactor-crossmodule-deptrac-rule](TASK-refactor-crossmodule-deptrac-rule.todo.md) — Добавить 2 точечных исключения в `CrossModuleDomainRule` (пакет `prikotov/coding-standard`): `Integration → foreign Domain\Contract\` (interface only) и `Infrastructure → foreign Domain\Contract\` (implements only). Закроет violations #4, #5, #12. **PR в coding-standard.**
+
+### PR#5: Рефакторинг — перенос классов в Integration
+- [ ] [TASK-refactor-integration-layer-violations](TASK-refactor-integration-layer-violations.todo.md) — Перенести 5 классов в Integration-слой, упразднить `ResolveExitCodeServiceInterface`. Устраняет 10 из 15 violations. **Зависит от PR#4 (или параллельно с skip_violations).**
+
+### PR#6: Документирование Shared Kernel
+- [ ] [TASK-docs-shared-kernel-contracts](TASK-docs-shared-kernel-contracts.todo.md) — Документировать статус `ChainExecution.Domain.Contract` как de facto Shared Kernel. Создать ADR, обновить architecture.md. **Зависит от PR#5.**
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [ ] Все Must Have требования выполнены
