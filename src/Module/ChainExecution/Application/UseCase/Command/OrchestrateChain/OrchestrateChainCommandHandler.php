@@ -30,6 +30,7 @@ class OrchestrateChainCommandHandler
     /**
      * Выполняет оркестрацию цепочки.
      */
+    // phpcs:ignore PrikotovCodingStandard.Application.CommandHandlerReturnType.ForbiddenReturnType -- no-DB context, see coding-standard todo TASK-command-handler-return-type.md
     public function __invoke(OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
         $chainInfo = $this->chainProvider->loadChainInfo($command->chainName);
