@@ -21,7 +21,6 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Cha
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigResult;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\ReportFormatEnum;
-
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
@@ -175,7 +174,7 @@ final class OrchestrateCommand extends Command
                 // Resume всегда резолвит exit code как dynamic — информация о типе цепочки не сохраняется в сессии.
                 $this->renderDynamicResult($io, $result);
 
-                return $result->resolveExitCode(true)->value;
+                return $this->resolveExitCodeFromResult($result, true)->value;
             }
 
             $loadResult = ($this->loadChainHandler)(new LoadChainQuery(
@@ -231,7 +230,7 @@ final class OrchestrateCommand extends Command
                 $this->renderStaticResult($io, $result);
             }
 
-            return $result->resolveExitCode($isDynamic)->value;
+            return $this->resolveExitCodeFromResult($result, $isDynamic)->value;
         } catch (\Throwable $e) {
             $io->error($e->getMessage());
 
@@ -398,7 +397,7 @@ final class OrchestrateCommand extends Command
             ));
         }
 
-        if ($result->isSuccessful(false) && !$result->budgetExceeded) {
+        if ($this->isResultSuccessful($result, false) && !$result->budgetExceeded) {
             $io->success(sprintf(
                 '✅ Chain completed in %ds | Total: ↑%s ↓%s $%.4f',
                 round($result->totalTime),
@@ -448,6 +447,36 @@ final class OrchestrateCommand extends Command
     }
 
     /**
+     * Определяет exit code по результату оркестрации.
+     *
+     * Presentation-концерн: CLI exit codes — это не Application-логика.
+     */
+    private function resolveExitCodeFromResult(OrchestrateChainResultDto $result, bool $isDynamic): OrchestrateExitCodeEnum
+    {
+        if ($result->budgetExceeded) {
+            return OrchestrateExitCodeEnum::budgetExceeded;
+        }
+
+        if ($result->timedOut) {
+            return OrchestrateExitCodeEnum::timeout;
+        }
+
+        if ($isDynamic) {
+            return $result->synthesis !== null
+                ? OrchestrateExitCodeEnum::success
+                : OrchestrateExitCodeEnum::chainFailed;
+        }
+
+        foreach ($result->stepResults as $stepResult) {
+            if ($stepResult->isError) {
+                return OrchestrateExitCodeEnum::chainFailed;
+            }
+        }
+
+        return OrchestrateExitCodeEnum::success;
+    }
+
+    /**
      * Определяет exit code по типу исключения.
      *
      * Использует строковое сопоставление имени класса вместо instanceof,
@@ -458,9 +487,17 @@ final class OrchestrateCommand extends Command
         $class = $throwable::class;
 
         return match (true) {
-            str_ends_with($class, '\ChainNotFoundException') => OrchestrateExitCodeEnum::chainNotFound,
-            str_ends_with($class, '\RoleNotFoundException') => OrchestrateExitCodeEnum::invalidConfig,
+            str_ends_with($class, '\\ChainNotFoundException') => OrchestrateExitCodeEnum::chainNotFound,
+            str_ends_with($class, '\\RoleNotFoundException') => OrchestrateExitCodeEnum::invalidConfig,
             default => OrchestrateExitCodeEnum::chainFailed,
         };
+    }
+
+    /**
+     * Проверяет, завершена ли цепочка успешно (для рендера итогового сообщения).
+     */
+    private function isResultSuccessful(OrchestrateChainResultDto $result, bool $isDynamic): bool
+    {
+        return $this->resolveExitCodeFromResult($result, $isDynamic) === OrchestrateExitCodeEnum::success;
     }
 }

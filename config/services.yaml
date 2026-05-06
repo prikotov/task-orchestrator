@@ -50,10 +50,10 @@ services:
     alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextService
 
   TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RoundCompletedNotifierInterface:
-    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\DispatchRoundEventService
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DispatchRoundEventService
 
   TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopAgentServiceInterface:
-    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\RunDynamicLoopAgentService
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\RunDynamicLoopAgentService
 
   TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FacilitatorResponseParserInterface:
     alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\FacilitatorResponseParserService
@@ -76,7 +76,7 @@ services:
   TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionReaderInterface:
     alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger
 
-  TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\DynamicExecutionStrategy:
+  TaskOrchestrator\Common\Module\DynamicLoop\Application\Service\DynamicExecutionStrategy:
     tags: ['orchestrator.execution_strategy']
 
   TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration\ChainDefinitionProviderInterface:
@@ -111,6 +111,7 @@ services:
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Shared\PromptFormatterInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\PromptFormatterService
 
+
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ExecuteConditionalStepServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\ExecuteConditionalStepService
 
@@ -138,10 +139,6 @@ services:
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetService
-
-  # Report format mappers
-  TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQueryHandlerInterface:
-    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\Query\GetRunnersQueryHandler
 
   # Report format mappers
   TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\ReportResultFactory:

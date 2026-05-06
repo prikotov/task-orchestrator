@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain;
 
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\OrchestrateExitCodeEnum;
-
 /**
  * DTO результата оркестрации цепочки.
  *
@@ -36,51 +34,5 @@ final readonly class OrchestrateChainResultDto
         public int $totalIterations = 0,
         public bool $timedOut = false,
     ) {
-    }
-
-    /**
-     * Определяет exit code по результату оркестрации.
-     */
-    public function resolveExitCode(bool $isDynamic): OrchestrateExitCodeEnum
-    {
-        if ($this->budgetExceeded) {
-            return OrchestrateExitCodeEnum::budgetExceeded;
-        }
-
-        if ($this->timedOut) {
-            return OrchestrateExitCodeEnum::timeout;
-        }
-
-        if ($isDynamic) {
-            return $this->synthesis !== null
-                ? OrchestrateExitCodeEnum::success
-                : OrchestrateExitCodeEnum::chainFailed;
-        }
-
-        return $this->staticChainHasError()
-            ? OrchestrateExitCodeEnum::chainFailed
-            : OrchestrateExitCodeEnum::success;
-    }
-
-    /**
-     * Проверяет, завершена ли цепочка успешно (для рендера итогового сообщения).
-     */
-    public function isSuccessful(bool $isDynamic): bool
-    {
-        return $this->resolveExitCode($isDynamic) === OrchestrateExitCodeEnum::success;
-    }
-
-    /**
-     * Проверяет, содержит ли static-цепочка ошибку на каком-либо шаге.
-     */
-    private function staticChainHasError(): bool
-    {
-        foreach ($this->stepResults as $stepResult) {
-            if ($stepResult->isError) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
