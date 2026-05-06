@@ -15,7 +15,7 @@ final class FacilitatorResponseVoTest extends TestCase
     #[Test]
     public function nextRoleCreatesContinueResponse(): void
     {
-        $vo = FacilitatorResponseVo::createFromNextRole('architect');
+        $vo = FacilitatorResponseVo::createNextRole('architect');
 
         self::assertFalse($vo->isDone());
         self::assertSame('architect', $vo->getNextRole());
@@ -25,7 +25,7 @@ final class FacilitatorResponseVoTest extends TestCase
     #[Test]
     public function nextRoleWithChallenge(): void
     {
-        $vo = FacilitatorResponseVo::createFromNextRole('architect', 'Explain your reasoning');
+        $vo = FacilitatorResponseVo::createNextRole('architect', 'Explain your reasoning');
 
         self::assertFalse($vo->isDone());
         self::assertSame('architect', $vo->getNextRole());
@@ -35,7 +35,7 @@ final class FacilitatorResponseVoTest extends TestCase
     #[Test]
     public function nextRoleWithoutChallengeReturnsNull(): void
     {
-        $vo = FacilitatorResponseVo::createFromNextRole('marketer');
+        $vo = FacilitatorResponseVo::createNextRole('marketer');
 
         self::assertNull($vo->getChallenge());
     }
@@ -43,7 +43,7 @@ final class FacilitatorResponseVoTest extends TestCase
     #[Test]
     public function doneCreatesFinishResponse(): void
     {
-        $vo = FacilitatorResponseVo::createFromDone('Summary text');
+        $vo = FacilitatorResponseVo::createDone('Summary text');
 
         self::assertTrue($vo->isDone());
         self::assertNull($vo->getNextRole());
@@ -53,7 +53,7 @@ final class FacilitatorResponseVoTest extends TestCase
     #[Test]
     public function doneChallengeIsNull(): void
     {
-        $vo = FacilitatorResponseVo::createFromDone('Summary');
+        $vo = FacilitatorResponseVo::createDone('Summary');
 
         self::assertNull($vo->getChallenge());
     }

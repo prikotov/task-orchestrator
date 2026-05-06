@@ -328,7 +328,24 @@ final readonly class RunStaticChainService
         $lastIndex = count($results) - 1;
         $last = $results[$lastIndex];
         if (!$last->iterationWarning) {
-            $results[$lastIndex] = $last->withIterationWarning();
+            $results[$lastIndex] = new StaticStepResultVo(
+                role: $last->role,
+                runner: $last->runner,
+                outputText: $last->outputText,
+                inputTokens: $last->inputTokens,
+                outputTokens: $last->outputTokens,
+                cost: $last->cost,
+                duration: $last->duration,
+                isError: $last->isError,
+                errorMessage: $last->errorMessage,
+                fallbackRunnerUsed: $last->fallbackRunnerUsed,
+                iterationNumber: $last->iterationNumber,
+                iterationWarning: true,
+                passed: $last->passed,
+                exitCode: $last->exitCode,
+                label: $last->label,
+                timedOut: $last->timedOut,
+            );
         }
 
         return $results;

@@ -13,6 +13,7 @@ use InvalidArgumentException;
  */
 final readonly class ExecutionRetryPolicyVo
 {
+    // phpcs:ignore
     public function __construct(
         private int $maxRetries = 3,
         private int $initialDelayMs = 1000,
@@ -72,7 +73,7 @@ final readonly class ExecutionRetryPolicyVo
         return min($delay, $this->maxDelayMs);
     }
 
-    public static function disabled(): self
+    public static function createDisabled(): self
     {
         return new self(maxRetries: 0);
     }

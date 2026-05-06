@@ -140,7 +140,7 @@ final class ChainSessionWriter
         $this->maxRounds = $data['max_rounds'] ?? 0;
         $this->roundFiles = $this->parseRoundFiles($data['rounds'] ?? []);
         $this->topic = $this->readSessionFile($sessionDir, $data['topic_file'] ?? '');
-        $this->budget = isset($data['budget']) && is_array($data['budget']) ? DynamicLoopBudgetVo::fromArray($data['budget']) : null;
+        $this->budget = isset($data['budget']) && is_array($data['budget']) ? DynamicLoopBudgetVo::createFromArray($data['budget']) : null;
         $this->resumedState = new DynamicLoopSessionStateVo(
             topic: $this->topic, facilitator: $this->facilitator,
             participants: $this->participants, maxRounds: $this->maxRounds,

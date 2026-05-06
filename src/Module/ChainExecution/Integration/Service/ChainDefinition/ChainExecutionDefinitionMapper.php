@@ -146,7 +146,7 @@ final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionPr
 
     private function mapCondition(\TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo $condition): ConditionExpressionVo
     {
-        return ConditionExpressionVo::fromComponents(
+        return ConditionExpressionVo::createFromComponents(
             rawExpression: $condition->getRawExpression(),
             path: $condition->getPath(),
             operator: ConditionOperatorEnum::from($condition->getOperator()->value),

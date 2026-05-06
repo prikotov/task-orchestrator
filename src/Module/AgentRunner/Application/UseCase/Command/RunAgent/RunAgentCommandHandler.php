@@ -34,7 +34,8 @@ final readonly class RunAgentCommandHandler
         $runner = $this->applyRetry($runner, $command);
 
         $request = $this->buildRequest($command);
-        $result = $runner->run($request->withTruncatedContext());
+        $request = $this->truncateRequestContext($request);
+        $result = $runner->run($request);
 
         return new RunAgentResultDto(
             outputText: $result->getOutputText(),
@@ -90,6 +91,31 @@ final readonly class RunAgentCommandHandler
             command: $command->command,
             runnerArgs: $command->runnerArgs,
             noContextFiles: $command->noContextFiles,
+        );
+    }
+
+    private function truncateRequestContext(AgentRunRequestVo $request): AgentRunRequestVo
+    {
+        $context = $request->getPreviousContext();
+        $maxLength = $request->getMaxContextLength();
+
+        if ($context === null || strlen($context) <= $maxLength) {
+            return $request;
+        }
+
+        return new AgentRunRequestVo(
+            role: $request->getRole(),
+            task: $request->getTask(),
+            systemPrompt: $request->getSystemPrompt(),
+            previousContext: substr($context, -$maxLength),
+            model: $request->getModel(),
+            tools: $request->getTools(),
+            workingDir: $request->getWorkingDir(),
+            timeout: $request->getTimeout(),
+            maxContextLength: $maxLength,
+            command: $request->getCommand(),
+            runnerArgs: $request->getRunnerArgs(),
+            noContextFiles: $request->hasNoContextFiles(),
         );
     }
 }

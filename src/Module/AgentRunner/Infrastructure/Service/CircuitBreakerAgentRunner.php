@@ -84,7 +84,7 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
                 $state->toLogString(),
             ));
 
-            return AgentResultVo::createFromError(
+            return AgentResultVo::createError(
                 errorMessage: sprintf(
                     'Circuit breaker is open for runner "%s". %s',
                     $runnerName,
@@ -164,7 +164,7 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
                 $throwable->getMessage(),
             ));
 
-            return AgentResultVo::createFromError(
+            return AgentResultVo::createError(
                 errorMessage: sprintf(
                     'Circuit breaker is open for runner "%s" and fallback runner "%s" threw exception: %s',
                     $runnerName,
@@ -218,7 +218,7 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
     private function handleFailure(string $runnerName, CircuitBreakerStateVo $state): void
     {
         $previousState = $state->getEffectiveState();
-        $newState = $state->recordFailure();
+        $newState = CircuitBreakerStateVo::createRecordedFailure($state);
         $this->states[$runnerName] = $newState;
 
         $newEffective = $newState->getEffectiveState();
@@ -267,6 +267,6 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
             ));
         }
 
-        $this->states[$runnerName] = $state->recordSuccess();
+        $this->states[$runnerName] = CircuitBreakerStateVo::createRecordedSuccess($state);
     }
 }

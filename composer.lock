@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9d62f2a299ae9c24770349024faec357",
+    "content-hash": "41bbae04f3c4bb57d54d2dea15dae570",
     "packages": [
         {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
@@ -151,16 +151,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.2.4",
+            "version": "v0.5.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:prikotov/coding-standard.git",
-                "reference": "d2b1389139a64bb096c3cf63572d20786aa17362"
+                "reference": "7ea65e810ec0fe39601e9d8a945ab3b607df7029"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/d2b1389139a64bb096c3cf63572d20786aa17362",
-                "reference": "d2b1389139a64bb096c3cf63572d20786aa17362",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/7ea65e810ec0fe39601e9d8a945ab3b607df7029",
+                "reference": "7ea65e810ec0fe39601e9d8a945ab3b607df7029",
                 "shasum": ""
             },
             "require": {
@@ -171,8 +171,7 @@
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
                 "deptrac/deptrac": "^2.0",
-                "phpunit/phpunit": "^10.5",
-                "prikotov/git-workflow": "@dev"
+                "phpunit/phpunit": "^10.5"
             },
             "suggest": {
                 "deptrac/deptrac": "For using ServiceContractDependencyRule — custom Deptrac rule that enforces service contract boundaries"
@@ -228,7 +227,7 @@
                 "phpcs",
                 "sniffs"
             ],
-            "time": "2026-04-29T14:12:43+00:00"
+            "time": "2026-05-06T05:28:10+00:00"
         },
         {
             "name": "psr/container",

@@ -45,7 +45,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function closedStatePassesCallToInnerRunner(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->expects(self::once())->method('run')->willReturn($successResult);
@@ -61,7 +61,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function closedStateStaysClosedOnSuccess(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($successResult);
@@ -77,7 +77,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function closedStateRecordsFailureOnErrorResult(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'API error');
+        $errorResult = AgentResultVo::createError(errorMessage: 'API error');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($errorResult);
@@ -112,7 +112,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function transitionsToOpenAfterThresholdFailures(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'Fail');
+        $errorResult = AgentResultVo::createError(errorMessage: 'Fail');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($errorResult);
@@ -137,7 +137,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function openStateBlocksCallsAndReturnsErrorWithoutFallback(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'Fail');
+        $errorResult = AgentResultVo::createError(errorMessage: 'Fail');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         // 3 вызова для перехода в Open, затем inner runner НЕ вызывается
@@ -168,11 +168,11 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
         $fallbackRunner->method('getName')->willReturn('codex');
 
-        $fallbackSuccessResult = AgentResultVo::createFromSuccess(outputText: 'Fallback OK');
+        $fallbackSuccessResult = AgentResultVo::createSuccess(outputText: 'Fallback OK');
         $fallbackRunner->expects(self::once())->method('run')->willReturn($fallbackSuccessResult);
 
         $this->innerRunner->method('getName')->willReturn('pi');
-        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createError(errorMessage: 'Fail'));
 
         $this->logger->method('warning');
         $this->logger->method('info');
@@ -202,7 +202,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
         $fallbackRunner->method('getName')->willReturn('codex');
 
-        $fallbackSuccessResult = AgentResultVo::createFromSuccess(outputText: 'Codex OK');
+        $fallbackSuccessResult = AgentResultVo::createSuccess(outputText: 'Codex OK');
         $fallbackCommand = ['codex', '--model', 'gpt-4o', '--full-auto'];
 
         // Проверяем, что fallback runner получает request с fallback command
@@ -215,7 +215,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
             });
 
         $this->innerRunner->method('getName')->willReturn('pi');
-        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createError(errorMessage: 'Fail'));
 
         $this->logger->method('warning');
         $this->logger->method('info');
@@ -245,11 +245,11 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
         $fallbackRunner->method('getName')->willReturn('codex');
 
-        $fallbackErrorResult = AgentResultVo::createFromError(errorMessage: 'Codex also failed');
+        $fallbackErrorResult = AgentResultVo::createError(errorMessage: 'Codex also failed');
         $fallbackRunner->method('run')->willReturn($fallbackErrorResult);
 
         $this->innerRunner->method('getName')->willReturn('pi');
-        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createError(errorMessage: 'Fail'));
 
         $this->logger->method('warning');
         $this->logger->method('error');
@@ -280,7 +280,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $fallbackRunner->method('run')->willThrowException(new RuntimeException('Connection refused'));
 
         $this->innerRunner->method('getName')->willReturn('pi');
-        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createError(errorMessage: 'Fail'));
 
         $this->logger->method('warning');
         $this->logger->method('error');
@@ -311,7 +311,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
         $fallbackRunner->method('getName')->willReturn('codex');
 
-        $fallbackSuccessResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $fallbackSuccessResult = AgentResultVo::createSuccess(outputText: 'OK');
         $fallbackCommand = ['codex', '--model', 'gpt-4o'];
 
         $customRequest = new AgentRunRequestVo(
@@ -350,7 +350,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
             });
 
         $this->innerRunner->method('getName')->willReturn('pi');
-        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createError(errorMessage: 'Fail'));
 
         $this->logger->method('warning');
         $this->logger->method('info');
@@ -379,7 +379,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
         $fallbackRunner->method('getName')->willReturn('codex');
 
-        $fallbackSuccessResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $fallbackSuccessResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $originalRequest = new AgentRunRequestVo(
             role: 'test',
@@ -397,7 +397,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
             });
 
         $this->innerRunner->method('getName')->willReturn('pi');
-        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createError(errorMessage: 'Fail'));
 
         $this->logger->method('warning');
         $this->logger->method('info');
@@ -424,11 +424,11 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
         $fallbackRunner->method('getName')->willReturn('codex');
         $fallbackRunner->method('run')->willReturn(
-            AgentResultVo::createFromSuccess(outputText: 'OK'),
+            AgentResultVo::createSuccess(outputText: 'OK'),
         );
 
         $this->innerRunner->method('getName')->willReturn('pi');
-        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createError(errorMessage: 'Fail'));
 
         // Ожидаем: 1 warning (Closed → Open) + 1 warning (delegating to fallback) + 1 info (fallback succeeded)
         $warningCalls = [];
@@ -474,11 +474,11 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $fallbackRunner = $this->createMock(AgentRunnerInterface::class);
         $fallbackRunner->method('getName')->willReturn('codex');
         $fallbackRunner->method('run')->willReturn(
-            AgentResultVo::createFromError(errorMessage: 'Codex error'),
+            AgentResultVo::createError(errorMessage: 'Codex error'),
         );
 
         $this->innerRunner->method('getName')->willReturn('pi');
-        $this->innerRunner->method('run')->willReturn(AgentResultVo::createFromError(errorMessage: 'Fail'));
+        $this->innerRunner->method('run')->willReturn(AgentResultVo::createError(errorMessage: 'Fail'));
 
         $errorCalls = [];
         $this->logger->method('warning');
@@ -521,7 +521,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
             lastFailureAt: $pastTime,
         );
 
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'Recovered');
+        $successResult = AgentResultVo::createSuccess(outputText: 'Recovered');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->expects(self::once())->method('run')->willReturn($successResult);
@@ -556,7 +556,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
             lastFailureAt: $pastTime,
         );
 
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'Still broken');
+        $errorResult = AgentResultVo::createError(errorMessage: 'Still broken');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->expects(self::once())->method('run')->willReturn($errorResult);
@@ -642,7 +642,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function circuitStateIsPerRunner(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($successResult);
@@ -665,7 +665,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function fullCycleClosedOpenHalfOpenClosedThroughRunner(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'Error');
+        $errorResult = AgentResultVo::createError(errorMessage: 'Error');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($errorResult);
@@ -698,7 +698,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
             lastFailureAt: $pastTime,
         );
 
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'Recovered');
+        $successResult = AgentResultVo::createSuccess(outputText: 'Recovered');
         $halfOpenRunner = $this->createMock(AgentRunnerInterface::class);
         $halfOpenRunner->method('getName')->willReturn('pi');
         $halfOpenRunner->method('run')->willReturn($successResult);
@@ -719,7 +719,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function constructorWithoutFallbackMaintainsBackwardCompatibility(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'Fail');
+        $errorResult = AgentResultVo::createError(errorMessage: 'Fail');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($errorResult);
@@ -750,7 +750,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function recordsCbStateChangeWhenClosedToOpen(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'Fail');
+        $errorResult = AgentResultVo::createError(errorMessage: 'Fail');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($errorResult);
@@ -782,7 +782,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function recordsCbRejectionWhenCallBlocked(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'Fail');
+        $errorResult = AgentResultVo::createError(errorMessage: 'Fail');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($errorResult);
@@ -825,7 +825,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
             lastFailureAt: $pastTime,
         );
 
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'Still broken');
+        $errorResult = AgentResultVo::createError(errorMessage: 'Still broken');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($errorResult);
@@ -864,7 +864,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
             lastFailureAt: $pastTime,
         );
 
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($successResult);
@@ -893,7 +893,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function recordsMultipleRejectionsWhenCbIsOpen(): void
     {
-        $errorResult = AgentResultVo::createFromError(errorMessage: 'Fail');
+        $errorResult = AgentResultVo::createError(errorMessage: 'Fail');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($errorResult);
@@ -926,7 +926,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     #[Test]
     public function worksssWithoutMetricsCollector(): void
     {
-        $successResult = AgentResultVo::createFromSuccess(outputText: 'OK');
+        $successResult = AgentResultVo::createSuccess(outputText: 'OK');
 
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($successResult);

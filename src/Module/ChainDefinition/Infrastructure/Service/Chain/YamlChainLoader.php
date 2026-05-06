@@ -149,7 +149,7 @@ final class YamlChainLoader implements ChainLoaderInterface
         if ($hasConditions) {
             $this->validateWhenReferences($name, $steps);
 
-            return ConditionalChainDefinitionVo::create(
+            return ConditionalChainDefinitionVo::createFromConditionalSteps(
                 name: $name,
                 description: $raw['description'] ?? '',
                 steps: $steps,
@@ -161,7 +161,7 @@ final class YamlChainLoader implements ChainLoaderInterface
             );
         }
 
-        return StaticChainDefinitionVo::create(
+        return StaticChainDefinitionVo::createFromSteps(
             name: $name,
             description: $raw['description'] ?? '',
             steps: $steps,
@@ -192,7 +192,7 @@ final class YamlChainLoader implements ChainLoaderInterface
 
         $this->validateWhenReferences($name, $steps);
 
-        return ConditionalChainDefinitionVo::create(
+        return ConditionalChainDefinitionVo::createFromConditionalSteps(
             name: $name,
             description: $raw['description'] ?? '',
             steps: $steps,
@@ -244,7 +244,7 @@ final class YamlChainLoader implements ChainLoaderInterface
                         );
                     }
 
-                    return ChainStepVo::qualityGate(
+                    return ChainStepVo::createQualityGate(
                         command: $command,
                         label: $label,
                         timeoutSeconds: $step['timeout_seconds'] ?? 120,
@@ -258,7 +258,7 @@ final class YamlChainLoader implements ChainLoaderInterface
                 $stepRetryPolicy = $this->parseRetryPolicy($step['retry_policy'] ?? null);
                 $stepNoContextFiles = (bool) ($step['no_context_files'] ?? $chainNoContextFiles);
 
-                return ChainStepVo::agent(
+                return ChainStepVo::createAgent(
                     role: $step['role'] ?? throw new InvalidArgumentException(
                         sprintf('Agent step "role" is required in chain "%s".', $name),
                     ),
@@ -362,7 +362,7 @@ final class YamlChainLoader implements ChainLoaderInterface
         $prompts = $this->resolvePrompts($name, $raw);
         $budget = $this->parseBudget($raw['budget'] ?? null);
 
-        return DynamicChainDefinitionVo::create(
+        return DynamicChainDefinitionVo::createFromDynamic(
             name: $name,
             description: $raw['description'] ?? '',
             facilitator: $facilitator,
@@ -393,7 +393,7 @@ final class YamlChainLoader implements ChainLoaderInterface
             return null;
         }
 
-        return ChainRetryPolicyVo::fromArray($raw);
+        return ChainRetryPolicyVo::createFromArray($raw);
     }
 
     /**
@@ -445,7 +445,7 @@ final class YamlChainLoader implements ChainLoaderInterface
             return null;
         }
 
-        return BudgetVo::fromArray($raw);
+        return BudgetVo::createFromArray($raw);
     }
 
     /**

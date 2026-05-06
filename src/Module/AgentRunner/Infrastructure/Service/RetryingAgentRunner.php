@@ -20,7 +20,7 @@ use Throwable;
  *
  * Оборачивает любой AgentRunnerInterface и при выбросе исключения
  * повторяет вызов с задержкой по exponential backoff.
- * После исчерпания всех попыток возвращает AgentResultVo::createFromError().
+ * После исчерпания всех попыток возвращает AgentResultVo::createError().
  *
  * Не изменяет AgentRunnerInterface — чистый Decorator pattern.
  */
@@ -83,7 +83,7 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
                 }
 
                 // Результат с ошибкой — классифицируем
-                $classification = ErrorClassificationVo::classify($result);
+                $classification = ErrorClassificationVo::createFromClassification($result);
 
                 if (!$classification->shouldRetry()) {
                     $this->logger->warning(
@@ -149,7 +149,7 @@ final readonly class RetryingAgentRunner implements AgentRunnerInterface
         // Если последний результат был timeout — пробрасываем флаг
         $timedOut = $lastResult?->isTimedOut() ?? false;
 
-        return AgentResultVo::createFromError(
+        return AgentResultVo::createError(
             errorMessage: sprintf(
                 'All %d attempts exhausted for runner "%s". Last error: %s',
                 $this->retryPolicy->getMaxRetries() + 1,

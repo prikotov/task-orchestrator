@@ -34,7 +34,7 @@ final readonly class ErrorClassificationVo
      * 3. exitCode == 0 + error → UNKNOWN
      * 4. exitCode > 0 && < 100 → TRANSIENT (default для обычных ошибок)
      */
-    public static function classify(AgentResultVo $result): self
+    public static function createFromClassification(AgentResultVo $result): self
     {
         if ($result->isTimedOut()) {
             return new self(ErrorClassificationEnum::transient);
@@ -59,7 +59,7 @@ final readonly class ErrorClassificationVo
      * Исключения из runner'а классифицируются как TRANSIENT —
      * причина обычно во внешних факторах (сеть, процесс упал и т.д.).
      */
-    public static function classifyFromException(Throwable $throwable): self
+    public static function createFromClassException(Throwable $throwable): self
     {
         return new self(ErrorClassificationEnum::transient);
     }

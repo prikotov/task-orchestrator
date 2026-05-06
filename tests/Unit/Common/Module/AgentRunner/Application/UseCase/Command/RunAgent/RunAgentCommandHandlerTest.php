@@ -57,7 +57,7 @@ final class RunAgentCommandHandlerTest extends TestCase
                 self::assertSame('gpt-4', $req->getModel());
                 self::assertSame(600, $req->getTimeout());
 
-                return AgentResultVo::createFromSuccess(
+                return AgentResultVo::createSuccess(
                     outputText: 'Code written',
                     inputTokens: 100,
                     outputTokens: 50,
@@ -93,7 +93,7 @@ final class RunAgentCommandHandlerTest extends TestCase
         $this->registry->expects(self::once())->method('getDefault')
             ->willReturn($this->runner);
         $this->runner->method('run')
-            ->willReturn(AgentResultVo::createFromSuccess(outputText: 'OK'));
+            ->willReturn(AgentResultVo::createSuccess(outputText: 'OK'));
 
         $result = ($this->handler)($command);
 
@@ -131,7 +131,7 @@ final class RunAgentCommandHandlerTest extends TestCase
             });
 
         $retryRunner->expects(self::once())->method('run')
-            ->willReturn(AgentResultVo::createFromSuccess(outputText: 'Retried OK'));
+            ->willReturn(AgentResultVo::createSuccess(outputText: 'Retried OK'));
 
         $result = ($this->handler)($command);
 
@@ -151,7 +151,7 @@ final class RunAgentCommandHandlerTest extends TestCase
 
         $this->registry->method('get')->willReturn($this->runner);
         $this->retryFactory->expects(self::never())->method('createRetryableRunner');
-        $this->runner->method('run')->willReturn(AgentResultVo::createFromSuccess(outputText: 'OK'));
+        $this->runner->method('run')->willReturn(AgentResultVo::createSuccess(outputText: 'OK'));
 
         $result = ($this->handler)($command);
 
@@ -170,7 +170,7 @@ final class RunAgentCommandHandlerTest extends TestCase
 
         $this->registry->method('get')->willReturn($this->runner);
         $this->retryFactory->expects(self::never())->method('createRetryableRunner');
-        $this->runner->method('run')->willReturn(AgentResultVo::createFromSuccess(outputText: 'OK'));
+        $this->runner->method('run')->willReturn(AgentResultVo::createSuccess(outputText: 'OK'));
 
         $result = ($this->handler)($command);
 
@@ -184,7 +184,7 @@ final class RunAgentCommandHandlerTest extends TestCase
 
         $this->registry->method('get')->willReturn($this->runner);
         $this->runner->method('run')
-            ->willReturn(AgentResultVo::createFromError(errorMessage: 'Timeout', exitCode: 124));
+            ->willReturn(AgentResultVo::createError(errorMessage: 'Timeout', exitCode: 124));
 
         $result = ($this->handler)($command);
 
@@ -227,7 +227,7 @@ final class RunAgentCommandHandlerTest extends TestCase
                 self::assertSame(['run', '--verbose'], $req->getCommand());
                 self::assertSame(['--append-system-prompt', '/path/to/prompt.md'], $req->getRunnerArgs());
 
-                return AgentResultVo::createFromSuccess(outputText: 'Analysis done');
+                return AgentResultVo::createSuccess(outputText: 'Analysis done');
             });
 
         $result = ($this->handler)($command);
