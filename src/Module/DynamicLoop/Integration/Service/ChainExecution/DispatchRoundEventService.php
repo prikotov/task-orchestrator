@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\DynamicLoop\Application\Service;
+namespace TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution;
 
 use Override;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -10,7 +10,9 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\Event\OrchestrateC
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RoundCompletedNotifierInterface;
 
 /**
- * Application-реализация: диспатчит OrchestrateRoundCompletedEvent через PSR EventDispatcher.
+ * Integration-реализация: диспатчит OrchestrateRoundCompletedEvent через PSR EventDispatcher.
+ *
+ * Расположен в Integration-слое, т.к. создаёт Event из чужого Application (разрешено: Integration → foreign Application).
  */
 final readonly class DispatchRoundEventService implements RoundCompletedNotifierInterface
 {

@@ -9,7 +9,8 @@ use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunn
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQuery;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\RunnerDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\Query\GetRunnersQueryHandler;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

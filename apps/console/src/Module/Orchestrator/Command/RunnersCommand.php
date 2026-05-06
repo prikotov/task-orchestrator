@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQuery;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQueryHandlerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\RunnerDto;
 
 #[AsCommand(
@@ -21,7 +21,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetR
 final class RunnersCommand extends Command
 {
     public function __construct(
-        private readonly GetRunnersQueryHandler $runnersHandler,
+        private readonly GetRunnersQueryHandlerInterface $runnersHandler,
     ) {
         parent::__construct();
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\DynamicLoop\Application\Service;
+namespace TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution;
 
 use LogicException;
 use Override;
@@ -30,10 +30,9 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundRe
  * Инкапсулирует фасилитаторный цикл: session start/resume,
  * context build, loop run, finalize, DTO mapping, event dispatch.
  *
- * DynamicLoopConfigVo получается через ChainDefinitionProviderInterface (Domain).
- *
- * @todo cross-module dependency: DynamicLoop implements ChainExecution interface.
- *       Fix in separate task (Group 3-4).
+ * Расположен в Integration-слое, т.к. реализует контракт ExecutionStrategyInterface
+ * из ChainExecution.Application.Contract и работает с DTO чужого модуля
+ * (разрешено: Integration → foreign Application).
  */
 final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterface
 {

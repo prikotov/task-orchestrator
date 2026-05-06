@@ -21,7 +21,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Cha
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigResult;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\ReportFormatEnum;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeServiceInterface;
+
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
@@ -73,7 +73,6 @@ final class OrchestrateCommand extends Command
         private readonly LoadChainQueryHandler $loadChainHandler,
         private readonly ValidateChainConfigQueryHandler $validateChainConfigHandler,
         private readonly LockFactory $lockFactory,
-        private readonly ResolveExitCodeServiceInterface $exitCodeResolver,
     ) {
         parent::__construct();
     }
@@ -176,7 +175,7 @@ final class OrchestrateCommand extends Command
                 // Resume всегда резолвит exit code как dynamic — информация о типе цепочки не сохраняется в сессии.
                 $this->renderDynamicResult($io, $result);
 
-                return $this->exitCodeResolver->resolveFromResult($result, true)->value;
+                return $result->resolveExitCode(true)->value;
             }
 
             $loadResult = ($this->loadChainHandler)(new LoadChainQuery(
@@ -232,11 +231,11 @@ final class OrchestrateCommand extends Command
                 $this->renderStaticResult($io, $result);
             }
 
-            return $this->exitCodeResolver->resolveFromResult($result, $isDynamic)->value;
+            return $result->resolveExitCode($isDynamic)->value;
         } catch (\Throwable $e) {
             $io->error($e->getMessage());
 
-            return $this->exitCodeResolver->resolveFromThrowable($e)->value;
+            return $this->resolveExitCodeFromThrowable($e)->value;
         } finally {
             $lock->release();
         }
@@ -399,7 +398,7 @@ final class OrchestrateCommand extends Command
             ));
         }
 
-        if ($this->exitCodeResolver->isSuccessfulResult($result, false) && !$result->budgetExceeded) {
+        if ($result->isSuccessful(false) && !$result->budgetExceeded) {
             $io->success(sprintf(
                 '✅ Chain completed in %ds | Total: ↑%s ↓%s $%.4f',
                 round($result->totalTime),
@@ -446,5 +445,22 @@ final class OrchestrateCommand extends Command
         } else {
             $io->writeln($content);
         }
+    }
+
+    /**
+     * Определяет exit code по типу исключения.
+     *
+     * Использует строковое сопоставление имени класса вместо instanceof,
+     * чтобы не импортировать Domain-исключения в Presentation-слой.
+     */
+    private function resolveExitCodeFromThrowable(\Throwable $throwable): OrchestrateExitCodeEnum
+    {
+        $class = $throwable::class;
+
+        return match (true) {
+            str_ends_with($class, '\ChainNotFoundException') => OrchestrateExitCodeEnum::chainNotFound,
+            str_ends_with($class, '\RoleNotFoundException') => OrchestrateExitCodeEnum::invalidConfig,
+            default => OrchestrateExitCodeEnum::chainFailed,
+        };
     }
 }

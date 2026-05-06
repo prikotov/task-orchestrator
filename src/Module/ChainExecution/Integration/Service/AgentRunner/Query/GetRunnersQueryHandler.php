@@ -2,15 +2,21 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\Query;
 
+use Override;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQuery as AgentRunnerGetRunnersQuery;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler as AgentRunnerGetRunnersQueryHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQuery;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\GetRunnersQueryHandlerInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GetRunners\RunnerDto;
 
 /**
- * UseCase получения списка доступных движков AI-агентов.
+ * Integration-прокси: делегирует запрос списка AI-движков в AgentRunner.Application.
+ *
+ * Расположен в Integration-слое, т.к. обращается к чужому Application (разрешено).
  */
-final readonly class GetRunnersQueryHandler
+final readonly class GetRunnersQueryHandler implements GetRunnersQueryHandlerInterface
 {
     public function __construct(
         private AgentRunnerGetRunnersQueryHandler $getRunnersHandler,
@@ -21,6 +27,7 @@ final readonly class GetRunnersQueryHandler
      * @return list<RunnerDto>
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[Override]
     public function __invoke(GetRunnersQuery $_query): array
     {
         $agentRunnerResult = ($this->getRunnersHandler)(new AgentRunnerGetRunnersQuery());

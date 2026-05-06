@@ -8,58 +8,13 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\OrchestrateExitCodeEnum;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ResolveExitCodeService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\StepResultDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Exception\ChainNotFoundException;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Exception\RoleNotFoundException;
 
-#[CoversClass(ResolveExitCodeService::class)]
+#[CoversClass(OrchestrateChainResultDto::class)]
 final class ResolveExitCodeServiceTest extends TestCase
 {
-    private ResolveExitCodeService $service;
-
-    #[Override]
-    protected function setUp(): void
-    {
-        $this->service = new ResolveExitCodeService();
-    }
-
-    // ─── resolveFromThrowable ─────────────────────────────────────────────────
-
-    #[Test]
-    public function chainNotFoundExceptionMapsToChainNotFound(): void
-    {
-        $result = $this->service->resolveFromThrowable(new ChainNotFoundException('missing'));
-
-        self::assertSame(OrchestrateExitCodeEnum::chainNotFound, $result);
-    }
-
-    #[Test]
-    public function roleNotFoundExceptionMapsToInvalidConfig(): void
-    {
-        $result = $this->service->resolveFromThrowable(new RoleNotFoundException('bad_role'));
-
-        self::assertSame(OrchestrateExitCodeEnum::invalidConfig, $result);
-    }
-
-    #[Test]
-    public function genericExceptionMapsToChainFailed(): void
-    {
-        $result = $this->service->resolveFromThrowable(new \RuntimeException('something broke'));
-
-        self::assertSame(OrchestrateExitCodeEnum::chainFailed, $result);
-    }
-
-    #[Test]
-    public function domainExceptionMapsToChainFailed(): void
-    {
-        $result = $this->service->resolveFromThrowable(new \DomainException('domain error'));
-
-        self::assertSame(OrchestrateExitCodeEnum::chainFailed, $result);
-    }
-
-    // ─── resolveFromResult: static chain ─────────────────────────────────────
+    // ─── resolveExitCode: static chain ─────────────────────────────────────
 
     #[Test]
     public function staticSuccessReturnsSuccess(): void
@@ -69,7 +24,7 @@ final class ResolveExitCodeServiceTest extends TestCase
             budgetExceeded: false,
         );
 
-        $exitCode = $this->service->resolveFromResult($result, false);
+        $exitCode = $result->resolveExitCode(false);
 
         self::assertSame(OrchestrateExitCodeEnum::success, $exitCode);
     }
@@ -94,12 +49,12 @@ final class ResolveExitCodeServiceTest extends TestCase
             budgetExceeded: false,
         );
 
-        $exitCode = $this->service->resolveFromResult($result, false);
+        $exitCode = $result->resolveExitCode(false);
 
         self::assertSame(OrchestrateExitCodeEnum::chainFailed, $exitCode);
     }
 
-    // ─── resolveFromResult: dynamic chain ────────────────────────────────────
+    // ─── resolveExitCode: dynamic chain ────────────────────────────────────
 
     #[Test]
     public function dynamicChainWithSynthesisReturnsSuccess(): void
@@ -109,7 +64,7 @@ final class ResolveExitCodeServiceTest extends TestCase
             budgetExceeded: false,
         );
 
-        $exitCode = $this->service->resolveFromResult($result, true);
+        $exitCode = $result->resolveExitCode(true);
 
         self::assertSame(OrchestrateExitCodeEnum::success, $exitCode);
     }
@@ -122,12 +77,12 @@ final class ResolveExitCodeServiceTest extends TestCase
             budgetExceeded: false,
         );
 
-        $exitCode = $this->service->resolveFromResult($result, true);
+        $exitCode = $result->resolveExitCode(true);
 
         self::assertSame(OrchestrateExitCodeEnum::chainFailed, $exitCode);
     }
 
-    // ─── resolveFromResult: budget priority ───────────────────────────────────
+    // ─── resolveExitCode: budget priority ───────────────────────────────────
 
     #[Test]
     public function budgetExceededTakesPriorityOverStepError(): void
@@ -151,7 +106,7 @@ final class ResolveExitCodeServiceTest extends TestCase
             totalCost: 6.0,
         );
 
-        $exitCode = $this->service->resolveFromResult($result, false);
+        $exitCode = $result->resolveExitCode(false);
 
         self::assertSame(OrchestrateExitCodeEnum::budgetExceeded, $exitCode);
     }
@@ -166,26 +121,26 @@ final class ResolveExitCodeServiceTest extends TestCase
             totalCost: 12.0,
         );
 
-        $exitCode = $this->service->resolveFromResult($result, false);
+        $exitCode = $result->resolveExitCode(false);
 
         self::assertSame(OrchestrateExitCodeEnum::budgetExceeded, $exitCode);
     }
 
-    // ─── isSuccessfulResult ──────────────────────────────────────────────────
+    // ─── isSuccessful ──────────────────────────────────────────────────────
 
     #[Test]
-    public function isSuccessfulResultReturnsTrueForStaticSuccess(): void
+    public function isSuccessfulReturnsTrueForStaticSuccess(): void
     {
         $result = new OrchestrateChainResultDto(
             stepResults: [],
             budgetExceeded: false,
         );
 
-        self::assertTrue($this->service->isSuccessfulResult($result, false));
+        self::assertTrue($result->isSuccessful(false));
     }
 
     #[Test]
-    public function isSuccessfulResultReturnsFalseForStaticFailure(): void
+    public function isSuccessfulReturnsFalseForStaticFailure(): void
     {
         $result = new OrchestrateChainResultDto(
             stepResults: [
@@ -204,22 +159,22 @@ final class ResolveExitCodeServiceTest extends TestCase
             budgetExceeded: false,
         );
 
-        self::assertFalse($this->service->isSuccessfulResult($result, false));
+        self::assertFalse($result->isSuccessful(false));
     }
 
     #[Test]
-    public function isSuccessfulResultReturnsTrueForDynamicWithSynthesis(): void
+    public function isSuccessfulReturnsTrueForDynamicWithSynthesis(): void
     {
         $result = new OrchestrateChainResultDto(
             synthesis: 'Done.',
             budgetExceeded: false,
         );
 
-        self::assertTrue($this->service->isSuccessfulResult($result, true));
+        self::assertTrue($result->isSuccessful(true));
     }
 
     #[Test]
-    public function isSuccessfulResultReturnsFalseForBudgetExceeded(): void
+    public function isSuccessfulReturnsFalseForBudgetExceeded(): void
     {
         $result = new OrchestrateChainResultDto(
             stepResults: [],
@@ -228,7 +183,7 @@ final class ResolveExitCodeServiceTest extends TestCase
             totalCost: 12.0,
         );
 
-        self::assertFalse($this->service->isSuccessfulResult($result, false));
+        self::assertFalse($result->isSuccessful(false));
     }
 
     #[Test]
@@ -241,12 +196,12 @@ final class ResolveExitCodeServiceTest extends TestCase
             totalCost: 12.0,
         );
 
-        $exitCode = $this->service->resolveFromResult($result, true);
+        $exitCode = $result->resolveExitCode(true);
 
         self::assertSame(OrchestrateExitCodeEnum::budgetExceeded, $exitCode);
     }
 
-    // ─── resolveFromResult: timeout ───────────────────────────────────────────
+    // ─── resolveExitCode: timeout ───────────────────────────────────────────
 
     #[Test]
     public function staticChainWithTimedOutStepReturnsTimeout(): void
@@ -270,7 +225,7 @@ final class ResolveExitCodeServiceTest extends TestCase
             timedOut: true,
         );
 
-        $exitCode = $this->service->resolveFromResult($result, false);
+        $exitCode = $result->resolveExitCode(false);
 
         self::assertSame(OrchestrateExitCodeEnum::timeout, $exitCode);
     }
@@ -284,7 +239,7 @@ final class ResolveExitCodeServiceTest extends TestCase
             timedOut: true,
         );
 
-        $exitCode = $this->service->resolveFromResult($result, true);
+        $exitCode = $result->resolveExitCode(true);
 
         self::assertSame(OrchestrateExitCodeEnum::timeout, $exitCode);
     }
@@ -313,7 +268,7 @@ final class ResolveExitCodeServiceTest extends TestCase
             timedOut: true,
         );
 
-        $exitCode = $this->service->resolveFromResult($result, false);
+        $exitCode = $result->resolveExitCode(false);
 
         self::assertSame(OrchestrateExitCodeEnum::budgetExceeded, $exitCode);
     }
@@ -340,13 +295,13 @@ final class ResolveExitCodeServiceTest extends TestCase
             timedOut: true,
         );
 
-        $exitCode = $this->service->resolveFromResult($result, false);
+        $exitCode = $result->resolveExitCode(false);
 
         self::assertSame(OrchestrateExitCodeEnum::timeout, $exitCode);
     }
 
     #[Test]
-    public function isSuccessfulResultReturnsFalseForTimedOut(): void
+    public function isSuccessfulReturnsFalseForTimedOut(): void
     {
         $result = new OrchestrateChainResultDto(
             stepResults: [],
@@ -354,6 +309,6 @@ final class ResolveExitCodeServiceTest extends TestCase
             timedOut: true,
         );
 
-        self::assertFalse($this->service->isSuccessfulResult($result, false));
+        self::assertFalse($result->isSuccessful(false));
     }
 }
