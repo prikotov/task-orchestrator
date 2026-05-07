@@ -8,9 +8,9 @@ depends_on: TASK-refactor-cross-module-dependencies
 epic: EPIC-refactor-responsibility-decomposition
 author: Тимлид Алекс
 assignee:
-branch:
+branch: task/docs-shared-kernel-contracts
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-docs-shared-kernel-contracts: ADR на межмодульное взаимодействие через Application

@@ -4,9 +4,9 @@
 
 Визуальный обзор слоёв, модулей и взаимодействий — в [Диаграммы](diagrams.md).
 
-## Двухмодульная структура
+## Трёхмодульная структура
 
-Бандл состоит из двух модулей, каждый со своими DDD-слоями:
+Бандл состоит из трёх модулей + модуля движка AI-агента, каждый со своими DDD-слоями:
 
 ```
 src/Module/
@@ -14,12 +14,25 @@ src/Module/
 │   ├── Domain/                  # Контракт движка: AgentRunnerInterface, VO, Registry
 │   ├── Application/             # Use cases: RunAgentCommandHandler, GetRunners
 │   └── Infrastructure/          # Реализации: PiAgentRunner, Retry, Circuit Breaker
-└── Orchestrator/                # Модуль оркестрации цепочек
-    ├── Domain/                  # Бизнес-логика: Chain, Budget, Dynamic, Static
-    ├── Application/             # Use cases, DTO, мапперы
-    ├── Integration/             # ACL к AgentRunner: RunAgentService, AgentDtoMapper
-    └── Infrastructure/          # YAML-загрузка, JSONL-лог, Session, Prompt
+├── ChainDefinition/             # Загрузка, валидация, VO определений цепочек
+│   ├── Domain/                  # ChainLoaderInterface, ChainDefinitionVo, Enums
+│   ├── Application/             # LoadChain, ListChains, ValidateChainConfig, LoadRawChain
+│   └── Infrastructure/          # YamlChainLoader
+├── ChainExecution/              # Выполнение static + conditional цепочек
+│   ├── Domain/                  # ExecutionStrategy, Budget, Hooks, Audit, VO
+│   ├── Application/             # OrchestrateChainCommandHandler, Static/Conditional стратегии
+│   ├── Integration/             # ChainDefinitionProvider (← ChainDefinition.Application)
+│   └── Infrastructure/          # Prompt, Audit, Hooks, Step execution
+└── DynamicLoop/                 # Выполнение dynamic-циклов
+    ├── Domain/                  # DynamicLoop entity, Session, Budget, Audit, VO
+    ├── Application/             # DynamicExecutionStrategy, Round/Session events
+    ├── Integration/             # ChainDefinitionProvider, RunAgentService (← ChainExecution.Application)
+    └── Infrastructure/          # Session, Audit, Agent runner, Prompt
 ```
+
+### Правило межмодульного взаимодействия
+
+Модули взаимодействуют **только через Application-слой**: Integration обращается к foreign Application (QueryHandler / CommandHandler), а не к foreign Domain. Domain каждого модуля — чёрный ящик. Подробнее — в [ADR-011: Межмодульное взаимодействие через Application](../adr/011-cross-module-application-api.md).
 
 ### Модуль AgentRunner
 
@@ -47,48 +60,90 @@ src/Module/
 - `CircuitBreakerAgentRunner` — обёртка Circuit Breaker (closed → open → half_open)
 - `RetryableRunnerFactory` — фабрика для создания retrying-обёртки
 
-### Модуль Orchestrator
+### Модуль ChainDefinition
 
-Отвечает за оркестрацию цепочек агентов (static/dynamic). Не зависит от конкретного движка — общается с AgentRunner через Integration-слой (ACL).
+Отвечает за загрузку, валидацию и определение цепочек. Не зависит ни от кого — единственный независимый модуль.
 
 **Domain-слой:**
-- `RunAgentServiceInterface` — интеграционный интерфейс запуска AI-агента (инкапсулирует retry)
-- Сервисы Chain: Audit, Dynamic, Session, Shared, Static, Budget, Prompt
-- Entity: `DynamicLoopExecution`, `StaticChainExecution`
-- VO: `ChainDefinitionVo`, `SharedChainDefinitionVo`, `PromptConfigurationVo`, `DynamicLoopResultVo` (с `getCompletionReason()`), и др.
+- `ChainLoaderInterface` — контракт загрузки цепочек
+- VO: `ChainDefinitionVo`, `SharedChainDefinitionVo`, `ChainStepVo`, и др.
 - Enum: `ChainStepTypeEnum`, `ChainTypeEnum`
-- Exception: `OrchestratorException`, `ChainNotFoundException`, `RoleNotFoundException`
+- Exception: `ChainNotFoundException`, `OrchestratorException`
 
 **Application-слой:**
-- Use cases: `OrchestrateChainCommandHandler` (диспетчер стратегий, ~58 строк, 2 зависимости), `RunAgentCommandHandler`, `GetRunnersQueryHandler`, `GenerateReportQueryHandler`
-- Стратегии выполнения: `ExecutionStrategyInterface`, `StaticExecutionStrategy`, `DynamicExecutionStrategy`
-- Сервисы: `ExecuteStaticChainService`, `ExecuteStaticChainServiceInterface`, `DispatchRoundEventService`, `DispatchSessionCompletedEventService`
-- DTO: команды и результаты
-- Mapper: `ReportFormatMapperInterface`, `ReportJsonMapper`, `ReportTextMapper`
-
-**Integration-слой (ACL к AgentRunner):**
-- `RunAgentService` — реализует `RunAgentServiceInterface`, делегирует в AgentRunner Application
-- `AgentDtoMapper` — маппер VO между Orchestrator Domain и AgentRunner Application DTO
+- Use cases: `LoadChainQueryHandler`, `ListChainsQueryHandler`, `ValidateChainConfigQueryHandler`, `LoadRawChainQueryHandler`
+- DTO: Query/Result
 
 **Infrastructure-слой:**
-- Сервисы Chain: `YamlChainLoader`, `ChainSessionLogger`, `QualityGateRunner`, и др.
+- `YamlChainLoader` — загрузка из YAML-файлов
+
+### Модуль ChainExecution
+
+Отвечает за выполнение static и conditional цепочек. Зависит от ChainDefinition (через Integration) и AgentRunner (через Integration).
+
+**Domain-слой:**
+- `RunAgentServiceInterface` — интеграционный интерфейс запуска AI-агента
+- `AuditLoggerInterface` — Port для audit-логирования
+- `PromptProviderInterface` — Port для системных промптов
+- Сервисы: Budget, Hooks, Static, Conditional, Prompt, Audit
+- Entity: `StaticChainExecution`
+- VO: `ChainRunRequestVo`, `ChainRunResultVo`, `FallbackAttemptVo`, и др.
+
+**Application-слой:**
+- Use cases: `OrchestrateChainCommandHandler` (диспетчер стратегий), `RunAgentCommandHandler`, `RunAgentQueryHandler`, `GetPromptFilePathQueryHandler`, `GenerateReportQueryHandler`
+- Стратегии: `ExecutionStrategyInterface`, `StaticExecutionStrategy`, `ConditionalExecutionStrategy`
+- Сервисы: `ExecuteStaticChainService`, `DynamicExecutionStrategy` (делегирует в DynamicLoop через Integration)
+- DTO: команды и результаты
+
+**Integration-слой:**
+- `ChainExecutionDefinitionMapper` — загрузка и маппинг определений из ChainDefinition (через `LoadRawChainQueryHandler` — foreign Application)
+- `RunAgentService` — реализует `RunAgentServiceInterface`, делегирует в AgentRunner Application
+- `StaticAuditService` — реализует Audit-Port
+
+**Infrastructure-слой:**
+- `JsonlAuditLogger` — JSONL audit-логгер (реализует `AuditLoggerInterface`)
+- `RolePromptBuilder`, `ExecuteConditionalStepService`, `ResolveChainRunnerService`
+
+### Модуль DynamicLoop
+
+Отвечает за выполнение dynamic-циклов (session, round, context, facilitator). Зависит от ChainDefinition (через Integration) и ChainExecution (через Integration → foreign Application).
+
+**Domain-слой:**
+- `RunDynamicLoopAgentServiceInterface` — Port запуска агента
+- `DynamicLoopAuditLoggerInterface` — Port audit-логирования
+- `ChainDefinitionProviderInterface` — Port получения определений цепочек
+- Сервисы: Dynamic, Session, Budget, Audit
+- Entity: `DynamicLoopExecution`
+- VO: `DynamicRoundResultVo`, `DynamicLoopResultVo`, `ChainSessionStateVo`, и др.
+
+**Application-слой:**
+- Сервисы: `DynamicExecutionStrategy`, `DispatchRoundEventService`, `DispatchSessionCompletedEventService`
+
+**Integration-слой:**
+- `DynamicLoopDefinitionMapper` — загрузка и маппинг определений из ChainDefinition (через `LoadRawChainQueryHandler` — foreign Application)
+- `RunDynamicLoopAgentService` — реализует `RunDynamicLoopAgentServiceInterface`, делегирует в `RunAgentQueryHandler` (ChainExecution.Application) и `GetPromptFilePathQueryHandler`
+
+**Infrastructure-слой:**
+- `JsonlAuditLogger` — JSONL audit-логгер (реализует `DynamicLoopAuditLoggerInterface`)
+- `ChainSessionLogger`, `ChainSessionReader`, `ChainSessionWriter`, `CheckDynamicBudgetService`, `FacilitatorResponseParserService`
 
 ## ExecutionStrategy Pattern
 
-Оркестрация использует **Strategy** для разделения поведенческих путей static/dynamic цепочек. Паттерн введён в ADR-006.
+Оркестрация использует **Strategy** для разделения поведенческих путей static/dynamic/conditional цепочек. Паттерн введён в ADR-006.
 
 **Как работает:**
 
-1. `OrchestrateChainCommandHandler` — чистый диспетчер. Две зависимости: `ChainLoaderInterface` + `iterable<ExecutionStrategyInterface>` (tagged iterator).
+1. `OrchestrateChainCommandHandler` — чистый диспетчер. Две зависимости: `ChainDefinitionProviderInterface` + `iterable<ExecutionStrategyInterface>` (tagged iterator).
 2. Стратегия определяется через `supports(ChainDefinitionVo): bool` — каждая проверяет тип цепочки.
 3. Найденная стратегия выполняет `execute()` или `resume()`.
 
 **Стратегии:**
 
-| Стратегия | Тип цепочки | Описание |
-|---|---|---|
-| `StaticExecutionStrategy` | static | Делегирует в `ExecuteStaticChainServiceInterface`. Resume не поддерживает. |
-| `DynamicExecutionStrategy` | dynamic | Полный цикл: session, context, loop, finalize, DTO-маппинг, event dispatch. |
+| Стратегия | Модуль | Тип цепочки | Описание |
+|---|---|---|---|
+| `StaticExecutionStrategy` | ChainExecution | static | Делегирует в `ExecuteStaticChainServiceInterface`. Resume не поддерживает. |
+| `ConditionalExecutionStrategy` | ChainExecution | conditional | Условное ветвление шагов. Resume не поддерживает. |
+| `DynamicExecutionStrategy` | DynamicLoop | dynamic | Полный цикл: session, context, loop, finalize, DTO-маппинг, event dispatch. |
 
 **DI-конфигурация:**
 
@@ -108,44 +163,87 @@ services:
 
 ## Integration-слой между модулями
 
-Модули связаны через **Integration-слой** Orchestrator (Clean Architecture). Orchestrator Domain определяет интерфейс `RunAgentServiceInterface` в `Domain/Service/Integration/`. Integration-слой реализует `RunAgentService`, который делегирует в AgentRunner Application.
+Модули связаны через **Integration-слой**, который обращается к чужому **Application** (QueryHandler / CommandHandler), а не к чужому Domain. Модель формализована в [ADR-011](../adr/011-cross-module-application-api.md).
+
+### Правило: Integration → foreign Application
 
 ```
-Orchestrator Domain                     Integration Layer                     AgentRunner Application
-─────────────────────                   ─────────────────────                 ────────────────────────
-RunAgentServiceInterface  ←──────────   RunAgentService       ───────────>   RunAgentCommandHandler
-(ChainRunRequestVo, ChainRunResultVo)   AgentDtoMapper         ───────────>   (RunAgentCommand, RunAgentResultDto)
+Integration-слой модуля A
+  → foreign Application (QueryHandler / CommandHandler модуля B)
+    → foreign Domain (модуля B)
+```
+
+**Integration никогда не обращается к foreign Domain напрямую.**
+
+### Примеры Integration → foreign Application
+
+#### ChainExecution ← ChainDefinition
+
+```
+ChainExecution.Integration.ChainExecutionDefinitionMapper
+  → ChainDefinition.Application.LoadRawChainQueryHandler     ✓ foreign Application
+
+ChainExecution.Integration.ChainExecutionDefinitionMapper
+  → ChainDefinition.Domain.ChainLoaderInterface              ✗ foreign Domain (ЗАПРЕЩЕНО)
+```
+
+#### DynamicLoop ← ChainExecution
+
+```
+DynamicLoop.Integration.RunDynamicLoopAgentService
+  → ChainExecution.Application.RunAgentQueryHandler          ✓ foreign Application
+
+DynamicLoop.Integration.RunDynamicLoopAgentService
+  → ChainExecution.Domain.RunAgentServiceInterface           ✗ foreign Domain (ЗАПРЕЩЕНО)
 ```
 
 ### VO-маппинг на границе модулей
 
-Каждый модуль имеет собственные VO. Маппинг выполняется в `AgentDtoMapper` (Integration):
+Каждый модуль имеет собственные VO. Integration-слой маппит VO при пересечении границы.
 
-| Orchestrator VO (Domain)          | AgentRunner Application DTO  |
-|-----------------------------------|------------------------------|
-| `ChainRunRequestVo`               | `RunAgentCommand`            |
-| `ChainRunResultVo`                | `RunAgentResultDto`          |
-| `ChainRetryPolicyVo`              | `RunAgentCommand` (поля retry) |
+**Принцип:** Domain каждого модуля не зависит от Domain других модулей. VO дублированы намеренно — каждый модуль владеет своими типами.
 
-**Принцип:** Orchestrator Domain не зависит от AgentRunner. VO дублированы намеренно — каждый модуль владеет своими типами.
+### Deptrac-верификация
+
+`CrossModuleDomainRule` автоматически верифицирует модель:
+
+```bash
+vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
+# → 0 violations = модель соблюдается
+```
 
 ## Зависимости модулей и слоёв
 
+### Внутримодульные зависимости
+
 | Откуда | Куда | Примечание |
 |---|---|---|
-| **Orchestrator** Domain | — | Только PHP std + `Psr\Log\LoggerInterface` |
-| **Orchestrator** Application | **Orchestrator** Domain | Через интерфейсы и VOs |
-| **Orchestrator** Integration | **Orchestrator** Domain (interfaces) | Реализует `RunAgentServiceInterface` |
-| **Orchestrator** Integration | **AgentRunner** Application | Делегирует в `RunAgentCommandHandler` |
-| **Orchestrator** Infrastructure | **Orchestrator** Domain (interfaces) | Реализует Domain-интерфейсы |
-| **AgentRunner** Domain | — | Только PHP std + `Psr\Log\LoggerInterface` |
-| **AgentRunner** Application | **AgentRunner** Domain | Через интерфейсы и VOs |
-| **AgentRunner** Infrastructure | **AgentRunner** Domain (interfaces) | Реализует AgentRunnerInterface |
+| Domain (любой модуль) | — | Только PHP std + `Psr\Log\LoggerInterface` |
+| Application | Domain (свой модуль) | Через интерфейсы и VO |
+| Integration | Domain (свой модуль, interfaces) | Реализует Port'ы своего Domain |
+| Infrastructure | Domain (свой модуль, interfaces) | Реализует Domain-интерфейсы |
+
+### Межмодульные зависимости
+
+| Откуда | Куда | Примечание |
+|---|---|---|
+| ChainExecution.Integration | ChainDefinition.Application | `LoadRawChainQueryHandler` — загрузка определений |
+| DynamicLoop.Integration | ChainDefinition.Application | `LoadRawChainQueryHandler` — загрузка определений |
+| DynamicLoop.Integration | ChainExecution.Application | `RunAgentQueryHandler`, `GetPromptFilePathQueryHandler` |
+| ChainExecution.Integration | AgentRunner.Application | `RunAgentCommandHandler` — запуск агента |
+| DynamicLoop.Integration | AgentRunner.Application | (через ChainExecution) |
+
+**Межмодульное правило:** Integration → foreign Application (QueryHandler/CommandHandler). Запрещено Integration → foreign Domain.
+
+### Внешние зависимости
+
+| Откуда | Куда | Примечание |
+|---|---|---|
 | Presentation | Application only | Внедряет use case handler'ы напрямую или через Bus |
 
 ### Правило: Domain не зависит ни от кого
 
-Оба модуля следуют принципу: Domain-слой не содержит зависимостей на другие слои или сторонние библиотеки (кроме `Psr\Log\LoggerInterface`).
+Все модули следуют принципу: Domain-слой не содержит зависимостей на другие слои или сторонние библиотеки (кроме `Psr\Log\LoggerInterface`).
 
 ### Почему CommandHandler для оркестрации
 
@@ -208,153 +306,163 @@ src/Module/AgentRunner/
         └── RetryingAgentRunner.php                      # обёртка с retry-policy
 ```
 
-### Orchestrator
+### ChainDefinition
 
 ```
 src/Module/ChainDefinition/
 ├── Domain/
 │   ├── Dto/
-│   │   ├── ChainResultAuditDto.php                      # параметры logChainResult
-│   │   └── StepAuditStatusDto.php                       # isError-статус шага
-│   ├── Entity/
-│   │   ├── DynamicLoopExecution.php                     # in-memory сущность dynamic-цикла
-│   │   └── StaticChainExecution.php                     # in-memory сущность static-цепочки
+│   │   ├── ChainResultAuditDto.php
+│   │   └── StepAuditStatusDto.php
 │   ├── Enum/
 │   │   ├── ChainStepTypeEnum.php                        # agent | quality_gate
-│   │   └── ChainTypeEnum.php                            # static | dynamic
+│   │   └── ChainTypeEnum.php                            # static | dynamic | conditional
 │   ├── Exception/
+│   │   ├── ChainConfigViolationVo.php
 │   │   ├── ChainNotFoundException.php
-│   │   ├── NotFoundExceptionInterface.php               # маркерный интерфейс
-│   │   ├── OrchestratorException.php                    # базовый exception модуля
-│   │   └── RoleNotFoundException.php
+│   │   └── OrchestratorException.php
 │   ├── Service/
-│   │   ├── Budget/
-│   │   │   └── CheckDynamicBudgetServiceInterface.php
-│   │   ├── Chain/
-│   │   │   ├── Audit/
-│   │   │   │   ├── AuditLoggerInterface.php
-│   │   │   │   └── AuditLoggerFactoryInterface.php
-│   │   │   ├── Dynamic/
-│   │   │   │   ├── BuildDynamicContextServiceInterface.php
-│   │   │   │   ├── BuildDynamicContextService.php
-│   │   │   │   ├── FormatDynamicJournalServiceInterface.php
-│   │   │   │   ├── FormatDynamicJournalService.php
-│   │   │   │   ├── RecordDynamicRoundServiceInterface.php
-│   │   │   │   ├── RecordDynamicRoundService.php
-│   │   │   │   ├── RunDynamicLoopAgentServiceInterface.php
-│   │   │   │   ├── RunDynamicLoopServiceInterface.php
-│   │   │   │   └── RunDynamicLoopService.php
-│   │   │   ├── Session/
-│   │   │   │   ├── ChainSessionLoggerInterface.php
-│   │   │   │   ├── ChainSessionReaderInterface.php
-│   │   │   │   └── ChainSessionWriterInterface.php
-│   │   │   ├── Shared/
-│   │   │   │   ├── ChainLoaderInterface.php
-│   │   │   │   ├── FacilitatorResponseParserInterface.php
-│   │   │   │   ├── PromptFormatterInterface.php
-│   │   │   │   ├── QualityGateRunnerInterface.php
-│   │   │   │   ├── ResolveChainRunnerServiceInterface.php
-│   │   │   │   ├── RoundCompletedNotifierInterface.php
-│   │   │   │   └── SessionCompletedNotifierInterface.php
-│   │   │   └── Static/
-│   │   │       ├── CheckStaticBudgetServiceInterface.php
-│   │   │       ├── CheckStaticBudgetService.php
-│   │   │       ├── ExecuteStaticStepService.php
-│   │   │       └── RunStaticChainService.php
-│   │   ├── Integration/
-│   │   │   └── RunAgentServiceInterface.php              # интеграционный интерфейс
-│   │   └── Prompt/
-│   │       └── PromptProviderInterface.php
+│   │   └── Chain/
+│   │       └── ChainLoaderInterface.php                # контракт загрузки цепочек
 │   └── ValueObject/
 │       ├── BudgetVo.php
-│       ├── ChainConfigViolationVo.php
 │       ├── ChainDefinitionVo.php
-│       ├── ChainRetryPolicyVo.php
-│       ├── ChainRunRequestVo.php
-│       ├── ChainRunResultVo.php
-│       ├── ChainSessionStateVo.php
 │       ├── ChainStepVo.php
-│       ├── ChainTurnResultVo.php
-│       ├── DynamicBudgetCheckVo.php
-│       ├── DynamicChainContextVo.php
-│       ├── DynamicLoopResultVo.php
-│       ├── DynamicRoundResultVo.php
-│       ├── DynamicTurnResultVo.php
-│       ├── FacilitatorResponseVo.php
-│       ├── FacilitatorTurnResultVo.php
-│       ├── FallbackAttemptVo.php
-│       ├── FallbackConfigVo.php
-│       ├── FixIterationGroupVo.php
 │       ├── PromptConfigurationVo.php
-│       ├── QualityGateResultVo.php
-│       ├── QualityGateVo.php
 │       ├── RoleConfigVo.php
 │       ├── SharedChainDefinitionVo.php
-│       ├── StaticChainResultVo.php
-│       ├── StaticProcessResultVo.php
-│       └── StaticStepResultVo.php
+│       └── ... (definition VO)
 ├── Application/
-│   ├── Enum/
-│   │   └── ReportFormatEnum.php                         # text | json
-│   ├── Event/OrchestrateChain/
-│   │   ├── OrchestrateRoundCompletedEvent.php
-│   │   └── OrchestrateSessionCompletedEvent.php
-│   ├── Mapper/
-│   │   ├── ReportFormatMapperInterface.php
-│   │   ├── ReportJsonMapper.php
-│   │   └── ReportTextMapper.php
+│   └── UseCase/
+│       └── Query/Chain/
+│           ├── ListChains/
+│           ├── LoadChain/
+│           ├── LoadRawChain/                           # API для Integration других модулей
+│           └── ValidateChainConfig/
+└── Infrastructure/
+    └── Service/Chain/
+        └── YamlChainLoader.php                         # загрузка из YAML
+```
+
+### ChainExecution
+
+```
+src/Module/ChainExecution/
+├── Domain/
+│   ├── Entity/
+│   │   └── StaticChainExecution.php
+│   ├── Exception/
+│   │   ├── NotFoundExceptionInterface.php
+│   │   └── RoleNotFoundException.php
+│   ├── Service/
+│   │   ├── Agent/
+│   │   │   └── RunAgentServiceInterface.php            # интеграционный Port
+│   │   ├── Chain/Audit/
+│   │   │   ├── AuditLoggerInterface.php
+│   │   │   └── AuditLoggerFactoryInterface.php
+│   │   ├── Hook/
+│   │   │   └── HookExecutorInterface.php
+│   │   ├── Prompt/
+│   │   │   └── PromptProviderInterface.php
+│   │   ├── Static/
+│   │   │   ├── CheckStaticBudgetServiceInterface.php
+│   │   │   ├── ExecuteStaticStepService.php
+│   │   │   ├── FormatPromptServiceInterface.php
+│   │   │   ├── ResolveChainRunnerServiceInterface.php
+│   │   │   └── RunStaticChainService.php
+│   │   └── Integration/
+│   │       └── ChainDefinitionProviderInterface.php    # Port загрузки определений
+│   └── ValueObject/
+│       ├── ChainRunRequestVo.php
+│       ├── ChainRunResultVo.php
+│       ├── ExecutionRetryPolicyVo.php
+│       ├── HookResultVo.php
+│       └── ... (execution VO)
+├── Application/
 │   ├── Service/Chain/
-│   │   ├── DispatchRoundEventService.php
-│   │   ├── DispatchSessionCompletedEventService.php
-│   │   ├── DynamicExecutionStrategy.php
+│   │   ├── ConditionalExecutionStrategy.php
 │   │   ├── ExecuteStaticChainService.php
-│   │   ├── ExecuteStaticChainServiceInterface.php
 │   │   ├── ExecutionStrategyInterface.php
 │   │   └── StaticExecutionStrategy.php
 │   └── UseCase/
 │       ├── Command/
-│       │   ├── OrchestrateChain/
-│       │   │   ├── DynamicLoopResultDto.php
-│       │   │   ├── DynamicRoundResultDto.php
-│       │   │   ├── FacilitatorTurnResultDto.php
-│       │   │   ├── OrchestrateChainCommand.php
-│       │   │   ├── OrchestrateChainCommandHandler.php
-│       │   │   ├── OrchestrateChainResultDto.php
-│       │   │   └── StepResultDto.php
-│       │   └── RunAgent/
-│       │       ├── RunAgentCommand.php
-│       │       ├── RunAgentCommandHandler.php
-│       │       └── RunAgentResultDto.php
+│       │   ├── OrchestrateChain/                       # диспетчер стратегий
+│       │   └── RunAgent/                                # запуск агента с промптом
 │       └── Query/
-│           ├── GenerateReport/
-│           │   ├── GenerateReportQuery.php
-│           │   ├── GenerateReportQueryHandler.php
-│           │   ├── GenerateReportResultDto.php
-│           │   └── ReportResultFactory.php
-│           └── GetRunners/
-│               ├── GetRunnersQuery.php
-│               ├── GetRunnersQueryHandler.php
-│               └── RunnerDto.php
+│           ├── Agent/RunAgent/                          # API для DynamicLoop Integration
+│           ├── Prompt/GetPromptFilePath/                # API для DynamicLoop Integration
+│           └── GenerateReport/
 ├── Integration/
 │   └── Service/
-│       └── AgentRunner/
-│           ├── RunAgentService.php                       # реализует RunAgentServiceInterface
-│           └── AgentDtoMapper.php                        # маппер VO Orchestrator ↔ AgentRunner DTO
+│       ├── AgentRunner/
+│       │   ├── RunAgentService.php                      # → AgentRunner.Application
+│       │   └── AgentDtoMapper.php
+│       ├── Audit/
+│       │   └── StaticAuditService.php
+│       └── ChainDefinition/
+│           └── ChainExecutionDefinitionMapper.php      # → ChainDefinition.Application
 └── Infrastructure/
     └── Service/
+        ├── Audit/
+        │   └── JsonlAuditLogger.php                    # implements AuditLoggerInterface
+        ├── Agent/
+        │   └── ResolveChainRunnerService.php
         ├── Chain/
-        │   ├── ChainSessionLogger.php
-        │   ├── CheckDynamicBudgetService.php
-        │   ├── FacilitatorResponseParserService.php
-        │   ├── JsonlAuditLogger.php
-        │   ├── JsonlAuditLoggerFactory.php
-        │   ├── PromptFormatterService.php
-        │   ├── QualityGateRunner.php
-        │   ├── ResolveChainRunnerService.php
-        │   ├── RunDynamicLoopAgentService.php
-        │   └── YamlChainLoader.php
+        │   └── ExecuteConditionalStepService.php
         └── Prompt/
             └── RolePromptBuilder.php
+```
+
+### DynamicLoop
+
+```
+src/Module/DynamicLoop/
+├── Domain/
+│   ├── Dto/
+│   │   └── DynamicLoopAuditDto.php
+│   ├── Entity/
+│   │   └── DynamicLoopExecution.php
+│   ├── Service/
+│   │   ├── Audit/
+│   │   │   └── DynamicLoopAuditLoggerInterface.php    # свой Port
+│   │   ├── Budget/
+│   │   │   └── CheckDynamicBudgetServiceInterface.php
+│   │   ├── Dynamic/
+│   │   │   ├── BuildDynamicContextServiceInterface.php
+│   │   │   ├── RunDynamicLoopAgentServiceInterface.php
+│   │   │   └── RunDynamicLoopServiceInterface.php
+│   │   ├── Session/
+│   │   │   ├── ChainSessionLoggerInterface.php
+│   │   │   ├── ChainSessionReaderInterface.php
+│   │   │   └── ChainSessionWriterInterface.php
+│   │   └── Integration/
+│   │       └── ChainDefinitionProviderInterface.php    # Port загрузки определений
+│   └── ValueObject/
+│       ├── DynamicLoopResultVo.php
+│       ├── DynamicRoundResultVo.php
+│       ├── ChainSessionStateVo.php
+│       └── ... (dynamic VO)
+├── Application/
+│   └── Service/
+│       ├── DispatchRoundEventService.php
+│       ├── DispatchSessionCompletedEventService.php
+│       └── DynamicExecutionStrategy.php
+├── Integration/
+│   └── Service/
+│       ├── ChainDefinition/
+│       │   └── DynamicLoopDefinitionMapper.php         # → ChainDefinition.Application
+│       └── ChainExecution/
+│           └── RunDynamicLoopAgentService.php          # → ChainExecution.Application
+└── Infrastructure/
+    └── Service/
+        ├── ChainSessionLogger.php
+        ├── ChainSessionReader.php
+        ├── ChainSessionWriter.php
+        ├── ChainSessionFileStorage.php
+        ├── CheckDynamicBudgetService.php
+        ├── FacilitatorResponseParserService.php
+        ├── JsonlAuditLogger.php                       # implements DynamicLoopAuditLoggerInterface
+        └── JsonlAuditLoggerFactory.php
 ```
 
 ### Bundle Infrastructure

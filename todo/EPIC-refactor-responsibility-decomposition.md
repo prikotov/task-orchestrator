@@ -159,7 +159,7 @@ DynamicLoop → ChainExecution = FORBIDDEN
 - [x] [TASK-refactor-merge-static-execution](done/TASK-refactor-merge-static-execution.todo.md) — Влить StaticExecution в ChainExecution. Перенести файлы, обновить namespace. Создать Integration-маппер ChainExecution ← ChainDefinition (Definition VO → Execution VO). Удалить старый модуль StaticExecution. Обновить services.yaml. **Зависит от PR#1. Рекомендуется после PR#2. ~1110 LOC новых файлов.**
 
 ### PR#4: Рефакторинг — устранение кросс-модульных зависимостей
-- [ ] [TASK-refactor-cross-module-dependencies](TASK-refactor-cross-module-dependencies.todo.md) — Упразднить `Domain\Contract\`, переписать Integration-мапперы через foreign Application (QueryHandler/CommandHandler), разделить JsonlAuditLogger. Deptrac → 0 violations без изменений правил. **Консенсус архитекторов Гэндальфа + Локи: проблема в коде, а не в Deptrac.**
+- [x] [TASK-refactor-cross-module-dependencies](done/TASK-refactor-cross-module-dependencies.todo.md) — Упразднить `Domain\Contract\`, переписать Integration-мапперы через foreign Application (QueryHandler/CommandHandler), разделить JsonlAuditLogger. Deptrac → 0 violations без изменений правил. **PR #156 (merged).**
 
 ### PR#5: ~~Рефакторинг — перенос классов в Integration~~ (MERGED #154)
 - [x] [TASK-refactor-integration-layer-violations](done/TASK-refactor-integration-layer-violations.todo.md) — Перенести 4 класса в Integration-слой, убрать прослойку GetRunnersQueryHandlerInterface, встроить exit code resolution в Presentation. 15→5 violations. **MERGED.**
