@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик Шерлок
 branch: task/research-hermes-agent
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-hermes-agent: Исследовать Hermes Agent (Nous Research) для сравнения с task-orchestrator
@@ -32,14 +32,14 @@ status: in_progress
 ## 3. Requirements (Требования, MoSCoW)
 
 ### 🔴 Must Have (Обязательно)
-- [ ] Исследован репозиторий https://github.com/nousresearch/hermes-agent: README, исходный код, примеры
-- [ ] Отчёт `docs/research/hermes-agent-comparison.md` по формату существующих comparison-документов
-- [ ] Строка добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
-- [ ] Вердикт: заимствовать паттерны / dependency / не подходит
+- [x] Исследован репозиторий https://github.com/nousresearch/hermes-agent: README, исходный код, примеры
+- [x] Отчёт `docs/research/hermes-agent-comparison.md` по формату существующих comparison-документов
+- [x] Строка добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
+- [x] Вердикт: заимствовать паттерны / dependency / не подходит
 
 ### 🟡 Should Have (Желательно)
-- [ ] Сравнение с нашими паттернами (ExecutionStrategy, DynamicLoop, ChainDefinition)
-- [ ] Конкретные рекомендации: что заимствовать, приоритет
+- [x] Сравнение с нашими паттернами (ExecutionStrategy, DynamicLoop, ChainDefinition)
+- [x] Конкретные рекомендации: что заимствовать, приоритет
 
 ### ⚫ Won't Have (Не в этот раз)
 - Код интеграции
@@ -54,9 +54,9 @@ status: in_progress
 
 ## 5. Definition of Done (Критерии приёмки)
 
-- [ ] Файл `docs/research/hermes-agent-comparison.md` создан
-- [ ] Строка Hermes Agent добавлена в сводную таблицу
-- [ ] Вердикт сформулирован
+- [x] Файл `docs/research/hermes-agent-comparison.md` создан
+- [x] Строка Hermes Agent добавлена в сводную таблицу
+- [x] Вердикт сформулирован
 
 ## 6. Risks and Dependencies (Риски и зависимости)
 
