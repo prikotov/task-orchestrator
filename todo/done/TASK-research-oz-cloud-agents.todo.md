@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: done/EPIC-research-agent-frameworks-comparison.md
 author:
-assignee:
-branch:
+assignee: Аналитик Шерлок
+branch: task/research-oz-cloud-agents
 pr:
-status: todo
+status: done
 ---
 
 # TASK-research-oz-cloud-agents: Oz — платформа оркестрации облачных AI-агентов
@@ -31,12 +31,12 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Comparison-документ в `docs/research/oz-cloud-agents-comparison.md`
-- [ ] Строка в сводной таблице `docs/research/agent-frameworks-summary.md`
-- [ ] Вердикт: заимствовать / dependency / не подходит
+- [x] Comparison-документ в `docs/research/oz-cloud-agents-comparison.md`
+- [x] Строка в сводной таблице `docs/research/agent-frameworks-summary.md`
+- [x] Вердикт: заимствовать / dependency / не подходит
 
 ### 🟡 Should Have (Желательно)
-- [ ] Сравнение с Archon и Mastra AI по cloud-orchestration подходу
+- [x] Сравнение с Archon и Mastra AI по cloud-orchestration подходу
 
 ## 4. Implementation Plan (План реализации)
 1. Изучить https://www.warp.dev/oz — документация, blog, демо
@@ -45,9 +45,9 @@ status: todo
 4. Обновить сводную таблицу
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] `docs/research/oz-cloud-agents-comparison.md` создан
-- [ ] Строка в сводной таблице добавлена
-- [ ] Вердикт обоснован
+- [x] `docs/research/oz-cloud-agents-comparison.md` создан
+- [x] Строка в сводной таблице добавлена
+- [x] Вердикт обоснован
 
 ## 6. Risks and Dependencies (Риски и зависимости)
 - Oz — проприетарный продукт, анализ только по документации
@@ -61,3 +61,4 @@ status: todo
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-05-02 | Тимлид | Создание задачи |
+| 2026-05-07 | Аналитик (Шерлок) | Исследование выполнено |
