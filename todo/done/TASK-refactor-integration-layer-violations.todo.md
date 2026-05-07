@@ -10,7 +10,7 @@ author: Тимлид Алекс
 assignee: Бэкендер Левша
 branch: task/refactor-integration-layer-violations
 pr: https://github.com/prikotov/task-orchestrator/pull/154
-status: review
+status: done
 ---
 
 # TASK-refactor-integration-layer-violations: Перенос классов в Integration-слой для устранения 10 Deptrac-violations

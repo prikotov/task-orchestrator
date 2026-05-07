@@ -10,7 +10,7 @@ author: Тимлид Алекс
 assignee:
 branch: task/docs-shared-kernel-contracts
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-docs-shared-kernel-contracts: ADR на межмодульное взаимодействие через Application
