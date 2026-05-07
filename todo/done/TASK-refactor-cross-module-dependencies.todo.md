@@ -8,9 +8,9 @@ depends_on:
 epic: EPIC-refactor-responsibility-decomposition
 author: Тимлид Алекс
 assignee:
-branch:
-pr:
-status: todo
+branch: task/refactor-cross-module-deps
+pr: '156'
+status: done
 ---
 
 # TASK-refactor-cross-module-dependencies: Устранение кросс-модульных зависимостей через рефакторинг кода
