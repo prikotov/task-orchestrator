@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution;
 
 use Override;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Agent\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Prompt\PromptProviderInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Agent\RunAgent\RunAgentQueryHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Prompt\GetPromptFilePath\GetPromptFilePathQuery;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Prompt\GetPromptFilePath\GetPromptFilePathQueryHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FacilitatorResponseParserInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopAgentServiceInterface;
@@ -19,20 +20,19 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTur
 /**
  * Запускает агентов (facilitator/participant) в dynamic-цикле.
  *
- * Использует RunAgentServiceInterface из ChainExecution.Domain.Contract
- * для реального запуска агента через AgentRunner.
- * Маппит DynamicLoop VO → ChainRunRequestVo для совместимости.
+ * Использует Application API ChainExecution:
+ * - RunAgentDirectCommandHandler — запуск агента
+ * - GetPromptFilePathQueryHandler — путь к файлу роли
  *
- * Расположен в Integration-слое, т.к. обращается к контрактам ChainExecution.Domain.Contract
- * (разрешено: Integration → foreign Domain через контракты).
+ * Обращается к foreign Application (Integration → foreign Application — разрешено Deptrac).
  */
 final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentServiceInterface
 {
     public function __construct(
-        private RunAgentServiceInterface $agentRunner,
+        private RunAgentQueryHandler $agentRunner,
         private DynamicLoopSessionWriterInterface $sessionWriter,
         private FacilitatorResponseParserInterface $responseParser,
-        private PromptProviderInterface $promptProvider,
+        private GetPromptFilePathQueryHandler $getPromptFilePathHandler,
         private DynamicLoopPromptFormatterInterface $formatter,
     ) {
     }
@@ -125,7 +125,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         ?string $challenge = null,
         ?string $promptFile = null,
     ): DynamicLoopTurnResultVo {
-        $roleFilePath = $promptFile ?? $this->promptProvider->getPromptFilePath($role);
+        $roleFilePath = $promptFile ?? ($this->getPromptFilePathHandler)(new GetPromptFilePathQuery($role));
         $appendPromptContent = sprintf($participantAppendPrompt, $roleFilePath);
 
         $userPrompt = $this->formatter->buildParticipantUserPrompt(
@@ -244,7 +244,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
     }
 
     /**
-     * Маппит DynamicLoopRunRequestVo → ChainRunRequestVo и запускает через RunAgentServiceInterface.
+     * Маппит DynamicLoopRunRequestVo → ChainRunRequestVo и запускает через foreign Application.
      */
     private function runViaAgentRunner(DynamicLoopRunRequestVo $request): DynamicLoopRunResultVo
     {

@@ -104,10 +104,13 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 Каждый модуль в `src/Module/` следует DDD-слоистой архитектуре. Подробное описание слоёв и правила зависимостей — в [`docs/conventions/index.md`](docs/conventions/index.md) и [`docs/guide/architecture.md`](docs/guide/architecture.md).
 
+* **Архитектура**: Clean Architecture (Robert C. Martin) + DDD.
 * **Domain**: бизнес-логика, Entity, VO, enum, интерфейсы, доменные сервисы. Не зависит ни от кого.
 * **Application**: use case handlers, DTO, мапперы. → `Domain`.
 * **Integration** (если требуется): ACL между модулями. → `Domain` (interfaces only), другой модуль `Application`.
 * **Infrastructure**: реализации интерфейсов Domain/Application. → `Domain` (interfaces only).
+
+**Именование:** Не используйте терминологию Ports & Adapters (Hexagonal Architecture). Интерфейсы внешних систем — `Domain\Service\Integration\*Interface`, реализация — `Infrastructure\*`. Запрещено `Port/` или `Adapter/` в путях и именах классов.
 
 ---
 

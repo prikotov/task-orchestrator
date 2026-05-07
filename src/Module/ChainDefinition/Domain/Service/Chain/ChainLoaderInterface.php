@@ -2,15 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\Contract\Chain;
+namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain;
 
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 
 /**
  * Контракт загрузки цепочек оркестрации.
- *
- * Расположен в Contract (а не Service), чтобы ServiceContractDependencyRule
- * не считал его cross-module сервисом при реализации/использовании в других модулях.
  */
 interface ChainLoaderInterface
 {

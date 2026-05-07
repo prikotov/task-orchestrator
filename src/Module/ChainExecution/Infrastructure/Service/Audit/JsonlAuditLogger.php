@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Audit;
 
 use DateTimeImmutable;
 use DateTimeZone;
 use Override;
 use RuntimeException;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Dto\DynamicLoopAuditDto;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Audit\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\ChainResultAuditDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use const FILE_APPEND;
 use const LOCK_EX;
 
 /**
- * JSONL audit-логгер для DynamicLoop.
+ * JSONL audit-логгер для ChainExecution (static/conditional chains).
  *
- * Реализует только DynamicLoopAuditLoggerInterface (Port своего модуля).
- * ChainExecution имеет собственную реализацию AuditLoggerInterface.
+ * Реализует AuditLoggerInterface из ChainExecution.Domain —
+ * Infrastructure своего модуля, реализует Port своего Domain.
  *
  * @SuppressWarnings(PHPMD.ErrorControlOperator)
  */
-final readonly class JsonlAuditLogger implements DynamicLoopAuditLoggerInterface
+final readonly class JsonlAuditLogger implements AuditLoggerInterface
 {
     private const string DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 
@@ -30,8 +30,6 @@ final readonly class JsonlAuditLogger implements DynamicLoopAuditLoggerInterface
         private string $logFilePath,
     ) {
     }
-
-    // ─── DynamicLoopAuditLoggerInterface (DynamicLoop.Domain) ──────────
 
     #[Override]
     public function logChainStart(string $chainName, string $task): void
@@ -58,12 +56,12 @@ final readonly class JsonlAuditLogger implements DynamicLoopAuditLoggerInterface
     }
 
     #[Override]
-    public function logDynamicStepResult(
+    public function logStepResult(
         string $chainName,
         int $stepNumber,
         string $role,
         string $runner,
-        DynamicRoundResultVo $result,
+        ChainRunResultVo $result,
         float $durationMs,
     ): void {
         $record = [
@@ -73,22 +71,22 @@ final readonly class JsonlAuditLogger implements DynamicLoopAuditLoggerInterface
             'step' => $stepNumber,
             'role' => $role,
             'runner' => $runner,
-            'input_tokens' => $result->inputTokens,
-            'output_tokens' => $result->outputTokens,
-            'cost' => $result->cost,
+            'input_tokens' => $result->getInputTokens(),
+            'output_tokens' => $result->getOutputTokens(),
+            'cost' => $result->getCost(),
             'duration_ms' => round($durationMs, 1),
-            'status' => $result->isError ? 'error' : 'success',
+            'status' => $result->isError() ? 'error' : 'success',
         ];
 
-        if ($result->isError) {
-            $record['error_message'] = $result->errorMessage ?? 'unknown';
+        if ($result->isError()) {
+            $record['error_message'] = $result->getErrorMessage() ?? 'unknown';
         }
 
         $this->append($record);
     }
 
     #[Override]
-    public function logDynamicChainResult(DynamicLoopAuditDto $audit): void
+    public function logChainResult(ChainResultAuditDto $audit): void
     {
         $hasErrors = false;
         foreach ($audit->stepStatuses as $status) {
@@ -111,8 +109,6 @@ final readonly class JsonlAuditLogger implements DynamicLoopAuditLoggerInterface
             'budget_exceeded' => $audit->budgetExceeded,
         ]);
     }
-
-    // ─── Private helpers ────────────────────────────────────────────────
 
     /**
      * @param array<string, mixed> $data

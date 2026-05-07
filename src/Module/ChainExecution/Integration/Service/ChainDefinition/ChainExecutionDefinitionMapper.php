@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition;
 
 use Override;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQuery;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
@@ -29,24 +31,23 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionSt
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 
 /**
- * Integration-маппер: ChainDefinition.Domain VO → ChainExecution.Domain VO.
- *
- * Транслирует StaticChainDefinitionVo / ConditionalChainDefinitionVo
- * в Execution-аналоги, разрывая зависимость ChainExecution.Domain от ChainDefinition.Domain.
+ * Integration-сервис: загружает определения цепочек через ChainDefinition.Application
+ * и транслирует ChainDefinition.Domain VO → ChainExecution.Domain VO.
  *
  * ACL (Anti-Corruption Layer) на границе модулей.
+ * Обращается к foreign Application (LoadRawChainQueryHandler), а не к foreign Domain.
  */
 final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionProviderInterface, ChainConfigMapperInterface
 {
     public function __construct(
-        private \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Contract\Chain\ChainLoaderInterface $chainLoader,
+        private LoadRawChainQueryHandler $loadRawChainHandler,
     ) {
     }
 
     #[Override]
     public function loadChainInfo(string $chainName): ExecutionChainInfoVo
     {
-        $chain = $this->chainLoader->load($chainName);
+        $chain = ($this->loadRawChainHandler)(new LoadRawChainQuery($chainName));
 
         $type = ChainExecutionTypeEnum::from($chain->getType()->value);
 
@@ -59,7 +60,7 @@ final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionPr
     #[Override]
     public function loadStaticChainConfig(string $chainName): ExecutionStaticChainConfigVo
     {
-        $chain = $this->chainLoader->load($chainName);
+        $chain = ($this->loadRawChainHandler)(new LoadRawChainQuery($chainName));
         assert($chain instanceof StaticChainDefinitionVo);
 
         return $this->mapStaticChain($chain);
@@ -68,7 +69,7 @@ final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionPr
     #[Override]
     public function loadConditionalChainConfig(string $chainName): ExecutionConditionalChainConfigVo
     {
-        $chain = $this->chainLoader->load($chainName);
+        $chain = ($this->loadRawChainHandler)(new LoadRawChainQuery($chainName));
         assert($chain instanceof ConditionalChainDefinitionVo);
 
         return $this->mapConditionalChain($chain);
