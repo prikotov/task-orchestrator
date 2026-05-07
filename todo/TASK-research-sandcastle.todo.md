@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Аналитик Шерлок
+branch: task/research-sandcastle
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-sandcastle: Исследовать Sandcastle (Matt Pocock) для сравнения с task-orchestrator
