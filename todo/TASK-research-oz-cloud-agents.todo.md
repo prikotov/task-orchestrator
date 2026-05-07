@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: done/EPIC-research-agent-frameworks-comparison.md
 author:
-assignee:
-branch:
+assignee: Аналитик Шерлок
+branch: task/research-oz-cloud-agents
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-oz-cloud-agents: Oz — платформа оркестрации облачных AI-агентов
