@@ -8,7 +8,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Contract\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainLoaderInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ConditionalExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
@@ -82,7 +83,7 @@ final class ConditionalChainIntegrationTest extends TestCase
         $hookExecutor = $this->createMock(HookExecutorInterface::class);
         $hookExecutor->method('execute')->willReturn(HookResultVo::createSkipped());
 
-        $conditionalDefinitionMapper = new ChainExecutionDefinitionMapper($this->chainLoader);
+        $conditionalDefinitionMapper = new ChainExecutionDefinitionMapper(new LoadRawChainQueryHandler($this->chainLoader));
         $conditionalStrategy = new ConditionalExecutionStrategy(
             $conditionEvaluator,
             $stepExecutor,
@@ -107,7 +108,7 @@ final class ConditionalChainIntegrationTest extends TestCase
         );
         $runStaticChainService = new RunStaticChainService($staticStepService, $budgetService, $hookExecutor);
         $staticChainExecutor = new ExecuteStaticChainService($runStaticChainService);
-        $definitionMapper = new ChainExecutionDefinitionMapper($this->chainLoader);
+        $definitionMapper = new ChainExecutionDefinitionMapper(new LoadRawChainQueryHandler($this->chainLoader));
         $staticStrategy = new StaticExecutionStrategy($staticChainExecutor, $definitionMapper);
 
         // --- Handler with both strategies ---

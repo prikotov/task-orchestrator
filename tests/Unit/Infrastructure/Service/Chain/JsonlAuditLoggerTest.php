@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\StepAuditStatusDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\JsonlAuditLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -70,118 +67,21 @@ final class JsonlAuditLoggerTest extends TestCase
     }
 
     #[Test]
-    public function logStepResultWritesSuccessRecord(): void
-    {
-        $result = ChainRunResultVo::createSuccess(
-            outputText: 'Done',
-            inputTokens: 1500,
-            outputTokens: 800,
-            cost: 0.023,
-        );
-
-        $this->logger->logStepResult('implement', 1, 'analyst', 'pi', $result, 5432.0);
-
-        $content = file_get_contents($this->logFile);
-        $record = json_decode(trim($content), true, 512, JSON_THROW_ON_ERROR);
-
-        self::assertSame('step_result', $record['event']);
-        self::assertSame('implement', $record['chain']);
-        self::assertSame(1, $record['step']);
-        self::assertSame('analyst', $record['role']);
-        self::assertSame('pi', $record['runner']);
-        self::assertSame(1500, $record['input_tokens']);
-        self::assertSame(800, $record['output_tokens']);
-        self::assertSame(0.023, $record['cost']);
-        self::assertEquals(5432.0, $record['duration_ms']);
-        self::assertSame('success', $record['status']);
-        self::assertArrayNotHasKey('error_message', $record);
-    }
-
-    #[Test]
-    public function logStepResultWritesErrorRecord(): void
-    {
-        $result = ChainRunResultVo::createError(
-            errorMessage: 'Timeout exceeded',
-            exitCode: 124,
-        );
-
-        $this->logger->logStepResult('implement', 2, 'developer', 'pi', $result, 300000.0);
-
-        $content = file_get_contents($this->logFile);
-        $record = json_decode(trim($content), true, 512, JSON_THROW_ON_ERROR);
-
-        self::assertSame('step_result', $record['event']);
-        self::assertSame('error', $record['status']);
-        self::assertSame('Timeout exceeded', $record['error_message']);
-    }
-
-    #[Test]
-    public function logChainResultWritesAggregatedRecord(): void
-    {
-        $this->logger->logChainResult(new ChainResultAuditDto(
-            chainName: 'implement',
-            totalDurationMs: 45200.0,
-            totalInputTokens: 12500,
-            totalOutputTokens: 8300,
-            totalCost: 0.42,
-            budgetExceeded: false,
-            stepsCount: 4,
-            stepStatuses: [],
-        ));
-
-        $content = file_get_contents($this->logFile);
-        $record = json_decode(trim($content), true, 512, JSON_THROW_ON_ERROR);
-
-        self::assertSame('chain_result', $record['event']);
-        self::assertSame('implement', $record['chain']);
-        self::assertEquals(45200.0, $record['total_duration_ms']);
-        self::assertSame(12500, $record['total_input_tokens']);
-        self::assertSame(8300, $record['total_output_tokens']);
-        self::assertSame(0.42, $record['total_cost']);
-        self::assertSame('success', $record['status']);
-        self::assertFalse($record['budget_exceeded']);
-    }
-
-    #[Test]
-    public function logChainResultDetectsErrorStatus(): void
-    {
-        $this->logger->logChainResult(new ChainResultAuditDto(
-            chainName: 'implement',
-            totalDurationMs: 1000.0,
-            totalInputTokens: 100,
-            totalOutputTokens: 50,
-            totalCost: 0.01,
-            budgetExceeded: false,
-            stepsCount: 1,
-            stepStatuses: [new StepAuditStatusDto(isError: true)],
-        ));
-
-        $content = file_get_contents($this->logFile);
-        $record = json_decode(trim($content), true, 512, JSON_THROW_ON_ERROR);
-
-        self::assertSame('error', $record['status']);
-    }
-
-    #[Test]
     public function multipleCallsAppendLines(): void
     {
         $this->logger->logChainStart('implement', 'Task A');
         $this->logger->logStepStart('implement', 1, 'analyst', 'pi');
-        $result = ChainRunResultVo::createSuccess('Done', 100, 50, 0, 0, 0.01);
-        $this->logger->logStepResult('implement', 1, 'analyst', 'pi', $result, 5000.0);
 
         $content = file_get_contents($this->logFile);
         $lines = array_filter(explode("\n", trim($content)));
 
-        self::assertCount(3, $lines);
+        self::assertCount(2, $lines);
 
         $record1 = json_decode($lines[0], true, 512, JSON_THROW_ON_ERROR);
         $record2 = json_decode($lines[1], true, 512, JSON_THROW_ON_ERROR);
-        $record3 = json_decode($lines[2], true, 512, JSON_THROW_ON_ERROR);
 
         self::assertSame('chain_start', $record1['event']);
         self::assertSame('step_start', $record2['event']);
-        self::assertSame('step_result', $record3['event']);
     }
 
     #[Test]
@@ -232,8 +132,6 @@ final class JsonlAuditLoggerTest extends TestCase
     #[Test]
     public function throwsRuntimeExceptionWhenDirectoryNotWritable(): void
     {
-        // Используем readonly-путь в /proc, который гарантированно не существует как директория
-        // и не может быть создан
         $logger = new JsonlAuditLogger('/proc/impossible/path/audit.jsonl');
 
         $this->expectException(RuntimeException::class);

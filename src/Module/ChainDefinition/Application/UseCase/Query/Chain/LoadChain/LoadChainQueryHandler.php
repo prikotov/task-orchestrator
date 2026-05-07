@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadChain;
 
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainDefinitionDtoMapper;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Contract\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainLoaderInterface;
 
 /**
  * Загружает определение цепочки по имени.

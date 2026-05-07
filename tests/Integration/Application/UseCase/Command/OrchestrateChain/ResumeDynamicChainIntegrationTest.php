@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
@@ -52,7 +53,7 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
         $this->stubSessionLogger = new ResumeStubSessionLogger();
 
         $contextBuilder = new BuildDynamicContextService();
-        $configMapper = new DynamicLoopDefinitionMapper($chainLoader);
+        $configMapper = new DynamicLoopDefinitionMapper(new \TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler($chainLoader));
         $auditFactory = $this->createMock(DynamicLoopAuditLoggerFactoryInterface::class);
         $sessionNotifier = $this->createMock(SessionCompletedNotifierInterface::class);
         $sessionNotifier->method('notifySessionCompleted');
@@ -66,7 +67,7 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
             sessionNotifier: $sessionNotifier,
         );
 
-        $chainDefinitionProvider = new ChainExecutionDefinitionMapper($chainLoader);
+        $chainDefinitionProvider = new ChainExecutionDefinitionMapper(new \TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler($chainLoader));
         $this->handler = new OrchestrateChainCommandHandler(
             $chainDefinitionProvider,
             new \ArrayIterator([$dynamicStrategy]),

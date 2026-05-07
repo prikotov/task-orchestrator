@@ -11,9 +11,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopA
 /**
  * Фабрика для создания JsonlAuditLogger с заданным путём.
  *
- * Создаёт логгер, реализующий оба Port'а:
- * - AuditLoggerInterface (ChainDefinition)
- * - DynamicLoopAuditLoggerInterface (DynamicLoop)
+ * Создаёт логгер, реализующий DynamicLoopAuditLoggerInterface (DynamicLoop.Domain).
  */
 final readonly class JsonlAuditLoggerFactory implements DynamicLoopAuditLoggerFactoryInterface
 {
