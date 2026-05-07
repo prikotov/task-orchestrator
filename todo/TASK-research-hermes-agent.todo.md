@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Аналитик Шерлок
+branch: task/research-hermes-agent
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-hermes-agent: Исследовать Hermes Agent (Nous Research) для сравнения с task-orchestrator
