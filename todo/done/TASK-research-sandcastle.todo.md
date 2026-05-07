@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Аналитик Шерлок
+branch: task/research-sandcastle
 pr:
-status: todo
+status: done
 ---
 
 # TASK-research-sandcastle: Исследовать Sandcastle (Matt Pocock) для сравнения с task-orchestrator
@@ -32,14 +32,14 @@ status: todo
 ## 3. Requirements (Требования, MoSCoW)
 
 ### 🔴 Must Have (Обязательно)
-- [ ] Исследован репозиторий https://github.com/mattpocock/sandcastle: README, исходный код, примеры
-- [ ] Отчёт `docs/research/sandcastle-comparison.md` по формату существующих comparison-документов
-- [ ] Строка добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
-- [ ] Вердикт: заимствовать паттерны / dependency / не подходит
+- [x] Исследован репозиторий https://github.com/mattpocock/sandcastle: README, исходный код, примеры
+- [x] Отчёт `docs/research/sandcastle-comparison.md` по формату существующих comparison-документов
+- [x] Строка добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
+- [x] Вердикт: заимствовать паттерны / dependency / не подходит
 
 ### 🟡 Should Have (Желательно)
-- [ ] Сравнение с нашими паттернами (ExecutionStrategy, DynamicLoop, ChainDefinition)
-- [ ] Конкретные рекомендации: что заимствовать, приоритет
+- [x] Сравнение с нашими паттернами (ExecutionStrategy, DynamicLoop, ChainDefinition)
+- [x] Конкретные рекомендации: что заимствовать, приоритет
 
 ### ⚫ Won't Have (Не в этот раз)
 - Код интеграции
@@ -54,9 +54,9 @@ status: todo
 
 ## 5. Definition of Done (Критерии приёмки)
 
-- [ ] Файл `docs/research/sandcastle-comparison.md` создан
-- [ ] Строка Sandcastle добавлена в сводную таблицу
-- [ ] Вердикт сформулирован
+- [x] Файл `docs/research/sandcastle-comparison.md` создан
+- [x] Строка Sandcastle добавлена в сводную таблицу
+- [x] Вердикт сформулирован
 
 ## 6. Risks and Dependencies (Риски и зависимости)
 

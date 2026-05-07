@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 19 / 19 исследований
+> **Статус заполнения:** 20 / 20 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -30,6 +30,7 @@
 | 17 | Factory Missions | — (проприетарный) | `multi-agent SaaS` | `orchestrator-worker (LLM orchestrator → serial worker sessions → auto-injected validators)` | `file-based (mission.md, features.json, validation-state.json, AGENTS.md, .factory/)` | `failed feature → orchestrator handles (no retry; creates fix features)` | `SKILL.md per worker type + .factory/library/ + services.yaml + 5 communication patterns (delegation/creator-verifier/broadcast/negotiation/direct)` | 🟡 заимствовать отдельные паттерны | [missions-framework-comparison.md](missions-framework-comparison.md) ✅ |
 | 18 | Hermes Agent (Nous Research) | Python | `CLI-agent` | `agent-loop` (LLM → tool call → result → LLM → ...) + subagent delegation | `persistent` (SQLite + FTS5 search) + `file-based memory` (MEMORY.md, USER.md) + Honcho dialectic modeling | `error classification (20+ failover reasons) + credential pool rotation (4 strategies) + fallback model` | `40+ tools + MCP + SKILL.md (agentskills.io) + Plugin system (memory/context_engine/model-providers/kanban) + 7 terminal backends + 15+ messaging platforms + Kanban multi-agent` | 🟡 заимствовать отдельные паттерны | [hermes-agent-comparison.md](hermes-agent-comparison.md) ✅ |
 | 19 | Oz (Warp) | — (проприетарный SaaS; SDK: Python, TypeScript) | `cloud/SaaS` | `cloud-managed agent runs` (QUEUED → INPROGRESS → SUCCEEDED/FAILED) + triggers (cron/webhook/API) | `cloud-managed` (run_id + state transitions + session links) | `SDK built-in retries` (HTTP-level) | `REST API + SDK (Python/TS) + Skills (SKILL.md) + MCP + Rules + Agent Profiles & Permissions + Integrations (Slack/Linear/GitHub Actions) + Cron Schedules` | 🟡 заимствовать отдельные паттерны | [oz-cloud-agents-comparison.md](oz-cloud-agents-comparison.md) ✅ |
+| 20 | Sandcastle (Matt Pocock) | TypeScript (Node.js) | `sandbox-orchestration` | `agent invocation loop` (run agent in sandbox → collect commits → iterate) | `git worktrees + commit collection` (без persistent DB) | `typed error hierarchy (20+ error types) + idle timeout + AbortSignal + worktree preservation on failure` | `AgentProvider (4 built-in: Claude Code/Codex/Pi/OpenCode) + SandboxProvider (Docker/Podman/Vercel/Daytona/custom) + Hooks + Templates (5) + Structured Output (Zod) + Completion Signal` | 🟡 заимствовать отдельные паттерны | [sandcastle-comparison.md](sandcastle-comparison.md) ✅ |
 
 ### Легенда колонок
 
@@ -46,7 +47,7 @@
 
 ## Резюме для принятия решений (Executive Summary)
 
-По результатам исследования 19 AI-agent фреймворков и инструментов можно сделать **три главных вывода**:
+По результатам исследования 20 AI-agent фреймворков и инструментов можно сделать **три главных вывода**:
 
 1. **task-orchestrator обладает уникальной комбинацией возможностей**, которой нет ни у одного из исследованных проектов: YAML-цепочки + retry с backoff + circuit breaker + quality gates (shell) + бюджетный контроль + fix_iterations + fallback routing + JSONL audit trail. Ни один фреймворк — ни open-source, ни проприетарный — не предлагает все эти механизмы вместе. **Paperclip AI** — ближайший аналог по уровню (мета-оркестратор), но работает на уровне компании/агентов, а не chain steps.
 
@@ -68,7 +69,7 @@
 
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
-| **Error classification** | Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (6 категорий), Codex (Guardian), Paperclip AI (transient_upstream errorFamily) | Классификация ошибок перед retry: FATAL → не retry, TRANSIENT → retry с backoff, UNKNOWN → консервативный подход | Не тратить попытки retry на заведомо неисправимые ошибки (401, 403). Подтверждён 3+ проектами |
+| **Error classification** | Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (6 категорий), Codex (Guardian), Paperclip AI (transient_upstream errorFamily), Sandcastle (20+ typed errors: AgentError, AgentIdleTimeoutError, ExecError, SyncError, WorktreeError и др.) | Классификация ошибок перед retry: FATAL → не retry, TRANSIENT → retry с backoff, UNKNOWN → консервативный подход | Не тратить попытки retry на заведомо неисправимые ошибки (401, 403). Подтверждён 4+ проектами. Sandcastle добавляет timeout-специфичные ошибки (timeout ≠ server error) |
 | **Error-specific fallback routing** | Agno (FallbackConfig: on_error/on_rate_limit/on_context_overflow) | При ошибке конкретного типа → переключение на альтернативный runner, а не retry того же | Дополнение к circuit breaker: CB защищает от cascade, error-specific routing переключает на альтернативу по типу ошибки |
 | **Stuck / Loop detection** | Crush (window-based), OpenHands SDK (4+1: 4 активных + 1 TODO), Paperclip AI (evidence-based liveness + regex output analysis) | Обнаружение зацикливания: повторяющиеся действия, повторяющиеся ошибки, чередование (context overflow — TODO) | Актуально для fix_iterations — если агент повторяет одни и те же действия, лучше остановить раньше. Paperclip AI добавляет evidence-based подход (подсчёт комментариев, документов, work products). Подтверждено 3 проектами |
 | **Model failover с cooldown** | OpenClaw (per-profile), Archon (fallbackModel), OpenHands SDK (FallbackStrategy), Paperclip AI (Codex escalation: same_session → safer_invocation → fresh_session) | При недоступности модели → переключение на fallback с cooldown, чтобы не «долбить» упавший endpoint | Дополнение к нашему circuit breaker: CB защищает от cascade failures, failover — переключает на альтернативу. Paperclip AI добавляет escalation strategy — не просто retry, а с изменением параметров |
@@ -96,7 +97,7 @@
 
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
-| **Docker-based sandboxing** | Codex (iptables + Docker), Copilot Cloud Agent (container isolation) | Shell-команды в Docker-контейнере с network whitelist | Для production CI/CD — критически важно. Codex — наиболее полная реализация: iptables + ipset + auto-cleanup |
+| **Docker-based sandboxing** | Codex (iptables + Docker), Copilot Cloud Agent (container isolation), Sandcastle (SandboxProvider: Docker/Podman/Vercel + SELinux + UID/GID alignment + network isolation) | Shell-команды в Docker-контейнере с network whitelist | Для production CI/CD — критически важно. Sandcastle — наиболее зрелая plug-and-play реализация: не Docker-специфичная, поддерживает Podman, Vercel VM, Daytona, и custom |
 | **Guardian (LLM safety reviewer)** | Codex | Pre-execution LLM-based risk assessment: data exfiltration, credential probing, destructive actions | Дополняет наши post-execution quality gates. Guardian оценивает risk ДО выполнения, gates — ПОСЛЕ |
 | **Network isolation** | Codex (iptables/ipset) | Default DROP, whitelist доменов (API endpoints, git servers) | Блокировка data exfiltration через network-level firewall |
 | **Policy engine** | Copilot Cloud Agent (org-level policies) | Организационные политики: scope, permissions, audit | Для enterprise-использования: ограничение chain execution по env, repo, team |
@@ -110,6 +111,7 @@
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
 | **Loop с `until_bash`** | Archon | Detector завершения цикла через shell-команду (тесты прошли → стоп) | Усиление fix_iterations: сейчас только max_iterations, а с until_bash — детерминированная проверка |
+| **Completion signal** | Sandcastle (`<promise>COMPLETE</promise>`) | Agent эмитит маркер в stdout — оркестратор останавливает loop раньше max_iterations | Усиление fix_iterations: probabilistic early termination (агент может забыть эмитить). Дополнение к until_bash (deterministic) |
 | **Loop с `end_condition` (callable)** | Agno (Loop: callable/CEL end_condition + forward_iteration_output) | Detector завершения цикла через произвольное условие или CEL-выражение | Обобщение until_bash: произвольная проверка вместо только shell. Для YAML нужен DSL или shell-команда |
 | **Loop с `fresh_context`** | Archon | Каждый iteration с чистым контекстом (agent читает state с диска) | Альтернатива накоплению контекста: agent не «перегружается» историей предыдущих итераций |
 | **Conditional branching** | Mastra AI (.branch()), LangGraph (conditional edges), Archon (when: expressions), Agno (Condition + Router) | Условное ветвление внутри цепочки | Подтверждено 4+ проектами. Реализуемо без полной DAG-миграции через расширение YAML-chain DSL |
@@ -118,7 +120,7 @@
 
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
-| **Typed I/O per step** | Mastra AI (Zod), LangGraph (TypedDict), Archon (JSON Schema) | Схемы валидации входных/выходных данных каждого шага | Повышает надёжность цепочек: невалидный input → fail-fast. Подтверждено 3+ проектами |
+| **Typed I/O per step** | Mastra AI (Zod), LangGraph (TypedDict), Archon (JSON Schema), Sandcastle (Output.object/string с Zod-валидацией) | Схемы валидации входных/выходных данных каждого шага | Повышает надёжность цепочек: невалидный input → fail-fast. Подтверждено 4+ проектами |
 | **Sub-agent pattern** | Claude Code (Task tool), Codex (spawn/wait/close_agent), OpenHands SDK (DelegateTool) | Изолированный контекст подзадачи, потенциально параллельно | «Chain внутри chain» с собственным бюджетом и контекстом. Для dynamic chains |
 | **Parallel execution** | Archon (DAG layers), pi_agent_rust (read-only tools), Mastra AI (.parallel()) | Параллельное выполнение независимых шагов | Оптимизация: lint + type-check + tests одновременно |
 | **Per-step model override** | Archon (per-node provider/model), Mastra AI, Codex (custom agent roles) | Дешёвая модель для простых шагов, дорогая для сложных | Оптимизация стоимости: классификация → Haiku, кодогенерация → Sonnet |
@@ -296,6 +298,17 @@
 * Oz (Warp): REST API / SDK (программное управление запуском и мониторингом цепочек) — 🟡 P3
 * Oz (Warp): Planning (LLM-генерация пошаговых планов для dynamic chains) — 🟡 P3
 * Oz (Warp): Codebase Context (semantic indexing для обогащения контекста агента) — 🟡 P3
+* Sandcastle: Sandbox Provider Interface (plug-and-play Docker/Podman/Vercel/Daytona/custom — для CI/CD sandboxing runner'ов) — 🟡 P2
+* Sandcastle: structured output (Output.object/string с Zod-валидацией — дополнение к quality gates) — 🟡 P2
+* Sandcastle: completion signal (early termination через маркер в agent stdout — усиление fix_iterations) — 🟡 P2
+* Sandcastle: prompt template engine ({{KEY}} + !`command` expansion — richer prompt templating) — 🟡 P2
+* Sandcastle: typed error hierarchy (20+ error classes с timeout, sandbox, git, agent categories — error classification) — 🟡 P2
+* Sandcastle: idle timeout (configurable timeout с periodic warnings — защита от зависших агентов) — 🟡 P2
+* Sandcastle: branch strategy / git worktrees (3 стратегии + stale pruning + dirty preservation — для параллельных chain runs) — 🟡 P3
+* Sandcastle: multi-agent templates (plan → execute N parallel → merge — модель для dynamic chains) — 🟡 P3
+* Sandcastle: lifecycle hooks (host.onWorktreeReady/onSandboxReady, sandbox.onSandboxReady — pre/post execution) — 🟡 P3
+* Sandcastle: AbortSignal / cancellation (cooperative cancellation через AbortSignal) — 🟡 P3
+* Sandcastle: worktree preservation (dirty state preservation при failure — для отладки failed chains) — 🟡 P3
 
 </details>
 
@@ -307,32 +320,35 @@
 
 ### 1. Уникальная позиция task-orchestrator
 
-**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 19 фреймворков.
+**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 20 фреймворков.
 
 **Ни один проприетарный продукт** (Claude Code, GitHub Copilot Cloud Agent, OpenAI Codex) не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны даже против крупнейших коммерческих AI-agent продуктов (включая Factory Missions — SaaS-продукт для multi-day autonomous software engineering, оценённый в $1.5B).
 
-**Ближайший аналог** по уровню абстракции — Archon (TypeScript/Bun), который тоже оркестирует внешние AI-ассистенты через subprocess SDK. Однако Archon не имеет circuit breaker, quality gates или бюджетного контроля. Agno (Python SDK) предлагает наиболее развитый workflow engine из исследованных (6 строительных блоков + вложенные workflows), но работает на уровне прямых LLM API, а не оркестрации внешних runner'ов.
+**Ближайший аналог** по уровню абстракции — Archon (TypeScript/Bun), который тоже оркестирует внешние AI-ассистенты через subprocess SDK. Однако Archon не имеет circuit breaker, quality gates или бюджетного контроля. **Sandcastle** (TypeScript/Node.js) — ближайший аналог по sandbox management (Docker/Podman/Vercel), но работает на уровне sandbox lifecycle, не chain orchestration: нет retry, circuit breaker, quality gates, budget. Agno (Python SDK) предлагает наиболее развитый workflow engine из исследованных (6 строительных блоков + вложенные workflows), но работает на уровне прямых LLM API, а не оркестрации внешних runner'ов.
 
 **Oz (Warp)** — облачная платформа оркестрации (SaaS), занимающая уникальную нишу: не SDK, не workflow engine, не мета-оркестратор, а **Cloud Agent Platform** — управляемая инфраструктура для запуска, координации и мониторинга автономных AI-агентов в Docker-окружениях через API/SDK, CLI, cron и webhook. Oz не имеет цепочек шагов (chains), retry с backoff, circuit breaker, quality gates или бюджетного контроля — все эти механизмы отсутствуют. Ключевое отличие Oz от task-orchestrator: Oz — это инфраструктура для запуска агентных *задач* (один prompt = один run), а task-orchestrator — оркестратор *процессов* (многошаговые цепочки с обработкой ошибок).
 
 ### 2. Agent Loop — доминирующая модель выполнения
 
-**13 из 19 фреймворков** (исключая AgentCraft и Oz, см. ниже) используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, AutoGen, OpenHands SDK, MetaGPT, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Hermes Agent). LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK), Paperclip AI (heartbeat-based мета-оркестрация) и Factory Missions (orchestrator-worker delegation с auto-injected validators) используют принципиально другие модели.
+**13 из 20 фреймворков** (исключая AgentCraft, Oz и Sandcastle, см. ниже) используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, AutoGen, OpenHands SDK, MetaGPT, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Hermes Agent). LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK), Paperclip AI (heartbeat-based мета-оркестрация), Factory Missions (orchestrator-worker delegation с auto-injected validators) и Sandcastle (agent invocation loop в песочнице) используют принципиально другие модели.
 
 **AgentCraft не учитывается в этом подсчёте:** он не имеет собственной модели выполнения, а выступает как GUI wrapper, делегируя выполнение подключённым внешним агентам (Claude Code, OpenCode, Cursor, OpenClaw). Эти агенты сами используют agent loop — AgentCraft лишь управляет их запуском и визуализирует прогресс. Таким образом, AgentCraft не является ни «agent loop», ни «другой моделью выполнения» — это управляющий слой поверх существующих сред.
+
+**Sandcastle не учитывается в этом подсчёте:** он не работает с LLM API напрямую. Sandcastle запускает внешние AI-агенты (Claude Code, Codex, Pi, OpenCode) как subprocess в песочнице — agent invocation loop, не классический `LLM → tool call → LLM`. Это ближе к Archon (subprocess SDK), но с фокусом на sandbox management (Docker/Podman/Vercel) вместо DAG workflow.
 
 Agno также поддерживает **step-based workflow** (Step/Steps/Loop/Parallel/Router/Condition) и **4 team modes** (coordinate/route/broadcast/tasks) поверх agent loop — наиболее развитый workflow engine из исследованных.
 
 **Вывод:** Наша модель (YAML chain → runner call → payload) — это оркестрация поверх agent loop. Это правильный уровень: мы не дублируем LLM interaction, а управляем им. Oz (Warp) подтверждает тренд: облачные платформы (SaaS) управляют *запуском* агентов (когда, где, с каким окружением), а task-orchestrator управляет *процессом* (шаги, retry, quality gates).
 
-### 3. Разделение на шесть уровней абстракции
+### 3. Разделение на семь уровней абстракции
 
-**Все 19 проектов** чётко делятся на шесть уровней:
+**Все 20 проектов** чётко делятся на семь уровней:
 
 | Уровень | Проекты | Что делают | Аналог в task-orchestrator |
 |---|---|---|---|
 | **SDK / Agent runtime** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, OpenClaw, Agno, Hermes Agent | Работают на уровне прямых LLM API | Runner'ы (pi, codex) |
 | **Оркестратор / Workflow engine** | CrewAI, LangGraph, AutoGen, Archon, MetaGPT, Copilot Workspace | Управляют потоком выполнения между агентами/шагами | Chain executor |
+| **Sandbox orchestration** | Sandcastle | Управляет жизненным циклом песочниц (Docker/Podman/Vercel), git worktrees, branch strategies для внешних AI-агентов | — (нет аналога) |
 | **GUI Manager / Launcher** | AgentCraft | Визуальный интерфейс для запуска и мониторинга внешних агентов, без собственной логики выполнения | — (нет аналога) |
 | **Multi-agent SaaS / Product** | Factory Missions | Автономная multi-day software development: orchestrator → workers → validators, file-based shared state | — (нет аналога, closest — chain executor + dynamic loops) |
 | **Cloud Agent Platform** | Oz (Warp) | Облачная платформа оркестрации: Docker-окружения, cron/webhook/API триггеры, REST API/SDK, observability | — (нет аналога) |
@@ -342,7 +358,7 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 4. SKILL.md / AGENTS.md — де-факто стандарт
 
-**12 из 19 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
+**12 из 20 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
 - Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex, Agno, Factory Missions (.factory/skills/), Hermes Agent, Oz (Warp) (oz-skills)
 - Формат: YAML frontmatter + markdown body, discovery из нескольких мест, валидация
 - Стандарт [agentskills.io](https://agentskills.io) получает широкое распространение
@@ -352,7 +368,7 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 5. MCP (Model Context Protocol) — повсеместный протокол расширения
 
-**13 из 19 проектов** поддерживают MCP:
+**13 из 20 проектов** поддерживают MCP:
 - Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Paperclip AI, Hermes Agent, Oz (Warp)
 - MCP — стандарт де-факто для расширения возможностей AI-агентов через внешние tool-серверы
 
@@ -360,7 +376,7 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 6. Контекст-менеджмент — повсеместная проблема
 
-**8 из 19 проектов** реализуют auto-compaction / auto-summarization при context overflow:
+**8 из 20 проектов** реализуют auto-compaction / auto-summarization при context overflow:
 - Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, Agno, Hermes Agent
 - Все используют LLM-суммаризацию для сжатия истории
 - Hermes Agent — наиболее продвинутый подход: 14-секционный structured summary template, tool result pruning + deduplication, anti-thrashing protection, iterative summary updates, tool_call/result pair integrity, last-user-message anchoring (~1500 LOC)
@@ -383,16 +399,20 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 | **Paperclip AI** | Execution policies (multi-stage approval) + budget hard stops + agent pause/resume/terminate + activity audit | Governance-level, company-wide |
 | **Oz (Warp)** | Agent Profiles & Permissions (autonomy levels) + command denylist + Docker isolation (Cloud Environments) + secrets management + run audit trail | Platform-level, SaaS-managed |
 
+**Sandcastle** — уникальная позиция: sandbox isolation как core product (не security feature). Встроенные SandboxProvider (Docker/Podman/Vercel) предоставляют container-level изоляцию по умолчанию. SELinux labels, UID/GID alignment, network isolation — из коробки.
+
 **Codex — наиболее полная реализация:** трёхуровневая модель (rules filter → LLM safety review → container isolation). Для CI/CD — наиболее готовый к production подход.
 
 **Вывод:** Безопасность станет критичной при переходе к автономному выполнению в CI/CD. Рекомендуется начать с exec policy (rules) — это quick win.
 
 ### 8. Sub-agents / Multi-agent — тренд к иерархической декомпозиции
 
-**12 из 19 проектов** поддерживают sub-agents или multi-agent:
+**12 из 20 проектов** поддерживают sub-agents или multi-agent:
 - Crush (Coder → Task), Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat), Agno (Team с 4 режимами), Factory Missions (Task tool для subagents: investigation, review, research), Hermes Agent (delegate_task: parallel spawning, orchestrator/leaf roles, depth control до 3)
 
 Oz (Warp) не имеет sub-agents в традиционном понимании, но поддерживает **unlimited parallel cloud agents** — одновременный запуск множества независимых agent runs через API. Это горизонтальное масштабирование, не иерархическая декомпозиция.
+
+Sandcastle поддерживает multi-agent orchestration через **templates**: parallel-planner запускает N агентов параллельно (Promise.allSettled), каждый на своей ветке; sequential-reviewer — implement + review в shared sandbox. Это parallel `run()` calls, не классический sub-agent (spawn/wait/close), но паттерн working — one failing agent doesn't cancel others.
 - Codex — наиболее продвинутая sub-agent система: mailbox pattern, fork modes, role system
 - Hermes Agent — наиболее продвинутая security model для sub-agents: DELEGATE_BLOCKED_TOOLS (no recursive delegation, no user interaction, no shared memory writes), auto-deny/approve для dangerous commands, child timeout
 - Paperclip AI не имеет sub-agents, но моделирует иерархию через org chart (агенты как «сотрудники» с reportsTo)
@@ -438,7 +458,7 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 | Язык | Проекты | Примечание |
 |---|---|---|
 | **Python** | CrewAI, LangGraph, AutoGen, OpenHands SDK, MetaGPT, Agno, Hermes Agent | Доминирующий язык для AI-agent фреймворков |
-| **TypeScript** | Archon, OpenClaw, Mastra AI, Paperclip AI | Растущая экосистема, особенно для workflow engines и мета-оркестраторов |
+| **TypeScript** | Archon, OpenClaw, Mastra AI, Paperclip AI, Sandcastle | Растущая экосистема, особенно для workflow engines, мета-оркестраторов и sandbox orchestration |
 | **Rust** | pi_agent_rust, Codex (codex-rs) | High-performance CLI-агенты |
 | **Go** | Crush | TUI-ориентированный агент |
 | **Проприетарный** | Claude Code, Copilot Cloud Agent, AgentCraft, Factory Missions, Oz (Warp) | Закрытый код, анализ по документации и reverse engineering |
@@ -460,6 +480,7 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 * **Agno — наиболее развитый workflow engine** из исследованных: 6 строительных блоков (Step, Steps, Loop, Parallel, Router, Condition) + nested workflows (до 10 уровней). При этом Agno — in-process SDK, не оркестратор внешних runner'ов. Error-specific fallback routing (on_error/on_rate_limit/on_context_overflow) — уникальная модель, дополняющая error classification. HITL (3 режима) требует runtime (FastAPI) — в CLI ограниченно применимо.
 * **Factory Missions — наиболее продвинутая multi-agent система для software engineering:** orchestrator-worker-validator архитектура, 51KB mission prompt, 5 communication patterns (delegation/creator-verifier/broadcast/negotiation/direct), validation contracts (mission-level TDD), sealed milestones, production runs до 16 дней. Проприетарный SaaS (Factory AI, Series C $150M, оценка $1.5B, Khosla Ventures). Prompt-driven архитектура (не hard-coded — улучшается с моделями). Каждый worker = fresh context, state на диске. 50% финального кода = тесты, 90% test coverage. Подтверждает тренд: autonomous software development — реальная production-возможность.
 * **AgentCraft — единственный GUI-оркестратор** в исследовании: RTS-геймификация (fog of war, achievements, race skins) поверх 4 внешних AI-агентов (Claude Code, OpenCode, Cursor, OpenClaw). Не фреймворк и не SDK — визуальный интерфейс для управления существующими агентами. Подтверждает тренд: оркестрация AI-агентов — отдельная продуктовая ниша, не только техническая. Git worktrees, Docker/Apple Containers, scheduled tasks — функциональные фичи, перекликающиеся с Archon и Codex.
+* **Sandcastle — наиболее продвинутый sandbox orchestration layer** из исследованных: plug-and-play SandboxProvider (Docker/Podman/Vercel/Daytona/custom), 3 branch strategies (head/merge-to-head/branch), git worktree management со stale pruning и dirty preservation, AgentProvider interface (4 built-in: Claude Code/Codex/Pi/OpenCode), structured output (Zod), completion signal, prompt template engine ({{KEY}} + !`command`), 5 multi-agent templates. Построен на Effect-TS — функциональной effect system. Не workflow engine и не chain orchestrator — инфраструктурный слой для запуска агентов в песочницах. Наиболее зрелая реализация sandbox management из исследованных: SELinux labels, UID/GID alignment, Windows path compatibility, worktree locking. Подтверждает тренд separation of concerns: sandbox orchestration (Sandcastle) → chain orchestrator (task-orchestrator) → cloud agent platform (Oz).
 
 ---
 
@@ -489,3 +510,4 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 | 2026-05-07 | Аналитик (Шерлок) | Создан отчёт missions-framework-comparison.md, заполнена строка Factory Missions (#17). Пересчитаны тренды (16→17): agent loop 12/17, SKILL.md 10/17, MCP 11/17, sub-agents 11/17, compression 7/17. Добавлен пятый уровень абстракции (Multi-agent SaaS / Product). Добавлены рекомендации Factory Missions (P2: structured handoffs, validation contract, mission boundaries, fresh context; P3: services manifest, milestone sealing, structured feature description, knowledge library). Добавлено наблюдение: Factory Missions — наиболее продвинутая multi-agent система для software engineering. Все 17 исследований завершены. |
 | 2026-05-07 | Аналитик (Шерлок) | Создан отчёт hermes-agent-comparison.md, заполнена строка Hermes Agent (#18). Пересчитаны тренды (17→18): agent loop 13/18, SKILL.md 11/18, MCP 12/18, sub-agents 12/18, compression 8/18. Добавлены рекомендации Hermes Agent (P2: error classification, context file injection scanning, credential pool rotation; P3: structured context compression, subagent delegation, filesystem checkpoints, rate limit header tracking, kanban multi-agent, tool result deduplication). Все 18 исследований завершены. |
 | 2026-05-07 | Аналитик (Шерлок) | Создан отчёт oz-cloud-agents-comparison.md, заполнена строка Oz (Warp) (#19). Пересчитаны тренды (18→19): agent loop 13/19, SKILL.md 12/19, MCP 13/19, sub-agents 12/19, compression 8/19. Добавлен шестой уровень абстракции (Cloud Agent Platform). Добавлены рекомендации Oz (P3: cron-расписания, webhook-триггеры, Cloud Environments, REST API/SDK, Planning, Codebase Context). Добавлено наблюдение: Oz — облачная платформа оркестрации с уникальной позицией (SaaS, не фреймворк). Все 19 исследований завершены. |
+| 2026-05-07 | Аналитик (Шерлок) | Создан отчёт sandcastle-comparison.md, заполнена строка Sandcastle (#20). Пересчитаны тренды (19→20): agent loop 13/20, SKILL.md 12/20, MCP 13/20, sub-agents 12/20, compression 8/20. Добавлен седьмой уровень абстракции (Sandbox orchestration). Добавлены рекомендации Sandcastle (P2: Sandbox Provider Interface, structured output, completion signal, prompt template engine, typed error hierarchy, idle timeout; P3: branch strategy/git worktrees, multi-agent templates, lifecycle hooks, AbortSignal, worktree preservation). Добавлено наблюдение: Sandcastle — наиболее продвинутый sandbox orchestration layer из исследованных. Все 20 исследований завершены. |
