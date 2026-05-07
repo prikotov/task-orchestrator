@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик Шерлок
 branch: task/research-missions-framework
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-missions-framework: Исследовать Missions Framework (Luke Alvoeiro) для сравнения с task-orchestrator
@@ -34,14 +34,14 @@ status: in_progress
 
 ### 🔴 Must Have (Обязательно)
 - [ ] Просмотрен доклад https://www.youtube.com/watch?v=ow1we5PzK-o, изучены доступные материалы (GitHub, блог, документация)
-- [ ] Отчёт `docs/research/missions-framework-comparison.md` по формату существующих comparison-документов
-- [ ] Строка добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
-- [ ] Вердикт: заимствовать паттерны / dependency / не подходит
-- [ ] Особый фокус на: delegation, verification, structured communication, long-running workflow coherence
+- [x] Отчёт `docs/research/missions-framework-comparison.md` по формату существующих comparison-документов
+- [x] Строка добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
+- [x] Вердикт: заимствовать паттерны / dependency / не подходит
+- [x] Особый фокус на: delegation, verification, structured communication, long-running workflow coherence
 
 ### 🟡 Should Have (Желательно)
-- [ ] Сравнение с нашим подходом к оркестрации (ChainDefinition → ChainExecution → DynamicLoop)
-- [ ] Анализ: подходит ли модель Missions для multi-day задач в task-orchestrator
+- [x] Сравнение с нашим подходом к оркестрации (ChainDefinition → ChainExecution → DynamicLoop)
+- [x] Анализ: подходит ли модель Missions для multi-day задач в task-orchestrator
 
 ### ⚫ Won't Have (Не будем делать)
 - Не пишем код интеграции
@@ -55,7 +55,7 @@ status: in_progress
 4. [ ] Сформулировать вердикт и рекомендации
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт создан, вердикт сформулирован
+- [x] Отчёт создан, вердикт сформулирован
 - [ ] Сводная таблица обновлена
 
 ## 6. Verification (Самопроверка)
