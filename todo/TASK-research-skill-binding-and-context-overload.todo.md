@@ -4,7 +4,7 @@ created: 2026-05-04
 assignee: Аналитик Шерлок
 branch: task/research-skill-binding
 pr:
-status: done
+status: in_progress
 ---
 
 # Исследование: привязка скиллов к агенту и перегрузка контекста
