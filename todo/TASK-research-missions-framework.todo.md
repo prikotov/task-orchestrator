@@ -7,10 +7,10 @@ priority: P2
 depends_on: []
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Аналитик Шерлок
+branch: task/research-missions-framework
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-missions-framework: Исследовать Missions Framework (Luke Alvoeiro) для сравнения с task-orchestrator
