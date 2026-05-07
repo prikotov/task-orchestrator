@@ -2,13 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Contract\Prompt;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt;
 
 /**
  * Контракт провайдера системных промптов для ролей AI-агентов.
- *
- * Расположен в Contract (а не Service), чтобы ServiceContractDependencyRule
- * не считал его cross-module сервисом при реализации в других модулях (Port/Adapter).
  */
 interface PromptProviderInterface
 {

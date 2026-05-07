@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition;
 
 use Override;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Contract\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQuery;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
@@ -17,24 +18,23 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPro
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRoleConfigVo;
 
 /**
- * Integration-маппер: ChainDefinition.Domain VO → DynamicLoop.Domain VO.
- *
- * Транслирует DynamicChainDefinitionVo в DynamicLoopConfigVo,
- * разрывая зависимость DynamicLoop.Domain от ChainDefinition.Domain.
+ * Integration-сервис: загружает определения цепочек через ChainDefinition.Application
+ * и транслирует ChainDefinition.Domain VO → DynamicLoop.Domain VO.
  *
  * ACL (Anti-Corruption Layer) на границе модулей.
+ * Обращается к foreign Application (LoadRawChainQueryHandler), а не к foreign Domain.
  */
 final readonly class DynamicLoopDefinitionMapper implements DynamicLoopConfigMapperInterface, ChainDefinitionProviderInterface
 {
     public function __construct(
-        private ChainLoaderInterface $chainLoader,
+        private LoadRawChainQueryHandler $loadRawChainHandler,
     ) {
     }
 
     #[Override]
     public function loadDynamicChainConfig(string $chainName): DynamicLoopConfigVo
     {
-        $chain = $this->chainLoader->load($chainName);
+        $chain = ($this->loadRawChainHandler)(new LoadRawChainQuery($chainName));
         assert($chain instanceof DynamicChainDefinitionVo);
 
         return $this->map($chain);
