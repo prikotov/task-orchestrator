@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 16 / 16 исследований
+> **Статус заполнения:** 17 / 17 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -27,6 +27,7 @@
 | 14 | Agno (бывший Phi) | Python | `SDK` | `step-based workflow (Step/Steps/Loop/Parallel/Router/Condition) + agent-loop + 4 team modes (coordinate/route/broadcast/tasks)` | `pluggable (12+ адаптеров: PostgreSQL, SQLite, MySQL, Redis, MongoDB, DynamoDB, Firestore, ...)` | `FallbackConfig (error-specific: on_error/on_rate_limit/on_context_overflow) + max_retries per step` | `Tools + MCP + Skills + Guardrails (PII, prompt injection) + Evals + Hooks + custom DB + HITL (3 режима) + Compression` | 🟡 заимствовать отдельные паттерны | [agno-comparison.md](agno-comparison.md) ✅ |
 | 15 | Paperclip AI | TypeScript (Node.js) | `meta-orchestration` | `heartbeat-based (scheduled/event-driven wakeup → adapter invocation → result)` | `persistent` (PostgreSQL / embedded PGlite, ~70 таблиц) | `transient failure retry с bounded backoff (2m→10m→30m→2h) + error classification (transient_upstream) + escalation strategy` | `Plugin SDK (events/jobs/data/tools/state/UI) + 7+ agent adapters (Claude/Codex/Cursor/Gemini/OpenClaw/pi/HTTP) + MCP + Skills + Company Skills + Adapter interface + Execution policies + Environments` | 🟡 заимствовать отдельные паттерны | [paperclip-ai-comparison.md](paperclip-ai-comparison.md) ✅ |
 | 16 | AgentCraft | — (проприетарный) | `GUI-orchestrator` | `GUI wrapper (RTS-интерфейс поверх внешних агентов: Claude Code, OpenCode, Cursor, OpenClaw)` | `local (git worktrees, mission history)` | `нет (делегируется агентам)` | `4 agent integrations + Skill Scrolls + Agent Teams + Docker/Apple Containers + Git Worktrees + Scheduled Tasks + Remote Access (tunnels + PWA) + Voice Input + Channels (upcoming)` | 🟡 заимствовать отдельные паттерны | [agentcraft-comparison.md](agentcraft-comparison.md) ✅ |
+| 17 | Factory Missions | — (проприетарный) | `multi-agent SaaS` | `orchestrator-worker (LLM orchestrator → serial worker sessions → auto-injected validators)` | `file-based (mission.md, features.json, validation-state.json, AGENTS.md, .factory/)` | `failed feature → orchestrator handles (no retry; creates fix features)` | `SKILL.md per worker type + .factory/library/ + services.yaml + 5 communication patterns (delegation/creator-verifier/broadcast/negotiation/direct)` | 🟡 заимствовать отдельные паттерны | [missions-framework-comparison.md](missions-framework-comparison.md) ✅ |
 
 ### Легенда колонок
 
@@ -43,7 +44,7 @@
 
 ## Резюме для принятия решений (Executive Summary)
 
-По результатам исследования 16 AI-agent фреймворков и инструментов можно сделать **три главных вывода**:
+По результатам исследования 17 AI-agent фреймворков и инструментов можно сделать **три главных вывода**:
 
 1. **task-orchestrator обладает уникальной комбинацией возможностей**, которой нет ни у одного из исследованных проектов: YAML-цепочки + retry с backoff + circuit breaker + quality gates (shell) + бюджетный контроль + fix_iterations + fallback routing + JSONL audit trail. Ни один фреймворк — ни open-source, ни проприетарный — не предлагает все эти механизмы вместе. **Paperclip AI** — ближайший аналог по уровню (мета-оркестратор), но работает на уровне компании/агентов, а не chain steps.
 
@@ -270,6 +271,14 @@
 * AgentCraft: isolated containers (Docker/Apple Containers) для CI/CD sandboxing — 🟡 P3
 * AgentCraft: scheduled tasks (cron-like запуск chain по расписанию) — 🟡 P3
 * AgentCraft: channels — Human-in-the-loop через мессенджеры (Telegram/Discord) — 🟡 P3
+* Factory Missions: structured handoffs (JSON-схема runner output: success/partial/failure + issues) — 🟡 P2
+* Factory Missions: validation contract (mission-level TDD — behavioral assertions пишутся ДО кода) — 🟡 P2
+* Factory Missions: mission boundaries (pre-execution ограничения: port ranges, off-limits resources) — 🟡 P2
+* Factory Missions: fresh context per iteration (каждый worker с чистым контекстом, state с диска) — 🟡 P2
+* Factory Missions: services manifest (.factory/services.yaml — единый файл команд и сервисов) — 🟡 P3
+* Factory Missions: milestone sealing (завершённые этапы замораживаются, never add after validation) — 🟡 P3
+* Factory Missions: structured feature description (preconditions + expectedBehavior + verificationSteps per step) — 🟡 P3
+* Factory Missions: knowledge library (.factory/library/ — персистентная база знаний) — 🟡 P3
 
 </details>
 
@@ -277,19 +286,19 @@
 
 ## Общие тренды
 
-> Анализ выполнен на основе всех 16 исследований. Тренды сгруппированы по значимости для архитектуры task-orchestrator.
+> Анализ выполнен на основе всех 17 исследований. Тренды сгруппированы по значимости для архитектуры task-orchestrator.
 
 ### 1. Уникальная позиция task-orchestrator
 
-**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 16 фреймворков.
+**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 17 фреймворков.
 
-**Ни один проприетарный продукт** (Claude Code, GitHub Copilot Cloud Agent, OpenAI Codex) не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны даже против крупнейших коммерческих AI-agent продуктов.
+**Ни один проприетарный продукт** (Claude Code, GitHub Copilot Cloud Agent, OpenAI Codex) не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны даже против крупнейших коммерческих AI-agent продуктов (включая Factory Missions — SaaS-продукт для multi-day autonomous software engineering, оценённый в $1.5B).
 
 **Ближайший аналог** по уровню абстракции — Archon (TypeScript/Bun), который тоже оркестирует внешние AI-ассистенты через subprocess SDK. Однако Archon не имеет circuit breaker, quality gates или бюджетного контроля. Agno (Python SDK) предлагает наиболее развитый workflow engine из исследованных (6 строительных блоков + вложенные workflows), но работает на уровне прямых LLM API, а не оркестрации внешних runner'ов.
 
 ### 2. Agent Loop — доминирующая модель выполнения
 
-**12 из 15 фреймворков** (исключая AgentCraft, см. ниже) используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, OpenHands SDK, MetaGPT, OpenClaw, Claude Code, Copilot Cloud Agent, Codex, Agno и др.). Только LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK) и Paperclip AI (heartbeat-based мета-оркестрация) используют принципиально другие модели.
+**12 из 17 фреймворков** (исключая AgentCraft, см. ниже) используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, AutoGen, OpenHands SDK, MetaGPT, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno). LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK), Paperclip AI (heartbeat-based мета-оркестрация) и Factory Missions (orchestrator-worker delegation с auto-injected validators) используют принципиально другие модели.
 
 **AgentCraft не учитывается в этом подсчёте:** он не имеет собственной модели выполнения, а выступает как GUI wrapper, делегируя выполнение подключённым внешним агентам (Claude Code, OpenCode, Cursor, OpenClaw). Эти агенты сами используют agent loop — AgentCraft лишь управляет их запуском и визуализирует прогресс. Таким образом, AgentCraft не является ни «agent loop», ни «другой моделью выполнения» — это управляющий слой поверх существующих сред.
 
@@ -297,32 +306,33 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 **Вывод для task-orchestrator:** Наша модель (YAML chain → runner call → payload) — это оркестрация поверх agent loop. Это правильный уровень: мы не дублируем LLM interaction, а управляем им.
 
-### 3. Разделение на четыре уровня абстракции
+### 3. Разделение на пять уровней абстракции
 
-**Все 16 проектов** чётко делятся на четыре уровня:
+**Все 17 проектов** чётко делятся на пять уровней:
 
 | Уровень | Проекты | Что делают | Аналог в task-orchestrator |
 |---|---|---|---|
 | **SDK / Agent runtime** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, OpenClaw, Agno | Работают на уровне прямых LLM API | Runner'ы (pi, codex) |
 | **Оркестратор / Workflow engine** | CrewAI, LangGraph, AutoGen, Archon, MetaGPT, Copilot Workspace | Управляют потоком выполнения между агентами/шагами | Chain executor |
 | **GUI Manager / Launcher** | AgentCraft | Визуальный интерфейс для запуска и мониторинга внешних агентов, без собственной логики выполнения | — (нет аналога) |
+| **Multi-agent SaaS / Product** | Factory Missions | Автономная multi-day software development: orchestrator → workers → validators, file-based shared state | — (нет аналога, closest — chain executor + dynamic loops) |
 | **Мета-оркестратор / Control plane** | Paperclip AI | Управляет компаниями из агентов: org charts, budgets, governance, goals | — (нет аналога) |
 
 **Paperclip AI** подтверждает тренд на многоуровневую абстракцию: SDK/runtime → оркестратор → GUI manager → мета-оркестратор. Paperclip — наиболее продвинутый мета-оркестратор из исследованных: org charts, budgets, governance, goal alignment, company portability.
 
 ### 4. SKILL.md / AGENTS.md — де-факто стандарт
 
-**9 из 16 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
-- Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex, Agno
+**10 из 17 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
+- Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex, Agno, Factory Missions (.factory/skills/)
 - Формат: YAML frontmatter + markdown body, discovery из нескольких мест, валидация
 - Стандарт [agentskills.io](https://agentskills.io) получает широкое распространение
 - Paperclip AI добавляет Company Skills: managed skill registry с import/export, trust levels, compatibility checks
 
-**AGENTS.md** используется как минимум в 6 проектах (Crush, pi_agent_rust, OpenHands SDK, Codex, Paperclip AI, task-orchestrator) — де-факто стандарт для AI-agent контекста.
+**AGENTS.md** используется как минимум в 7 проектах (Crush, pi_agent_rust, OpenHands SDK, Codex, Paperclip AI, Factory Missions (per-mission AGENTS.md с boundaries + guidance), task-orchestrator) — де-факто стандарт для AI-agent контекста.
 
 ### 5. MCP (Model Context Protocol) — повсеместный протокол расширения
 
-**11 из 16 проектов** поддерживают MCP:
+**11 из 17 проектов** поддерживают MCP:
 - Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Paperclip AI
 - MCP — стандарт де-факто для расширения возможностей AI-агентов через внешние tool-серверы
 
@@ -330,14 +340,14 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 6. Контекст-менеджмент — повсеместная проблема
 
-**7 из 16 проектов** реализуют auto-compaction / auto-summarization при context overflow:
+**7 из 17 проектов** реализуют auto-compaction / auto-summarization при context overflow:
 - Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, Agno
 - Все используют LLM-суммаризацию для сжатия истории
 - OpenClaw пошёл дальше: формализованный `ContextEngine` interface (ingest → assemble → compact → maintain) с tokenBudget
 - Mastra AI — самый продвинутый подход: Observer + Reflector agents с async buffering
 - Paperclip AI добавляет session compaction policy (per-adapter thresholds: max runs/tokens/age)
 
-**Вывод:** Для длинных цепочек и dynamic loops контекст-менеджмент станет необходим. Но для текущих конечных цепочек (max_iterations) это P3.
+**Вывод:** Для длинных цепочек и dynamic loops контекст-менеджмент станет необходим. Но для текущих конечных цепочек (max_iterations) это P3. Factory Missions решает проблему иначе: **fresh context per worker session** — каждый worker стартует с чистым контекстом, читая state с диска.
 
 ### 7. Безопасность автономного выполнения — зреющий тренд
 
@@ -357,8 +367,8 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 8. Sub-agents / Multi-agent — тренд к иерархической декомпозиции
 
-**10 из 16 проектов** поддерживают sub-agents или multi-agent:
-- Crush (Coder → Task), Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat), Agno (Team с 4 режимами)
+**11 из 17 проектов** поддерживают sub-agents или multi-agent:
+- Crush (Coder → Task), Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat), Agno (Team с 4 режимами), Factory Missions (Task tool для subagents: investigation, review, research)
 - Codex — наиболее продвинутая sub-agent система: mailbox pattern, fork modes, role system
 - Paperclip AI не имеет sub-agents, но моделирует иерархию через org chart (агенты как «сотрудники» с reportsTo)
 - AgentCraft реализует Agent Teams — мультиагентные командные workflows через GUI wrapper (детали закрыты)
@@ -404,7 +414,7 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 | **TypeScript** | Archon, OpenClaw, Mastra AI, Paperclip AI | Растущая экосистема, особенно для workflow engines и мета-оркестраторов |
 | **Rust** | pi_agent_rust, Codex (codex-rs) | High-performance CLI-агенты |
 | **Go** | Crush | TUI-ориентированный агент |
-| **Проприетарный** | Claude Code, Copilot Cloud Agent, AgentCraft | Закрытый код, анализ по документации |
+| **Проприетарный** | Claude Code, Copilot Cloud Agent, AgentCraft, Factory Missions | Закрытый код, анализ по документации и reverse engineering |
 
 **Task-orchestrator (PHP/Symfony)** — единственный в своей нише: Symfony Bundle для chain-оркестрации AI-агентов. Это не недостаток — это уникальная позиция в PHP-экосистеме. Paperclip AI (TypeScript/Node.js) — ближайший по масштабу (60K+ звёзд), но работает на другом уровне абстракции (company management, не chain steps).
 
@@ -420,6 +430,7 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 * **OpenClaw — production-ready multi-channel personal assistant** (20+ мессенджеров, desktop/mobile apps, voice wake). Не фреймворк оркестрации, а законченный продукт.
 * **Copilot Cloud Agent подтверждает тренд multi-model marketplace:** единый API поверх GPT-4, Claude, Gemini, Llama. Индустриальный аналог нашего AgentRunnerInterface.
 * **Agno — наиболее развитый workflow engine** из исследованных: 6 строительных блоков (Step, Steps, Loop, Parallel, Router, Condition) + nested workflows (до 10 уровней). При этом Agno — in-process SDK, не оркестратор внешних runner'ов. Error-specific fallback routing (on_error/on_rate_limit/on_context_overflow) — уникальная модель, дополняющая error classification. HITL (3 режима) требует runtime (FastAPI) — в CLI ограниченно применимо.
+* **Factory Missions — наиболее продвинутая multi-agent система для software engineering:** orchestrator-worker-validator архитектура, 51KB mission prompt, 5 communication patterns (delegation/creator-verifier/broadcast/negotiation/direct), validation contracts (mission-level TDD), sealed milestones, production runs до 16 дней. Проприетарный SaaS (Factory AI, Series C $150M, оценка $1.5B, Khosla Ventures). Prompt-driven архитектура (не hard-coded — улучшается с моделями). Каждый worker = fresh context, state на диске. 50% финального кода = тесты, 90% test coverage. Подтверждает тренд: autonomous software development — реальная production-возможность.
 * **AgentCraft — единственный GUI-оркестратор** в исследовании: RTS-геймификация (fog of war, achievements, race skins) поверх 4 внешних AI-агентов (Claude Code, OpenCode, Cursor, OpenClaw). Не фреймворк и не SDK — визуальный интерфейс для управления существующими агентами. Подтверждает тренд: оркестрация AI-агентов — отдельная продуктовая ниша, не только техническая. Git worktrees, Docker/Apple Containers, scheduled tasks — функциональные фичи, перекликающиеся с Archon и Codex.
 
 ---
@@ -447,3 +458,4 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 | 2026-04-29 | Технический писатель (Гермиона) | Доработка по результатам саморевью PR #96: исправлены счётчики трендов (15→16) в трендах 2–6, AgentCraft добавлен в список исключений тренда 2 (agent loop), добавлен в таблицу тренда 3 (уровни абстракции), добавлены индивидуальные рекомендации AgentCraft в секцию details. |
 | 2026-04-28 | Технический писатель (Гермиона) | Создан отчёт agentcraft-comparison.md, заполнена строка AgentCraft (#16). Пересчитаны тренды (15→16): sub-agents 10/16 (+AgentCraft Agent Teams), проприетарные продукты 3/16. Добавлено наблюдение: GUI-оркестратор как отдельная продуктовая ниша. Все 16 исследований завершены. |
 | 2026-04-29 | Технический писатель (Гермиона) | Доработка по замечаниям ревьювера (Архитектор Локи, post-factum ревью PR #96): (1) исправлен stale-текст «13 исследований» → «16 исследований» в преамбуле трендов; (2) AgentCraft убран из перечисления «принципиально других моделей» в тренде 2 — добавлено пояснение, что AgentCraft не имеет собственной модели выполнения (GUI wrapper), счётчик 12/15; (3) AgentCraft выделен в отдельную строку «GUI Manager / Launcher» в таблице тренда 3. |
+| 2026-05-07 | Аналитик (Шерлок) | Создан отчёт missions-framework-comparison.md, заполнена строка Factory Missions (#17). Пересчитаны тренды (16→17): agent loop 12/17, SKILL.md 10/17, MCP 11/17, sub-agents 11/17, compression 7/17. Добавлен пятый уровень абстракции (Multi-agent SaaS / Product). Добавлены рекомендации Factory Missions (P2: structured handoffs, validation contract, mission boundaries, fresh context; P3: services manifest, milestone sealing, structured feature description, knowledge library). Добавлено наблюдение: Factory Missions — наиболее продвинутая multi-agent система для software engineering. Все 17 исследований завершены. |
