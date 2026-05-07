@@ -64,7 +64,7 @@ vendor/bin/task-orchestrator --version
 
 ## 8. Sources
 - [Packagist](https://packagist.org/)
-- [RFC: cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md)
+- [RFC: cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md)
 
 ## Change History
 | Дата | Автор (роль) | Изменение |

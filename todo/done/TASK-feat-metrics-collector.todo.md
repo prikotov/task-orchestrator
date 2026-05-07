@@ -117,7 +117,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - **Hooks integration (Sprint 10):** `MetricsCollectorInterface` будет использоваться hooks system для записи post_step метрик. Интерфейс должен быть достаточно гибким для этого.
 
 ## 8. Sources (Источники)
-- [ ] [Анализ Локи: Observability gap](../../docs/research/loki-roadmap-review-2026-05.md) — MetricsCollector как упущенная потребность
+- [ ] [Анализ Локи: Observability gap](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — MetricsCollector как упущенная потребность
 - [ ] [AuditLoggerInterface](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) — существующий observability механизм
 - [ ] [RetryingAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php)
 - [ ] [CircuitBreakerAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php)

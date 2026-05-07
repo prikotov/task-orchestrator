@@ -65,7 +65,7 @@ cat docs/agents/skills/install-task-orchestrator/SKILL.md
 ## 8. Sources
 - [SKILL-CREATION.md](../docs/agents/skills/SKILL-CREATION.md) — формат
 - [Пример SKILL](../docs/agents/skills/) — существующие skill'ы
-- [RFC: cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md) — Решение владельца #3
+- [RFC: cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md) — Решение владельца #3
 
 ## Change History
 | Дата | Автор (роль) | Изменение |

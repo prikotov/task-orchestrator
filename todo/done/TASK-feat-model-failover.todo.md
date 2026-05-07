@@ -104,7 +104,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ## 8. Sources (Источники)
 - [ ] [Roadmap: Sprint 9](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [ ] [Анализ Локи: Model Failover](../../docs/research/loki-roadmap-review-2026-05.md) — Вариант A (через RoleConfigVo fallback)
+- [ ] [Анализ Локи: Model Failover](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — Вариант A (через RoleConfigVo fallback)
 - [ ] [CircuitBreakerAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php)
 - [ ] [FallbackConfigVo](../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php)
 - [ ] [RoleConfigVo](../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php)

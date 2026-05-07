@@ -24,7 +24,7 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 *   **Где делаем:** docs/research/
-*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (agent-bernstein-comparison.md, agent-orchestrator-comparison.md, superpowers-brainstorming-comparison.md)
+*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (framework-comparisons/agent-bernstein-comparison.md, framework-comparisons/agent-orchestrator-comparison.md, framework-comparisons/superpowers-brainstorming-comparison.md)
 *   **Границы (Out of Scope):** Не пишем код интеграции — только исследование
 
 ## 3. Requirements (Требования, MoSCoW)
@@ -33,7 +33,7 @@ status: done
 - [ ] Изучить LangGraph: графовую модель оркестрации, state management, conditional edges
 - [ ] Изучить AutoGen: multi-agent conversations, code execution, human-in-the-loop
 - [ ] Сравнить все три с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [ ] Оформить отчёт в docs/research/crewai-langgraph-autogen-comparison.md по формату существующих comparison-документов
+- [ ] Оформить отчёт в docs/research/framework-comparisons/crewai-langgraph-autogen-comparison.md по формату существующих comparison-документов
 - [ ] Заполнить строки для CrewAI, LangGraph, AutoGen в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Составить сравнительную таблицу: модель оркестрации, state management, error handling, extensibility
@@ -46,17 +46,17 @@ status: done
 1. [ ] Изучить репозитории и документацию CrewAI, LangGraph, AutoGen
 2. [ ] Сравнить модели оркестрации между собой и с нашей
 3. [ ] Составить сравнительную таблицу
-4. [ ] Написать docs/research/crewai-langgraph-autogen-comparison.md
+4. [ ] Написать docs/research/framework-comparisons/crewai-langgraph-autogen-comparison.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт docs/research/crewai-langgraph-autogen-comparison.md создан по формату существующих comparison-документов
+- [ ] Отчёт docs/research/framework-comparisons/crewai-langgraph-autogen-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит сравнительную таблицу трёх фреймворков
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
 - [ ] Строки CrewAI, LangGraph, AutoGen в сводной таблице docs/research/agent-frameworks-summary.md заполнены
 
 ## 6. Verification (Самопроверка)
 ```bash
-ls docs/research/crewai-langgraph-autogen-comparison.md
+ls docs/research/framework-comparisons/crewai-langgraph-autogen-comparison.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)

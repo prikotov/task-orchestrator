@@ -103,7 +103,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - **Нет зависимости от других задач Sprint 9** — можно выполнять параллельно.
 
 ## 8. Sources (Источники)
-- [ ] [Анализ Локи: Error Classification](../../docs/research/loki-roadmap-review-2026-05.md) — упрощённая реализация
+- [ ] [Анализ Локи: Error Classification](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — упрощённая реализация
 - [ ] [RetryingAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php)
 - [ ] [AgentResultVo](../../src/Module/AgentRunner/Domain/ValueObject/AgentResultVo.php)
 - [ ] [RetryPolicyVo](../../src/Module/AgentRunner/Domain/ValueObject/RetryPolicyVo.php)

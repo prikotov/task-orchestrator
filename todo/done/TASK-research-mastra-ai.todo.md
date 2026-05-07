@@ -24,7 +24,7 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 *   **Где делаем:** docs/research/
-*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (agent-bernstein-comparison.md, agent-orchestrator-comparison.md, superpowers-brainstorming-comparison.md)
+*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (framework-comparisons/agent-bernstein-comparison.md, framework-comparisons/agent-orchestrator-comparison.md, framework-comparisons/superpowers-brainstorming-comparison.md)
 *   **Границы (Out of Scope):** Не пишем код интеграции — только исследование
 
 ## 3. Requirements (Требования, MoSCoW)
@@ -32,7 +32,7 @@ status: done
 - [ ] Изучить Mastra AI: архитектуру, TypeScript-first подход, модель агентов, workflows, инструменты (tools)
 - [ ] Изучить систему workflows: step-based, branching, conditional, parallel execution
 - [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [ ] Оформить отчёт в docs/research/mastra-ai-comparison.md по формату существующих comparison-документов
+- [ ] Оформить отчёт в docs/research/framework-comparisons/mastra-ai-comparison.md по формату существующих comparison-документов
 - [ ] Заполнить строку для Mastra AI в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Определить конкретные паттерны, которые стоит заимствовать
@@ -45,16 +45,16 @@ status: done
 ## 4. Implementation Plan (План реализации)
 1. [ ] Изучить репозиторий https://github.com/mastra-inc/mastra и документацию https://mastra.ai
 2. [ ] Сравнить модель workflows и оркестрации с нашей
-3. [ ] Написать docs/research/mastra-ai-comparison.md
+3. [ ] Написать docs/research/framework-comparisons/mastra-ai-comparison.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт docs/research/mastra-ai-comparison.md создан по формату существующих comparison-документов
+- [ ] Отчёт docs/research/framework-comparisons/mastra-ai-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
 - [ ] Строка Mastra AI в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
-ls docs/research/mastra-ai-comparison.md
+ls docs/research/framework-comparisons/mastra-ai-comparison.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)

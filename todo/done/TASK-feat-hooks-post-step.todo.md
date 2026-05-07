@@ -144,7 +144,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ## 8. Sources (Источники)
 - [ ] [Roadmap: Sprint 10](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [ ] [Анализ Локи: Hooks System](../../docs/research/loki-roadmap-review-2026-05.md) — Sprint 10, Задача 1
+- [ ] [Анализ Локи: Hooks System](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — Sprint 10, Задача 1
 - [ ] [Symfony Process Component](https://symfony.com/doc/current/components/process.html)
 - [ ] [Конвенции: Value Object](../../docs/conventions/core_patterns/value-object.md)
 - [ ] [Конвенции: External Service](../../docs/conventions/core_patterns/external-service.md)

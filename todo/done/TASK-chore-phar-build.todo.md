@@ -69,7 +69,7 @@ php task-orchestrator.phar --version
 
 ## 8. Sources
 - [Box — Phar builder](https://github.com/box-project/box)
-- [RFC: cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md) — Решение 3, investment tier
+- [RFC: cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md) — Решение 3, investment tier
 
 ## Change History
 | Дата | Автор (роль) | Изменение |

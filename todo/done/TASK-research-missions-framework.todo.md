@@ -25,7 +25,7 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 
-* **Где делаем:** `docs/research/missions-framework-comparison.md`
+* **Где делаем:** `docs/research/framework-comparisons/missions-framework-comparison.md`
 * **Текущее поведение:** В `docs/research/` уже есть сравнительные анализы 13+ фреймворков и сводная таблица `agent-frameworks-summary.md`
 * **Источник:** https://www.youtube.com/watch?v=ow1we5PzK-o — доклад Luke Alvoeiro о Missions
 * **Границы (Out of Scope):** Не пишем код интеграции — только исследование
@@ -34,7 +34,7 @@ status: done
 
 ### 🔴 Must Have (Обязательно)
 - [ ] Просмотрен доклад https://www.youtube.com/watch?v=ow1we5PzK-o, изучены доступные материалы (GitHub, блог, документация)
-- [x] Отчёт `docs/research/missions-framework-comparison.md` по формату существующих comparison-документов
+- [x] Отчёт `docs/research/framework-comparisons/missions-framework-comparison.md` по формату существующих comparison-документов
 - [x] Строка добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
 - [x] Вердикт: заимствовать паттерны / dependency / не подходит
 - [x] Особый фокус на: delegation, verification, structured communication, long-running workflow coherence

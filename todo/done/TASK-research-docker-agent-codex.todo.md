@@ -24,7 +24,7 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 *   **Где делаем:** docs/research/
-*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (agent-bernstein-comparison.md, agent-orchestrator-comparison.md, superpowers-brainstorming-comparison.md)
+*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (framework-comparisons/agent-bernstein-comparison.md, framework-comparisons/agent-orchestrator-comparison.md, framework-comparisons/superpowers-brainstorming-comparison.md)
 *   **Границы (Out of Scope):** Не пишем код интеграции — только исследование
 
 ## 3. Requirements (Требования, MoSCoW)
@@ -32,7 +32,7 @@ status: done
 - [x] Изучить Docker Agent: архитектуру, контейнеризацию, sandboxing, связь с хост-системой
 - [x] Изучить OpenAI Codex (CLI / cloud): агентный цикл, модель инструментов, контекст
 - [x] Сравнить оба продукта с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [x] Оформить отчёт в docs/research/docker-agent-codex-comparison.md по формату существующих comparison-документов
+- [x] Оформить отчёт в docs/research/framework-comparisons/docker-agent-codex-comparison.md по формату существующих comparison-документов
 - [x] Заполнить строку для Docker Agent + Codex в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [x] Определить конкретные паттерны, которые стоит заимствовать
@@ -45,16 +45,16 @@ status: done
 1. [x] Изучить документацию OpenAI: Docker Agent, Codex CLI
 2. [x] Изучить открытые материалы: статьи, GitHub, API reference
 3. [x] Сравнить с нашей моделью оркестрации
-4. [x] Написать docs/research/docker-agent-codex-comparison.md
+4. [x] Написать docs/research/framework-comparisons/docker-agent-codex-comparison.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [x] Отчёт docs/research/docker-agent-codex-comparison.md создан по формату существующих comparison-документов
+- [x] Отчёт docs/research/framework-comparisons/docker-agent-codex-comparison.md создан по формату существующих comparison-документов
 - [x] Содержит чёткий вывод: заимствовать / использовать / не подходит
 - [x] Строка Docker Agent + Codex в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
-ls docs/research/docker-agent-codex-comparison.md
+ls docs/research/framework-comparisons/docker-agent-codex-comparison.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)

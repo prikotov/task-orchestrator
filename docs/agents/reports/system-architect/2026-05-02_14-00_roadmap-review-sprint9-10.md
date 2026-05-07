@@ -9,7 +9,7 @@
 
 ## Полный отчёт
 
-Сохранён в: [`docs/research/loki-roadmap-review-2026-05.md`](../../../research/loki-roadmap-review-2026-05.md)
+Сохранён в: [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../../../research/analytical/loki-roadmap-review-2026-05.md)
 
 ## Краткое резюме
 

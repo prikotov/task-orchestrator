@@ -66,7 +66,7 @@ vendor/bin/psalm
 - Валидация может не покрывать все edge cases — начать с обязательных полей
 
 ## 8. Sources
-- [RFC: cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md) — Brainstorm #2
+- [RFC: cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md) — Brainstorm #2
 - [chains.yaml](../config/chains.yaml) — структура конфигурации
 
 ## Инструкции для сабагента
