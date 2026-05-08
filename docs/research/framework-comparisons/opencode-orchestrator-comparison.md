@@ -1,4 +1,4 @@
-# Исследование: Kilo Code (OpenCode) — AI-агентная платформа с оркестрацией через subagents
+# Исследование: Kilo Code — AI-агентная платформа с оркестрацией через subagents
 
 > **Проект:** [github.com/Kilo-Org/kilocode](https://github.com/Kilo-Org/kilocode)
 > **Дата анализа:** 2026-05-08
@@ -11,7 +11,7 @@
 
 ## 1. Обзор проекта
 
-Kilo Code (бывший OpenCode) — **полнофункциональная AI-агентная платформа для разработки ПО** от Kilo AI. Включает VS Code Extension, CLI-клиент, JetBrains plugin. Реализует модель `LLM → tool call → observation → LLM → ...` с встроенным механизмом subagents через `task` tool. Ключевая особенность: **оркестратор теперь встроен в каждый primary-агент** — специализированный Orchestrator Mode объявлен deprecated.
+Kilo Code — **полнофункциональная AI-агентная платформа для разработки ПО** от Kilo AI. Включает VS Code Extension, CLI-клиент, JetBrains plugin. Реализует модель `LLM → tool call → observation → LLM → ...` с встроенным механизмом subagents через `task` tool. Ключевая особенность: **оркестратор теперь встроен в каждый primary-агент** — специализированный Orchestrator Mode объявлен deprecated.
 
 > ⚠️ **Важно:** Orchestrator Mode официально **deprecated** и будет удалён в будущей версии. Документация прямо заявляет: «Orchestrator mode is no longer needed — agents with full tool access (Code, Plan, Debug) can now delegate to subagents natively». Тем не менее, архитектурные паттерны, которые он представляет, заслуживают детального анализа, т.к. они сохранены в текущей архитектуре subagents.
 
@@ -110,7 +110,7 @@ Kilo Code (бывший OpenCode) — **полнофункциональная A
 
 ## 2. Сравнительная таблица: что у нас есть vs. чего нет
 
-| Функция | Task Orchestrator | Kilo Code (OpenCode) | Статус |
+| Функция | Task Orchestrator | Kilo Code | Статус |
 |---|---|---|---|
 | **Цепочки шагов (chains)** | ✅ YAML chains, статические и динамические | ❌ Нет (agent loop + tool calls, нет chain DSL) | ✅ У нас есть |
 | **DAG / Workflow engine** | ❌ Только линейные/динамические цепочки | ❌ Нет (только wave-based parallel subagent calls) | — |
@@ -366,6 +366,6 @@ Kilo Code использует SQLite через Drizzle ORM для session pers
 📚 **Источники:**
 1. [github.com/Kilo-Org/kilocode](https://github.com/Kilo-Org/kilocode) — репозиторий проекта (19K stars, MIT)
 2. [kilo.ai/docs](https://kilo.ai/docs/code-with-ai/agents/orchestrator-mode) — документация Orchestrator Mode (deprecated)
-3. [packages/opencode/src/](https://github.com/Kilo-Org/kilocode/tree/main/packages/opencode/src) — исходный код OpenCode CLI
+3. [packages/opencode/src/](https://github.com/Kilo-Org/kilocode/tree/main/packages/opencode/src) — исходный код Kilo Code CLI
 4. [packages/kilo-docs/](https://github.com/Kilo-Org/kilocode/tree/main/packages/kilo-docs) — документация в репозитории
 5. [packages/opencode/src/agent/prompt/orchestrator.txt](https://github.com/Kilo-Org/kilocode/blob/main/packages/opencode/src/agent/prompt/orchestrator.txt) — Orchestrator prompt (wave-based pattern)
