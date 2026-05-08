@@ -8,12 +8,12 @@
 
 ## 1. Обзор Superpowers Brainstorming Skill
 
-Brainstorming Skill — навык (skill) из проекта obra/superpowers для структурирования взаимодействия AI с пользователем при проектировании. Ключевая идея: **design before implementation** — обязательный фаза дизайна с gate-проверкой до перехода к коду.
+Brainstorming Skill — навык (skill) из проекта obra/superpowers для структурирования взаимодействия AI с пользователем при проектировании. Ключевая идея: **design before implementation** — обязательная фаза дизайна с gate-проверкой до перехода к коду.
 
 ### Процесс (9 шагов)
 
 | Шаг | Описание | Тип |
-|---|---|---|
+| --- | --- | --- |
 | 1. Explore project context | Изучение файлов, документации, коммитов | Input |
 | 2. Offer visual companion | Предложить визуальный инструмент (браузер) для mockup'ов | Optional |
 | 3. Ask clarifying questions | Уточнение по одному вопросу за раз | Interactive |
@@ -27,7 +27,7 @@ Brainstorming Skill — навык (skill) из проекта obra/superpowers 
 ### Ключевые принципы
 
 | Принцип | Суть |
-|---|---|
+| --- | --- |
 | **HARD-GATE** | Запрет на реализацию до одобрения дизайна — для ВСЕХ проектов, включая «простые» |
 | **One question at a time** | Фокус на уточнении, не перегружать пользователя |
 | **Multiple choice preferred** | Легче отвечать, чем open-ended |
@@ -45,12 +45,12 @@ Brainstorming Skill — навык (skill) из проекта obra/superpowers 
 
 ---
 
-## 2. Сравнительная таблица
+## 2. Возможности оркестрации — обзор
 
 ### 2.1. Концептуальное сравнение
 
 | Концепт | Superpowers Brainstorming | TasK Dynamic Loop | Пересечение |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Управление процессом** | Checklist (9 шагов), deterministic | Facilitator (LLM), emergent | 🔀 Разные подходы |
 | **Роль фасилитатора** | Нет — AI сам следует checklist'у | Да — выделенная роль `facilitator` решает кому дать слово | Наш гибче |
 | **Роли участников** | AI + User (2 стороны) | Facilitator + N участников (ролей) | Наш богаче |
@@ -65,25 +65,25 @@ Brainstorming Skill — навык (skill) из проекта obra/superpowers 
 
 ### 2.2. Функциональное сравнение
 
-| Функция | Superpowers | TasK Orchestrator | Статус |
-|---|---|---|---|
-| **Фасилитатор** | Нет (AI = facilitator + designer) | ✅ Выделенная роль, JSON-решение | ✅ У нас лучше |
-| **Множественные роли** | Нет (AI + User) | ✅ N ролей (.md промпты) | ✅ У нас лучше |
-| **Budget control** | Нет | ✅ BudgetVo + CheckDynamicBudgetService | ✅ У нас лучше |
-| **Quality gates** | Self-review (text analysis) | ✅ Shell-команды (QualityGateVo) | ✅ У нас лучше |
-| **Circuit breaker** | Нет | ✅ CircuitBreakerAgentRunner | ✅ У нас лучше |
-| **Retry** | Нет | ✅ RetryingAgentRunner + RetryPolicyVo | ✅ У нас лучше |
-| **Fallback runner** | Нет | ✅ FallbackConfigVo | ✅ У нас лучше |
-| **Audit trail** | Design doc (Markdown) | ✅ JSONL + session files | ✅ У нас лучше |
-| **Checklist-driven process** | ✅ 9 обязательных шагов | ❌ Нет — facilitator решает | 🔴 Берём |
-| **Multiple approaches** | ✅ Обязательно 2-3 варианта | ❌ Нет | 🔴 Берём |
-| **Decomposition** | ✅ Явный шаг при большом scope | ❌ Нет | 🟡 Берём позже |
-| **Self-review** | ✅ Spec validation (4 критерия) | ❌ Нет текстового self-review | 🔴 Берём |
-| **One question at a time** | ✅ Принцип общения | ❌ Нет — facilitator свободен | 🟡 Берём позже |
-| **HARD-GATE** | ✅ Запрет реализации до дизайна | ❌ Нет — цепочка выполняется полностью | 🟡 Берём позже |
-| **Visual companion** | ✅ Браузерный mockup-инструмент | ❌ Нет | 🟢 Не берём |
-| **Design for isolation** | ✅ Принцип модульности | ✅ DDD layers, interfaces | ✅ Паритет |
-| **YAGNI** | ✅ Явный принцип | ❌ Нет явного принципа | 🟡 Стоит внедрить |
+| Функция | Superpowers |
+| --- | --- |
+| **Фасилитатор** | Нет (AI = facilitator + designer) |
+| **Множественные роли** | Нет (AI + User) |
+| **Budget control** | Нет |
+| **Quality gates** | Self-review (text analysis) |
+| **Circuit breaker** | Нет |
+| **Retry** | Нет |
+| **Fallback runner** | Нет |
+| **Audit trail** | Design doc (Markdown) |
+| **Checklist-driven process** | ❌ Нет — facilitator решает |
+| **Multiple approaches** | ❌ Нет |
+| **Decomposition** | ❌ Нет |
+| **Self-review** | ❌ Нет текстового self-review |
+| **One question at a time** | ❌ Нет — facilitator свободен |
+| **HARD-GATE** | ❌ Нет — цепочка выполняется полностью |
+| **Visual companion** | ❌ Нет |
+| **Design for isolation** | ✅ DDD layers, interfaces |
+| **YAGNI** | ❌ Нет явного принципа |
 
 ---
 
@@ -97,41 +97,64 @@ Brainstorming skill описывает **детерминированный** п
 
 ```mermaid
 flowchart LR
-    subgraph Superpowers["Superpowers Brainstorming"]
-        direction TB
-        C[Checklist<br/>9 deterministic steps] --> |sequential| R[Result]
-    end
+ subgraph Superpowers["Superpowers Brainstorming"]
+ direction TB
+ C[Checklist<br/>9 deterministic steps] --> |sequential| R[Result]
+ end
 
-    subgraph TasK["TasK Dynamic Loop"]
-        direction TB
-        F[Facilitator<br/>LLM-driven] --> |decides| P1[Participant 1]
-        F --> |decides| P2[Participant 2]
-        F --> |decides| P3[Participant N]
-        P1 --> F
-        P2 --> F
-        P3 --> F
-        F --> |done| S[Synthesis]
-    end
+ subgraph TasK["TasK Dynamic Loop"]
+ direction TB
+ F[Facilitator<br/>LLM-driven] --> |decides| P1[Participant 1]
+ F --> |decides| P2[Participant 2]
+ F --> |decides| P3[Participant N]
+ P1 --> F
+ P2 --> F
+ P3 --> F
+ F --> |done| S[Synthesis]
+ end
 ```
 
-**Пересечение:** Оба подхода реализуют итеративный процесс с уточнением и валидацией. Но:
-- Superpowers = **scripted** (предсказуемый, но негибкий)
-- TasK = **adaptive** (гибкий, но зависит от качества фасилитатора)
+**Пересечение:** Оба подхода реализуют итеративный процесс с уточнением и валидацией. Но фундаментально различаются по модели управления:
 
-**Вывод:** Наш dynamic loop — более мощная модель. Но checklist-driven подход полезен для **дисциплинирования** фасилитатора — можно добавить в промпт фасилитатора инструкции следовать определённому процессу.
+- Superpowers = **scripted** (предсказуемый, воспроизводимый, нулевая стоимость управления процессом)
+- TasK = **adaptive** (контекстно-зависимый, но требует LLM-вызов на каждый раунд + подвержен drift'у)
+
+**Trade-offs:**
+
+| Критерий | Scripted (Superpowers) | Adaptive (TasK) |
+| --- | --- | --- |
+| **Воспроизводимость** | Одинаковый результат при одинаковом вводе | Результат зависит от LLM-генерации фасилитатора |
+| **Стоимость** | Нулевые накладные расходы на управление процессом | Каждый раунд = LLM-вызов фасилитатора |
+| **Гибкость** | Не адаптируется к нестандартным сценариям | Фасилитатор может менять стратегию на лету |
+| **Пропуск шагов** | Невозможно — checklist гарантирует прохождение | Фасилитатор может «проскочить» этап |
+| **Отладка** | Простая: шаг → результат | Сложнее: нужно анализировать журнал решений фасилитатора |
+| **Масштабирование участников** | Нет — только AI + User | Да — N участников с разными ролями |
+
+**Вывод:** Два подхода решают разные задачи. Scripted гарантирует полноту и предсказуемость при минимальной стоимости. Adaptive обеспечивает гибкость и multi-agent взаимодействие, но за счёт дополнительных LLM-вызовов и риска пропуска этапов. Практический вывод: checklist-дисциплину можно внедрить в adaptive-подход через промпт фасилитатора, получив гибкость без потери полноты.
 
 ### 3.2. Со Static Chain (Fixed Steps)
 
 Static chain — фиксированные шаги с retry-группами. Это ближе к brainstorming checklist: тоже последовательность шагов. Но:
 
 | Аспект | Static Chain | Brainstorming Checklist |
-|---|---|---|
+| --- | --- | --- |
 | **Порядок** | Фиксированный YAML | Фиксированный checklist |
 | **Условия перехода** | Quality gate (exit code) | User approval |
 | **Итерации** | fixIterationGroup (retry) | Design revision cycle |
 | **Gate тип** | Shell-команда | Текстовый review |
 
-**Пересечение:** Static chain может быть использован для реализации brainstorming-подобного процесса: шаги = checklist items, quality gate = approval check. Но это требует дополнительного функционала (см. рекомендации).
+**Пересечение:** Static chain — структурно ближайший аналог brainstorming checklist. Оба — детерминированные последовательности с условиями перехода. Но static chain покрывает только механику, а не семантику brainstorming-процесса.
+
+**Ключевые пробелы static chain относительно brainstorming:**
+
+| Пробел | Пояснение |
+| --- | --- |
+| **Нет текстового gate** | Quality gate = shell-команда (exit code). Brainstorming требует анализа текстового вывода (placeholders, contradictions, ambiguity). Shell-команда не способна оценить семантику |
+| **Нет multiple approaches** | Static chain выполняет один путь. Brainstorming требует 2-3 варианта с trade-offs на каждом decision point |
+| **Нет self-correction на уровне контента** | Retry = повторный запуск того же шага. Brainstorming = осмысленная ревизия результата по конкретным критериям (completeness, consistency) |
+| **Нет декомпозиции** | Static chain не умеет разбивать задачу на подзадачи и оркестровать вложенные цепочки |
+
+**Вывод:** Static chain покрывает механику (последовательность, retry, gate), но не покрывает семантику brainstorming-процесса. Для полноценной реализации brainstorming поверх static chain потребуется расширение gate-механизма до текстового анализа. Альтернатива — реализация через dynamic loop с соответствующими промптами.
 
 ---
 
@@ -143,18 +166,17 @@ Static chain — фиксированные шаги с retry-группами. 
 
 **Что:** Добавить «self-review» раунд в dynamic loop перед finalize.
 
-**Проблема:** Сейчас facilitator может завершить dynamic loop с synthesis, содержащим:
-- Незавершённые мысли («...и так далее»)
+- Placeholders: TBD, TODO, «...», «и так далее»
 - Противоречия между ответами участников
 - Пропущенные аспекты topic
 
 **Решение:** После `isDone()` от фасилитатора, но перед finalize, добавить **self-review раунд**:
 1. Facilitator получает synthesis + journal
 2. Проверяет по 4 критериям (по аналогии с Superpowers):
-   - **Placeholder scan:** Нет ли TBD, TODO, «...»?
-   - **Internal consistency:** Нет ли противоречий?
-   - **Completeness:** Все ли аспекты topic покрыты?
-   - **Ambiguity:** Можно ли что-то трактовать двояко?
+ - **Placeholder scan:** Нет ли TBD, TODO, «...»?
+ - **Internal consistency:** Нет ли противоречий?
+ - **Completeness:** Все ли аспекты topic покрыты?
+ - **Ambiguity:** Можно ли что-то трактовать двояко?
 3. Если найдены проблемы → ещё один раунд уточнения
 4. Если чисто → finalize
 
@@ -169,8 +191,6 @@ Static chain — фиксированные шаги с retry-группами. 
 #### 4.2. «Propose Multiple Approaches» инструкция для facilitator
 
 **Что:** Добавить в системный промпт фасилитатора инструкцию: при brainstorming сложных тем предлагать 2-3 варианта решений с trade-offs.
-
-**Проблема:** Фасилитатор может принять первое предложенное решение, не исследовав альтернативы.
 
 **Решение:** Расширить `facilitatorAppendPrompt` инструкцией:
 ```
@@ -200,7 +220,7 @@ Follow this process:
 6. FINALIZE — produce final synthesis
 ```
 
-**Проблема:** Фасилитатор «плавает» — иногда углубляется в детали, иногда поспешно завершает. Checklist дисциплинирует.
+Checklist дисциплинирует.
 
 **Решение:** Добавить в `FacilitatorResponseVo` поле `phase: ?string` (`explore|clarify|propose|synthesize|review|finalize`) и отслеживать прогресс по фазам в `DynamicLoopExecution`.
 
@@ -217,7 +237,7 @@ Follow this process:
 
 **Что:** После завершения dynamic loop — автоматическая проверка результата на «over-engineering».
 
-**Проблема:** LLM-агенты склонны предлагать избыточные решения. Superpowers явно борется с этим через YAGNI-принцип.
+Superpowers явно борется с этим через YAGNI-принцип.
 
 **Решение:** Добавить post-loop hook, который вызывает отдельный агент (или reuse фасилитатора) с YAGNI-промптом:
 ```
@@ -238,7 +258,7 @@ that are not directly required by the topic. Apply YAGNI ruthlessly.
 
 **Что:** Тип шага `gate` в static chain, который требует явного подтверждения (через CLI prompt) перед переходом к следующему шагу.
 
-**Проблема:** Brainstorming skill имеет HARD-GATE: «Do NOT invoke any implementation skill until design is approved». В автоматической цепочке нет точки останова для human approval.
+**В автоматической цепочке нет точки останова для human approval.
 
 **Решение:**
 - Новый `ChainStepTypeEnum::GATE` = `gate`
@@ -257,8 +277,6 @@ that are not directly required by the topic. Apply YAGNI ruthlessly.
 
 **Что:** Если фасилитатор определяет, что topic слишком большой — предлагает разбить на под-топики и запустить отдельные dynamic loops.
 
-**Проблема:** Brainstorming skill имеет явный шаг: «if the request describes multiple independent subsystems, flag this immediately».
-
 **Решение:** Добавить в ответ фасилитатора поле `decomposition: ?list<string>` — список под-топиков. Если facilitator возвращает decomposition → прервать loop и вернуть список под-топиков как результат.
 
 **Архитектурное влияние:**
@@ -273,8 +291,8 @@ that are not directly required by the topic. Apply YAGNI ruthlessly.
 
 ## 5. Сводная таблица заимствований
 
-| Заимствование | Приоритет | Обоснование | Трудозатраты |
-|---|---|---|---|
+| Возможность | Категория | Описание | Примечание |
+| --- | --- | --- | --- |
 | Self-review step | 🔴 Must | Улучшает качество synthesis, предотвращает неполные результаты | ~1 день |
 | Multiple approaches prompt | 🔴 Must | Расширяет пространство решений, минимальные трудозатраты | ~2 часа |
 | Checklist-aware facilitator | 🟡 Should | Дисциплинирует фасилитатора, делает процесс предсказуемее | ~2 дня |
@@ -289,7 +307,7 @@ that are not directly required by the topic. Apply YAGNI ruthlessly.
 ### 6.1. Изменения в Domain
 
 | Компонент | Изменение | Приоритет |
-|---|---|---|
+| --- | --- | --- |
 | `FacilitatorResponseVo` | Добавить `phase`, `decomposition` | Should / Could |
 | `DynamicChainContextVo` | Добавить `enableSelfReview`, `requireMultipleApproaches` | Must |
 | `DynamicLoopResultVo` | Добавить `decomposition` | Could |
@@ -300,7 +318,7 @@ that are not directly required by the topic. Apply YAGNI ruthlessly.
 ### 6.2. Изменения в Application
 
 | Компонент | Изменение | Приоритет |
-|---|---|---|
+| --- | --- | --- |
 | `OrchestrateChainCommandHandler` | Передавать новые параметры контекста | Must |
 | `OrchestrateChainResultDto` | Отражать self-review и decomposition | Should |
 
@@ -326,8 +344,7 @@ that are not directly required by the topic. Apply YAGNI ruthlessly.
 ### Что Superpowers делает лучше
 
 1. **Дисциплина процесса** — явный checklist гарантирует, что все этапы пройдены. Наш фасилитатор может «проскочить» этапы.
-2. **Multiple approaches** — обязательное требование 2-3 вариантов. У нас это на усмотрение фасилитатора.
-3. **Self-review** — проверка результата на полноту и непротиворечивость перед финализацией.
+2. **Multiple approaches** — обязательное требование 2-3 вариантов. 3. **Self-review** — проверка результата на полноту и непротиворечивость перед финализацией.
 4. **YAGNI** — явный принцип удаления избыточности.
 5. **HARD-GATE** — запрет на реализацию до одобрения (полезно для human-in-the-loop).
 

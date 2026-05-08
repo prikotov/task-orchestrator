@@ -24,58 +24,58 @@ Warp — «агентный терминал» (agentic terminal), переос�
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   Точки входа / Триггеры                     │
-│   Warp Terminal │ Oz CLI │ REST API │ SDK (Python/TS)       │
-│   Slack │ Linear │ GitHub Actions │ Cron Schedules          │
+│ Точки входа / Триггеры │
+│ Warp Terminal │ Oz CLI │ REST API │ SDK (Python/TS) │
+│ Slack │ Linear │ GitHub Actions │ Cron Schedules │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   Oz Orchestration Layer                     │
-│   • Agent run lifecycle (QUEUED → INPROGRESS → SUCCEEDED/   │
-│     FAILED)                                                  │
-│   • Schedule management (create/pause/resume/delete)        │
-│   • Integration routing (webhook → agent run)               │
-│   • Run tracking & audit (run_id, state, timestamps)        │
+│ Oz Orchestration Layer │
+│ • Agent run lifecycle (QUEUED → INPROGRESS → SUCCEEDED/ │
+│ FAILED) │
+│ • Schedule management (create/pause/resume/delete) │
+│ • Integration routing (webhook → agent run) │
+│ • Run tracking & audit (run_id, state, timestamps) │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-              ┌────────────┴────────────┐
-              ▼                         ▼
-┌──────────────────────┐  ┌──────────────────────────────────┐
-│  Встроенный Oz Agent │  │  Сторонние CLI-агенты            │
-│  (own LLM orchest.)  │  │  Claude Code / Codex / Gemini    │
-│  • Codebase Context  │  │  (запуск в Docker-окружении)     │
-│  • Planning          │  │                                  │
-│  • Task Lists        │  │                                  │
-│  • MCP               │  │                                  │
-└──────────┬───────────┘  └──────────────┬───────────────────┘
-           │                             │
-           └──────────────┬──────────────┘
-                          ▼
+ │
+ ┌────────────┴────────────┐
+ ▼ ▼
+┌──────────────────────┐ ┌──────────────────────────────────┐
+│ Встроенный Oz Agent │ │ Сторонние CLI-агенты │
+│ (own LLM orchest.) │ │ Claude Code / Codex / Gemini │
+│ • Codebase Context │ │ (запуск в Docker-окружении) │
+│ • Planning │ │ │
+│ • Task Lists │ │ │
+│ • MCP │ │ │
+└──────────┬───────────┘ └──────────────┬───────────────────┘
+ │ │
+ └──────────────┬──────────────┘
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                Cloud Environments (Docker)                   │
-│   • Docker image (base / language / full)                   │
-│   • GitHub repos clone                                      │
-│   • Setup commands                                          │
-│   • Secrets (API keys)                                      │
-│   • MCP server configs                                      │
-│   • Skills (SKILL.md)                                       │
+│ Cloud Environments (Docker) │
+│ • Docker image (base / language / full) │
+│ • GitHub repos clone │
+│ • Setup commands │
+│ • Secrets (API keys) │
+│ • MCP server configs │
+│ • Skills (SKILL.md) │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Observability & Management                      │
-│   • Oz Web App (oz.warp.dev) — dashboard                    │
-│   • Run listing / filtering (state, config, creator)        │
-│   • Session links (full transcript)                         │
-│   • Notification system (in-app + desktop)                  │
+│ Observability & Management │
+│ • Oz Web App (oz.warp.dev) — dashboard │
+│ • Run listing / filtering (state, config, creator) │
+│ • Session links (full transcript) │
+│ • Notification system (in-app + desktop) │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Ключевые характеристики
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | Платформа оркестрации облачных AI-агентов (SaaS) |
 | **Модель выполнения** | Cloud-managed agent runs (QUEUED → INPROGRESS → SUCCEEDED / FAILED) |
 | **Триггеры запуска** | CLI, REST API, SDK, Cron-расписания, Slack, Linear, GitHub Actions, Webhook |
@@ -101,31 +101,31 @@ client = OzAPI(api_key=os.environ.get("WARP_API_KEY"))
 
 # Запуск облачного агента
 response = client.agent.run(
-    prompt="Fix the bug in auth.go",
-    config={
-        "environment_id": "env_abc123",
-        "model_id": "claude-sonnet-4",
-        "base_prompt": "You are a helpful coding assistant.",
-        "mcp_servers": {
-            "github": {"warp_id": "shared-mcp-id"},
-        },
-    },
+ prompt="Fix the bug in auth.go",
+ config={
+ "environment_id": "env_abc123",
+ "model_id": "claude-sonnet-4",
+ "base_prompt": "You are a helpful coding assistant.",
+ "mcp_servers": {
+ "github": {"warp_id": "shared-mcp-id"},
+ },
+ },
 )
 print(response.run_id)
 
 # Проверка статуса
 run = client.agent.runs.retrieve(run_id)
-print(run.state)  # QUEUED | INPROGRESS | SUCCEEDED | FAILED
+print(run.state) # QUEUED | INPROGRESS | SUCCEEDED | FAILED
 
 # Список runs
 for run in client.agent.runs.list():
-    print(run.run_id, run.state)
+ print(run.run_id, run.state)
 ```
 
 ### SDK — ключевые модели
 
 | Модель | Назначение |
-|---|---|
+| --- | --- |
 | `RunAgentRequest` | Запрос на запуск (prompt + config) |
 | `RunAgentResponse` | Ответ (run_id, state) |
 | `RunItem` | Полная информация о run (state, timestamps, session_link, config) |
@@ -136,39 +136,32 @@ for run in client.agent.runs.list():
 
 ---
 
-## 2. Сравнительная таблица: что у нас есть vs. чего нет
+## 2. Возможности оркестрации — обзор
 
-| Функция | Task Orchestrator | Oz | Статус |
-|---|---|---|---|
-| **Цепочки шагов (chains)** | ✅ YAML chains, статические и динамические | ❌ Нет цепочек — каждый run = один агент с одним prompt | ✅ У нас есть (ключевое отличие) |
-| **Retry с backoff** | ✅ RetryingAgentRunner | ⚠️ SDK имеет built-in retries (HTTP-level), платформа управляет run lifecycle | ✅ У нас есть (на уровне шагов) |
-| **Circuit Breaker** | ✅ CircuitBreakerAgentRunner | ❌ Нет (пользователь не управляет retry-логикой) | ✅ У нас есть |
-| **Quality Gates** | ✅ Shell-команды как проверки | ❌ Нет явных quality gates — агент сам решает, когда завершить | ✅ У нас есть |
-| **Бюджетный контроль** | ✅ BudgetVo (cost-based) | ❌ Нет явного бюджетного контроля (биллинг через Warp-подписку) | ✅ У нас есть |
-| **Итерационные циклы (fix_iterations)** | ✅ Группа шагов с max_iterations | ❌ Нет итерационных циклов — один prompt = один run | ✅ У нас есть |
-| **Fallback routing** | ✅ Per-step fallback runner | ⚠️ Пользователь выбирает model_id, fallback — на уровне платформы | ✅ У нас есть (явный) |
-| **Облачные Docker-окружения** | ❌ Локальное выполнение | ✅ Cloud Environments: 10+ Docker-образов, clone любых GitHub repos, setup commands | 🟡 Интересно |
-| **Cron-расписания** | ❌ Нет | ✅ Schedule management (create/pause/resume/delete, cron expressions) | 🟡 Интересно |
-| **Webhook / Integration triggers** | ❌ Только CLI | ✅ Slack, Linear, GitHub Actions — webhook → agent run | 🟡 Интересно |
-| **REST API / SDK** | ❌ Нет (только CLI) | ✅ REST API + Python SDK + TypeScript SDK | 🟡 Позже |
-| **SKILL.md** | ✅ Ролевые .md файлы | ✅ SKILL.md (агенты запускаются из skill definitions: `owner/repo:skill-name`) | ✅ Паритет |
-| **MCP-протокол** | ❌ Нет | ✅ Per-run MCP-конфигурация (warp shared / stdio / remote SSE) | 🟡 Позже |
-| **Planning (LLM)** | ❌ Нет | ✅ Agent Planning — LLM генерирует план, пользователь редактирует, agent выполняет | 🟡 Интересно |
-| **Codebase Context (semantic indexing)** | ❌ Нет | ✅ Semantic indexing Git-tracked файлов для контекста агента | 🟡 Интересно |
-| **Agent Profiles & Permissions** | ❌ Нет | ✅ Профили с уровнями автономии + command denylist | 🟡 Позже |
-| **Параллельные agents** | ❌ Последовательное выполнение цепочек | ✅ Unlimited parallel cloud agents (cloud-native) | 🟡 Интересно |
-| **Observability / Audit** | ✅ JSONL audit trail | ✅ Run tracking (run_id, state, timestamps, session_link) + Web dashboard | ✅ Паритет (разный подход) |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Проприетарный SaaS (архитектура неизвестна) | ✅ У нас лучше |
-| **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Cloud API (нет доступа к внутренней архитектуре) | ✅ У нас лучше |
-| **Notification system** | ❌ Нет | ✅ In-app (toast, mailbox, tab indicators) + desktop alerts | 🟢 Не берём |
-| **Web Dashboard** | ❌ Нет | ✅ oz.warp.dev — visual management | 🟢 Не берём |
-| **Компьютерное использование (Computer Use)** | ❌ Нет | ✅ Desktop GUI interaction (screenshots, clicks, typing) | 🟢 Не берём |
-| **Computer Use (Full Terminal Use)** | ❌ Нет | ✅ Agent управляет интерактивными терминальными приложениями | 🟢 Не берём |
-| **Web Search** | ❌ Нет | ✅ Agent может искать в интернете | 🟢 Не берём |
+| Функция | Oz |
+| --- | --- |
+| **Облачные Docker-окружения** | ✅ Cloud Environments: 10+ Docker-образов, clone любых GitHub repos, setup commands |
+| **Cron-расписания** | ✅ Schedule management (create/pause/resume/delete, cron expressions) |
+| **Webhook / Integration triggers** | ✅ Slack, Linear, GitHub Actions — webhook → agent run |
+| **REST API / SDK** | ✅ REST API + Python SDK + TypeScript SDK |
+| **SKILL.md** | ✅ SKILL.md (агенты запускаются из skill definitions: `owner/repo:skill-name`) |
+| **MCP-протокол** | ✅ Per-run MCP-конфигурация (Warp shared / stdio / remote SSE) |
+| **Planning (LLM)** | ✅ Agent Planning — LLM генерирует план, пользователь редактирует, agent выполняет |
+| **Codebase Context (semantic indexing)** | ✅ Semantic indexing Git-tracked файлов для контекста агента |
+| **Agent Profiles & Permissions** | ✅ Профили с уровнями автономии + command denylist |
+| **Параллельные agents** | ✅ Unlimited parallel cloud agents (cloud-native) |
+| **Observability / Audit** | ✅ Run tracking (run_id, state, timestamps, session_link) + Web dashboard |
+| **DDD-архитектура** | ❌ Проприетарный SaaS (архитектура неизвестна) |
+| **Decorator pattern** | ❌ Cloud API (нет доступа к внутренней архитектуре) |
+| **Notification system** | ✅ In-app (toast, mailbox, tab indicators) + desktop alerts |
+| **Web Dashboard** | ✅ oz.warp.dev — visual management |
+| **Компьютерное использование (Computer Use)** | ✅ Desktop GUI interaction (screenshots, clicks, typing) |
+| **Computer Use (Full Terminal Use)** | ✅ Agent управляет интерактивными терминальными приложениями |
+| **Web Search** | ✅ Agent может искать в интернете |
 
 ---
 
-## 3. Что полезно взять и почему
+## 3. Оркестрационные возможности
 
 ### 3.1 🟡 Cron-расписания (Scheduled Agents)
 
@@ -176,17 +169,15 @@ for run in client.agent.runs.list():
 
 ```bash
 oz schedule create \
-  --name "Weekly dependency updates" \
-  --cron "0 10 * * 1" \
-  --environment env_abc123 \
-  --prompt "Check for dependency updates and open a PR"
+ --name "Weekly dependency updates" \
+ --cron "0 10 * * 1" \
+ --environment env_abc123 \
+ --prompt "Check for dependency updates and open a PR"
 ```
 
 SDK: `client.agent.schedules.create()`, `.pause()`, `.resume()`, `.delete()`.
 
-**Почему нам интересно:** Для CI/CD-сценариев: автоматический запуск цепочки по расписанию (ежедневный lint, еженедельный dependency update). Реализуемо через внешний cron + CLI, но встроенный scheduler — более удобный UX.
-
-**Отличие:** У Oz расписание = повторяющийся запуск одного и того же промпта. У нас потенциально расписание = повторяющийся запуск цепочки с разными входными данными.
+**Оркестрационная значимость:** Cron-расписания превращают Oz в автоматически действующую систему — агент запускается без участия человека по календарю. Типичные сценарии: ежедневный lint, еженедельный dependency update, ночной regression-тест. Ключевое ограничение: cron-выражения поддерживают только временные триггеры; событийная активация (например, «при появлении нового коммита») реализуется через webhook-интеграции (см. §3.2), а не через cron.
 
 ### 3.2 🟡 Webhook-триггеры (Slack, Linear, GitHub Actions)
 
@@ -195,7 +186,7 @@ SDK: `client.agent.schedules.create()`, `.pause()`, `.resume()`, `.delete()`.
 - Linear: новый issue → agent run
 - GitHub Actions: workflow event → agent run
 
-**Почему нам интересно:** Для CI/CD: push в ветку → запуск цепочки (lint → test → review). Проблема: наш оркестратор — CLI-инструмент, не web-сервис. Реализуемо через GitHub Actions + CLI, но требует обёртку.
+**Оркестрационная значимость:** Webhook-триггеры реализуют паттерн event-driven orchestration: внешнее событие (Slack-сообщение, Linear-issue, GitHub Actions workflow) автоматически порождает agent run. Это устраняет необходимость ручного запуска и позволяет встраивать AI-агентов в существующие CI/CD-пайплайны и рабочие процессы. Ограничение: поддерживаются только три предустановленные интеграции; произвольный webhook с кастомной трансформацией payload в prompt — через REST API.
 
 ### 3.3 🟡 Cloud Environments (Docker-based isolation)
 
@@ -206,7 +197,7 @@ SDK: `client.agent.schedules.create()`, `.pause()`, `.resume()`, `.delete()`.
 - Secrets management (API keys)
 - `-agents` варианты образов с предустановленными Claude Code, Codex, Gemini CLI
 
-**Почему нам интересно:** Полная изоляция + воспроизводимость. Для production CI/CD — критически важно. Мы уже заимствовали паттерн из Docker Agent + Codex (iptables + Docker). Oz предлагает более «упакованное» решение (managed).
+**Оркестрационная значимость:** Изоляция через Docker-контейнеры обеспечивает два ключевых свойства: (1) **воспроизводимость** — каждый run стартует в детерминированном окружении с фиксированным образом и setup-командами; (2) **безопасность** — агент не имеет доступа к хост-системе или данным других runs. Предустановленные `-agents`-образы (с Claude Code, Codex, Gemini CLI) сокращают время подготовки окружения до минимума. Ограничение: managed-окружения — проприетарные; кастомные образы можно собирать на основе открытых Dockerfile из `oz-dev-environments`, но сборка и публикация — на стороне пользователя.
 
 ### 3.4 🟡 REST API / SDK
 
@@ -216,7 +207,7 @@ SDK: `client.agent.schedules.create()`, `.pause()`, `.resume()`, `.delete()`.
 - `GET /agent/runs` — список с фильтрами
 - `POST /agent/runs/{runId}/cancel` — отмена
 
-**Почему нам интересно:** Для программного управления цепочками из других систем (CI/CD, Slack bot, IDE extension). Но для CLI-инструмента это P3: сперва нужно убедиться, что оркестратор работает автономно.
+**Оркестрационная значимость:** REST API и SDK позволяют программно управлять полным жизненным циклом agent run: запуск, проверка статуса, отмена. Это даёт возможность строить мета-оркестрацию — внешнюю систему, которая координирует несколько Oz-агентов как шаги единого пайплайна (запуск → ожидание результата → условный запуск следующего). Ограничение: API не предоставляет встроенных примитивов для цепочек (chain, pipeline, DAG) — последовательную координацию нескольких runs необходимо реализовывать на стороне вызывающей системы.
 
 ### 3.5 🟡 Planning (LLM-генерация плана)
 
@@ -225,17 +216,17 @@ SDK: `client.agent.schedules.create()`, `.pause()`, `.resume()`, `.delete()`.
 - Пользователь редактирует
 - Агент выполняет план step-by-step
 
-**Почему нам интересно:** Похож на наш DynamicChainResolver, но с интерактивным участием человека. Для автономного режима — не подходит (требует интерактивности). Для интерактивного — interesting R&D.
+**Оркестрационная значимость:** Похож на DynamicChainResolver, но с интерактивным участием человека. Для автономного режима — не подходит (требует интерактивности). Для интерактивного — interesting R&D.
 
 ### 3.6 🟡 Codebase Context (Semantic Indexing)
 
 **Что у них:** Автоматическая семантическая индексация Git-отслеживаемых файлов для обогащения контекста агента. Агент «понимает» структуру кодовой базы без явного указания файлов.
 
-**Почему нам интересно:** Для длинных цепочек с множеством шагов — обогащение контекста агента знанием о проекте. Но это уровень runner'а (как Codex с AGENTS.md), не оркестратора.
+**Оркестрационная значимость:** Для длинных цепочек с множеством шагов — обогащение контекста агента знанием о проекте. Но это уровень runner'а (как Codex с AGENTS.md), не оркестратора.
 
 ---
 
-## 4. Что НЕ берём и почему
+## 4. Прочие возможности (вне оркестрации)
 
 ### 4.1 🟢 Cloud SaaS-модель
 
@@ -243,7 +234,7 @@ Oz — полностью облачный SaaS-продукт. Agent runs вы�
 
 ### 4.2 🟢 Unlimited Parallel Cloud Agents
 
-Oz позволяет запускать неограниченное количество параллельных агентов в облаке. Это cloud-native feature, недоступная в CLI-контексте. Наш оркестратор выполняет одну цепочку за раз (последовательно).
+Oz позволяет запускать неограниченное количество параллельных агентов в облаке. Это cloud-native feature, недоступная в CLI-контексте.
 
 ### 4.3 🟢 Web Dashboard (oz.warp.dev)
 
@@ -263,22 +254,15 @@ Oz позволяет агентам управлять GUI (скриншоты,
 
 ### 4.7 🟢 Multi-Model Selection
 
-Oz позволяет выбирать LLM-модель (Claude Sonnet/Opus, GPT-4, Gemini) для каждого run. У нас это реализовано через runner concept: каждый runner = конкретный AI-ассистент (pi, codex). Разный уровень: Oz выбирает model, мы выбираем runner.
+Oz позволяет выбирать LLM-модель (Claude Sonnet/Opus, GPT-4, Gemini) для каждого run. Разный уровень: Oz выбирает model, мы выбираем runner.
 
 ---
 
-## 5. Сводка рекомендаций
+## 5. Сводка по оркестрации
 
-| Фича | Приоритет | Обоснование |
-|---|---|---|
-| Chain orchestration (YAML chains) | ✅ Уже есть | Core-функциональность task-orchestrator, отсутствует у Oz |
-| Retry + Circuit Breaker | ✅ Уже есть | Устойчивость при сбоях, отсутствует у Oz |
-| Quality Gates | ✅ Уже есть | Автоматическая проверка кода, отсутствует у Oz |
-| Budget control | ✅ Уже есть | Предотвращение runaway spending, отсутствует у Oz |
-| Fix iterations | ✅ Уже есть | Closed-loop цикл разработки, отсутствует у Oz |
-| Cron-расписания | 🟡 P3 | Для автоматического запуска цепочек по расписанию. Реализуемо через внешний cron + CLI |
-| Webhook-триггеры | 🟡 P3 | Для CI/CD интеграции. Реализуемо через GitHub Actions + CLI |
-| Cloud Environments (Docker) | 🟡 P3 | Изоляция + воспроизводимость. Уже исследовано через Docker Agent + Codex |
+| Возможность | Статус в продукте | Описание |
+| --- | --- | --- |
+| Cron-расписания | 🟡 P3 | Для автоматического запуска цепочек по расписанию. Уже исследовано через Docker Agent + Codex |
 | REST API / SDK | 🟡 P3 | Для программного управления. Сперва — стабилизация CLI |
 | Planning (LLM) | 🟡 P3 | R&D: LLM-генерация динамических цепочек. Требует интерактивности |
 | Codebase Context | 🟡 P3 | Уровень runner'а, не оркестратора |

@@ -7,12 +7,11 @@
 > **Версия:** v7.2.44
 > **Аналитик:** Аналитик (Шерлок)
 
-
 ---
 
 ## 1. Обзор проекта
 
-Kilo Code — **полнофункциональная AI-агентная платформа для разработки ПО** от Kilo AI. Включает VS Code Extension, CLI-клиент, JetBrains plugin. Реализует модель `LLM → tool call → observation → LLM → ...` с встроенным механизмом subagents через `task` tool. Ключевая особенность: **оркестратор теперь встроен в каждый primary-агент** — специализированный Orchestrator Mode объявлен deprecated.
+Kilo Code — **полнофункциональная AI-агентная платформа для разработки ПО** от Kilo AI. Включает VS Code Extension, CLI-клиент, JetBrains plugin. Реализует модель `LLM → tool call → observation → LLM → ...` со встроенным механизмом subagents через `task` tool. Ключевая особенность: **оркестратор теперь встроен в каждый primary-агент** — специализированный Orchestrator Mode объявлен deprecated.
 
 > ⚠️ **Важно:** Orchestrator Mode официально **deprecated** и будет удалён в будущей версии. Документация прямо заявляет: «Orchestrator mode is no longer needed — agents with full tool access (Code, Plan, Debug) can now delegate to subagents natively». Тем не менее, архитектурные паттерны, которые он представляет, заслуживают детального анализа, т.к. они сохранены в текущей архитектуре subagents.
 
@@ -22,80 +21,80 @@ Kilo Code — **полнофункциональная AI-агентная пл�
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Пользователь (CLI / VS Code / JetBrains)                    │
-│  • Выбор агента: Code, Plan, Debug, Ask, Custom              │
-│  • Ввод промпта                                               │
-│  • Интерактивное подтверждение (ask/deny/allow)               │
+│ Пользователь (CLI / VS Code / JetBrains) │
+│ • Выбор агента: Code, Plan, Debug, Ask, Custom │
+│ • Ввод промпта │
+│ • Интерактивное подтверждение (ask/deny/allow) │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Agent Service (agent.ts)                         │
-│  • Agent.Info: name, mode (primary/subagent/all),             │
-│    permission, model, prompt, steps, temperature, topP       │
-│  • 7 built-in агентов: code, plan, debug, ask,               │
-│    orchestrator (deprecated), general, explore                │
-│  • Custom agents: JSON config / Markdown files / CLI create   │
-│  • Permission system: allow/ask/deny per tool                 │
-│  • Mode: primary (user-facing) / subagent (delegated) / all   │
+│ Agent Service (agent.ts) │
+│ • Agent.Info: name, mode (primary/subagent/all), │
+│ permission, model, prompt, steps, temperature, topP │
+│ • 7 built-in агентов: code, plan, debug, ask, │
+│ orchestrator (deprecated), general, explore │
+│ • Custom agents: JSON config / Markdown files / CLI create │
+│ • Permission system: allow/ask/deny per tool │
+│ • Mode: primary (user-facing) / subagent (delegated) / all │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Session (session.ts)                             │
-│  • Session prompt → LLM streaming → tool calls               │
-│  • MessageV2: role, modelID, providerID, cost, parts         │
-│  • Context compaction при overflow (LLM summarization)       │
-│  • Retry policy: exponential backoff + Retry-After headers   │
-│  • Max steps control (agent.steps)                           │
+│ Session (session.ts) │
+│ • Session prompt → LLM streaming → tool calls │
+│ • MessageV2: role, modelID, providerID, cost, parts │
+│ • Context compaction при overflow (LLM summarization) │
+│ • Retry policy: exponential backoff + Retry-After headers │
+│ • Max steps control (agent.steps) │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-               ┌───────────┴───────────┐
-               ▼                       ▼
-┌────────────────────┐   ┌────────────────────────────────────┐
-│  Tools (tool/)     │   │  Task Tool (task.ts)               │
-│  • read/write/edit │   │  • Subagent invocation mechanism   │
-│  • bash            │   │  • Creates isolated child session   │
-│  • grep/glob       │   │  • Permission inheritance           │
-│  • plan            │   │  • Cost propagation (child→parent)  │
-│  • question        │   │  • task_id для resume               │
-│  • skill           │   │  • Subagent type: general/explore   │
-│  • mcp             │   │  • Parallel invocation support      │
-│  • webfetch/search │   │  • Subagent cannot call task        │
-│  • todo            │   │    (deny by default)                │
-│  • diagnostics     │   │  • AbortSignal propagation          │
-│  • apply_patch     │   │                                     │
-│  • task            │   │                                     │
-└────────────────────┘   └────────────────────────────────────┘
+ │
+ ┌───────────┴───────────┐
+ ▼ ▼
+┌────────────────────┐ ┌────────────────────────────────────┐
+│ Tools (tool/) │ │ Task Tool (task.ts) │
+│ • read/write/edit │ │ • Subagent invocation mechanism │
+│ • bash │ │ • Creates isolated child session │
+│ • grep/glob │ │ • Permission inheritance │
+│ • plan │ │ • Cost propagation (child→parent) │
+│ • question │ │ • task_id для resume │
+│ • skill │ │ • Subagent type: general/explore │
+│ • mcp │ │ • Parallel invocation support │
+│ • webfetch/search │ │ • Subagent cannot call task │
+│ • todo │ │ (deny by default) │
+│ • diagnostics │ │ • AbortSignal propagation │
+│ • apply_patch │ │ │
+│ • task │ │ │
+└────────────────────┘ └────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
-│         Permission System (permission/)                       │
-│  • Rules: { permission, pattern, action }                    │
-│  • Action: allow / ask / deny                                │
-│  • Pattern matching: glob (*, git diff*)                     │
-│  • Last matching rule wins                                   │
-│  • Bash allowlist/denylist с glob patterns                   │
-│  • Per-agent overrides через config                          │
-│  • Inheritance: caller restrictions → child session          │
+│ Permission System (permission/) │
+│ • Rules: { permission, pattern, action } │
+│ • Action: allow / ask / deny │
+│ • Pattern matching: glob (*, git diff*) │
+│ • Last matching rule wins │
+│ • Bash allowlist/denylist с glob patterns │
+│ • Per-agent overrides через config │
+│ • Inheritance: caller restrictions → child session │
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
-│         Orchestrator Agent (deprecated)                       │
-│  • Prompt: wave-based execution pattern                      │
-│  • Bash: denied (только task delegation)                     │
-│  • Edit: denied                                              │
-│  • Task: allowed (делегирование subagents)                   │
-│  • Flow: explore → plan → wave-by-wave → synthesize          │
-│  • Wave = параллельные tool calls в одном сообщении          │
-│  • Зависимости: independent → parallel, dependent →          │
-│    sequential                                                │
+│ Orchestrator Agent (deprecated) │
+│ • Prompt: wave-based execution pattern │
+│ • Bash: denied (только task delegation) │
+│ • Edit: denied │
+│ • Task: allowed (делегирование subagents) │
+│ • Flow: explore → plan → wave-by-wave → synthesize │
+│ • Wave = параллельные tool calls в одном сообщении │
+│ • Зависимости: independent → parallel, dependent → │
+│ sequential │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Ключевые характеристики
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | AI-агентная платформа для разработки (VS Code + CLI + JetBrains) |
 | **Модель выполнения** | Agent loop (LLM → tool call → observation → LLM → ...) + subagent delegation |
 | **Агенты** | 7 built-in (code, plan, debug, ask, orchestrator, general, explore) + custom |
@@ -109,37 +108,33 @@ Kilo Code — **полнофункциональная AI-агентная пл�
 
 ---
 
-## 2. Сравнительная таблица: что у нас есть vs. чего нет
+## 2. Возможности оркестрации — обзор
 
-| Функция | Task Orchestrator | Kilo Code | Статус |
-|---|---|---|---|
-| **Цепочки шагов (chains)** | ✅ YAML chains, статические и динамические | ❌ Нет (agent loop + tool calls, нет chain DSL) | ✅ У нас есть |
-| **DAG / Workflow engine** | ❌ Только линейные/динамические цепочки | ❌ Нет (только wave-based parallel subagent calls) | — |
-| **Retry с backoff** | ✅ RetryingAgentRunner | ✅ Exponential backoff + Retry-After header parsing | ✅ Паритет |
-| **Circuit Breaker** | ✅ CircuitBreakerAgentRunner | ❌ Нет | ✅ У нас есть |
-| **Quality Gates** | ✅ Shell-команды как проверки | ❌ Нет (нет post-execution validation) | ✅ У нас есть |
-| **Бюджетный контроль** | ✅ BudgetVo (cost-based) | ⚠️ Cost tracking (cost propagation) + steps limit, но без budget limit | ✅ У нас есть |
-| **Subagent / Sub-task** | ❌ Нет | ✅ Task tool: isolated session, parallel, resume, cost propagation | 🟡 Интересно |
-| **Permission system** | ❌ Нет (shell-команды без ограничений) | ✅ allow/ask/deny per tool, glob patterns, inheritance, bash allowlist | 🟡 Интересно |
-| **Context compaction** | ❌ Нет | ✅ LLM summarization при overflow с structured template | 🟡 Интересно |
-| **Agent modes** | ✅ AgentRunnerInterface (decorator pattern) | ✅ Agent.Info с mode (primary/subagent/all), per-agent model/temperature/prompt | ✅ Паритет (разные подходы) |
-| **Parallel execution** | ❌ Нет | ✅ Несколько task tool calls в одном сообщении (parallel subagents) | 🟡 Интересно |
-| **Error classification** | ⚠️ Basic (retry on failure) | ✅ ContextOverflow, API 5xx, rate limit, FreeUsageLimitError, Kilo errors | 🟡 Интересно |
-| **Cost propagation** | ❌ Нет | ✅ Child→parent cost propagation с concurrent lock | 🟡 Интересно |
-| **Wave-based orchestration** | ❌ Нет | ✅ Orchestrator prompt: parallel waves, dependency classification | 🟡 Интересно |
-| **Workflows (slash commands)** | ❌ Нет | ✅ Markdown files как пошаговые инструкции | 🟡 Интересно |
-| **MCP support** | ❌ Нет | ✅ MCP client (встроенный) | 🟡 Интересно |
-| **Skills (SKILL.md)** | ❌ Нет | ✅ Skill discovery из config/skill директорий | 🟡 Интересно |
-| **Custom agents** | ❌ Нет (только YAML chains) | ✅ JSON config / Markdown files / CLI create / Agent.generate (LLM-based) | 🟡 Интересно |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Effect-TS service layer (Context.Tag + Layer) | ✅ У нас лучше |
-| **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов Effect-пайплайна | ✅ У нас лучше |
-| **Session resume** | ❌ Нет | ✅ task_id для resume subagent session | 🟡 Интересно |
-| **Git worktree** | ❌ Нет | ✅ worktree/ модуль (ограниченная поддержка) | 🟡 Интересно |
-| **Autonomous CI/CD mode** | ❌ Нет | ✅ `kilo run --auto` (no user interaction) | 🟡 Интересно |
+| Функция | Kilo Code |
+| --- | --- |
+| **DAG / Workflow engine** | ❌ Только линейные/динамические цепочки |
+| **Retry с backoff** | ✅ Exponential backoff + Retry-After header parsing |
+| **Subagent / Sub-task** | ✅ Task tool: isolated session, parallel, resume, cost propagation |
+| **Permission system** | ✅ allow/ask/deny per tool, glob patterns, inheritance, bash allowlist |
+| **Context compaction** | ✅ LLM summarization при overflow с structured template |
+| **Agent modes** | ✅ Agent.Info с mode (primary/subagent/all), per-agent model/temperature/prompt |
+| **Parallel execution** | ✅ Несколько task tool calls в одном сообщении (parallel subagents) |
+| **Error classification** | ✅ ContextOverflow, API 5xx, rate limit, FreeUsageLimitError, Kilo errors |
+| **Cost propagation** | ✅ Child→parent cost propagation с concurrent lock |
+| **Wave-based orchestration** | ✅ Orchestrator prompt: parallel waves, dependency classification |
+| **Workflows (slash commands)** | ✅ Markdown files как пошаговые инструкции |
+| **MCP support** | ✅ MCP client (встроенный) |
+| **Skills (SKILL.md)** | ✅ Skill discovery из config/skill директорий |
+| **Custom agents** | ✅ JSON config / Markdown files / CLI create / Agent.generate (LLM-based) |
+| **DDD-архитектура** | ❌ Effect-TS service layer (Context.Tag + Layer) |
+| **Decorator pattern** | ❌ Прямой вызов Effect-пайплайна |
+| **Session resume** | ✅ task_id для resume subagent session |
+| **Git worktree** | ✅ worktree/ модуль (ограниченная поддержка) |
+| **Autonomous CI/CD mode** | ✅ `kilo run --auto` (no user interaction) |
 
 ---
 
-## 3. Что полезно взять и почему
+## 3. Оркестрационные возможности
 
 ### 3.1 🟡 Wave-Based Orchestration Pattern (из Orchestrator prompt)
 
@@ -153,7 +148,12 @@ Kilo Code — **полнофункциональная AI-агентная пл�
 
 Ключевое правило: **«All agents share the same working directory. If two subtasks are likely to edit the same files, they MUST be in different waves to avoid conflicts.»**
 
-**Почему нам интересно:** Модель для будущих dynamic chains с parallel execution. Wave-based подход — практичная альтернатива полноценному DAG: вместо построения графа зависимостей — ручная классификация агентом (independent vs dependent) → parallel vs sequential execution. Для YAML-цепочек можно реализовать `wave`-группировку шагов: шаги в одной wave выполняются параллельно, между waves — последовательно.
+**Ограничения и риски:** Wave-based подход — упрощённая альтернатива DAG, но с существенными компромиссами:
+
+1. **LLM-классификация зависимостей ненадёжна.** Агент определяет, какие подзадачи независимы, а какие — нет. False positive (зависимые задачи определены как независимые) → параллельное выполнение → конфликт редактирования одних и тех же файлов. False negative (независимые → зависимые) → ненужная последовательность → потеря скорости.
+2. **Shared working directory — фундаментальное ограничение.** Все subagents работают в одной файловой системе. Единственная защита — инструкция в промпте: «If two subtasks are likely to edit the same files, they MUST be in different waves». Это soft guarantee, зависящая от качества LLM-рассуждений.
+3. **Deprecated статус Orchestrator Mode.** Авторы Kilo Code отказались от специализированного оркестратора в пользу embedded subagents (task tool доступен в каждом primary agent). Это указывает на то, что выделенный оркестрирующий агент не показал преимуществ перед прямым делегированием.
+4. **Нет механизма rollback.** Если wave завершена с ошибкой — нет встроенного способа откатить изменения предыдущих wave. Agent полагается на git как внешний механизм восстановления.
 
 ### 3.2 🟡 Subagent Isolation с Permission Inheritance (KiloTask.inherited)
 
@@ -168,24 +168,24 @@ Kilo Code — **полнофункциональная AI-агентная пл�
 // Ключевая логика из task.ts
 const rules = KiloTask.inherited({ caller, session, mcp })
 const nextSession = yield* sessions.create({
-  parentID: ctx.sessionID,
-  permission: [
-    ...(parent.permission ?? []).filter(...),
-    // Запретить task и todowrite для subagents
-    ...(canTask ? [] : [{ permission: "task", pattern: "*", action: "deny" }]),
-    ...KiloTask.permissions(rules),
-  ],
+ parentID: ctx.sessionID,
+ permission: [
+ ...(parent.permission ?? []).filter(...),
+ // Запретить task и todowrite для subagents
+ ...(canTask ? [] : [{ permission: "task", pattern: "*", action: "deny" }]),
+ ...KiloTask.permissions(rules),
+ ],
 })
 ```
 
-**Почему нам интересно:** Модель для вложенных chain runs (chain внутри chain). В task-orchestrator можно реализовать «step type: chain» — шаг, который запускает вложенную цепочку с собственным бюджетом, контекстом и ограничениями. Permission inheritance — способ передать ограничения родительской цепочки в дочернюю. Cost propagation — механизм агрегации затрат при вложенных вызовах.
+**Оркестрационная значимость:** Модель для вложенных chain runs (chain внутри chain). Permission inheritance — способ передать ограничения родительской цепочки в дочернюю. Cost propagation — механизм агрегации затрат при вложенных вызовах.
 
 ### 3.3 🟡 Permission System с Glob Patterns
 
 **Что у них:** Трёхуровневая система разрешений:
 
 | Action | Поведение |
-|---|---|
+| --- | --- |
 | `allow` | Разрешить без запроса |
 | `ask` | Запросить подтверждение пользователя |
 | `deny` | Заблокировать полностью |
@@ -193,17 +193,17 @@ const nextSession = yield* sessions.create({
 Поддерживается glob-паттерны для bash-команд:
 ```json
 {
-  "bash": {
-    "*": "ask",
-    "git diff *": "allow",
-    "rm *": "deny"
-  }
+ "bash": {
+ "*": "ask",
+ "git diff *": "allow",
+ "rm *": "deny"
+ }
 }
 ```
 
 **Last matching rule wins** — порядок важен. Встроенный bash allowlist из 40+ безопасных команд (cat, grep, ls, jq, git log, git diff, ...). Read-only bash отдельный набор (без git stash, git push, sort -o, пайпов, редиректов).
 
-**Почему нам интересно:** Для автономного выполнения в CI/CD — необходимый механизм. Реализуемо на уровне chain executor: каждый шаг chain может иметь permission profile (allow/deny per tool type). Glob patterns для shell-команд — практичная альтернатива Docker sandboxing: не нужен контейнер, достаточно whitelist команд. Подтверждено Codex (exec policy), Claude Code (allow/deny lists).
+**Оркестрационная значимость:** Для автономного выполнения в CI/CD — необходимый механизм. Реализуемо на уровне chain executor: каждый шаг chain может иметь permission profile (allow/deny per tool type). Glob patterns для shell-команд — практичная альтернатива Docker sandboxing: не нужен контейнер, достаточно whitelist команд. Подтверждено Codex (exec policy), Claude Code (allow/deny lists).
 
 ### 3.4 🟡 Cost Propagation с Concurrent Lock
 
@@ -212,30 +212,30 @@ const nextSession = yield* sessions.create({
 ```typescript
 // acquireUseRelease pattern — serialize concurrent propagations
 yield* Effect.acquireUseRelease(
-  // acquire: snapshot child cost
-  Effect.gen(function* () {
-    return yield* KiloCostPropagation.childCost(sessions, nextSession.id)
-  }),
-  // use: run subagent
-  () => Effect.gen(function* () { /* ... */ }),
-  // release: propagate cost delta
-  (costBefore) => Effect.gen(function* () {
-    const costAfter = yield* KiloCostPropagation.childCost(sessions, nextSession.id)
-    yield* KiloCostPropagation.propagate(sessions, ctx.sessionID, ctx.messageID, costAfter - costBefore)
-  }),
+ // acquire: snapshot child cost
+ Effect.gen(function* () {
+ return yield* KiloCostPropagation.childCost(sessions, nextSession.id)
+ }),
+ // use: run subagent
+ () => Effect.gen(function* () { /* ... */ }),
+ // release: propagate cost delta
+ (costBefore) => Effect.gen(function* () {
+ const costAfter = yield* KiloCostPropagation.childCost(sessions, nextSession.id)
+ yield* KiloCostPropagation.propagate(sessions, ctx.sessionID, ctx.messageID, costAfter - costBefore)
+ }),
 )
 ```
 
 Concurrent lock (`acquire(key)`) предотвращает lost updates при параллельном завершении нескольких subagents.
 
-**Почему нам интересно:** Для вложенных chain runs — агрегация cost на каждом уровне иерархии. Parent chain знает стоимость всех child chains. Concurrent lock — важная деталь для корректности при параллельном выполнении шагов. В PHP аналогом может быть pessimistic locking через DB transaction.
+**Оркестрационная значимость:** Для вложенных chain runs — агрегация cost на каждом уровне иерархии. Parent chain знает стоимость всех child chains. Concurrent lock — важная деталь для корректности при параллельном выполнении шагов. В PHP аналогом может быть pessimistic locking через DB transaction.
 
 ### 3.5 🟡 Error Classification для Retry Policy
 
 **Что у них:** Retry policy классифицирует ошибки перед retry:
 
 | Тип ошибки | Retry? | Обоснование |
-|---|---|---|
+| --- | --- | --- |
 | ContextOverflowError | ❌ Нет | Контекст переполнен — retry бессмысленно |
 | API 5xx | ✅ Да | Transient server failure |
 | Rate limit (429) | ✅ Да | С backoff + Retry-After header |
@@ -246,7 +246,7 @@ Concurrent lock (`acquire(key)`) предотвращает lost updates при 
 
 Retry delay: exponential backoff (2s → 4s → 8s → ...) + respect Retry-After headers (ms, seconds, HTTP date). Max delay: 30s (no headers) / 2^31 ms (with headers).
 
-**Почему нам интересно:** Конкретная модель для нашего `RetryingAgentRunner`. Сейчас retry на любую ошибку — нужно добавить классификацию: context overflow → не retry, auth errors → не retry, rate limit → retry с backoff + Retry-After. Подтверждено Archon, OpenClaw, Hermes Agent.
+**Оркестрационная значимость:** Конкретная модель для нашего `RetryingAgentRunner`. Сейчас retry на любую ошибку — нужно добавить классификацию: context overflow → не retry, auth errors → не retry, rate limit → retry с backoff + Retry-After. Подтверждено Archon, OpenClaw, Hermes Agent.
 
 ### 3.6 🟡 Context Compaction с Structured Template
 
@@ -264,7 +264,13 @@ Retry delay: exponential backoff (2s → 4s → 8s → ...) + respect Retry-Afte
 
 Параметры: PRUNE_MINIMUM = 20K tokens, PRUNE_PROTECT = 40K tokens, tool output truncated до 2000 chars, protected tools (skill), DEFAULT_TAIL_TURNS = 2.
 
-**Почему нам интересно:** Для длинных цепочек и fix_iterations — контекст растёт и упирается в context window limit. Structured template лучше plain summarization — сохраняет goal, progress, decisions. Tool output truncation — практичный механизм для сжатия. Подтверждено 8/20 проектами.
+**Ограничения и риски:** Context compaction — lossy-операция с несколькими критическими компромиссами:
+
+1. **Потеря intermediate values.** LLM-суммаризация может потерять конкретные данные: file paths, error messages, variable values, intermediate вычисления. Structured template частично решает проблему, но не гарантирует сохранение всех значимых деталей.
+2. **Зависимость от качества summarization-model.** Если модель, выполняющая compaction, плохо структурирует информацию — subsequent steps получают некачественный контекст, что ведёт к ошибкам. Качество compaction = качество модели × качество template.
+3. **Hardcoded пороги.** PRUNE_MINIMUM = 20K tokens, PRUNE_PROTECT = 40K tokens — фиксированные значения, не адаптируются к context window конкретной модели (у GPT-4 и Claude разные limits). Несоответствие порога и window → преждевременное или запоздалое сжатие.
+4. **Tool output truncation до 2000 chars** — агрессивный лимит, вырезающий полный вывод команд (bash output, file contents). Для debugging-сценариев потеря полного tool output критична.
+5. **Нет оценки влияния на качество.** В коде нет метрик или A/B тестирования, показывающих, как compaction влияет на success rate последующих шагов. Эмпирические данные отсутствуют.
 
 ### 3.7 🟡 Custom Agent Configuration (JSON + Markdown)
 
@@ -276,21 +282,30 @@ Retry delay: exponential backoff (2s → 4s → 8s → ...) + respect Retry-Afte
 
 Configuration precedence: built-in defaults → global config → project config → global markdown → project markdown. Properties merge (override, not replace).
 
-**Почему нам интересно:** Для task-orchestrator — модель переиспользуемых chain templates. Markdown files с YAML frontmatter — удобный формат для определения chain templates (аналог наших YAML-цепочек, но с richer metadata). AI-генерация конфигурации (`Agent.generate`) — интересный подход для onboarding.
+**Оркестрационная значимость:** Markdown files с YAML frontmatter — удобный формат для определения chain templates (аналог наших YAML-цепочек, но с richer metadata). AI-генерация конфигурации (`Agent.generate`) — интересный подход для onboarding.
 
 ### 3.8 🟡 Steps Limit (Max Agentic Iterations)
 
-**Что у них:** Каждый агент имеет `steps` — максимальное количество agentic итераций (LLM call + tool calls). После достижения лимита — forced text-only response.
+**Что у них:** Каждый агент имеет параметр `steps` — максимальное количество agentic итераций (LLM call + tool calls). После достижения лимита — **forced text-only response**: агент обязан ответить текстом без вызова tool calls, даже если задача не завершена.
 
 ```json
 { "agent": { "test-gen": { "steps": 15 } } }
 ```
 
-**Почему нам интересно:** Аналог нашего `max_iterations` в fix_iterations, но на уровне агента (шага chain), а не цепочки. Можно добавить `max_steps` per chain step — ограничение количества итераций agent loop внутри одного шага, дополнение к `max_iterations` на уровне цепочки.
+**Механизм работы:**
+1. Каждая итерация agent loop (LLM call → tool calls → observation) увеличивает счётчик.
+2. При `steps_exceeded` — LLM получает системное сообщение о необходимости завершить ответ текстом.
+3. Forced text-only response не гарантирует полезный результат — агент может вернуть неполный или бессодержательный ответ.
+
+**Ограничения:**
+1. **Steps ≠ time.** Лимит итераций не контролирует wall-clock time: одна итерация с длительным tool call (bash, MCP) может занять минуты, при этом steps counter = 1.
+2. **Нет recovery-стратегии.** При forced text-only response — нет встроенного механизма resume или retry. Вызывающая сторона получает whatever text agent managed to produce.
+3. **Default значение не документировано явно.** Built-in агенты используют разные defaults (code=80, ask=1), custom agents — без явного указания fallback на глобальный default.
+4. **Не распространяется на subagents.** Каждый subagent через task tool имеет собственный steps limit, independent от parent. Parent не может ограничить суммарное количество шагов parent + children.
 
 ---
 
-## 4. Что НЕ берём и почему
+## 4. Прочие возможности (вне оркестрации)
 
 ### 4.1 🟢 Agent Loop (прямое LLM API взаимодействие)
 
@@ -322,13 +337,10 @@ Kilo Code использует SQLite через Drizzle ORM для session pers
 
 ---
 
-## 5. Сводка рекомендаций
+## 5. Сводка по оркестрации
 
-| Фича | Приоритет | Обоснование |
-|---|---|---|
-| Chain orchestration (YAML chains) | ✅ Уже есть | Core-функциональность task-orchestrator |
-| Retry + Circuit Breaker + Quality Gates | ✅ Уже есть | Устойчивость при сбоях — ключевые отличия |
-| Budget control | ✅ Уже есть | Предотвращение runaway spending |
+| Возможность | Статус в продукте | Описание |
+| --- | --- | --- |
 | Wave-based parallel execution | 🟡 P3 | Модель для будущих dynamic chains: parallel waves внутри chain steps. Практичная альтернатива DAG |
 | Subagent isolation + permission inheritance | 🟡 P2 | «Chain внутри chain» с изолированным контекстом и ограничениями. Cost propagation для вложенных вызовов |
 | Permission system (allow/deny per tool, glob) | 🟡 P2 | Для CI/CD: declarative restrictions без Docker sandboxing. Bash allowlist из Kilo Code — конкретный reference |

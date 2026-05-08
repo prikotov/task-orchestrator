@@ -19,45 +19,45 @@ Agno **не является** оркестратором внешних CLI-а�
 
 ```
 libs/agno/agno/
-├── agent/                     # Agent: LLM-сессия, tools, memory, hooks, guardrails
-│   └── agent.py               # Agent dataclass (1729 строк): generate/run, tools, memory, reasoning
-├── team/                      # Team: multi-agent coordination
-│   ├── team.py                # Team dataclass: members, mode (coordinate/route/broadcast/tasks)
-│   └── mode.py                # TeamMode enum: coordinate, route, broadcast, tasks
-├── workflow/                  # Workflow: structured step-based execution
-│   ├── workflow.py            # Workflow class: compose steps, loops, parallels, routers
-│   ├── step.py                # Step: единица работы (agent/team/executor/workflow), HITL, retries
-│   ├── loop.py                # Loop: итеративное выполнение с end_condition (callable/CEL)
-│   ├── parallel.py            # Parallel: параллельное выполнение независимых шагов
-│   ├── router.py              # Router: динамический выбор шага (selector/CEL/HITL)
-│   ├── condition.py           # Condition: условное ветвление (if/else)
-│   └── steps.py               # Steps: последовательная цепочка шагов
-├── memory/                    # Memory Manager: user memories, CRUD, semantic search
-├── compression/               # Compression Manager: LLM-based сжатие tool call results
-├── knowledge/                 # Knowledge / RAG: vector search, document processing
-├── guardrails/                # Guardrails: PII detection, prompt injection, OpenAI moderation
-├── eval/                      # Evaluation: pre/post checks для agent/team
-├── db/                        # Database: 12+ адаптеров (PostgreSQL, SQLite, MySQL, Redis, Mongo, DynamoDB, Firestore, ...)
-├── models/                    # Model integration: 40+ провайдеров (OpenAI, Anthropic, Google, Groq, Mistral, xAI, Ollama, ...)
-│   └── fallback.py            # FallbackConfig: error-specific model routing (on_error/on_rate_limit/on_context_overflow)
-├── os/                        # AgentOS: FastAPI runtime с API endpoints, WebSocket, tracing
-├── tools/                     # Tools framework: Toolkit, Function, MCP integration
-├── skills/                    # Skills: structured instructions and reference docs
-├── session/                   # Session management: AgentSession, TeamSession, WorkflowSession
-├── tracing/                   # Tracing: spans, traces, observability
-├── hooks/                     # Hooks: lifecycle events
-├── approval/                  # Approval system: runtime approval enforcement
-├── scheduler/                 # Scheduler: background execution
-├── reasoning/                 # Reasoning: step-by-step problem solving
-├── learn/                     # Learning Machine: extract learnings from runs
-├── culture/                   # Cultural Knowledge: domain-specific knowledge base
-└── vectordb/                  # Vector DB abstraction
+├── agent/ # Agent: LLM-сессия, tools, memory, hooks, guardrails
+│ └── agent.py # Agent dataclass (1729 строк): generate/run, tools, memory, reasoning
+├── team/ # Team: multi-agent coordination
+│ ├── team.py # Team dataclass: members, mode (coordinate/route/broadcast/tasks)
+│ └── mode.py # TeamMode enum: coordinate, route, broadcast, tasks
+├── workflow/ # Workflow: structured step-based execution
+│ ├── workflow.py # Workflow class: compose steps, loops, parallels, routers
+│ ├── step.py # Step: единица работы (agent/team/executor/workflow), HITL, retries
+│ ├── loop.py # Loop: итеративное выполнение с end_condition (callable/CEL)
+│ ├── parallel.py # Parallel: параллельное выполнение независимых шагов
+│ ├── router.py # Router: динамический выбор шага (selector/CEL/HITL)
+│ ├── condition.py # Condition: условное ветвление (if/else)
+│ └── steps.py # Steps: последовательная цепочка шагов
+├── memory/ # Memory Manager: user memories, CRUD, semantic search
+├── compression/ # Compression Manager: LLM-based сжатие tool call results
+├── knowledge/ # Knowledge / RAG: vector search, document processing
+├── guardrails/ # Guardrails: PII detection, prompt injection, OpenAI moderation
+├── eval/ # Evaluation: pre/post checks для agent/team
+├── db/ # Database: 12+ адаптеров (PostgreSQL, SQLite, MySQL, Redis, MongoDB, DynamoDB, Firestore, ...)
+├── models/ # Model integration: 40+ провайдеров (OpenAI, Anthropic, Google, Groq, Mistral, xAI, Ollama, ...)
+│ └── fallback.py # FallbackConfig: error-specific model routing (on_error/on_rate_limit/on_context_overflow)
+├── os/ # AgentOS: FastAPI runtime с API endpoints, WebSocket, tracing
+├── tools/ # Tools framework: Toolkit, Function, MCP integration
+├── skills/ # Skills: structured instructions and reference docs
+├── session/ # Session management: AgentSession, TeamSession, WorkflowSession
+├── tracing/ # Tracing: spans, traces, observability
+├── hooks/ # Hooks: lifecycle events
+├── approval/ # Approval system: runtime approval enforcement
+├── scheduler/ # Scheduler: background execution
+├── reasoning/ # Reasoning: step-by-step problem solving
+├── learn/ # Learning Machine: extract learnings from runs
+├── culture/ # Cultural Knowledge: domain-specific knowledge base
+└── vectordb/ # Vector DB abstraction
 ```
 
 ### Ключевые характеристики
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | SDK-фреймворк (Python), работает на уровне LLM API |
 | **Модель выполнения (Agents)** | Agent loop (LLM → tool call → observation → LLM → ...) |
 | **Модель выполнения (Teams)** | 4 режима: coordinate (supervisor), route (router), broadcast (all members), tasks (autonomous decomposition) |
@@ -77,7 +77,7 @@ libs/agno/agno/
 ### Основные компоненты
 
 | Компонент | Назначение |
-|---|---|
+| --- | --- |
 | [`agent/agent.py`](https://github.com/agno-agi/agno/blob/main/libs/agno/agno/agent/agent.py) | Agent: LLM-сессия, tools, memory, hooks (pre/post), guardrails, evals, reasoning, compression |
 | [`team/team.py`](https://github.com/agno-agi/agno/blob/main/libs/agno/agno/team/team.py) | Team: multi-agent coordination с 4 режимами выполнения (coordinate/route/broadcast/tasks) |
 | [`team/mode.py`](https://github.com/agno-agi/agno/blob/main/libs/agno/agno/team/mode.py) | TeamMode enum: coordinate (supervisor), route (router), broadcast (all), tasks (autonomous) |
@@ -99,84 +99,84 @@ libs/agno/agno/
 
 ---
 
-## 2. Сравнительная таблица: что у нас есть vs. чего нет
+## 2. Возможности оркестрации — обзор
 
-| Функция | TasK Orchestrator | Agno | Статус |
-|---|---|---|---|
-| **Цепочки шагов (chains)** | ✅ YAML chains, статические и динамические | ✅ Workflow: Steps (последовательная цепочка) | ✅ Паритет |
-| **Conditional branching** | ❌ Нет | ✅ Condition (if/else) + Router (selector/CEL) | 🟡 Позже |
-| **Parallel execution** | ❌ Нет | ✅ Parallel — параллельное выполнение | 🟡 Позже |
-| **Циклы (loops)** | ✅ fix_iterations с max_iterations | ✅ Loop с max_iterations + end_condition (callable/CEL) | ✅ Паритет, у них богаче |
-| **Retry с backoff** | ✅ RetryingAgentRunner (exponential backoff) | ⚠️ `max_retries` на Step (без backoff, но есть FallbackConfig) | ⚠️ Разные стратегии (retry-same vs fallback-to-alternative) |
-| **Circuit Breaker** | ✅ CircuitBreakerAgentRunner | ❌ Нет | ✅ У нас есть |
-| **Quality Gates** | ✅ Shell-команды как проверки | ⚠️ Guardrails (PII, prompt injection, moderation) + Evals (pre/post checks) | ✅ Разный фокус |
-| **Бюджетный контроль** | ✅ BudgetVo (cost-based) | ❌ Нет встроенного budget control | ✅ У нас есть |
-| **Fallback routing** | ✅ Per-step fallback runner | ✅ FallbackConfig: on_error/on_rate_limit/on_context_overflow с callback | 🟡 У них богаче (error-specific) |
-| **Audit Trail (JSONL)** | ✅ JsonlAuditLogger | ✅ Tracing (spans, traces) + session persistence | ✅ Паритет (разный подход) |
-| **Ролевые промпты** | ✅ .md файлы (18+ ролей) | ⚠️ `instructions` в Agent constructor (строка) + Skills | ✅ У нас лучше |
-| **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ 40+ провайдеров через model integration | ✅ Паритет (разный уровень) |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Монорепозиторий, пакетная структура | ⚠️ Разные типы проектов (приложение vs SDK) |
-| **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов + hooks | ✅ У нас лучше |
-| **YAML-конфигурация** | ✅ Chains + roles в YAML | ⚠️ AgentOS поддерживает YAML config для runtime | ✅ Разный подход |
-| **Human-in-the-loop** | ❌ Нет | ✅ 3 режима: confirmation, user_input, output_review + CEL + HITL retry + timeout | 🟡 Позже |
-| **Session persistence** | ❌ Нет (in-memory) | ✅ Pluggable storage (12+ адаптеров) | 🟡 Предусловие для Loop/Parallel (см. §7) |
-| **Memory system** | ❌ Нет | ✅ MemoryManager: user memories, CRUD, semantic search, agentic memory | 🟡 Интересно |
-| **RAG / Knowledge** | ❌ Нет | ✅ Knowledge + VectorDB + agentic knowledge filters | 🟢 Не берём |
-| **Evaluation framework** | ❌ Нет | ✅ BaseEval: abstract pre/post checks (sync + async) | 🟡 Позже |
-| **Compression** | ❌ Нет | ✅ CompressionManager: LLM-based сжатие tool call results при overflow | 🟡 Интересно |
-| **CEL expressions** | ❌ Нет | ✅ Common Expression Language для conditions/routers/loops | 🟡 Интересно, но нельзя выразить в YAML |
-| **Approval system** | ❌ Нет | ✅ Runtime approval enforcement | 🟡 Позже |
-| **Guardrails** | ❌ Нет | ✅ PII detection, prompt injection, OpenAI moderation | 🟡 Позже |
-| **Multi-agent Teams** | ❌ Нет | ✅ 4 режима: coordinate, route, broadcast, tasks | 🟡 Позже |
-| **Nested workflows** | ❌ Нет | ✅ Workflow как Step (до 10 уровней вложенности) | 🟡 Позже |
-| **Tool hooks** | ❌ Нет | ✅ tool_hooks: middleware вокруг tool calls | 🟡 Интересно |
-| **Reasoning mode** | ❌ Нет | ✅ Step-by-step reasoning с отдельной reasoning_model | 🟢 Не берём |
-| **Runtime (FastAPI)** | ❌ CLI-only | ✅ AgentOS: REST API, WebSocket, horizontal scaling | 🟢 Не берём |
-| **Scheduler** | ❌ Нет | ✅ Background execution с расписанием | 🟢 Не берём |
-| **Learning** | ❌ Нет | ✅ LearningMachine: extract learnings from runs | 🟡 Интересно |
+| Функция | Agno |
+| --- | --- |
+| **Цепочки шагов (chains)** | ✅ Workflow: Steps (последовательная цепочка) |
+| **Conditional branching** | ✅ Condition (if/else) + Router (selector/CEL) |
+| **Parallel execution** | ✅ Parallel — параллельное выполнение |
+| **Циклы (loops)** | ✅ Loop с max_iterations + end_condition (callable/CEL) |
+| **Retry с backoff** | ⚠️ `max_retries` на Step (без backoff, но есть FallbackConfig) |
+| **Quality Gates** | ⚠️ Guardrails (PII, prompt injection, moderation) + Evals (pre/post checks) |
+| **Fallback routing** | ✅ FallbackConfig: on_error/on_rate_limit/on_context_overflow с callback |
+| **Audit Trail (JSONL)** | ✅ Tracing (spans, traces) + session persistence |
+| **Ролевые промпты** | ⚠️ `instructions` в Agent constructor (строка) + Skills |
+| **Multiple runners** | ✅ 40+ провайдеров через model integration |
+| **DDD-архитектура** | ❌ Монорепозиторий, пакетная структура |
+| **Decorator pattern** | ❌ Прямой вызов + hooks |
+| **YAML-конфигурация** | ⚠️ AgentOS поддерживает YAML config для runtime |
+| **Human-in-the-loop** | ✅ 3 режима: confirmation, user_input, output_review + CEL + HITL retry + timeout |
+| **Session persistence** | ✅ Pluggable storage (12+ адаптеров) |
+| **Memory system** | ✅ MemoryManager: user memories, CRUD, semantic search, agentic memory |
+| **RAG / Knowledge** | ✅ Knowledge + VectorDB + agentic knowledge filters |
+| **Evaluation framework** | ✅ BaseEval: abstract pre/post checks (sync + async) |
+| **Compression** | ✅ CompressionManager: LLM-based сжатие tool call results при overflow |
+| **CEL expressions** | ✅ Common Expression Language для conditions/routers/loops |
+| **Approval system** | ✅ Runtime approval enforcement |
+| **Guardrails** | ✅ PII detection, prompt injection, OpenAI moderation |
+| **Multi-agent Teams** | ✅ 4 режима: coordinate, route, broadcast, tasks |
+| **Nested workflows** | ✅ Workflow как Step (до 10 уровней вложенности) |
+| **Tool hooks** | ✅ tool_hooks: middleware вокруг tool calls |
+| **Reasoning mode** | ✅ Step-by-step reasoning с отдельной reasoning_model |
+| **Runtime (FastAPI)** | ✅ AgentOS: REST API, WebSocket, horizontal scaling |
+| **Scheduler** | ✅ Background execution с расписанием |
+| **Learning** | ✅ LearningMachine: extract learnings from runs |
 
 ---
 
-## 3. Что полезно взять и почему
+## 3. Оркестрационные возможности
 
 ### 3.1 🟡 Workflow Engine с Loop, Parallel, Router, Condition (`workflow/`)
 
 **Что у них:** Agno предоставляет 6 строительных блоков для workflows:
 
-| Блок | Назначение | Аналог в task-orchestrator |
-|---|---|---|
-| `Step` | Единица работы (agent/team/executor/workflow) | Шаг chain |
-| `Steps` | Последовательная цепочка шагов | Static chain |
-| `Loop` | Итерации с end_condition (callable/CEL) | fix_iterations (у нас беднее — нет end_condition) |
-| `Parallel` | Параллельное выполнение | ❌ Нет |
-| `Router` | Динамический выбор шага | ❌ Нет |
-| `Condition` | Условное ветвление (if/else) | ❌ Нет |
+| Блок | Назначение |
+| --- | --- |
+| `Step` | Единица работы (agent/team/executor/workflow) |
+| `Steps` | Последовательная цепочка шагов |
+| `Loop` | Итерации с end_condition (callable/CEL) |
+| `Parallel` | Параллельное выполнение независимых шагов |
+| `Router` | Динамический выбор шага (selector/CEL/HITL) |
+| `Condition` | Условное ветвление (if/else) |
 
 ```python
 # Пример workflow
 workflow = Workflow(
-    name="code-review",
-    steps=[
-        implement_step,                          # Step
-        Loop(                                    # Loop с end_condition
-            steps=[review_step, fix_step],
-            end_condition=lambda outputs: outputs[-1].success,
-            max_iterations=5,
-        ),
-        Parallel(lint_step, type_check_step),    # Parallel
-        Router(                                  # Router
-            selector=lambda inp: deploy_step if inp.success else notify_step,
-            choices=[deploy_step, notify_step],
-        ),
-    ],
+ name="code-review",
+ steps=[
+ implement_step, # Step
+ Loop( # Loop с end_condition
+ steps=[review_step, fix_step],
+ end_condition=lambda outputs: outputs[-1].success,
+ max_iterations=5,
+ ),
+ Parallel(lint_step, type_check_step), # Parallel
+ Router( # Router
+ selector=lambda inp: deploy_step if inp.success else notify_step,
+ choices=[deploy_step, notify_step],
+ ),
+ ],
 )
 ```
 
 **Вложенные workflows:** Step может ссылаться на другой Workflow (до 10 уровней вложенности, ограничение `_MAX_NESTED_WORKFLOW_DEPTH`). Контекст передаётся через `StepInput/StepOutput`, изоляция через отдельный `WorkflowSession`.
 
-> ⚠️ **Риск overengineering:** Сейчас у нас 1 тип цепочки (static + dynamic brainstorm). Внедрение 6 блоков workflow — минимум 3× рост кодовой базы. Без реальной user story на Parallel/Router это premature abstraction. Рекомендация: внедрять по одному блоку по мере появления задач.
-
-
+> ⚠️ **Архитектурные компромиссы:**
+> - Композиция через плоский список (heterogeneous blocks в `steps=[]`) даёт гибкость, но лишает возможности статической валидации структуры workflow — ошибки в композиции обнаруживаются только в runtime.
+> - Parallel выполняет ветви одновременно, но нет DAG (направленный ациклический граф) — отсутствует механизм зависимостей между параллельными ветвями с частичным порядком выполнения.
+> - Лимит вложенности (`_MAX_NESTED_WORKFLOW_DEPTH = 10`) — hardcoded, не настраивается потребителем API.
+> - Для простых последовательных цепочек (Step + Steps + Loop) API surface из 6 блоков избыточен.
 
 ---
 
@@ -184,23 +184,27 @@ workflow = Workflow(
 
 **Что у них:** Team с 4 режимами выполнения:
 
-| Режим | Описание | Аналог |
-|---|---|---|
-| `coordinate` | Supervisor pattern: leader выбирает members, формулирует задачи, синтезирует ответы | Dynamic chain с facilitator |
-| `route` | Router pattern: leader маршрутизирует к специалисту, возвращает ответ напрямую | ❌ Нет |
-| `broadcast` | Broadcast pattern: задача делегируется всем members одновременно | ❌ Нет (Parallel) |
-| `tasks` | Autonomous: leader декомпозирует цели в shared task list, делегирует, циклит до завершения | Dynamic loop (ближайший аналог) |
+| Режим | Описание |
+| --- | --- |
+| `coordinate` | Supervisor pattern: leader выбирает members, формулирует задачи, синтезирует ответы |
+| `route` | Router pattern: leader маршрутизирует к специалисту, возвращает ответ напрямую |
+| `broadcast` | Broadcast pattern: задача делегируется всем members одновременно |
+| `tasks` | Autonomous: leader декомпозирует цели в shared task list, делегирует, повторяет до завершения |
 
 **Ключевые параметры Team:**
-- `max_iterations: int = 10` — лимит итераций (как наш max_iterations)
+- `max_iterations: int = 10` — лимит итераций (safety bound)
 - `share_member_interactions: bool` — пересылать ли взаимодействия между members
 - `add_team_history_to_members: bool` — передавать ли team-level историю
-- `delegate_to_all_members: bool` — делегировать всем (аналог broadcast)
+- `delegate_to_all_members: bool` — делегировать задачу всем members одновременно
 - `determine_input_for_members: bool` — leader решает input для каждого member
 
-**Почему нам интересно:** `route` mode — это routing к конкретному runner (аналог нашего `resolve_runner`). `coordinate` — наш dynamic loop с facilitator. `tasks` mode с autonomous decomposition — следующий шаг для dynamic chains.
+**Оркестрационная значимость:** `coordinate` — классический supervisor pattern с LLM-лидером. `route` — простейший routing к одному specialist, полезен при разнородных задачах. `broadcast` — параллельный запрос всех members, эффективен при 3+ agents. `tasks` — наиболее сложный режим: leader выполняет autonomous decomposition цели в task list, делегирует tasks members, отслеживает прогресс — требует LLM-in-the-loop для декомпозиции, что делает его применимым только при наличии модели с достаточным reasoning capacity.
 
-> ⚠️ **Риск premature abstraction:** Сейчас у нас ровно 2 runner'а (Pi + Codex). Broadcast (все runners одновременно) при 2 runners — бессмысленно. Route — тривиально. Tasks mode не реализуем без LLM-in-the-loop для декомпозиции, а LLM-вызовы делает runner, не оркестратор. Рекомендация: возвращаться к TeamMode когда появится 4+ runners.
+> ⚠️ **Архитектурные ограничения:**
+> - Все режимы, кроме `broadcast`, делегируют решение о маршрутизации LLM: `coordinate` — LLM выбирает member и формулирует задачу, `route` — LLM определяет специалиста, `tasks` — LLM декомпозирует цель. Качество координации **полностью** зависит от reasoning capacity модели.
+> - При ошибке LLM-маршрутизации (выбран неправильный member) нет детерминированного fallback — опции: повторная итерация (расход tokens) или прекращение выполнения.
+> - `broadcast` при 2 members эквивалентен параллельному вызову без координации.
+> - `tasks` mode требует значительного token consumption: LLM-лидер генерирует и отслеживает task list в каждом цикле.
 
 ---
 
@@ -210,10 +214,10 @@ workflow = Workflow(
 
 ```python
 FallbackConfig(
-    on_error=[Claude(id="claude-sonnet-4")],         # Общий fallback
-    on_rate_limit=[OpenAIChat(id="gpt-4o-mini")],     # При 429 → дешёвая модель
-    on_context_overflow=[Claude(id="claude-sonnet-4")], # При context overflow → модель с большим окном
-    callback=lambda primary, fallback, error: log(...),  # Callback при активации
+ on_error=[Claude(id="claude-sonnet-4")], # Общий fallback
+ on_rate_limit=[OpenAIChat(id="gpt-4o-mini")], # При 429 → дешёвая модель
+ on_context_overflow=[Claude(id="claude-sonnet-4")], # При context overflow → модель с большим окном
+ callback=lambda primary, fallback, error: log(...), # Callback при активации
 )
 ```
 
@@ -223,9 +227,12 @@ FallbackConfig(
 - `on_error` → общий fallback при 5xx/network errors
 - Приоритет: error-specific → general (только для retryable ошибок)
 
-**Почему нам интересно:** Наш `CircuitBreakerAgentRunner` защищает от cascade failures, но не переключает на альтернативный runner. Agno показывает, как добавить **error-specific fallback**: при rate limit → дешёвый runner, при timeout → быстрый runner, при context overflow → runner с другим model. Это дополнение к нашему circuit breaker.
+**Оркестрационная значимость:** Error-specific fallback — паттерн, дополняющий retry и circuit breaker. Вместо единого fallback-механизма (при любой ошибке → альтернативный обработчик), Agno классифицирует ошибки и маршрутизирует к разным fallback-моделям: rate limit → дешёвая модель с другим провайдером, context overflow → модель с большим context window, 5xx/network → надежная резервная модель. Приоритет: error-specific fallback → general fallback.
 
-> ⚠️ **Требуется domain model:** Наш `FallbackConfigVo` — массив CLI-аргументов без типа ошибки. Для error-specific fallback нужна классификация: rate limit ≠ timeout ≠ malformed output ≠ context overflow. Без модели ошибок реализация начнётся с неправильной абстракции.
+> ⚠️ **Архитектурные ограничения:**
+> - FallbackConfig работает **только на уровне модели** — замена одного LLM на другой в рамках текущего вызова. Не предоставляет: step-level retry с другой конфигурацией шага, workflow-level fallback (путь A → при ошибке путь B), cross-agent fallback (агент A → при ошибке агент B).
+> - Для корректной работы error-specific fallback необходима классификация ошибок (rate limit ≠ timeout ≠ malformed output ≠ context overflow) и явная модель ошибок. Без классификации fallback-логика становится неуправляемой.
+> - FallbackConfig не включает retry с exponential backoff — это отдельная механика на уровне Step (`max_retries` без backoff).
 
 ---
 
@@ -234,7 +241,7 @@ FallbackConfig(
 **Что у них:** Каждый Step может требовать участия человека в 3 режимах:
 
 | Режим | Параметры | Поведение |
-|---|---|---|
+| --- | --- | --- |
 | **Confirmation** | `requires_confirmation=True`, `confirmation_message`, `on_reject` (skip/cancel) | Пауза перед выполнением, user подтверждает или отклоняет |
 | **User Input** | `requires_user_input=True`, `user_input_schema` (name, type, description, required) | Пауза для ввода данных пользователем |
 | **Output Review** | `requires_output_review=True` (bool или callable), `output_review_message` | Пауза после выполнения, user ревьюит результат |
@@ -250,15 +257,13 @@ FallbackConfig(
 ```python
 # Router с HITL — user выбирает шаг из доступных
 Router(
-    choices=[deploy_step, notify_step],
-    requires_user_input=True,
-    user_input_message="Choose deployment strategy",
+ choices=[deploy_step, notify_step],
+ requires_user_input=True,
+ user_input_message="Choose deployment strategy",
 )
 ```
 
-**Почему нам интересно:** Production-ready HITL — востребованная функция для автономных цепочек. Три режима покрывают основные сценарии: confirm → input → review. Callable в `requires_output_review` позволяет условный review (только если результат не устраивает).
-
-> ⚠️ **Архитектурное ограничение:** task-orchestrator — CLI-утилита. HITL в CLI означает блокировку терминала и невозможность запуска в CI/CD. Agno решает это через FastAPI runtime (WebSocket, REST API), который мы не берём. HITL без runtime — ограниченная фича. Реалистичный сценарий: интерактивный режим при ручном запуске, skip при CI/CD.
+**Оркестрационная значимость:** Production-ready HITL — востребованная функция для автономных цепочек. Три режима покрывают основные сценарии: confirm → input → review. Callable в `requires_output_review` позволяет условный review (только если результат не устраивает).
 
 ---
 
@@ -268,16 +273,16 @@ Router(
 
 ```python
 Loop(
-    steps=[review_step, fix_step],
-    max_iterations=5,
+ steps=[review_step, fix_step],
+ max_iterations=5,
 
-    # Вариант 1: callable
-    end_condition=lambda outputs: outputs[-1].success,
+ # Вариант 1: callable
+ end_condition=lambda outputs: outputs[-1].success,
 
-    # Вариант 2: CEL-выражение (Common Expression Language)
-    end_condition='all_success && current_iteration >= 2',
+ # Вариант 2: CEL-выражение (Common Expression Language)
+ end_condition='all_success && current_iteration >= 2',
 
-    # Вариант 3: None — только max_iterations
+ # Вариант 3: None — только max_iterations
 )
 ```
 
@@ -288,11 +293,9 @@ Loop(
 - `last_step_content` — контент последнего шага
 - `step_outputs` — map имени шага → контент
 
-**`forward_iteration_output: bool = False`** — если True, output каждой итерации передаётся как input следующей (как наш fix_iterations).
+**`forward_iteration_output: bool = False`** — если True, output каждой итерации передаётся как input следующей, образуя цепочку `output[i] → input[i+1]`. При False каждая итерация получает исходный input loop.
 
-**Почему нам интересно:** Прямое усиление нашего `fix_iterations`: сейчас только `max_iterations`, а с `end_condition` — детерминированная проверка завершения. CEL-выражения позволяют декларативно описать условие без кода. Аналог Archon `until_bash`, но более общий (не только shell).
-
-> ⚠️ **CEL vs YAML:** CEL отброшен как зависимость (§4.6), но callable нельзя положить в YAML — наш core формат конфигурации. Нужно решить: либо DSL для условий в YAML (свой мини-CEL), либо callable регистрируется через service container, либо `end_condition` выражается как shell-команда (как `until_bash` у Archon). Третий вариант — самый совместимый с текущей архитектурой.
+**Оркестрационная значимость:** Комбинация `max_iterations` + `end_condition` — стандартный паттерн для итеративных процессов: верхняя граница (safety) + содержательная проверка (semantics). CEL-выражения позволяют декларативно описать условие без кода. `forward_iteration_output` обеспечивает контекстную связность между итерациями — каждый шаг получает результат предыдущего.
 
 ---
 
@@ -302,10 +305,10 @@ Loop(
 
 ```python
 CompressionManager(
-    model=Claude(id="claude-sonnet-4"),
-    compress_tool_results=True,               # Включить сжатие
-    compress_tool_results_limit=2000,         # Порог по токенам
-    compress_token_limit=1000,                # Целевой размер после сжатия
+ model=Claude(id="claude-sonnet-4"),
+ compress_tool_results=True, # Включить сжатие
+ compress_tool_results_limit=2000, # Порог по токенам
+ compress_token_limit=1000, # Целевой размер после сжатия
 )
 ```
 
@@ -314,7 +317,9 @@ CompressionManager(
 - Сжимать: описания, пояснения, списки
 - Удалять: вступления, filler, форматирование, redundancy
 
-**Почему нам интересно:** Для длинных dynamic loops контекст растёт. Сжатие tool results — самый простой первый шаг: не сжимать весь контекст, а только output tool calls. Менее радикально, чем auto-summarization всего диалога.
+**Оркестрационная значимость:** В итеративных loops с tool calls контекст растёт монотонно. LLM-based сжатие tool results — компромисс между потерей информации и переполнением context window: сохраняются факты/числа/идентификаторы, удаляются filler и redundancy.
+
+> ⚠️ **Trade-off:** LLM-based сжатие добавляет один дополнительный LLM API call на каждый цикл компрессии — дополнительная latency (время ответа модели сжатия) и стоимость (token consumption модели сжатия). Альтернатива — auto-summarization всего диалога — более агрессивный подход с большей потерей контекста, но без отдельного вызова на каждый tool result.
 
 ---
 
@@ -324,7 +329,7 @@ CompressionManager(
 
 ```python
 Agent(
-    tool_hooks=[log_tool_call, validate_tool_input, rate_limit_tool],
+ tool_hooks=[log_tool_call, validate_tool_input, rate_limit_tool],
 )
 ```
 
@@ -333,7 +338,9 @@ Agent(
 - `post_hooks` — функции, вызываемые после output (до возврата ответа)
 - В hooks можно передавать `BaseGuardrail` и `BaseEval` — guardrails и evals работают как hooks
 
-**Почему нам интересно:** Аналог нашего decorator pattern, но на уровне tool calls. Для chain executor `tool_hooks` может заменить декораторы для per-step middleware (логирование, валидация, rate limiting).
+**Оркестрационная значимость:** Tool hooks — middleware-паттерн на уровне tool calls. Позволяет реализовать cross-cutting concerns (логирование, валидация, rate limiting, аудит) без модификации логики tool'а. Composable: несколько hooks выполняются последовательно, формируя pipeline.
+
+> ⚠️ **Слепая зона:** В middleware-цепочке hook'ов не специфицирована семантика ошибок. Если pre-hook выбрасывает исключение — прерывается ли tool call? Если post-hook падает — сохраняется ли результат tool call? Без явного контракта error handling поведение зависит от имплементации хука.
 
 ---
 
@@ -342,22 +349,47 @@ Agent(
 **Что у них:** 3 встроенных guardrail:
 
 | Guardrail | Назначение |
-|---|---|
+| --- | --- |
 | `PIIDetectionGuardrail` | Обнаружение персональных данных (PII) |
 | `PromptInjectionGuardrail` | Обнаружение prompt injection атак |
 | `OpenAIModerationGuardrail` | Модерация контента через OpenAI API |
 
 **Механика:** Guardrails реализуют `BaseGuardrail` и могут использоваться как `pre_hooks` / `post_hooks`. Выбрасывают исключение при нарушении.
 
-**Почему нам интересно:** Guardrails — это «pre-flight checks» перед выполнением шага. Для production: проверка входных данных (нет ли PII, не содержит ли prompt injection) перед отправкой в runner. Дополняет наши post-execution quality gates.
+**Оркестрационная значимость:** Guardrails — «pre-flight checks» перед выполнением шага и «post-flight checks» после. Для production-систем: проверка входных данных (PII, prompt injection) перед отправкой к модели и модерация выходных данных. Дополняет evaluation framework, обеспечивая безопасность на уровне данных, а не только качества результата.
+
+> ⚠️ **Ограничение:** Guardrails — реактивный механизм (detect → reject), а не превентивный (sanitize → transform). Они выбрасывают исключение при нарушении, но не преобразуют вход в безопасную форму. Для production-сценариев может потребоваться отдельный слой нормализации.
 
 ---
 
-## 4. Что НЕ берём и почему
+### 3.9 🔴 Error propagation и state flow — архитектурный пробел
+
+В §3.1–§3.8 описаны индивидуальные строительные блоки workflow engine, но не раскрыты два ключевых cross-cutting вопроса: **как распространяются ошибки** между блоками и **как передаётся состояние**.
+
+**Error propagation:**
+
+| Сценарий | Документировано? | Ожидаемое поведение |
+| --- | --- | --- |
+| Step failure внутри Steps | Частично (`on_error` на Step) | `fail` → остановка цепочки, `skip` → пропуск, `pause` → HITL |
+| Step failure внутри Loop | Нет | Неясно: повторяется ли итерация, пропускается ли шаг или loop прерывается |
+| Одна ветвь Parallel завершилась с ошибкой | Нет | Неясно: продолжают ли другие ветви работу? Каков итоговый результат Parallel? |
+| Router не смог выбрать шаг | Нет | Неясно: fallback-шаг? Исключение? |
+| Nested workflow error | Нет | Неясно: bubbling до родительского workflow или изоляция? |
+
+**State flow:**
+
+- StepInput / StepOutput — типизированные обёртки для передачи данных между шагами. Контент может быть строкой или структурой.
+- В Parallel — нет документированного механизма для доступа к результату одной ветви из другой (shared state). Каждая ветвь получает одинаковый input.
+- В Loop — `forward_iteration_output` управляет передачей output между итерациями, но нет документированного способа передать данные из loop наружному workflow, кроме как через последний StepOutput.
+- В Router — selector-функция получает input, но не имеет доступа к результатам предыдущих шагов workflow (только к текущему контексту).
+
+> ⚠️ **Архитектурная оценка:** Отсутствие документированной модели error propagation — значительный пробел для orchestration engine. Без чётких контрактов (какая ошибка куда распространяется, как изолируются сбои, как определяется итоговый статус составного блока) поведение при частичных отказах непредсказуемо. Для production-систем это требует либо эмпирического тестирования каждого сценария, либо чтения исходного кода `workflow/`.
+
+## 4. Прочие возможности (вне оркестрации)
 
 ### 4.1 🟢 AgentOS Runtime (FastAPI)
 
-Agno включает полноценный FastAPI-сервер с REST API, WebSocket, per-user/session isolation, horizontal scaling. Наш оркестратор — CLI-утилита, HTTP-сервер не нужен. Если понадобится API-доступ — это отдельный проект.
+Agno включает полноценный FastAPI-сервер с REST API, WebSocket, per-user/session isolation, horizontal scaling. Если понадобится API-доступ — это отдельный проект.
 
 ### 4.2 🟢 Knowledge / RAG / VectorDB
 
@@ -365,7 +397,7 @@ Agno имеет встроенный RAG pipeline с vector search. Для ор�
 
 ### 4.3 🟢 Reasoning Mode
 
-Agno поддерживает step-by-step reasoning с отдельной reasoning_model/reasoning_agent. Это LLM-level feature, не связанная с оркестрацией цепочек.
+Agno поддерживает step-by-step reasoning с отдельной reasoning_model/reasoning_agent. Это возможность уровня LLM, не связанная с оркестрацией цепочек.
 
 ### 4.4 🟢 Scheduler
 
@@ -381,18 +413,11 @@ CEL — мощный, но добавляет зависимость на Google
 
 ---
 
-## 5. Сводка рекомендаций
+## 5. Сводка по оркестрации
 
-| Фича | Приоритет | Обоснование |
-|---|---|---|
-| Chain orchestration | ✅ Уже есть | Core-функциональность task-orchestrator |
-| Retry + Circuit Breaker | ✅ Уже есть | Устойчивость при сбоях |
-| Quality Gates (shell) | ✅ Уже есть | Автоматическая проверка кода |
-| Budget control | ✅ Уже есть | Предотвращение runaway spending |
-| Fix iterations | ✅ Уже есть | Closed-loop цикл разработки |
-| Audit trail (JSONL) | ✅ Уже есть | Полный лог выполнения |
-| Fallback routing | ✅ Уже есть | Переключение runner'ов при сбоях |
-| Loop с end_condition (callable) | 🟡 P2 | Усиление fix_iterations: детерминированная проверка завершения вместо только max_iterations |
+| Возможность | Статус в продукте | Описание |
+| --- | --- | --- |
+| Loop с end_condition (callable) | 🟡 P2 | Усиление fix_iterations: детерминированная проверка завершения вместо одного лишь max_iterations |
 | Error-specific fallback (on_rate_limit/on_timeout) | 🟡 P2 | Дополнение к circuit breaker: fallback на другой runner по типу ошибки |
 | Conditional branching в chains | 🟡 P2 | Условное ветвление в YAML chains (концепция из Condition) |
 | Tool hooks (per-step middleware) | 🟡 P2 | Альтернатива decorator pattern для per-step логирования/валидации |

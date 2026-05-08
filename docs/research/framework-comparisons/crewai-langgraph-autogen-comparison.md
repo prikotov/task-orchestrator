@@ -24,31 +24,31 @@ CrewAI — fast, standalone Python multi-agent фреймворк, постро�
 
 ```
 lib/crewai/src/crewai/
-  agent/                     Agent: role, goal, backstory, tools, LLM
-  agents/                    Agent builders, caching, parser
-  crew.py                    Crew: orchestrates agents + tasks
-  task.py                    Task: description, expected_output, agent assignment
-  process.py                 Process: sequential | hierarchical
-  flow/
-    flow.py                  Flow: event-driven workflow engine
-    flow_context.py          Execution context (state propagation)
-    persistence/             Flow state persistence
-    visualization/           Flow graph visualization
-  llm.py / llms/             LLM abstraction (multi-provider)
-  memory/                    Short-term + long-term memory
-  knowledge/                 RAG integration
-  mcp/                       MCP (Model Context Protocol) integration
-  tools/                     Built-in + custom tool framework
-  security/                  Fingerprint, security config
-  skills/                    Agent Skills (SKILL.md-based)
-  state/                     Checkpoint configuration
-  telemetry/                 Usage metrics (PostHog)
+ agent/ Agent: role, goal, backstory, tools, LLM
+ agents/ Agent builders, caching, parser
+ crew.py Crew: orchestrates agents + tasks
+ task.py Task: description, expected_output, agent assignment
+ process.py Process: sequential | hierarchical
+ flow/
+ flow.py Flow: event-driven workflow engine
+ flow_context.py Execution context (state propagation)
+ persistence/ Flow state persistence
+ visualization/ Flow graph visualization
+ llm.py / llms/ LLM abstraction (multi-provider)
+ memory/ Short-term + long-term memory
+ knowledge/ RAG integration
+ mcp/ MCP (Model Context Protocol) integration
+ tools/ Built-in + custom tool framework
+ security/ Fingerprint, security config
+ skills/ Agent Skills (SKILL.md-based)
+ state/ Checkpoint configuration
+ telemetry/ Usage metrics (PostHog)
 ```
 
 **Ключевые характеристики:**
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | Multi-agent фреймворк (role-based + event-driven) |
 | **Модель выполнения** | Sequential / Hierarchical (Crews) + Event-driven DAG (Flows) |
 | **State management** | In-memory + checkpoint persistence (SQLite) |
@@ -68,35 +68,35 @@ LangGraph — low-level orchestration framework для построения stat
 
 ```
 libs/langgraph/langgraph/
-  graph/
-    state.py                 StateGraph: граф с shared state
-    _branch.py               Conditional branching
-    _node.py                 Node definitions
-    message.py               Message graph utilities
-  pregel/                    Pregel execution engine (supersteps)
-  channels/                  State channels: reducers, aggregation
-  func/                      Functional API (@entrypoint, @task)
-  errors.py                  Error types
-  types.py                   RetryPolicy, Send, Command
-  callbacks.py               Execution callbacks
-  runtime.py                 Runtime context injection
+ graph/
+ state.py StateGraph: граф с shared state
+ _branch.py Conditional branching
+ _node.py Node definitions
+ message.py Message graph utilities
+ pregel/ Pregel execution engine (supersteps)
+ channels/ State channels: reducers, aggregation
+ func/ Functional API (@entrypoint, @task)
+ errors.py Error types
+ types.py RetryPolicy, Send, Command
+ callbacks.py Execution callbacks
+ runtime.py Runtime context injection
 
-libs/checkpoint/             State persistence (отдельный пакет)
-  langgraph/checkpoint/
-    base/                    Base checkpointer interface
-    memory/                  In-memory checkpointer
-  langgraph/store/           Long-term key-value store
-    base/
-    memory/
+libs/checkpoint/ State persistence (отдельный пакет)
+ langgraph/checkpoint/
+ base/ Base checkpointer interface
+ memory/ In-memory checkpointer
+ langgraph/store/ Long-term key-value store
+ base/
+ memory/
 
-libs/checkpoint-sqlite/      SQLite-backed checkpoint (отдельный пакет)
-libs/checkpoint-postgres/    PostgreSQL-backed checkpoint (отдельный пакет)
+libs/checkpoint-sqlite/ SQLite-backed checkpoint (отдельный пакет)
+libs/checkpoint-postgres/ PostgreSQL-backed checkpoint (отдельный пакет)
 ```
 
 **Ключевые характеристики:**
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | Low-level orchestration framework (graph-based) |
 | **Модель выполнения** | Directed graph (StateGraph): nodes → conditional edges → superstep execution |
 | **State management** | TypedDict state + reducer functions, checkpoint persistence (memory / SQLite / PostgreSQL) |
@@ -116,41 +116,41 @@ AutoGen — фреймворк для multi-agent AI-приложений от M
 
 ```
 python/packages/
-  autogen-core/src/autogen_core/
-    _agent.py                BaseAgent: message handler
-    _agent_runtime.py        AgentRuntime: message passing, event-driven
-    _routed_agent.py         RoutedAgent: type-based message routing
-    _single_threaded_agent_runtime.py  Single-threaded runtime
-    _topic.py                Topic-based pub/sub
-    _subscription.py         Subscription management
-    _intervention.py         Intervention/hook mechanism
-    code_executor/           Code execution sandbox
-    memory/                  Memory management
-    models/                  Model client abstractions
-    tools/                   Tool framework
+ autogen-core/src/autogen_core/
+ _agent.py BaseAgent: message handler
+ _agent_runtime.py AgentRuntime: message passing, event-driven
+ _routed_agent.py RoutedAgent: type-based message routing
+ _single_threaded_agent_runtime.py Single-threaded runtime
+ _topic.py Topic-based pub/sub
+ _subscription.py Subscription management
+ _intervention.py Intervention/hook mechanism
+ code_executor/ Code execution sandbox
+ memory/ Memory management
+ models/ Model client abstractions
+ tools/ Tool framework
 
-  autogen-agentchat/src/autogen_agentchat/
-    agents/                  AssistantAgent, CodeExecutorAgent, ...
-    teams/_group_chat/
-      _base_group_chat.py        Base group chat orchestration
-      _base_group_chat_manager.py  Manager: turn tracking, termination
-      _round_robin_group_chat.py   Round-robin orchestration
-      _selector_group_chat.py      LLM-based speaker selection
-      _swarm_group_chat.py         Swarm (handoff-based) orchestration
-      _magentic_one/               Magentic-One: generalist multi-agent team
-      _graph/                      Graph-based orchestration (DAG)
-    conditions/              Termination conditions (max_turns, text_mention, ...)
-    state/                   Team state management
-    tools/                   AgentTool (wrap agent as tool)
+ autogen-agentchat/src/autogen_agentchat/
+ agents/ AssistantAgent, CodeExecutorAgent, ...
+ teams/_group_chat/
+ _base_group_chat.py Base group chat orchestration
+ _base_group_chat_manager.py Manager: turn tracking, termination
+ _round_robin_group_chat.py Round-robin orchestration
+ _selector_group_chat.py LLM-based speaker selection
+ _swarm_group_chat.py Swarm (handoff-based) orchestration
+ _magentic_one/ Magentic-One: generalist multi-agent team
+ _graph/ Graph-based orchestration (DAG)
+ conditions/ Termination conditions (max_turns, text_mention, ...)
+ state/ Team state management
+ tools/ AgentTool (wrap agent as tool)
 
-  autogen-ext/               Extensions: OpenAI client, MCP, Docker code execution
-  autogen-studio/            No-code GUI for prototyping
+ autogen-ext/ Extensions: OpenAI client, MCP, Docker code execution
+ autogen-studio/ No-code GUI for prototyping
 ```
 
 **Ключевые характеристики:**
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | Multi-agent framework (event-driven + conversation-based) |
 | **Модель выполнения** | Event-driven (Core API) / Group Chat patterns (AgentChat) / Graph (DAG) |
 | **State management** | Message thread per group chat, model_context per agent |
@@ -163,37 +163,37 @@ python/packages/
 
 ---
 
-## 2. Сравнительная таблица: три фреймворка vs. task-orchestrator
+## 2. Возможности оркестрации — обзор
 
-| Функция | Task Orchestrator | CrewAI | LangGraph | AutoGen |
-|---|---|---|---|---|
+| Функция | Task-orchestrator | CrewAI | LangGraph | AutoGen |
+| --- | --- | --- | --- | --- |
 | **Язык** | PHP 8.4 | Python | Python | Python + .NET |
 | **Модель оркестрации** | Chain (sequential/dynamic) | Sequential / Hierarchical (Crews) + Event-driven (Flows) | Directed graph (StateGraph) + superstep execution | Event-driven (Core) / Group chat (AgentChat) / Graph |
 | **State management** | In-memory + JSONL audit | In-memory + checkpoint (SQLite) | TypedDict + reducers + checkpoint (memory/SQLite/PostgreSQL) | Message thread + model context |
 | **Error handling** | Retry + Circuit Breaker | Basic retry (LLM level) | RetryPolicy per node, durable execution | CancellationToken, exception propagation |
-| **Quality Gates** | ✅ Shell-команды | ❌ Нет встроенных | ❌ Нет встроенных | ❌ Нет встроенных |
-| **Бюджетный контроль** | ✅ BudgetVo (cost-based) | ⚠️ Cost tracking (records, no limits) | ❌ Нет | ❌ Нет |
-| **Итерационные циклы** | ✅ fix_iterations (max_iterations) | ⚠️ Hierarchical process (manager retries) | ✅ Cycles в графе (conditional edge назад) | ⚠️ max_turns в group chat |
-| **Fallback routing** | ✅ Per-step fallback runner | ❌ Нет (ручное переключение) | ✅ Conditional edges | ❌ Нет |
-| **Circuit Breaker** | ✅ 3-state (closed/open/half-open) | ❌ Нет | ❌ Нет | ❌ Нет |
-| **Audit Trail** | ✅ JSONL | ⚠️ Event bus + telemetry | ⚠️ Checkpoint history | ⚠️ Logging |
-| **Ролевые промпты** | ✅ .md файлы (18+ ролей) | ✅ role/goal/backstory в YAML | ❌ Системный промпт = node function | ✅ system_message per agent |
-| **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ Multi-provider (LiteLLM) | ✅ Любые через langchain-core Runnable | ✅ Multi-provider (extensions) |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Плоская структура (lib/crewai/) | ❌ Flat module (libs/langgraph/) | ⚠️ Слоистая (core/agentchat/ext) |
-| **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов | ❌ Node functions | ✅ RoutedAgent + subscriptions |
-| **Human-in-the-loop** | ❌ Нет | ✅ Human feedback | ✅ Interrupts + state modification | ✅ Intervention hooks |
-| **Memory** | ❌ Нет | ✅ Short-term + long-term + RAG | ✅ Short-term (state) + long-term (store) | ✅ model_context + memory module |
-| **Code execution** | ❌ Внешние CLI-tools | ⚠️ Custom tools | ⚠️ External tools | ✅ Built-in sandbox (Docker) |
-| **MCP support** | ❌ Нет | ✅ MCP integration | ⚠️ Через LangChain tools | ✅ MCP workbench |
-| **Durable execution** | ❌ Нет | ⚠️ Checkpoint persistence | ✅ Checkpoint + replay + resume | ❌ Нет |
-| **Parallel execution** | ❌ Sequential only | ⚠️ Concurrent tasks в Crew | ✅ Send (map-reduce), fan-out/fan-in | ✅ Async agents |
-| **Multi-agent collaboration** | ❌ Single chain | ✅ Crew (role-based team) | ✅ Subgraphs, multi-agent patterns | ✅ Group chat (round-robin, selector, swarm) |
-| **Graph visualization** | ❌ Нет | ✅ Flow visualization | ✅ LangGraph Studio | ✅ AutoGen Studio |
-| **Статус проекта** | Активный | Активный, commercial | Активный, enterprise | ⚠️ Maintenance mode |
+| **Quality Gates** | ❌ Нет встроенных | ❌ Нет встроенных |
+| **Бюджетный контроль** | ⚠️ Cost tracking (records, no limits) | ❌ Нет |
+| **Итерационные циклы** | ⚠️ Hierarchical process (manager retries) | ⚠️ max_turns в group chat |
+| **Fallback routing** | ❌ Нет (ручное переключение) | ❌ Нет |
+| **Circuit Breaker** | ❌ Нет | ❌ Нет |
+| **Audit Trail** | ⚠️ Event bus + telemetry | ⚠️ Logging |
+| **Ролевые промпты** | ✅ role/goal/backstory в YAML | ✅ system_message per agent |
+| **Multiple runners** | ✅ Multi-provider (LiteLLM) | ✅ Multi-provider (extensions) |
+| **DDD-архитектура** | ❌ Плоская структура (lib/crewai/) | ⚠️ Слоистая (core/agentchat/ext) |
+| **Decorator pattern** | ❌ Прямой вызов | ✅ RoutedAgent + subscriptions |
+| **Human-in-the-loop** | ✅ Human feedback | ✅ Intervention hooks |
+| **Memory** | ✅ Short-term + long-term + RAG | ✅ model_context + memory module |
+| **Code execution** | ⚠️ Custom tools | ✅ Built-in sandbox (Docker) |
+| **MCP support** | ✅ MCP integration | ✅ MCP workbench |
+| **Durable execution** | ⚠️ Checkpoint persistence | ❌ Нет |
+| **Parallel execution** | ⚠️ Concurrent tasks в Crew | ✅ Async agents |
+| **Multi-agent collaboration** | ✅ Crew (role-based team) | ✅ Group chat (round-robin, selector, swarm) |
+| **Graph visualization** | ✅ Flow visualization | ✅ AutoGen Studio |
+| **Статус проекта** | Активный, commercial | ⚠️ Maintenance mode |
 
 ---
 
-## 3. Что полезно взять и почему
+## 3. Оркестрационные возможности
 
 ### 3.1 🟡 Graph-based conditional routing (LangGraph)
 
@@ -210,34 +210,30 @@ graph.add_node("fixer", fixer_node)
 graph.add_edge(START, "developer")
 graph.add_edge("developer", "reviewer")
 graph.add_conditional_edges("reviewer", should_fix,
-    {"fix": "fixer", "done": END})
-graph.add_edge("fixer", "reviewer")  # Cycle back
+ {"fix": "fixer", "done": END})
+graph.add_edge("fixer", "reviewer") # Cycle back
 ```
 
-**Почему нам интересно:** Наши fix_iterations — это простая группа шагов с лимитом. Graph-модель позволяет описывать более сложные циклы: условные переходы, branching, fan-out/fan-in. Сейчас это R&D, но если chain-модель станет ограничением — LangGraph показывает path forward.
-
-**Отличие от нашей реализации:**
-- У нас: YAML chain с линейными шагами + fix_iterations как group
-- У них: произвольный directed graph с conditional edges и cycles
+**Оркестрационная значимость:** Наши fix_iterations — это простая группа шагов с лимитом. Graph-модель позволяет описывать более сложные циклы: условные переходы, branching, fan-out/fan-in. Сейчас это R&D, но если chain-модель станет ограничением — LangGraph показывает path forward.
 
 ---
 
-### 3.2 🟡 Durable Execution / Checkpointing (LangGraph)
+### 3.2 🟡 Checkpoint Persistence (LangGraph)
 
-**Что у них:** LangGraph поддерживает checkpoint persistence — состояние графа сохраняется после каждого superstep. При сбое выполнение можно возобновить с последнего checkpoint:
+**Что у них:** LangGraph поддерживает checkpoint persistence — состояние графа сериализуется после каждого superstep (шага выполнения). Реализации бэкендов: in-memory (тестирование), SQLite, PostgreSQL. При повторном вызове с тем же `thread_id` выполнение возобновляется с последнего сохранённого checkpoint:
 
 ```python
 from langgraph.checkpoint.sqlite import SqliteSaver
 
-checkpointer = SqliteSaver.from_conn_string(":memory:")
+checkpointer = SqliteSaver.from_conn_string("checkpoints.db")  # Файловая БД, не :memory:
 graph = app.compile(checkpointer=checkpointer)
 
-# При сбое — возобновляем с checkpoint:
 config = {"configurable": {"thread_id": "thread-1"}}
 result = graph.invoke({"input": "..."}, config)
+# При сбое — повторный вызов с тем же thread_id продолжит с checkpoint
 ```
 
-**Почему нам интересно:** Для длинных цепочек (implement → review → fix → review → test → ...) при сбое на шаге 4 можно возобновить с шага 3, а не начинать сначала. Наш JSONL audit trail записывает что произошло, но не позволяет replay.
+**Важное уточнение:** LangGraph checkpointing — это сериализация state, а не полноценный durable execution (как в Temporal или Inngest). Нет требований к детерминизму функций-узлов, нет автоматического replay всей истории. Checkpoint сохраняет слепок state, и при возобновлении граф продолжает с этого слепка. Это достаточный уровень для большинства сценариев восстановления, но не гарантирует корректности, если побочные эффекты (HTTP-вызовы, записи в БД) уже были выполнены до сбоя.
 
 ---
 
@@ -251,14 +247,14 @@ result = graph.invoke({"input": "..."}, config)
 
 ```python
 crew = Crew(
-    agents=[researcher, writer, editor],
-    tasks=[research_task, write_task, edit_task],
-    process=Process.hierarchical,  # Manager auto-created
-    manager_llm="gpt-4o",
+ agents=[researcher, writer, editor],
+ tasks=[research_task, write_task, edit_task],
+ process=Process.hierarchical, # Manager auto-created
+ manager_llm="gpt-4o",
 )
 ```
 
-**Почему нам интересно:** Наш подход — статическая YAML chain, где порядок шагов определён заранее. Hierarchical delegation — это dynamic routing на основе результата предыдущего шага. Для сложных задач это может быть эффективнее фиксированных цепочек.
+**Оркестрационная значимость:** Наш подход — статическая YAML chain, где порядок шагов определён заранее. Hierarchical delegation — это dynamic routing на основе результата предыдущего шага. Для сложных задач это может быть эффективнее фиксированных цепочек.
 
 ---
 
@@ -270,25 +266,25 @@ crew = Crew(
 from crewai.flow.flow import Flow, listen, start, router
 
 class MyFlow(Flow):
-    @start()
-    def begin(self): return {"data": "..."}
+ @start()
+ def begin(self): return {"data": "..."}
 
-    @listen(begin)
-    def process(self, data): return {"result": "..."}
+ @listen(begin)
+ def process(self, data): return {"result": "..."}
 
-    @router(process)
-    def route(self, result):
-        if result["ok"]: return "success"
-        return "retry"
+ @router(process)
+ def route(self, result):
+ if result["ok"]: return "success"
+ return "retry"
 
-    @listen("success")
-    def finalize(self, data): ...
+ @listen("success")
+ def finalize(self, data): ...
 
-    @listen("retry")
-    def retry_step(self, data): ...
+ @listen("retry")
+ def retry_step(self, data): ...
 ```
 
-**Почему нам интересно:** Event-driven модель хорошо сочетается с нашим decorator pattern. Можно реализовать события на уровне chain executor (step_completed, step_failed, budget_exceeded) и дать возможность подписчикам реагировать.
+**Оркестрационная значимость:** Event-driven модель хорошо сочетается с нашим decorator pattern. Можно реализовать события на уровне chain executor (step_completed, step_failed, budget_exceeded) и дать возможность подписчикам реагировать.
 
 ---
 
@@ -297,13 +293,13 @@ class MyFlow(Flow):
 **Что у них:** AutoGen предоставляет несколько готовых паттернов group chat:
 
 | Паттерн | Описание |
-|---|---|
+| --- | --- |
 | `RoundRobinGroupChat` | Агенты говорят по очереди |
 | `SelectorGroupChat` | LLM выбирает следующего спикера |
 | `SwarmGroupChat` | Агент передаёт контроль (handoff) другому |
 | `MagenticOne` | Generalist team: orchestrator + web surfer + coder + file surfer |
 
-**Почему нам интересно:** Если task-orchestrator будет развиваться в сторону multi-agent (несколько runner'ов с разными ролями одновременно), эти паттерны — готовые модели взаимодействия. Сейчас мы single-chain, но swarm/handoff модель может быть полезна для dynamic chains.
+**Оркестрационная значимость:** Сейчас мы single-chain, но swarm/handoff модель может быть полезна для dynamic chains.
 
 ---
 
@@ -313,46 +309,58 @@ class MyFlow(Flow):
 
 ```python
 from autogen_agentchat.conditions import (
-    TextMentionTermination,
-    MaxMessageTermination,
-    TokenUsageTermination,
-    SourceMatchTermination,
-    TimeoutTermination,
+ TextMentionTermination,
+ MaxMessageTermination,
+ TokenUsageTermination,
+ SourceMatchTermination,
+ TimeoutTermination,
 )
 
 termination = (
-    TextMentionTermination("TERMINATE") |
-    MaxMessageTermination(10) |
-    TokenUsageTermination(max_total_token=10000)
+ TextMentionTermination("TERMINATE") |
+ MaxMessageTermination(10) |
+ TokenUsageTermination(max_total_token=10000)
 )
 ```
 
 Комбинируются через `|` (OR) и `&` (AND).
 
-**Почему нам интересно:** У нас есть `max_iterations` для fix_iterations и `BudgetVo` для бюджетного контроля. Дополнительные условия остановки (timeout, token limit, keyword-based) могут обогатить нашу модель.
+**Оркестрационная значимость:** Дополнительные условия остановки (timeout, token limit, keyword-based) могут обогатить нашу модель.
 
 ---
 
 ### 3.7 🟡 Memory System (CrewAI / LangGraph)
 
-**Что у них:** Оба фреймворка поддерживают многоуровневую память:
-- **Short-term** — контекст текущей сессии/выполнения
+**Что у них — CrewAI:** Трёхуровневая система памяти агента:
+- **Short-term** — контекст текущей сессии выполнения (in-memory)
 - **Long-term** — персистентное хранение между запусками (SQLite / PostgreSQL)
-- **RAG** — поиск по knowledge base для обогащения промптов
+- **Entity** — структурированная память о сущностях (кто, что, когда)
+- **RAG** — интеграция с knowledge base для обогащения промптов (встроено в фреймворк)
 
-**Почему нам интересно:** Наш оркестратор stateless (in-memory + JSONL). Memory позволит цепочкам «учиться» на предыдущих запусках: кэшировать результаты типовых задач, накапливать контекст проекта. Пока это P3/R&D.
+**Что у них — LangGraph:** Принципиально другая модель, не «память агента»:
+- **Checkpoint** — полная сериализация state графа между запусками (memory / SQLite / PostgreSQL). Это механизм resume-after-failure, а не «память» в привычном смысле
+- **Store** — key-value хранилище (`BaseStore`), доступное из узлов графа. Предназначено для хранения произвольных данных между вызовами
+- **RAG не встроен** — для RAG используется экосистема LangChain (retrievers, vector stores), а не сам LangGraph
 
----
-
-### 3.8 🟡 Loop Detection через Termination Conditions (AutoGen)
-
-**Что у них:** AutoGen не имеет явного loop detection, но комбинация `MaxMessageTermination` + `TimeoutTermination` предотвращает бесконечные циклы в group chat. LangGraph имеет `RetryPolicy` с max_attempts.
-
-**Почему нам интересно:** Мы уже идентифицировали loop detection (из исследования Crush) как P2. Паттерн AutoGen — декларативные условия остановки — более гибкий, чем хардкод window size.
+**Сравнение:** Модели памяти фундаментально отличаются. CrewAI — «память агента» (агент помнит контекст предыдущих взаимодействий). LangGraph — «персистентность графа» (состояние выполнения переживает рестарт). Это разные задачи с разным дизайном.
 
 ---
 
-## 4. Что НЕ берём и почему
+### 3.8 🟡 Защита от бесконечных циклов (все три фреймворка)
+
+**Факт:** Ни один из трёх фреймворков не имеет встроенного loop detection — механизма распознавания семантического зацикливания (агент повторяет одно и то же действие или ходит по кругу между состояниями). Вместо этого используются грубые ограничители:
+
+| Фреймворк | Механизм | Что делает |
+| --- | --- | --- |
+| **LangGraph** | `RetryPolicy(max_attempts=N)` | Ограничивает число повторных попыток при **ошибке** узла. Не предотвращает циклы при успешных переходах. |
+| **AutoGen** | `MaxMessageTermination` + `TimeoutTermination` | Ограничивает число сообщений и время в group chat. Не распознаёт циклы, но предотвращает бесконечное выполнение. |
+| **CrewAI** | `max_iter` на уровне агента | Ограничивает число итераций делегирования в hierarchical process. Аналогично — грубый лимит, не detection. |
+
+**Суть:** Все три подхода — это счётчики и таймауты, а не анализ паттернов выполнения. `RetryPolicy` в LangGraph — механизм повтора при сбое (failure recovery), а не обнаружение циклов (loop detection). Это разные задачи с разными решениями. Истинный loop detection требует отслеживания паттернов state-переходов и семантического анализа повторяющихся действий — такого нет ни в одном из рассмотренных фреймворков.
+
+---
+
+## 4. Прочие возможности (вне оркестрации)
 
 ### 4.1 🟢 Python как язык реализации
 
@@ -360,11 +368,11 @@ termination = (
 
 ### 4.2 🟢 LLM-level integration (LLM абстракции)
 
-CrewAI, LangGraph, AutoGen — все работают на уровне прямых вызовов LLM API. Наш оркестратор работает на уровне runner'ов (pi, codex), которые сами управляют LLM-взаимодействием. Разный уровень абстракции.
+CrewAI, LangGraph, AutoGen — все работают на уровне прямых вызовов LLM API. Разный уровень абстракции.
 
 ### 4.3 🟢 Code Execution Sandbox (AutoGen)
 
-AutoGen имеет встроенный sandbox для выполнения кода (Docker). Это valuable для агента-кодера, но наш оркестратор делегирует выполнение runner'ам. Sandbox — забота runner'а, не оркестратора.
+AutoGen имеет встроенный sandbox для выполнения кода (Docker). Это полезно для агента-кодера, но наш оркестратор делегирует выполнение runner'ам. Sandbox — забота runner'а, не оркестратора.
 
 ### 4.4 🟢 No-code GUI / Studio (AutoGen Studio, LangGraph Studio)
 
@@ -384,16 +392,10 @@ AutoGen в maintenance mode. Microsoft рекомендует переход н�
 
 ---
 
-## 5. Сводка рекомендаций
+## 5. Сводка по оркестрации
 
 | Фича | Источник | Приоритет | Обоснование |
-|---|---|---|---|
-| Chain orchestration (static + dynamic) | — | ✅ Уже есть | Core-функциональность task-orchestrator |
-| Retry + Circuit Breaker | Bernstein | ✅ Уже есть | Устойчивость при сбоях |
-| Quality Gates | Bernstein | ✅ Уже есть | Автоматическая проверка кода |
-| Budget control | Bernstein | ✅ Уже есть | Предотвращение runaway spending |
-| Fix iterations | Bernstein | ✅ Уже есть | Closed-loop цикл разработки |
-| JSONL Audit Trail | Bernstein | ✅ Уже есть | Воспроизводимость и отладка |
+| --- | --- | --- | --- |
 | Declarative termination conditions | AutoGen | 🟡 P2 | Timeout, token limit, keyword — обогащение модели остановки |
 | Graph-based conditional routing | LangGraph | 🟡 P3 | Для сложных dynamic chains, если YAML станет ограничением |
 | Checkpoint / Durable execution | LangGraph | 🟡 P3 | Resume после сбоя для длинных цепочек |

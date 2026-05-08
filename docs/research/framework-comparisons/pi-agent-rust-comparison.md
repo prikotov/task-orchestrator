@@ -18,43 +18,43 @@ pi_agent_rust **не является** фреймворком оркестра�
 
 ```
 src/
-├── main.rs                  CLI entry point (clap), режимы (interactive/print/rpc)
-├── agent.rs                 Agent loop: LLM → tool call → LLM → ... (332KB)
-├── agent_cx.rs              AgentCx: capability-scoped async context
-├── cli.rs                   CLI-аргументы (clap derive)
-├── config.rs                Settings load/merge (JSON), precedence chain
-├── auth.rs                  API key storage, provider credential resolution
-├── models.rs                Model registry + resolver (162KB)
-├── model.rs                 Message/content types, StreamEvent
-├── provider.rs              Provider trait + Context/StreamOptions
-├── providers/               10 native провайдеров (Anthropic, OpenAI, OpenAI Responses, Gemini, Cohere, Azure, Bedrock, Vertex, Copilot, GitLab)
-├── tools.rs                 8 встроенных инструментов (read/write/edit/bash/grep/find/ls/hashline_edit)
-├── session.rs               JSONL session persistence (v3, tree branching)
-├── session_index.rs         SQLite session index (metadata, search)
-├── session_store_v2.rs      V2 sidecar store (segmented log + offset index)
-├── session_sqlite.rs        SQLite session backend (optional)
-├── compaction.rs            Context compaction: token estimation, cut-point, summarization
-├── compaction_worker.rs     Background compaction worker
-├── extensions.rs            Extension system: policy, trust lifecycle, hostcall mesh (1.9MB)
-├── extensions_js.rs         QuickJS runtime bridge, hostcalls, Node shims (987KB)
-├── extension_*.rs           Extension validation, scoring, licensing, conformance и т.д.
-├── hostcall_*.rs            Hostcall lanes: AMAC, io_uring, queue, S3-FIFO, trace JIT
-├── permissions.rs           Persistent capability decisions (allow/deny per extension)
-├── scheduler.rs             Deterministic event loop для JS runtime
-├── resources.rs             Skills, prompts, themes, extensions: discovery + loading
-├── package_manager.rs       Package lifecycle (install, remove, update)
-├── sse.rs                   Custom SSE parser (streaming responses)
-├── interactive.rs           TUI: Bubble Tea v2 (charmed_rust)
-├── rpc.rs                   RPC mode: JSON protocol over stdin/stdout
-├── autocomplete.rs          Context-aware autocomplete (@files, /commands)
-├── tui.rs                   TUI rendering helpers (rich_rust)
-└── error.rs                 Structured error types (thiserror)
+├── main.rs CLI entry point (clap), режимы (interactive/print/rpc)
+├── agent.rs Agent loop: LLM → tool call → LLM → ... (332KB)
+├── agent_cx.rs AgentCx: capability-scoped async context
+├── cli.rs CLI-аргументы (clap derive)
+├── config.rs Settings load/merge (JSON), precedence chain
+├── auth.rs API key storage, provider credential resolution
+├── models.rs Model registry + resolver (162KB)
+├── model.rs Message/content types, StreamEvent
+├── provider.rs Provider trait + Context/StreamOptions
+├── providers/ 10 native провайдеров (Anthropic, OpenAI, OpenAI Responses, Gemini, Cohere, Azure, Bedrock, Vertex, Copilot, GitLab)
+├── tools.rs 8 встроенных инструментов (read/write/edit/bash/grep/find/ls/hashline_edit)
+├── session.rs JSONL session persistence (v3, tree branching)
+├── session_index.rs SQLite session index (metadata, search)
+├── session_store_v2.rs V2 sidecar store (segmented log + offset index)
+├── session_sqlite.rs SQLite session backend (optional)
+├── compaction.rs Context compaction: token estimation, cut-point, summarization
+├── compaction_worker.rs Background compaction worker
+├── extensions.rs Extension system: policy, trust lifecycle, hostcall mesh (1.9MB)
+├── extensions_js.rs QuickJS runtime bridge, hostcalls, Node shims (987KB)
+├── extension_*.rs Extension validation, scoring, licensing, conformance и т.д.
+├── hostcall_*.rs Hostcall lanes: AMAC, io_uring, queue, S3-FIFO, trace JIT
+├── permissions.rs Persistent capability decisions (allow/deny per extension)
+├── scheduler.rs Deterministic event loop для JS runtime
+├── resources.rs Skills, prompts, themes, extensions: discovery + loading
+├── package_manager.rs Package lifecycle (install, remove, update)
+├── sse.rs Custom SSE parser (streaming responses)
+├── interactive.rs TUI: Bubble Tea v2 (charmed_rust)
+├── rpc.rs RPC mode: JSON protocol over stdin/stdout
+├── autocomplete.rs Context-aware autocomplete (@files, /commands)
+├── tui.rs TUI rendering helpers (rich_rust)
+└── error.rs Structured error types (thiserror)
 ```
 
 ### Ключевые характеристики
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | CLI-агент (TUI), одноагентный |
 | **Модель выполнения** | Agent loop (LLM → tool call → LLM → ...) с max 50 итераций |
 | **State management** | JSONL (v3, tree branching) + SQLite index + optional SQLite backend |
@@ -68,7 +68,7 @@ src/
 ### Основные компоненты
 
 | Компонент | Назначение |
-|---|---|
+| --- | --- |
 | [`src/agent.rs`](https://github.com/Dicklesworthstone/pi_agent_rust/blob/main/src/agent.rs) | Agent loop: streaming, tool execution, message queue, abort/timeout |
 | [`src/provider.rs`](https://github.com/Dicklesworthstone/pi_agent_rust/blob/main/src/provider.rs) | Provider trait: async streaming, Context (Cow-optimized), ToolDef |
 | [`src/tools.rs`](https://github.com/Dicklesworthstone/pi_agent_rust/blob/main/src/tools.rs) | 8 инструментов: read, write, edit, bash, grep, find, ls, hashline_edit |
@@ -83,40 +83,35 @@ src/
 
 ---
 
-## 2. Сравнительная таблица: что у нас есть vs. чего нет
+## 2. Возможности оркестрации — обзор
 
-| Функция | TasK Orchestrator | pi_agent_rust | Статус |
-|---|---|---|---|
-| **Цепочки шагов (chains)** | ✅ YAML chains, статические и динамические | ❌ Agent loop (LLM → tool call → ...) без декларативных цепочек | ✅ У нас есть |
-| **Retry с backoff** | ✅ RetryingAgentRunner | ⚠️ Basic retry (max_retries=3, exponential backoff в config) | ✅ У нас лучше (decorator pattern) |
-| **Circuit Breaker** | ✅ CircuitBreakerAgentRunner | ❌ Нет | ✅ У нас есть |
-| **Quality Gates** | ✅ Shell-команды как проверки | ❌ Нет | ✅ У нас есть |
-| **Бюджетный контроль** | ✅ BudgetVo (cost-based) | ❌ Только cost tracking (session metrics), без лимитов/блокировок | ✅ У нас есть |
-| **Итерационные циклы (fix_iterations)** | ✅ Группа шагов с max_iterations | ❌ Нет (agent loop повторяет tool calls, но не «developer → reviewer → developer») | ✅ У нас есть |
-| **Fallback routing** | ✅ Per-step fallback runner | ⚠️ Model auto-select fallback (3 модели в цепочке), но не per-step | ✅ У нас лучше |
-| **Audit Trail (JSONL)** | ✅ JsonlAuditLogger | ✅ JSONL session v3 (tree-structured) + session index (SQLite) | ✅ Паритет (у них богаче) |
-| **Ролевые промпты** | ✅ .md файлы (18+ ролей) | ✅ System prompt + skills (SKILL.md) + prompt templates | ✅ У нас лучше (множество ролей) |
-| **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ 10 native провайдеров + extension-provided | ✅ У них шире |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Плоская структура `src/` (все в одном crate) | ✅ У нас лучше |
-| **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов Provider | ✅ У нас лучше |
-| **YAML-конфигурация** | ✅ Chains + roles в YAML | ✅ settings.json (JSON) | ✅ Паритет (разные форматы) |
-| **Session persistence** | ❌ In-memory + JSONL audit | ✅ JSONL v3 (tree branching) + SQLite index + v2 sidecar | 🟡 Интересно |
-| **Auto-compaction** | ❌ Нет | ✅ Token estimation, cut-point, LLM summarization, background worker | 🟡 Интересно |
-| **Extension system** | ❌ Нет | ✅ QuickJS/WASM, capability-gated hostcalls, trust lifecycle | 🟡 Позже |
-| **Permission system** | ❌ Нет | ✅ Per-extension capability decisions, persistent, scoped by version | 🟡 Позже |
-| **Tool parallelism** | ❌ Нет | ✅ MAX_CONCURRENT_TOOLS=8, read-only tools параллельно | 🟡 Интересно |
-| **RPC mode** | ❌ Нет | ✅ JSON protocol over stdin/stdout (для IDE integrations) | 🟢 Не берём |
-| **TUI** | ❌ CLI Symfony Console | ✅ Bubble Tea v2 (charmed_rust) + rich_rust | 🟢 Не берём |
-| **Custom SSE parser** | ❌ Нет (зависит от runner) | ✅ Zero-copy, UTF-8 aware, chunk boundary handling | 🟢 Не берём |
-| **Context file discovery** | ✅ AGENTS.md, role .md | ✅ AGENTS.md, + стандарт agentskills.io | ✅ Паритет |
-| **Structured concurrency** | ❌ Нет (PHP/Symfony) | ✅ asupersync: structured cancellation, capability context | 🟢 Разный стек |
-| **Retry config** | ✅ В YAML, per-step | ✅ В settings.json (global: enabled, max_retries, base/max delay) | ✅ Паритет |
-| **Streaming** | ✅ Через runner | ✅ Native SSE parser, streaming-first architecture | ✅ Паритет |
-| **Cost tracking** | ✅ Через budget/check | ✅ Per-session token/cost metrics (Usage/Cost в model.rs, отображение в TUI) | ✅ Паритет |
+| Функция | pi_agent_rust |
+| --- | --- |
+| **Retry с backoff** | ⚠️ Basic retry (max_retries=3, exponential backoff в config) |
+| **Fallback routing** | ⚠️ Model auto-select fallback (3 модели в цепочке), но не per-step |
+| **Audit Trail (JSONL)** | ✅ JSONL session v3 (tree-structured) + session index (SQLite) |
+| **Ролевые промпты** | ✅ System prompt + skills (SKILL.md) + prompt templates |
+| **Multiple runners** | ✅ 10 native провайдеров + extension-provided |
+| **DDD-архитектура** | ❌ Плоская структура `src/` (все в одном crate) |
+| **Decorator pattern** | ❌ Прямой вызов Provider |
+| **YAML-конфигурация** | ✅ settings.json (JSON) |
+| **Session persistence** | ✅ JSONL v3 (tree branching) + SQLite index + v2 sidecar |
+| **Auto-compaction** | ✅ Token estimation, cut-point, LLM summarization, background worker |
+| **Extension system** | ✅ QuickJS/WASM, capability-gated hostcalls, trust lifecycle |
+| **Permission system** | ✅ Per-extension capability decisions, persistent, scoped by version |
+| **Tool parallelism** | ✅ MAX_CONCURRENT_TOOLS=8, read-only tools параллельно |
+| **RPC mode** | ✅ JSON protocol over stdin/stdout (для IDE integrations) |
+| **TUI** | ✅ Bubble Tea v2 (charmed_rust) + rich_rust |
+| **Custom SSE parser** | ✅ Zero-copy, UTF-8 aware, chunk boundary handling |
+| **Context file discovery** | ✅ AGENTS.md, + стандарт agentskills.io |
+| **Structured concurrency** | ✅ asupersync: structured cancellation, capability context |
+| **Retry config** | ✅ В settings.json (global: enabled, max_retries, base/max delay) |
+| **Streaming** | ✅ Native SSE parser, streaming-first architecture |
+| **Cost tracking** | ✅ Per-session token/cost metrics (Usage/Cost в model.rs, отображение в TUI) |
 
 ---
 
-## 3. Что полезно взять и почему
+## 3. Оркестрационные возможности
 
 ### 3.1 🟡 Auto-Compaction — управление контекстом при длинных сессиях (`src/compaction.rs`)
 
@@ -130,16 +125,14 @@ src/
 
 ```rust
 pub struct ResolvedCompactionSettings {
-    pub enabled: bool,
-    pub context_window_tokens: u32,  // 128K default
-    pub reserve_tokens: u32,          // ~8% of context window
-    pub keep_recent_tokens: u32,      // ~10% of context window
+ pub enabled: bool,
+ pub context_window_tokens: u32, // 128K default
+ pub reserve_tokens: u32, // ~8% of context window
+ pub keep_recent_tokens: u32, // ~10% of context window
 }
 ```
 
-**Почему нам интересно:** Для длинных цепочек (implement → review → fix → review → ...) с большим количеством шагов, контекст может расти. Если chain step передаёт весь контекст в runner — auto-compaction позволяет работать с arbitrarily длинными цепочками.
-
-**Отличие от нашей реализации:** У нас нет механизма compaction. Цепочки конечные (max_iterations), поэтому переполнение контекста менее вероятно. Но для future dynamic loops может стать актуальным.
+**Оркестрационная значимость:** Для длинных цепочек (implement → review → fix → review → ...) с большим количеством шагов, контекст может расти. Если chain step передаёт весь контекст в runner — auto-compaction позволяет работать со сколь угодно длинными цепочками.
 
 ---
 
@@ -153,12 +146,10 @@ pub struct ResolvedCompactionSettings {
 - V2 sidecar store: segmented log + offset index для O(index+tail) resume
 - Durability modes: `strict` / `balanced` / `throughput`
 
-**Почему нам интересно:** Наш JSONL audit trail — append-only log. Tree-structured sessions позволяют:
-- Ветвление выполнения (альтернативные пути в chain)
-- Откат к предыдущему состоянию (undo шага)
-- Параллельные ветки экспериментов
-
-**Отличие от нашей реализации:** У нас `JsonlAuditLogger` — однонаправленный лог. Tree branching — это более богатая модель, но и более сложная в реализации.
+**Оркестрационная значимость:** Tree-structured sessions отличаются от линейного append-only лога тем, что каждая запись имеет `parent_id`, образуя дерево. Это позволяет:
+- Ветвление выполнения: пользователь или агент может откатиться к произвольной точке и пойти по другому пути, сохранив обе ветки
+- Undo на уровне сессии: возврат к предыдущему состоянию без потери истории
+- Параллельные ветки экспериментов: несколько альтернативных путей в рамках одной сессии
 
 ---
 
@@ -174,9 +165,7 @@ pub struct ResolvedCompactionSettings {
 6. **Runtime risk ledger:** hash-linked, tamper-evident audit trail
 7. **Hostcall reactor mesh:** deterministic shard routing, backpressure
 
-**Почему нам интересно:** Если task-orchestrator будет поддерживать пользовательские runners/tools — нужна система контроля, что именно runner может делать. Capability-gated подход — лучшая практика для extension security.
-
-**Отличие:** У нас runners реализуют `AgentRunnerInterface` — PHP-интерфейс. Нет capability model, trust lifecycle или policy enforcement.
+**Оркестрационная значимость:** Capability-gated подход — лучшая практика для extension security.
 
 ---
 
@@ -186,11 +175,11 @@ pub struct ResolvedCompactionSettings {
 
 ```rust
 pub struct PersistedDecision {
-    pub capability: String,     // "exec", "http", etc.
-    pub allow: bool,
-    pub decided_at: String,     // ISO-8601
-    pub expires_at: Option<String>,
-    pub version_range: Option<String>,  // semver range
+ pub capability: String, // "exec", "http", etc.
+ pub allow: bool,
+ pub decided_at: String, // ISO-8601
+ pub expires_at: Option<String>,
+ pub version_range: Option<String>, // semver range
 }
 ```
 
@@ -199,7 +188,7 @@ pub struct PersistedDecision {
 - Expiry: опциональный TTL для decisions
 - Atomic write: temp file + rename
 
-**Почему нам интересно:** Для автономного выполнения цепочек (без участия человека) — нужна система: какие команды можно выполнять, какие файлы редактировать. Persistent decisions позволяют один раз дать разрешение и не спрашивать каждый раз.
+**Оркестрационная значимость:** Для автономного выполнения цепочек (без участия человека) — нужна система: какие команды можно выполнять, какие файлы редактировать. Persistent decisions позволяют один раз дать разрешение и не спрашивать каждый раз.
 
 ---
 
@@ -215,7 +204,7 @@ const MAX_CONCURRENT_TOOLS: usize = 8;
 - Write tools (`write`, `edit`, `bash`, `hashline_edit`) — последовательно
 - Tool trait имеет метод `is_read_only()` → `bool`
 
-**Почему нам интересно:** В наших цепочках все шаги выполняются последовательно. Если несколько шагов в chain независимы — можно выполнять их параллельно. Это особенно полезно для dynamic chains, где LLM может вызывать несколько инструментов одновременно.
+**Оркестрационная значимость:** В наших цепочках все шаги выполняются последовательно. Если несколько шагов в chain независимы — можно выполнять их параллельно. Это особенно полезно для dynamic chains, где LLM может вызывать несколько инструментов одновременно.
 
 ---
 
@@ -225,16 +214,16 @@ const MAX_CONCURRENT_TOOLS: usize = 8;
 
 ```json
 {
-  "retry": {
-    "enabled": true,
-    "max_retries": 3,
-    "base_delay_ms": 2000,
-    "max_delay_ms": 60000
-  }
+ "retry": {
+ "enabled": true,
+ "max_retries": 3,
+ "base_delay_ms": 2000,
+ "max_delay_ms": 60000
+ }
 }
 ```
 
-**Почему нам интересно:** У нас retry реализован через `RetryingAgentRunner` decorator. Конфигурация pi_agent_rust — более прозрачная (явные параметры). Наш подход через decorator pattern — более гибкий (per-step, per-runner), но конфигурация в YAML может быть менее очевидной.
+**Оркестрационная значимость:** Retry-механизм pi_agent_rust сконцентрирован на уровне LLM-вызовов (provider errors, rate limits, timeouts) и настраивается глобально через явные параметры. Ограничение: конфигурация единая для всех вызовов — нет возможности задать разные стратегии retry для разных шагов или инструментов в рамках одной сессии.
 
 ---
 
@@ -248,11 +237,11 @@ const MAX_CONCURRENT_TOOLS: usize = 8;
 - **I4:** Hostcall completions enqueue macrotasks, never re-enter
 - **I5:** Total ordering by sequence number
 
-**Почему нам интересно:** Концепция формальных инвариантов для execution loop применима к нашему chain executor. Мы могли бы формализовать инварианты выполнения цепочек: «каждый шаг получает результат предыдущего», «budget проверяется до и после каждого шага» и т.д.
+**Оркестрационная значимость:** Deterministic scheduler формализует порядок выполнения асинхронных операций через строгие инварианты (I1–I5). Это гарантирует воспроизводимость поведения extension runtime: при одинаковой последовательности hostcall-ответов результат детерминирован. Подход ценен тем, что вместо неформального «работает как ожидается» execution loop имеет доказуемые свойства — total ordering, отсутствие re-entrancy, детерминированный порядок таймеров.
 
 ---
 
-## 4. Что НЕ берём и почему
+## 4. Прочие возможности (вне оркестрации)
 
 ### 4.1 🟢 TUI (Bubble Tea v2 / rich_rust)
 
@@ -260,7 +249,7 @@ pi_agent_rust — интерактивный TUI-клиент с богатым 
 
 ### 4.2 🟢 Custom SSE Parser
 
-pi_agent_rust реализует собственный SSE parser для streaming LLM responses. Наш оркестратор работает через runner'ы (pi, codex), каждый из которых сам управляет streaming. Нам не нужен собственный SSE parser.
+pi_agent_rust реализует собственный SSE parser для streaming LLM responses. Нам не нужен собственный SSE parser.
 
 ### 4.3 🟢 RPC Mode / SDK
 
@@ -276,7 +265,7 @@ asupersync — Rust-специфичный async runtime с structured concurren
 
 ### 4.6 🟢 Model Registry (10+ провайдеров)
 
-pi_agent_rust поддерживает 10 native провайдеров LLM. Наш оркестратор общается с LLM через runner'ы (pi, codex), которые сами работают с конкретными API. Нам не нужна собственная абстракция над провайдерами.
+pi_agent_rust поддерживает 10 native провайдеров LLM. Нам не нужна собственная абстракция над провайдерами.
 
 ### 4.7 🟢 Performance Engineering (LTO, jemalloc, binary size)
 
@@ -288,17 +277,10 @@ Rust-специфичные оптимизации (LTO, jemalloc, single binary
 
 ---
 
-## 5. Сводка рекомендаций
+## 5. Сводка по оркестрации
 
-| Фича | Приоритет | Обоснование |
-|---|---|---|
-| Chain orchestration | ✅ Уже есть | Core-функциональность task-orchestrator |
-| Retry + Circuit Breaker | ✅ Уже есть | Устойчивость при сбоях |
-| Quality Gates | ✅ Уже есть | Автоматическая проверка кода |
-| Budget control | ✅ Уже есть | Предотвращение runaway spending |
-| Fix iterations | ✅ Уже есть | Closed-loop цикл разработки |
-| Fallback routing | ✅ Уже есть | Per-step fallback runner |
-| Audit Trail | ✅ Уже есть | JSONL audit logger |
+| Возможность | Статус в продукте | Описание |
+| --- | --- | --- |
 | Auto-compaction | 🟡 P3 | Для длинных dynamic loops, не критично сейчас |
 | Session persistence (tree) | 🟡 P3 | Для branching и undo в цепочках |
 | Extension/Permission system | 🟡 P3 | Для автономного выполнения и custom runners |
