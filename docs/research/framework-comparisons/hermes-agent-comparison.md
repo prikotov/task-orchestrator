@@ -21,53 +21,53 @@ Hermes Agent — **self-improving AI agent** от Nous Research, позицио�
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Presentation Layer                                         │
-│   TUI (Ink/React) │ CLI (prompt_toolkit) │ Web UI           │
-│   Gateway (Telegram, Discord, Slack, WhatsApp, Signal, ...) │
+│ Presentation Layer │
+│ TUI (Ink/React) │ CLI (prompt_toolkit) │ Web UI │
+│ Gateway (Telegram, Discord, Slack, WhatsApp, Signal, ...) │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                     AIAgent (run_agent.py)                  │
-│          Core conversation loop (~12k LOC)                  │
-│   • Agent loop: LLM → tool call → result → LLM → ...       │
-│   • Context compression (auto-compact)                      │
-│   • Budget tracking, credential pool, error classification  │
-│   • Subagent spawning (delegate_task)                       │
+│ AIAgent (run_agent.py) │
+│ Core conversation loop (~12k LOC) │
+│ • Agent loop: LLM → tool call → result → LLM → ... │
+│ • Context compression (auto-compact) │
+│ • Budget tracking, credential pool, error classification │
+│ • Subagent spawning (delegate_task) │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-               ┌───────────┴───────────┐
-               ▼                       ▼
-┌────────────────────┐   ┌────────────────────────────────────┐
-│  Tool Registry     │   │  Agent Internals                   │
-│  (tools/registry)  │   │  error_classifier.py               │
-│  40+ tools,        │   │  context_compressor.py (~1500 LOC) │
-│  toolsets system,  │   │  credential_pool.py                │
-│  MCP integration   │   │  memory_manager.py                 │
-│  Skills (SKILL.md) │   │  prompt_builder.py                 │
-│                    │   │  rate_limit_tracker.py              │
-│                    │   │  context_references.py              │
-│                    │   │  curator.py (skill improvement)     │
-└────────┬───────────┘   └────────────────────────────────────┘
-         │
-         ▼
+ │
+ ┌───────────┴───────────┐
+ ▼ ▼
+┌────────────────────┐ ┌────────────────────────────────────┐
+│ Tool Registry │ │ Agent Internals │
+│ (tools/registry) │ │ error_classifier.py │
+│ 40+ tools, │ │ context_compressor.py (~1500 LOC) │
+│ toolsets system, │ │ credential_pool.py │
+│ MCP integration │ │ memory_manager.py │
+│ Skills (SKILL.md) │ │ prompt_builder.py │
+│ │ │ rate_limit_tracker.py │
+│ │ │ context_references.py │
+│ │ │ curator.py (skill improvement) │
+└────────┬───────────┘ └────────────────────────────────────┘
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│           Terminal Backends (tools/environments/)            │
-│   local │ docker │ ssh │ singularity │ modal │ daytona │     │
-│   vercel_sandbox                                             │
+│ Terminal Backends (tools/environments/) │
+│ local │ docker │ ssh │ singularity │ modal │ daytona │ │
+│ vercel_sandbox │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              SQLite (session DB with FTS5 search)            │
-│              ~/.hermes/ (config, memory, skills, checkpoints)│
+│ SQLite (session DB with FTS5 search) │
+│ ~/.hermes/ (config, memory, skills, checkpoints)│
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Ключевые характеристики
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | Интерактивный AI-агент с closed learning loop |
 | **Модель выполнения** | Agent loop (LLM → tool call → result → LLM → ...) |
 | **AI-провайдеры** | 200+ через OpenRouter, Nous Portal, Anthropic, OpenAI, Bedrock, Gemini, NVIDIA NIM, Xiaomi MiMo, z.ai/GLM, Kimi/Moonshot, MiniMax, Hugging Face, llama.cpp, и др. |
@@ -82,7 +82,7 @@ Hermes Agent — **self-improving AI agent** от Nous Research, позицио�
 ### Основные модули
 
 | Модуль | Назначение |
-|---|---|
+| --- | --- |
 | `run_agent.py` (~12k LOC) | AIAgent — core conversation loop, retry, budget, context management |
 | `model_tools.py` | Tool orchestration, `discover_builtin_tools()`, `handle_function_call()` |
 | `toolsets.py` | Toolset definitions — compositional grouping of tools |
@@ -103,43 +103,40 @@ Hermes Agent — **self-improving AI agent** от Nous Research, позицио�
 
 ---
 
-## 2. Сравнительная таблица: что у нас есть vs. чего нет
+## 2. Возможности оркестрации — обзор
 
-| Функция | Task Orchestrator | Hermes Agent | Статус |
-|---|---|---|---|
-| **Цепочки шагов (chains)** | ✅ YAML chains, статические и динамические | ❌ Нет (agent loop, без явного chain DSL) | ✅ У нас есть |
-| **DAG / Workflow engine** | ❌ Только линейные/динамические цепочки | ❌ Нет (последовательный agent loop) | — |
-| **Retry с backoff** | ✅ RetryingAgentRunner | ✅ Встроенный retry с credential rotation и error classification | ✅ Паритет (у них богаче) |
-| **Circuit Breaker** | ✅ CircuitBreakerAgentRunner | ❌ Нет (credential rotation + fallback model вместо CB) | ✅ У нас есть |
-| **Quality Gates** | ✅ Shell-команды как проверки | ❌ Нет (агент сам решает, когда завершить) | ✅ У нас есть |
-| **Бюджетный контроль** | ✅ BudgetVo (cost-based) | ✅ Iteration budget + token tracking + cost display (`/usage`) | ✅ Паритет |
-| **Итерационные циклы (fix_iterations)** | ✅ Группа шагов с max_iterations | ⚠️ Agent loop с `max_iterations` (90 default), но без явного «fix loop» | ✅ У нас лучше (явный DSL) |
-| **Fallback routing** | ✅ Per-step fallback runner | ✅ Credential pool rotation + fallback model + multi-provider support | ✅ Паритет |
-| **Error classification** | ⚠️ Basic (retry on failure) | ✅ 20+ failover reasons: auth, billing, rate_limit, overloaded, timeout, context_overflow, model_not_found, format_error, provider_policy_blocked и др. | 🟡 Интересно |
-| **Credential rotation** | ❌ Нет | ✅ Multi-credential pool: fill_first, round_robin, random, least_used | 🟡 Интересно |
-| **Context compression** | ❌ Нет | ✅ Structured summarization (14-section template), tool result pruning, anti-thrashing, iterative summary updates | 🟡 Интересно |
-| **Sub-agents** | ❌ Нет | ✅ `delegate_task`: parallel spawning, orchestrator/leaf roles, depth control (max 3), blocked tools list, timeout per child | 🟡 Интересно |
-| **Kanban multi-agent** | ❌ Нет | ✅ Shared SQLite board, worker spawning, heartbeat, blocking, parent-child handoffs | 🟡 Позже |
-| **Skills system** | ✅ Свои role .md файлы | ✅ SKILL.md (agentskills.io standard), autonomous creation, self-improvement (curator), Skills Hub marketplace | ✅ Паритет (у них богаче) |
-| **Memory (persistent)** | ❌ Нет | ✅ MEMORY.md + USER.md + Honcho dialectic modeling + FTS5 session search + memory provider plugins | 🟡 Позже |
-| **Session persistence** | ❌ In-memory | ✅ SQLite + FTS5 search across sessions + session resume | 🟡 Позже |
-| **Filesystem checkpoints** | ❌ Нет | ✅ Shadow git store, per-turn snapshots, rollback to any checkpoint | 🟡 Интересно |
-| **Terminal backends** | ✅ Runner interface (pi, codex) | ✅ 7 backends: local, Docker, SSH, Singularity, Modal, Daytona, Vercel Sandbox | 🟡 Интересно |
-| **MCP** | ❌ Нет | ✅ MCP client integration | 🟡 Позже |
-| **Messaging platforms** | ❌ Только CLI | ✅ 15+ платформ: Telegram, Discord, Slack, WhatsApp, Signal, Matrix и др. | 🟢 Не берём |
-| **Cron scheduling** | ❌ Нет | ✅ Built-in cron: natural language → scheduled execution → platform delivery | 🟡 Интересно |
-| **Context file injection scanning** | ❌ Нет | ✅ Prompt injection detection (11 threat patterns), invisible unicode detection | 🟡 Интересно |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Monorepo modules (agent/, tools/, gateway/, plugins/) | ✅ У нас лучше |
-| **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов через tool registry | ✅ У нас лучше |
-| **Structured output** | ❌ Нет (текстовый вывод runner'ов) | ⚠️ Нет явного output_format (текстовый ответ + tool calls) | — |
-| **Rate limit tracking** | ❌ Нет | ✅ x-ratelimit-* header parsing (RPM/TPM per minute/hour), `/usage` display | 🟡 Интересно |
-| **Audit Trail (JSONL)** | ✅ JsonlAuditLogger | ✅ JSONL logs + SQLite session DB + trajectory export | ✅ Паритет |
-| **Plugin system** | ❌ Нет | ✅ plugins/: memory, context_engine, model-providers, kanban, observability, image_gen, achievements | 🟡 Позже |
-| **AGENTS.md support** | ✅ Свои .md файлы | ✅ Hierarchical discovery (`.hermes.md` / `HERMES.md`), injection scanning | ✅ Паритет |
+| Функция | Hermes Agent |
+| --- | --- |
+| **DAG / Workflow engine** | ❌ Только линейные/динамические цепочки |
+| **Retry с backoff** | ✅ Встроенный retry с credential rotation и error classification |
+| **Бюджетный контроль** | ✅ Iteration budget + token tracking + cost display (`/usage`) |
+| **Итерационные циклы (fix_iterations)** | ⚠️ Agent loop с `max_iterations` (90 default), но без явного «fix loop» |
+| **Fallback routing** | ✅ Credential pool rotation + fallback model + multi-provider support |
+| **Error classification** | ✅ 20+ failover reasons: auth, billing, rate_limit, overloaded, timeout, context_overflow, model_not_found, format_error, provider_policy_blocked и др. |
+| **Credential rotation** | ✅ Multi-credential pool: fill_first, round_robin, random, least_used |
+| **Context compression** | ✅ Structured summarization (14-section template), tool result pruning, anti-thrashing, iterative summary updates |
+| **Sub-agents** | ✅ `delegate_task`: parallel spawning, orchestrator/leaf roles, depth control (max 3), blocked tools list, timeout per child |
+| **Kanban multi-agent** | ✅ Shared SQLite board, worker spawning, heartbeat, blocking, parent-child handoffs |
+| **Skills system** | ✅ SKILL.md (agentskills.io standard), autonomous creation, self-improvement (curator), Skills Hub marketplace |
+| **Memory (persistent)** | ✅ MEMORY.md + USER.md + Honcho dialectic modeling + FTS5 session search + memory provider plugins |
+| **Session persistence** | ✅ SQLite + FTS5 search across sessions + session resume |
+| **Filesystem checkpoints** | ✅ Shadow git store, per-turn snapshots, rollback to any checkpoint |
+| **Terminal backends** | ✅ 7 backends: local, Docker, SSH, Singularity, Modal, Daytona, Vercel Sandbox |
+| **MCP** | ✅ MCP client integration |
+| **Messaging platforms** | ✅ 15+ платформ: Telegram, Discord, Slack, WhatsApp, Signal, Matrix и др. |
+| **Cron scheduling** | ✅ Built-in cron: natural language → scheduled execution → platform delivery |
+| **Context file injection scanning** | ✅ Prompt injection detection (11 threat patterns), invisible unicode detection |
+| **DDD-архитектура** | ❌ Monorepo modules (agent/, tools/, gateway/, plugins/) |
+| **Decorator pattern** | ❌ Прямой вызов через tool registry |
+| **Structured output** | ❌ Нет (текстовый вывод runner'ов) |
+| **Rate limit tracking** | ✅ x-ratelimit-* header parsing (RPM/TPM per minute/hour), `/usage` display |
+| **Audit Trail (JSONL)** | ✅ JSONL logs + SQLite session DB + trajectory export |
+| **Plugin system** | ✅ plugins/: memory, context_engine, model-providers, kanban, observability, image_gen, achievements |
+| **AGENTS.md support** | ✅ Hierarchical discovery (`.hermes.md` / `HERMES.md`), injection scanning |
 
 ---
 
-## 3. Что полезно взять и почему
+## 3. Оркестрационные возможности
 
 ### 3.1 🟡 Error Classification Taxonomy (`agent/error_classifier.py`)
 
@@ -147,22 +144,22 @@ Hermes Agent — **self-improving AI agent** от Nous Research, позицио�
 
 ```python
 class FailoverReason(enum.Enum):
-    auth = "auth"                        # 401/403 — refresh/rotate
-    auth_permanent = "auth_permanent"    # Auth failed after refresh — abort
-    billing = "billing"                  # 402 — rotate immediately
-    rate_limit = "rate_limit"            # 429 — backoff then rotate
-    overloaded = "overloaded"            # 503/529 — backoff
-    server_error = "server_error"        # 500/502 — retry
-    timeout = "timeout"                  # Connection timeout — rebuild client
-    context_overflow = "context_overflow" # Context too large — compress
-    model_not_found = "model_not_found"  # 404 — fallback model
-    provider_policy_blocked = "provider_policy_blocked"
-    # + format_error, thinking_signature, long_context_tier и др.
+ auth = "auth" # 401/403 — refresh/rotate
+ auth_permanent = "auth_permanent" # Auth failed after refresh — abort
+ billing = "billing" # 402 — rotate immediately
+ rate_limit = "rate_limit" # 429 — backoff then rotate
+ overloaded = "overloaded" # 503/529 — backoff
+ server_error = "server_error" # 500/502 — retry
+ timeout = "timeout" # Connection timeout — rebuild client
+ context_overflow = "context_overflow" # Context too large — compress
+ model_not_found = "model_not_found" # 404 — fallback model
+ provider_policy_blocked = "provider_policy_blocked"
+ # + format_error, thinking_signature, long_context_tier и др.
 ```
 
 Каждая классификация содержит recovery hints: `retryable`, `should_compress`, `should_rotate_credential`, `should_fallback`.
 
-**Почему нам интересно:** Наш `RetryingAgentRunner` делает retry без разбора. Hermes предлагает наиболее развитую систему классификации ошибок из всех исследованных проектов — 20+ категорий вместо 3 (Archon) или 6 (OpenClaw). Для PHP можно начать с упрощённого набора: `auth`, `rate_limit`, `server_error`, `context_overflow`, `model_not_found`, `unknown` — и расширять по мере необходимости.
+**Оркестрационная значимость:** Классификация ошибок управляет поведением agent loop: каждая категория определяет конкретную стратегию восстановления — `retryable` вызывает повторный запрос с backoff, `should_rotate_credential` переключает API key, `should_compress` запускает context compression, `should_fallback` переводит на резервную модель. Например, `context_overflow` → compression + retry, `rate_limit` → backoff + credential rotation, `auth_permanent` → немедленный abort. Это превращает error handling из «retry на всё» в детерминированную таблицу решений, где каждая категория ошибок mapped на конкретное действие.
 
 ### 3.2 🟡 Structured Context Compression (`agent/context_compressor.py`, ~1500 LOC)
 
@@ -171,14 +168,14 @@ class FailoverReason(enum.Enum):
 1. **Pre-pass: tool result pruning** — замена старых tool results на информативные summaries (`[terminal] ran 'npm test' → exit 0, 47 lines output`), дедупликация идентичных результатов, truncation больших tool_call arguments
 2. **Tail protection by token budget** — protect head (system prompt + first exchange) + N токенов tail; boundary alignment для tool_call/result pairs
 3. **Structured LLM summarization** — 14-секционный шаблон (Active Task, Goal, Completed Actions, Active State, In Progress, Blocked, Key Decisions, Resolved Questions, Pending User Asks, Relevant Files, Remaining Work, Critical Context)
-4. **Iterative summary updates** — при повторной компресии обновляет предыдущую summary вместо создания с нуля
-5. **Anti-thrashing protection** — если две последовательные компресии сэкономили <10% каждая, skip compression
-6. **Tool pair integrity** — cleanup orphaned tool_call/tool_result pairs после компресии
+4. **Iterative summary updates** — при повторной компрессии обновляет предыдущую summary вместо создания с нуля
+5. **Anti-thrashing protection** — если две последовательные компрессии сэкономили <10% каждая, skip compression
+6. **Tool pair integrity** — cleanup orphaned tool_call/tool_result pairs после компрессии
 7. **Last user message anchoring** — гарантия, что последнее сообщение пользователя всегда в protected tail (bug #10896)
 
-**Почему нам интересно:** Самый продвинутый context compressor из всех исследованных проектов. Конкретные паттерны для заимствования:
+**Оркестрационная значимость:** Самый продвинутый context compressor из всех исследованных проектов. Конкретные паттерны для заимствования:
 - **Structured summary template** — 14-секционный формат для передачи контекста между итерациями fix_iterations
-- **Anti-thrashing** — защита от бесполезной компресии (у нас может быть аналогия: если retry не меняет результат, stop)
+- **Anti-thrashing** — защита от бесполезной компресии 
 - **Tool result deduplication** — актуально для fix_iterations, где agent может повторять одни и те же команды
 
 ### 3.3 🟡 Subagent Delegation (`tools/delegate_tool.py`)
@@ -187,30 +184,30 @@ class FailoverReason(enum.Enum):
 
 ```python
 delegate_task(
-    goal="Implement auth module",
-    tasks=["JWT tokens", "Session management", "Tests"],  # batch/parallel mode
-    role="orchestrator" | "leaf",     # orchestrator может порождать дочерних
-    max_spawn_depth=1,                # до 3 уровней вложенности
-    max_concurrent_children=3,        # параллельное выполнение
-    child_timeout_seconds=600,        # timeout на каждого child
-    toolsets=["terminal", "file"],    # restricted toolset
+ goal="Implement auth module",
+ tasks=["JWT tokens", "Session management", "Tests"], # batch/parallel mode
+ role="orchestrator" | "leaf", # orchestrator может порождать дочерних
+ max_spawn_depth=1, # до 3 уровней вложенности
+ max_concurrent_children=3, # параллельное выполнение
+ child_timeout_seconds=600, # timeout на каждого child
+ toolsets=["terminal", "file"], # restricted toolset
 )
 ```
 
 Ключевые механизмы:
 - **DELEGATE_BLOCKED_TOOLS** — `delegate_task`, `clarify`, `memory`, `send_message`, `execute_code` (no recursive delegation, no user interaction, no shared memory writes)
-- **Orchestrator/Leaf roles** — orchestrator может порождать sub-agents, leaf — нет
+- **Orchestrator/Leaf roles** — orchestrator может порождать subagents, leaf — нет
 - **ThreadPoolExecutor** — параллельное выполнение через Python threads
 - **Subagent approval callbacks** — auto-deny (default) / auto-approve для dangerous commands в subagent threads
 
-**Почему нам интересно:** Ближайший аналог для нашего будущего sub-agent pattern. Ключевая идея: **blocked tools list** — subagent не должен иметь инструменты, позволяющие ему взаимодействовать с пользователем, модифицировать shared state или порождать своих потомков.
+**Оркестрационная значимость:** Ближайший аналог для нашего будущего sub-agent pattern. Ключевая идея: **blocked tools list** — subagent не должен иметь инструменты, позволяющие ему взаимодействовать с пользователем, модифицировать shared state или порождать своих потомков.
 
 ### 3.4 🟡 Credential Pool с Multi-Strategy Rotation (`agent/credential_pool.py`)
 
 **Что у них:** Пул credentials (API ключей) для одного провайдера с 4 стратегиями:
 
 | Стратегия | Поведение |
-|---|---|
+| --- | --- |
 | `fill_first` | Использовать первый доступный, пока не исчерпан |
 | `round_robin` | Циклическое переключение |
 | `random` | Случайный выбор |
@@ -218,7 +215,29 @@ delegate_task(
 
 Exhausted credentials охлаждаются 1 час (override от провайдера). Поддержка OAuth + API key credentials.
 
-**Почему нам интересно:** Для task-orchestrator — дополнение к circuit breaker: CB защищает от cascade failures, credential rotation — от rate limiting. Если один API key исчерпан, автоматически переключаемся на следующий.
+Механика rotation:
+```python
+class CredentialPool:
+    def __init__(self, credentials: list[Credential], strategy: RotationStrategy):
+        self.credentials = credentials
+        self.strategy = strategy
+        self.exhausted: dict[str, datetime] = {}  # credential_id → cooldown_until
+
+    def acquire(self) -> Credential | None:
+        """Возвращает первый доступный credential согласно стратегии."""
+        # fill_first: linear scan до первого не-exhausted
+        # round_robin: cycle через credentials, skip exhausted
+        # least_used: sort по usage_count, pick min
+        # random: choice из не-exhausted
+
+    def mark_exhausted(self, credential_id: str, cooldown_seconds: int = 3600):
+        """Исключает credential из rotation на cooldown период."""
+        self.exhausted[credential_id] = utcnow() + timedelta(seconds=cooldown_seconds)
+```
+
+Типичный flow: `acquire()` → API call → если 429 → `mark_exhausted()` → `acquire()` снова с другим credential. Если все exhausted — wait до ближайшего cooldown истечения.
+
+**Оркестрационная значимость:** Credential pool реализует паттерн «circuit breaker на уровне ключей»: каждый ключ имеет individual cooldown, а пул как целое деградирует gracefully — от N доступных ключей до 0 с понятным ожиданием восстановления. Стратегии rotation позволяют балансировать между равномерным износом (`round_robin`, `least_used`) и минимизацией переключений (`fill_first`).
 
 ### 3.5 🟡 Filesystem Checkpoints (`tools/checkpoint_manager.py`)
 
@@ -226,15 +245,15 @@ Exhausted credentials охлаждаются 1 час (override от прова�
 
 ```
 ~/.hermes/checkpoints/
-    store/                          — single bare git repo (deduplication across projects)
-        refs/hermes/<hash16>        — per-project branch tip
-        indexes/<hash16>            — per-project git index
-        projects/<hash16>.json      — {workdir, created_at, last_touch}
+ store/ — single bare git repo (deduplication across projects)
+ refs/hermes/<hash16> — per-project branch tip
+ indexes/<hash16> — per-project git index
+ projects/<hash16>.json — {workdir, created_at, last_touch}
 ```
 
 Создаются перед file-mutating operations (`write_file`, `patch`, `terminal` с destructive flags). Поддержка rollback к любому checkpoint. Auto-prune stale/orphan snapshots.
 
-**Почему нам интересно:** Для автономных fix_iterations — гарантия, что можно откатить изменения агента. У нас нет механизма отката. Реализация через git — изящная: нулевой overhead для неизменённых файлов.
+**Оркестрационная значимость:** Для автономных fix_iterations — гарантия, что можно откатить изменения агента. Реализация через git — изящная: нулевой overhead для неизменённых файлов.
 
 ### 3.6 🟡 Context File Injection Scanning (`agent/prompt_builder.py`)
 
@@ -242,17 +261,17 @@ Exhausted credentials охлаждаются 1 час (override от прова�
 
 ```python
 _CONTEXT_THREAT_PATTERNS = [
-    (r'ignore\s+(previous|all|above)\s+instructions', "prompt_injection"),
-    (r'do\s+not\s+tell\s+the\s+user', "deception_hide"),
-    (r'system\s+prompt\s+override', "sys_prompt_override"),
-    (r'disregard\s+(your|all)\s+(instructions|rules)', "disregard_rules"),
-    # + 6 more patterns + invisible unicode detection
+ (r'ignore\s+(previous|all|above)\s+instructions', "prompt_injection"),
+ (r'do\s+not\s+tell\s+the\s+user', "deception_hide"),
+ (r'system\s+prompt\s+override', "sys_prompt_override"),
+ (r'disregard\s+(your|all)\s+(instructions|rules)', "disregard_rules"),
+ # + 6 more patterns + invisible unicode detection
 ]
 ```
 
 Блокированные файлы заменяются на `[BLOCKED: <filename> contained potential prompt injection ...]`.
 
-**Почему нам интересно:** При загрузке .md файлов (роли, skills) в task-orchestrator — защита от prompt injection через вредоносные context files. Quick win: regex-паттерны для базовой санитизации.
+**Оркестрационная значимость:** Hermes загружает произвольные `.md` файлы с диска (AGENTS.md, SOUL.md, SKILL.md, контекстные файлы проекта) в system prompt. Без сканирования любой из этих файлов становится вектором prompt injection — злоумышленный `.hermes.md` в клонированном репозитории может переопределить поведение агента. 11 regex-паттернов + invisible unicode detection — эвристическая защита, которая не требует отдельной модели и добавляет <1ms overhead. Ложноположительные срабатывания заменяют файл на `[BLOCKED: ...]` вместо краша, сохраняя агент работоспособным.
 
 ### 3.7 🟡 Rate Limit Header Tracking (`agent/rate_limit_tracker.py`)
 
@@ -261,16 +280,16 @@ _CONTEXT_THREAT_PATTERNS = [
 ```python
 @dataclass
 class RateLimitState:
-    requests_min: RateLimitBucket    # RPM cap
-    requests_hour: RateLimitBucket   # RPH cap
-    tokens_min: RateLimitBucket      # TPM cap
-    tokens_hour: RateLimitBucket     # TPH cap
-    # limit, remaining, reset_seconds для каждого bucket
+ requests_min: RateLimitBucket # RPM cap
+ requests_hour: RateLimitBucket # RPH cap
+ tokens_min: RateLimitBucket # TPM cap
+ tokens_hour: RateLimitBucket # TPH cap
+ # limit, remaining, reset_seconds для каждого bucket
 ```
 
 Отображение через `/usage` slash command.
 
-**Почему нам интересно:** Дополнение к circuit breaker: отслеживание rate limits позволяет превентивно переключаться на fallback runner до получения 429, а не реактивно.
+**Оркестрационная значимость:** Дополнение к circuit breaker: отслеживание rate limits позволяет превентивно переключаться на fallback runner до получения 429, а не реактивно.
 
 ### 3.8 🟡 Kanban Multi-Agent Coordination (`tools/kanban_tools.py` + `plugins/kanban/`)
 
@@ -281,11 +300,11 @@ class RateLimitState:
 - **Parent-child handoffs:** summary + metadata передаются от родителя к дочернему worker'у
 - **Worker spawning:** агенты запускаются с `$HERMES_KANBAN_TASK` env var
 
-**Почему нам интересно:** Модель координации для будущих multi-agent scenarios. Конкретный паттерн: **kanban board как shared coordination surface** — agents не общаются напрямую, а координируются через общую доску задач. Аналогия с нашими YAML chains, но для параллельного выполнения.
+**Оркестрационная значимость:** Модель координации для будущих multi-agent scenarios. Конкретный паттерн: **kanban board как shared coordination surface** — agents не общаются напрямую, а координируются через общую доску задач. Аналогия с нашими YAML chains, но для параллельного выполнения.
 
 ---
 
-## 4. Что НЕ берём и почему
+## 4. Прочие возможности (вне оркестрации)
 
 ### 4.1 🟢 Agent Loop (прямое LLM API взаимодействие)
 
@@ -325,21 +344,16 @@ Plugin architecture (memory, context_engine, model-providers) — мощная, 
 
 ---
 
-## 5. Сводка рекомендаций
+## 5. Сводка по оркестрации
 
-| Фича | Приоритет | Обоснование |
-|---|---|---|
-| Chain orchestration (YAML chains) | ✅ Уже есть | Core-функциональность task-orchestrator |
-| Retry + Circuit Breaker | ✅ Уже есть | Устойчивость при сбоях |
-| Quality Gates | ✅ Уже есть | Автоматическая проверка кода |
-| Budget control | ✅ Уже есть | Предотвращение runaway spending |
-| Fix iterations | ✅ Уже есть | Closed-loop цикл разработки |
+| Возможность | Статус в продукте | Описание |
+| --- | --- | --- |
 | Error classification (20+ categories) | 🟡 P2 | Наиболее развитая система из исследованных. Начать с 6 категорий: auth, rate_limit, server_error, context_overflow, model_not_found, unknown |
 | Credential pool / API key rotation | 🟡 P2 | Дополнение к CB: rotation вместо retry при rate_limit |
 | Context compression (structured summary) | 🟡 P3 | 14-секционный summary template для передачи контекста в fix_iterations |
 | Subagent delegation (blocked tools, depth control) | 🟡 P3 | Для будущих dynamic chains: «chain внутри chain» с изолированным контекстом |
 | Filesystem checkpoints (shadow git) | 🟡 P3 | Rollback для fix_iterations — гарантия восстановления при ошибке |
-| Context file injection scanning | 🟡 P2 | Quick win: regex-паттерны для базовой защиты от prompt injection в .md файлах |
+| Context file injection scanning | 🟡 P2 | Сканирование .md файлов на prompt injection (11 threat patterns) |
 | Rate limit header tracking | 🟡 P3 | Превентивное переключение runner до получения 429 |
 | Kanban multi-agent coordination | 🟡 P3 | Модель для будущих multi-agent scenarios |
 | Tool result deduplication | 🟡 P3 | Для fix_iterations: не повторять одинаковые tool calls в контексте |

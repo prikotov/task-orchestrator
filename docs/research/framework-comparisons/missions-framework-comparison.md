@@ -22,66 +22,66 @@ Factory AI — компания (Series C, $150M, оценка $1.5B, Khosla Ven
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                     User (Developer)                         │
-│   • Describes mission goals via Factory CLI / Web UI         │
-│   • Reviews proposals, provides clarifications               │
+│ User (Developer) │
+│ • Describes mission goals via Factory CLI / Web UI │
+│ • Reviews proposals, provides clarifications │
 └───────────────────────────┬──────────────────────────────────┘
-                            │
-                            ▼
+ │
+ ▼
 ┌──────────────────────────────────────────────────────────────┐
-│               Orchestrator (claude-opus-4-6)                  │
-│            51KB mission-specific system prompt                │
-│                                                              │
-│  Responsibilities:                                           │
-│   • Plan & decompose → milestones, features                  │
-│   • Create shared state (mission.md, AGENTS.md, .factory/)   │
-│   • Delegate features → workers via start_mission_run        │
-│   • Handle worker handoffs & mid-mission user requests       │
-│   • Track requirements & quality enforcement                 │
-│                                                              │
-│  Tools: ProposeMission, StartMissionRun,                     │
-│         DismissHandoffItems, AskUser, Task (subagents)       │
+│ Orchestrator (claude-opus-4-6) │
+│ 51KB mission-specific system prompt │
+│ │
+│ Responsibilities: │
+│ • Plan & decompose → milestones, features │
+│ • Create shared state (mission.md, AGENTS.md, .factory/) │
+│ • Delegate features → workers via start_mission_run │
+│ • Handle worker handoffs & mid-mission user requests │
+│ • Track requirements & quality enforcement │
+│ │
+│ Tools: ProposeMission, StartMissionRun, │
+│ DismissHandoffItems, AskUser, Task (subagents) │
 └──────────┬───────────────────────────────┬───────────────────┘
-           │                               │
-    ┌──────┴──────┐              ┌─────────┴─────────┐
-    ▼             ▼              ▼                   ▼
-┌─────────┐  ┌─────────┐  ┌──────────┐  ┌───────────────────┐
-│ Worker  │  │ Worker  │  │ Validator│  │ Validator         │
-│ (opus)  │  │ (opus)  │  │ Scrutiny │  │ User-Testing      │
-│         │  │         │  │ (inject) │  │ (inject)          │
-│ Code    │  │ Code    │  │          │  │                   │
-│ only    │  │ only    │  │ test +   │  │ behavioral        │
-│         │  │         │  │ lint +   │  │ assertions via    │
-│ No      │  │ No      │  │ typecheck│  │ flow validators   │
-│ AskUser │  │ AskUser │  │ + review │  │ + synthesis       │
-│ No Task │  │ No Task │  │ subagents│  │ + evidence capture│
-└────┬────┘  └────┬────┘  └──────────┘  └───────────────────┘
-     │            │
-     └────────────┴──────────────────────────────────┐
-                                                     ▼
+ │ │
+ ┌──────┴──────┐ ┌─────────┴─────────┐
+ ▼ ▼ ▼ ▼
+┌─────────┐ ┌─────────┐ ┌──────────┐ ┌───────────────────┐
+│ Worker │ │ Worker │ │ Validator│ │ Validator │
+│ (opus) │ │ (opus) │ │ Scrutiny │ │ User-Testing │
+│ │ │ │ │ (inject) │ │ (inject) │
+│ Code │ │ Code │ │ │ │ │
+│ only │ │ only │ │ test + │ │ behavioral │
+│ │ │ │ │ lint + │ │ assertions via │
+│ No │ │ No │ │ typecheck│ │ flow validators │
+│ AskUser │ │ AskUser │ │ + review │ │ + synthesis │
+│ No Task │ │ No Task │ │ subagents│ │ + evidence capture│
+└────┬────┘ └────┬────┘ └──────────┘ └───────────────────┘
+ │ │
+ └────────────┴──────────────────────────────────┐
+ ▼
 ┌──────────────────────────────────────────────────────────────┐
-│                  Shared State (on disk)                       │
-│                                                              │
-│  missionDir:                                                 │
-│   • mission.md (proposal, requirements)                      │
-│   • validation-contract.md (behavioral assertions, TDD)      │
-│   • validation-state.json (assertion status tracker)         │
-│   • features.json (ordered feature list)                     │
-│   • AGENTS.md (operational guidance for workers)             │
-│                                                              │
-│  repo root:                                                  │
-│   • .factory/skills/{worker-type}/SKILL.md                   │
-│   • .factory/services.yaml (commands + services manifest)    │
-│   • .factory/init.sh (idempotent env setup)                  │
-│   • .factory/library/ (knowledge base, flat structure)       │
-│   • .factory/validation/<milestone>/ (reports)               │
+│ Shared State (on disk) │
+│ │
+│ missionDir: │
+│ • mission.md (proposal, requirements) │
+│ • validation-contract.md (behavioral assertions, TDD) │
+│ • validation-state.json (assertion status tracker) │
+│ • features.json (ordered feature list) │
+│ • AGENTS.md (operational guidance for workers) │
+│ │
+│ repo root: │
+│ • .factory/skills/{worker-type}/SKILL.md │
+│ • .factory/services.yaml (commands + services manifest) │
+│ • .factory/init.sh (idempotent env setup) │
+│ • .factory/library/ (knowledge base, flat structure) │
+│ • .factory/validation/<milestone>/ (reports) │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 ### Три роли агентов
 
 | Роль | Модель | Инструменты | Контекст | Ответственность |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | **Orchestrator** | claude-opus-4-6 | ProposeMission, StartMissionRun, DismissHandoffItems, AskUser, Task (subagents) | 51KB mission prompt + full mission history | Планирование, декомпозиция, делегирование, контроль качества |
 | **Worker** | claude-opus-4-6 | Кодирование, файлы, shell | 4KB prompt + AGENTS.md + mission.md + skill + feature description | Реализация конкретной фичи в одной сессии |
 | **Validator** | claude-opus-4-6 | Кодирование, тесты, shell | missionDir + services.yaml + library | Автоматическая валидация (scrutiny + user-testing) |
@@ -89,7 +89,7 @@ Factory AI — компания (Series C, $150M, оценка $1.5B, Khosla Ven
 ### Ключевые характеристики
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | Проприетарный SaaS-продукт (multi-day autonomous software development) |
 | **Модель выполнения** | Orchestrator → Worker delegation (serial feature execution) |
 | **AI-провайдер** | claude-opus-4-6 (model-agnostic дизайн) |
@@ -104,85 +104,81 @@ Factory AI — компания (Series C, $150M, оценка $1.5B, Khosla Ven
 ### Рабочий процесс Mission (4 фазы)
 
 ```
-Phase 1: Mission Planning         Phase 2: Worker Design
-┌──────────────────────┐          ┌──────────────────────┐
-│ User describes goal   │          │ Determine worker types│
-│ Orchestrator asks     │          │ Create SKILL.md per   │
-│   clarifying questions│          │   worker type         │
-│ Investigate codebase  │          │ Design handoff format │
-│   via subagents       │          │ Define acceptance     │
-│ Confirm milestones    │          │   criteria            │
-│ Capture ALL           │          │                      │
-│   requirements        │          │                      │
-└──────────┬───────────┘          └──────────┬───────────┘
-           │                                  │
-           └──────────┬───────────────────────┘
-                      ▼
-           Phase 3: Creating Mission Artifacts
-           ┌──────────────────────────────────┐
-           │ validation-contract.md (TDD!)     │
-           │ validation-state.json (pending)   │
-           │ features.json (ordered list)      │
-           │ AGENTS.md (boundaries + guidance) │
-           │ .factory/skills/                  │
-           │ .factory/services.yaml            │
-           │ .factory/init.sh                  │
-           │ .factory/library/                 │
-           └──────────────┬───────────────────┘
-                          ▼
-           Phase 4: Managing Execution
-           ┌──────────────────────────────────┐
-           │ start_mission_run (blocking)     │
-           │   → Worker 1: feature A          │
-           │   → Worker 2: feature B          │
-           │   → ... (serial execution)       │
-           │ Milestone complete?               │
-           │   → scrutiny-validator (auto)    │
-           │   → user-testing-validator (auto)│
-           │ Handle handoffs:                  │
-           │   → fix features? → re-run       │
-           │   → user input? → pause          │
-           │ All milestones sealed?            │
-           │   → ALL assertions passed? → DONE│
-           └──────────────────────────────────┘
+Phase 1: Mission Planning Phase 2: Worker Design
+┌──────────────────────┐ ┌──────────────────────┐
+│ User describes goal │ │ Determine worker types│
+│ Orchestrator asks │ │ Create SKILL.md per │
+│ clarifying questions│ │ worker type │
+│ Investigate codebase │ │ Design handoff format │
+│ via subagents │ │ Define acceptance │
+│ Confirm milestones │ │ criteria │
+│ Capture ALL │ │ │
+│ requirements │ │ │
+└──────────┬───────────┘ └──────────┬───────────┘
+ │ │
+ └──────────┬───────────────────────┘
+ ▼
+ Phase 3: Creating Mission Artifacts
+ ┌──────────────────────────────────┐
+ │ validation-contract.md (TDD!) │
+ │ validation-state.json (pending) │
+ │ features.json (ordered list) │
+ │ AGENTS.md (boundaries + guidance) │
+ │ .factory/skills/ │
+ │ .factory/services.yaml │
+ │ .factory/init.sh │
+ │ .factory/library/ │
+ └──────────────┬───────────────────┘
+ ▼
+ Phase 4: Managing Execution
+ ┌──────────────────────────────────┐
+ │ start_mission_run (blocking) │
+ │ → Worker 1: feature A │
+ │ → Worker 2: feature B │
+ │ → ... (serial execution) │
+ │ Milestone complete? │
+ │ → scrutiny-validator (auto) │
+ │ → user-testing-validator (auto)│
+ │ Handle handoffs: │
+ │ → fix features? → re-run │
+ │ → user input? → pause │
+ │ All milestones sealed? │
+ │ → ALL assertions passed? → DONE│
+ └──────────────────────────────────┘
 ```
 
 ---
 
-## 2. Сравнительная таблица: что у нас есть vs. чего нет
+## 2. Возможности оркестрации — обзор
 
-| Функция | Task Orchestrator | Factory Missions | Статус |
-|---|---|---|---|
-| **Цепочки шагов (chains)** | ✅ YAML chains, статические и динамические | ✅ features.json (ordered array, serial execution) | ✅ Паритет (разный подход) |
-| **Оркестратор (центральный агент)** | ✅ Chain Executor (PHP-код) | ✅ LLM-оркестратор (51KB prompt, opus) | 🟡 Разная парадигма |
-| **Делегирование (delegation)** | ✅ Chain step → runner | ✅ Orchestrator → Worker (start_mission_run) | ✅ Паритет (разный подход) |
-| **Validation Contract (mission-level TDD)** | ❌ Нет (quality gates = shell-команды) | ✅ validation-contract.md + validation-state.json — поведенческие assertion'ы пишутся ДО кода | 🟡 Очень интересно |
-| **Structured Handoffs** | ❌ Нет (runner вывод → текст) | ✅ Worker returns: successState, discoveredIssues, whatWasLeftUndone, handoffFile | 🟡 Очень интересно |
-| **Milestones + Sealing** | ❌ Нет | ✅ Vertical slices + sealed milestones (never add after validation) | 🟡 Интересно |
-| **Serial feature execution** | ✅ Serial chain execution | ✅ Serial feature execution (avoid agent conflicts) | ✅ Паритет |
-| **Shared state on disk** | ❌ In-memory + JSONL audit | ✅ mission.md, AGENTS.md, .factory/ (all file-based) | 🟡 Интересно |
-| **Retry с backoff** | ✅ RetryingAgentRunner | ❌ Нет (failed feature → orchestrator handles) | ✅ У нас есть |
-| **Circuit Breaker** | ✅ CircuitBreakerAgentRunner | ❌ Нет | ✅ У нас есть |
-| **Quality Gates** | ✅ Shell-команды как проверки | ✅ Two-level: scrutiny (test/lint/typecheck + review subagents) + user-testing (behavioral assertions) | 🟡 Более развитые |
-| **Бюджетный контроль** | ✅ BudgetVo (cost-based) | ❌ Нет явного budget control | ✅ У нас есть |
-| **Fix iterations** | ✅ Группа шагов с max_iterations | ✅ Failed feature → fix features → re-run validator (incremental) | ✅ Паритет (разный подход) |
-| **Fallback routing** | ✅ Per-step fallback runner | ❌ Нет (model-agnostic design, но один провайдер) | ✅ У нас есть |
-| **Subagents (Task tool)** | ❌ Нет | ✅ Orchestrator delegates to subagents for investigation, review, research | 🟡 Интересно |
-| **Mid-mission scope changes** | ❌ Нет (chain = static definition) | ✅ Formal procedure: pause → investigate → update all shared state → update contract → resume | 🟡 Очень интересно |
-| **Requirement tracking** | ❌ Нет | ✅ Every requirement tracked, echo-back to user, propagate to all files | 🟡 Интересно |
-| **Mission Boundaries** | ❌ Нет | ✅ Explicit constraints (port ranges, off-limits resources, never violate) | 🟡 Интересно |
-| **Worker skills (SKILL.md)** | ✅ Role .md файлы (18+ ролей) | ✅ .factory/skills/{worker-type}/SKILL.md per worker type | ✅ Паритет |
-| **Services manifest** | ❌ Нет (runner'ы сами управляют) | ✅ .factory/services.yaml (commands + services + ports + healthchecks) | 🟡 Интересно |
-| **Knowledge library** | ❌ Нет | ✅ .factory/library/ (flat structure, topic files) | 🟡 Интересно |
-| **AGENTS.md as operational guidance** | ✅ AGENTS.md (project-level) | ✅ AGENTS.md per mission (boundaries + conventions + testing guidance) | ✅ Паритет |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Monolithic prompt-driven (51KB system prompt) | ✅ У нас лучше |
-| **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Direct tool invocation | ✅ У нас лучше |
-| **Proprietary / Open-source** | ✅ Open-source (MIT) | 🔴 Проприетарный SaaS | 🔴 Не dependency |
-| **Язык реализации** | PHP 8.4 / Symfony 8.0 | Prompt-driven (TypeScript backend, закрытый) | — |
+| Функция | Factory Missions |
+| --- | --- |
+| **Цепочки шагов (chains)** | ✅ features.json (ordered array, serial execution) |
+| **Оркестратор (центральный агент)** | ✅ LLM-оркестратор (51KB prompt, opus) |
+| **Делегирование (delegation)** | ✅ Orchestrator → Worker (start_mission_run) |
+| **Validation Contract (mission-level TDD)** | ✅ validation-contract.md + validation-state.json — поведенческие assertion'ы пишутся ДО кода |
+| **Structured Handoffs** | ✅ Worker returns: successState, discoveredIssues, whatWasLeftUndone, handoffFile |
+| **Milestones + Sealing** | ✅ Vertical slices + sealed milestones (never add after validation) |
+| **Serial feature execution** | ✅ Serial feature execution (avoid agent conflicts) |
+| **Shared state on disk** | ✅ mission.md, AGENTS.md, .factory/ (all file-based) |
+| **Quality Gates** | ✅ Two-level: scrutiny (test/lint/typecheck + review subagents) + user-testing (behavioral assertions) |
+| **Fix iterations** | ✅ Failed feature → fix features → re-run validator (incremental) |
+| **Subagents (Task tool)** | ✅ Orchestrator delegates to subagents for investigation, review, research |
+| **Mid-mission scope changes** | ✅ Formal procedure: pause → investigate → update all shared state → update contract → resume |
+| **Requirement tracking** | ✅ Every requirement tracked, echo-back to user, propagate to all files |
+| **Mission Boundaries** | ✅ Explicit constraints (port ranges, off-limits resources, never violate) |
+| **Worker skills (SKILL.md)** | ✅ .factory/skills/{worker-type}/SKILL.md per worker type |
+| **Services manifest** | ✅ .factory/services.yaml (commands + services + ports + healthchecks) |
+| **Knowledge library** | ✅ .factory/library/ (flat structure, topic files) |
+| **AGENTS.md as operational guidance** | ✅ AGENTS.md per mission (boundaries + conventions + testing guidance) |
+| **DDD-архитектура** | ❌ Monolithic prompt-driven (51KB system prompt) |
+| **Decorator pattern** | ❌ Direct tool invocation |
+| **Proprietary / Open-source** | 🔴 Проприетарный SaaS |
+| **Язык реализации** | PHP 8.4 / Symfony 8.0 |
 
 ---
 
-## 3. Что полезно взять и почему
+## 3. Оркестрационные возможности
 
 ### 3.1 🟡 Validation Contract — mission-level TDD
 
@@ -196,7 +192,7 @@ A user with valid credentials submits the login form and is redirected to the da
 Evidence: screenshot, console-errors, network(POST /api/auth/login -> 200)
 ```
 
-**Почему нам интересно:** Наши quality gates — это shell-команды (пост-фактум проверки). Validation contract — это **декларативная спецификация корректности**, независимая от имплементации. Концепция применима на уровне chain: определить assertion'ы для всей цепочки перед выполнением, затем проверить каждый после завершения.
+**Оркестрационная значимость:** Наши quality gates — это shell-команды (пост-фактум проверки). Validation contract — это **декларативная спецификация корректности**, независимая от имплементации. Концепция применима на уровне chain: определить assertion'ы для всей цепочки перед выполнением, затем проверить каждый после завершения.
 
 **Как адаптировать:** Не обязательно behavioural assertions — можно начать с JSON Schema для output каждого шага + `until_bash` для детерминированных проверок + shell-based gates как сейчас. Validation contract как паттерн мышления (TDD на уровне chain), а не как формат файла.
 
@@ -210,7 +206,7 @@ Evidence: screenshot, console-errors, network(POST /api/auth/login -> 200)
 
 Orchestrator решает: fix within mission → user input required → escalate.
 
-**Почему нам интересно:** У нас runner возвращает текстовый вывод. Structured handoff позволил бы chain executor'у принимать решения: если `successState = "partial"` → retry с доп. контекстом, если `discoveredIssues` → добавить fix-шаг, если `whatWasLeftUndone` → insert additional step.
+**Оркестрационная значимость:** Structured handoff позволил бы chain executor'у принимать решения: если `successState = "partial"` → retry с доп. контекстом, если `discoveredIssues` → добавить fix-шаг, если `whatWasLeftUndone` → insert additional step.
 
 **Как адаптировать:** Определить схему handoff для runner output (JSON поверх текста). Chain executor парсит handoff и принимает решения. Начать с простого: `success: bool`, `issues: string[]`, `next_action: "continue" | "retry" | "stop"`.
 
@@ -224,17 +220,19 @@ Orchestrator решает: fix within mission → user input required → escala
 
 Если нужна доработка sealed milestone → `misc-*` milestone или follow-up milestone.
 
-**Почему нам интересно:** У нас нет концепции «завершённого этапа» — chain выполняется последовательно, и любой шаг может быть повторён. Sealing обеспечивает прогресс: «эта часть готова, не трогаем». Для длинных multi-step chains это предотвратило бы regression.
+**Оркестрационная значимость:** Sealing обеспечивает прогресс: «эта часть готова, не трогаем». Для длинных multi-step chains это предотвратило бы regression.
 
-**Как адаптировать:** Для простых chains — не нужно (chain = один атомарный запуск). Для dynamic chains / fix_iterations: после завершения fix loop → seal (запретить модификацию уже проверенных шагов). Реализуемо через metadata в chain execution.
+**Как адаптировать:** Для простых chains — не нужно (chain = один атомарный запуск). Для dynamic chains / fix_iterations: после завершения fix loop → seal (запретить модификацию уже проверенных шагов).
 
 ### 3.4 🟡 Fresh Context per Worker Session
 
 **Что у них:** Каждый worker стартует с чистым контекстом. Worker читает state с диска (mission.md, AGENTS.md, SKILL.md, feature description). Нет «накопления» контекста предыдущих worker'ов.
 
-**Почему нам интересно:** Напрямую связано с нашей DynamicLoop — если agent loop повторяется много раз, контекст разрастается. Archon предлагает `fresh_context: true` для loop nodes. Missions доводит идею до логического завершения: каждый worker = чистая сессия.
+**Оркестрационная значимость:** Fresh context — ключевое архитектурное решение для долгоживущих multi-agent систем. Накопление контекста в LLM-сессиях приводит к деградации качества решений, увеличению latency и росту стоимости. Изоляция каждого worker'а в чистую сессию с чтением state с диска устраняет эту проблему ценой дополнительного I/O и необходимости полной сериализации state в файлы.
 
-**Как адаптировать:** Для fix_iterations: опциональный режим, где каждый iteration начинается с чистого контекста (agent читает state payload с диска, а не из накопившегося контекста). Требует персистентного payload storage.
+**Сильные стороны:** Предсказуемое использование контекста, отсутствие «утечек» между workers, воспроизводимость результатов.
+
+**Ограничения:** Требует полной сериализации всего необходимого state в файловую систему. Если worker обнаружит, что в state не хватает информации — ему некуда обратиться (нет AskUser, нет Task). Это заставляет extremely тщательно проектировать shared state upfront.
 
 ### 3.5 🟡 Five Multi-Agent Communication Patterns
 
@@ -245,9 +243,11 @@ Orchestrator решает: fix within mission → user input required → escala
 4. **Negotiation**: orchestrator ↔ user (AskUser tool, clarifying questions)
 5. **Direct**: subagents (Task tool для investigation, review, research)
 
-**Почему нам интересно:** Это таксономия паттернов для multi-agent систем. У нас есть (1) Delegation (chain step → runner) и зачатки (3) Broadcast (payload между шагами). Паттерн Creator-Verifier — это наши quality gates, но Missions интегрирует его формально (auto-injected validators). Negotiation — для interactive mode (частично).
+**Оркестрационная значимость:** Формальная таксономия из пяти паттернов покрывает основной спектр коммуникаций в multi-agent системах. Creator-Verifier — встроенный в runtime контроль качества: валидаторы инжектируются автоматически, а не вызываются вручную. Broadcast через shared state — stateless-подход к координации: все workers читают одни и те же файлы, нет in-memory синхронизации. Negotiation (AskUser) — единственный синхронный паттерн, требует блокировки worker'а до ответа пользователя.
 
-**Как адаптировать:** Использовать таксономию для проектирования расширений: когда добавляем validation → паттерн Creator-Verifier, когда добавляем HITL → паттерн Negotiation, когда добавляем sub-agents → паттерн Direct.
+**Сильные стороны:** Каждый паттерн решает конкретную проблему координации. Автоинжекция валидаторов устраняет human error (забыл запустить проверки). Shared state как broadcast-канал — простота и надёжность без message broker'а.
+
+**Ограничения:** Паттерны не ортогональны — broadcast и delegation частично пересекаются при обновлении shared state. Нет formal error handling для паттернов: если validator падает — нет специфицированного fallback. Negotiation — единственный паттерн, нарушающий автономность (блокировка на ответ пользователя).
 
 ### 3.6 🟡 Mission Boundaries (явные ограничения)
 
@@ -264,9 +264,11 @@ Orchestrator решает: fix within mission → user input required → escala
 Workers: If you cannot complete your work within these boundaries, return to orchestrator.
 ```
 
-**Почему нам интересно:** Для автономного выполнения chains в CI/CD нужны аналогичные ограничения. Наши quality gates — это post-execution проверки. Mission boundaries — pre-execution ограничения, которые runner видит ДО начала работы.
+**Оркестрационная значимость:** Mission boundaries — pre-execution ограничения, которые workers видят до начала работы. В отличие от post-execution проверок (тесты, lint), boundaries предотвращают нежелательные действия: workers не могут нарушить port range, не могут модифицировать off-limits ресурсы. При невозможности выполнить задачу в рамках boundaries — worker обязан вернуть управление orchestrator'у (fail-safe, а не fail-silent). Это архитектурный принцип «explicit constraints over implicit assumptions».
 
-**Как адаптировать:** Добавить секцию `boundaries` в chain definition YAML. Runner'ы получают boundaries как часть payload. При нарушении → fail-fast. Простой quick win: `allowed_paths`, `banned_commands`, `max_timeout`.
+**Сильные стороны:** Fail-fast при нарушении (worker не пытается «обойти» ограничение). Явные ограничения в текстовом формате — человекочитаемые и audit-friendly. Гарантируют изоляцию mission от остальной инфраструктуры.
+
+**Ограничения:** Boundaries — это промпт-инструкции, не enforceable на уровне системы. LLM-worker может нарушить ограничение (галлюцинация, игнорирование инструкций). Нет runtime-enforced sandbox: в отличие от container security policies или seccomp, boundaries полагаются исключительно на следование инструкциям LLM.
 
 ### 3.7 🟡 Services Manifest (.factory/services.yaml)
 
@@ -274,22 +276,22 @@ Workers: If you cannot complete your work within these boundaries, return to orc
 
 ```yaml
 commands:
-  install: pnpm install
-  test: npm run test
-  build: turbo build
+ install: pnpm install
+ test: npm run test
+ build: turbo build
 
 services:
-  postgres:
-    start: docker compose up -d postgres
-    stop: docker compose stop postgres
-    healthcheck: pg_isready -h localhost -p 5432
-    port: 5432
-    depends_on: []
+ postgres:
+ start: docker compose up -d postgres
+ stop: docker compose stop postgres
+ healthcheck: pg_isready -h localhost -p 5432
+ port: 5432
+ depends_on: []
 ```
 
 Workers читают services.yaml — не угадывают команды. Port hardcoded в каждой команде.
 
-**Почему нам интересно:** У нас runner'ы получают payload через chain, но нет единого манифеста «как запустить окружение». Для chains, требующих запуска тестов, серверов, БД — это ценная абстракция.
+**Оркестрационная значимость:** Для chains, требующих запуска тестов, серверов, БД — это ценная абстракция.
 
 **Как адаптировать:** Опциональный `services.yaml` в chain definition. Runner'ы могут ссылаться на `services.test` вместо хардкода. Не обязательно для P1, но полезно для chains с комплексным окружением.
 
@@ -303,13 +305,11 @@ Workers читают services.yaml — не угадывают команды. P
 
 **Ключевой принцип:** «Every file that states the old truth must be updated to state the new truth before workers resume.»
 
-**Почему нам интересно:** Для сложных chains с множеством шагов актуально: если mid-execution меняются требования (пользовательский ввод, ошибка), нужно propagate изменения в downstream шаги. У нас это решается через dynamic chains, но формализации нет.
-
-**Как адаптировать:** Для task-orchestrator — это patтерн мышления, а не реализация. При dynamic chain resolution: если обнаружено изменение requirements → пересоздать downstream steps. Формализовать через metadata payload.
+**Оркестрационная значимость:** Для сложных chains с множеством шагов актуально: если mid-execution меняются требования (пользовательский ввод, ошибка), нужно propagate изменения в downstream шаги. **Как адаптировать:** При dynamic chain resolution: если обнаружено изменение requirements → пересоздать downstream steps. Формализовать через metadata payload.
 
 ---
 
-## 4. Что НЕ берём и почему
+## 4. Прочие возможности (вне оркестрации)
 
 ### 4.1 🟢 LLM-as-Orchestrator (51KB system prompt)
 
@@ -323,9 +323,7 @@ Factory — SaaS-продукт с закрытым исходным кодом.
 
 ### 4.3 🟢 User-Testing Validator (behavioral assertions через LLM)
 
-Missions инжектирует user-testing validator, который через LLM-субагентов тестирует behavioral assertions (GUI interactions, flows). Это мощно, но требует: (а) GUI-доступ к приложению, (б) LLM-модели для тестирования, (в) significant compute.
-
-Для task-orchestrator (CLI) — это overengineering. Наши shell-based quality gates покрывают практические случаи (test suite, lint, typecheck).
+Missions инжектирует user-testing validator, который через LLM-субагентов тестирует behavioral assertions (GUI interactions, flows). Это мощно, но требует: (а) GUI-доступ к приложению, (б) LLM-модели для тестирования, (в) significant compute. Наши shell-based quality gates покрывают практические случаи (test suite, lint, typecheck).
 
 ### 4.4 🟢 Mid-Mission User Interaction (AskUser)
 
@@ -333,7 +331,7 @@ Missions позволяет orchestrator'у задавать пользоват�
 
 ### 4.5 🟢 Online Research Subagents
 
-Missions позволяет orchestrator'у делегировать online research субагентам (WebSearch, FetchUrl). Для task-orchestrator — не актуально, наши chains работают с кодом, а не с веб-поиском.
+Missions позволяет orchestrator'у делегировать online research субагентам (WebSearch, FetchUrl).
 
 ### 4.6 🟢 Prompt-Driven Architecture
 
@@ -341,7 +339,7 @@ Factory сознательно выбрала «prompt-driven, not hard-coded» 
 
 ### 4.7 🟢 Subagent Pattern (Task tool)
 
-Orchestrator делегирует investigation/review subagents через Task tool. У нас нет subagents (каждый chain step = один runner call). Добавление subagents = significant architectural change (P3+). Связано с паттерном sub-agent из Archon, Codex, Claude Code.
+Orchestrator делегирует investigation/review subagents через Task tool. Добавление subagents = significant architectural change (P3+). Связано с паттерном sub-agent из Archon, Codex, Claude Code.
 
 ---
 
@@ -384,11 +382,11 @@ Orchestrator делегирует investigation/review subagents через Task
 
 **Заимствовать:** Structured handoffs (JSON-схема для runner output). Knowledge library как паттерн (может быть реализован через AGENTS.md с секциями).
 
-### Multi-Day Workflow Coherence (согласованность много-дневных workflows)
+### Multi-Day Workflow Coherence (согласованность многодневных workflows)
 
 **Missions решает эту проблему через:**
 1. **Fresh context per worker** — нет деградации от накопления контекста
-2. **Shared state on disk** — state переживает переcreation контекста
+2. **Shared state on disk** — state переживает пересоздание контекста
 3. **Validation contract** — определение «done» не зависит от конкретной имплементации
 4. **Sealed milestones** — завершённые этапы не модифицируются
 5. **Requirement tracking** — все требования отслеживаются и распространяются
@@ -404,12 +402,8 @@ Orchestrator делегирует investigation/review subagents через Task
 
 ## 6. Сводка рекомендаций
 
-| Фича | Приоритет | Обоснование |
-|---|---|---|
-| Chain orchestration (YAML chains) | ✅ Уже есть | Core-функциональность |
-| Retry + Circuit Breaker + Budget | ✅ Уже есть | Устойчивость при сбоях |
-| Quality Gates (shell-based) | ✅ Уже есть | Автоматическая проверка |
-| Fix iterations (DynamicLoop) | ✅ Уже есть | Closed-loop разработка |
+| Возможность | Статус в продукте | Описание |
+| --- | --- | --- |
 | Structured handoffs (JSON-схема runner output) | 🟡 P2 | Явные решения chain executor'а на основе runner output |
 | Mission Boundaries в chain definition | 🟡 P2 | Pre-execution ограничения для автономного выполнения |
 | Validation contract (TDD at chain level) | 🟡 P2 | Structured assertions → усиление quality gates |

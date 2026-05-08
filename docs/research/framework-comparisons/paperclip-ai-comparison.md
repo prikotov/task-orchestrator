@@ -20,61 +20,61 @@ Paperclip **не является** фреймворком оркестраци�
 
 ```
 paperclipai/paperclip/
-├── server/                           # Express REST API + сервисы оркестрации
-│   ├── src/
-│   │   ├── adapters/                 # Адаптеры: process (CLI), HTTP
-│   │   │   ├── process/execute.ts    # Process adapter — subprocess execution
-│   │   │   └── http/execute.ts       # HTTP adapter — webhook/API invocation
-│   │   ├── auth/                     # Аутентификация: better-auth, JWT
-│   │   ├── middleware/               # Auth, error handler, logging, validation
-│   │   ├── routes/                   # REST API маршруты (~30 модулей)
-│   │   ├── secrets/                  # Encrypted storage, provider registry
-│   │   ├── services/                 # Бизнес-логика (~70 сервисов)
-│   │   │   ├── heartbeat.ts          # ★ Core execution engine: heartbeat runs
-│   │   │   ├── agents.ts             # Agent CRUD, config revisions, API keys
-│   │   │   ├── issues.ts             # Task/issue management, status workflow
-│   │   │   ├── budgets.ts            # Budget policies, enforcement, incidents
-│   │   │   ├── costs.ts              # Cost tracking, monthly spend, billing
-│   │   │   ├── approvals.ts          # Governance: approval workflows
-│   │   │   ├── routines.ts           # Scheduled tasks (cron, webhook, API)
-│   │   │   ├── recovery/             # ★ Run recovery, liveness, auto-restart
-│   │   │   ├── company-skills.ts     # Skill management, import/export
-│   │   │   ├── agent-instructions.ts # AGENTS.md prompt bundle management
-│   │   │   ├── environments.ts       # Execution environments (local, remote)
-│   │   │   ├── execution-workspaces/ # Git worktree isolation
-│   │   │   ├── run-liveness.ts       # ★ Stuck run detection (LLM output analysis)
-│   │   │   ├── run-continuations.ts  # Run continuation after transient failure
-│   │   │   ├── plugin-*.ts           # Plugin lifecycle, registry, workers
-│   │   │   └── ...                   # +40 других сервисов
-│   │   └── storage/                  # Local disk, S3 providers
-│   └── scripts/
+├── server/ # Express REST API + сервисы оркестрации
+│ ├── src/
+│ │ ├── adapters/ # Адаптеры: process (CLI), HTTP
+│ │ │ ├── process/execute.ts # Process adapter — subprocess execution
+│ │ │ └── http/execute.ts # HTTP adapter — webhook/API invocation
+│ │ ├── auth/ # Аутентификация: better-auth, JWT
+│ │ ├── middleware/ # Auth, error handler, logging, validation
+│ │ ├── routes/ # REST API маршруты (~30 модулей)
+│ │ ├── secrets/ # Encrypted storage, provider registry
+│ │ ├── services/ # Бизнес-логика (~70 сервисов)
+│ │ │ ├── heartbeat.ts # ★ Core execution engine: heartbeat runs
+│ │ │ ├── agents.ts # Agent CRUD, config revisions, API keys
+│ │ │ ├── issues.ts # Task/issue management, status workflow
+│ │ │ ├── budgets.ts # Budget policies, enforcement, incidents
+│ │ │ ├── costs.ts # Cost tracking, monthly spend, billing
+│ │ │ ├── approvals.ts # Governance: approval workflows
+│ │ │ ├── routines.ts # Scheduled tasks (cron, webhook, API)
+│ │ │ ├── recovery/ # ★ Run recovery, liveness, auto-restart
+│ │ │ ├── company-skills.ts # Skill management, import/export
+│ │ │ ├── agent-instructions.ts # AGENTS.md prompt bundle management
+│ │ │ ├── environments.ts # Execution environments (local, remote)
+│ │ │ ├── execution-workspaces/ # Git worktree isolation
+│ │ │ ├── run-liveness.ts # ★ Stuck run detection (LLM output analysis)
+│ │ │ ├── run-continuations.ts # Run continuation after transient failure
+│ │ │ ├── plugin-*.ts # Plugin lifecycle, registry, workers
+│ │ │ └── ... # +40 других сервисов
+│ │ └── storage/ # Local disk, S3 providers
+│ └── scripts/
 ├── packages/
-│   ├── db/                           # Drizzle ORM schema (~70 таблиц), migrations
-│   ├── shared/                       # Types, validators, constants, telemetry
-│   ├── adapter-utils/                # Shared adapter utilities, session compaction
-│   ├── adapters/                     # Agent adapter implementations
-│   │   ├── claude-local/             # Claude Code adapter (subprocess, skill sync)
-│   │   ├── codex-local/              # OpenAI Codex adapter
-│   │   ├── cursor-local/             # Cursor adapter
-│   │   ├── gemini-local/             # Gemini adapter
-│   │   ├── openclaw-gateway/         # OpenClaw gateway adapter
-│   │   ├── opencode-local/           # OpenCode adapter
-│   │   └── pi-local/                 # Pi adapter
-│   ├── plugins/                      # Plugin system
-│   │   ├── sdk/                      # Plugin SDK (definePlugin, context API)
-│   │   ├── examples/                 # Example plugins (kitchen-sink, orchestration)
-│   │   └── sandbox-providers/        # E2B sandbox provider
-│   └── mcp-server/                   # MCP server integration
-├── ui/                               # React + Vite dashboard UI
-├── cli/                              # CLI tools (onboard, configure)
-├── skills/                           # Built-in agent skills
-└── tests/                            # Integration tests (Playwright)
+│ ├── db/ # Drizzle ORM schema (~70 таблиц), migrations
+│ ├── shared/ # Types, validators, constants, telemetry
+│ ├── adapter-utils/ # Shared adapter utilities, session compaction
+│ ├── adapters/ # Agent adapter implementations
+│ │ ├── claude-local/ # Claude Code adapter (subprocess, skill sync)
+│ │ ├── codex-local/ # OpenAI Codex adapter
+│ │ ├── cursor-local/ # Cursor adapter
+│ │ ├── gemini-local/ # Gemini adapter
+│ │ ├── openclaw-gateway/ # OpenClaw gateway adapter
+│ │ ├── opencode-local/ # OpenCode adapter
+│ │ └── pi-local/ # Pi adapter
+│ ├── plugins/ # Plugin system
+│ │ ├── sdk/ # Plugin SDK (definePlugin, context API)
+│ │ ├── examples/ # Example plugins (kitchen-sink, orchestration)
+│ │ └── sandbox-providers/ # E2B sandbox provider
+│ └── mcp-server/ # MCP server integration
+├── ui/ # React + Vite dashboard UI
+├── cli/ # CLI tools (onboard, configure)
+├── skills/ # Built-in agent skills
+└── tests/ # Integration tests (Playwright)
 ```
 
 ### Ключевые характеристики
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | Мета-оркестратор (control plane) для AI-агентных компаний |
 | **Модель выполнения** | Heartbeat-based: scheduled/event-driven wakeup → adapter invocation → result |
 | **State management** | Persistent (PostgreSQL / embedded PGlite), ~70 таблиц |
@@ -86,7 +86,7 @@ paperclipai/paperclip/
 ### Основные компоненты
 
 | Компонент | Назначение |
-|---|---|
+| --- | --- |
 | [`server/src/services/heartbeat.ts`](https://github.com/paperclipai/paperclip/blob/master/server/src/services/heartbeat.ts) | ★ Core engine: wakeup queue, budget enforcement, adapter invocation, run lifecycle, session compaction |
 | [`server/src/services/agents.ts`](https://github.com/paperclipai/paperclip/blob/master/server/src/services/agents.ts) | Agent CRUD, config revisions (с rollback), API keys, runtime state |
 | [`server/src/services/issues.ts`](https://github.com/paperclipai/paperclip/blob/master/server/src/services/issues.ts) | Task/issue management: status workflow, atomic checkout, blocker dependencies |
@@ -103,43 +103,38 @@ paperclipai/paperclip/
 
 ---
 
-## 2. Сравнительная таблица: что у нас есть vs. чего нет
+## 2. Возможности оркестрации — обзор
 
-| Функция | TasK Orchestrator | Paperclip AI | Статус |
-|---|---|---|---|
-| **Цепочки шагов (chains)** | ✅ YAML chains, статические и динамические | ❌ Нет. Heartbeat-based task execution (одна задача = один run) | ✅ У нас есть |
-| **Retry с backoff** | ✅ RetryingAgentRunner | ✅ Transient failure retry с bounded delays (2m → 10m → 30m → 2h) | ✅ Паритет |
-| **Circuit Breaker** | ✅ CircuitBreakerAgentRunner | ❌ Нет (но есть quota windows + budget hard stops) | ✅ У нас есть |
-| **Quality Gates** | ✅ Shell-команды как проверки | ❌ Нет (но есть execution policy с approval stages) | ✅ У нас есть |
-| **Бюджетный контроль** | ✅ BudgetVo (cost-based) | ✅ Scoped budget policies (company/agent/project), warning + hard stop, auto-pause | 🟡 У них шире |
-| **Итерационные циклы (fix_iterations)** | ✅ Группа шагов с max_iterations | ❌ Нет (одноразовый run per heartbeat) | ✅ У нас есть |
-| **Fallback routing** | ✅ Per-step fallback runner | ❌ Нет (но есть transient failure retry с escalation strategy) | ✅ У нас есть |
-| **Audit Trail (JSONL)** | ✅ JsonlAuditLogger | ✅ Activity log (DB), run events, workspace operation logs | ✅ Паритет |
-| **Ролевые промпты** | ✅ .md файлы (18+ ролей) | ✅ AGENTS.md bundles (managed/external), skill injection per adapter | ✅ Паритет |
-| **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ 7+ adapters: Claude, Codex, Cursor, Gemini, OpenClaw, pi, HTTP, process | ✅ Паритет |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Плоская структура: routes → services → db schema | ✅ У нас лучше |
-| **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов через adapter.execute() | ✅ У нас лучше |
-| **YAML-конфигурация** | ✅ Chains + roles в YAML | ✅ DB-stored config, API-driven | ✅ Разные подходы |
-| **Org chart / иерархия агентов** | ❌ Нет | ✅ Роли, title, reportsTo, иерархия управления | 🟡 Интересно |
-| **Goal alignment** | ❌ Нет | ✅ Company → Project → Goal → Issue, goal ancestry в контексте агента | 🟡 Интересно |
-| **Ticket system (issues)** | ❌ Нет | ✅ Full issue lifecycle: backlog → todo → in_progress → in_review → done | 🟡 Позже |
-| **Heartbeat / scheduling** | ❌ Нет (только CLI запуск) | ✅ DB-backed wakeup queue, cron/webhook/API triggers, coalescing | 🟡 Интересно |
-| **Governance / approvals** | ❌ Нет | ✅ Multi-stage approval workflows, decision tracking, hire approvals | 🟡 Позже |
-| **Budget enforcement** | ⚠️ BudgetVo (проверка перед шагом) | ✅ Scoped policies, warning thresholds, hard stops, auto-pause агентов | 🟡 У них шире |
-| **Run liveness / stuck detection** | ❌ Нет | ✅ Regex-based output analysis + evidence-based liveness classification | 🟡 Интересно |
-| **Run recovery** | ❌ Нет | ✅ Stranded issue recovery, stale run evaluation, auto-wakeup | 🟡 Интересно |
-| **Session compaction** | ❌ Нет | ✅ Per-adapter policy: max runs/tokens/age, adapter-managed vs. threshold | 🟡 Позже |
-| **Config revisions / rollback** | ❌ Нет | ✅ Agent config revisions с SHA snapshot + rollback | 🟡 Интересно |
-| **Plugin system** | ❌ Нет | ✅ Full SDK: events, jobs, data, tools, state, UI contributions, DB | 🟡 Позже |
-| **Multi-company isolation** | ❌ Нет | ✅ Every entity is company-scoped, complete data isolation | 🟢 Не берём |
-| **React UI dashboard** | ❌ Нет (CLI only) | ✅ Full React + Vite dashboard: org chart, costs, issues, agents | 🟢 Не берём |
-| **Company portability** | ❌ Нет | ✅ Export/import entire orgs, secret scrubbing, collision handling | 🟢 Не берём |
-| **Execution workspaces** | ❌ Нет | ✅ Git worktree isolation, runtime services (dev servers, preview URLs) | 🟡 Позже |
-| **MCP server** | ❌ Нет | ✅ MCP server package (packages/mcp-server) | 🟡 Позже |
+| Функция | Paperclip AI |
+| --- | --- |
+| **Retry с backoff** | ✅ Transient failure retry с bounded delays (2m → 10m → 30m → 2h) |
+| **Бюджетный контроль** | ✅ Scoped budget policies (company/agent/project), warning + hard stop, auto-pause |
+| **Audit Trail (JSONL)** | ✅ Activity log (DB), run events, workspace operation logs |
+| **Ролевые промпты** | ✅ AGENTS.md bundles (managed/external), skill injection per adapter |
+| **Multiple runners** | ✅ 7+ adapters: Claude, Codex, Cursor, Gemini, OpenClaw, pi, HTTP, process |
+| **DDD-архитектура** | ❌ Плоская структура: routes → services → db schema |
+| **Decorator pattern** | ❌ Прямой вызов через adapter.execute() |
+| **YAML-конфигурация** | ✅ DB-stored config, API-driven |
+| **Org chart / иерархия агентов** | ✅ Роли, title, reportsTo, иерархия управления |
+| **Goal alignment** | ✅ Company → Project → Goal → Issue, goal ancestry в контексте агента |
+| **Ticket system (issues)** | ✅ Full issue lifecycle: backlog → todo → in_progress → in_review → done |
+| **Heartbeat / scheduling** | ✅ DB-backed wakeup queue, cron/webhook/API triggers, coalescing |
+| **Governance / approvals** | ✅ Multi-stage approval workflows, decision tracking, hire approvals |
+| **Budget enforcement** | ✅ Scoped policies, warning thresholds, hard stops, auto-pause агентов |
+| **Run liveness / stuck detection** | ✅ Regex-based output analysis + evidence-based liveness classification |
+| **Run recovery** | ✅ Stranded issue recovery, stale run evaluation, auto-wakeup |
+| **Session compaction** | ✅ Per-adapter policy: max runs/tokens/age, adapter-managed vs. threshold |
+| **Config revisions / rollback** | ✅ Agent config revisions с SHA snapshot + rollback |
+| **Plugin system** | ✅ Full SDK: events, jobs, data, tools, state, UI contributions, DB |
+| **Multi-company isolation** | ✅ Every entity is company-scoped, complete data isolation |
+| **React UI dashboard** | ✅ Full React + Vite dashboard: org chart, costs, issues, agents |
+| **Company portability** | ✅ Export/import entire orgs, secret scrubbing, collision handling |
+| **Execution workspaces** | ✅ Git worktree isolation, runtime services (dev servers, preview URLs) |
+| **MCP server** | ✅ MCP server package (packages/mcp-server) |
 
 ---
 
-## 3. Что полезно взять и почему
+## 3. Оркестрационные возможности
 
 ### 3.1 🟡 Run Liveness / Stuck Detection (`server/src/services/run-liveness.ts`)
 
@@ -157,11 +152,7 @@ const MANAGER_REVIEW_RE = /\b(?:manager review|human review|manual review|securi
 const APPROVAL_REQUIRED_RE = /\b(?:approval required|requires? .{0,80}\bapproval|pending approval)\b/i;
 ```
 
-**Почему нам интересно:** Для итерационных циклов (fix_iterations) — если агент застрял (повторяет одни и те же действия, или не может продвинуться), нужно это обнаружить и остановить. Подход Paperclip через regex + evidence — более продвинутый, чем простой loop detection через SHA-256 сигнатуры (как у Crush), и не требует LLM-вызова.
-
-**Отличие от нашей реализации:**
-- У нас: нет защиты от зацикливания в fix_iterations
-- У них: evidence-based liveness classification с actionable рекомендациями
+**Оркестрационная значимость:** Для итерационных циклов (fix_iterations) — если агент застрял (повторяет одни и те же действия, или не может продвинуться), нужно это обнаружить и остановить. Подход Paperclip через regex + evidence — более продвинутый, чем простой loop detection через SHA-256 сигнатуры (как у Crush), и не требует LLM-вызова.
 
 ---
 
@@ -171,10 +162,10 @@ const APPROVAL_REQUIRED_RE = /\b(?:approval required|requires? .{0,80}\bapproval
 
 ```typescript
 const BOUNDED_TRANSIENT_HEARTBEAT_RETRY_DELAYS_MS = [
-  2 * 60 * 1000,   // 2 минуты
-  10 * 60 * 1000,  // 10 минут
-  30 * 60 * 1000,  // 30 минут
-  2 * 60 * 60 * 1000, // 2 часа
+ 2 * 60 * 1000, // 2 минуты
+ 10 * 60 * 1000, // 10 минут
+ 30 * 60 * 1000, // 30 минут
+ 2 * 60 * 60 * 1000, // 2 часа
 ];
 ```
 
@@ -184,11 +175,7 @@ const BOUNDED_TRANSIENT_HEARTBEAT_RETRY_DELAYS_MS = [
 - Attempt 3: fresh_session (новая сессия)
 - Attempt 4+: fresh_session_safer_invocation
 
-**Почему нам интересно:** Наш RetryingAgentRunner делает retry с backoff, но без классификации ошибок и без escalation strategy. Подход Paperclip — retry *с изменением стратегии* при каждой попытке — это более продвинутый паттерн, чем простой retry.
-
-**Отличие от нашей реализации:**
-- У нас: retry с uniform backoff на любую ошибку
-- У них: error classification (transient_upstream) + bounded delays + escalation strategy
+**Оркестрационная значимость:** Наш RetryingAgentRunner делает retry с backoff, но без классификации ошибок и без escalation strategy. Подход Paperclip — retry *с изменением стратегии* при каждой попытке — это более продвинутый паттерн, чем простой retry.
 
 ---
 
@@ -205,40 +192,41 @@ const BOUNDED_TRANSIENT_HEARTBEAT_RETRY_DELAYS_MS = [
 
 ```typescript
 function budgetStatusFromObserved(observedAmount, amount, warnPercent) {
-  if (amount <= 0) return "ok";
-  if (observedAmount >= amount) return "hard_stop";
-  if (observedAmount >= Math.ceil((amount * warnPercent) / 100)) return "warning";
-  return "ok";
+ if (amount <= 0) return "ok";
+ if (observedAmount >= amount) return "hard_stop";
+ if (observedAmount >= Math.ceil((amount * warnPercent) / 100)) return "warning";
+ return "ok";
 }
 ```
 
-**Почему нам интересно:** Наш BudgetVo контролирует бюджет на уровне шага в цепочке. У Paperclip — на уровне компании/агента/проекта с monthly/lifetime окном. Это разные уровни: мы контролируем *одну цепочку*, Paperclip — *всего агента*. Но подход с scoped policies + warning thresholds + auto-pause — более гибкий.
-
-**Отличие от нашей реализации:**
-- У нас: BudgetVo на уровне шага, cost-based
-- У них: BudgetPolicy на уровне company/agent/project, с warning + hard stop + auto-pause + incidents
+**Оркестрационная значимость:** Наш BudgetVo контролирует бюджет на уровне шага в цепочке. У Paperclip — на уровне компании/агента/проекта с monthly/lifetime окном. Это разные уровни: мы контролируем *одну цепочку*, Paperclip — *всего агента*. Но подход с scoped policies + warning thresholds + auto-pause — более гибкий.
 
 ---
 
 ### 3.4 🟡 Config Revisions / Rollback (`server/src/services/agents.ts`)
 
-**Что у них:** Paperclip сохраняет snapshot конфигурации агента при каждом изменении:
+**Что у них:** Paperclip сохраняет snapshot конфигурации агента при каждом изменении. Механизм основан на отдельной таблице `agent_config_revisions` (Drizzle ORM schema):
 
 ```typescript
 const CONFIG_REVISION_FIELDS = [
-  "name", "role", "title", "reportsTo", "capabilities",
-  "adapterType", "adapterConfig", "runtimeConfig",
-  "defaultEnvironmentId", "budgetMonthlyCents", "metadata",
+ "name", "role", "title", "reportsTo", "capabilities",
+ "adapterType", "adapterConfig", "runtimeConfig",
+ "defaultEnvironmentId", "budgetMonthlyCents", "metadata",
 ];
 ```
 
-Каждый revision хранит JSON snapshot + метаданные (кто изменил, откуда, rollback source). Rollback — это создание нового revision из предыдущего snapshot.
+Каждый revision содержит:
+- **JSON snapshot** — полный дамп всех полей из `CONFIG_REVISION_FIELDS` на момент изменения
+- **SHA snapshot** — хеш для быстрого сравнения
+- **Метаданные** — `createdBy` (кто изменил), `source` (откуда: API, UI, CLI, rollback), `rollbackSourceRevisionId` (если это rollback — ссылка на исходный revision)
 
-**Почему нам интересно:** Для task-orchestrator: если chain YAML был изменён и цепочка начала падать — нужен механизм отката. Сейчас мы полагаемся на git history, но формализованные config revisions с API-доступом — более удобны.
+**Механика rollback:** Rollback не перезаписывает историю — он создаёт *новый* revision, чей JSON snapshot копируется из целевого предыдущего revision. Это append-only модель: история изменений никогда не удаляется, rollback фиксируется как отдельное событие с `source: "rollback"`.
 
-**Отличие от нашей реализации:**
-- У нас: git history для YAML chains
-- У них: DB-stored config revisions с API-driven rollback
+**Trade-offs подхода:**
+- **Append-only vs. diff-based:** Paperclip хранит полный JSON snapshot на каждое изменение, а не diff. Это упрощает чтение (не нужно применять цепочку diffs), но при частых изменениях (например, автоматический rotation API keys) storage растёт линейно.
+- **Нет semantic diff:** два revision'а сравниваются побайтово (SHA), но нет инструмента для отображения *смысловых* различий (какие именно параметры изменились и как).
+- **Нет GC policy:** в документации и коде не обнаружен механизм очистки старых revisions. При длительной эксплуатации количество revisions будет расти неограниченно.
+- **Нет branching/merging:** конфигурация — линейная история. Невозможно вести параллельные конфигурации (например, staging vs. production) и мержить их.
 
 ---
 
@@ -248,40 +236,41 @@ const CONFIG_REVISION_FIELDS = [
 
 ```typescript
 const DEFAULT_SESSION_COMPACTION_POLICY: SessionCompactionPolicy = {
-  enabled: true,
-  maxSessionRuns: 200,       // максимум runs в сессии
-  maxRawInputTokens: 2_000_000, // максимум токенов
-  maxSessionAgeHours: 72,    // максимум возраст сессии
+ enabled: true,
+ maxSessionRuns: 200, // максимум runs в сессии
+ maxRawInputTokens: 2_000_000, // максимум токенов
+ maxSessionAgeHours: 72, // максимум возраст сессии
 };
 ```
 
 Адаптеры с native context management (Claude Code, Codex) получают `ADAPTER_MANAGED_SESSION_POLICY` — Paperclip не вмешивается в их context management. Остальные адаптеры получают default policy.
 
-**Почему нам интересно:** Для длинных цепочек с многократными вызовами runner'ов — контекст может расти. Per-runner policy сompression — актуально, если task-orchestrator будет работать с session-based runner'ами (Claude Code, Codex).
-
-**Отличие от нашей реализации:**
-- У нас: нет context management (каждый вызов runner'а — новый контекст)
-- У них: per-adapter session compaction policy с thresholds
+**Оркестрационная значимость:** Для длинных цепочек с многократными вызовами runner'ов — контекст может расти. Per-runner policy compression — актуально для session-based runner'ов (Claude Code, Codex).
 
 ---
 
 ### 3.6 🟡 Goal Alignment — Goal Ancestry в контексте агента (`server/src/services/goals.ts`, heartbeat)
 
-**Что у них:** Paperclip создаёт иерархию целей: Company → Project → Goal → Issue. Каждый issue carry full goal ancestry — агент видит не только текущую задачу, но и:
+**Что у них:** Paperclip создаёт иерархию целей: Company → Project → Goal → Issue. Каждый issue содержит full goal ancestry — агент видит не только текущую задачу, но и полный путь до корневой цели:
 
-- К какой цели относится задача
-- В каком проекте
-- Какова mission компании
+```
+Company: "Acme Corp" (mission: "Build reliable payment infrastructure")
+  └─ Project: "Billing v2" (description: "Redesign billing system")
+      └─ Goal: "Migrate to new pricing model" (description: "...")
+          └─ Issue #42: "Implement proration logic" (description: "...")
+```
 
-Это передаётся в контекст heartbeat run через `PAPERCLIP_TASK_ID`, `PAPERCLIP_WAKE_REASON` и prompt injection.
+Goal ancestry передаётся агенту двумя механизмами:
+1. **Environment variables:** `PAPERCLIP_TASK_ID` (issue ID), `PAPERCLIP_WAKE_REASON` (причина пробуждения: cron, webhook, manual, catch-up)
+2. **Prompt injection:** heartbeat-сервис формирует текстовый блок с ancestry и вставляет его в инструкции для adapter execution. Адаптеры (например, Claude Code) получают это как часть AGENTS.md bundle.
 
-**Почему нам интересно:** Для сложных цепочек (implement → review → fix → deploy) — каждый шаг должен понимать *зачем* он выполняется, а не только *что*. Goal alignment в промпте улучшает качество решений агента.
+**Ограничения подхода:**
+- **Token overhead:** full ancestry для глубоких иерархий (company → 3-4 уровня projects/goals → issue) может занимать сотни токенов в промпте. При множестве параллельных issue'ов это суммируется.
+- **Stale context:** если goal или project изменились между началом и концом выполнения issue, агент может работать с устаревшим контекстом. Механизма refresh goal ancestry во время выполнения не обнаружено.
+- **Нет формальной оценки эффективности:** утверждение «goal alignment улучшает качество решений» — концептуальное. Paperclip не предоставляет метрик (A/B тесты, сравнение с/без ancestry) для подтверждения.
+- **Flat structure:** внутри одного Goal все Issues равнозначны — нет приоритизации по вкладу в цель (weight, impact score).
 
-**⚠️ Ограниченная применимость для task-orchestrator:** Эффект ограничен: в task-orchestrator chain выполняется в контексте одной задачи, goal ancestry даст меньше пользы, чем в мета-оркестраторе с множеством параллельных агентов. Каждый шаг chain'а и так знает свою задачу из YAML-конфигурации. Полезность возрастёт только при переходе к multi-chain / multi-agent сценариям.
 
-**Отличие от нашей реализации:**
-- У нас: role .md промпт + payload (task description)
-- У них: goal ancestry + company mission + project context в каждом run
 
 ---
 
@@ -291,27 +280,23 @@ const DEFAULT_SESSION_COMPACTION_POLICY: SessionCompactionPolicy = {
 
 ```typescript
 interface IssueExecutionPolicy {
-  mode: "normal";
-  commentRequired: boolean;
-  stages: Array<{
-    type: string;
-    approvalsNeeded: 1;
-    participants: Array<{
-      type: "agent" | "user";
-      agentId?: string;
-      userId?: string;
-    }>;
-  }>;
+ mode: "normal";
+ commentRequired: boolean;
+ stages: Array<{
+ type: string;
+ approvalsNeeded: 1;
+ participants: Array<{
+ type: "agent" | "user";
+ agentId?: string;
+ userId?: string;
+ }>;
+ }>;
 }
 ```
 
 Каждый stage требует approval от указанных участников. Execution state отслеживает текущую стадию и решения.
 
-**Почему нам интересно:** Это аналог наших quality gates, но на уровне governance (кто утверждает), а не технических проверок (прошли ли тесты). Комбинация: quality gates (автоматическая проверка) + execution policy (human approval) — полная модель.
-
-**Отличие от нашей реализации:**
-- У нас: shell-команды как quality gates (автоматические)
-- У них: multi-stage approval с participants (human governance)
+**Оркестрационная значимость:** Это аналог наших quality gates, но на уровне governance (кто утверждает), а не технических проверок (прошли ли тесты). Комбинация: quality gates (автоматическая проверка) + execution policy (human approval) — полная модель.
 
 ---
 
@@ -321,27 +306,23 @@ interface IssueExecutionPolicy {
 
 - **definePlugin()** — factory для определения plugin
 - **PluginContext API:**
-  - `ctx.events.on("issue.created", ...)` — подписка на domain events
-  - `ctx.jobs.register("full-sync", ...)` — регистрация job handlers
-  - `ctx.data.register("sync-health", ...)` — data providers для UI
-  - `ctx.tools.register(...)` —暴露 tools для агентов
-  - `ctx.state.get/set(...)` — persistent state
-  - `ctx.config.get(...)` — plugin config
-  - `ctx.secrets.resolve(...)` — секреты
-  - `ctx.http.fetch(...)` — HTTP client
-  - `ctx.logger.info(...)` — logging
+ - `ctx.events.on("issue.created", ...)` — подписка на domain events
+ - `ctx.jobs.register("full-sync", ...)` — регистрация job handlers
+ - `ctx.data.register("sync-health", ...)` — data providers для UI
+ - `ctx.tools.register(...)` — предоставляет tools для агентов
+ - `ctx.state.get/set(...)` — persistent state
+ - `ctx.config.get(...)` — plugin config
+ - `ctx.secrets.resolve(...)` — секреты
+ - `ctx.http.fetch(...)` — HTTP client
+ - `ctx.logger.info(...)` — logging
 - **Capability-gated:** плагины объявляют необходимые capabilities, host валидирует
 - **Out-of-process workers:** плагины запускаются как отдельные процессы (JSON-RPC)
 - **UI contributions:** плагины могут добавлять UI-компоненты в dashboard
 - **Plugin DB:** каждый плагин может иметь собственные таблицы в DB
 
-**Почему нам интересно:** Plugin system — это mechanism для расширения task-orchestrator без изменения core. Если мы хотим позволить пользователям добавлять custom runners, quality gates, event handlers — plugin SDK — готовый паттерн.
+**Оркестрационная значимость:** Plugin system — mechanism для расширения оркестратора без изменения core. Пользователи могут добавлять custom runners, quality gates, event handlers через plugin SDK.
 
 **⚠️ Преждевременная рекомендация для CLI:** Plugin system оправдан только при появлении внешних пользователей, которым нужна кастомизация без форка. Для текущего stage проекта (CLI-утилита с внутренним использованием) — накладные расходы на plugin SDK (out-of-process workers, DB, UI contributions) не оправданы. Расширение через реализацию `AgentRunnerInterface` покрывает текущие потребности.
-
-**Отличие от нашей реализации:**
-- У нас: расширение через реализацию AgentRunnerInterface
-- У них: полноценный plugin SDK с events, jobs, data, tools, state, UI
 
 ---
 
@@ -351,30 +332,30 @@ interface IssueExecutionPolicy {
 
 ```typescript
 interface AdapterExecutionContext {
-  runId: string;
-  agent: AdapterAgent;
-  runtime: AdapterRuntime;
-  config: Record<string, unknown>;
-  context: Record<string, unknown>;
-  executionTarget?: AdapterExecutionTarget;
-  onLog: (stream, chunk) => Promise<void>;
-  onMeta?: (meta) => Promise<void>;
-  onSpawn?: (meta) => Promise<void>;
-  authToken?: string;
+ runId: string;
+ agent: AdapterAgent;
+ runtime: AdapterRuntime;
+ config: Record<string, unknown>;
+ context: Record<string, unknown>;
+ executionTarget?: AdapterExecutionTarget;
+ onLog: (stream, chunk) => Promise<void>;
+ onMeta?: (meta) => Promise<void>;
+ onSpawn?: (meta) => Promise<void>;
+ authToken?: string;
 }
 
 interface AdapterExecutionResult {
-  exitCode: number | null;
-  timedOut: boolean;
-  errorMessage?: string;
-  errorCode?: string;
-  errorFamily?: AdapterExecutionErrorFamily; // "transient_upstream"
-  usage?: UsageSummary;
-  costUsd?: number;
-  billingType?: AdapterBillingType;
-  summary?: string;
-  runtimeServices?: AdapterRuntimeServiceReport[];
-  question?: { prompt, choices }; // HITL
+ exitCode: number | null;
+ timedOut: boolean;
+ errorMessage?: string;
+ errorCode?: string;
+ errorFamily?: AdapterExecutionErrorFamily; // "transient_upstream"
+ usage?: UsageSummary;
+ costUsd?: number;
+ billingType?: AdapterBillingType;
+ summary?: string;
+ runtimeServices?: AdapterRuntimeServiceReport[];
+ question?: { prompt, choices }; // HITL
 }
 ```
 
@@ -385,45 +366,63 @@ interface AdapterExecutionResult {
 - **Runtime services:** отчёт о запущенных сервисах (dev servers, preview URLs)
 - **Session management:** `sessionId` + `sessionParams` + `sessionDisplayId`
 
-**Почему нам интересно:** AdapterExecutionContext / AdapterExecutionResult — более развитый контракт, чем наш AgentRunnerInterface. Особенно: error classification (errorFamily), cost tracking в result, HITL (question), runtime services.
-
-**Отличие от нашей реализации:**
-- У нас: AgentRunnerInterface с простым run() → AgentResult
-- У них: AdapterExecutionContext с rich result (error classification, cost, HITL, runtime services)
+**Оркестрационная значимость:** AdapterExecutionContext / AdapterExecutionResult — развитый контракт для runner interface. Ключевые элементы: error classification (errorFamily), cost tracking в result, HITL (question), runtime services.
 
 ---
 
 ### 3.10 🟡 Security: Secrets Management, Execution Environments, Agent Permissions
 
-Paperclip AI реализует три уровня безопасности, которые не были разобраны в предыдущих секциях:
+Paperclip AI реализует три уровня безопасности:
 
 **Secrets Management** (`server/src/secrets/`):
-- Encrypted storage секретов (API keys, tokens) с provider registry
-- Секреты резолвятся на уровне adapter execution — агент получает только нужные
-- Plugin SDK имеет доступ к секретам через `ctx.secrets.resolve(...)`
-- Export/import организаций включает scrubbing секретов
+- Encrypted storage секретов (API keys, tokens) с provider registry — каждый секрет шифруется перед сохранением в БД и расшифровывается на уровне adapter execution
+- Секреты резолвятся по имени через provider registry — агент получает только секреты своего adapter config
+- Plugin SDK имеет доступ к секретам через `ctx.secrets.resolve(...)` — плагины не могут перечислить чужие секреты, но могут обратиться к своим по имени
+- Export/import организаций включает scrubbing секретов (замена на placeholders)
+
+**Ограничения:**
+- Нет интеграции с внешними secret managers (Vault, AWS Secrets Manager) — секреты хранятся только в БД Paperclip
+- Нет automatic rotation: обновление API key требует ручного edit через API/UI
+- Нет audit log доступа к секретам (кто и когда резолвил конкретный секрет)
 
 **Execution Environments** (`server/src/services/environments.ts`):
-- Конфигурируемые окружения: local, remote, Docker
-- Каждый agent привязан к default environment
-- Execution workspaces (`server/src/services/execution-workspaces/`) — изоляция через git worktree
-- Runtime services: dev servers, preview URLs с auto-cleanup
+- Конфигурируемые окружения: local, remote (SSH), Docker (через E2B sandbox plugin)
+- Каждый agent привязан к default environment — adapter execution направляется в указанное окружение
+- Execution workspaces (`server/src/services/execution-workspaces/`) — изоляция через git worktree: каждый run получает отдельный worktree, предотвращая конфликты между параллельными агентами
+- Runtime services: dev servers, preview URLs с auto-cleanup при завершении run
+
+**Ограничения:**
+- Git worktree обеспечивает изоляцию filesystem, но не process/network — агент может влиять на процессы другого агента в том же хосте
+- Docker-изоляция доступна через E2B plugin, но не встроена в core — требует отдельной настройки и внешнего сервиса
+- Нет resource limits (CPU, memory) для local-окружений — агент может исчерпать ресурсы хоста
 
 **Agent Permissions**:
-- Pause/resume/terminate агентов — административный контроль
-- Budget hard stops + auto-pause — автоматическое ограничение при превышении
-- Execution policy (multi-stage approval) — governance-level контроль
-- Activity audit — полный лог действий для compliance
+- Pause/resume/terminate агентов — coarse-grained административный контроль (binary: agent active/paused/terminated)
+- Budget hard stops + auto-pause — автоматическое ограничение при превышении бюджета (глава 3.3)
+- Execution policy (multi-stage approval) — governance-level контроль: кто должен утвердить выполнение (глава 3.7)
+- Activity audit — логирование действий через DB (activity log + run events)
 
-**Почему нам интересно:** Для автономного выполнения в CI/CD (наша roadmap) минимальный набор: secrets management (шифрование API keys runner'ов) + exec policy (ограничение shell-команд) + basic audit. Полноценные execution environments (Docker, git worktree) — долгосрочная перспектива.
+**Ограничения:**
+- Нет fine-grained RBAC — нет ролей с различными уровнями доступа (readonly, operator, admin)
+- Нет access control list для ресурсов — любой agent может читать любой issue в своей компании
+- Нет ограничений на выполняемые команды — адаптер (CLI-agent) имеет полный доступ к shell; нет whitelist/blacklist команд
+- Audit log хранится в БД без tamper protection — нет cryptographic chaining или external log shipping
 
-**Отличие от нашей реализации:**
-- У нас: нет secrets management (ключи в env vars), нет exec policy, нет sandboxing
-- У них: encrypted secrets + execution environments + governance permissions + audit
+**Модель угроз (покрытие):**
+| Угроза | Покрытие |
+|--------|----------|
+| Компрометация API key в storage | ✅ Encrypted at rest |
+| Компрометация API key в transit | ⚠️ Зависит от HTTPS/TLS настройки хоста |
+| Агент выходит из-под контроля (бесконечный loop) | ✅ Budget hard stop + run liveness detection |
+| Агент получает доступ к чужим секретам | ⚠️ Provider registry, но нет ACL |
+| Агент выполняет destructive команды (rm -rf) | ❌ Нет command filtering |
+| Параллельные агенты конфликтуют в filesystem | ✅ Git worktree isolation |
+| Параллельные агенты конфликтуют в process namespace | ❌ Нет process isolation |
+| Insider threat (администратор компании) | ⚠️ Audit log, но нет tamper protection |
 
 ---
 
-## 4. Что НЕ берём и почему
+## 4. Прочие возможности (вне оркестрации)
 
 ### 4.1 🟢 Org Chart / Иерархия агентов
 
@@ -451,19 +450,14 @@ Paperclip wakes агентов по расписанию (heartbeat). Task-orche
 
 ### 4.7 🟢 Embedded PostgreSQL
 
-Paperclip использует embedded PGlite для dev и полноценный PostgreSQL для production. Для task-orchestrator (in-memory + JSONL) — overhead.
+Paperclip использует embedded PGlite для dev и полноценный PostgreSQL для production.
 
 ---
 
-## 5. Сводка рекомендаций
+## 5. Сводка по оркестрации
 
-| Фича | Приоритет | Обоснование |
-|---|---|---|
-| Chain orchestration | ✅ Уже есть | Core-функциональность task-orchestrator |
-| Retry + Circuit Breaker | ✅ Уже есть | Устойчивость при сбоях |
-| Quality Gates | ✅ Уже есть | Автоматическая проверка кода |
-| Budget control | ✅ Уже есть | Предотвращение runaway spending |
-| Fix iterations | ✅ Уже есть | Closed-loop цикл разработки |
+| Возможность | Статус в продукте | Описание |
+| --- | --- | --- |
 | Run liveness / stuck detection | 🟡 P2 | Evidence-based + regex — защита от зацикливания в fix_iterations |
 | Error classification + escalation strategy | 🟡 P2 | Transient failure retry с bounded backoff + strategy escalation |
 | Adapter execution context (rich result) | 🟡 P2 | Error family, cost, HITL, runtime services в контракте runner'а |

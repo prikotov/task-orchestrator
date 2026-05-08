@@ -22,48 +22,48 @@ MetaGPT работает на уровне прямых LLM API. Каждый а
 
 ```
 metagpt/
-  roles/                         Роли-агенты
-    role.py                      Role: базовый класс (think → act, watch, react_mode)
-    product_manager.py           ProductManager: PrepareDocuments → WritePRD
-    architect.py                 Architect: WriteDesign
-    engineer.py                  Engineer: WriteCode → WriteCodeReview
-    qa_engineer.py               QaEngineer: WriteTest
-    project_manager.py           ProjectManager: WriteTasks
-    di/
-      role_zero.py               RoleZero: универсальный react-loop агент
-      team_leader.py             TeamLeader: планирование и координация
-      data_analyst.py            DataAnalyst: анализ данных
-      engineer2.py               Engineer2: кодинг через RoleZero
+ roles/ Роли-агенты
+ role.py Role: базовый класс (think → act, watch, react_mode)
+ product_manager.py ProductManager: PrepareDocuments → WritePRD
+ architect.py Architect: WriteDesign
+ engineer.py Engineer: WriteCode → WriteCodeReview
+ qa_engineer.py QaEngineer: WriteTest
+ project_manager.py ProjectManager: WriteTasks
+ di/
+ role_zero.py RoleZero: универсальный react-loop агент
+ team_leader.py TeamLeader: планирование и координация
+ data_analyst.py DataAnalyst: анализ данных
+ engineer2.py Engineer2: кодинг через RoleZero
 
-  actions/                       Actions — атомарные единицы работы
-    action.py                    Action: base class (_aask → LLM call)
-    write_prd.py                 WritePRD
-    design_api.py                WriteDesign
-    write_code.py                WriteCode
-    write_code_review.py         WriteCodeReview
-    write_test.py                WriteTest
-    action_node.py               ActionNode: structured output через Pydantic
+ actions/ Actions — атомарные единицы работы
+ action.py Action: base class (_aask → LLM call)
+ write_prd.py WritePRD
+ design_api.py WriteDesign
+ write_code.py WriteCode
+ write_code_review.py WriteCodeReview
+ write_test.py WriteTest
+ action_node.py ActionNode: structured output через Pydantic
 
-  environment/                   Environment — шина сообщений между ролями
-    base_env.py                  Environment: publish_message, add_roles, run
-    software/                    SoftwareEnv: SOP для software development
+ environment/ Environment — шина сообщений между ролями
+ base_env.py Environment: publish_message, add_roles, run
+ software/ SoftwareEnv: SOP для software development
 
-  schema.py                      Message, Task, Plan, TaskResult
-  team.py                        Team: hire + invest + run (n_round)
-  memory/                        Memory: storage + index по cause_by
-  strategy/                      Planner: plan-based execution (Plan → Task)
-  provider/                      LLM provider abstraction
-  skills/                        Pre-built skills (Writer, Summarize)
-  tools/                         Tool registry + built-in tools
-  rag/                           RAG: retrievers, rankers, parsers
-  utils/
-    cost_manager.py              CostManager: token cost tracking + max_budget
+ schema.py Message, Task, Plan, TaskResult
+ team.py Team: hire + invest + run (n_round)
+ memory/ Memory: storage + index по cause_by
+ strategy/ Planner: plan-based execution (Plan → Task)
+ provider/ LLM provider abstraction
+ skills/ Pre-built skills (Writer, Summarize)
+ tools/ Tool registry + built-in tools
+ rag/ RAG: retrievers, rankers, parsers
+ utils/
+ cost_manager.py CostManager: token cost tracking + max_budget
 ```
 
 **Ключевые характеристики:**
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | Multi-agent SOP-фреймворк (role-based) |
 | **Модель выполнения** | Fixed SOP (BY_ORDER) / Dynamic react-loop (REACT / PLAN_AND_ACT) |
 | **State management** | In-memory Memory (message storage + index) |
@@ -86,50 +86,50 @@ OpenClaw использует встроенный Pi-агент (встроен
 
 ```
 src/
-  agents/                        Агентский runtime (~800 файлов)
-    agent-scope.ts               Multi-agent routing: agentId → config → model → sandbox
-    agent-command.ts             CLI agent command
-    acp-spawn.ts                 ACP sub-agent spawning
-    model-fallback.ts            Model failover: primary → fallbacks с cooldown
-    failover-error.ts            Structured error: FailoverError (reason, provider, model, status)
-    failover-policy.ts           Failover policy: rate_limit, overloaded, billing, timeout, auth
-    bootstrap-*.ts               Bootstrap: injection budget, hooks, files, prompt
-    context.ts                   Context window: resolve, cache, guard
-    context-window-guard.ts      Context window guard: warn/block below threshold
-    bash-tools.ts                Bash tool: exec, process, approval
-    skills/                      Skills: discovery, filter, frontmatter, bundled, plugin
-    auth-profiles/               Auth profiles: rotation, cooldown, store
-    sandbox/                     Sandbox: Docker, SSH, OpenShell backends
-    subagent-*.ts                Sub-agent: registry, depth, capabilities
+ agents/ Агентский runtime (~800 файлов)
+ agent-scope.ts Multi-agent routing: agentId → config → model → sandbox
+ agent-command.ts CLI agent command
+ acp-spawn.ts ACP sub-agent spawning
+ model-fallback.ts Model failover: primary → fallbacks с cooldown
+ failover-error.ts Structured error: FailoverError (reason, provider, model, status)
+ failover-policy.ts Failover policy: rate_limit, overloaded, billing, timeout, auth
+ bootstrap-*.ts Bootstrap: injection budget, hooks, files, prompt
+ context.ts Context window: resolve, cache, guard
+ context-window-guard.ts Context window guard: warn/block below threshold
+ bash-tools.ts Bash tool: exec, process, approval
+ skills/ Skills: discovery, filter, frontmatter, bundled, plugin
+ auth-profiles/ Auth profiles: rotation, cooldown, store
+ sandbox/ Sandbox: Docker, SSH, OpenShell backends
+ subagent-*.ts Sub-agent: registry, depth, capabilities
 
-  context-engine/                Pluggable context management
-    types.ts                     ContextEngine interface: ingest, assemble, compact, maintain
-    legacy.ts                    LegacyContextEngine: wraps existing compaction
-    delegate.ts                  Delegates compaction to Pi runtime
-    registry.ts                  Context engine factory registry
+ context-engine/ Pluggable context management
+ types.ts ContextEngine interface: ingest, assemble, compact, maintain
+ legacy.ts LegacyContextEngine: wraps existing compaction
+ delegate.ts Delegates compaction to Pi runtime
+ registry.ts Context engine factory registry
 
-  gateway/                       Gateway: HTTP/WS server, auth, protocol
-  channels/                      Channel integrations (20+ messengers)
-  routing/                       Session routing: sessionKey → agentId → binding
-  sessions/                      Session management: lifecycle, transcript, model overrides
-  security/                      Security audit: DM policy, tool policy, sandbox, deep probes
-  plugins/                       Plugin loader/registry
-  flows/                         Setup flows: channel setup, provider flow, search setup
-  skills/                        (root) Bundled skills (53 skills)
-  mcp/                           MCP integration (mcporter)
-  hooks/                         Internal hooks (pre/post bootstrap, etc.)
-  tasks/                         Detached task runtime
-  cron/                          Cron jobs
-  memory-host-sdk/               Memory plugin host SDK
+ gateway/ Gateway: HTTP/WS server, auth, protocol
+ channels/ Channel integrations (20+ messengers)
+ routing/ Session routing: sessionKey → agentId → binding
+ sessions/ Session management: lifecycle, transcript, model overrides
+ security/ Security audit: DM policy, tool policy, sandbox, deep probes
+ plugins/ Plugin loader/registry
+ flows/ Setup flows: channel setup, provider flow, search setup
+ skills/ (root) Bundled skills (53 skills)
+ mcp/ MCP integration (mcporter)
+ hooks/ Internal hooks (pre/post bootstrap, etc.)
+ tasks/ Detached task runtime
+ cron/ Cron jobs
+ memory-host-sdk/ Memory plugin host SDK
 
-extensions/                      Bundled provider plugins (40+)
-  anthropic/, openai/, codex/, amazon-bedrock/, ...
+extensions/ Bundled provider plugins (40+)
+ anthropic/, openai/, codex/, amazon-bedrock/, ...
 ```
 
 **Ключевые характеристики:**
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | Personal AI assistant (single-agent, multi-channel) |
 | **Модель выполнения** | Agent loop (LLM → tool call → observation → LLM → ...) |
 | **State management** | File-backed session transcripts + context engine |
@@ -143,40 +143,40 @@ extensions/                      Bundled provider plugins (40+)
 
 ---
 
-## 2. Сравнительная таблица: MetaGPT, OpenClaw vs. task-orchestrator
+## 2. Возможности оркестрации — обзор
 
-| Функция | Task Orchestrator | MetaGPT | OpenClaw |
-|---|---|---|---|
+| Функция | MetaGPT | OpenClaw |
+| --- | --- | --- | --- |
 | **Язык** | PHP 8.4 | Python | TypeScript (Node.js) |
 | **Тип** | Chain-based orchestrator | Multi-agent SOP-фреймворк | Single-agent multi-channel assistant |
 | **Модель оркестрации** | YAML chains (sequential/dynamic) | SOP (BY_ORDER) / React-loop / Plan-and-Act | Agent loop + tool calls |
 | **State management** | In-memory + JSONL audit | In-memory Memory (index by cause_by) | File-backed transcripts + context engine |
 | **Error handling** | Retry + Circuit Breaker + Fallback | ❌ Нет встроенного retry | ✅ Model failover с cooldown + per-profile rotation |
-| **Quality Gates** | ✅ Shell-команды | ❌ Нет | ❌ Нет |
-| **Бюджетный контроль** | ✅ BudgetVo (cost-based) | ⚠️ CostManager: tracking + max_budget → NoMoneyException | ⚠️ Bootstrap budget (context window chars), token tracking |
-| **Итерационные циклы** | ✅ fix_iterations (max_iterations) | ⚠️ n_round loop в Team.run(), max_react_loop в RoleZero | ❌ Нет явных iteration loops |
-| **Fallback routing** | ✅ Per-step fallback runner | ❌ Нет | ✅ Model failover: primary → fallback chain |
-| **Circuit Breaker** | ✅ 3-state (closed/open/half-open) | ❌ Нет | ⚠️ Cooldown per auth profile (similar concept) |
-| **Audit Trail** | ✅ JSONL | ⚠️ Memory storage (in-memory) | ✅ Session transcripts (file-backed) |
-| **Ролевые промпты** | ✅ .md файлы (18+ ролей) | ✅ Роли: ProductManager, Architect, Engineer и т.д. | ⚠️ Multi-agent routing (agentId → config), без SOP |
-| **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ Multi-provider LLM abstraction | ✅ 40+ провайдеров через plugin extensions |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Плоская структура (roles/actions/environment) | ❌ Плоская структура (src/agents/, src/gateway/...) |
-| **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов | ❌ Прямой вызов |
-| **Message passing** | ❌ Нет (chain = linear steps) | ✅ Environment + Message + cause_by/watch | ❌ Нет (single agent) |
-| **SOP (Standard Operating Procedures)** | ❌ Нет (YAML chains — похожая идея) | ✅ Core concept: BY_ORDER + watch/cause_by | ❌ Нет |
-| **Sub-agent spawning** | ❌ Нет | ✅ Hierarchical: TeamLeader → Task delegation | ✅ ACP spawn + subagent registry (max depth/children) |
-| **Context engine** | ❌ Нет | ⚠️ Memory (in-memory storage + index) | ✅ Pluggable ContextEngine (ingest/assemble/compact/maintain) |
-| **Sandbox** | ❌ Нет | ❌ Нет | ✅ Docker, SSH, OpenShell backends |
-| **Plugin system** | ❌ Нет | ⚠️ Tool registry + Skills | ✅ Plugin SDK + extensions (40+ providers) |
-| **MCP support** | ❌ Нет | ❌ Нет | ✅ mcporter integration |
-| **Multi-channel** | ❌ Нет (CLI) | ❌ Нет (CLI) | ✅ 20+ messengers |
-| **Memory / RAG** | ❌ Нет | ✅ Memory + RAG (retrievers, rankers) | ✅ Memory plugin slot + context engine |
-| **Security** | ❌ Нет | ❌ Нет | ✅ DM policy, tool policy, sandbox, deep probes, audit |
+| **Quality Gates** | ❌ Нет |
+| **Бюджетный контроль** | ⚠️ CostManager: tracking + max_budget → NoMoneyException |
+| **Итерационные циклы** | ⚠️ n_round loop в Team.run(), max_react_loop в RoleZero |
+| **Fallback routing** | ❌ Нет |
+| **Circuit Breaker** | ❌ Нет |
+| **Audit Trail** | ⚠️ Memory storage (in-memory) |
+| **Ролевые промпты** | ✅ Роли: ProductManager, Architect, Engineer и т.д. |
+| **Multiple runners** | ✅ Multi-provider LLM abstraction |
+| **DDD-архитектура** | ❌ Плоская структура (roles/actions/environment) |
+| **Decorator pattern** | ❌ Прямой вызов |
+| **Message passing** | ✅ Environment + Message + cause_by/watch |
+| **SOP (Standard Operating Procedures)** | ✅ Core concept: BY_ORDER + watch/cause_by |
+| **Sub-agent spawning** | ✅ Hierarchical: TeamLeader → Task delegation |
+| **Context engine** | ⚠️ Memory (in-memory storage + index) |
+| **Sandbox** | ❌ Нет |
+| **Plugin system** | ⚠️ Tool registry + Skills |
+| **MCP support** | ❌ Нет |
+| **Multi-channel** | ❌ Нет (CLI) |
+| **Memory / RAG** | ✅ Memory + RAG (retrievers, rankers) |
+| **Security** | ❌ Нет |
 | **Статус проекта** | Активный | Активный, commercial (MGX) | Активный, спонсируемый (OpenAI, GitHub, NVIDIA) |
 
 ---
 
-## 3. Что полезно взять и почему
+## 3. Оркестрационные возможности
 
 ### 3.1 🟡 SOP / Fixed Action Sequence (MetaGPT)
 
@@ -184,19 +184,15 @@ extensions/                      Bundled provider plugins (40+)
 
 ```python
 class ProductManager(RoleZero):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        if self.use_fixed_sop:
-            self.set_actions([PrepareDocuments, WritePRD])
-            self._watch([UserRequirement, PrepareDocuments])
-            self.rc.react_mode = RoleReactMode.BY_ORDER
+ def __init__(self, **kwargs):
+ super().__init__(**kwargs)
+ if self.use_fixed_sop:
+ self.set_actions([PrepareDocuments, WritePRD])
+ self._watch([UserRequirement, PrepareDocuments])
+ self.rc.react_mode = RoleReactMode.BY_ORDER
 ```
 
-**Почему нам интересно:** Наш подход YAML chains — это уже форма SOP (фиксированная последовательность шагов). Однако MetaGPT формализует связь «watch → act» через типы сообщений (`cause_by`), а не через позицию в цепочке. Это позволяет строить **event-driven chains**, где шаг активируется не по порядку, а по типу полученного результата.
-
-**Отличие от нашей реализации:**
-- У нас: шаг в chain активируется по порядку (step 1 → step 2 → ...)
-- У них: роль активируется по типу сообщения (`cause_by=WritePRD` → Architect запускается)
+**Оркестрационная значимость:** Наш подход YAML chains — это уже форма SOP (фиксированная последовательность шагов). Однако MetaGPT формализует связь «watch → act» через типы сообщений (`cause_by`), а не через позицию в цепочке. Это позволяет строить **event-driven chains**, где шаг активируется не по порядку, а по типу полученного результата.
 
 ---
 
@@ -206,17 +202,17 @@ class ProductManager(RoleZero):
 
 ```python
 class Environment(ExtEnv):
-    roles: dict[str, BaseRole]
-    history: Memory
+ roles: dict[str, BaseRole]
+ history: Memory
 
-    def publish_message(self, message: Message): ...
-    def add_roles(self, roles: list[BaseRole]): ...
-    async def run(self): ...
+ def publish_message(self, message: Message): ...
+ def add_roles(self, roles: list[BaseRole]): ...
+ async def run(self): ...
 ```
 
 Сообщение содержит `cause_by` (какое action создало) и `send_to` (кому адресовано). Роли подписываются на `cause_by` через `_watch`. Это автоматическая маршрутизация: Architect «смотрит» за `WritePRD` и автоматически получает PRD для обработки.
 
-**Почему нам интересно:** Для будущих dynamic chains — когда цепочка может ветвиться или когда несколько шагов могут выполняться параллельно — message-passing модель удобнее линейных YAML chains. Сейчас это R&D, но паттерн值得изучения.
+**Оркестрационная значимость:** Паттерн «subscribe by message type» (watch/cause_by) развязывает продюсера и потребителя: агент не знает, кто именно отправил сообщение, а реагирует только на его тип. Это упрощает добавление новых ролей без изменения существующих. Для ветвящихся сценариев (несколько шагов параллельно, условные переходы) message-passing гибче линейных цепочек, но требует явного управления очередью сообщений и предотвращения циклов.
 
 ---
 
@@ -233,11 +229,7 @@ class Environment(ExtEnv):
 
 `FailoverError` содержит: `reason` (rate_limit, overloaded, billing, auth, timeout, ...), `provider`, `model`, `profileId`, `status`. Политика cooldown: rate_limit и overloaded → transient cooldown probe; auth_permanent → preserve slot.
 
-**Почему нам интересно:** Наш `CircuitBreakerAgentRunner` — это per-step circuit breaker. OpenClaw показывает более гранулярную модель: **per-profile** cooldown с классификацией ошибок. Это похоже на наш retry + circuit breaker, но с явной categorization error reasons и separate cooldown per auth profile.
-
-**Отличие от нашей реализации:**
-- У нас: circuit breaker на уровне runner (все запросы через один breaker)
-- У них: failover на уровне model profile (primary → fallback1 → fallback2) с per-profile cooldown
+**Оркестрационная значимость:** Per-step circuit breaker — базовый уровень. OpenClaw показывает более гранулярную модель: **per-profile** cooldown с классификацией ошибок. Явная классификация причин ошибок (error reasons) и раздельный cooldown per auth profile.
 
 ---
 
@@ -247,20 +239,20 @@ class Environment(ExtEnv):
 
 ```typescript
 interface ContextEngine {
-  readonly info: ContextEngineInfo;
-  bootstrap?(params): Promise<BootstrapResult>;       // Init engine for session
-  ingest(params): Promise<IngestResult>;               // Add message to engine
-  assemble(params): Promise<AssembleResult>;           // Build context for LLM call
-  compact(params): Promise<CompactResult>;             // Compress context
-  afterTurn?(params): Promise<void>;                    // Post-turn lifecycle
-  maintain?(params): Promise<ContextEngineMaintenanceResult>; // Transcript maintenance
-  prepareSubagentSpawn?(params): Promise<...>;         // Sub-agent context prep
-  onSubagentEnded?(params): Promise<void>;             // Sub-agent cleanup
-  dispose?(): Promise<void>;                           // Cleanup resources
+ readonly info: ContextEngineInfo;
+ bootstrap?(params): Promise<BootstrapResult>; // Init engine for session
+ ingest(params): Promise<IngestResult>; // Add message to engine
+ assemble(params): Promise<AssembleResult>; // Build context for LLM call
+ compact(params): Promise<CompactResult>; // Compress context
+ afterTurn?(params): Promise<void>; // Post-turn lifecycle
+ maintain?(params): Promise<ContextEngineMaintenanceResult>; // Transcript maintenance
+ prepareSubagentSpawn?(params): Promise<...>; // Sub-agent context prep
+ onSubagentEnded?(params): Promise<void>; // Sub-agent cleanup
+ dispose?(): Promise<void>; // Cleanup resources
 }
 ```
 
-**Почему нам интересно:** Для длинных цепочек (implement → review → fix → review → ...) context management критичен. `assemble()` с `tokenBudget` — это именно то, чего нам не хватает: собрать контекст так, чтобы уложиться в бюджет. `compact()` — auto-summarization при переполнении.
+**Оркестрационная значимость:** Для длинных цепочек (implement → review → fix → review → ...) context management критичен. `assemble()` с `tokenBudget` — это именно то, чего нам не хватает: собрать контекст так, чтобы уложиться в бюджет. `compact()` — auto-summarization при переполнении.
 
 ---
 
@@ -272,12 +264,12 @@ interface ContextEngine {
 DEFAULT_AGENT_MAX_CONCURRENT = 4;
 DEFAULT_SUBAGENT_MAX_CONCURRENT = 8;
 DEFAULT_SUBAGENT_MAX_CHILDREN_PER_AGENT = 5;
-DEFAULT_SUBAGENT_MAX_SPAWN_DEPTH = 1;  // depth-1 = leaves by default
+DEFAULT_SUBAGENT_MAX_SPAWN_DEPTH = 1; // depth-1 = leaves by default
 ```
 
 Sub-agent может работать в sandbox (Docker), с собственным контекстом и session key. Регистрация sub-agent через `subagent-registry.ts`.
 
-**Почему нам интересно:** Если task-orchestrator будет поддерживать параллельное выполнение шагов (например, review и test одновременно) — нужна модель sub-agent с лимитами. OpenClaw показывает простую но эффективную модель: max depth + max children + max concurrent.
+**Оркестрационная значимость:** OpenClaw показывает простую, но эффективную модель: max depth + max children + max concurrent.
 
 ---
 
@@ -286,7 +278,7 @@ Sub-agent может работать в sandbox (Docker), с собственн
 **Что у них:** OpenClaw классифицирует ошибки по `FailoverReason`:
 
 | Reason | HTTP Status | Поведение |
-|---|---|---|
+| --- | --- | --- |
 | `rate_limit` | 429 | Transient cooldown probe |
 | `overloaded` | 503 | Transient cooldown probe |
 | `billing` | 402 | Cooldown probe |
@@ -296,7 +288,7 @@ Sub-agent может работать в sandbox (Docker), с собственн
 | `model_not_found` | 404 | Preserve slot |
 | `format` | 400 | Preserve slot |
 
-**Почему нам интересно:** Это перекликается с Archon error classification (FATAL/TRANSIENT/UNKNOWN). Классификация ошибок позволяет умный retry: не тратить попытки на неисправимые ошибки (403, 404) и делать cooldown на временные (429, 503).
+**Оркестрационная значимость:** Это перекликается с Archon error classification (FATAL/TRANSIENT/UNKNOWN). Классификация ошибок позволяет умный retry: не тратить попытки на неисправимые ошибки (403, 404) и делать cooldown на временные (429, 503).
 
 ---
 
@@ -306,43 +298,41 @@ Sub-agent может работать в sandbox (Docker), с собственн
 
 ```python
 class Team:
-    env: Environment
-    investment: float = 10.0
+ env: Environment
+ investment: float = 10.0
 
-    def hire(self, roles: list[Role]):
-        self.env.add_roles(roles)
+ def hire(self, roles: list[Role]):
+ self.env.add_roles(roles)
 
-    def invest(self, investment: float):
-        self.investment = investment
-        self.cost_manager.max_budget = investment
+ def invest(self, investment: float):
+ self.investment = investment
+ self.cost_manager.max_budget = investment
 
-    async def run(self, n_round=3, idea="", ...):
-        while n_round > 0:
-            if self.env.is_idle: break
-            n_round -= 1
-            self._check_balance()  # → NoMoneyException if over budget
-            await self.env.run()
+ async def run(self, n_round=3, idea="", ...):
+ while n_round > 0:
+ if self.env.is_idle: break
+ n_round -= 1
+ self._check_balance() # → NoMoneyException if over budget
+ await self.env.run()
 ```
 
-**Почему нам интересно:** Это почти буквально наша модель: chain (Team) + budget (investment) + max_iterations (n_round) + idle detection. Подтверждает, что наш подход к оркестрации — правильный. Отличие: у MetaGPT бюджет на уровне команды (все роли делят один бюджет), у нас — на уровне chain (все шаги делят один budget).
-
----
+**Оркестрационная значимость:** Team — базовый примитив оркестрации: собирает разнородных агентов в единую среду (Environment), задаёт глобальный бюджет и управляет циклами выполнения. Паттерн «hire → invest → run» разделяет конфигурацию (кто работает), ограничения (сколько стоит) и исполнение (сколько итераций). Проверка бюджета на каждом раунде (`_check_balance` → `NoMoneyException`) — hard stop, предотвращающий неконтролируемый расход токенов при зацикливании агентов. Ограничение: бюджет учитывает только LLM-затраты (CostManager), но не накладные расходы на память и маршрутизацию сообщений.
 
 ### 3.8 🟡 Bootstrap Budget для Context Injection (OpenClaw)
 
 **Что у них:** OpenClaw управляет «bootstrap budget» — сколько символов/токенов можно потратить на injection контекстных файлов (AGENTS.md, skills, system prompts) в начало сессии:
 
 ```typescript
-DEFAULT_BOOTSTRAP_NEAR_LIMIT_RATIO = 0.85;  // Предупреждение при 85% бюджета
+DEFAULT_BOOTSTRAP_NEAR_LIMIT_RATIO = 0.85; // Предупреждение при 85% бюджета
 // Per-file limit + total limit
 // Truncation report: truncatedFiles, nearLimitFiles, totalNearLimit
 ```
 
-**Почему нам интересно:** У нас нет ограничения на размер role .md файлов и context injection. Если роль содержит огромный промпт — он весь уйдёт в context window, оставляя меньше места для полезной работы. Bootstrap budget — это превентивная защита.
+**Оркестрационная значимость:** Bootstrap budget ограничивает объём контекста, расходуемый на системные файлы (роли, навыки, конфигурация) при старте сессии. Без этого лимита объёмный системный промпт может занять большую часть context window, оставляя мало места для полезной работы. Порог 85% (`near-limit`) позволяет предупредить о перерасходе до того, как сессия станет неработоспособной. Паттерн применим к любой оркестрации, где агенты имеют развёрнутые системные промпты.
 
 ---
 
-## 4. Что НЕ берём и почему
+## 4. Прочие возможности (вне оркестрации)
 
 ### 4.1 🟢 Python как язык (MetaGPT)
 
@@ -358,11 +348,11 @@ OpenClaw — это multi-channel AI assistant с 20+ мессенджерами
 
 ### 4.4 🟢 SOP-ролевая модель как единственный способ координации (MetaGPT)
 
-MetaGPT жёстко привязывает роли к конкретным actions (ProductManager → WritePRD, Architect → WriteDesign). Это ограничивает гибкость: мы хотим, чтобы любая роль могла выполнять любой шаг. Наша модель (role .md + chain YAML) гибче.
+MetaGPT жёстко привязывает роли к конкретным actions (ProductManager → WritePRD, Architect → WriteDesign). Это ограничивает гибкость: мы хотим, чтобы любая роль могла выполнять любой шаг. Наша модель (role.md + chain YAML) гибче.
 
 ### 4.5 🟢 LLM-level Integration (оба проекта)
 
-MetaGPT и OpenClaw работают на уровне прямых LLM API (provider abstraction). Наш оркестратор работает на уровне runner'ов (pi, codex), которые сами управляют LLM-взаимодействием. Разный уровень абстракции.
+MetaGPT и OpenClaw работают на уровне прямых LLM API (provider abstraction). Разный уровень абстракции.
 
 ### 4.6 🟢 Desktop / Mobile Companion Apps (OpenClaw)
 
@@ -378,35 +368,22 @@ MetaGPT имеет коммерческую платформу [mgx.dev](https:/
 
 ---
 
-## 5. Сводка рекомендаций
+## 5. Сводка по оркестрации
 
 | Фича | Источник | Приоритет | Обоснование |
-|---|---|---|---|
-| Chain orchestration (static + dynamic) | — | ✅ Уже есть | Core-функциональность task-orchestrator |
-| Retry + Circuit Breaker | — | ✅ Уже есть | Устойчивость при сбоях |
-| Quality Gates | — | ✅ Уже есть | Автоматическая проверка кода |
-| Budget control | — | ✅ Уже есть | Предотвращение runaway spending |
-| Fix iterations | — | ✅ Уже есть | Closed-loop цикл разработки |
-| JSONL Audit Trail | — | ✅ Уже есть | Воспроизводимость и отладка |
-| Team/chain budget model | MetaGPT | ✅ Паритет | Подтверждает наш подход (invest + max_budget + n_round) |
-| SOP: event-driven step activation | MetaGPT | 🟡 P3 | watch/cause_by routing для dynamic chains |
-| Model failover с cooldown | OpenClaw | 🟡 P2 | Per-profile fallback с error classification |
-| Error classification | OpenClaw | 🟡 P2 | Умный retry: не тратить попытки на неисправимые ошибки |
-| Pluggable context engine | OpenClaw | 🟡 P3 | assemble() с tokenBudget, compact() при overflow |
-| Sub-agent spawning с limits | OpenClaw | 🟡 P3 | Для параллельного выполнения шагов |
-| Bootstrap budget для context injection | OpenClaw | 🟡 P3 | Защита от oversized промптов |
-| Message-based coordination | MetaGPT | 🟡 P3 | Для будущих multi-agent dynamic chains |
-| Python/TypeScript dependency | Оба | 🟢 — | Разный стек |
-| Multi-channel messaging | OpenClaw | 🟢 — | Разная парадигма |
-| SOP-ролевая модель (жёсткая) | MetaGPT | 🟢 — | Ограничивает гибкость |
-| LLM-level integration | Оба | 🟢 — | Разный уровень абстракции |
-| Gateway daemon | OpenClaw | 🟢 — | Разная модель работы |
-| Desktop/Mobile apps | OpenClaw | 🟢 — | Не актуально для CLI bundle |
-| MGX commercial platform | MetaGPT | 🟢 — | Не относится к open-source |
+| --- | --- | --- | --- |
+| Team/chain budget model | MetaGPT | ✅ Паритет | Budget check per round, hard stop при превышении |
+| Per-profile model failover | OpenClaw | ✅ Паритет | Гранулярный cooldown с классификацией ошибок |
+| Pluggable context engine | OpenClaw | 🟡 Влияние | Lifecycle: ingest → assemble → compact → maintain |
+| Sub-agent depth/children limits | OpenClaw | 🟡 Влияние | Max depth + max children + max concurrent |
+| Error classification для retry | OpenClaw | ✅ Паритет | Transient vs permanent, умный retry |
+| Bootstrap budget | OpenClaw | 🟡 Влияние | Ограничение контекста системных файлов |
+| SOP / Fixed Action Sequence | MetaGPT | 🟡 Влияние | Event-driven chains через cause_by/watch |
+| Message-based coordination | MetaGPT | 🟡 Влияние | Subscribe by message type, развязка producer/consumer |
 
 ---
 
-## 6. Указатель источников для деталей
+## 6. Указатель источников
 
 ### MetaGPT
 

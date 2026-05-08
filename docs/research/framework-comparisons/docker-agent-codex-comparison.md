@@ -12,7 +12,7 @@
 
 **OpenAI Codex** — линейка AI-coding продуктов от OpenAI, включающая три форм-фактора:
 1. **Codex CLI** (`@openai/codex`) — open-source CLI-агент (Rust), работает локально с OS-level sandboxing;
-2. **Codex Web** (`chatg.com/codex`) — проприетарный cloud-агент в sandboxed compute environment;
+2. **Codex Web** (`chatgpt.com/codex`) — проприетарный cloud-агент в sandboxed compute environment;
 3. **Codex IDE** — интеграция в VS Code / Cursor / Windsurf.
 
 Codex CLI — наиболее технически продвинутый CLI-агент из исследованных: Rust-ядро, многоуровневая система sandboxing (Seatbelt / Landlock / Bubblewrap / Docker containers + iptables firewall), иерархические multi-agent'ы с depth limit, Guardian (LLM-based safety reviewer), exec policy (rules-based command filtering), MCP client/server, auto-compact, SKILL.md.
@@ -30,64 +30,64 @@ Codex CLI **не является** фреймворком оркестраци�
 Codex CLI — open-source (Apache-2.0) продукт с Rust-ядром. Архитектура восстановлена по исходному коду (`codex-rs/`), официальной документации и конфигурационным файлам.
 
 ```
-codex (binary)                     CLI entry point (Rust / Ratatui TUI)
-  codex-rs/core/                   Business logic
-    agent/                          Multi-agent system
-      control.rs                   AgentControl — spawn/terminate sub-agents
-      mailbox.rs                   Mailbox — async message passing (Sender/Receiver)
-      registry.rs                  Registry — depth tracking, spawn limits
-      role.rs                      Roles — agent type system (default, custom)
-    session/                        Session management
-      session.rs                   Core session loop (LLM → tool → observation → ...)
-      turn.rs                      Turn management (one LLM call = one turn)
-      turn_context.rs              Per-turn context (config, environment, services)
-      rollout_reconstruction.rs    Session replay from persisted rollout files
-      handlers.rs                  Tool call handlers dispatch
-    codex_delegate.rs               Sub-agent delegation (spawn, IO channels, approval routing)
-    codex_thread.rs                 Thread management for interactive sub-agents
-    guardian/                       LLM-based safety reviewer
-      policy.md                    Risk taxonomy (data exfiltration, credential probing, etc.)
-      review.rs                    Review logic (risk assessment → allow/deny/escalate)
-      review_session.rs            Review session management
-    exec_policy.rs                  Rules-based command execution policy
-    sandboxing/                     OS-level sandboxing adapter
-    config/                         Configuration system
-      permissions.rs               Filesystem/network permission compilation
-      schema.rs                    Config schema (config.toml → typed config)
-    compact.rs                      Auto-compaction (context overflow → LLM summarization)
-    client.rs                       OpenAI API client (Responses API)
-    tools/                          Built-in tools
-      handlers/
-        apply_patch.rs             File editing (structured patch)
-        multi_agents_v2/           Multi-agent tools (spawn/send_message/wait/close_agent/list_agents)
-        mcp.rs                     MCP tool calls
-        plan.rs                    Plan mode (analyze without executing)
-        list_dir.rs                Directory listing
-        js_repl.rs                 JavaScript REPL
-        agent_jobs.rs              Background agent jobs
-    context/                        Context assembly (prompt instructions, permission prompts, environment)
-      agents_md.rs                 AGENTS.md hierarchical discovery
-    context_manager/                Conversation history management
-      history.rs                   History entry storage/lookup
-      updates.rs                   History update logic
-  codex-rs/exec/                    Headless CLI (codex exec)
-  codex-rs/tui/                     Full-screen TUI (Ratatui)
-  codex-rs/cli/                     CLI multitool (subcommands: exec, review, sandbox, mcp, plugin, mcp-server, app, apply, resume, fork, …)
-  codex-rs/hooks/                   Hook engine (pre/post tool use, session start/stop)
-  codex-rs/memories/                Long-term memory (citations, storage, compaction)
-  codex-rs/plugins/                 Plugin system (marketplace, dynamic tool loading)
-  codex-rs/network-proxy/           Network proxy for outbound traffic control
-  codex-rs/process-hardening/       Process-level security hardening
-  codex-cli/Dockerfile              Docker container for sandboxed execution
-  codex-cli/scripts/
-    run_in_container.sh            Docker run with iptables firewall
-    init_firewall.sh               iptables/ipset-based network whitelist
+codex (binary) CLI entry point (Rust / Ratatui TUI)
+ codex-rs/core/ Business logic
+ agent/ Multi-agent system
+ control.rs AgentControl — spawn/terminate sub-agents
+ mailbox.rs Mailbox — async message passing (Sender/Receiver)
+ registry.rs Registry — depth tracking, spawn limits
+ role.rs Roles — agent type system (default, custom)
+ session/ Session management
+ session.rs Core session loop (LLM → tool → observation → ...)
+ turn.rs Turn management (one LLM call = one turn)
+ turn_context.rs Per-turn context (config, environment, services)
+ rollout_reconstruction.rs Session replay from persisted rollout files
+ handlers.rs Tool call handlers dispatch
+ codex_delegate.rs Sub-agent delegation (spawn, IO channels, approval routing)
+ codex_thread.rs Thread management for interactive sub-agents
+ guardian/ LLM-based safety reviewer
+ policy.md Risk taxonomy (data exfiltration, credential probing, etc.)
+ review.rs Review logic (risk assessment → allow/deny/escalate)
+ review_session.rs Review session management
+ exec_policy.rs Rules-based command execution policy
+ sandboxing/ OS-level sandboxing adapter
+ config/ Configuration system
+ permissions.rs Filesystem/network permission compilation
+ schema.rs Config schema (config.toml → typed config)
+ compact.rs Auto-compaction (context overflow → LLM summarization)
+ client.rs OpenAI API client (Responses API)
+ tools/ Built-in tools
+ handlers/
+ apply_patch.rs File editing (structured patch)
+ multi_agents_v2/ Multi-agent tools (spawn/send_message/wait/close_agent/list_agents)
+ mcp.rs MCP tool calls
+ plan.rs Plan mode (analyze without executing)
+ list_dir.rs Directory listing
+ js_repl.rs JavaScript REPL
+ agent_jobs.rs Background agent jobs
+ context/ Context assembly (prompt instructions, permission prompts, environment)
+ agents_md.rs AGENTS.md hierarchical discovery
+ context_manager/ Conversation history management
+ history.rs History entry storage/lookup
+ updates.rs History update logic
+ codex-rs/exec/ Headless CLI (codex exec)
+ codex-rs/tui/ Full-screen TUI (Ratatui)
+ codex-rs/cli/ CLI multitool (subcommands: exec, review, sandbox, mcp, plugin, mcp-server, app, apply, resume, fork, …)
+ codex-rs/hooks/ Hook engine (pre/post tool use, session start/stop)
+ codex-rs/memories/ Long-term memory (citations, storage, compaction)
+ codex-rs/plugins/ Plugin system (marketplace, dynamic tool loading)
+ codex-rs/network-proxy/ Network proxy for outbound traffic control
+ codex-rs/process-hardening/ Process-level security hardening
+ codex-cli/Dockerfile Docker container for sandboxed execution
+ codex-cli/scripts/
+ run_in_container.sh Docker run with iptables firewall
+ init_firewall.sh iptables/ipset-based network whitelist
 ```
 
 ### Ключевые характеристики
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | CLI-агент + cloud-агент, одноагентный (с hierarchical sub-agent'ами) |
 | **Модель выполнения** | Agent loop (LLM → tool call → observation → LLM → ...) |
 | **State management** | SQLite + rollout files (persistent), auto-compact при переполнении, memories (long-term) |
@@ -101,7 +101,7 @@ codex (binary)                     CLI entry point (Rust / Ratatui TUI)
 ### Основные компоненты
 
 | Компонент | Назначение |
-|---|---|
+| --- | --- |
 | Agent loop | Ядро: итеративный вызов LLM с инструментами, до естественного завершения или лимита итераций |
 | Sandbox (OS-level) | Seatbelt (macOS), Landlock/Bubblewrap (Linux), restricted token (Windows) — filesystem + network isolation |
 | Sandbox (Docker) | Docker container + iptables/ipset firewall — whitelist доменов, auto-cleanup |
@@ -121,48 +121,40 @@ codex (binary)                     CLI entry point (Rust / Ratatui TUI)
 
 ---
 
-## 2. Сравнительная таблица: что у нас есть vs. чего нет
+## 2. Возможности оркестрации — обзор
 
-| Функция | Task Orchestrator | Codex CLI + Docker Agent | Статус |
-|---|---|---|---|
-| **Цепочки шагов (chains)** | ✅ YAML chains, статические и динамические | ❌ Нет. Agent loop — один непрерывный поток | ✅ У нас есть |
-| **Retry с backoff** | ✅ RetryingAgentRunner | ⚠️ Базовый retry на уровне API (429/500) | ✅ У нас есть |
-| **Circuit Breaker** | ✅ CircuitBreakerAgentRunner | ❌ Нет | ✅ У нас есть |
-| **Quality Gates** | ✅ Shell-команды как проверки | ❌ Нет (LLM сам оценивает результат) | ✅ У нас есть |
-| **Бюджетный контроль** | ✅ BudgetVo (cost-based лимиты) | ⚠️ ChatGPT plan limits, но без программных лимитов | ✅ У нас лучше |
-| **Итерационные циклы (fix_iterations)** | ✅ Группа шагов с max_iterations | ❌ Нет явных итерационных циклов | ✅ У нас есть |
-| **Fallback routing** | ✅ Per-step fallback runner | ⚠️ Нет (поддержка OpenAI + Ollama + Amazon Bedrock + custom providers, но без fallback routing) | ✅ У нас есть |
-| **Audit Trail (JSONL)** | ✅ JsonlAuditLogger | ✅ Rollout files (JSONL) + SQLite state | ✅ Паритет |
-| **Ролевые промпты** | ✅ .md файлы (18+ ролей) | ✅ AGENTS.md + agent roles (TOML) | ✅ Паритет |
-| **Multiple runners** | ✅ Pi + Codex (через interface) | ✅ OpenAI + Ollama + Amazon Bedrock + custom providers + model_provider в config.toml | ✅ Паритет |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Monorepo crate structure | ✅ У нас есть |
-| **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов | ✅ У нас есть |
-| **YAML-конфигурация** | ✅ Chains + roles в YAML | ✅ config.toml (TOML) | ✅ Паритет |
-| **Sandboxing (OS-level)** | ❌ Нет | ✅ Seatbelt/Landlock/Bubblewrap/restricted token — per-platform | 🟡 Интересно |
-| **Sandboxing (Docker)** | ❌ Нет | ✅ Docker + iptables firewall + domain whitelist + auto-cleanup | 🟡 Интересно |
-| **Guardian (safety reviewer)** | ❌ Нет | ✅ LLM-based risk assessment — data exfiltration, credential probing, destructive actions | 🟡 Интересно |
-| **Exec policy (rules)** | ❌ Нет | ✅ .rules файлы — banned prefixes, safe command detection, per-path restrictions | 🟡 Интересно |
-| **Multi-agent (hierarchical)** | ❌ Нет | ✅ spawn/send_message/wait/close_agent/list_agents + depth limit + mailbox | 🟡 Интересно |
-| **Network isolation** | ❌ Нет | ✅ iptables/ipset firewall — whitelist доменов, DNS-only, DROP default | 🟡 Интересно |
-| **Split filesystem permissions** | ❌ Нет | ✅ Per-path read/write/none — granular filesystem access control | 🟡 Интересно |
-| **Compaction (auto-compact)** | ❌ Нет | ✅ LLM summarization при context overflow (inline + remote) | 🟡 Позже |
-| **MCP server mode** | ❌ Нет | ✅ `codex mcp-server` — Codex как MCP tool для других агентов | 🟡 Интересно |
-| **MCP client** | ❌ Нет | ✅ MCP servers в config.toml, parallel tool calls support | 🟡 Позже |
-| **SKILL.md** | ✅ Есть в agent skills | ✅ Bundled + custom skills | ✅ Паритет |
-| **Session persistence** | ❌ Нет (in-memory) | ✅ SQLite + rollout files (JSONL) — `codex resume`/`codex fork` | 🟡 Позже |
-| **Plan mode** | ❌ Нет | ✅ TUI collaboration mode (`ModeKind::Plan`) — структурированное планирование через `update_plan` tool | 🟡 Интересно |
-| **Headless mode** | ✅ CLI Symfony Console | ✅ `codex exec` (stdin/stdout) | ✅ Паритет |
-| **Non-interactive CI mode** | ✅ CLI pipeline | ✅ `codex exec --full-auto` — для CI/CD | ✅ Паритет |
-| **Hooks (lifecycle)** | ❌ Нет | ✅ Pre/post tool use, session start/stop — внешние скрипты | 🟡 Позже |
-| **Memories (long-term)** | ❌ Нет | ✅ Citations, storage, компактификация — персистентный контекст между сессиями | 🟡 Позже |
-| **Plugins (marketplace)** | ❌ Нет | ✅ Динамическая загрузка инструментов через `codex plugin` | 🟢 Не берём |
-| **IDE integration** | ❌ Нет | ✅ VS Code / Cursor / Windsurf extensions | 🟢 Не берём |
-| **Realtime audio** | ❌ Нет | ✅ Experimental realtime audio mode | 🟢 Не берём |
-| **Image generation** | ❌ Нет | ✅ Built-in image generation context | 🟢 Не берём |
+| Функция | Codex CLI + Docker Agent |
+| --- | --- |
+| **Бюджетный контроль** | ⚠️ ChatGPT plan limits, но без программных лимитов |
+| **Audit Trail (JSONL)** | ✅ Rollout files (JSONL) + SQLite state |
+| **Ролевые промпты** | ✅ AGENTS.md + agent roles (TOML) |
+| **Multiple runners** | ✅ OpenAI + Ollama + Amazon Bedrock + custom providers + model_provider в config.toml |
+| **YAML-конфигурация** | ✅ config.toml (TOML) |
+| **Sandboxing (OS-level)** | ✅ Seatbelt/Landlock/Bubblewrap/restricted token — per-platform |
+| **Sandboxing (Docker)** | ✅ Docker + iptables firewall + domain whitelist + auto-cleanup |
+| **Guardian (safety reviewer)** | ✅ LLM-based risk assessment — data exfiltration, credential probing, destructive actions |
+| **Exec policy (rules)** | ✅ .rules файлы — banned prefixes, safe command detection, per-path restrictions |
+| **Multi-agent (hierarchical)** | ✅ spawn/send_message/wait/close_agent/list_agents + depth limit + mailbox |
+| **Network isolation** | ✅ iptables/ipset firewall — whitelist доменов, DNS-only, DROP default |
+| **Split filesystem permissions** | ✅ Per-path read/write/none — granular filesystem access control |
+| **Compaction (auto-compact)** | ✅ LLM summarization при context overflow (inline + remote) |
+| **MCP server mode** | ✅ `codex mcp-server` — Codex как MCP tool для других агентов |
+| **MCP client** | ✅ MCP servers в config.toml, parallel tool calls support |
+| **SKILL.md** | ✅ Bundled + custom skills |
+| **Session persistence** | ✅ SQLite + rollout files (JSONL) — `codex resume`/`codex fork` |
+| **Plan mode** | ✅ TUI collaboration mode (`ModeKind::Plan`) — структурированное планирование через `update_plan` tool |
+| **Headless mode** | ✅ `codex exec` (stdin/stdout) |
+| **Non-interactive CI mode** | ✅ `codex exec --full-auto` — для CI/CD |
+| **Hooks (lifecycle)** | ✅ Pre/post tool use, session start/stop — внешние скрипты |
+| **Memories (long-term)** | ✅ Citations, storage, компактификация — персистентный контекст между сессиями |
+| **Plugins (marketplace)** | ✅ Динамическая загрузка инструментов через `codex plugin` |
+| **IDE integration** | ✅ VS Code / Cursor / Windsurf extensions |
+| **Realtime audio** | ✅ Experimental realtime audio mode |
+| **Image generation** | ✅ Built-in image generation context |
 
 ---
 
-## 3. Что полезно взять и почему
+## 3. Оркестрационные возможности
 
 ### 3.1 🟡 Multi-layer Sandboxing — OS-level + Docker + Network isolation
 
@@ -170,46 +162,45 @@ codex (binary)                     CLI entry point (Rust / Ratatui TUI)
 
 **Уровень 1: OS-level sandboxing**
 ```
-macOS  → Seatbelt (/usr/bin/sandbox-exec)
-Linux  → Bubblewrap (bwrap) + Landlock
+macOS → Seatbelt (/usr/bin/sandbox-exec)
+Linux → Bubblewrap (bwrap) + Landlock
 Windows → Restricted token + elevated backend
 ```
 
-Конфигурация через `--sandbox` flag:
-- `read-only` — только чтение filesystem, нет network
-- `workspace-write` — запись в workspace, network через proxy
+Конфигурация через `--sandbox` flag и `SandboxPolicy` enum в `config.toml`:
+- `read-only` — только чтение filesystem (`read_only_access`), нет network
+- `workspace-write` — запись в workspace (`writable_roots`), network через proxy
 - `danger-full-access` — без ограничений (для trusted environments)
+- `external-sandbox` — процесс уже в контейнере/VM, full disk access, network по настройке
+
+Каждый вариант управляет параметрами: `read_only_access`, `writable_roots`, `network_access`, `readable_roots`, `read_only_subpaths`.
 
 **Уровень 2: Split filesystem permissions**
 ```toml
 [permissions.default.filesystem]
 entries = [
-  { path = "/workspace", access = "write" },
-  { path = "/workspace/.env", access = "none" },
-  { path = "/workspace/secrets", access = "read" },
+ { path = "/workspace", access = "write" },
+ { path = "/workspace/.env", access = "none" },
+ { path = "/workspace/secrets", access = "read" },
 ]
-``` 
-
-> **Примечание:** Фактический формат конфигурации в `config.toml` использует `SandboxPolicy` enum с вариантами `danger-full-access`, `read-only`, `workspace-write`, `external-sandbox`. Каждый вариант имеет свои параметры: `read_only_access`, `writable_roots`, `network_access`, `readable_roots`, `read_only_subpaths`.
+```
 
 **Уровень 3: Docker + iptables firewall**
 ```
 docker run \
-  --cap-add=NET_ADMIN \
-  -v "$WORK_DIR:/app$WORK_DIR" \
-  codex sleep infinity
+ --cap-add=NET_ADMIN \
+ -v "$WORK_DIR:/app$WORK_DIR" \
+ codex sleep infinity
 → iptables whitelist (api.openai.com, github.com, ...)
 → DROP default policy
 → auto-cleanup при выходе
 ```
 
-**Почему нам интересно:** Для autonomous CI/CD pipeline — критически важная безопасность. Task-orchestrator запускает shell-команды без ограничений. Multi-layer sandboxing позволяет:
+**Оркестрационная значимость:** Для autonomous CI/CD pipeline — критически важная безопасность. Multi-layer sandboxing позволяет:
 - Изолировать выполнение shell-команд от host-системы
 - Ограничить network access (только к разрешённым API endpoints)
 - Контролировать filesystem access (запись только в workspace)
 - Запускать pipeline в Docker container с auto-cleanup
-
-**Отличие:** У нас нет sandboxing вообще. Shell-команды выполняются напрямую на host.
 
 ---
 
@@ -219,14 +210,14 @@ docker run \
 
 ```
 Agent → tool call (shell command / file write)
-  → Guardian review (risk assessment)
-    → Risk taxonomy:
-      • Data Exfiltration (high/critical): отправка данных наружу
-      • Credential Probing (high): извлечение credentials
-      • Persistent Security Weakening (high/critical): ослабление безопасности
-      • Destructive Actions (high/critical): удаление данных,破坏 production
-      • Low-Risk Actions (low/medium): обычные операции
-    → Decision: allow / deny / escalate to user
+ → Guardian review (risk assessment)
+ → Risk taxonomy:
+ • Data Exfiltration (high/critical): отправка данных наружу
+ • Credential Probing (high): извлечение credentials
+ • Persistent Security Weakening (high/critical): ослабление безопасности
+ • Destructive Actions (high/critical): удаление данных, повреждение production-окружения
+ • Low-Risk Actions (low/medium): обычные операции
+ → Decision: allow / deny / escalate to user
 ```
 
 Ключевые правила Guardian:
@@ -235,11 +226,9 @@ Agent → tool call (shell command / file write)
 - **Granularity:** отличает `rm -rf` конкретного файла (low/medium) от broad destructive action (high/critical)
 - **Override:** user authorization может повысить разрешённый risk level
 
-**Почему нам интересно:** Для autonomous execution в CI/CD — LLM-based «quality gate» на уровне каждого shell-вызова. Это дополняет наши shell-based quality gates: если step выполняет потенциально опасную команду, Guardian может оценить risk и заблокировать. Пример:
-- Quality gate: проверяет результат команды (тесты прошли/упали)
-- Guardian: проверяет безопасность команды до выполнения (не удалит ли production)
-
-**Отличие:** У нас quality gates — post-execution проверки. Guardian — pre-execution safety review.
+**Оркестрационная значимость:** Для autonomous execution в CI/CD — LLM-based «quality gate» на уровне каждого shell-вызова. Guardian дополняет статические проверки (exec policy, sandboxing) семантической оценкой намерения команды:
+- Exec policy: блокирует команды по формальным правилам (pattern matching)
+- Guardian: оценивает семантику действия — даже если команда не попадает под запрещённый паттерн, LLM может распознать опасную последовательность
 
 ---
 
@@ -250,18 +239,18 @@ Agent → tool call (shell command / file write)
 ```python
 # default.rules / .codexpolicy — Starlark DSL
 prefix_rule(
-    pattern = ["git", "reset", "--hard"],
-    decision = "forbidden",
-    justification = "destructive operation",
-    match   = [["git", "reset", "--hard"]],
-    not_match = [["git", "reset", "--keep"]],
+ pattern = ["git", "reset", "--hard"],
+ decision = "forbidden",
+ justification = "destructive operation",
+ match = [["git", "reset", "--hard"]],
+ not_match = [["git", "reset", "--keep"]],
 )
 
 define_program(
-    program="ls",
-    system_path=["/bin/ls", "/usr/bin/ls"],
-    options=[flag("-a"), flag("-l")],
-    args=[ARG_RFILES_OR_CWD],
+ program="ls",
+ system_path=["/bin/ls", "/usr/bin/ls"],
+ options=[flag("-a"), flag("-l")],
+ args=[ARG_RFILES_OR_CWD],
 )
 ```
 
@@ -272,12 +261,10 @@ define_program(
 - **Network rules:** per-command network access control
 - **Per-path restrictions:** команды ограничены определёнными директориями
 
-**Почему нам интересно:** Декларативные rules для ограничения shell-команд в цепочках. Сейчас task-orchestrator выполняет любую shell-команду без ограничений. Exec policy позволяет:
+**Оркестрационная значимость:** Декларативные rules для ограничения shell-команд в цепочках. Exec policy позволяет:
 - Определить разрешённые команды для каждого типа шага
 - Заблокировать опасные команды (`rm -rf /`, `curl` к внешним endpoints)
 - Дифференцировать политики по environment (dev vs. CI vs. production)
-
-**Отличие:** У нас quality gates — post-execution проверки. Exec policy — pre-execution filtering.
 
 ---
 
@@ -287,13 +274,13 @@ define_program(
 
 ```
 Codex (main agent)
-  ├─ spawn("Investigate auth module") → sub-agent с изолированным контекстом
-  │    ├─ send_message("Found issue in auth.rs")
-  │    └─ close_agent()
-  ├─ spawn("Write unit tests") → sub-agent
-  │    └─ send_message("3 tests written")
-  └─ spawn("Review code") → sub-agent
-       └─ send_message("LGTM")
+ ├─ spawn("Investigate auth module") → sub-agent с изолированным контекстом
+ │ ├─ send_message("Found issue in auth.rs")
+ │ └─ close_agent()
+ ├─ spawn("Write unit tests") → sub-agent
+ │ └─ send_message("3 tests written")
+ └─ spawn("Review code") → sub-agent
+ └─ send_message("LGTM")
 ```
 
 **Механика:**
@@ -305,13 +292,11 @@ Codex (main agent)
 - **Role system:** `agent_type` — назначение роли sub-agent'у (default, custom, built-in roles)
 - **Approval routing:** sub-agent approval requests направляются parent session
 
-**Почему нам интересно:** Для dynamic chains — возможность делегировать подзадачу отдельному агенту с чистым контекстом. Sub-agent pattern позволяет:
+**Оркестрационная значимость:** Для dynamic chains — возможность делегировать подзадачу отдельному агенту с чистым контекстом. Sub-agent pattern позволяет:
 - Изолировать контекст подзадачи (меньше token usage)
 - Выполнять подзадачи параллельно
 - Ограничивать вложенность (depth limit) — защита от runaway spawning
 - Назначать разные роли/модели разным sub-agent'ам
-
-**Отличие:** У нас каждый шаг — вызов runner'а с payload. Sub-agent — «chain внутри chain» с собственным контекстом, mailbox communication и depth limit.
 
 ---
 
@@ -328,49 +313,47 @@ ipset destroy allowed-domains 2>/dev/null || true
 
 # 2. Allow DNS and localhost
 iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
-iptables -A INPUT  -p udp --sport 53 -j ACCEPT
-iptables -A INPUT  -i lo -j ACCEPT
+iptables -A INPUT -p udp --sport 53 -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
 iptables -A OUTPUT -o lo -j ACCEPT
 
 # 3. Create ipset with allowed domains
 ipset create allowed-domains hash:net
 for domain in "${ALLOWED_DOMAINS[@]}"; do
-  ips=$(dig +short A "$domain")
-  ipset add allowed-domains "$ips"
+ ips=$(dig +short A "$domain")
+ ipset add allowed-domains "$ips"
 done
 
 # 4. Allow host network (Docker host → container communication)
 HOST_IP=$(ip route | grep default | cut -d" " -f3)
-iptables -A INPUT  -s "$HOST_NETWORK" -j ACCEPT
+iptables -A INPUT -s "$HOST_NETWORK" -j ACCEPT
 iptables -A OUTPUT -d "$HOST_NETWORK" -j ACCEPT
 
 # 5. Default DROP
-iptables -P INPUT   DROP
-iptables -P OUTPUT  DROP
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
 iptables -P FORWARD DROP
 
 # 6. Allow established connections + whitelisted domains
-iptables -A INPUT  -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -m set --match-set allowed-domains dst -j ACCEPT
 
 # 7. REJECT (not DROP) for immediate error feedback
-iptables -A INPUT   -p tcp -j REJECT --reject-with tcp-reset
-iptables -A OUTPUT  -p tcp -j REJECT --reject-with tcp-reset
+iptables -A INPUT -p tcp -j REJECT --reject-with tcp-reset
+iptables -A OUTPUT -p tcp -j REJECT --reject-with tcp-reset
 
 # 8. Verify: example.com blocked, api.openai.com allowed
-curl --connect-timeout 5 https://example.com     # must fail
-curl --connect-timeout 5 https://api.openai.com  # must succeed
+curl --connect-timeout 5 https://example.com # must fail
+curl --connect-timeout 5 https://api.openai.com # must succeed
 ```
 
-**Почему нам интересно:** Для autonomous pipeline — критически важно ограничить network access. Если AI-агент может выполнять shell-команды, он потенциально может:
+**Оркестрационная значимость:** Для autonomous pipeline — критически важно ограничить network access. Если AI-агент может выполнять shell-команды, он потенциально может:
 - Скачать и выполнить вредоносный код
 - Отправить данные на внешний сервер
 - Получить инструкции от третьих лиц
 
 Network isolation через iptables — простой и надёжный механизм: по умолчанию блокировать всё, разрешать только whitelist доменов (API endpoints runner'ов, git servers).
-
-**Отличие:** У нас нет network isolation. Shell-команды в pipeline выполняются с полным network access.
 
 ---
 
@@ -393,36 +376,39 @@ Network isolation через iptables — простой и надёжный м�
 - **Preservation:** сохраняет initial context + summary + последний user message
 - **Analytics:** отслеживание compaction events (trigger, strategy, status)
 
-**Почему нам интересно:** Для длинных цепочек с большим количеством шагов — context overflow реальная проблема. Auto-compaction позволяет:
+**Оркестрационная значимость:** Для длинных цепочек с большим количеством шагов — context overflow — реальная проблема. Auto-compaction позволяет:
 - Продолжать выполнение даже при длинной истории
 - Сохранять ключевой контекст через LLM summarization
 - Не терять последние instructions при сжатии
-
-**Отличие:** У нас нет context management. Payload передаётся между шагами без сжатия.
 
 ---
 
 ### 3.7 🟡 Plan Mode — read-only exploration перед выполнением
 
-**Что у них:** Codex CLI поддерживает Plan mode — agent анализирует задачу без выполнения destructive actions:
+**Что у них:** Codex CLI поддерживает Plan mode (`ModeKind::Plan`) — агент анализирует задачу, не выполняя деструктивные действия:
 
 ```
 codex --plan "Refactor authentication module"
-→ Agent читает файлы, анализирует код, предлагает план
+→ Agent использует tool update_plan для структурированного планирования
+→ Читает файлы, анализирует код, формирует план
 → Не выполняет shell-команды, не пишет файлы
-→ Пользователь подтверждает → Agent выполняет
+→ Пользователь подтверждает → Agent переключается в execution mode
 ```
 
-**Почему нам интересно:** Для dynamic chains — возможность preview перед execution. В task-orchestrator динамическая цепочка генерируется и выполняется сразу. Plan mode позволяет:
-- Сгенерировать цепочку → показать пользователю → подтвердить → выполнить
-- Использовать дешёвую модель для planning, дорогую для execution
-- Разделять exploration и execution phases
+**Техническая реализация:**
+- Переключение через `--plan` flag в CLI или `ModeKind::Plan` в API
+- Агент использует `update_plan` tool для структурированного планирования вместо прямого выполнения
+- Plan mode ограничивает доступные инструменты: запрещены `shell` и `apply_patch`, разрешены `read`, `list_dir`, `update_plan`
+- Результат планирования сохраняется в сессии и может быть использован при повторном запуске в execution mode
 
-**Отличие:** У нас нет preview/plan phase для dynamic chains.
+**Оркестрационная значимость:** Для dynamic chains — разделение exploration и execution phases:
+- Сгенерировать план → показать пользователю → подтвердить → выполнить
+- Снизить риск: планирование на основе актуального состояния кодовой базы перед модификацией
+- Разделять exploration (анализ репозитория) и execution (внесение изменений)
 
 ---
 
-## 4. Что НЕ берём и почему
+## 4. Прочие возможности (вне оркестрации)
 
 ### 4.1 🟢 Seatbelt / Landlock / Bubblewrap — OS-specific sandboxing
 
@@ -457,16 +443,10 @@ Codex может выступать как MCP server — предоставля
 
 ---
 
-## 5. Сводка рекомендаций
+## 5. Сводка по оркестрации
 
-| Фича | Приоритет | Обоснование |
-|---|---|---|
-| Chain orchestration | ✅ Уже есть | Core-функциональность task-orchestrator |
-| Retry + Circuit Breaker | ✅ Уже есть | Устойчивость при сбоях |
-| Quality Gates | ✅ Уже есть | Автоматическая проверка кода |
-| Budget control | ✅ Уже есть | Предотвращение runaway spending |
-| Fix iterations | ✅ Уже есть | Closed-loop цикл разработки |
-| SKILL.md | ✅ Уже есть | Формализация agent skills |
+| Возможность | Статус в продукте | Описание |
+| --- | --- | --- |
 | Docker-based sandboxing | 🟡 P2 | Контейнеризация pipeline для CI/CD: изоляция filesystem + network |
 | Network isolation (iptables) | 🟡 P2 | Whitelist доменов для autonomous pipeline — блокировка data exfiltration |
 | Guardian (LLM safety reviewer) | 🟡 P2 | Pre-execution safety review для shell-команд — дополнение к post-execution quality gates |
