@@ -21,88 +21,88 @@ OpenCode — **наиболее популярный open source AI-coding agent
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Presentation Layer                                          │
-│  • TUI (terminal user interface, Solid.js через @opentui)    │
-│  • Desktop App (Tauri/Electron)                              │
-│  • VS Code / JetBrains / Zed Extensions                      │
-│  • HTTP API (Hono) + WebSocket sync                          │
-│  • ACP (Agent Client Protocol) — stdio JSON-RPC              │
+│ Presentation Layer │
+│ • TUI (terminal user interface, Solid.js через @opentui) │
+│ • Desktop App (Tauri/Electron) │
+│ • VS Code / JetBrains / Zed Extensions │
+│ • HTTP API (Hono) + WebSocket sync │
+│ • ACP (Agent Client Protocol) — stdio JSON-RPC │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  Session Layer (session/)                                    │
-│  • Session CRUD (create/fork/list/remove)                    │
-│  • MessageV2 (user/assistant/tool/compaction parts)          │
-│  • SessionPrompt.prompt() — основной entry point             │
-│  • SessionPrompt.loop() — agentic loop (LLM → tools → LLM)  │
-│  • RunState — mutual exclusion per session (Runner)          │
-│  • Status: idle / busy / retry                               │
-│  • Cost tracking (getUsage: tokens + cost per call)          │
+│ Session Layer (session/) │
+│ • Session CRUD (create/fork/list/remove) │
+│ • MessageV2 (user/assistant/tool/compaction parts) │
+│ • SessionPrompt.prompt() — основной entry point │
+│ • SessionPrompt.loop() — agentic loop (LLM → tools → LLM) │
+│ • RunState — mutual exclusion per session (Runner) │
+│ • Status: idle / busy / retry │
+│ • Cost tracking (getUsage: tokens + cost per call) │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  Agent Loop (session/processor.ts + session/llm.ts)          │
-│  • Stream processing (start → text/tool/reasoning → finish)  │
-│  • Tool lifecycle: pending → running → completed/error       │
-│  • Doom loop detection (3 repeated identical tool calls)     │
-│  • Retry policy (exponential backoff + Retry-After headers)  │
-│  • Context overflow → auto-compaction                        │
-│  • Permission checks per tool call                           │
-│  • AbortSignal support                                       │
+│ Agent Loop (session/processor.ts + session/llm.ts) │
+│ • Stream processing (start → text/tool/reasoning → finish) │
+│ • Tool lifecycle: pending → running → completed/error │
+│ • Doom loop detection (3 repeated identical tool calls) │
+│ • Retry policy (exponential backoff + Retry-After headers) │
+│ • Context overflow → auto-compaction │
+│ • Permission checks per tool call │
+│ • AbortSignal support │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
-               ┌───────────┴───────────┐
-               ▼                       ▼
-┌────────────────────┐   ┌────────────────────────────────────┐
-│  Agent Service     │   │  Tool Registry                     │
-│  (agent/agent.ts)  │   │  (tool/registry.ts)                │
-│  • build (primary) │   │  • shell, read, write, edit,       │
-│  • plan (primary)  │   │    apply_patch, glob, grep          │
-│  • general (sub)   │   │  • task (subagent delegation)       │
-│  • explore (sub)   │   │  • todo, question, skill, plan      │
-│  • compaction      │   │  • webfetch, websearch, lsp         │
-│  • title, summary  │   │  • Custom: .opencode/tool/*.ts      │
-│  • Custom agents   │   │  • Plugin tools                     │
-│    (.opencode/      │   │  • MCP tools                       │
-│     agent/*.md)     │   │                                    │
-│  • AI-generated    │   │                                    │
-│    agents          │   │                                    │
-└────────┬───────────┘   └────────────────────────────────────┘
-         │
-         ▼
+ │
+ ┌───────────┴───────────┐
+ ▼ ▼
+┌────────────────────┐ ┌────────────────────────────────────┐
+│ Agent Service │ │ Tool Registry │
+│ (agent/agent.ts) │ │ (tool/registry.ts) │
+│ • build (primary) │ │ • shell, read, write, edit, │
+│ • plan (primary) │ │ apply_patch, glob, grep │
+│ • general (sub) │ │ • task (subagent delegation) │
+│ • explore (sub) │ │ • todo, question, skill, plan │
+│ • compaction │ │ • webfetch, websearch, lsp │
+│ • title, summary │ │ • Custom: .opencode/tool/*.ts │
+│ • Custom agents │ │ • Plugin tools │
+│ (.opencode/ │ │ • MCP tools │
+│ agent/*.md) │ │ │
+│ • AI-generated │ │ │
+│ agents │ │ │
+└────────┬───────────┘ └────────────────────────────────────┘
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  Provider Layer (provider/)                                  │
-│  • 23+ LLM провайдеров через Vercel AI SDK                   │
-│  • Anthropic, OpenAI, Google, Azure, Bedrock, Groq, ...     │
-│  • Model-specific prompts (anthropic.txt, gpt.txt, ...)      │
-│  • Cost calculation per provider (input/output/cache/reason)  │
-│  • Variant system (cheapest/flash/default/progressive)       │
-│  • GitHub Copilot provider (OAuth + OpenAI-compatible)       │
+│ Provider Layer (provider/) │
+│ • 23+ LLM провайдеров через Vercel AI SDK │
+│ • Anthropic, OpenAI, Google, Azure, Bedrock, Groq, ... │
+│ • Model-specific prompts (anthropic.txt, gpt.txt, ...) │
+│ • Cost calculation per provider (input/output/cache/reason) │
+│ • Variant system (cheapest/flash/default/progressive) │
+│ • GitHub Copilot provider (OAuth + OpenAI-compatible) │
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
-│  Cross-cutting Services                                      │
-│  • Permission (allow/ask/deny per tool + glob patterns)      │
-│  • Compaction (auto-summarization при context overflow)      │
-│  • Skills (SKILL.md discovery из .opencode/skills/)          │
-│  • Plugins (JS/TS модули, hooks, custom tools)               │
-│  • MCP (Model Context Protocol)                              │
-│  • LSP (Language Server Protocol, встроенный)                 │
-│  • Snapshot (file diff tracking per step)                    │
-│  • Worktree (git worktree create/remove/reset)               │
-│  • Sync (event-sourced state через SQLite + sync events)     │
-│  • Bus (publish/subscribe event bus)                         │
-│  • Storage (SQLite через Drizzle ORM)                        │
-│  • Effect-TS (Context.Tag + Layer — dependency injection)    │
+│ Cross-cutting Services │
+│ • Permission (allow/ask/deny per tool + glob patterns) │
+│ • Compaction (auto-summarization при context overflow) │
+│ • Skills (SKILL.md discovery из .opencode/skills/) │
+│ • Plugins (JS/TS модули, hooks, custom tools) │
+│ • MCP (Model Context Protocol) │
+│ • LSP (Language Server Protocol, встроенный) │
+│ • Snapshot (file diff tracking per step) │
+│ • Worktree (git worktree create/remove/reset) │
+│ • Sync (event-sourced state через SQLite + sync events) │
+│ • Bus (publish/subscribe event bus) │
+│ • Storage (SQLite через Drizzle ORM) │
+│ • Effect-TS (Context.Tag + Layer — dependency injection) │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Ключевые характеристики
 
 | Характеристика | Значение |
-|---|---|
+| --- | --- |
 | **Тип** | CLI-agent + Desktop App + SDK (AI coding assistant) |
 | **Модель выполнения** | Agent loop (LLM → tool call → observation → LLM → ...) |
 | **Агенты** | 7 built-in (build/plan/general/explore/compaction/title/summary) + custom (.opencode/agent/*.md) + AI-generated |
@@ -118,40 +118,34 @@ OpenCode — **наиболее популярный open source AI-coding agent
 
 ---
 
-## 2. Сравнительная таблица: что у нас есть vs. чего нет
+## 2. Возможности оркестрации — обзор
 
-| Функция | Task Orchestrator | OpenCode | Статус |
-|---|---|---|---|
-| **Цепочки шагов (chains)** | ✅ YAML chains, статические и динамические | ❌ Нет (один agent loop per session, нет multi-step DSL) | ✅ У нас есть |
-| **Retry с backoff** | ✅ RetryingAgentRunner | ✅ SessionRetry.policy — exponential backoff + Retry-After header parsing + error classification | ✅ У нас есть (OpenCode детальнее) |
-| **Circuit Breaker** | ✅ CircuitBreakerAgentRunner | ❌ Нет (retry — максимум) | ✅ У нас есть |
-| **Quality Gates** | ✅ Shell-команды как проверки | ❌ Нет (agent сам решает) | ✅ У нас есть |
-| **Бюджетный контроль** | ✅ BudgetVo (cost-based) | ⚠️ Cost tracking per session/message, но без budget limit | ✅ У нас есть |
-| **Итерационные циклы** | ✅ fix_iterations с max_iterations | ✅ Agent steps (maxSteps) — forced text-only response при достижении лимита | ✅ Паритет |
-| **Fallback routing** | ✅ Per-step fallback runner | ❌ Нет (один provider/model per session) | ✅ У нас есть |
-| **Doom loop detection** | ❌ Нет | ✅ 3 повторяющихся идентичных tool call → permission ask | 🟡 Интересно |
-| **Permission system** | ❌ Нет | ✅ allow/ask/deny per tool + glob patterns + inherited + session-level overrides | 🟡 Интересно |
-| **Agent modes** | ❌ Нет (только runner types) | ✅ 7 built-in агентов + custom + AI-generated; primary/subagent/hidden режимы | 🟡 Интересно |
-| **Subagents (task tool)** | ❌ Нет | ✅ Isolated session + permission inheritance + resume по task_id + no recursive delegation | 🟡 Интересно |
-| **Context compaction** | ❌ Нет | ✅ Auto-compaction с 7-секционным structured template + pruning + preserve recent turns | 🟡 Интересно |
-| **Git worktrees** | ❌ Нет | ✅ Create/remove/reset + auto-branch + start scripts + snapshot tracking | 🟡 Интересно |
-| **Cost tracking** | ❌ Нет (budget control только) | ✅ Per-message cost + tokens (input/output/reasoning/cache read/cache write) + provider-specific pricing | 🟡 Интересно |
-| **Skills (SKILL.md)** | ❌ Нет | ✅ Discovery из .opencode/skills/, .claude/skills/, .agents/skills/ + remote URLs + permission filtering | 🟡 Интересно |
-| **Custom agents** | ❌ Нет | ✅ Markdown-файлы (.opencode/agent/*.md) + AI-генерация через generateObject | 🟡 Интересно |
-| **Plugin system** | ❌ Нет | ✅ JS/TS модули + hooks + custom tools + system prompt transformation | 🟡 Интересно |
-| **MCP support** | ❌ Нет (уровень runner'ов) | ✅ Full MCP client (tools + resources + OAuth) | — (разный уровень) |
-| **LSP support** | ❌ Нет | ✅ Built-in LSP client (diagnostics, definitions, references) | — (разный уровень) |
-| **Snapshot tracking** | ❌ Нет | ✅ File diff tracking per LLM step + revert capability | 🟡 Интересно |
-| **Error classification** | ⚠️ Basic (retry on failure) | ✅ ContextOverflow/API 5xx/FreeUsageLimitError/GoUsageLimitError/rate limit — retry/no-retry classification | 🟡 Интересно |
-| **Client-server architecture** | ❌ Нет (CLI только) | ✅ HTTP API (Hono) + WebSocket sync + mDNS discovery + remote control | — (разный уровень) |
-| **ACP (Agent Client Protocol)** | ❌ Нет | ✅ JSON-RPC over stdio (Zed, внешние IDE) | — (разный уровень) |
-| **DDD-архитектура** | ✅ Domain/Application/Infrastructure | ❌ Effect-TS service layer (Context.Tag + Layer) | ✅ У нас лучше |
-| **Decorator pattern** | ✅ AgentRunnerInterface | ❌ Прямой вызов Effect-пайплайна | ✅ У нас лучше |
-| **JSONL audit trail** | ✅ JsonlAuditLogger | ⚠️ Sync events (event-sourced), не audit trail в нашем смысле | ✅ У нас лучше |
+| Функция | OpenCode |
+| --- | --- |
+| **Итерационные циклы** | ✅ Agent steps (maxSteps) — forced text-only response при достижении лимита |
+| **Doom loop detection** | ✅ 3 повторяющихся идентичных tool call → permission ask |
+| **Permission system** | ✅ allow/ask/deny per tool + glob patterns + inherited + session-level overrides |
+| **Agent modes** | ✅ 7 built-in агентов + custom + AI-generated; primary/subagent/hidden режимы |
+| **Subagents (task tool)** | ✅ Isolated session + permission inheritance + resume по task_id + no recursive delegation |
+| **Context compaction** | ✅ Auto-compaction с 7-секционным structured template + pruning + preserve recent turns |
+| **Git worktrees** | ✅ Create/remove/reset + auto-branch + start scripts + snapshot tracking |
+| **Cost tracking** | ✅ Per-message cost + tokens (input/output/reasoning/cache read/cache write) + provider-specific pricing |
+| **Skills (SKILL.md)** | ✅ Discovery из .opencode/skills/, .claude/skills/, .agents/skills/ + remote URLs + permission filtering |
+| **Custom agents** | ✅ Markdown-файлы (.opencode/agent/*.md) + AI-генерация через generateObject |
+| **Plugin system** | ✅ JS/TS модули + hooks + custom tools + system prompt transformation |
+| **MCP support** | ❌ Нет (уровень runner'ов) |
+| **LSP support** | ❌ Нет |
+| **Snapshot tracking** | ✅ File diff tracking per LLM step + revert capability |
+| **Error classification** | ✅ ContextOverflow/API 5xx/FreeUsageLimitError/GoUsageLimitError/rate limit — retry/no-retry classification |
+| **Client-server architecture** | ❌ Нет (CLI только) |
+| **ACP (Agent Client Protocol)** | ❌ Нет |
+| **DDD-архитектура** | ❌ Effect-TS service layer (Context.Tag + Layer) |
+| **Decorator pattern** | ❌ Прямой вызов Effect-пайплайна |
+| **JSONL audit trail** | ⚠️ Sync events (event-sourced), не audit trail в нашем смысле |
 
 ---
 
-## 3. Что полезно взять и почему
+## 3. Оркестрационные возможности
 
 ### 3.1 🟡 Doom Loop Detection (session/processor.ts)
 
@@ -159,34 +153,34 @@ OpenCode — **наиболее популярный open source AI-coding agent
 
 ```typescript
 // В processor.ts, обработка события "tool-call"
-const recentParts = parts.slice(-DOOM_LOOP_THRESHOLD)  // DOOM_LOOP_THRESHOLD = 3
+const recentParts = parts.slice(-DOOM_LOOP_THRESHOLD) // DOOM_LOOP_THRESHOLD = 3
 
 if (
-  recentParts.length !== DOOM_LOOP_THRESHOLD ||
-  !recentParts.every(
-    (part) =>
-      part.type === "tool" &&
-      part.tool === value.toolName &&
-      part.state.status !== "pending" &&
-      JSON.stringify(part.state.input) === JSON.stringify(value.input),
-  )
+ recentParts.length !== DOOM_LOOP_THRESHOLD ||
+ !recentParts.every(
+ (part) =>
+ part.type === "tool" &&
+ part.tool === value.toolName &&
+ part.state.status !== "pending" &&
+ JSON.stringify(part.state.input) === JSON.stringify(value.input),
+ )
 ) {
-  return  // не doom loop — продолжаем
+ return // не doom loop — продолжаем
 }
 
 // 3 идентичных tool call подряд → ask permission
 const agent = yield* agents.get(ctx.assistantMessage.agent)
 yield* permission.ask({
-  permission: "doom_loop",
-  patterns: [value.toolName],
-  sessionID: ctx.sessionID,
-  metadata: { tool: value.toolName, input: value.input },
-  always: [value.toolName],
-  ruleset: agent.permission,
+ permission: "doom_loop",
+ patterns: [value.toolName],
+ sessionID: ctx.sessionID,
+ metadata: { tool: value.toolName, input: value.input },
+ always: [value.toolName],
+ ruleset: agent.permission,
 })
 ```
 
-**Почему нам интересно:** Защита от зацикливания в fix_iterations. Подтверждено 3+ проектами (Crush — window-based, OpenHands SDK — 4+1, Paperclip AI — evidence-based). OpenCode предлагает простейшую реализацию: 3 идентичных вызова = doom loop. Для task-orchestrator: detect repeating runner calls с идентичными параметрами → early termination или warning.
+**Оркестрационная значимость:** Защита от зацикливания в fix_iterations. Подтверждено 3+ проектами (Crush — window-based, OpenHands SDK — 4+1, Paperclip AI — evidence-based). OpenCode предлагает простейшую реализацию: 3 идентичных вызова = doom loop.
 
 ### 3.2 🟡 Structured Context Compaction (session/compaction.ts)
 
@@ -226,7 +220,7 @@ yield* permission.ask({
 - **Replay** — при overflow: компактификация + повторный запуск последнего промпта (без медиа)
 - **Tail splitting** — если turn не помещается в бюджет, разрезание на head/tail
 
-**Почему нам интересно:** Наиболее структурированный подход к compaction из исследованных. Kilo Code имеет похожий 7-секционный шаблон, но OpenCode добавляет pruning, preserve recent и replay — три дополнительных механизма. Для длинных цепочек и dynamic loops контекст-менеджмент станет необходим.
+**Оркестрационная значимость:** Наиболее структурированный подход к compaction из исследованных. Kilo Code имеет похожий 7-секционный шаблон, но OpenCode добавляет pruning, preserve recent и replay — три дополнительных механизма. Для длинных цепочек и dynamic loops контекст-менеджмент станет необходим.
 
 ### 3.3 🟡 Permission System с Glob Patterns (permission/)
 
@@ -235,17 +229,17 @@ yield* permission.ask({
 ```typescript
 // Конфигурация (opencode.jsonc)
 {
-  "permission": {
-    "*": "allow",                    // все tools → allow
-    "doom_loop": "ask",              // doom loop detection → ask
-    "edit": { "*.env": "ask" },      // edit .env → ask
-    "external_directory": {          // доступ к внешним директориям
-      "*": "ask",
-      "/tmp/*": "allow"
-    },
-    "read": { "*.env": "ask" },      // read .env → ask
-    "question": "deny"               // question tool → deny
-  }
+ "permission": {
+ "*": "allow", // все tools → allow
+ "doom_loop": "ask", // doom loop detection → ask
+ "edit": { "*.env": "ask" }, // edit .env → ask
+ "external_directory": { // доступ к внешним директориям
+ "*": "ask",
+ "/tmp/*": "allow"
+ },
+ "read": { "*.env": "ask" }, // read .env → ask
+ "question": "deny" // question tool → deny
+ }
 }
 ```
 
@@ -257,7 +251,7 @@ yield* permission.ask({
 - **Approval persistence** — "always" approvals сохраняются в SQLite
 - **Doom loop** как отдельное permission (`doom_loop`)
 
-**Почему нам интересно:** Для CI/CD sandboxing: не требует Docker — работает на уровне chain executor. Аналог exec policy из Codex, но с glob patterns. Для task-orchestrator: allow/deny per runner + glob patterns для shell-команд.
+**Оркестрационная значимость:** Трёхуровневая модель allow/ask/deny с glob-фильтрацией — механизм разграничения доступа на уровне агентного loop. Уровень `ask` подразумевает интерактивное подтверждение пользователем, что ограничивает применимость в полностью автоматическом (batch) режиме. Glob patterns позволяют детализировать доступ до уровня файлов и директорий.
 
 ### 3.4 🟡 Subagent Task Tool (tool/task.ts + session/prompt.ts + agent/agent.ts)
 
@@ -266,11 +260,11 @@ yield* permission.ask({
 ```typescript
 // Параметры task tool (Schema-валидация)
 {
-  description: "short 3-5 words",      // краткое описание задачи
-  prompt: "task for the agent",         // полный промпт для субагента
-  subagent_type: "general",            // имя агента (general | explore | custom)
-  task_id: "optional_for_resume",      // для продолжения предыдущей сессии
-  command: "triggering command"         // команда, вызвавшая задачу
+ description: "short 3-5 words", // краткое описание задачи
+ prompt: "task for the agent", // полный промпт для субагента
+ subagent_type: "general", // имя агента (general | explore | custom)
+ task_id: "optional_for_resume", // для продолжения предыдущей сессии
+ command: "triggering command" // команда, вызвавшая задачу
 }
 ```
 
@@ -284,7 +278,7 @@ yield* permission.ask({
 - **Model inheritance** — subagent использует модель parent (из assistantMessage), если у агента нет явного model override
 - **Tool filtering** — subagent получает ограниченный набор инструментов: task=false, todowrite=false, primary_tools=false
 
-**Почему нам интересно:** «Chain внутри chain» с изолированным контекстом. Kilo Code имеет аналогичный task tool, но OpenCode добавляет resume по task_id и primary_tools isolation — уникальные возможности. Для dynamic chains: изолированные шаги с собственным контекстом + возможность возобновления.
+**Оркестрационная значимость:** «Chain внутри chain» с изолированным контекстом. Kilo Code имеет аналогичный task tool, но OpenCode добавляет resume по task_id и primary_tools isolation — уникальные возможности. Для dynamic chains: изолированные шаги с собственным контекстом + возможность возобновления.
 
 ---
 
@@ -295,11 +289,11 @@ yield* permission.ask({
 Жизненный цикл субагента — это state machine с пятью состояниями:
 
 ```
-┌──────────┐   create    ┌───────────┐   prompt()   ┌───────────┐
-│   none   │─────────────►│  created  │─────────────►│  running  │
-└──────────┘             └───────────┘              └─┬─────┬───┘
-                                                        │     │
-                                          completed ◄──┘     └──► error / aborted
+┌──────────┐ create ┌───────────┐ prompt() ┌───────────┐
+│ none │─────────────►│ created │─────────────►│ running │
+└──────────┘ └───────────┘ └─┬─────┬───┘
+ │ │
+ completed ◄──┘ └──► error / aborted
 ```
 
 **Последовательность операций в `TaskTool.execute()` (tool/task.ts:67–161):**
@@ -308,8 +302,8 @@ yield* permission.ask({
 2. **Agent resolution** — `agent.get(subagent_type)`. Если агент не найден — `Effect.fail`.
 3. **Capability check** — проверка `canTask` и `canTodo` по permission ruleset агента. Определяет, какие инструменты будут доступны субагенту.
 4. **Session resolution:**
-   - Если передан `task_id` — попытка загрузить существующую сессию (`sessions.get(taskID)` с catchCause → undefined при отсутствии). Это механизм **resume**.
-   - Если `task_id` не передан или сессия не найдена — `sessions.create()` с параметрами наследования.
+ - Если передан `task_id` — попытка загрузить существующую сессию (`sessions.get(taskID)` с catchCause → undefined при отсутствии). Это механизм **resume**.
+ - Если `task_id` не передан или сессия не найдена — `sessions.create()` с параметрами наследования.
 5. **Model resolution** — берётся модель из agent config, либо наследуется от текущего assistant message.
 6. **Metadata update** — `ctx.metadata()` записывает sessionId и model в tool call state (для UI).
 7. **Запуск agent loop** — `ops.prompt()` вызывает `SessionPrompt.prompt()` → `createUserMessage()` → `loop()` → `runLoop()` для child session.
@@ -334,7 +328,7 @@ task_id: <sessionID> (for resuming to continue this task if needed)
 Встроенные агенты определены в `agent/agent.ts` (state initializer). Каждый агент имеет `mode`:
 
 | Агент | mode | Может быть субагентом | Назначение |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **build** | `primary` | Нет (primary-only) | Основной агент. Полный доступ к tools, question, plan_enter. |
 | **plan** | `primary` | Нет (primary-only) | Режим планирования. edit запрещён, кроме plan files. |
 | **general** | `subagent` | **Да (основной субагент)** | Универсальный. todowrite запрещён по умолчанию. |
@@ -368,20 +362,20 @@ Custom agents (`.opencode/agent/*.md`) могут иметь mode `"all"` (и pr
 **Модель данных изоляции (task.ts:87–115):**
 ```typescript
 const nextSession = yield* sessions.create({
-  parentID: ctx.sessionID,            // связь parent → child
-  title: params.description + ` (@${next.name} subagent)`,
-  permission: [
-    // 1. Наследуем deny rules и external_directory от parent
-    ...(parent.permission ?? []).filter(
-      (rule) => rule.permission === "external_directory" || rule.action === "deny",
-    ),
-    // 2. Запрещаем todowrite, если агент не разрешает
-    ...(canTodo ? [] : [{ permission: "todowrite", pattern: "*", action: "deny" }]),
-    // 3. Запрещаем task (рекурсивная делегация), если агент не разрешает
-    ...(canTask ? [] : [{ permission: "task", pattern: "*", action: "deny" }]),
-    // 4. Запрещаем primary_tools (экспериментальная фича)
-    ...(cfg.experimental?.primary_tools?.map(item => ({ pattern: "*", action: "allow", permission: item })) ?? []),
-  ],
+ parentID: ctx.sessionID, // связь parent → child
+ title: params.description + ` (@${next.name} subagent)`,
+ permission: [
+ // 1. Наследуем deny rules и external_directory от parent
+ ...(parent.permission ?? []).filter(
+ (rule) => rule.permission === "external_directory" || rule.action === "deny",
+ ),
+ // 2. Запрещаем todowrite, если агент не разрешает
+ ...(canTodo ? [] : [{ permission: "todowrite", pattern: "*", action: "deny" }]),
+ // 3. Запрещаем task (рекурсивная делегация), если агент не разрешает
+ ...(canTask ? [] : [{ permission: "task", pattern: "*", action: "deny" }]),
+ // 4. Запрещаем primary_tools (экспериментальная фича)
+ ...(cfg.experimental?.primary_tools?.map(item => ({ pattern: "*", action: "allow", permission: item })) ?? []),
+ ],
 })
 ```
 
@@ -393,11 +387,11 @@ const nextSession = yield* sessions.create({
 ```typescript
 // findLast — последнее правило побеждает (приоритет по порядку)
 function evaluate(permission, pattern, ...rulesets): Rule {
-  const rules = rulesets.flat()
-  const match = rules.findLast(
-    (rule) => Wildcard.match(permission, rule.permission) && Wildcard.match(pattern, rule.pattern)
-  )
-  return match ?? { action: "ask", permission, pattern: "*" }  // default = ask
+ const rules = rulesets.flat()
+ const match = rules.findLast(
+ (rule) => Wildcard.match(permission, rule.permission) && Wildcard.match(pattern, rule.pattern)
+ )
+ return match ?? { action: "ask", permission, pattern: "*" } // default = ask
 }
 ```
 
@@ -416,26 +410,25 @@ function evaluate(permission, pattern, ...rulesets): Rule {
 **Настройка:** Через opencode.jsonc:
 ```jsonc
 {
-  "permission": {
-    "*": "allow",
-    "task": { "general": "allow" },   // general может делегировать
-    "edit": { "*.env": "deny" }        // запретить edit .env для всех
-  }
+ "permission": {
+ "*": "allow",
+ "task": { "general": "allow" }, // general может делегировать
+ "edit": { "*.env": "deny" } // запретить edit .env для всех
+ }
 }
 ```
 
 ##### 5. Параллельность
 
-**Да, параллельный запуск поддерживается.** task.txt (description для LLM) прямо инструктирует:
+LLM-primary agent может отправить **несколько tool calls в одном сообщении** (Vercel AI SDK поддерживает parallel tool calls). task.txt инструктирует:
 > «Launch multiple agents concurrently whenever possible, to maximize performance; to do that, use a single message with multiple tool uses»
 
-LLM-primary agent может отправить **несколько tool calls в одном сообщении** (Vercel AI SDK поддерживает parallel tool calls). Каждый tool call → отдельный TaskTool.execute() → отдельная child session → отдельный agent loop.
+Каждый tool call → отдельный TaskTool.execute() → отдельная child session → отдельный agent loop. Это **LLM-инициированный параллелизм без оркестраторного управления**: нет планировщика, нет очереди, нет приоритизации.
 
 **Механизм координации:**
 - Каждый субагент работает в **изолированной child session** — нет shared state между параллельными субагентами.
 - LLM-primary agent получает **все результаты одновременно** как tool observations в следующем assistant message.
-- Координация результатов — **на уровне LLM** (primary agent анализирует все результаты и синтезирует ответ).
-- Нет встроенного merge/reduce для результатов субагентов.
+- Координация результатов — **полностью на усмотрение LLM** (primary agent анализирует все результаты и синтезирует ответ). Нет встроенного merge/reduce, нет промежуточных барьеров синхронизации.
 
 **Ограничения:**
 - `SessionRunState` обеспечивает **mutual exclusion per session** — один agent loop на сессию. Параллельные tool calls запускают разные child sessions, но одна child session не может выполнять два agent loops одновременно.
@@ -451,26 +444,28 @@ Shell → ShellThenRun (shell complete + pending run)
 ShellThenRun → Running (shell done, run starts)
 ```
 
-##### 6. Cost Propagation
+##### 6. Cost Tracking и изоляция стоимости
 
 **Cost tracking реализован на уровне MessageV2 (сообщение), а не Session (сессия).** Каждый assistant message содержит:
 ```typescript
 {
-  cost: number,           // стоимость в USD
-  tokens: {
-    input: number,        // non-cached input tokens
-    output: number,       // output tokens (без reasoning)
-    reasoning: number,    // reasoning tokens
-    cache: { read: number, write: number }  // cache tokens
-  }
+ cost: number, // стоимость в USD
+ tokens: {
+ input: number, // non-cached input tokens
+ output: number, // output tokens (без reasoning)
+ reasoning: number, // reasoning tokens
+ cache: { read: number, write: number } // cache tokens
+ }
 }
 ```
 
-**Как субагент влияет на cost родителя:**
+**Изоляция стоимости между сессиями:**
 - Субагент работает в своей child session. Каждый LLM call в child session создаёт assistant message с собственным cost/tokens.
 - **Cost субагента НЕ прибавляется к cost родительского сообщения.** Родитель и child — раздельные sessions с раздельными message histories.
 - Cost субагента учитывается **только в его собственной child session**.
 - Родитель видит только результат task tool (text output), а не токены/стоимость субагента.
+
+Следствие: при нескольких субагентах **агрегированная стоимость цепочки вызовов невидима для родителя**. Нельзя отследить суммарные затраты primary agent + все его child sessions.
 
 **getUsage() (session/session.ts)** — provider-specific pricing:
 - Anthropic: `metadata.anthropic.cacheCreationInputTokens`
@@ -478,7 +473,7 @@ ShellThenRun → Running (shell done, run starts)
 - Bedrock: `metadata.bedrock.usage.cacheWriteInputTokens`
 - Experimental over 200K pricing
 
-**Budget limit:** В OpenCode **нет явного budget limit**. Cost tracking — информационный. Нет механизма остановки по budget.
+**Budget limit:** В OpenCode **нет явного budget limit**. Cost tracking — исключительно информационный. Нет механизма остановки выполнения по достижении лимита стоимости.
 
 ##### 7. Resume по task_id
 
@@ -525,33 +520,7 @@ ShellThenRun → Running (shell done, run starts)
 
 **Doom loop detection** работает и в child session: 3 идентичных tool call подряд → permission ask (если не deny).
 
-##### 9. Сравнение с паттернами task-orchestrator
 
-| Аспект | OpenCode | task-orchestrator | Применимость |
-|---|---|---|---|
-| **Изоляция контекста** | Child session (SQLite) с чистой историей | Step execution с изолированным runner context | 🟡 Модель для «sub-chain» — шаг цепочки с собственным контекстом |
-| **Рекурсивная делегация** | Запрещена по умолчанию (task=false для subagents) | Не поддерживается (нет вложенных chain steps) | 🟡 Для future: вложенные dynamic loops с ограничением глубины |
-| **Resume** | task_id → продолжение child session с полной историей | fix_iterations — перезапуск с тем же контекстом | ✅ **Parity:** наш fix_iterations — аналог resume |
-| **Параллельность** | LLM инициирует параллельные tool calls | Нет (последовательные шаги chain) | 🟡 Для future: parallel step execution в chain |
-| **Cost propagation** | Изолированный per-session, нет budget limit | BudgetVo с global cost tracking | ✅ **У нас лучше:** BudgetVo + budget limit |
-| **Error handling** | Catch в handleSubtask, parent продолжает | Chain executor → Circuit Breaker → fallback | 🟡 Adopt: изоляция ошибок sub-step от parent chain |
-| **Permission inheritance** | deny rules + external_directory → child | Нет permission system | 🟡 Для sandbox: deny rules для shell-команд runner'ов |
-| **Abort propagation** | parent abort → child cancel через AbortSignal | Нет механизма отмены | 🟡 Для future: cancel signal для running chains |
-| **Tool filtering** | task=false, todowrite=false, primary_tools=false | Нет аналога | — (разный уровень абстракции) |
-| **Agent modes** | primary / subagent / all / hidden | Нет (только runner types) | 🟡 Модель для «step modes» в chain |
-| **Primary tools** | Инструменты только для primary агентов | Нет аналога | — (разный уровень абстракции) |
-
-**Практические рекомендации:**
-
-1. **Resume = fix_iterations:** Наш `fix_iterations` — функциональный аналог OpenCode resume. Разница: OpenCode resume — по task_id (manual), наш — автоматический до max_iterations. Можно добавить manual resume как опцию.
-
-2. **Изоляция ошибок sub-step:** Adopt pattern из handleSubtask: ошибка sub-step → error result, не fatal chain failure. Родительская цепочка получает error observation и может решить — retry, fallback, abort.
-
-3. **Permission inheritance для runners:** Per-runner deny rules (shell-команды, file patterns) → наследуются вложенными steps. Аналог OpenCode deny rules для субагентов.
-
-4. **Abort propagation:** Parent chain cancel → signal всем running steps. Аналог AbortSignal propagation из OpenCode.
-
-5. **Параллельные steps:** Для future — parallel step execution в chain. OpenCode показывает модель: LLM инициирует → изолированные child sessions → results merge на уровне parent. Для task-orchestrator: YAML chain с `parallel: true` → FanOut → results aggregation.
 
 ### 3.5 🟡 Error Classification + Retry Policy (session/retry.ts)
 
@@ -562,19 +531,19 @@ ShellThenRun → Running (shell done, run starts)
 if (MessageV2.ContextOverflowError.isInstance(error)) return undefined
 
 // Retryable:
-if (status >= 500) return { message: ... }                    // 5xx → retry
-if (responseBody?.includes("FreeUsageLimitError")) return ...  // upsell
-if (responseBody?.includes("GoUsageLimitError")) return ...    // upsell
-if (msg.includes("rate limit")) return { message: msg }        // rate limit → retry
-if (json.error?.type === "too_many_requests") return ...       // 429 → retry
+if (status >= 500) return { message: ... } // 5xx → retry
+if (responseBody?.includes("FreeUsageLimitError")) return ... // upsell
+if (responseBody?.includes("GoUsageLimitError")) return ... // upsell
+if (msg.includes("rate limit")) return { message: msg } // rate limit → retry
+if (json.error?.type === "too_many_requests") return ... // 429 → retry
 
 // Retry-After header parsing:
-const retryAfterMs = headers["retry-after-ms"]    // миллисекунды
-const retryAfter = headers["retry-after"]          // секунды или HTTP date
+const retryAfterMs = headers["retry-after-ms"] // миллисекунды
+const retryAfter = headers["retry-after"] // секунды или HTTP date
 // Fallback: exponential backoff 2s → 4s → 8s → ... → 30s max
 ```
 
-**Почему нам интересно:** Конкретная модель для RetryingAgentRunner: context overflow → не retry (→ compact), 5xx → retry с backoff, rate limit → retry с Retry-After. Дополнение к circuit breaker: CB защищает от cascade, error classification — от бессмысленных retry.
+**Оркестрационная значимость:** Конкретная модель для RetryingAgentRunner: context overflow → не retry (→ compact), 5xx → retry с backoff, rate limit → retry с Retry-After. Дополнение к circuit breaker: CB защищает от cascade, error classification — от бессмысленных retry.
 
 ### 3.6 🟡 Custom Agents через Markdown (config/agent.ts)
 
@@ -590,8 +559,8 @@ mode: subagent
 temperature: 0.3
 steps: 10
 permission:
-  edit: deny
-  bash: ask
+ edit: deny
+ bash: ask
 ---
 
 You are a research agent. Focus on reading code, searching for patterns,
@@ -602,13 +571,13 @@ and providing detailed analysis. Do not modify any files.
 
 ```typescript
 const result = yield* agents.generate({
-  description: "An agent that reviews PRs",
-  model: { providerID, modelID },
+ description: "An agent that reviews PRs",
+ model: { providerID, modelID },
 })
 // → { identifier, whenToUse, systemPrompt }
 ```
 
-**Почему нам интересно:** Модель для переиспользуемых chain templates: markdown-определение шага/агента с frontmatter-конфигурацией. AI-генерация — для будущего DSL: user описывает что нужно → AI генерирует chain definition.
+**Оркестрационная значимость:** Модель для переиспользуемых chain templates: markdown-определение шага/агента с frontmatter-конфигурацией. AI-генерация — для будущего DSL: user описывает, что нужно → AI генерирует chain definition.
 
 ### 3.7 🟡 Git Worktree Management (worktree/)
 
@@ -633,7 +602,7 @@ yield* reset({ directory })
 - **Reset to default branch** — full clean + submodule update
 - **Scoped to git projects only** — graceful error для non-git
 
-**Почему нам интересно:** Для параллельных chain runs: изоляция через git worktrees. Sandcastle и Archon предлагают похожие модели. OpenCode добавляет reset и submodule update — наиболее полная реализация cleanup.
+**Оркестрационная значимость:** Для параллельных chain runs: изоляция через git worktrees. Sandcastle и Archon предлагают похожие модели. OpenCode добавляет reset и submodule update — наиболее полная реализация cleanup.
 
 ### 3.8 🟡 Cost Tracking (session/session.ts)
 
@@ -641,24 +610,24 @@ yield* reset({ directory })
 
 ```typescript
 export function getUsage(input: { model, usage, metadata }) {
-  const tokens = {
-    total,
-    input: adjustedInputTokens,           // input - cache read - cache write
-    output: outputTokens - reasoningTokens,
-    reasoning: reasoningTokens,
-    cache: {
-      write: cacheWriteInputTokens,
-      read: cacheReadInputTokens,
-    },
-  }
+ const tokens = {
+ total,
+ input: adjustedInputTokens, // input - cache read - cache write
+ output: outputTokens - reasoningTokens,
+ reasoning: reasoningTokens,
+ cache: {
+ write: cacheWriteInputTokens,
+ read: cacheReadInputTokens,
+ },
+ }
 
-  const cost = inputTokens * price.input/1M
-    + outputTokens * price.output/1M
-    + cacheReadTokens * price.cache.read/1M
-    + cacheWriteTokens * price.cache.write/1M
-    + reasoningTokens * price.output/1M
+ const cost = inputTokens * price.input/1M
+ + outputTokens * price.output/1M
+ + cacheReadTokens * price.cache.read/1M
+ + cacheWriteTokens * price.cache.write/1M
+ + reasoningTokens * price.output/1M
 
-  return { cost, tokens }
+ return { cost, tokens }
 }
 ```
 
@@ -668,7 +637,7 @@ export function getUsage(input: { model, usage, metadata }) {
 - Bedrock: `metadata.bedrock.usage.cacheWriteInputTokens`
 - Experimental over 200K pricing
 
-**Почему нам интересно:** Детализация cost tracking для budget control: cache tokens отдельно, reasoning отдельно, provider-specific pricing. Для BudgetVo: более точный расчёт стоимости.
+**Оркестрационная значимость:** Детализация cost tracking для budget control: cache tokens отдельно, reasoning отдельно, provider-specific pricing. Для BudgetVo: более точный расчёт стоимости.
 
 ### 3.9 🟡 Snapshot Tracking + Revert (snapshot/, session/revert.ts)
 
@@ -679,11 +648,11 @@ export function getUsage(input: { model, usage, metadata }) {
 - **Revert** — откат к конкретному message/part через сохранённый snapshot
 - **Summary** — additions/deletions/files/diffs per session
 
-**Почему нам интересно:** Audit trail на уровне файловых изменений: каждый шаг цепочки оставляет diff. Для task-orchestrator: вместо JSONL-only audit — snapshot + diff per step. Revert — механизм отката failed chains.
+**Оркестрационная значимость:** Audit trail на уровне файловых изменений: каждый шаг цепочки оставляет diff. Revert — механизм отката failed chains.
 
 ---
 
-## 4. Что НЕ берём и почему
+## 4. Прочие возможности (вне оркестрации)
 
 ### 4.1 🟢 LLM API / AI SDK Integration
 
@@ -715,15 +684,13 @@ JSON-RPC over stdio для интеграции с Zed и другими IDE —
 
 ---
 
-## 5. Сводка рекомендаций
+## 5. Сводка по оркестрации
 
-| Фича | Приоритет | Обоснование |
-|---|---|---|
-| Chain orchestration (YAML chains) | ✅ Уже есть | Core-функциональность task-orchestrator |
-| Retry + Circuit Breaker + Quality Gates + Budget | ✅ Уже есть | Ключевые отличия task-orchestrator |
+| Возможность | Статус в продукте | Описание |
+| --- | --- | --- |
 | Doom loop detection | 🟡 P2 | Защита от зацикливания в fix_iterations. Подтверждено OpenCode (3 идентичных вызова) + Crush + OpenHands + Paperclip AI |
 | Error classification для retry | 🟡 P2 | ContextOverflow → compact, 5xx → retry, rate limit → retry с Retry-After. Конкретная модель для RetryingAgentRunner |
-| Permission system (allow/ask/deny + glob) | 🟡 P2 | Для CI/CD sandboxing без Docker. Per-runner restrictions + shell command filtering |
+| Permission system (allow/ask/deny + glob) | 🟡 P2 | Интерактивное разграничение доступа с glob-фильтрацией. ask-уровень требует подтверждения — ограничение для batch-режима |
 | Context compaction (structured template) | 🟡 P3 | 7-секционный summary + pruning + preserve recent. Для длинных цепочек и dynamic loops |
 | Subagent task tool (isolated session) | 🟡 P3 | «Chain внутри chain» с изолированным контекстом + resume. Для future dynamic chains |
 | Custom agents через Markdown | 🟡 P3 | Модель для переиспользуемых chain templates: MD frontmatter = конфиг |
