@@ -33,14 +33,14 @@ status: in_progress
 ## 3. Requirements (Требования, MoSCoW)
 
 ### 🔴 Must Have (Обязательно)
-- [ ] Исследован OpenCode (anomalyco/opencode): README, документация, исходный код (TypeScript)
-- [ ] Отчёт `docs/research/framework-comparisons/opencode-comparison.md` по формату существующих comparison-документов
-- [ ] Строка #22 добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
-- [ ] Вердикт: заимствовать паттерны / dependency / не подходит
+- [x] Исследован OpenCode (anomalyco/opencode): README, документация, исходный код (TypeScript)
+- [x] Отчёт `docs/research/framework-comparisons/opencode-comparison.md` по формату существующих comparison-документов
+- [x] Строка #22 добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
+- [x] Вердикт: заимствовать паттерны / dependency / не подходит
 
 ### 🟡 Should Have (Желательно)
-- [ ] Сравнение с нашими паттернами (ExecutionStrategy, DynamicLoop, ChainDefinition)
-- [ ] Конкретные рекомендации: что заимствовать, приоритет
+- [x] Сравнение с нашими паттернами (ExecutionStrategy, DynamicLoop, ChainDefinition)
+- [x] Конкретные рекомендации: что заимствовать, приоритет
 
 ### ⚫ Won't Have (Не в этот раз)
 - Код интеграции
@@ -55,9 +55,9 @@ status: in_progress
 
 ## 5. Definition of Done (Критерии приёмки)
 
-- [ ] Файл `docs/research/framework-comparisons/opencode-comparison.md` создан
-- [ ] Строка OpenCode добавлена в сводную таблицу
-- [ ] Вердикт сформулирован
+- [x] Файл `docs/research/framework-comparisons/opencode-comparison.md` создан
+- [x] Строка OpenCode добавлена в сводную таблицу
+- [x] Вердикт сформулирован
 
 ## 6. Risks and Dependencies (Риски и зависимости)
 
