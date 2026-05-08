@@ -25,7 +25,7 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 
-*   **Где делаем:** `docs/research/hermes-agent-comparison.md`
+*   **Где делаем:** `docs/research/framework-comparisons/hermes-agent-comparison.md`
 *   **Текущее поведение:** В `docs/research/` уже есть сравнительные анализы 13+ фреймворков и сводная таблица `agent-frameworks-summary.md`
 *   **Границы (Out of Scope):** Не пишем код интеграции — только исследование
 
@@ -33,7 +33,7 @@ status: done
 
 ### 🔴 Must Have (Обязательно)
 - [x] Исследован репозиторий https://github.com/nousresearch/hermes-agent: README, исходный код, примеры
-- [x] Отчёт `docs/research/hermes-agent-comparison.md` по формату существующих comparison-документов
+- [x] Отчёт `docs/research/framework-comparisons/hermes-agent-comparison.md` по формату существующих comparison-документов
 - [x] Строка добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
 - [x] Вердикт: заимствовать паттерны / dependency / не подходит
 
@@ -49,12 +49,12 @@ status: done
 
 1. [ ] Изучить README, документацию и исходный код репозитория
 2. [ ] Проанализировать по единой методологии: модель оркестрации, state management, error handling, extensibility
-3. [ ] Составить отчёт `docs/research/hermes-agent-comparison.md`
+3. [ ] Составить отчёт `docs/research/framework-comparisons/hermes-agent-comparison.md`
 4. [ ] Добавить строку в `docs/research/agent-frameworks-summary.md`
 
 ## 5. Definition of Done (Критерии приёмки)
 
-- [x] Файл `docs/research/hermes-agent-comparison.md` создан
+- [x] Файл `docs/research/framework-comparisons/hermes-agent-comparison.md` создан
 - [x] Строка Hermes Agent добавлена в сводную таблицу
 - [x] Вердикт сформулирован
 

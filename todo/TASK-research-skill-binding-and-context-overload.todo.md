@@ -1,7 +1,10 @@
 ---
 type: research
 created: 2026-05-04
-status: todo
+assignee: Аналитик Шерлок
+branch: task/research-skill-binding
+pr:
+status: in_progress
 ---
 
 # Исследование: привязка скиллов к агенту и перегрузка контекста
@@ -15,10 +18,10 @@ status: todo
 Исходная база: `docs/research/agent-frameworks-summary.md` — 9/16 фреймворков используют SKILL.md, Paperclip AI добавляет Company Skills (managed registry, trust levels, compatibility checks).
 
 Нужно вытащить из ресерча:
-- [ ] Паттерны привязки скиллов к агенту по каждому фреймворку
-- [ ] Есть ли порог/лимит на количество скиллов у кого-либо
-- [ ] Routing agent → specialist — кто так делает (Agno: 4 team modes, CrewAI: hierarchical)
-- [ ] Dynamic skill loading vs всё в контексте
+- [x] Паттерны привязки скиллов к агенту по каждому фреймворку
+- [x] Есть ли порог/лимит на количество скиллов у кого-либо
+- [x] Routing agent → specialist — кто так делает (Agno: 4 team modes, CrewAI: hierarchical)
+- [x] Dynamic skill loading vs всё в контексте
 
 ## Вопрос 2: Перегрузка контекста скиллами
 

@@ -71,7 +71,7 @@ vendor/bin/psalm
 - Обратная совместимость: существующие CI-скрипты могут проверять только exit code 0/1 — но проект в v0.x, breaking change допустим
 
 ## 8. Sources
-- [RFC: cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md) — Brainstorm #2, решение про typed exit codes
+- [RFC: cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md) — Brainstorm #2, решение про typed exit codes
 - [OrchestrateCommand.php](../apps/console/src/Module/Orchestrator/Command/OrchestrateCommand.php) — текущая реализация
 
 ## Инструкции для сабагента

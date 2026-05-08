@@ -93,7 +93,7 @@ grep "OQ-6" docs/releases/ROADMAP-2026-Q2-Q3.md
 
 ## 8. Sources (Источники)
 - [ ] [Roadmap: OQ-6](../../docs/releases/ROADMAP-2026-Q2-Q3.md) — открытый вопрос
-- [ ] [Анализ Локи: Integration-паттерн](../../docs/research/loki-roadmap-review-2026-05.md) — «Dynamic split решение не блокирует Sprint 9 задачи»
+- [ ] [Анализ Локи: Integration-паттерн](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — «Dynamic split решение не блокирует Sprint 9 задачи»
 - [ ] [ADR-006: ExecutionStrategy composition](../../docs/adr/006-execution-strategy-composition.md) — формат ADR
 - [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md) — Shared Kernel scope
 - [ ] [EPIC-sprint-8-conditional-branching](EPIC-sprint-8-conditional-branching.md) — результаты Sprint 8

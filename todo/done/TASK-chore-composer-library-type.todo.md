@@ -62,7 +62,7 @@ vendor/bin/psalm
 - Текущая структура `apps/console/` может не совпадать с ожиданиями от `bin/` — нужно проверить совместимость
 
 ## 8. Sources
-- [RFC: cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md) — Решение 2
+- [RFC: cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md) — Решение 2
 - [Composer vendor binaries](https://getcomposer.org/doc/articles/vendor-binaries.md)
 
 ## Инструкции для сабагента

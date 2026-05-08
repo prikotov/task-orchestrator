@@ -32,7 +32,7 @@ status: done
 
 ### Источники
 - Roadmap: [`docs/releases/ROADMAP-2026-Q2-Q3.md`](../docs/releases/ROADMAP-2026-Q2-Q3.md) — секция Sprint 9
-- Анализ Локи: [`docs/research/loki-roadmap-review-2026-05.md`](../docs/research/loki-roadmap-review-2026-05.md) — рекомендованный состав Sprint 9
+- Анализ Локи: [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../docs/research/analytical/loki-roadmap-review-2026-05.md) — рекомендованный состав Sprint 9
 
 ### In Scope (Что делаем)
 - Model failover: CB open → автоматически триггерит fallback runner (wiring через [`RoleConfigVo::$fallback`](../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php))
@@ -160,13 +160,13 @@ flowchart TD
 
 ## 9. Sources (Источники)
 - [ ] [Roadmap 2026 Q2–Q3: Sprint 9](../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [ ] [Анализ Локи: Sprint 9–10](../docs/research/loki-roadmap-review-2026-05.md)
+- [ ] [Анализ Локи: Sprint 9–10](../docs/research/analytical/loki-roadmap-review-2026-05.md)
 - [ ] [ADR-006: ExecutionStrategy composition](../docs/adr/006-execution-strategy-composition.md)
 - [ ] [ADR-008: Shared Kernel Contract](../docs/adr/008-shared-kernel-contract.md)
 - [ ] [Конвенции проекта](../docs/conventions/index.md)
 
 ## 10. Comments (Комментарии)
-- Sprint 9 полностью основан на рекомендациях Локи из [`docs/research/loki-roadmap-review-2026-05.md`](../docs/research/loki-roadmap-review-2026-05.md). Loop detection, Typed I/O, Sub-agent ADR — отменены или отложены.
+- Sprint 9 полностью основан на рекомендациях Локи из [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../docs/research/analytical/loki-roadmap-review-2026-05.md). Loop detection, Typed I/O, Sub-agent ADR — отменены или отложены.
 - Model failover — wiring существующего кода (CB + FallbackConfigVo), не новая архитектура. Это снижает риск.
 - MetricsCollector — foundation для hooks system в Sprint 10. Hook pipeline будет использовать metrics.
 - ADR Dynamic split закрывает OQ-6 из roadmap. Sprint 8 валидировал Integration-паттерн на 2 стратегиях — пора принимать решение.

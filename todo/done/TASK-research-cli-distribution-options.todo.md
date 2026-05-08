@@ -32,7 +32,7 @@ status: done
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [x] RFC-документ (`docs/research/cli-distribution-rfc.md`) с анализом вариантов:
+- [x] RFC-документ (`docs/research/rfc/cli-distribution-rfc.md`) с анализом вариантов:
   - **Вариант A:** Composer binary (`vendor/bin/task-orchestrator`) — Symfony Console Application
   - **Вариант B:** Phar-архив (исполняемый файл, сборка через box-project/box)
   - **Вариант C:** Гибрид (Composer binary + Phar через GitHub Releases)
@@ -66,7 +66,7 @@ status: done
 6. [ ] Передать на согласование владельцу проекта
 
 ## 5. Definition of Done (Критерии приёмки)
-- [x] RFC-документ создан в `docs/research/cli-distribution-rfc.md`
+- [x] RFC-документ создан в `docs/research/rfc/cli-distribution-rfc.md`
 - [x] Все 4 варианта проанализированы
 - [x] Есть рекомендация с обоснованием
 - [ ] Владелец проекта ознакомлен и согласовал решение (комментарий в задаче)
@@ -76,7 +76,7 @@ status: done
 ```bash
 # Документация-only, проверки кода не требуются
 # Убедиться, что RFC создан и читаем:
-cat docs/research/cli-distribution-rfc.md
+cat docs/research/rfc/cli-distribution-rfc.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)
@@ -99,7 +99,7 @@ cat docs/research/cli-distribution-rfc.md
 **Участники:** Архитектор Гэндальф, Архитектор Локи, Бэкендер Тони
 **Фасилитатор:** Тимлид Алекс
 **Раунды:** 21 (31 мин, завершён естественно)
-**RFC:** [docs/research/cli-distribution-rfc.md](../docs/research/cli-distribution-rfc.md)
+**RFC:** [docs/research/rfc/cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md)
 **Сессия:** `var/sessions/cli-distribution/2026-04-22_16-22-53/`
 
 #### Принятые решения

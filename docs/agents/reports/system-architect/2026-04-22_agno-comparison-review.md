@@ -1,8 +1,8 @@
-# Архитектурное ревью: docs/research/agno-comparison.md
+# Архитектурное ревью: docs/research/framework-comparisons/agno-comparison.md
 
 **Роль:** Архитектор Локи
 **Дата:** 2026-04-22
-**Объект:** `docs/research/agno-comparison.md` — сравнительный анализ Agno v2.5.17
+**Объект:** `docs/research/framework-comparisons/agno-comparison.md` — сравнительный анализ Agno v2.5.17
 **Задача:** Найти слепые зоны, слабые аргументы, риски заимствования и антипаттерны Agno
 
 ---

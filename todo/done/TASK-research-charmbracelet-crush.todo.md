@@ -24,14 +24,14 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 *   **Где делаем:** docs/research/
-*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (agent-bernstein-comparison.md, agent-orchestrator-comparison.md, superpowers-brainstorming-comparison.md)
+*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (framework-comparisons/agent-bernstein-comparison.md, framework-comparisons/agent-orchestrator-comparison.md, framework-comparisons/superpowers-brainstorming-comparison.md)
 *   **Границы (Out of Scope):** Не пишем код интеграции — только исследование
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
 - [ ] Изучить репозиторий https://github.com/charmbracelet/crush: архитектуру, стек, модель цепочек
 - [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [ ] Оформить отчёт в docs/research/crush-comparison.md по формату существующих comparison-документов
+- [ ] Оформить отчёт в docs/research/framework-comparisons/crush-comparison.md по формату существующих comparison-документов
 - [ ] Заполнить строку(и) для Crush в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Определить конкретные паттерны, которые стоит заимствовать
@@ -43,16 +43,16 @@ status: done
 ## 4. Implementation Plan (План реализации)
 1. [ ] Изучить README, архитектуру, исходный код crush
 2. [ ] Сравнить с нашей моделью оркестрации
-3. [ ] Написать docs/research/crush-comparison.md
+3. [ ] Написать docs/research/framework-comparisons/crush-comparison.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт docs/research/crush-comparison.md создан по формату существующих comparison-документов
+- [ ] Отчёт docs/research/framework-comparisons/crush-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
 - [ ] Строка Crush в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
-ls docs/research/crush-comparison.md
+ls docs/research/framework-comparisons/crush-comparison.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)

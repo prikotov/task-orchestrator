@@ -246,7 +246,7 @@ Roadmap покрывает два крупных направления:
 
 > **Тема:** Повышение отказоустойчивости цепочек и закладка observability-фундамента. Рекомендовано Локи: модель failover — реальная боль (pain 7/10), metrics — упущенная потребность, error classification — дешёвое улучшение.
 >
-> **Источник:** [`docs/research/loki-roadmap-review-2026-05.md`](../research/loki-roadmap-review-2026-05.md)
+> **Источник:** [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../research/analytical/loki-roadmap-review-2026-05.md)
 
 | # | Задача | Оценка | Pain |
 |---|--------|--------|------|
@@ -282,7 +282,7 @@ OQ-6 открыт: остаётся ли Dynamic в Orchestrator навсегд�
 
 > **Тема:** Hooks MVP для observability + завершение технического долга (ChainDefinitionVo split). Рекомендовано Локи: post_step hooks — реальная боль (pain 6/10), God-VO — долг от Sprint 4.
 >
-> **Источник:** [`docs/research/loki-roadmap-review-2026-05.md`](../research/loki-roadmap-review-2026-05.md)
+> **Источник:** [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../research/analytical/loki-roadmap-review-2026-05.md)
 
 | # | Задача | Оценка | Pain |
 |---|--------|--------|------|
@@ -341,9 +341,9 @@ Static/Conditional стратегии не поддерживают resume — �
 | — | Hooks system: post_step MVP | Roadmap | Sprint 10 | ✅ Done |
 | — | ChainDefinitionVo завершение split | Roadmap | Sprint 10 | ✅ Done |
 | — | Resume для static цепочек: ADR | Roadmap | Sprint 10 | ✅ Done |
-| — | ~~Loop detection (fix_iterations)~~ | Roadmap | — | ❌ Cancelled — `maxIterations` уже ограничивает циклы; LLM-text similarity unreliable; pain 0/10. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
-| — | ~~Typed I/O per step (JSON Schema)~~ | Roadmap | — | ❌ Cancelled — нет structured output между шагами, строить не на чем; pain 1/10. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
-| — | ~~Sub-agent pattern: ADR + design~~ | Roadmap | — | ❌ Cancelled — speculative ADR без опыта эксплуатации conditional chains; отложено до Q4. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
+| — | ~~Loop detection (fix_iterations)~~ | Roadmap | — | ❌ Cancelled — `maxIterations` уже ограничивает циклы; LLM-text similarity unreliable; pain 0/10. [Обоснование](../research/analytical/loki-roadmap-review-2026-05.md) |
+| — | ~~Typed I/O per step (JSON Schema)~~ | Roadmap | — | ❌ Cancelled — нет structured output между шагами, строить не на чем; pain 1/10. [Обоснование](../research/analytical/loki-roadmap-review-2026-05.md) |
+| — | ~~Sub-agent pattern: ADR + design~~ | Roadmap | — | ❌ Cancelled — speculative ADR без опыта эксплуатации conditional chains; отложено до Q4. [Обоснование](../research/analytical/loki-roadmap-review-2026-05.md) |
 
 ---
 
@@ -356,10 +356,10 @@ Static/Conditional стратегии не поддерживают resume — �
 | **Conditional branching** | Кластер 3: Оркестрация | Sprint 8 | Archon (`when:`), Mastra AI (`.branch()`), LangGraph (conditional edges), Agno (Condition + Router) | Подтверждена 4+ проектами. Реализуема через ExecutionStrategyInterface |
 | ~~**Security policy**~~ | Кластер 2: Безопасность | — | Codex (exec policy + Guardian + Docker sandbox), Claude Code (permissions), Copilot Cloud Agent (policy engine) | ❌ **Cancelled:** security theater — правила проверяют текст промпта, но не видят реальные shell-команды внутри сессии. Контроль доступа — через OS sandbox при необходимости |
 | **Error classification** | Кластер 1: Обработка ошибок | Sprint 9 | RetryingAgentRunner, AgentResultVo | Упрощённая классификация по `exitCode`/`isTimedOut`/`isError`. ~30 строк, не парсинг текста |
-| ~~**Typed I/O**~~ | Кластер 3: Оркестрация | — | Mastra AI (Zod), LangGraph (TypedDict), Archon (JSON Schema) | ❌ **Cancelled:** нет structured output между шагами (`outputText` — сырой текст), JSON Schema не на что накладывать. Отложено до Q4 2026 / Q1 2027. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
+| ~~**Typed I/O**~~ | Кластер 3: Оркестрация | — | Mastra AI (Zod), LangGraph (TypedDict), Archon (JSON Schema) | ❌ **Cancelled:** нет structured output между шагами (`outputText` — сырой текст), JSON Schema не на что накладывать. Отложено до Q4 2026 / Q1 2027. [Обоснование](../research/analytical/loki-roadmap-review-2026-05.md) |
 | **Hooks system** | Кластер 3: Оркестрация | Sprint 10 | Claude Code (20+ events), OpenHands SDK (6 lifecycle events), Codex (hooks) | MVP: только `post_step` hooks (observability/notification). `pre_step` = conditional branching (уже есть через `when:`) |
-| ~~**Sub-agents**~~ | Кластер 3: Оркестрация | — | Claude Code (Task tool), Codex (spawn/wait), OpenHands SDK (DelegateTool) | ❌ **Cancelled (Q3):** speculative ADR без опыта эксплуатации conditional chains. Отложено до Q4 Sprint 1. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
-| ~~**Loop detection**~~ | Кластер 1: Обработка ошибок | — | Crush (window-based), OpenHands SDK (4+1), Paperclip AI (evidence-based) | ❌ **Cancelled:** `maxIterations` уже ограничивает циклы; LLM-text similarity unreliable; проблема качества модели, не оркестратора. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
+| ~~**Sub-agents**~~ | Кластер 3: Оркестрация | — | Claude Code (Task tool), Codex (spawn/wait), OpenHands SDK (DelegateTool) | ❌ **Cancelled (Q3):** speculative ADR без опыта эксплуатации conditional chains. Отложено до Q4 Sprint 1. [Обоснование](../research/analytical/loki-roadmap-review-2026-05.md) |
+| ~~**Loop detection**~~ | Кластер 1: Обработка ошибок | — | Crush (window-based), OpenHands SDK (4+1), Paperclip AI (evidence-based) | ❌ **Cancelled:** `maxIterations` уже ограничивает циклы; LLM-text similarity unreliable; проблема качества модели, не оркестратора. [Обоснование](../research/analytical/loki-roadmap-review-2026-05.md) |
 | **Model failover** | Кластер 1: Обработка ошибок | Sprint 9 | OpenClaw (per-profile), Archon (fallbackModel), Paperclip AI (escalation) | CB open → автоматически триггерить fallback runner. Wiring существующих CB + FallbackConfigVo, не новая архитектура. Pain 7/10 |
 | **Parallel execution** | Кластер 3: Оркестрация | Q4 2026 | Archon (DAG layers), Mastra AI (`.parallel()`), pi_agent_rust (read-only tools) | Требует DAG foundation. `ChainStepVo` nullable-поля: `?array $dependsOn`, `?string $parallelGroup` |
 | **Auto-compaction** | Кластер 4: Контекст | Q4 2026 | Crush, OpenHands SDK, Mastra AI, Claude Code, Codex (6/13 проектов) | LLM-суммаризация при context overflow. Для длинных dynamic loops |
@@ -478,7 +478,7 @@ graph TD
 | **R-2** | **Conditional branching YAML DSL** — выбор синтаксиса может стать предметом длительных обсуждений | Средняя | Задержка Sprint 8 | Зафиксировать DSL в ADR до Sprint 8 |
 | **R-3** | **P3 → Roadmap-фичи overlap** — декомпозиция RunDynamicLoopService (Sprint 6) может пересечься с conditional branching (Sprint 8) по срокам | Низкая | Сдвиг Sprint 8 | Sprint 5 как буфер |
 | **R-4** | ~~**Security Policy cross-cutting** — может потребовать architecture decision, замедляющего Sprint 9~~ | — | — | ✅ **Resolved:** Security Policy отменён |
-| **R-5** | ~~**Typed I/O (JSON Schema)** — может потребовать значительных изменений в YAML-парсере и ChainLoader~~ | — | — | ✅ **Resolved:** Typed I/O отменён. Нет structured output между шагами, строить не на чем. [Обоснование](../research/loki-roadmap-review-2026-05.md) |
+| **R-5** | ~~**Typed I/O (JSON Schema)** — может потребовать значительных изменений в YAML-парсере и ChainLoader~~ | — | — | ✅ **Resolved:** Typed I/O отменён. Нет structured output между шагами, строить не на чем. [Обоснование](../research/analytical/loki-roadmap-review-2026-05.md) |
 | **R-6** | **Static split Integration-паттерн не масштабируется** — Integration-слой для Static (~1270 LOC, 4 зависимости от ChainDefinitionVo) может оказаться недостаточным для Conditional Branching (Sprint 8) | Средняя | Merge Static обратно в Orchestrator | Sprint 8 (Conditional Branching) валидировал паттерн ✅ |
 
 ---
@@ -589,4 +589,4 @@ graph TD
 |------|-------|----------|
 | 2026-04-29 | Шерлок | Черновик roadmap создан |
 | 2026-04-30 | Шерлок | Добавлены результаты Brainstorm #2, триггеры для split, ключевые инсайты |
-| 2026-05-02 | Гермиона | **Sprint 9–10 переписаны по рекомендациям Локи** ([`docs/research/loki-roadmap-review-2026-05.md`](../research/loki-roadmap-review-2026-05.md)). Sprint 9: Resilience + Observability (Model failover, Error classification упрощённая, MetricsCollector, ADR Dynamic split). Sprint 10: Hooks + Debt Cleanup (post_step MVP, ChainDefinitionVo split завершение, Resume ADR). Loop detection, Typed I/O, Sub-agent ADR — ❌ Cancelled. Вехи M6/M7 обновлены. OQ-6 — решение перенесено в Sprint 9. R-5 закрыт |
+| 2026-05-02 | Гермиона | **Sprint 9–10 переписаны по рекомендациям Локи** ([`docs/research/analytical/loki-roadmap-review-2026-05.md`](../research/analytical/loki-roadmap-review-2026-05.md)). Sprint 9: Resilience + Observability (Model failover, Error classification упрощённая, MetricsCollector, ADR Dynamic split). Sprint 10: Hooks + Debt Cleanup (post_step MVP, ChainDefinitionVo split завершение, Resume ADR). Loop detection, Typed I/O, Sub-agent ADR — ❌ Cancelled. Вехи M6/M7 обновлены. OQ-6 — решение перенесено в Sprint 9. R-5 закрыт |

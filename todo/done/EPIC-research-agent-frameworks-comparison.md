@@ -112,7 +112,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 - Разные языки/экосистемы (Python, TypeScript, Rust, Go) — нужна аккуратность при переносе паттернов в PHP
 
 ## 9. Sources (Источники)
-- Существующие comparison-документы: `docs/research/agent-bernstein-comparison.md`, `docs/research/agent-orchestrator-comparison.md`, `docs/research/superpowers-brainstorming-comparison.md`
+- Существующие comparison-документы: `docs/research/framework-comparisons/agent-bernstein-comparison.md`, `docs/research/framework-comparisons/agent-orchestrator-comparison.md`, `docs/research/framework-comparisons/superpowers-brainstorming-comparison.md`
 - Ссылки на репозитории и документацию — в индивидуальных задачах
 
 ## 10. Comments (Комментарии)
