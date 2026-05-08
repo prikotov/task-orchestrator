@@ -32,7 +32,7 @@ status: done
 - [x] Изучить Agno: архитектуру, Python-first подход, модель агентов, multi-agent teams, tools
 - [x] Изучить систему оркестрации: Agent Teams, workflow-паттерны, routing
 - [x] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [x] Оформить отчёт в docs/research/agno-comparison.md по формату существующих comparison-документов
+- [x] Оформить отчёт в docs/research/framework-comparisons/agno-comparison.md по формату существующих comparison-документов
 - [x] Заполнить строку для Agno в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [x] Определить конкретные паттерны, которые стоит заимствовать
@@ -45,17 +45,17 @@ status: done
 ## 4. Implementation Plan (План реализации)
 1. [x] Изучить репозиторий https://github.com/agno-agi/agno и документацию https://docs.agno.com
 2. [x] Сравнить модель agents/teams и оркестрации с нашей
-3. [x] Написать docs/research/agno-comparison.md
+3. [x] Написать docs/research/framework-comparisons/agno-comparison.md
 4. [x] Добавить строку Agno в docs/research/agent-frameworks-summary.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [x] Отчёт docs/research/agno-comparison.md создан по формату существующих comparison-документов
+- [x] Отчёт docs/research/framework-comparisons/agno-comparison.md создан по формату существующих comparison-документов
 - [x] Содержит чёткий вывод: заимствовать / использовать / не подходит
 - [x] Строка Agno в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
-ls docs/research/agno-comparison.md
+ls docs/research/framework-comparisons/agno-comparison.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)

@@ -24,7 +24,7 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 *   **Где делаем:** docs/research/
-*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (agent-bernstein-comparison.md, agent-orchestrator-comparison.md, superpowers-brainstorming-comparison.md)
+*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (framework-comparisons/agent-bernstein-comparison.md, framework-comparisons/agent-orchestrator-comparison.md, framework-comparisons/superpowers-brainstorming-comparison.md)
 *   **Границы (Out of Scope):** Не пишем код интеграции — только исследование
 
 ## 3. Requirements (Требования, MoSCoW)
@@ -32,7 +32,7 @@ status: done
 - [x] Изучить MetaGPT (FoundationAgents): архитектуру, ролевую модель (ProductManager, Architect, Engineer), SOP, message passing
 - [x] Изучить OpenClaw (openclaw): архитектуру, подход к multi-agent координации, модель оркестрации
 - [x] Сравнить оба продукта с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [x] Оформить отчёт в docs/research/metagpt-openclaw-comparison.md по формату существующих comparison-документов
+- [x] Оформить отчёт в docs/research/framework-comparisons/metagpt-openclaw-comparison.md по формату существующих comparison-документов
 - [x] Заполнить строки для MetaGPT и OpenClaw в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [x] Определить конкретные паттерны SOP и ролевой координации, которые стоит заимствовать
@@ -44,16 +44,16 @@ status: done
 ## 4. Implementation Plan (План реализации)
 1. [x] Изучить репозитории: https://github.com/FoundationAgents/MetaGPT, https://github.com/openclaw/openclaw
 2. [x] Сравнить модели оркестрации между собой и с нашей
-3. [x] Написать docs/research/metagpt-openclaw-comparison.md
+3. [x] Написать docs/research/framework-comparisons/metagpt-openclaw-comparison.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [x] Отчёт docs/research/metagpt-openclaw-comparison.md создан по формату существующих comparison-документов
+- [x] Отчёт docs/research/framework-comparisons/metagpt-openclaw-comparison.md создан по формату существующих comparison-документов
 - [x] Содержит чёткий вывод: заимствовать / использовать / не подходит
 - [x] Строки MetaGPT и OpenClaw в сводной таблице docs/research/agent-frameworks-summary.md заполнены
 
 ## 6. Verification (Самопроверка)
 ```bash
-ls docs/research/metagpt-openclaw-comparison.md
+ls docs/research/framework-comparisons/metagpt-openclaw-comparison.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)

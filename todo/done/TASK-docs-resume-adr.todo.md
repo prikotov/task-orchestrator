@@ -93,7 +93,7 @@ grep -r "resume()" src/Module/Orchestrator/Application/Service/Chain/
 
 ## 8. Sources (Источники)
 - [ ] [Roadmap: Sprint 10](../../docs/releases/ROADMAP-2026-Q2-Q3.md) — Sprint 10, Задача 3
-- [ ] [Анализ Локи: Resume для static цепочек](../../docs/research/loki-roadmap-review-2026-05.md) — Упущенная боль #4
+- [ ] [Анализ Локи: Resume для static цепочек](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — Упущенная боль #4
 - [ ] [ExecutionStrategyInterface](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — метод `resume()`
 - [ ] [ADR-006: ExecutionStrategy composition](../../docs/adr/006-execution-strategy-composition.md) — архитектурный контекст
 - [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md) — архитектурный контекст

@@ -24,14 +24,14 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 *   **Где делаем:** docs/research/
-*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (agent-bernstein-comparison.md, agent-orchestrator-comparison.md, superpowers-brainstorming-comparison.md)
+*   **Текущее поведение:** В docs/research/ уже есть сравнительные анализы (framework-comparisons/agent-bernstein-comparison.md, framework-comparisons/agent-orchestrator-comparison.md, framework-comparisons/superpowers-brainstorming-comparison.md)
 *   **Границы (Out of Scope):** Не пишем код интеграции — только исследование
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
 - [ ] Изучить репозиторий https://github.com/Dicklesworthstone/pi_agent_rust: архитектуру, стек, модель агентов
 - [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [ ] Оформить отчёт в docs/research/pi-agent-rust-comparison.md по формату существующих comparison-документов
+- [ ] Оформить отчёт в docs/research/framework-comparisons/pi-agent-rust-comparison.md по формату существующих comparison-документов
 - [ ] Заполнить строку для pi_agent_rust в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Определить конкретные паттерны, которые стоит заимствовать
@@ -43,16 +43,16 @@ status: done
 ## 4. Implementation Plan (План реализации)
 1. [ ] Изучить README, архитектуру, исходный код pi_agent_rust
 2. [ ] Сравнить с нашей моделью оркестрации
-3. [ ] Написать docs/research/pi-agent-rust-comparison.md
+3. [ ] Написать docs/research/framework-comparisons/pi-agent-rust-comparison.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт docs/research/pi-agent-rust-comparison.md создан по формату существующих comparison-документов
+- [ ] Отчёт docs/research/framework-comparisons/pi-agent-rust-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
 - [ ] Строка pi_agent_rust в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
-ls docs/research/pi-agent-rust-comparison.md
+ls docs/research/framework-comparisons/pi-agent-rust-comparison.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)

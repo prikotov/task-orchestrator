@@ -76,16 +76,16 @@ grep -c "✅\|🟢\|🟡\|🔴" docs/research/agent-frameworks-summary.md
 
 ## 8. Sources (Источники)
 - docs/research/agent-frameworks-summary.md — сводная таблица (заполняется инкрементально)
-- docs/research/crush-comparison.md
-- docs/research/pi-agent-rust-comparison.md
-- docs/research/crewai-langgraph-autogen-comparison.md
-- docs/research/openhands-sdk-comparison.md
-- docs/research/archon-comparison.md
-- docs/research/metagpt-openclaw-comparison.md
-- docs/research/mastra-ai-comparison.md
-- docs/research/claude-code-comparison.md
-- docs/research/copilot-agent-hq-comparison.md
-- docs/research/docker-agent-codex-comparison.md
+- docs/research/framework-comparisons/crush-comparison.md
+- docs/research/framework-comparisons/pi-agent-rust-comparison.md
+- docs/research/framework-comparisons/crewai-langgraph-autogen-comparison.md
+- docs/research/framework-comparisons/openhands-sdk-comparison.md
+- docs/research/framework-comparisons/archon-comparison.md
+- docs/research/framework-comparisons/metagpt-openclaw-comparison.md
+- docs/research/framework-comparisons/mastra-ai-comparison.md
+- docs/research/framework-comparisons/claude-code-comparison.md
+- docs/research/framework-comparisons/copilot-agent-hq-comparison.md
+- docs/research/framework-comparisons/docker-agent-codex-comparison.md
 
 ## 9. Comments (Комментарии)
 Это финальная задача эпика EPIC-research-agent-frameworks-comparison. Запускается только после завершения всех индивидуальных исследований. Индивидуальные задачи заполняют строки в сводной таблице инкрементально — эта задача финализирует таблицу и добавляет аналитику. Результат — ключевой артефакт для принятия архитектурных решений.

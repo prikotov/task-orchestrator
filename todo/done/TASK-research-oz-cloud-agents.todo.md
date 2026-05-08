@@ -20,7 +20,7 @@ status: done
 Когда мы исследуем паттерны AI-агентной оркестрации, я хочу проанализировать Oz (https://www.warp.dev/oz) — платформу оркестрации облачных AI-агентов, чтобы понять её подход к управлению агентными workflow, обработке контекста и масштабированию.
 
 ### Goal (Цель по SMART)
-Создать comparison-документ `docs/research/oz-cloud-agents-comparison.md` по единой методологии (модель оркестрации, state management, error handling, extensibility). Заполнить строку в сводной таблице `docs/research/agent-frameworks-summary.md`. Вердикт: заимствовать / dependency / не подходит.
+Создать comparison-документ `docs/research/framework-comparisons/oz-cloud-agents-comparison.md` по единой методологии (модель оркестрации, state management, error handling, extensibility). Заполнить строку в сводной таблице `docs/research/agent-frameworks-summary.md`. Вердикт: заимствовать / dependency / не подходит.
 
 ## 2. Context and Scope (Контекст и Границы)
 * **Что это:** Oz — orchestration platform for cloud agents от команды Warp. Позволяет запускать и координировать множество AI-агентов в облаке.
@@ -31,7 +31,7 @@ status: done
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [x] Comparison-документ в `docs/research/oz-cloud-agents-comparison.md`
+- [x] Comparison-документ в `docs/research/framework-comparisons/oz-cloud-agents-comparison.md`
 - [x] Строка в сводной таблице `docs/research/agent-frameworks-summary.md`
 - [x] Вердикт: заимствовать / dependency / не подходит
 
@@ -45,7 +45,7 @@ status: done
 4. Обновить сводную таблицу
 
 ## 5. Definition of Done (Критерии приёмки)
-- [x] `docs/research/oz-cloud-agents-comparison.md` создан
+- [x] `docs/research/framework-comparisons/oz-cloud-agents-comparison.md` создан
 - [x] Строка в сводной таблице добавлена
 - [x] Вердикт обоснован
 

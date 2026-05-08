@@ -31,7 +31,7 @@ status: done
 ### 🔴 Must Have (Обязательно)
 - [ ] Изучить AgentCraft: архитектуру, модель агентов, workflow-паттерны, tools
 - [ ] Сравнить с нашей моделью (static/dynamic chains, retry, circuit breaker, budget, quality gates)
-- [ ] Оформить отчёт в docs/research/agentcraft-comparison.md по формату существующих comparison-документов
+- [ ] Оформить отчёт в docs/research/framework-comparisons/agentcraft-comparison.md по формату существующих comparison-документов
 - [ ] Заполнить строку для AgentCraft в сводной таблице docs/research/agent-frameworks-summary.md
 ### 🟡 Should Have (Желательно)
 - [ ] Определить конкретные паттерны, которые стоит заимствовать
@@ -43,17 +43,17 @@ status: done
 ## 4. Implementation Plan (План реализации)
 1. Изучить проект AgentCraft (https://www.getagentcraft.com/) — архитектуру, модель агентов, workflow, tools
 2. При недостатке публичной документации — проанализировать доступные материалы (сайт, демо, API, GitHub)
-3. Составить отчёт по формату существующих comparison-документов (см. docs/research/crush-comparison.md как пример)
+3. Составить отчёт по формату существующих comparison-документов (см. docs/research/framework-comparisons/crush-comparison.md как пример)
 4. Заполнить строку AgentCraft (#16) в сводной таблице docs/research/agent-frameworks-summary.md
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт docs/research/agentcraft-comparison.md создан по формату существующих comparison-документов
+- [ ] Отчёт docs/research/framework-comparisons/agentcraft-comparison.md создан по формату существующих comparison-документов
 - [ ] Содержит чёткий вывод: заимствовать / использовать / не подходит
 - [ ] Строка AgentCraft в сводной таблице docs/research/agent-frameworks-summary.md заполнена
 
 ## 6. Verification (Самопроверка)
 ```bash
-ls docs/research/agentcraft-comparison.md
+ls docs/research/framework-comparisons/agentcraft-comparison.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)
@@ -72,7 +72,7 @@ ls docs/research/agentcraft-comparison.md
 1. Переключись в ветку `task/research-agentcraft`: `git checkout task/research-agentcraft`
 2. Изучи проект AgentCraft (https://www.getagentcraft.com/) — архитектуру, модель агентов, workflow-паттерны, tools, state management, error handling, расширяемость.
 3. При недостатке документации — анализируй сайт, демо, API, GitHub-профиль, публичные материалы.
-4. Создай отчёт docs/research/agentcraft-comparison.md по формату существующих comparison-документов (как docs/research/crush-comparison.md).
+4. Создай отчёт docs/research/framework-comparisons/agentcraft-comparison.md по формату существующих comparison-документов (как docs/research/framework-comparisons/crush-comparison.md).
 5. Заполни строку AgentCraft (#16) в сводной таблице docs/research/agent-frameworks-summary.md.
 6. Следуй [Конвенциям](docs/conventions/index.md) проекта.
 7. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` (хотя для docs-only они могут быть пропущены — укажи это в отчёте).

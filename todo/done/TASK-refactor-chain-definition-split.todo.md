@@ -137,7 +137,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ## 8. Sources (Источники)
 - [ ] [Roadmap: Sprint 10](../../docs/releases/ROADMAP-2026-Q2-Q3.md) — Sprint 10, Задача 2
-- [ ] [Анализ Локи: ChainDefinitionVo — God-VO](../../docs/research/loki-roadmap-review-2026-05.md) — Упущенная боль #2
+- [ ] [Анализ Локи: ChainDefinitionVo — God-VO](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — Упущенная боль #2
 - [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md) — заложенный контракт
 - [ ] [Конвенции: Value Object](../../docs/conventions/core_patterns/value-object.md)
 - [ ] [Конвенции: External Service](../../docs/conventions/core_patterns/external-service.md)
