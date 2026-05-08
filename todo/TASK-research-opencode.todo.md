@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик Шерлок
 branch: task/research-opencode
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-opencode: Исследовать OpenCode (opencode-ai/opencode) для сравнения с task-orchestrator
