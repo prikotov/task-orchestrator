@@ -6,8 +6,7 @@
 > **Лицензия:** MIT
 > **Версия:** v7.2.44
 > **Аналитик:** Аналитик (Шерлок)
->
-> ⚠️ **Kilo Code ≠ OpenCode.** Это два разных проекта. Kilo Code (этот отчёт) — TypeScript-платформа от Kilo AI (VS Code + CLI + JetBrains). OpenCode — отдельный Go-проект (`opencode-ai/opencode`, 12K+ звёзд), терминальный AI-agent. Внутри репозитория Kilo Code движок лежит в пакете `packages/opencode/`, что создаёт путаницу.
+
 
 ---
 
