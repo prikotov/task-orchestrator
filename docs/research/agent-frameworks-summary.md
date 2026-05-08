@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 20 / 20 исследований
+> **Статус заполнения:** 21 / 21 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -31,6 +31,7 @@
 | 18 | Hermes Agent (Nous Research) | Python | `CLI-agent` | `agent-loop` (LLM → tool call → result → LLM → ...) + subagent delegation | `persistent` (SQLite + FTS5 search) + `file-based memory` (MEMORY.md, USER.md) + Honcho dialectic modeling | `error classification (20+ failover reasons) + credential pool rotation (4 strategies) + fallback model` | `40+ tools + MCP + SKILL.md (agentskills.io) + Plugin system (memory/context_engine/model-providers/kanban) + 7 terminal backends + 15+ messaging platforms + Kanban multi-agent` | 🟡 заимствовать отдельные паттерны | [hermes-agent-comparison.md](framework-comparisons/hermes-agent-comparison.md) ✅ |
 | 19 | Oz (Warp) | — (проприетарный SaaS; SDK: Python, TypeScript) | `cloud/SaaS` | `cloud-managed agent runs` (QUEUED → INPROGRESS → SUCCEEDED/FAILED) + triggers (cron/webhook/API) | `cloud-managed` (run_id + state transitions + session links) | `SDK built-in retries` (HTTP-level) | `REST API + SDK (Python/TS) + Skills (SKILL.md) + MCP + Rules + Agent Profiles & Permissions + Integrations (Slack/Linear/GitHub Actions) + Cron Schedules` | 🟡 заимствовать отдельные паттерны | [oz-cloud-agents-comparison.md](framework-comparisons/oz-cloud-agents-comparison.md) ✅ |
 | 20 | Sandcastle (Matt Pocock) | TypeScript (Node.js) | `sandbox-orchestration` | `agent invocation loop` (run agent in sandbox → collect commits → iterate) | `git worktrees + commit collection` (без persistent DB) | `typed error hierarchy (20+ error types) + idle timeout + AbortSignal + worktree preservation on failure` | `AgentProvider (4 built-in: Claude Code/Codex/Pi/OpenCode) + SandboxProvider (Docker/Podman/Vercel/Daytona/custom) + Hooks + Templates (5) + Structured Output (Zod) + Completion Signal` | 🟡 заимствовать отдельные паттерны | [sandcastle-comparison.md](framework-comparisons/sandcastle-comparison.md) ✅ |
+| 21 | Kilo Code (OpenCode) | TypeScript (Bun, Effect-TS) | `CLI-agent + SDK` | `agent-loop` (LLM → tool call → observation → LLM → ...) + subagent delegation (task tool: wave-based parallel execution) | `in-memory + context compaction (LLM summarization) + session persistence (SQLite)` | `error classification (ContextOverflow/API 5xx/rate limit/Kilo errors) + exponential backoff + Retry-After header parsing` | `Custom agents (JSON/Markdown/CLI) + MCP + Skills (SKILL.md) + Plugins + Workflows (slash commands) + Permission system (glob patterns) + 7 built-in agents` | 🟡 заимствовать отдельные паттерны | [opencode-orchestrator-comparison.md](framework-comparisons/opencode-orchestrator-comparison.md) ✅ |
 
 ### Легенда колонок
 
@@ -69,7 +70,7 @@
 
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
-| **Error classification** | Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (6 категорий), Codex (Guardian), Paperclip AI (transient_upstream errorFamily), Sandcastle (20+ typed errors: AgentError, AgentIdleTimeoutError, ExecError, SyncError, WorktreeError и др.) | Классификация ошибок перед retry: FATAL → не retry, TRANSIENT → retry с backoff, UNKNOWN → консервативный подход | Не тратить попытки retry на заведомо неисправимые ошибки (401, 403). Подтверждён 4+ проектами. Sandcastle добавляет timeout-специфичные ошибки (timeout ≠ server error) |
+| **Error classification** | Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (6 категорий), Codex (Guardian), Paperclip AI (transient_upstream errorFamily), Sandcastle (20+ typed errors: AgentError, AgentIdleTimeoutError, ExecError, SyncError, WorktreeError и др.), **Kilo Code** (ContextOverflow/API 5xx/rate limit/FreeUsageLimitError/Kilo errors) | Классификация ошибок перед retry: FATAL → не retry, TRANSIENT → retry с backoff, UNKNOWN → консервативный подход | Не тратить попытки retry на заведомо неисправимые ошибки (401, 403). Подтверждён 5+ проектами. Kilo Code добавляет Retry-After header parsing и context overflow detection |
 | **Error-specific fallback routing** | Agno (FallbackConfig: on_error/on_rate_limit/on_context_overflow) | При ошибке конкретного типа → переключение на альтернативный runner, а не retry того же | Дополнение к circuit breaker: CB защищает от cascade, error-specific routing переключает на альтернативу по типу ошибки |
 | **Stuck / Loop detection** | Crush (window-based), OpenHands SDK (4+1: 4 активных + 1 TODO), Paperclip AI (evidence-based liveness + regex output analysis) | Обнаружение зацикливания: повторяющиеся действия, повторяющиеся ошибки, чередование (context overflow — TODO) | Актуально для fix_iterations — если агент повторяет одни и те же действия, лучше остановить раньше. Paperclip AI добавляет evidence-based подход (подсчёт комментариев, документов, work products). Подтверждено 3 проектами |
 | **Model failover с cooldown** | OpenClaw (per-profile), Archon (fallbackModel), OpenHands SDK (FallbackStrategy), Paperclip AI (Codex escalation: same_session → safer_invocation → fresh_session) | При недоступности модели → переключение на fallback с cooldown, чтобы не «долбить» упавший endpoint | Дополнение к нашему circuit breaker: CB защищает от cascade failures, failover — переключает на альтернативу. Paperclip AI добавляет escalation strategy — не просто retry, а с изменением параметров |
@@ -90,8 +91,8 @@
 
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
-| **Exec policy (rules)** | Codex (.rules файлы), Claude Code (allow/deny lists) | Декларативные правила: banned prefixes (`bash -c`), safe command detection, per-path restrictions | Простой и надёжный механизм. Не требует Docker — работает на уровне chain executor |
-| **Permission system** | Claude Code (auto-accept/ask/deny), Crush (allow-list), Codex (split FS permissions) | Ограничение доступных runner'ов и команд для цепочки: allow/deny per step | Для CI/CD: `--allowedTools`, `--max-turns` — аналогичные ограничения для chain execution |
+| **Exec policy (rules)** | Codex (.rules файлы), Claude Code (allow/deny lists), **Kilo Code** (bash allowlist 40+ команд + glob patterns + last-matching-wins) | Декларативные правила: banned prefixes (`bash -c`), safe command detection, per-path restrictions | Простой и надёжный механизм. Не требует Docker — работает на уровне chain executor. Kilo Code подтверждает подход: read-only bash отдельный набор (без git stash, пайпов, редиректов) |
+| **Permission system** | Claude Code (auto-accept/ask/deny), Crush (allow-list), Codex (split FS permissions), **Kilo Code** (allow/ask/deny per tool + glob patterns + inheritance) | Ограничение доступных runner'ов и команд для цепочки: allow/deny per step | Для CI/CD: `--allowedTools`, `--max-turns` — аналогичные ограничения для chain execution. Kilo Code добавляет permission inheritance для subagents |
 
 #### 🟡 Среднесрочные (P2–P3)
 
@@ -121,8 +122,8 @@
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
 | **Typed I/O per step** | Mastra AI (Zod), LangGraph (TypedDict), Archon (JSON Schema), Sandcastle (Output.object/string с Zod-валидацией) | Схемы валидации входных/выходных данных каждого шага | Повышает надёжность цепочек: невалидный input → fail-fast. Подтверждено 4+ проектами |
-| **Sub-agent pattern** | Claude Code (Task tool), Codex (spawn/wait/close_agent), OpenHands SDK (DelegateTool) | Изолированный контекст подзадачи, потенциально параллельно | «Chain внутри chain» с собственным бюджетом и контекстом. Для dynamic chains |
-| **Parallel execution** | Archon (DAG layers), pi_agent_rust (read-only tools), Mastra AI (.parallel()) | Параллельное выполнение независимых шагов | Оптимизация: lint + type-check + tests одновременно |
+| **Sub-agent pattern** | Claude Code (Task tool), Codex (spawn/wait/close_agent), OpenHands SDK (DelegateTool), **Kilo Code** (task tool: isolated session, permission inheritance, cost propagation, resume, parallel invocation) | Изолированный контекст подзадачи, потенциально параллельно | «Chain внутри chain» с собственным бюджетом и контекстом. Для dynamic chains. Kilo Code — наиболее развитая модель permission inheritance |
+| **Parallel execution** | Archon (DAG layers), pi_agent_rust (read-only tools), Mastra AI (.parallel()), **Kilo Code** (wave-based: parallel tool calls в одном LLM-сообщении, dependency classification) | Параллельное выполнение независимых шагов | Оптимизация: lint + type-check + tests одновременно. Kilo Code добавляет wave-based подход — практичная альтернатива DAG |
 | **Per-step model override** | Archon (per-node provider/model), Mastra AI, Codex (custom agent roles) | Дешёвая модель для простых шагов, дорогая для сложных | Оптимизация стоимости: классификация → Haiku, кодогенерация → Sonnet |
 | **Processor pipeline** | Mastra AI (6 фаз), OpenHands SDK (condenser pipeline) | Middleware-паттерн: pre/post обработка на уровне шага | Расширение decorator pattern: более granular контроль (input → output) |
 
@@ -134,7 +135,7 @@
 
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
-| **Auto-compaction / summarization** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex (6/13 проектов) | LLM-суммаризация при context overflow | Широко распространённый паттерн (6/13). Для длинных цепочек и dynamic loops |
+| **Auto-compaction / summarization** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex (6/13 проектов), **Kilo Code** (structured template: Goal/Constraints/Progress/Decisions/Next Steps/Critical Context/Files, tool output truncation до 2000 chars) | LLM-суммаризация при context overflow | Широко распространённый паттерн (9/21). Для длинных цепочек и dynamic loops. Kilo Code добавляет structured template — лучше plain summarization |
 | **Bootstrap budget** | OpenClaw | Ограничение на размер context injection (AGENTS.md, skills, system prompts) | Защита от oversized промптов — context injection не превышает N% context window |
 | **Pluggable context engine** | OpenClaw (ingest/assemble/compact/maintain) | Формализованный интерфейс для context management lifecycle | Самый продвинутый подход к context management из исследованных |
 
@@ -309,6 +310,15 @@
 * Sandcastle: lifecycle hooks (host.onWorktreeReady/onSandboxReady, sandbox.onSandboxReady — pre/post execution) — 🟡 P3
 * Sandcastle: AbortSignal / cancellation (cooperative cancellation через AbortSignal) — 🟡 P3
 * Sandcastle: worktree preservation (dirty state preservation при failure — для отладки failed chains) — 🟡 P3
+* Kilo Code: subagent isolation + permission inheritance (task tool: isolated session, edit/bash/MCP restrictions propagation, no recursive delegation — модель для вложенных chain runs) — 🟡 P2
+* Kilo Code: permission system с glob patterns (allow/ask/deny per tool, bash allowlist из 40+ команд, last-matching-wins — для CI/CD sandboxing без Docker) — 🟡 P2
+* Kilo Code: error classification для retry (ContextOverflow → не retry, API 5xx → retry, rate limit → retry с backoff + Retry-After — модель для RetryingAgentRunner) — 🟡 P2
+* Kilo Code: steps limit per agent (max agentic iterations → forced text-only response — аналог max_iterations per chain step) — 🟡 P2
+* Kilo Code: cost propagation child→parent (acquireUseRelease pattern + concurrent lock от race conditions — для вложенных chain runs) — 🟡 P3
+* Kilo Code: wave-based parallel execution (parallel subagent calls в одном LLM-сообщении, dependency classification — модель для будущих dynamic chains) — 🟡 P3
+* Kilo Code: context compaction с structured template (8-секционный summary: Goal/Constraints/Progress/Decisions/Next Steps/Critical Context/Files — для длинных цепочек и fix_iterations) — 🟡 P3
+* Kilo Code: custom agent config (JSON/markdown/CLI create + AI-генерация — модель для переиспользуемых chain templates) — 🟡 P3
+* Kilo Code: session resume (task_id для продолжения subagent session — для возобновления прерванных chain runs) — 🟡 P3
 
 </details>
 
@@ -316,11 +326,11 @@
 
 ## Общие тренды
 
-> Анализ выполнен на основе всех 19 исследований. Тренды сгруппированы по значимости для архитектуры task-orchestrator.
+> Анализ выполнен на основе всех 21 исследований. Тренды сгруппированы по значимости для архитектуры task-orchestrator.
 
 ### 1. Уникальная позиция task-orchestrator
 
-**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 20 фреймворков.
+**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 21 фреймворков.
 
 **Ни один проприетарный продукт** (Claude Code, GitHub Copilot Cloud Agent, OpenAI Codex) не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны даже против крупнейших коммерческих AI-agent продуктов (включая Factory Missions — SaaS-продукт для multi-day autonomous software engineering, оценённый в $1.5B).
 
@@ -330,7 +340,7 @@
 
 ### 2. Agent Loop — доминирующая модель выполнения
 
-**13 из 20 фреймворков** (исключая AgentCraft, Oz и Sandcastle, см. ниже) используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, AutoGen, OpenHands SDK, MetaGPT, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Hermes Agent). LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK), Paperclip AI (heartbeat-based мета-оркестрация), Factory Missions (orchestrator-worker delegation с auto-injected validators) и Sandcastle (agent invocation loop в песочнице) используют принципиально другие модели.
+**14 из 21 фреймворков** (исключая AgentCraft, Oz и Sandcastle, см. ниже) используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, AutoGen, OpenHands SDK, MetaGPT, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Hermes Agent, **Kilo Code**). LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK), Paperclip AI (heartbeat-based мета-оркестрация), Factory Missions (orchestrator-worker delegation с auto-injected validators) и Sandcastle (agent invocation loop в песочнице) используют принципиально другие модели.
 
 **AgentCraft не учитывается в этом подсчёте:** он не имеет собственной модели выполнения, а выступает как GUI wrapper, делегируя выполнение подключённым внешним агентам (Claude Code, OpenCode, Cursor, OpenClaw). Эти агенты сами используют agent loop — AgentCraft лишь управляет их запуском и визуализирует прогресс. Таким образом, AgentCraft не является ни «agent loop», ни «другой моделью выполнения» — это управляющий слой поверх существующих сред.
 
@@ -342,11 +352,11 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 3. Разделение на семь уровней абстракции
 
-**Все 20 проектов** чётко делятся на семь уровней:
+**Все 21 проект** чётко делятся на семь уровней:
 
 | Уровень | Проекты | Что делают | Аналог в task-orchestrator |
 |---|---|---|---|
-| **SDK / Agent runtime** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, OpenClaw, Agno, Hermes Agent | Работают на уровне прямых LLM API | Runner'ы (pi, codex) |
+| **SDK / Agent runtime** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, OpenClaw, Agno, Hermes Agent, **Kilo Code** | Работают на уровне прямых LLM API | Runner'ы (pi, codex) |
 | **Оркестратор / Workflow engine** | CrewAI, LangGraph, AutoGen, Archon, MetaGPT, Copilot Workspace | Управляют потоком выполнения между агентами/шагами | Chain executor |
 | **Sandbox orchestration** | Sandcastle | Управляет жизненным циклом песочниц (Docker/Podman/Vercel), git worktrees, branch strategies для внешних AI-агентов | — (нет аналога) |
 | **GUI Manager / Launcher** | AgentCraft | Визуальный интерфейс для запуска и мониторинга внешних агентов, без собственной логики выполнения | — (нет аналога) |
@@ -358,8 +368,8 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 4. SKILL.md / AGENTS.md — де-факто стандарт
 
-**12 из 20 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
-- Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex, Agno, Factory Missions (.factory/skills/), Hermes Agent, Oz (Warp) (oz-skills)
+**13 из 21 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
+- Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex, Agno, Factory Missions (.factory/skills/), Hermes Agent, Oz (Warp) (oz-skills), **Kilo Code**
 - Формат: YAML frontmatter + markdown body, discovery из нескольких мест, валидация
 - Стандарт [agentskills.io](https://agentskills.io) получает широкое распространение
 - Paperclip AI добавляет Company Skills: managed skill registry с import/export, trust levels, compatibility checks
@@ -368,16 +378,16 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 5. MCP (Model Context Protocol) — повсеместный протокол расширения
 
-**13 из 20 проектов** поддерживают MCP:
-- Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Paperclip AI, Hermes Agent, Oz (Warp)
+**14 из 21 проектов** поддерживают MCP:
+- Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Paperclip AI, Hermes Agent, Oz (Warp), **Kilo Code**
 - MCP — стандарт де-факто для расширения возможностей AI-агентов через внешние tool-серверы
 
 **Вывод:** MCP-поддержка в task-orchestrator — вопрос времени. Но реализовывать нужно на уровне runner'ов, не оркестратора.
 
 ### 6. Контекст-менеджмент — повсеместная проблема
 
-**8 из 20 проектов** реализуют auto-compaction / auto-summarization при context overflow:
-- Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, Agno, Hermes Agent
+**9 из 21 проектов** реализуют auto-compaction / auto-summarization при context overflow:
+- Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, Agno, Hermes Agent, **Kilo Code**
 - Все используют LLM-суммаризацию для сжатия истории
 - Hermes Agent — наиболее продвинутый подход: 14-секционный structured summary template, tool result pruning + deduplication, anti-thrashing protection, iterative summary updates, tool_call/result pair integrity, last-user-message anchoring (~1500 LOC)
 - OpenClaw: формализованный `ContextEngine` interface (ingest → assemble → compact → maintain) с tokenBudget
@@ -407,8 +417,8 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 8. Sub-agents / Multi-agent — тренд к иерархической декомпозиции
 
-**12 из 20 проектов** поддерживают sub-agents или multi-agent:
-- Crush (Coder → Task), Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat), Agno (Team с 4 режимами), Factory Missions (Task tool для subagents: investigation, review, research), Hermes Agent (delegate_task: parallel spawning, orchestrator/leaf roles, depth control до 3)
+**13 из 21 проектов** поддерживают sub-agents или multi-agent:
+- Crush (Coder → Task), Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat), Agno (Team с 4 режимами), Factory Missions (Task tool для subagents: investigation, review, research), Hermes Agent (delegate_task: parallel spawning, orchestrator/leaf roles, depth control до 3), **Kilo Code** (task tool: isolated session, permission inheritance, cost propagation, resume, parallel invocation)
 
 Oz (Warp) не имеет sub-agents в традиционном понимании, но поддерживает **unlimited parallel cloud agents** — одновременный запуск множества независимых agent runs через API. Это горизонтальное масштабирование, не иерархическая декомпозиция.
 
@@ -436,8 +446,8 @@ Sandcastle поддерживает multi-agent orchestration через **templ
 
 ### 11. Error classification — повторяющийся паттерн
 
-**4 проекта** классифицируют ошибки для умного retry:
-- Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (6 категорий по HTTP status), Codex (Guardian risk taxonomy), Hermes Agent (20+ FailoverReason: auth, billing, rate_limit, overloaded, server_error, timeout, context_overflow, model_not_found, provider_policy_blocked и др.)
+**5 проектов** классифицируют ошибки для умного retry:
+- Archon (FATAL/TRANSIENT/UNKNOWN), OpenClaw (6 категорий по HTTP status), Codex (Guardian risk taxonomy), Hermes Agent (20+ FailoverReason: auth, billing, rate_limit, overloaded, server_error, timeout, context_overflow, model_not_found, provider_policy_blocked и др.), **Kilo Code** (ContextOverflow, API 5xx, rate limit, FreeUsageLimitError, Kilo errors — retry/no-retry classification)
 
 Hermes Agent предлагает наиболее развитую систему: **20+ failover reasons с recovery hints** (retryable, should_compress, should_rotate_credential, should_fallback) + **credential pool rotation** (4 стратегии: fill_first, round_robin, random, least_used). Error classification + credential rotation — дополняют circuit breaker: CB защищает от cascade, rotation — от rate limiting.
 
@@ -458,7 +468,7 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 | Язык | Проекты | Примечание |
 |---|---|---|
 | **Python** | CrewAI, LangGraph, AutoGen, OpenHands SDK, MetaGPT, Agno, Hermes Agent | Доминирующий язык для AI-agent фреймворков |
-| **TypeScript** | Archon, OpenClaw, Mastra AI, Paperclip AI, Sandcastle | Растущая экосистема, особенно для workflow engines, мета-оркестраторов и sandbox orchestration |
+| **TypeScript** | Archon, OpenClaw, Mastra AI, Paperclip AI, Sandcastle, **Kilo Code** | Растущая экосистема, особенно для workflow engines, мета-оркестраторов и sandbox orchestration |
 | **Rust** | pi_agent_rust, Codex (codex-rs) | High-performance CLI-агенты |
 | **Go** | Crush | TUI-ориентированный агент |
 | **Проприетарный** | Claude Code, Copilot Cloud Agent, AgentCraft, Factory Missions, Oz (Warp) | Закрытый код, анализ по документации и reverse engineering |
@@ -481,6 +491,7 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 * **Factory Missions — наиболее продвинутая multi-agent система для software engineering:** orchestrator-worker-validator архитектура, 51KB mission prompt, 5 communication patterns (delegation/creator-verifier/broadcast/negotiation/direct), validation contracts (mission-level TDD), sealed milestones, production runs до 16 дней. Проприетарный SaaS (Factory AI, Series C $150M, оценка $1.5B, Khosla Ventures). Prompt-driven архитектура (не hard-coded — улучшается с моделями). Каждый worker = fresh context, state на диске. 50% финального кода = тесты, 90% test coverage. Подтверждает тренд: autonomous software development — реальная production-возможность.
 * **AgentCraft — единственный GUI-оркестратор** в исследовании: RTS-геймификация (fog of war, achievements, race skins) поверх 4 внешних AI-агентов (Claude Code, OpenCode, Cursor, OpenClaw). Не фреймворк и не SDK — визуальный интерфейс для управления существующими агентами. Подтверждает тренд: оркестрация AI-агентов — отдельная продуктовая ниша, не только техническая. Git worktrees, Docker/Apple Containers, scheduled tasks — функциональные фичи, перекликающиеся с Archon и Codex.
 * **Sandcastle — наиболее продвинутый sandbox orchestration layer** из исследованных: plug-and-play SandboxProvider (Docker/Podman/Vercel/Daytona/custom), 3 branch strategies (head/merge-to-head/branch), git worktree management со stale pruning и dirty preservation, AgentProvider interface (4 built-in: Claude Code/Codex/Pi/OpenCode), structured output (Zod), completion signal, prompt template engine ({{KEY}} + !`command`), 5 multi-agent templates. Построен на Effect-TS — функциональной effect system. Не workflow engine и не chain orchestrator — инфраструктурный слой для запуска агентов в песочницах. Наиболее зрелая реализация sandbox management из исследованных: SELinux labels, UID/GID alignment, Windows path compatibility, worktree locking. Подтверждает тренд separation of concerns: sandbox orchestration (Sandcastle) → chain orchestrator (task-orchestrator) → cloud agent platform (Oz).
+* **Kilo Code (OpenCode) — наиболее развитая AI-агентная платформа для разработки** из исследованных: VS Code extension + CLI + JetBrains plugin, 19K звёзд, MIT лицензия, 7 built-in агентов (code/plan/debug/ask/orchestrator/general/explore), custom agents через JSON/markdown/CLI, permission system с glob patterns, context compaction с structured template, error classification для retry policy, subagent delegation через task tool (isolated session, permission inheritance, cost propagation, resume, parallel invocation), MCP, Skills (SKILL.md), Plugins, Workflows (slash commands), autonomous CI/CD mode (`kilo run --auto`). Orchestrator Mode объявлен **deprecated** — subagents встроены в каждый primary agent. Wave-based execution pattern (parallel waves, dependency classification) — модель для будущих dynamic chains. Построен на Effect-TS + Bun + Vercel AI SDK. Подтверждает тренд: оркестрация — не отдельный режим, а capability каждого агента.
 
 ---
 
@@ -511,3 +522,4 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 | 2026-05-07 | Аналитик (Шерлок) | Создан отчёт hermes-agent-comparison.md, заполнена строка Hermes Agent (#18). Пересчитаны тренды (17→18): agent loop 13/18, SKILL.md 11/18, MCP 12/18, sub-agents 12/18, compression 8/18. Добавлены рекомендации Hermes Agent (P2: error classification, context file injection scanning, credential pool rotation; P3: structured context compression, subagent delegation, filesystem checkpoints, rate limit header tracking, kanban multi-agent, tool result deduplication). Все 18 исследований завершены. |
 | 2026-05-07 | Аналитик (Шерлок) | Создан отчёт oz-cloud-agents-comparison.md, заполнена строка Oz (Warp) (#19). Пересчитаны тренды (18→19): agent loop 13/19, SKILL.md 12/19, MCP 13/19, sub-agents 12/19, compression 8/19. Добавлен шестой уровень абстракции (Cloud Agent Platform). Добавлены рекомендации Oz (P3: cron-расписания, webhook-триггеры, Cloud Environments, REST API/SDK, Planning, Codebase Context). Добавлено наблюдение: Oz — облачная платформа оркестрации с уникальной позицией (SaaS, не фреймворк). Все 19 исследований завершены. |
 | 2026-05-07 | Аналитик (Шерлок) | Создан отчёт sandcastle-comparison.md, заполнена строка Sandcastle (#20). Пересчитаны тренды (19→20): agent loop 13/20, SKILL.md 12/20, MCP 13/20, sub-agents 12/20, compression 8/20. Добавлен седьмой уровень абстракции (Sandbox orchestration). Добавлены рекомендации Sandcastle (P2: Sandbox Provider Interface, structured output, completion signal, prompt template engine, typed error hierarchy, idle timeout; P3: branch strategy/git worktrees, multi-agent templates, lifecycle hooks, AbortSignal, worktree preservation). Добавлено наблюдение: Sandcastle — наиболее продвинутый sandbox orchestration layer из исследованных. Все 20 исследований завершены. |
+| 2026-05-08 | Аналитик (Шерлок) | Создан отчёт opencode-orchestrator-comparison.md, заполнена строка Kilo Code (OpenCode) (#21). Пересчитаны тренды (20→21): agent loop 14/21, SKILL.md 13/21, MCP 14/21, sub-agents 13/21, compression 9/21, error classification 5/21. Добавлены рекомендации Kilo Code (P2: subagent isolation, permission system, error classification, steps limit; P3: cost propagation, wave-based parallel execution, context compaction, custom agent config, session resume). Добавлено наблюдение: Kilo Code — наиболее развитая AI-агентная платформа для разработки (19K звёзд, MIT, deprecated Orchestrator Mode). Все 21 исследований завершены. |

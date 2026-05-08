@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик Шерлок
 branch: task/research-opencode-orchestrator
 pr:
-status: todo
+status: done
 ---
 
 # TASK-research-opencode-orchestrator: Исследовать OpenCode Orchestrator (Kilo) для сравнения с task-orchestrator
@@ -32,14 +32,14 @@ status: todo
 ## 3. Requirements (Требования, MoSCoW)
 
 ### 🔴 Must Have (Обязательно)
-- [ ] Исследован OpenCode Orchestrator Mode: документация, исходный код, примеры
-- [ ] Отчёт `docs/research/framework-comparisons/opencode-orchestrator-comparison.md` по формату существующих comparison-документов
-- [ ] Строка #21 добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
-- [ ] Вердикт: заимствовать паттерны / dependency / не подходит
+- [x] Исследован OpenCode Orchestrator Mode: документация, исходный код, примеры
+- [x] Отчёт `docs/research/framework-comparisons/opencode-orchestrator-comparison.md` по формату существующих comparison-документов
+- [x] Строка #21 добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
+- [x] Вердикт: заимствовать паттерны / dependency / не подходит
 
 ### 🟡 Should Have (Желательно)
-- [ ] Сравнение с нашими паттернами (ExecutionStrategy, DynamicLoop, ChainDefinition)
-- [ ] Конкретные рекомендации: что заимствовать, приоритет
+- [x] Сравнение с нашими паттернами (ExecutionStrategy, DynamicLoop, ChainDefinition)
+- [x] Конкретные рекомендации: что заимствовать, приоритет
 
 ### ⚫ Won't Have (Не в этот раз)
 - Код интеграции
@@ -54,9 +54,9 @@ status: todo
 
 ## 5. Definition of Done (Критерии приёмки)
 
-- [ ] Файл `docs/research/framework-comparisons/opencode-orchestrator-comparison.md` создан
-- [ ] Строка OpenCode Orchestrator добавлена в сводную таблицу
-- [ ] Вердикт сформулирован
+- [x] Файл `docs/research/framework-comparisons/opencode-orchestrator-comparison.md` создан
+- [x] Строка OpenCode Orchestrator добавлена в сводную таблицу
+- [x] Вердикт сформулирован
 
 ## 6. Risks and Dependencies (Риски и зависимости)
 
