@@ -8,10 +8,10 @@ priority: P3
 depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-openclaw-agent
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-openclaw-agent: OpenClaw
@@ -81,6 +81,17 @@ grep "OpenClaw" docs/research/coding-agents-summary.md
 
 ## 9. Comments (Комментарии)
 OpenClaw уже исследовался в EPIC-research-agent-frameworks-comparison — можно переиспользовать и дополнить.
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-openclaw-agent (уже создана и активна)
+**PR:** будет указан после создания
+
+### Порядок действий
+1. Переключись в ветку `task/research-openclaw-agent`: `git checkout task/research-openclaw-agent`
+2. Реализуй задачу согласно описанию.
+3. Делай промежуточные коммиты после каждого логического этапа.
+4. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
