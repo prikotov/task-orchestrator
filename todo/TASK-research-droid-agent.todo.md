@@ -85,7 +85,7 @@ Droid — название может быть неоднозначным. Ут�
 ## Инструкции для сабагента
 
 **Ветка:** task/research-droid-agent (уже создана и активна)
-**PR:** будет указан после создания
+**PR:** [PR #182](https://github.com/prikotov/task-orchestrator/pull/182)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-droid-agent`: `git checkout task/research-droid-agent`
