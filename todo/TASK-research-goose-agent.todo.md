@@ -8,10 +8,10 @@ priority: P2
 depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-goose-agent
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-goose-agent: Goose
@@ -81,6 +81,17 @@ grep "Goose" docs/research/coding-agents-summary.md
 
 ## 9. Comments (Комментарии)
 
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-goose-agent (уже создана и активна)
+**PR:** будет указан после создания
+
+### Порядок действий
+1. Переключись в ветку `task/research-goose-agent`: `git checkout task/research-goose-agent`
+2. Реализуй задачу согласно описанию.
+3. Делай промежуточные коммиты после каждого логического этапа.
+4. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
