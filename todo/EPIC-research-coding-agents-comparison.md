@@ -8,7 +8,7 @@ priority: P2
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 status: todo
-pr:
+pr: "#171"
 branch:
 ---
 
