@@ -8,10 +8,10 @@ priority: P1
 depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-codex-cli
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-codex-cli: Codex CLI (OpenAI)
@@ -84,6 +84,20 @@ grep "Codex CLI" docs/research/coding-agents-summary.md
 
 ## 9. Comments (Комментарии)
 Codex уже используется — его исследование должно быть подробным, наравне с Pi. Особый интерес: подход к системному промпту через `model_instructions_file` (отличается от pi), поддержка `--oss` для локальных моделей.
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-codex-cli (уже создана и активна)
+**PR:** уже создан (draft) — номер будет указан после создания
+
+### Порядок действий
+1. Переключись в ветку `task/research-codex-cli`: `git checkout task/research-codex-cli`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `make check`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
