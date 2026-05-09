@@ -85,7 +85,7 @@ grep "Qwen CLI" docs/research/coding-agents-summary.md
 ## Инструкции для сабагента
 
 **Ветка:** task/research-qwen-cli (уже создана и активна)
-**PR:** будет указан после создания
+**PR:** [PR #178](https://github.com/prikotov/task-orchestrator/pull/178)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-qwen-cli`: `git checkout task/research-qwen-cli`
