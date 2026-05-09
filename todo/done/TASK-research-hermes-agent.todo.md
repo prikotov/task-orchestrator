@@ -1,73 +1,99 @@
 ---
+# Metadata (Метаданные)
 type: research
-created: 2026-05-04
+created: 2026-05-09
 value: V3
-complexity: C3
-priority: P2
-depends_on: []
-epic: EPIC-research-agent-frameworks-comparison
-author: Тимлид (Алекс)
-assignee: Аналитик Шерлок
+complexity: C2
+priority: P3
+depends_on:
+epic: EPIC-research-coding-agents-comparison
+author: Аналитик (Шерлок)
+assignee: Аналитик (Шерлок)
 branch: task/research-hermes-agent
 pr:
-status: done
+status: in_progress
 ---
 
-# TASK-research-hermes-agent: Исследовать Hermes Agent (Nous Research) для сравнения с task-orchestrator
+# TASK-research-hermes-agent: Hermes (Nous Research)
 
 ## 1. Concept and Goal (Концепция и Цель)
-
 ### Story (Job Story)
-Когда мы оцениваем AI-agent фреймворки и паттерны оркестрации, я хочу изучить Hermes Agent (https://github.com/nousresearch/hermes-agent), чтобы понять его модель оркестрации агентов, подход к multi-agent координации, обработку ошибок и state management — и сравнить с нашими подходами.
+> **Job Story:** Когда мне нужно подключить CLI-агент кодинга как сабагента к роли команды, я хочу знать его возможности по кастомизации (системный промпт, скиллы, AGENTS.md, запуск в JSON-режиме), чтобы определить, подходит ли он для работы с нашей системой ролей и скиллов.
 
 ### Goal (Цель по SMART)
-Провести техническое исследование Hermes Agent: архитектура, модель агентов, оркестрация, обработка ошибок, расширяемость. Составить отчёт с выводами: заимствовать паттерны, использовать как dependency, или не подходит. Добавить строку в сводную таблицу `docs/research/agent-frameworks-summary.md`.
+Исследовать Hermes (Nous Research) (Nous Research Hermes agent) по 10 критериям. Создать отчёт в `docs/research/coding-agents/hermes-agent-comparison.md` со сводкой по каждому критерию. Вердикт: подходит / частично подходит / не подходит для использования как сабагент с ролями.
 
 ## 2. Context and Scope (Контекст и Границы)
-
-*   **Где делаем:** `docs/research/framework-comparisons/hermes-agent-comparison.md`
-*   **Текущее поведение:** В `docs/research/` уже есть сравнительные анализы 13+ фреймворков и сводная таблица `agent-frameworks-summary.md`
-*   **Границы (Out of Scope):** Не пишем код интеграции — только исследование
+*   **Где делаем:** `docs/research/coding-agents/hermes-agent-comparison.md`
+*   **Текущее поведение:** Агент ещё не подключён к нашей системе
+*   **Границы (Out of Scope):** написание кода интеграции, глубокий code review исходников, бенчмарки
 
 ## 3. Requirements (Требования, MoSCoW)
-
 ### 🔴 Must Have (Обязательно)
-- [x] Исследован репозиторий https://github.com/nousresearch/hermes-agent: README, исходный код, примеры
-- [x] Отчёт `docs/research/framework-comparisons/hermes-agent-comparison.md` по формату существующих comparison-документов
-- [x] Строка добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
-- [x] Вердикт: заимствовать паттерны / dependency / не подходит
+- [ ] **Критерий 1. Системный промпт:** Можно ли полностью заменить системный промпт? Дополнить? Передать файл роли? Механизмы (CLI-аргумент, конфигурационный файл, env). Сравнение с pi (`--system-prompt`, `--append-system-prompt`) и codex (`model_instructions_file`).
+- [ ] **Критерий 2. Промпт агента / роль:** Инъекция контекста роли (файл роли) в сессию через CLI-аргумент, env, файл конфигурации.
+- [ ] **Критерий 3. Скиллы:** Встроенная поддержка скиллов. Подключение файлов/каталогов скиллов к сессии. Можно ли задавать разные скиллы разным ролям.
+- [ ] **Критерий 4. AGENTS.md:** Автообнаружение `AGENTS.md` из корня проекта. Можно ли отключить. Альтернативные форматы инструкций проекта.
+- [ ] **Критерий 5. Стандартная папка `.agents/skills/`:** Поддержка стандартной директории `.agents/skills/`. Автосканирование из коробки или нужно явное подключение.
+- [ ] **Критерий 6. Запуск как сабагент:** JSON-режим / programmatic API / pipe-управление. Контроль таймаутов. Структурированный результат. Non-interactive / ephemeral режим.
+- [ ] **Критерий 7. Токены и стоимость:** Отслеживание потребления токенов (input/output) за сессию. Расчёт стоимости. Какие метрики доступны и как их получить.
+- [ ] **Критерий 8. Free tier:** Наличие бесплатного тарифа. Какие модели доступны бесплатно. Ограничения (лимиты токенов, RPM, число запросов).
+- [ ] **Критерий 9. Провайдеры и модели:** Конкретный список поддерживаемых LLM-провайдеров (OpenAI, Anthropic, Google, Mistral, Ollama и т.д.). Конкретные модели из коробки. BYOK — можно ли подключить свой API-ключ. Локальные модели (ollama, lmstudio). Легкость переключения между провайдерами.
+- [ ] **Критерий 10. Лицензия:** Open source / проприетарный. Тип лицензии (MIT, Apache, proprietary). Условия использования.
+- [ ] Вердикт: подходит / частично подходит / не подходит — с обоснованием
 
 ### 🟡 Should Have (Желательно)
-- [x] Сравнение с нашими паттернами (ExecutionStrategy, DynamicLoop, ChainDefinition)
-- [x] Конкретные рекомендации: что заимствовать, приоритет
+- [ ] Практические примеры запуска в JSON-режиме (если поддерживается)
+- [ ] Сравнение с pi и codex по ключевым критериям
 
-### ⚫ Won't Have (Не в этот раз)
-- Код интеграции
-- Performance-бенчмарки
+### 🟢 Could Have (Опционально)
+- [ ] Mermaid-диаграмма потока данных при запуске как сабагент
+
+### ⚫ Won't Have (Не будем делать)
+- [ ] Код интеграции
+- [ ] Бенчмарки производительности
 
 ## 4. Implementation Plan (План реализации)
-
-1. [ ] Изучить README, документацию и исходный код репозитория
-2. [ ] Проанализировать по единой методологии: модель оркестрации, state management, error handling, extensibility
-3. [ ] Составить отчёт `docs/research/framework-comparisons/hermes-agent-comparison.md`
-4. [ ] Добавить строку в `docs/research/agent-frameworks-summary.md`
+1. [ ] Найти официальный репозиторий и документацию агента
+2. [ ] Изучить CLI-параметры и конфигурацию
+3. [ ] Оценить каждый из 10 критериев с примерами
+4. [ ] Создать отчёт в `docs/research/coding-agents/hermes-agent-comparison.md`
+5. [ ] Добавить строку в `docs/research/coding-agents-summary.md`
 
 ## 5. Definition of Done (Критерии приёмки)
+- [ ] Отчёт создан в `docs/research/coding-agents/hermes-agent-comparison.md`
+- [ ] Каждый из 10 критериев оценён с примерами CLI-команд или конфигурации
+- [ ] Вердикт: подходит / частично подходит / не подходит — с обоснованием
+- [ ] Строка агента добавлена в `docs/research/coding-agents-summary.md`
 
-- [x] Файл `docs/research/framework-comparisons/hermes-agent-comparison.md` создан
-- [x] Строка Hermes Agent добавлена в сводную таблицу
-- [x] Вердикт сформулирован
+## 6. Verification (Самопроверка)
+```bash
+ls docs/research/coding-agents/hermes-agent-comparison.md
+grep "Hermes (Nous Research)" docs/research/coding-agents-summary.md
+```
 
-## 6. Risks and Dependencies (Риски и зависимости)
+## 7. Risks and Dependencies (Риски и зависимости)
+- Агент может быть проприетарным — анализ только по документации
+- Агент может активно развиваться — информация может устареть
 
-- Репозиторий может быть ранней стадии — мало документации → анализ по исходному коду
+## 8. Sources (Источники)
+- [ ] [Hermes — Nous Research](https://nousresearch.com/)
 
-## 7. Sources (Источники)
+## 9. Comments (Комментарии)
 
-- https://github.com/nousresearch/hermes-agent
-- Существующие comparison-документы в `docs/research/`
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-hermes-agent (уже создана и активна)
+**PR:** [PR #185](https://github.com/prikotov/task-orchestrator/pull/185)
+
+### Порядок действий
+1. Переключись в ветку `task/research-hermes-agent`: `git checkout task/research-hermes-agent`
+2. Реализуй задачу согласно описанию.
+3. Делай промежуточные коммиты после каждого логического этапа.
+4. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
-| 2026-05-04 | Тимлид (Алекс) | Создание задачи |
+| 2026-05-09 | Аналитик (Шерлок) | Создание задачи |
