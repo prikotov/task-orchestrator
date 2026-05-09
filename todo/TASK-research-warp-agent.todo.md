@@ -85,7 +85,7 @@ grep "Warp AI" docs/research/coding-agents-summary.md
 ## Инструкции для сабагента
 
 **Ветка:** task/research-warp-agent (уже создана и активна)
-**PR:** будет указан после создания
+**PR:** [PR #183](https://github.com/prikotov/task-orchestrator/pull/183)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-warp-agent`: `git checkout task/research-warp-agent`
