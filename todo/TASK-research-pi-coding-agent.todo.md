@@ -87,7 +87,7 @@ Pi уже подключён как сабагент — его исследов
 ## Инструкции для сабагента
 
 **Ветка:** task/research-pi-coding-agent (уже создана и активна)
-**PR:** уже создан (draft) из task/research-pi-coding-agent в epic/research-coding-agents-comparison — будет указан после создания
+**PR:** уже создан (draft) из task/research-pi-coding-agent в epic/research-coding-agents-comparison — [PR #172](https://github.com/prikotov/task-orchestrator/pull/172)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-pi-coding-agent`: `git checkout task/research-pi-coding-agent`
