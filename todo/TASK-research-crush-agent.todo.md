@@ -85,7 +85,7 @@ grep "Crush (Charmbracelet)" docs/research/coding-agents-summary.md
 ## Инструкции для сабагента
 
 **Ветка:** task/research-crush-agent (уже создана и активна)
-**PR:** будет указан после создания
+**PR:** [PR #180](https://github.com/prikotov/task-orchestrator/pull/180)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-crush-agent`: `git checkout task/research-crush-agent`
