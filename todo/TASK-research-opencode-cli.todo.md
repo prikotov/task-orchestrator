@@ -85,7 +85,7 @@ grep "OpenCode" docs/research/coding-agents-summary.md
 ## Инструкции для сабагента
 
 **Ветка:** task/research-opencode-cli (уже создана и активна)
-**PR:** будет указан после создания
+**PR:** [PR #176](https://github.com/prikotov/task-orchestrator/pull/176)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-opencode-cli`: `git checkout task/research-opencode-cli`
