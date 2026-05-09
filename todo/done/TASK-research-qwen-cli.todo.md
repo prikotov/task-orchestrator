@@ -8,10 +8,10 @@ priority: P2
 depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-qwen-cli
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-qwen-cli: Qwen CLI
@@ -81,6 +81,17 @@ grep "Qwen CLI" docs/research/coding-agents-summary.md
 
 ## 9. Comments (Комментарии)
 
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-qwen-cli (уже создана и активна)
+**PR:** [PR #178](https://github.com/prikotov/task-orchestrator/pull/178)
+
+### Порядок действий
+1. Переключись в ветку `task/research-qwen-cli`: `git checkout task/research-qwen-cli`
+2. Реализуй задачу согласно описанию.
+3. Делай промежуточные коммиты после каждого логического этапа.
+4. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
