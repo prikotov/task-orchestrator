@@ -88,7 +88,7 @@ Codex уже используется — его исследование дол
 ## Инструкции для сабагента
 
 **Ветка:** task/research-codex-cli (уже создана и активна)
-**PR:** уже создан (draft) — номер будет указан после создания
+**PR:** уже создан (draft) — [PR #173](https://github.com/prikotov/task-orchestrator/pull/173)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-codex-cli`: `git checkout task/research-codex-cli`
