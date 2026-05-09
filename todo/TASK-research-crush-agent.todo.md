@@ -8,10 +8,10 @@ priority: P2
 depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-crush-agent
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-crush-agent: Crush (Charmbracelet)
@@ -81,6 +81,17 @@ grep "Crush (Charmbracelet)" docs/research/coding-agents-summary.md
 
 ## 9. Comments (Комментарии)
 У нас уже есть исследование Crush в EPIC-research-agent-frameworks-comparison — можно переиспользовать и дополнить оценкой по новым критериям.
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-crush-agent (уже создана и активна)
+**PR:** будет указан после создания
+
+### Порядок действий
+1. Переключись в ветку `task/research-crush-agent`: `git checkout task/research-crush-agent`
+2. Реализуй задачу согласно описанию.
+3. Делай промежуточные коммиты после каждого логического этапа.
+4. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
