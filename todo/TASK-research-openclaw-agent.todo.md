@@ -85,7 +85,7 @@ OpenClaw уже исследовался в EPIC-research-agent-frameworks-compa
 ## Инструкции для сабагента
 
 **Ветка:** task/research-openclaw-agent (уже создана и активна)
-**PR:** будет указан после создания
+**PR:** [PR #184](https://github.com/prikotov/task-orchestrator/pull/184)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-openclaw-agent`: `git checkout task/research-openclaw-agent`
