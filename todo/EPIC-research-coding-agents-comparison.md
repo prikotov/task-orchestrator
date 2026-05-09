@@ -93,7 +93,7 @@ flowchart LR
 - [x] [TASK-research-pi-coding-agent](done/TASK-research-pi-coding-agent.todo.md) — Pi Coding Agent (Node.js/TypeScript, @earendil-works/pi-coding-agent)
 - [x] [TASK-research-codex-cli](done/TASK-research-codex-cli.todo.md) — Codex CLI (OpenAI, Rust) ✅ Частично подходит (6/10)
 - [x] [TASK-research-opencode-cli](done/TASK-research-opencode-cli.todo.md) — OpenCode (Go)
-- [ ] [TASK-research-kilocode-cli](TASK-research-kilocode-cli.todo.md) — Kilo Code CLI (TypeScript)
+- [x] [TASK-research-kilocode-cli](done/TASK-research-kilocode-cli.todo.md) — Kilo Code CLI (TypeScript)
 - [x] [TASK-research-gemini-cli](done/TASK-research-gemini-cli.todo.md) — Gemini CLI (Google, TypeScript)
 - [x] [TASK-research-claude-code-agent](done/TASK-research-claude-code-agent.todo.md) — Claude Code (Anthropic, проприетарный)
 - [ ] [TASK-research-qwen-cli](TASK-research-qwen-cli.todo.md) — Qwen CLI (Alibaba/Qwen, Python)
