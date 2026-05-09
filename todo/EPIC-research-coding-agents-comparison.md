@@ -9,7 +9,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 status: todo
 pr: "#171"
-branch:
+branch: epic/research-coding-agents-comparison
 ---
 
 # EPIC-research-coding-agents-comparison: Сравнительное исследование CLI-агентов кодинга
