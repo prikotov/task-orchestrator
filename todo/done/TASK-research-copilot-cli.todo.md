@@ -8,10 +8,10 @@ priority: P2
 depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-copilot-cli
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-copilot-cli: GitHub Copilot CLI
@@ -81,6 +81,17 @@ grep "GitHub Copilot CLI" docs/research/coding-agents-summary.md
 
 ## 9. Comments (Комментарии)
 GitHub Copilot CLI — проприетарный продукт Microsoft/GitHub. Возможна ограниченная кастомизация.
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-copilot-cli (уже создана и активна)
+**PR:** [PR #181](https://github.com/prikotov/task-orchestrator/pull/181)
+
+### Порядок действий
+1. Переключись в ветку `task/research-copilot-cli`: `git checkout task/research-copilot-cli`
+2. Реализуй задачу согласно описанию.
+3. Делай промежуточные коммиты после каждого логического этапа.
+4. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
