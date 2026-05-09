@@ -7,6 +7,10 @@
  * Слушает на 127.0.0.1:0 (ОС назначает свободный порт), принимает HTTP CONNECT-запросы
  * и пересылает их через TLS на upstream HTTPS-прокси.
  *
+ * Bidirectional forwarding реализован через pcntl_fork():
+ * — родитель: client → upstream (blocking fread/fwrite)
+ * — ребёнок:  upstream → client (blocking fread/fwrite)
+ *
  * Конфигурация передаётся через environment variables:
  *   BRIDGE_UPSTREAM_HOST   — хост upstream HTTPS-прокси
  *   BRIDGE_UPSTREAM_PORT   — порт upstream HTTPS-прокси
@@ -34,6 +38,8 @@ if ($connectTimeout <= 0) {
     $connectTimeout = 15;
 }
 
+// ─── TCP Server ────────────────────────────────────────────────────────
+
 $server = @stream_socket_server('tcp://' . $bridgeHost . ':0', $errno, $errstr);
 if ($server === false) {
     fwrite(STDERR, "Bridge: cannot create server: $errstr ($errno)\n");
@@ -53,11 +59,17 @@ if (function_exists('pcntl_signal')) {
     pcntl_async_signals(true);
 }
 
+// ─── Main accept loop ─────────────────────────────────────────────────
+
+$childPids = [];
+
 while (true) {
     $client = @stream_socket_accept($server, 60);
     if ($client === false) {
         continue;
     }
+
+    // ── Читаем CONNECT-запрос (non-blocking, короткий timeout) ──
 
     stream_set_blocking($client, false);
 
@@ -85,6 +97,8 @@ while (true) {
 
     $targetHost = $m[1];
     $targetPort = (int) $m[2];
+
+    // ── TLS connect к upstream HTTPS-прокси ──
 
     $verifyTls = getenv('BRIDGE_TLS_VERIFY') !== '0';
 
@@ -115,6 +129,8 @@ while (true) {
         continue;
     }
 
+    // ── Отправляем CONNECT через upstream прокси ──
+
     $connectRequest = "CONNECT {$targetHost}:{$targetPort} HTTP/1.1\r\n"
         . "Host: {$targetHost}:{$targetPort}\r\n";
     if ($authHeader !== false && $authHeader !== '') {
@@ -124,9 +140,11 @@ while (true) {
 
     fwrite($upstream, $connectRequest);
 
+    // Читаем ответ upstream (non-blocking, короткий timeout)
+    stream_set_blocking($upstream, false);
+
     $response = '';
     $start = microtime(true);
-    stream_set_blocking($upstream, false);
     while ((microtime(true) - $start) < 10.0) {
         $chunk = fread($upstream, 8192);
         if ($chunk !== false && $chunk !== '') {
@@ -145,8 +163,84 @@ while (true) {
         continue;
     }
 
+    // ── 200 Connection Established → начинаем forwarding ──
+
     fwrite($client, "HTTP/1.1 200 Connection Established\r\n\r\n");
 
+    // Переключаем оба потока в blocking для надёжного fread/fwrite
+    stream_set_blocking($client, true);
+    stream_set_blocking($upstream, true);
+
+    // pcntl_fork: родитель — client→upstream, ребёнок — upstream→client
+    if (!function_exists('pcntl_fork')) {
+        // Fallback: однопоточный forwarding через stream_select
+        // Менее надёжен для TLS/WebSocket, но работает для коротких запросов
+        forwardSelect($client, $upstream);
+        @fclose($upstream);
+        @fclose($client);
+        continue;
+    }
+
+    $pid = pcntl_fork();
+    if ($pid === -1) {
+        // fork failed — fallback на stream_select
+        forwardSelect($client, $upstream);
+        @fclose($upstream);
+        @fclose($client);
+        continue;
+    }
+
+    if ($pid === 0) {
+        // ── Ребёнок: upstream → client ──
+        fclose($server);
+        pipeStream($upstream, $client);
+        fclose($client);
+        fclose($upstream);
+        exit(0);
+    }
+
+    // ── Родитель: client → upstream ──
+    $childPids[] = $pid;
+    pipeStream($client, $upstream);
+    fclose($upstream);
+    fclose($client);
+
+    // Ждём ребёнка (non-blocking)
+    foreach ($childPids as $i => $cpid) {
+        $res = pcntl_waitpid($cpid, $status, WNOHANG);
+        if ($res > 0) {
+            unset($childPids[$i]);
+        }
+    }
+}
+
+// ─── Functions ─────────────────────────────────────────────────────────
+
+/**
+ * Blocking pipe: читает из $source и пишет в $dest.
+ * Завершается при EOF или ошибке записи.
+ */
+function pipeStream($source, $dest): void
+{
+    while (true) {
+        $data = @fread($source, 65536);
+        if ($data === '' || $data === false) {
+            break;
+        }
+        $written = @fwrite($dest, $data);
+        if ($written === false) {
+            break;
+        }
+        fflush($dest);
+    }
+}
+
+/**
+ * Fallback bidirectional forwarding через stream_select.
+ * Используется когда pcntl_fork недоступен.
+ */
+function forwardSelect($client, $upstream): void
+{
     $startTime = time();
     while (true) {
         if (time() - $startTime > 300) {
@@ -162,27 +256,21 @@ while (true) {
         }
 
         if ($changed === 0) {
-            if (function_exists('pcntl_signal_dispatch')) {
-                pcntl_signal_dispatch();
-            }
             continue;
         }
 
         foreach ($read as $socket) {
             $data = @fread($socket, 65536);
-            if ($data === false || $data === '') {
-                break 2;
+            if ($data === '' || $data === false) {
+                if (feof($socket)) {
+                    break 2;
+                }
+                continue;
             }
 
             $dest = ($socket === $client) ? $upstream : $client;
             @fwrite($dest, $data);
-        }
-
-        if (function_exists('pcntl_signal_dispatch')) {
-            pcntl_signal_dispatch();
+            fflush($dest);
         }
     }
-
-    @fclose($upstream);
-    @fclose($client);
 }
