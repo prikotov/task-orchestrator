@@ -90,7 +90,7 @@ flowchart LR
 
 ### Этап 1: Индивидуальные исследования (параллельные)
 
-- [ ] [TASK-research-pi-coding-agent](TASK-research-pi-coding-agent.todo.md) — Pi Coding Agent (Node.js/TypeScript, @earendil-works/pi-coding-agent)
+- [x] [TASK-research-pi-coding-agent](done/TASK-research-pi-coding-agent.todo.md) — Pi Coding Agent (Node.js/TypeScript, @earendil-works/pi-coding-agent)
 - [ ] [TASK-research-codex-cli](TASK-research-codex-cli.todo.md) — Codex CLI (OpenAI, Rust)
 - [ ] [TASK-research-opencode-cli](TASK-research-opencode-cli.todo.md) — OpenCode (Go)
 - [ ] [TASK-research-kilocode-cli](TASK-research-kilocode-cli.todo.md) — Kilo Code CLI (TypeScript)
