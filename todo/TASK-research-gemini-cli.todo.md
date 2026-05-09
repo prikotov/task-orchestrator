@@ -8,10 +8,10 @@ priority: P1
 depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-gemini-cli
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-gemini-cli: Gemini CLI
@@ -82,6 +82,17 @@ grep "Gemini CLI" docs/research/coding-agents-summary.md
 
 ## 9. Comments (Комментарии)
 
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-gemini-cli (уже создана и активна)
+**PR:** будет указан после создания
+
+### Порядок действий
+1. Переключись в ветку `task/research-gemini-cli`: `git checkout task/research-gemini-cli`
+2. Реализуй задачу согласно описанию.
+3. Делай промежуточные коммиты после каждого логического этапа.
+4. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
