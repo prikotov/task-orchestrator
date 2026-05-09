@@ -103,7 +103,7 @@ flowchart LR
 - [x] [TASK-research-crush-agent](done/TASK-research-crush-agent.todo.md) — Crush (Charmbracelet, Go)
 - [x] [TASK-research-openclaw-agent](done/TASK-research-openclaw-agent.todo.md) — OpenClaw (Python)
 - [x] [TASK-research-copilot-cli](done/TASK-research-copilot-cli.todo.md) — GitHub Copilot CLI (проприетарный)
-- [ ] [TASK-research-hermes-agent](TASK-research-hermes-agent.todo.md) — Hermes (Nous Research)
+- [x] [TASK-research-hermes-agent](done/TASK-research-hermes-agent.todo.md) — Hermes (Nous Research)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
