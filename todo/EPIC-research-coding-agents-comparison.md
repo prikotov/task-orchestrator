@@ -100,7 +100,7 @@ flowchart LR
 - [x] [TASK-research-goose-agent](done/TASK-research-goose-agent.todo.md) — Goose (Block/Square, Go)
 - [ ] [TASK-research-droid-agent](TASK-research-droid-agent.todo.md) — Droid
 - [ ] [TASK-research-warp-agent](TASK-research-warp-agent.todo.md) — Warp (Warp AI, Rust-терминал)
-- [ ] [TASK-research-crush-agent](TASK-research-crush-agent.todo.md) — Crush (Charmbracelet, Go)
+- [x] [TASK-research-crush-agent](done/TASK-research-crush-agent.todo.md) — Crush (Charmbracelet, Go)
 - [ ] [TASK-research-openclaw-agent](TASK-research-openclaw-agent.todo.md) — OpenClaw (Python)
 - [ ] [TASK-research-copilot-cli](TASK-research-copilot-cli.todo.md) — GitHub Copilot CLI (проприетарный)
 - [ ] [TASK-research-hermes-agent](TASK-research-hermes-agent.todo.md) — Hermes (Nous Research)
