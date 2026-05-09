@@ -85,7 +85,7 @@ grep "Goose" docs/research/coding-agents-summary.md
 ## Инструкции для сабагента
 
 **Ветка:** task/research-goose-agent (уже создана и активна)
-**PR:** будет указан после создания
+**PR:** [PR #179](https://github.com/prikotov/task-orchestrator/pull/179)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-goose-agent`: `git checkout task/research-goose-agent`
