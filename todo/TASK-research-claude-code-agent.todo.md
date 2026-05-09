@@ -8,10 +8,10 @@ priority: P1
 depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-claude-code-agent
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-claude-code-agent: Claude Code
@@ -82,6 +82,17 @@ grep "Claude Code" docs/research/coding-agents-summary.md
 
 ## 9. Comments (Комментарии)
 Claude Code уже исследовался в EPIC-research-agent-frameworks-comparison, но в контексте оркестрации. Теперь оцениваем по критериям кастомизации и сабагент-интеграции.
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-claude-code-agent (уже создана и активна)
+**PR:** будет указан после создания
+
+### Порядок действий
+1. Переключись в ветку `task/research-claude-code-agent`: `git checkout task/research-claude-code-agent`
+2. Реализуй задачу согласно описанию.
+3. Делай промежуточные коммиты после каждого логического этапа.
+4. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
