@@ -18,6 +18,9 @@ use RuntimeException;
  * Решение: мост слушает как обычный HTTP-прокси (http://), а сам подключается
  * к upstream через TLS, отправляя CONNECT с Proxy-Authorization.
  *
+ * Bidirectional forwarding реализован через pcntl_fork() (blocking pipes),
+ * fallback на stream_select() если pcntl недоступен.
+ *
  * Жизненный цикл:
  * 1. CodexAgentRunner обнаруживает https:// в CODEX_HTTP_PROXY
  * 2. Создаёт HttpsProxyBridge, вызывает start()
@@ -215,7 +218,7 @@ final class HttpsProxyBridge
 
         return [
             'host' => $host,
-            'port' => $port,
+            'port' => $parsed['port'],
             'user' => urldecode($parsed['user'] ?? ''),
             'pass' => urldecode($parsed['pass'] ?? ''),
         ];
