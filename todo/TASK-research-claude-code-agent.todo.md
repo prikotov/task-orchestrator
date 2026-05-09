@@ -86,7 +86,7 @@ Claude Code уже исследовался в EPIC-research-agent-frameworks-co
 ## Инструкции для сабагента
 
 **Ветка:** task/research-claude-code-agent (уже создана и активна)
-**PR:** будет указан после создания
+**PR:** [PR #175](https://github.com/prikotov/task-orchestrator/pull/175)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-claude-code-agent`: `git checkout task/research-claude-code-agent`
