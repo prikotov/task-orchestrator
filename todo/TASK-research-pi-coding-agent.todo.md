@@ -8,10 +8,10 @@ priority: P1
 depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-pi-coding-agent
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-pi-coding-agent: Pi Coding Agent
@@ -83,6 +83,20 @@ grep "Pi Coding Agent" docs/research/coding-agents-summary.md
 
 ## 9. Comments (Комментарии)
 Pi уже подключён как сабагент — его исследование должно быть наиболее полным и служить бенчмарком для остальных 13 агентов.
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-pi-coding-agent (уже создана и активна)
+**PR:** уже создан (draft) из task/research-pi-coding-agent в epic/research-coding-agents-comparison — будет указан после создания
+
+### Порядок действий
+1. Переключись в ветку `task/research-pi-coding-agent`: `git checkout task/research-pi-coding-agent`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `make check`.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
