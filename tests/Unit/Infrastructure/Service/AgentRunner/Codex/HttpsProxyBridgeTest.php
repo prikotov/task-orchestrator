@@ -257,7 +257,8 @@ final class HttpsProxyBridgeTest extends TestCase
     #[Test]
     public function bridgeProcessAcceptsConnectRequest(): void
     {
-        $bridge = new HttpsProxyBridge('https://user:pass@proxy.example.com:8080');
+        // Короткий connect timeout чтобы upstream быстро отдал 502
+        $bridge = new HttpsProxyBridge('https://user:pass@proxy.example.com:8080', 1);
 
         try {
             $localUrl = $bridge->start();
