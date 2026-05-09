@@ -85,7 +85,7 @@ grep "Hermes (Nous Research)" docs/research/coding-agents-summary.md
 ## Инструкции для сабагента
 
 **Ветка:** task/research-hermes-agent (уже создана и активна)
-**PR:** будет указан после создания
+**PR:** [PR #185](https://github.com/prikotov/task-orchestrator/pull/185)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-hermes-agent`: `git checkout task/research-hermes-agent`
