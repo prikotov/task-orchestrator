@@ -10,8 +10,8 @@ epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-pi-coding-agent
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/172
+status: done
 ---
 
 # TASK-research-pi-coding-agent: Pi Coding Agent
