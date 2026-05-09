@@ -94,7 +94,7 @@ flowchart LR
 - [x] [TASK-research-codex-cli](done/TASK-research-codex-cli.todo.md) — Codex CLI (OpenAI, Rust) ✅ Частично подходит (6/10)
 - [ ] [TASK-research-opencode-cli](TASK-research-opencode-cli.todo.md) — OpenCode (Go)
 - [ ] [TASK-research-kilocode-cli](TASK-research-kilocode-cli.todo.md) — Kilo Code CLI (TypeScript)
-- [ ] [TASK-research-gemini-cli](TASK-research-gemini-cli.todo.md) — Gemini CLI (Google, TypeScript)
+- [x] [TASK-research-gemini-cli](done/TASK-research-gemini-cli.todo.md) — Gemini CLI (Google, TypeScript)
 - [ ] [TASK-research-claude-code-agent](TASK-research-claude-code-agent.todo.md) — Claude Code (Anthropic, проприетарный)
 - [ ] [TASK-research-qwen-cli](TASK-research-qwen-cli.todo.md) — Qwen CLI (Alibaba/Qwen, Python)
 - [ ] [TASK-research-goose-agent](TASK-research-goose-agent.todo.md) — Goose (Block/Square, Go)
