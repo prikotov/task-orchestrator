@@ -85,7 +85,7 @@ GitHub Copilot CLI — проприетарный продукт Microsoft/GitHu
 ## Инструкции для сабагента
 
 **Ветка:** task/research-copilot-cli (уже создана и активна)
-**PR:** будет указан после создания
+**PR:** [PR #181](https://github.com/prikotov/task-orchestrator/pull/181)
 
 ### Порядок действий
 1. Переключись в ветку `task/research-copilot-cli`: `git checkout task/research-copilot-cli`
