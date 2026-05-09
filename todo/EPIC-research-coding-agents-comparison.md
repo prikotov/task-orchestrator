@@ -102,7 +102,7 @@ flowchart LR
 - [ ] [TASK-research-warp-agent](TASK-research-warp-agent.todo.md) — Warp (Warp AI, Rust-терминал)
 - [x] [TASK-research-crush-agent](done/TASK-research-crush-agent.todo.md) — Crush (Charmbracelet, Go)
 - [ ] [TASK-research-openclaw-agent](TASK-research-openclaw-agent.todo.md) — OpenClaw (Python)
-- [ ] [TASK-research-copilot-cli](TASK-research-copilot-cli.todo.md) — GitHub Copilot CLI (проприетарный)
+- [x] [TASK-research-copilot-cli](done/TASK-research-copilot-cli.todo.md) — GitHub Copilot CLI (проприетарный)
 - [ ] [TASK-research-hermes-agent](TASK-research-hermes-agent.todo.md) — Hermes (Nous Research)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
