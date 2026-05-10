@@ -116,7 +116,7 @@ flowchart LR
 
 - [x] [TASK-feat-watch-subagent-runner-param](done/TASK-feat-watch-subagent-runner-param.todo.md) — Параметризация `watch-subagent.sh`: `--runner`, `--model`, env-фолбэки, поддержка codex
 - [x] [TASK-feat-tool-step-type](done/TASK-feat-tool-step-type.todo.md) — Тип шага `tool` в цепочках: enum, handler, загрузка YAML, context propagation
-- [ ] [TASK-feat-task-implement-chain](TASK-feat-task-implement-chain.todo.md) — Шаблонная цепочка `task-implement` в `chains.yaml` с fix_iterations
+- [x] [TASK-feat-task-implement-chain](done/TASK-feat-task-implement-chain.todo.md) — Шаблонная цепочка `task-implement` в `chains.yaml` с fix_iterations
 - [x] [TASK-feat-agent-run-extensions](done/TASK-feat-agent-run-extensions.todo.md) — Расширение `app:agent:run`: `--timeout`, `--context`
 
 ## 6. Definition of Done (Критерии приёмки эпика)

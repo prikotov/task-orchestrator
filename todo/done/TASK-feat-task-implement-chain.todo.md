@@ -10,8 +10,8 @@ epic: EPIC-feat-subagent-delegation-and-task-chains
 author: Тимлид Алекс (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/feat-task-implement-chain
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/198
+status: done
 ---
 
 # TASK-feat-task-implement-chain: Шаблонная цепочка task-implement
