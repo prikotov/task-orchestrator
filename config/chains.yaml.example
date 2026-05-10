@@ -10,7 +10,7 @@ chains:
 
   # ─── Static-цепочка: линейная последовательность шагов ────────────
   #
-  # Каждый шаг — вызов агента (type: agent) или проверка (type: quality_gate).
+  # Каждый шаг — вызов агента (type: agent), проверка (type: quality_gate) или команда (type: tool).
   # Шаги выполняются последовательно. При ошибке — цепочка прерывается
   # (если не заданы fix_iterations или retry_policy).
 
@@ -20,6 +20,12 @@ chains:
     # no_context_files: true         # (опционально) отключить загрузку AGENTS.md / CLAUDE.md для всех шагов цепочки
 
     steps:
+      - type: tool                # Shell-команда с записью stdout в context
+        command: "git rev-parse --abbrev-ref HEAD"
+        label: "Get current branch"
+        output_key: current_branch  # Ключ для stdout в context (опционально)
+        timeout_seconds: 10
+
       - type: agent
         role: system_analyst       # Роль — имя .md-файла из roles_dir без расширения
         runner: pi                  # Движок запуска агента (по умолчанию: pi)
