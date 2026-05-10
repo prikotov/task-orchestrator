@@ -4,27 +4,27 @@ type: research
 created: 2026-05-09
 value: V3
 complexity: C2
-priority: P2
+priority: P1
 depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-gemini-cli
 pr:
-status: todo
+status: done
 ---
 
-# TASK-research-crush-agent: Crush (Charmbracelet)
+# TASK-research-gemini-cli: Gemini CLI
 
 ## 1. Concept and Goal (Концепция и Цель)
 ### Story (Job Story)
 > **Job Story:** Когда мне нужно подключить CLI-агент кодинга как сабагента к роли команды, я хочу знать его возможности по кастомизации (системный промпт, скиллы, AGENTS.md, запуск в JSON-режиме), чтобы определить, подходит ли он для работы с нашей системой ролей и скиллов.
 
 ### Goal (Цель по SMART)
-Исследовать Crush (Charmbracelet) (Charmbracelet Crush coding agent (Go)) по 10 критериям. Создать отчёт в `docs/research/coding-agents/crush-agent-comparison.md` со сводкой по каждому критерию. Вердикт: подходит / частично подходит / не подходит для использования как сабагент с ролями.
+Исследовать Gemini CLI (Google Gemini CLI coding agent (TypeScript)) по 10 критериям. Создать отчёт в `docs/research/coding-agents/gemini-cli-comparison.md` со сводкой по каждому критерию. Вердикт: подходит / частично подходит / не подходит для использования как сабагент с ролями.
 
 ## 2. Context and Scope (Контекст и Границы)
-*   **Где делаем:** `docs/research/coding-agents/crush-agent-comparison.md`
+*   **Где делаем:** `docs/research/coding-agents/gemini-cli-comparison.md`
 *   **Текущее поведение:** Агент ещё не подключён к нашей системе
 *   **Границы (Out of Scope):** написание кода интеграции, глубокий code review исходников, бенчмарки
 
@@ -57,19 +57,19 @@ status: todo
 1. [ ] Найти официальный репозиторий и документацию агента
 2. [ ] Изучить CLI-параметры и конфигурацию
 3. [ ] Оценить каждый из 10 критериев с примерами
-4. [ ] Создать отчёт в `docs/research/coding-agents/crush-agent-comparison.md`
+4. [ ] Создать отчёт в `docs/research/coding-agents/gemini-cli-comparison.md`
 5. [ ] Добавить строку в `docs/research/coding-agents-summary.md`
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт создан в `docs/research/coding-agents/crush-agent-comparison.md`
+- [ ] Отчёт создан в `docs/research/coding-agents/gemini-cli-comparison.md`
 - [ ] Каждый из 10 критериев оценён с примерами CLI-команд или конфигурации
 - [ ] Вердикт: подходит / частично подходит / не подходит — с обоснованием
 - [ ] Строка агента добавлена в `docs/research/coding-agents-summary.md`
 
 ## 6. Verification (Самопроверка)
 ```bash
-ls docs/research/coding-agents/crush-agent-comparison.md
-grep "Crush (Charmbracelet)" docs/research/coding-agents-summary.md
+ls docs/research/coding-agents/gemini-cli-comparison.md
+grep "Gemini CLI" docs/research/coding-agents-summary.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)
@@ -77,10 +77,22 @@ grep "Crush (Charmbracelet)" docs/research/coding-agents-summary.md
 - Агент может активно развиваться — информация может устареть
 
 ## 8. Sources (Источники)
-- [ ] [Crush — GitHub](https://github.com/charmbracelet/crush)
+- [ ] [Gemini CLI — GitHub](https://github.com/google-gemini/gemini-cli)
+- [ ] [Gemini CLI — документация](https://ai.google.dev/gemini-api/docs)
 
 ## 9. Comments (Комментарии)
-У нас уже есть исследование Crush в EPIC-research-agent-frameworks-comparison — можно переиспользовать и дополнить оценкой по новым критериям.
+
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-gemini-cli (уже создана и активна)
+**PR:** будет указан после создания
+
+### Порядок действий
+1. Переключись в ветку `task/research-gemini-cli`: `git checkout task/research-gemini-cli`
+2. Реализуй задачу согласно описанию.
+3. Делай промежуточные коммиты после каждого логического этапа.
+4. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

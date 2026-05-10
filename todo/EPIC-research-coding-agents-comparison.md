@@ -9,7 +9,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 status: todo
 pr: "#171"
-branch:
+branch: epic/research-coding-agents-comparison
 ---
 
 # EPIC-research-coding-agents-comparison: Сравнительное исследование CLI-агентов кодинга
@@ -35,25 +35,25 @@ branch:
 ## 3. Requirements (Требования, MoSCoW)
 
 ### 🔴 Must Have (Блокирующие требования)
-- [ ] Каждый агент исследован по единой методологии из 10 критериев
-- [ ] По каждому агенту создан отчёт в `docs/research/coding-agents/<agent-slug>-comparison.md`
-- [ ] Сводная таблица в `docs/research/coding-agents-summary.md` со всеми 14 агентами
-- [ ] Чёткий вердикт по каждому: подходит / частично подходит / не подходит — с обоснованием
-- [ ] Итоговые рекомендации по приоритетам интеграции
+- [x] Каждый агент исследован по единой методологии из 10 критериев
+- [x] По каждому агенту создан отчёт в `docs/research/coding-agents/<agent-slug>-comparison.md`
+- [x] Сводная таблица в `docs/research/coding-agents-summary.md` со всеми 14 агентами
+- [x] Чёткий вердикт по каждому: подходит / частично подходит / не подходит — с обоснованием
+- [x] Итоговые рекомендации по приоритетам интеграции
 
 ### 🟡 Should Have (Важные требования)
-- [ ] Сравнительная таблица с группировкой по категориям (open source, проприетарный)
-- [ ] Ранжирование агентов по степени пригодности для сабагент-интеграции
-- [ ] Выявление общих паттернов CLI-интерфейсов агентов
+- [x] Сравнительная таблица с группировкой по категориям (open source, проприетарный)
+- [x] Ранжирование агентов по степени пригодности для сабагент-интеграции
+- [x] Выявление общих паттернов CLI-интерфейсов агентов
 
 ### 🟢 Could Have (Желательно)
-- [ ] Визуализация (Mermaid-диаграммы) ключевых различий
-- [ ] Практические примеры запуска каждого агента в JSON-режиме
+- [x] Визуализация (Mermaid-диаграммы) ключевых различий
+- [x] Практические примеры запуска каждого агента в JSON-режиме
 
 ### ⚫ Won't Have (Не в этот раз)
-- [ ] Код интеграции любого из агентов
-- [ ] Performance-бенчмарки
-- [ ] Глубокий анализ исходного кода агентов
+- [x] Код интеграции любого из агентов
+- [x] Performance-бенчмарки
+- [x] Глубокий анализ исходного кода агентов
 
 ## 4. Solution Design (Техническое решение)
 
@@ -90,31 +90,31 @@ flowchart LR
 
 ### Этап 1: Индивидуальные исследования (параллельные)
 
-- [ ] [TASK-research-pi-coding-agent](TASK-research-pi-coding-agent.todo.md) — Pi Coding Agent (Node.js/TypeScript, @earendil-works/pi-coding-agent)
-- [ ] [TASK-research-codex-cli](TASK-research-codex-cli.todo.md) — Codex CLI (OpenAI, Rust)
-- [ ] [TASK-research-opencode-cli](TASK-research-opencode-cli.todo.md) — OpenCode (Go)
-- [ ] [TASK-research-kilocode-cli](TASK-research-kilocode-cli.todo.md) — Kilo Code CLI (TypeScript)
-- [ ] [TASK-research-gemini-cli](TASK-research-gemini-cli.todo.md) — Gemini CLI (Google, TypeScript)
-- [ ] [TASK-research-claude-code-agent](TASK-research-claude-code-agent.todo.md) — Claude Code (Anthropic, проприетарный)
-- [ ] [TASK-research-qwen-cli](TASK-research-qwen-cli.todo.md) — Qwen CLI (Alibaba/Qwen, Python)
-- [ ] [TASK-research-goose-agent](TASK-research-goose-agent.todo.md) — Goose (Block/Square, Go)
-- [ ] [TASK-research-droid-agent](TASK-research-droid-agent.todo.md) — Droid
-- [ ] [TASK-research-warp-agent](TASK-research-warp-agent.todo.md) — Warp (Warp AI, Rust-терминал)
-- [ ] [TASK-research-crush-agent](TASK-research-crush-agent.todo.md) — Crush (Charmbracelet, Go)
-- [ ] [TASK-research-openclaw-agent](TASK-research-openclaw-agent.todo.md) — OpenClaw (Python)
-- [ ] [TASK-research-copilot-cli](TASK-research-copilot-cli.todo.md) — GitHub Copilot CLI (проприетарный)
-- [ ] [TASK-research-hermes-agent](TASK-research-hermes-agent.todo.md) — Hermes (Nous Research)
+- [x] [TASK-research-pi-coding-agent](done/TASK-research-pi-coding-agent.todo.md) — Pi Coding Agent (Node.js/TypeScript, @earendil-works/pi-coding-agent)
+- [x] [TASK-research-codex-cli](done/TASK-research-codex-cli.todo.md) — Codex CLI (OpenAI, Rust) ✅ Частично подходит (6/10)
+- [x] [TASK-research-opencode-cli](done/TASK-research-opencode-cli.todo.md) — OpenCode (Go)
+- [x] [TASK-research-kilocode-cli](done/TASK-research-kilocode-cli.todo.md) — Kilo Code CLI (TypeScript)
+- [x] [TASK-research-gemini-cli](done/TASK-research-gemini-cli.todo.md) — Gemini CLI (Google, TypeScript)
+- [x] [TASK-research-claude-code-agent](done/TASK-research-claude-code-agent.todo.md) — Claude Code (Anthropic, проприетарный)
+- [x] [TASK-research-qwen-cli](done/TASK-research-qwen-cli.todo.md) — Qwen CLI (Alibaba/Qwen, Python)
+- [x] [TASK-research-goose-agent](done/TASK-research-goose-agent.todo.md) — Goose (Block/Square, Go)
+- [x] [TASK-research-droid-agent](TASK-research-droid-agent.todo.md) — Droid
+- [x] [TASK-research-warp-agent](TASK-research-warp-agent.todo.md) — Warp (Warp AI, Rust-терминал)
+- [x] [TASK-research-crush-agent](done/TASK-research-crush-agent.todo.md) — Crush (Charmbracelet, Go)
+- [x] [TASK-research-openclaw-agent](done/TASK-research-openclaw-agent.todo.md) — OpenClaw (Python)
+- [x] [TASK-research-copilot-cli](done/TASK-research-copilot-cli.todo.md) — GitHub Copilot CLI (проприетарный)
+- [x] [TASK-research-hermes-agent](done/TASK-research-hermes-agent.todo.md) — Hermes (Nous Research)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
-- [ ] [TASK-research-coding-agents-summary](TASK-research-coding-agents-summary.todo.md) — Сводная таблица и итоговые рекомендации
+- [x] [TASK-research-coding-agents-summary](TASK-research-coding-agents-summary.todo.md) — Сводная таблица и итоговые рекомендации
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [ ] Все 14 индивидуальных research-задач выполнены
-- [ ] Каждый comparison-документ создан в `docs/research/coding-agents/`
-- [ ] Сводная таблица `docs/research/coding-agents-summary.md` создана и заполнена
-- [ ] По каждому агенту есть вердикт: подходит / частично подходит / не подходит
-- [ ] Финальная задача с ранжированием и рекомендациями выполнена
+- [x] Все 14 индивидуальных research-задач выполнены
+- [x] Каждый comparison-документ создан в `docs/research/coding-agents/`
+- [x] Сводная таблица `docs/research/coding-agents-summary.md` создана и заполнена
+- [x] По каждому агенту есть вердикт: подходит / частично подходит / не подходит
+- [x] Финальная задача с ранжированием и рекомендациями выполнена
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
 Не требуется — эпик содержит только исследовательские задачи (docs).
