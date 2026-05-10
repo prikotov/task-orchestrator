@@ -9,9 +9,9 @@ depends_on:
 epic: EPIC-feat-subagent-delegation-and-task-chains
 author: Тимлид Алекс (pi)
 assignee: Бэкендер Тони (pi)
-branch:
+branch: task/feat-agent-run-extensions
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-agent-run-extensions: Расширение app:agent:run —timeout и --context
@@ -90,6 +90,19 @@ php bin/console app:agent:run --help
 
 ## 9. Comments (Комментарии)
 Гэндальф рекомендовал расширить `app:agent:run` вместо создания новой команды `delegate`. Это первая итерация — только timeout + context. Остальные опции (--reasoning-effort, --provider, --report-file) — отдельные задачи.
+
+## Инструкции для сабагента
+
+**Ветка:** task/feat-agent-run-extensions (уже создана и активна)
+**PR:** будет создан draft PR из task/feat-agent-run-extensions в task/epic-feat-subagent-delegation-and-task-chains
+
+### Порядок действий
+1. Переключись в ветку `task/feat-agent-run-extensions`: `git checkout task/feat-agent-run-extensions`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`, `vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress`.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
