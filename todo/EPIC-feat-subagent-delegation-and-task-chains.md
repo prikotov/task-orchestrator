@@ -9,7 +9,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/epic-feat-subagent-delegation-and-task-chains
 status: todo
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/194
 ---
 
 # EPIC-feat-subagent-delegation-and-task-chains: Делегирование сабагентов и оцифровка task-workflow
