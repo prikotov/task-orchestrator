@@ -142,6 +142,7 @@ final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionPr
             noContextFiles: $step->hasNoContextFiles(),
             when: $conditionVo,
             postStep: $step->getPostStep(),
+            outputKey: $step->getOutputKey(),
         );
     }
 
