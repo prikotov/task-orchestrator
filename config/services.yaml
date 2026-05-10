@@ -137,6 +137,9 @@ services:
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\QualityGate\QualityGateRunner
 
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ToolStepRunnerInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\ToolStep\ToolStepRunner
+
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Agent\ResolveChainRunnerService
 
