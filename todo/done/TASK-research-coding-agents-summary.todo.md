@@ -8,10 +8,10 @@ priority: P1
 depends_on: TASK-research-pi-coding-agent, TASK-research-codex-cli, TASK-research-opencode-cli, TASK-research-kilocode-cli, TASK-research-gemini-cli, TASK-research-claude-code-agent, TASK-research-qwen-cli, TASK-research-goose-agent, TASK-research-droid-agent, TASK-research-warp-agent, TASK-research-crush-agent, TASK-research-openclaw-agent, TASK-research-copilot-cli, TASK-research-hermes-agent
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-coding-agents-summary
 pr:
-status: todo
+status: done
 ---
 
 # TASK-research-coding-agents-summary: Сводная таблица и итоговые рекомендации
