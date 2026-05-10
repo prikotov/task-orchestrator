@@ -7,7 +7,7 @@ complexity: C4
 priority: P2
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-status: done
+status: todo
 pr: "#171"
 branch: epic/research-coding-agents-comparison
 ---
