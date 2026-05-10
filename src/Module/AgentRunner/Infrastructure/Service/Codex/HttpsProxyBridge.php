@@ -190,7 +190,7 @@ final class HttpsProxyBridge
      *
      * @param string $url URL прокси
      *
-     * @return array{host: string, port: int, user: string, pass: string}|null
+     * @return array{host: non-empty-string, port: int, user: string, pass: string}|null
      */
     public static function parseUpstreamUrl(string $url): ?array
     {
@@ -210,7 +210,7 @@ final class HttpsProxyBridge
         }
 
         $host = $parsed['host'] ?? '';
-        $port = $parsed['port'] ?? 0;
+        $port = isset($parsed['port']) && $parsed['port'] > 0 ? $parsed['port'] : 0;
 
         if ($host === '' || $port === 0) {
             return null;
@@ -218,7 +218,7 @@ final class HttpsProxyBridge
 
         return [
             'host' => $host,
-            'port' => $parsed['port'],
+            'port' => $port,
             'user' => urldecode($parsed['user'] ?? ''),
             'pass' => urldecode($parsed['pass'] ?? ''),
         ];
