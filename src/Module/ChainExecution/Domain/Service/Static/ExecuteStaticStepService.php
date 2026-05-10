@@ -24,12 +24,14 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepR
 final readonly class ExecuteStaticStepService
 {
     private const string QUALITY_GATE_RUNNER_NAME = 'shell';
+    private const string TOOL_RUNNER_NAME = 'shell';
 
     public function __construct(
         private RunAgentServiceInterface $agentRunner,
         private ResolveChainRunnerServiceInterface $runnerHelper,
         private FormatPromptServiceInterface $formatter,
         private ?QualityGateRunnerInterface $qualityGateRunner = null,
+        private ?ToolStepRunnerInterface $toolStepRunner = null,
         private ?LoggerInterface $logger = null,
     ) {
     }
@@ -167,6 +169,65 @@ final readonly class ExecuteStaticStepService
             label: $result->label,
             passed: $result->passed,
             exitCode: $result->exitCode,
+        );
+    }
+
+    /**
+     * Выполняет tool-шаг: shell-команда с передачей stdout в context.
+     *
+     * Если exit code ≠ 0 — шаг помечается как ошибка (error policy: fail),
+     * что останавливает цепочку.
+     *
+     * @return StaticStepResultVo результат с outputText = stdout
+     */
+    public function runToolStep(
+        ExecutionStepVo $step,
+    ): StaticStepResultVo {
+        if ($this->toolStepRunner === null) {
+            // Без runner'а шаг считается успешным (no-op)
+            return new StaticStepResultVo(
+                role: 'tool',
+                runner: self::TOOL_RUNNER_NAME,
+                outputText: '',
+                inputTokens: 0,
+                outputTokens: 0,
+                cost: 0.0,
+                duration: 0.0,
+                isError: false,
+                label: $step->getLabel(),
+                exitCode: 0,
+            );
+        }
+
+        $result = $this->toolStepRunner->run($step->toToolStepVo());
+        $duration = $result->durationMs / 1000.0;
+
+        if (!$result->success) {
+            $this->logger?->warning(
+                sprintf(
+                    '[StaticChainExecutor] Tool step "%s" failed (exit code %d): %s',
+                    $step->getLabel(),
+                    $result->exitCode,
+                    $result->stdout,
+                ),
+            );
+        }
+
+        return new StaticStepResultVo(
+            role: 'tool',
+            runner: self::TOOL_RUNNER_NAME,
+            outputText: $result->stdout,
+            inputTokens: 0,
+            outputTokens: 0,
+            cost: 0.0,
+            duration: $duration,
+            isError: !$result->success,
+            errorMessage: !$result->success
+                ? sprintf('Tool "%s" failed with exit code %d', $step->getLabel(), $result->exitCode)
+                : null,
+            label: $step->getLabel(),
+            exitCode: $result->exitCode,
+            outputKey: $step->getOutputKey(),
         );
     }
 
