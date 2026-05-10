@@ -115,7 +115,7 @@ flowchart LR
 ## 5. Implementation Plan (План реализации)
 
 - [x] [TASK-feat-watch-subagent-runner-param](done/TASK-feat-watch-subagent-runner-param.todo.md) — Параметризация `watch-subagent.sh`: `--runner`, `--model`, env-фолбэки, поддержка codex
-- [ ] [TASK-feat-tool-step-type](TASK-feat-tool-step-type.todo.md) — Тип шага `tool` в цепочках: enum, handler, загрузка YAML, context propagation
+- [x] [TASK-feat-tool-step-type](done/TASK-feat-tool-step-type.todo.md) — Тип шага `tool` в цепочках: enum, handler, загрузка YAML, context propagation
 - [ ] [TASK-feat-task-implement-chain](TASK-feat-task-implement-chain.todo.md) — Шаблонная цепочка `task-implement` в `chains.yaml` с fix_iterations
 - [ ] [TASK-feat-agent-run-extensions](TASK-feat-agent-run-extensions.todo.md) — Расширение `app:agent:run`: `--timeout`, `--context`
 
