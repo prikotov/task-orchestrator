@@ -9,9 +9,9 @@ depends_on: TASK-feat-tool-step-type
 epic: EPIC-feat-subagent-delegation-and-task-chains
 author: Тимлид Алекс (pi)
 assignee: Бэкендер Левша (pi)
-branch:
+branch: task/feat-task-implement-chain
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-task-implement-chain: Шаблонная цепочка task-implement
@@ -89,6 +89,25 @@ php bin/console app:agent:orchestrate task-implement
 
 ## 9. Comments (Комментарии)
 PoC — начинаем с одной цепочки `task-implement`. Если опыт успешный — добавить `task-hotfix`. Git-операции пока оставляем тимлиду (Локи прав — нет idempotency).
+
+## Инструкции для сабагента
+
+**Ветка:** task/feat-task-implement-chain (уже создана и активна)
+**PR:** будет создан draft PR из task/feat-task-implement-chain в task/epic-feat-subagent-delegation-and-task-chains
+
+### Порядок действий
+1. Переключись в ветку `task/feat-task-implement-chain`: `git checkout task/feat-task-implement-chain`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`.
+6. Сделай `git push`.
+
+### Важно
+- Зависимость TASK-feat-tool-step-type уже выполнена — тип шага `tool` доступен
+- Цепочка `task-implement` — типа `static` в `chains.yaml`
+- Шаги: agent (implement) → agent (self-review) → agent (review) → quality_gate (make check)
+- fix_iterations на цикле implement → review (max 3)
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
