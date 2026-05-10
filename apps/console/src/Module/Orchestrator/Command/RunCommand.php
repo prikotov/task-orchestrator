@@ -76,7 +76,7 @@ final class RunCommand extends Command
         if ($contextRaw !== null && $contextRaw !== '') {
             $decoded = json_decode($contextRaw, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                $io->error(sprintf('Invalid JSON in --context: %s', json_last_error_message()));
+                $io->error(sprintf('Invalid JSON in --context: %s', json_last_error_msg()));
 
                 return Command::FAILURE;
             }
