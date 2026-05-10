@@ -8,7 +8,7 @@ priority: P1
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/epic-feat-subagent-delegation-and-task-chains
-status: todo
+status: done
 pr: https://github.com/prikotov/task-orchestrator/pull/194
 ---
 
