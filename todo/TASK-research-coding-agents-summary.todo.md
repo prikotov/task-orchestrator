@@ -11,7 +11,7 @@ author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-coding-agents-summary
 pr:
-status: in-progress
+status: done
 ---
 
 # TASK-research-coding-agents-summary: Сводная таблица и итоговые рекомендации
