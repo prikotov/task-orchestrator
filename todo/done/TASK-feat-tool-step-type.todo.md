@@ -10,8 +10,8 @@ epic: EPIC-feat-subagent-delegation-and-task-chains
 author: Тимлид Алекс (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/feat-tool-step-type
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/196
+status: done
 ---
 
 # TASK-feat-tool-step-type: Тип шага tool в цепочках
