@@ -118,14 +118,14 @@ final readonly class RunStaticChainService
         bool $noContextFiles = false,
     ): ?StaticProcessResultVo {
         $step = $steps[$execution->getStepIndex()];
-        $budgetRole = ($step->isAgent() ? $step->getRole() : null) ?? 'quality_gate';
+        $budgetRole = ($step->isAgent() ? $step->getRole() : null) ?? ($step->isTool() ? 'tool' : 'quality_gate');
 
         if ($this->budgetService->shouldBreakBeforeStep($execution, $chain->budget, $budgetRole)) {
             return null;
         }
 
         $stepIndex1 = $execution->getStepIndex() + 1;
-        $role = $step->isAgent() ? ($step->getRole() ?? '') : 'quality_gate';
+        $role = $step->isAgent() ? ($step->getRole() ?? '') : ($step->isTool() ? 'tool' : 'quality_gate');
         $stepResult = $this->executeStep(
             $step,
             $chain,
@@ -245,6 +245,26 @@ final readonly class RunStaticChainService
             return $stepResult;
         }
 
+        if ($step->isTool()) {
+            $auditService?->logStepStart(
+                $chain->name,
+                $stepIndex1,
+                $role,
+                'shell',
+            );
+            $stepResult = $this->stepExecution->runToolStep($step);
+            $auditService?->logStepResult(
+                $chain->name,
+                $stepIndex1,
+                $role,
+                'shell',
+                $stepResult,
+                $stepResult->duration * 1000.0,
+            );
+
+            return $stepResult;
+        }
+
         $iterationGroup = $groupForStep[$execution->getStepIndex()] ?? null;
         $iterationNumber = $iterationGroup !== null
             ? $execution->getIterationNumber($iterationGroup->getGroup()) : null;
@@ -345,6 +365,7 @@ final readonly class RunStaticChainService
                 exitCode: $last->exitCode,
                 label: $last->label,
                 timedOut: $last->timedOut,
+                outputKey: $last->outputKey,
             );
         }
 
@@ -424,7 +445,7 @@ final readonly class RunStaticChainService
             'chain_name' => $chainName,
             'step_name' => $step->getName(),
             'runner' => $step->isAgent() ? $step->getRunner() : 'shell',
-            'role' => $step->isAgent() ? ($step->getRole() ?? '') : 'quality_gate',
+            'role' => $step->isAgent() ? ($step->getRole() ?? '') : ($step->isTool() ? 'tool' : 'quality_gate'),
             'exit_code' => $stepResult->exitCode,
             'duration' => $stepResult->duration,
         ];

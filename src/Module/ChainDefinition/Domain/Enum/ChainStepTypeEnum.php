@@ -9,9 +9,11 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum;
  *
  * agent — выполнение AI-агентом в определённой роли (недетерминированный).
  * quality_gate — выполнение shell-команды для проверки (детерминированный: pass/fail).
+ * tool — выполнение детерминированной shell-команды с передачей stdout в context.
  */
 enum ChainStepTypeEnum: string
 {
     case agent = 'agent';
     case qualityGate = 'quality_gate';
+    case tool = 'tool';
 }
