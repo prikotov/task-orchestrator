@@ -4,27 +4,27 @@ type: research
 created: 2026-05-09
 value: V3
 complexity: C2
-priority: P3
+priority: P2
 depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
-assignee:
-branch:
+assignee: Аналитик (Шерлок)
+branch: task/research-kilocode-cli
 pr:
-status: todo
+status: in_progress
 ---
 
-# TASK-research-droid-agent: Droid
+# TASK-research-kilocode-cli: Kilo Code CLI
 
 ## 1. Concept and Goal (Концепция и Цель)
 ### Story (Job Story)
 > **Job Story:** Когда мне нужно подключить CLI-агент кодинга как сабагента к роли команды, я хочу знать его возможности по кастомизации (системный промпт, скиллы, AGENTS.md, запуск в JSON-режиме), чтобы определить, подходит ли он для работы с нашей системой ролей и скиллов.
 
 ### Goal (Цель по SMART)
-Исследовать Droid (Droid coding agent) по 10 критериям. Создать отчёт в `docs/research/coding-agents/droid-agent-comparison.md` со сводкой по каждому критерию. Вердикт: подходит / частично подходит / не подходит для использования как сабагент с ролями.
+Исследовать Kilo Code CLI (TypeScript-based CLI coding agent) по 10 критериям. Создать отчёт в `docs/research/coding-agents/kilocode-cli-comparison.md` со сводкой по каждому критерию. Вердикт: подходит / частично подходит / не подходит для использования как сабагент с ролями.
 
 ## 2. Context and Scope (Контекст и Границы)
-*   **Где делаем:** `docs/research/coding-agents/droid-agent-comparison.md`
+*   **Где делаем:** `docs/research/coding-agents/kilocode-cli-comparison.md`
 *   **Текущее поведение:** Агент ещё не подключён к нашей системе
 *   **Границы (Out of Scope):** написание кода интеграции, глубокий code review исходников, бенчмарки
 
@@ -57,19 +57,19 @@ status: todo
 1. [ ] Найти официальный репозиторий и документацию агента
 2. [ ] Изучить CLI-параметры и конфигурацию
 3. [ ] Оценить каждый из 10 критериев с примерами
-4. [ ] Создать отчёт в `docs/research/coding-agents/droid-agent-comparison.md`
+4. [ ] Создать отчёт в `docs/research/coding-agents/kilocode-cli-comparison.md`
 5. [ ] Добавить строку в `docs/research/coding-agents-summary.md`
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт создан в `docs/research/coding-agents/droid-agent-comparison.md`
+- [ ] Отчёт создан в `docs/research/coding-agents/kilocode-cli-comparison.md`
 - [ ] Каждый из 10 критериев оценён с примерами CLI-команд или конфигурации
 - [ ] Вердикт: подходит / частично подходит / не подходит — с обоснованием
 - [ ] Строка агента добавлена в `docs/research/coding-agents-summary.md`
 
 ## 6. Verification (Самопроверка)
 ```bash
-ls docs/research/coding-agents/droid-agent-comparison.md
-grep "Droid" docs/research/coding-agents-summary.md
+ls docs/research/coding-agents/kilocode-cli-comparison.md
+grep "Kilo Code CLI" docs/research/coding-agents-summary.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)
@@ -77,10 +77,21 @@ grep "Droid" docs/research/coding-agents-summary.md
 - Агент может активно развиваться — информация может устареть
 
 ## 8. Sources (Источники)
-- [ ] [Droid — уточнить проект и репозиторий](...)
+- [ ] [Kilo Code — документация](https://kilocode.ai/)
 
 ## 9. Comments (Комментарии)
-Droid — название может быть неоднозначным. Уточнить: Android-агент или CLI-агент кодинга.
+
+
+## Инструкции для сабагента
+
+**Ветка:** task/research-kilocode-cli (уже создана и активна)
+**PR:** [PR #177](https://github.com/prikotov/task-orchestrator/pull/177)
+
+### Порядок действий
+1. Переключись в ветку `task/research-kilocode-cli`: `git checkout task/research-kilocode-cli`
+2. Реализуй задачу согласно описанию.
+3. Делай промежуточные коммиты после каждого логического этапа.
+4. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
