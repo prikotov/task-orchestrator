@@ -10,8 +10,8 @@ epic: EPIC-feat-subagent-delegation-and-task-chains
 author: Тимлид Алекс (pi)
 assignee: Бэкендер Тони (pi)
 branch: task/feat-watch-subagent-runner-param
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/195
+status: done
 ---
 
 # TASK-feat-watch-subagent-runner-param: Параметризация watch-subagent.sh для pi и codex
