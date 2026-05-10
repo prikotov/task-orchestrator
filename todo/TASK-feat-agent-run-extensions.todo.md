@@ -11,7 +11,7 @@ author: Тимлид Алекс (pi)
 assignee: Бэкендер Тони (pi)
 branch: task/feat-agent-run-extensions
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-feat-agent-run-extensions: Расширение app:agent:run —timeout и --context
@@ -36,16 +36,16 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] `--timeout <seconds>` в `RunCommand` — ограничение общего времени выполнения
-- [ ] Timeout пробрасывается в `AgentRunRequestVo`
-- [ ] `--context <json>` в `RunCommand` — произвольный JSON как previousContext
-- [ ] Context парсится и валидируется (должен быть валидный JSON)
-- [ ] Context передаётся в prompt агента как `previousContext`
-- [ ] Unit-тесты: RunCommand с timeout, RunCommand с context
+- [x] `--timeout <seconds>` в `RunCommand` — ограничение общего времени выполнения
+- [x] Timeout пробрасывается в `AgentRunRequestVo`
+- [x] `--context <json>` в `RunCommand` — произвольный JSON как previousContext
+- [x] Context парсится и валидируется (должен быть валидный JSON)
+- [x] Context передаётся в prompt агента как `previousContext`
+- [x] Unit-тесты: RunCommand с timeout, RunCommand с context
 
 ### 🟡 Should Have (Желательно)
-- [ ] `--timeout 0` = без лимита (default)
-- [ ] Ошибка при невалидном JSON в `--context`
+- [x] `--timeout 0` = без лимита (default)
+- [x] Ошибка при невалидном JSON в `--context`
 
 ### 🟢 Could Have (Опционально)
 - [ ] `--report-file <path>` — вывод результата в файл
@@ -56,20 +56,20 @@ status: in_progress
 - [ ] `--provider` (отдельная задача)
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Добавить `--timeout` и `--context` в `RunCommand::configure()`
-2. [ ] Добавить поля в DTO: `AgentRunRequestVo` (timeout, context)
-3. [ ] В `RunCommand::execute()`: валидация JSON, проброс в request
-4. [ ] В runners (PiAgentRunner, CodexAgentRunner): timeout → process timeout
-5. [ ] В prompt builder: context → previousContext секция
-6. [ ] Unit-тесты: RunCommand options, AgentRunRequestVo, prompt builder
-7. [ ] Обновить документацию команды
+1. [x] Добавить `--timeout` и `--context` в `RunCommand::configure()`
+2. [x] Добавить поля в DTO: `AgentRunRequestVo` (timeout, context)
+3. [x] В `RunCommand::execute()`: валидация JSON, проброс в request
+4. [x] В runners (PiAgentRunner, CodexAgentRunner): timeout → process timeout
+5. [x] В prompt builder: context → previousContext секция
+6. [x] Unit-тесты: RunCommand options, AgentRunRequestVo, prompt builder
+7. [x] Обновить документацию команды
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] `app:agent:run --role dev --task "..." --timeout 300` завершается за ≤300 сек или Killed
-- [ ] `app:agent:run --role dev --task "..." --context '{"key":"value"}'` — агент видит context
-- [ ] Невалидный JSON в `--context` даёт ошибку
-- [ ] Psalm, PHPUnit зелёные
-- [ ] Deptrac не нарушен
+- [x] `app:agent:run --role dev --task "..." --timeout 300` завершается за ≤300 сек или Killed
+- [x] `app:agent:run --role dev --task "..." --context '{"key":"value"}'` — агент видит context
+- [x] Невалидный JSON в `--context` даёт ошибку
+- [x] Psalm, PHPUnit зелёные
+- [x] Deptrac не нарушен
 
 ## 6. Verification (Самопроверка)
 ```bash
