@@ -89,7 +89,7 @@ bash docs/agents/skills/run-pi-subagent/scripts/watch-subagent.sh -h
 ## Инструкции для сабагента
 
 **Ветка:** task/feat-watch-subagent-runner-param (уже создана и активна)
-**PR:** будет создан draft PR из task/feat-watch-subagent-runner-param в task/epic-feat-subagent-delegation-and-task-chains
+**PR:** уже создан (draft) из task/feat-watch-subagent-runner-param в task/epic-feat-subagent-delegation-and-task-chains — [PR #195](https://github.com/prikotov/task-orchestrator/pull/195)
 
 ### Порядок действий
 1. Переключись в ветку `task/feat-watch-subagent-runner-param`: `git checkout task/feat-watch-subagent-runner-param`
