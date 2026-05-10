@@ -120,8 +120,45 @@ mkfifo "$PIPE"
 
 PI_PID=""
 
+# Рекурсивно собрать все PID-потомки процесса
+_get_descendants() {
+    local pid=$1
+    local children
+    children=$(pgrep -P "$pid" 2>/dev/null || true)
+    for child in $children; do
+        echo "$child"
+        _get_descendants "$child"
+    done
+}
+
+# Убиваем pi и ВСЕ его дочерние процессы (включая orphaned)
+kill_pi_tree() {
+    if [[ -n "$PI_PID" ]]; then
+        # 1. SIGTERM pi (даём шанс graceful shutdown)
+        kill "$PI_PID" 2>/dev/null || true
+        # 2. Ждём до 3 сек
+        local waited=0
+        while [[ $waited -lt 3 ]] && kill -0 "$PI_PID" 2>/dev/null; do
+            sleep 1
+            waited=$((waited + 1))
+        done
+        # 3. Собираем ВСЕХ потомков (pgrep -P рекурсивно)
+        #    pi запускает дочерние процессы bash-tool с detached=true,
+        #    которые могут выжить после SIGTERM pi и не входить в его process group
+        local all_pids
+        all_pids=$(_get_descendants "$PI_PID")
+        # 4. SIGKILL всех потомков (младшие → старшие)
+        for pid in $(echo "$all_pids" | tac); do
+            kill -9 "$pid" 2>/dev/null || true
+        done
+        # 5. SIGKILL pi
+        kill -9 "$PI_PID" 2>/dev/null || true
+        PI_PID=""
+    fi
+}
+
 cleanup() {
-    [[ -n "$PI_PID" ]] && kill "$PI_PID" 2>/dev/null || true
+    kill_pi_tree
     rm -rf "$TMPDIR"
 }
 trap cleanup EXIT
@@ -134,6 +171,24 @@ PI_CMD+=(--append-system-prompt "Возьми на себя роль из фай
 "${PI_CMD[@]}" <<< "$PROMPT" > "$PIPE" 2>/dev/null &
 PI_PID=$!
 
+# Даём pi 5 сек на запуск, проверяем что он жив
+sleep 0.2
+if ! kill -0 "$PI_PID" 2>/dev/null; then
+    echo '{"type":"_watch_error","reason":"pi_start_failed"}' >&2
+    exit 1
+fi
+
+# Вычисляем таймауты: soft — основной, hard — абсолютный потолок
+# SOFT_TIMEOUT обязателен, hard не может быть < soft
+# Если -m не задан явно, hard = max(soft*2, 1200)
+EFFECTIVE_HARD=${HARD_TIMEOUT}
+if [[ -n "$SOFT_TIMEOUT" ]]; then
+    computed_hard=$((SOFT_TIMEOUT * 2))
+    if [[ $computed_hard -gt $EFFECTIVE_HARD ]]; then
+        EFFECTIVE_HARD=$computed_hard
+    fi
+fi
+
 START_TIME=$(date +%s)
 last_event_time=$START_TIME
 STREAM_RAW=false
@@ -143,6 +198,8 @@ while IFS= read -r -t "$STALL_TIMEOUT" line; do
     echo "$line" >> "$OUTFILE"
 
     last_event_time=$(date +%s)
+    now=$last_event_time
+    elapsed=$((now - START_TIME))
 
     # raw — стримим на stdout сразу
     $STREAM_RAW && echo "$line"
@@ -157,12 +214,18 @@ while IFS= read -r -t "$STALL_TIMEOUT" line; do
         exit 0
     fi
 
-    # Проверяем жёсткий таймаут
-    now=$(date +%s)
-    elapsed=$((now - START_TIME))
+    # Проверяем soft timeout — предупреждаем, но НЕ убиваем
+    if [[ -n "$SOFT_TIMEOUT" ]] && [[ $elapsed -ge $SOFT_TIMEOUT ]]; then
+        # Пишем предупреждение один раз (флаг)
+        if [[ -z "${_SOFT_WARNED:-}" ]]; then
+            _SOFT_WARNED=1
+            echo '{"type":"_watch_timeout","reason":"soft","elapsed":'${elapsed}',"limit":'${SOFT_TIMEOUT}'}' >&2
+        fi
+    fi
 
-    if [[ $elapsed -ge $HARD_TIMEOUT ]]; then
-        echo '{"type":"_watch_timeout","reason":"hard","elapsed":'${elapsed}'}' >&2
+    # Проверяем жёсткий таймаут — УБИВАЕМ
+    if [[ $elapsed -ge $EFFECTIVE_HARD ]]; then
+        echo '{"type":"_watch_timeout","reason":"hard","elapsed":'${elapsed}',"limit":'${EFFECTIVE_HARD}'}' >&2
         exit 1
     fi
 
