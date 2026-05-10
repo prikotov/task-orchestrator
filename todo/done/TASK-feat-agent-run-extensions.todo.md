@@ -10,7 +10,7 @@ epic: EPIC-feat-subagent-delegation-and-task-chains
 author: Тимлид Алекс (pi)
 assignee: Бэкендер Тони (pi)
 branch: task/feat-agent-run-extensions
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/197
 status: done
 ---
 
