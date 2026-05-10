@@ -219,6 +219,10 @@ while (true) {
 /**
  * Blocking pipe: читает из $source и пишет в $dest.
  * Завершается при EOF или ошибке записи.
+ *
+ * @param resource $source
+ * @param resource $dest
+ * @SuppressWarnings(PHPMD.ErrorControlOperator)
  */
 function pipeStream($source, $dest): void
 {
@@ -238,6 +242,14 @@ function pipeStream($source, $dest): void
 /**
  * Fallback bidirectional forwarding через stream_select.
  * Используется когда pcntl_fork недоступен.
+ */
+/**
+ * Fallback bidirectional forwarding через stream_select.
+ * Используется когда pcntl_fork недоступен.
+ *
+ * @param resource $client
+ * @param resource $upstream
+ * @SuppressWarnings(PHPMD.ErrorControlOperator)
  */
 function forwardSelect($client, $upstream): void
 {
