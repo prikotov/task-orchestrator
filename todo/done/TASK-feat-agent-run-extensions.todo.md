@@ -9,9 +9,9 @@ depends_on:
 epic: EPIC-feat-subagent-delegation-and-task-chains
 author: Тимлид Алекс (pi)
 assignee: Бэкендер Тони (pi)
-branch:
-pr:
-status: todo
+branch: task/feat-agent-run-extensions
+pr: https://github.com/prikotov/task-orchestrator/pull/197
+status: done
 ---
 
 # TASK-feat-agent-run-extensions: Расширение app:agent:run —timeout и --context
@@ -36,16 +36,16 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] `--timeout <seconds>` в `RunCommand` — ограничение общего времени выполнения
-- [ ] Timeout пробрасывается в `AgentRunRequestVo`
-- [ ] `--context <json>` в `RunCommand` — произвольный JSON как previousContext
-- [ ] Context парсится и валидируется (должен быть валидный JSON)
-- [ ] Context передаётся в prompt агента как `previousContext`
-- [ ] Unit-тесты: RunCommand с timeout, RunCommand с context
+- [x] `--timeout <seconds>` в `RunCommand` — ограничение общего времени выполнения
+- [x] Timeout пробрасывается в `AgentRunRequestVo`
+- [x] `--context <json>` в `RunCommand` — произвольный JSON как previousContext
+- [x] Context парсится и валидируется (должен быть валидный JSON)
+- [x] Context передаётся в prompt агента как `previousContext`
+- [x] Unit-тесты: RunCommand с timeout, RunCommand с context
 
 ### 🟡 Should Have (Желательно)
-- [ ] `--timeout 0` = без лимита (default)
-- [ ] Ошибка при невалидном JSON в `--context`
+- [x] `--timeout 0` = без лимита (default)
+- [x] Ошибка при невалидном JSON в `--context`
 
 ### 🟢 Could Have (Опционально)
 - [ ] `--report-file <path>` — вывод результата в файл
@@ -56,20 +56,20 @@ status: todo
 - [ ] `--provider` (отдельная задача)
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Добавить `--timeout` и `--context` в `RunCommand::configure()`
-2. [ ] Добавить поля в DTO: `AgentRunRequestVo` (timeout, context)
-3. [ ] В `RunCommand::execute()`: валидация JSON, проброс в request
-4. [ ] В runners (PiAgentRunner, CodexAgentRunner): timeout → process timeout
-5. [ ] В prompt builder: context → previousContext секция
-6. [ ] Unit-тесты: RunCommand options, AgentRunRequestVo, prompt builder
-7. [ ] Обновить документацию команды
+1. [x] Добавить `--timeout` и `--context` в `RunCommand::configure()`
+2. [x] Добавить поля в DTO: `AgentRunRequestVo` (timeout, context)
+3. [x] В `RunCommand::execute()`: валидация JSON, проброс в request
+4. [x] В runners (PiAgentRunner, CodexAgentRunner): timeout → process timeout
+5. [x] В prompt builder: context → previousContext секция
+6. [x] Unit-тесты: RunCommand options, AgentRunRequestVo, prompt builder
+7. [x] Обновить документацию команды
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] `app:agent:run --role dev --task "..." --timeout 300` завершается за ≤300 сек или Killed
-- [ ] `app:agent:run --role dev --task "..." --context '{"key":"value"}'` — агент видит context
-- [ ] Невалидный JSON в `--context` даёт ошибку
-- [ ] Psalm, PHPUnit зелёные
-- [ ] Deptrac не нарушен
+- [x] `app:agent:run --role dev --task "..." --timeout 300` завершается за ≤300 сек или Killed
+- [x] `app:agent:run --role dev --task "..." --context '{"key":"value"}'` — агент видит context
+- [x] Невалидный JSON в `--context` даёт ошибку
+- [x] Psalm, PHPUnit зелёные
+- [x] Deptrac не нарушен
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -90,6 +90,19 @@ php bin/console app:agent:run --help
 
 ## 9. Comments (Комментарии)
 Гэндальф рекомендовал расширить `app:agent:run` вместо создания новой команды `delegate`. Это первая итерация — только timeout + context. Остальные опции (--reasoning-effort, --provider, --report-file) — отдельные задачи.
+
+## Инструкции для сабагента
+
+**Ветка:** task/feat-agent-run-extensions (уже создана и активна)
+**PR:** будет создан draft PR из task/feat-agent-run-extensions в task/epic-feat-subagent-delegation-and-task-chains
+
+### Порядок действий
+1. Переключись в ветку `task/feat-agent-run-extensions`: `git checkout task/feat-agent-run-extensions`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`, `vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress`.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
