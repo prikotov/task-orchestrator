@@ -9,6 +9,8 @@ services:
       tags: ['agent.runner']
     TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface:
       tags: ['orchestrator.execution_strategy']
+    TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStepServiceInterface:
+      tags: ['chain_execution.step_runner']
 
   # --- Auto-discovery (Application + Infrastructure, Domain исключён) ---
   TaskOrchestrator\Common\:
@@ -137,11 +139,22 @@ services:
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\QualityGate\QualityGateRunner
 
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ToolStepRunnerInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\ToolStep\ToolStepRunner
+
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Agent\ResolveChainRunnerService
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetService
+
+  # Step runner strategies (tagged)
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerService:
+    arguments:
+      $runners: !tagged_iterator chain_execution.step_runner
 
   # Report format mappers
   TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\ReportResultFactory:
