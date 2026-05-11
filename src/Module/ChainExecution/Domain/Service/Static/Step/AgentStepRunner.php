@@ -11,6 +11,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPr
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\FallbackAttemptVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
@@ -120,7 +121,7 @@ final readonly class AgentStepRunner implements StepRunnerInterface
     }
 
     private function applyFallback(
-        \TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo $fallbackConfig,
+        ExecutionFallbackConfigVo $fallbackConfig,
         string $role,
         string $runnerName,
         ExecutionStepVo $step,
