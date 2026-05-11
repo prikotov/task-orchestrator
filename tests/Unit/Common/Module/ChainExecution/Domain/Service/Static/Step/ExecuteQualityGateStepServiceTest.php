@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteQualityGateStepService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteQualityGateStepService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionQualityGateVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\QualityGateResultVo;

@@ -9,7 +9,7 @@ services:
       tags: ['agent.runner']
     TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface:
       tags: ['orchestrator.execution_strategy']
-    TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteStepServiceInterface:
+    TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStepServiceInterface:
       tags: ['chain_execution.step_runner']
 
   # --- Auto-discovery (Application + Infrastructure, Domain исключён) ---
@@ -149,10 +149,10 @@ services:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetService
 
   # Step runner strategies (tagged)
-  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ResolveStepRunnerServiceInterface:
-    alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ResolveStepRunnerService
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerService
 
-  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ResolveStepRunnerService:
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerService:
     arguments:
       $runners: !tagged_iterator chain_execution.step_runner
 
