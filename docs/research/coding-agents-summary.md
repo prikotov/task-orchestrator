@@ -1,7 +1,7 @@
 # Coding Agents — Сводная таблица сравнения (финальная версия)
 
 **Дата создания:** 2026-05-09
-**Дата обновления:** 2026-05-10 (финальная версия, все 14 исследований)
+**Дата обновления:** 2026-05-11 (15 исследований, добавлен Oh My OpenAgent)
 **Эпик:** [EPIC-research-coding-agents-comparison](../../todo/EPIC-research-coding-agents-comparison.todo.md)
 **Автор:** Аналитик (Шерлок)
 
@@ -28,15 +28,16 @@
 | 3 | **Claude Code** | Пропр. | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ✅ | ✅ | ❌ | ⚠️ | ❌ | **21** | ⚠️ Частично (7/10) |
 | 4 | **Goose** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | **24** | ⚠️ Частично (7/10) |
 | 5 | **OpenCode CLI** | MIT | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ | **26** | ⚠️ Частично (7/10) |
-| 6 | **Hermes Agent** | MIT | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | **25** | ⚠️ Частично (7/10) |
-| 7 | **Warp AI (Oz)** | AGPL | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **20** | ⚠️ Частично (7/10) |
-| 8 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
-| 9 | **Gemini CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | **22** | ⚠️ Частично (6/10) |
-| 10 | **Kilo Code CLI** | MIT | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | **22** | ⚠️ Частично (6/10) |
-| 11 | **Crush** | FSL | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | **20** | ⚠️ Частично (6/10) |
-| 12 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
-| 13 | **OpenClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ✅ | ✅ | **21** | ❌ Не подходит (4/10) |
-| 14 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
+| 6 | **Oh My OpenAgent** | SUL-1.0 | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | **25** | ⚠️ Частично (7/10) |
+| 7 | **Hermes Agent** | MIT | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | **25** | ⚠️ Частично (7/10) |
+| 8 | **Warp AI (Oz)** | AGPL | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **20** | ⚠️ Частично (7/10) |
+| 9 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
+| 10 | **Gemini CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | **22** | ⚠️ Частично (6/10) |
+| 11 | **Kilo Code CLI** | MIT | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | **22** | ⚠️ Частично (6/10) |
+| 12 | **Crush** | FSL | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | **20** | ⚠️ Частично (6/10) |
+| 13 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
+| 14 | **OpenClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ✅ | ✅ | **21** | ❌ Не подходит (4/10) |
+| 15 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
 
 > **Примечание:** Вердикт включает качественную оценку (числовой score не всегда совпадает с суммой баллов — учитывается вес критериев для конкретного сценария сабагентной интеграции).
 
@@ -53,6 +54,7 @@
 | **Pi** | `--system-prompt <text>` ✅ | `--append-system-prompt <text>` ✅ | `.pi/SYSTEM.md` ✅ | `.pi/APPEND_SYSTEM.md` ✅ |
 | **Qwen Code** | `--system-prompt <text>` ✅ | `--append-system-prompt <text>` ✅ | — | — |
 | **OpenCode** | Агенты `.opencode/agent/*.md` ✅ | `instructions[]` в конфиге ✅ | — | — |
+| **OmO** | `agents.<name>.prompt` с `file://` ✅ | `agents.<name>.prompt_append` с `file://` ✅ | — | — |
 | **Hermes** | SOUL.md (файл) ⚠️ | `HERMES_EPHEMERAL_SYSTEM_PROMPT` env ⚠️ | `~/.hermes/SOUL.md` ✅ | — |
 | **Goose** | Только через config.yaml ⚠️ | `--system <text>` ✅ | `GOOSE_SYSTEM_PROMPT_FILE_PATH` ⚠️ | — |
 | **Codex CLI** | `model_instructions_file` в config ⚠️ | ❌ Нет | config.toml ✅ | — |
@@ -69,6 +71,7 @@
 | **Pi** | `--append-system-prompt` + инструкция прочитать файл ✅ | Нет (роль в промпте) |
 | **Qwen Code** | `--append-system-prompt` + инструкция прочитать файл ✅ | Нет (роль в промпте) |
 | **OpenCode** | `--agent <name>`, полная изоляция tools/permissions ✅ | ✅ Да (отдельный агент) |
+| **OmO** | `--agent <name>` + 11 Discipline Agents ✅ | ✅ Да (isolated agents + categories) |
 | **Hermes** | `HERMES_EPHEMERAL_SYSTEM_PROMPT` env / профили ⚠️ | ✅ Да (профили) |
 | **Goose** | `--system <text>` / рецепты (YAML) ⚠️ | ⚠️ Через рецепты |
 | **Codex CLI** | User prompt / profiles ⚠️ | ⚠️ Через profiles |
@@ -87,6 +90,7 @@
 | **Warp Oz** | ✅ 20+ встроенных | ✅ `--skill <spec>` | ✅ Разные через CLI |
 | **Qwen Code** | ✅ Из коробки | ❌ Нет CLI | ❌ Все глобальны |
 | **OpenCode** | ✅ Из коробки | ❌ Нет CLI | ❌ Все глобальны |
+| **OmO** | ✅ Из коробки + Skill-Embedded MCPs | ❌ Нет CLI | ⚠️ Через `task(load_skills=[])` |
 | **Goose** | ✅ Плагины | ❌ Нет CLI | ❌ Все глобальны |
 | **Codex CLI** | ⚠️ Глобальные скиллы | ❌ Нет CLI | ❌ Все глобальны |
 | **Gemini CLI** | ⚠️ Установка/ссылки | ❌ Нет CLI | ❌ Все глобальны |
@@ -101,6 +105,7 @@
 | **Pi** | ✅ Авто | ✅ Авто | `.pi/SYSTEM.md` | `--no-context-files` |
 | **Qwen Code** | ✅ Авто | — | `QWEN.md` | Нет |
 | **OpenCode** | ✅ Авто | ✅ Авто | — | Нет |
+| **OmO** | ✅ Авто + `/init-deep` (иерархический) | ✅ Авто + Claude Code compat | — | Нет |
 | **Hermes** | ✅ Progressive discovery | ✅ | `.hermes.md` | `--ignore-rules` |
 | **Goose** | ✅ Авто | — | `.goosehints` | Нет |
 | **Codex CLI** | ✅ Авто | — | — | Нет |
@@ -117,6 +122,7 @@
 | **Pi** | ✅ | `.pi/skills/`, `settings.json` | `--skill` или `settings.json` |
 | **Qwen Code** | ✅ | `.qwen/skills/` | Симлинк |
 | **OpenCode** | ✅ | `.opencode/skill/`, `skills.paths` | `skills.paths` в конфиге |
+| **OmO** | ✅ + Skill-Embedded MCPs | `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` | `skills.paths` в конфиге / symlink |
 | **Hermes** | ✅ (через `external_dirs`) | `~/.hermes/skills/` | `skills.external_dirs` |
 | **Goose** | ✅ | `.goose/skills/`, `.claude/skills/` | Симлинк |
 | **Codex CLI** | ❌ | `~/.codex/skills/` | Копия в `~/.codex/skills/` |
@@ -135,6 +141,8 @@
 | **Claude Code** | `--print --output-format json` ✅ | По умолчанию (без --resume) | `--max-turns`, `--max-budget-usd` | ✅ stream-json |
 | **Goose** | `--output-format stream-json` ✅ | `--no-session` ✅ | Внешний timeout | ⚠️ message, complete |
 | **OpenCode** | `--format json` ⚠️ | Нет (сессия в SQLite) | Внешний timeout | ❌ Только step_start/text/finish |
+| **OmO** | `--json` runner ⚠️ | Нет (сессия в SQLite) | Внешний timeout | ❌ Structured result only |
+| **OmO Team** | 12 `team_*` tools ⚠️ | Нет | `max_wall_clock_minutes` в config | ❌ Mailbox-based |
 | **Hermes** | ❌ Plain text (`hermes -z`) | Нет | Внешний timeout | ❌ Нет |
 | **Codex CLI** | `--json` ⚠️ | `--ephemeral` ✅ | Внешний timeout | ❌ Бедные события |
 | **Gemini CLI** | `-o stream-json` ✅ | Нет | Внешний timeout | ✅ tool_use / tool_result |
@@ -151,6 +159,7 @@
 | **Claude Code** | ✅ Полная | ✅ `total_cost_usd` | ✅ `modelUsage` |
 | **Gemini CLI** | ✅ Полная (input, output, cached, thoughts) | ❌ Только токены | ✅ Per-model |
 | **OpenCode** | ✅ В step_finish | ✅ `cost` в USD | ✅ `opencode stats` |
+| **OmO** | ✅ В step_finish + context-window-monitor | ✅ `cost` в USD | ✅ `opencode stats` + dynamic pruning |
 | **Qwen Code** | ✅ В JSON output | ❌ Только токены | ❌ |
 | **Kilo Code** | ✅ `kilo stats` CLI | ❌ Только токены | ✅ `--models` флаг |
 | **Hermes** | ❌ Нет при `hermes -z` | ❌ Только через API Server | ❌ |
@@ -167,6 +176,7 @@
 | **Pi** | MIT | ✅ Полностью бесплатный | ✅ | ✅ Ollama, LM Studio, vLLM |
 | **Qwen Code** | Apache-2.0 | ⚠️ OAuth free tier прекращён | ✅ | ✅ Ollama, vLLM, LM Studio |
 | **OpenCode** | MIT | ✅ + 5 бесплатных моделей Zen | ✅ | ✅ Через кастомный провайдер |
+| **OmO** | SUL-1.0 | ✅ + 4+ бесплатных модели Zen | ✅ | ✅ Через кастомный провайдер |
 | **Hermes** | MIT | ✅ + Google Gemini OAuth free | ✅ | ✅ LM Studio, Ollama |
 | **Goose** | Apache-2.0 | ✅ | ✅ | ✅ Ollama, LM Studio, Docker |
 | **Gemini CLI** | Apache-2.0 | ✅ 60 RPM / 1000 запросов/день | ⚠️ Только Gemini | ❌ Нет |
@@ -181,6 +191,7 @@
 | Агент | Кол-во провайдеров | Ключевые провайдеры | OpenRouter | Локальные модели |
 |-------|-------------------|--------------------|-----------|-----------------|
 | **OpenCode** | 75+ | Все через models.dev | ✅ | ✅ |
+| **OmO** | 75+ (plugin для OpenCode) | Все через models.dev + Category System | ✅ | ✅ |
 | **OpenClaw** | 40+ | OpenAI, Anthropic, Google, ZAI, DeepSeek... | ✅ | ✅ Ollama, LM Studio |
 | **Hermes** | 30+ | OpenRouter, OpenAI, Anthropic, Google, DeepSeek... | ✅ | ✅ LM Studio, Ollama |
 | **Goose** | 30+ | OpenAI, Anthropic, Google, Ollama, Groq, Cerebras... | ✅ | ✅ Ollama, LM Studio, Docker |
@@ -199,6 +210,7 @@
 | **Pi** | MIT | ✅ | ✅ | ❌ Нет |
 | **Qwen Code** | Apache-2.0 | ✅ | ✅ | ❌ Нет |
 | **OpenCode** | MIT | ✅ | ✅ | ❌ Нет |
+| **OmO** | SUL-1.0 | ✅ | ⚠️ Только internal use | ❌ Нет (коммерческое распространение запрещено) |
 | **Hermes** | MIT | ✅ | ✅ | ❌ Нет |
 | **Goose** | Apache-2.0 (Linux Foundation) | ✅ | ✅ | ❌ Нет |
 | **Codex CLI** | Apache-2.0 | ✅ | ✅ | ❌ Нет |
@@ -412,6 +424,7 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 | 2 | Qwen Code | [qwen-cli-comparison.md](coding-agents/qwen-cli-comparison.md) | ✅ Подходит (8/10) |
 | 3 | Claude Code | [claude-code-agent-comparison.md](coding-agents/claude-code-agent-comparison.md) | ⚠️ Частично (7/10) |
 | 4 | OpenCode CLI | [opencode-cli-comparison.md](coding-agents/opencode-cli-comparison.md) | ⚠️ Частично (7/10) |
+| 5 | Oh My OpenAgent | [oh-my-openagent-comparison.md](coding-agents/oh-my-openagent-comparison.md) | ⚠️ Частично (7/10) |
 | 5 | Goose | [goose-agent-comparison.md](coding-agents/goose-agent-comparison.md) | ⚠️ Частично (7/10) |
 | 6 | Hermes Agent | [hermes-agent-comparison.md](coding-agents/hermes-agent-comparison.md) | ⚠️ Частично (7/10) |
 | 7 | Warp AI (Oz) | [warp-agent-comparison.md](coding-agents/warp-agent-comparison.md) | ⚠️ Частично (7/10) |
@@ -434,6 +447,7 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 | Pi Coding Agent | TypeScript/Node.js | MIT | 20+ | 10/10 |
 | Qwen Code | TypeScript/Node.js | Apache-2.0 | 3 протокола | 8/10 |
 | OpenCode CLI | TypeScript/Go | MIT | 75+ | 7/10 |
+| Oh My OpenAgent | TypeScript/Bun (plugin) | SUL-1.0 | 75+ (OpenCode) | 7/10 |
 | Hermes Agent | Python | MIT | 30+ | 7/10 |
 | Goose | Rust | Apache-2.0 | 30+ | 7/10 |
 | Warp Oz | Rust | AGPL-3.0/MIT | 4 BYOK + 4 harness | 7/10 |
