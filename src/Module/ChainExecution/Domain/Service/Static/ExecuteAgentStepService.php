@@ -4,68 +4,65 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static;
 
-use Psr\Log\LoggerInterface;
+use Override;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Agent\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRoleConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\FallbackAttemptVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 
 /**
- * Выполнение отдельного шага static-цепочки: agent-step, quality-gate, fallback.
+ * Сервис выполнения agent-шага static-цепочки.
  *
- * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
- * @todo PHPMD bug: multi-file analysis inflates LOC counts. Recheck after PHPMD upgrade.
+ * Выполняет AI-агента, обрабатывает fallback при ошибке,
+ * усекает контекст при превышении лимита.
  */
-final readonly class ExecuteStaticStepService
+final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterface
 {
-    private const string QUALITY_GATE_RUNNER_NAME = 'shell';
-
     public function __construct(
         private RunAgentServiceInterface $agentRunner,
         private ResolveChainRunnerServiceInterface $runnerHelper,
         private FormatPromptServiceInterface $formatter,
-        private ?QualityGateRunnerInterface $qualityGateRunner = null,
-        private ?LoggerInterface $logger = null,
     ) {
     }
 
-    public function runAgentStep(
-        ExecutionStepVo $step,
-        string $task,
-        ?string $workingDir,
-        int $timeout,
-        ?string $previousContext,
-        ?int $iterationNumber,
-        ?ExecutionRoleConfigVo $roleConfig,
-        bool $noContextFiles = false,
-    ): StaticStepResultVo {
+    #[Override]
+    public function supports(ChainStepTypeEnum $type): bool
+    {
+        return $type === ChainStepTypeEnum::agent;
+    }
+
+    #[Override]
+    public function run(ExecutionStepVo $step, StepContextVo $context): StaticStepResultVo
+    {
         $role = $step->getRole() ?? '';
-        $context = $previousContext !== null
+        $formattedContext = $context->previousContext !== null
             ? $this->formatter->buildStaticContext(
                 $role,
-                $previousContext,
-                $task,
+                $context->previousContext,
+                $context->task,
             )
             : null;
 
         $runnerName = $step->getRunner();
         $request = new ChainRunRequestVo(
             role: $role,
-            task: $task,
+            task: $context->task,
             systemPrompt: null,
-            previousContext: $context,
+            previousContext: $formattedContext,
             model: $step->getModel(),
             tools: $step->getTools(),
-            workingDir: $workingDir,
-            timeout: $roleConfig?->getTimeout() ?? $timeout,
-            command: $roleConfig?->getCommand() ?? [],
+            workingDir: $context->workingDir,
+            timeout: $context->roleConfig?->getTimeout() ?? $context->timeout,
+            command: $context->roleConfig?->getCommand() ?? [],
             runnerName: $runnerName,
-            noContextFiles: $noContextFiles || $step->hasNoContextFiles(),
+            noContextFiles: $context->noContextFiles || $step->hasNoContextFiles(),
         );
 
         $start = microtime(true);
@@ -74,7 +71,7 @@ final readonly class ExecuteStaticStepService
         $duration = microtime(true) - $start;
 
         $fallbackRunnerUsed = null;
-        $fallbackConfig = $roleConfig?->getFallback();
+        $fallbackConfig = $context->roleConfig?->getFallback();
         $timedOut = $result->isTimedOut();
         if ($result->isError() && $fallbackConfig !== null) {
             $fallbackResult = $this->applyFallback(
@@ -83,7 +80,7 @@ final readonly class ExecuteStaticStepService
                 $runnerName,
                 $step,
                 $request,
-                $roleConfig?->getPromptFile(),
+                $context->roleConfig?->getPromptFile(),
             );
             $duration += $fallbackResult->extraDuration;
             $fallbackRunnerUsed = $fallbackResult->fallbackRunnerName;
@@ -118,73 +115,8 @@ final readonly class ExecuteStaticStepService
             isError: $result->isError(),
             errorMessage: $result->getErrorMessage(),
             fallbackRunnerUsed: $fallbackRunnerUsed,
-            iterationNumber: $iterationNumber,
+            iterationNumber: $context->iterationNumber,
             timedOut: $timedOut,
-        );
-    }
-
-    public function runQualityGate(
-        ExecutionStepVo $step,
-    ): StaticStepResultVo {
-        if ($this->qualityGateRunner === null) {
-            return new StaticStepResultVo(
-                role: 'quality_gate',
-                runner: self::QUALITY_GATE_RUNNER_NAME,
-                outputText: '',
-                inputTokens: 0,
-                outputTokens: 0,
-                cost: 0.0,
-                duration: 0.0,
-                isError: false,
-                label: $step->getLabel(),
-                passed: true,
-            );
-        }
-
-        $result = $this->qualityGateRunner->run($step->toQualityGateVo());
-        $duration = $result->durationMs / 1000.0;
-
-        if (!$result->passed) {
-            $this->logger?->warning(
-                sprintf(
-                    '[StaticChainExecutor] Quality gate "%s" failed (exit code %d): %s',
-                    $result->label,
-                    $result->exitCode,
-                    $result->output,
-                ),
-            );
-        }
-
-        return new StaticStepResultVo(
-            role: 'quality_gate',
-            runner: self::QUALITY_GATE_RUNNER_NAME,
-            outputText: $result->output,
-            inputTokens: 0,
-            outputTokens: 0,
-            cost: 0.0,
-            duration: $duration,
-            isError: false,
-            label: $result->label,
-            passed: $result->passed,
-            exitCode: $result->exitCode,
-        );
-    }
-
-    public function createAgentResultFromStep(
-        StaticStepResultVo $stepResult,
-    ): ChainRunResultVo {
-        if ($stepResult->isError) {
-            return ChainRunResultVo::createError(
-                $stepResult->errorMessage ?? 'unknown',
-                timedOut: $stepResult->timedOut,
-            );
-        }
-
-        return ChainRunResultVo::createSuccess(
-            $stepResult->outputText,
-            $stepResult->inputTokens,
-            $stepResult->outputTokens,
-            cost: $stepResult->cost,
         );
     }
 
@@ -225,10 +157,10 @@ final readonly class ExecuteStaticStepService
 
     private function truncateRequestContext(ChainRunRequestVo $request): ChainRunRequestVo
     {
-        $context = $request->getPreviousContext();
+        $contextStr = $request->getPreviousContext();
         $maxLength = $request->getMaxContextLength();
 
-        if ($context === null || strlen($context) <= $maxLength) {
+        if ($contextStr === null || strlen($contextStr) <= $maxLength) {
             return $request;
         }
 
@@ -236,7 +168,7 @@ final readonly class ExecuteStaticStepService
             role: $request->getRole(),
             task: $request->getTask(),
             systemPrompt: $request->getSystemPrompt(),
-            previousContext: substr($context, -$maxLength),
+            previousContext: substr($contextStr, -$maxLength),
             model: $request->getModel(),
             tools: $request->getTools(),
             workingDir: $request->getWorkingDir(),
