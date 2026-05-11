@@ -34,7 +34,7 @@ PROMPT
 | `--role-file`     | `-r`       | Путь к файлу описания роли (обязателен)                      | —            |
 | `--runner`        | —          | Раннер: `pi` или `codex` (env `RUNNER`)                      | `pi`         |
 | `--model`         | —          | Модель (env `MODEL`)                                         | —            |
-| `--reasoning`     | —          | Reasoning effort для codex (`-c model_reasoning_effort=...`) | —            |
+| `--reasoning`     | —          | Reasoning/thinking effort (pi: `--thinking`, codex: `-c model_reasoning_effort=...`) | —            |
 | `[prompt text]`   | —          | Промпт. Если не указан — читается из stdin                   | —            |
 
 ### Приоритет параметров
@@ -105,6 +105,14 @@ PROMPT
 # Делегирование через codex
 scripts/watch-subagent.sh --runner codex -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
 Выполни задачу: todo/TASK-feat-example.todo.md.
+PROMPT
+```
+
+Примеры с reasoning:
+```bash
+# pi с thinking level
+scripts/watch-subagent.sh --reasoning high -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
+<prompt>
 PROMPT
 ```
 

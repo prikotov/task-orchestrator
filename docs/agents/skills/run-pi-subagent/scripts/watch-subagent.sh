@@ -16,7 +16,7 @@
 #   -r, --role-file <file> — путь к файлу описания роли (обязателен).
 #   --runner <pi|codex>  — раннер (default: pi; env RUNNER).
 #   --model <string>     — модель (env MODEL).
-#   --reasoning <string> — reasoning effort для codex (→ -c model_reasoning_effort=...).
+#   --reasoning <string> — reasoning/thinking effort (pi: → --thinking, codex: → -c model_reasoning_effort=...).
 #   [prompt text]        — промпт. Если не указан — читается из stdin.
 #
 # Выход:
@@ -129,6 +129,7 @@ build_runner_command() {
         pi)
             RUNNER_CMD=(pi --mode json --no-session --system-prompt "$SYSTEM_PROMPT_FILE")
             [[ -n "$MODEL" ]] && RUNNER_CMD+=(--model "$MODEL")
+            [[ -n "$REASONING" ]] && RUNNER_CMD+=(--thinking "$REASONING")
             RUNNER_CMD+=(--append-system-prompt "Возьми на себя роль из файла: $ROLE_FILE")
             ;;
         codex)
