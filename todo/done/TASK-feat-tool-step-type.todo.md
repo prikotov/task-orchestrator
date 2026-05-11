@@ -9,9 +9,9 @@ depends_on:
 epic: EPIC-feat-subagent-delegation-and-task-chains
 author: Тимлид Алекс (pi)
 assignee: Бэкендер Левша (pi)
-branch:
-pr:
-status: todo
+branch: task/feat-tool-step-type
+pr: https://github.com/prikotov/task-orchestrator/pull/196
+status: done
 ---
 
 # TASK-feat-tool-step-type: Тип шага tool в цепочках
@@ -103,6 +103,19 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ## 9. Comments (Комментарии)
 Команда сошлась на урезанной версии (Тони, Гэндальф). Локи предупредил о риске разрастания — принято, scope ограничен. Если tool-шаг понадобится расширить — отдельная задача с обоснованием.
+
+## Инструкции для сабагента
+
+**Ветка:** task/feat-tool-step-type (уже создана и активна)
+**PR:** уже создан (draft) из task/feat-tool-step-type в task/epic-feat-subagent-delegation-and-task-chains — [PR #196](https://github.com/prikotov/task-orchestrator/pull/196)
+
+### Порядок действий
+1. Переключись в ветку `task/feat-tool-step-type`: `git checkout task/feat-tool-step-type`
+2. Реализуй задачу согласно описанию.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`, `vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress`.
+6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
