@@ -130,7 +130,7 @@ flowchart LR
 - [ ] Deptrac не нарушен
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
-- [ ] Обновить документацию `docs/agents/skills/run-pi-subagent/SKILL.md` — добавить `--runner`
+- [ ] Обновить документацию `docs/agents/skills/run-subagent/SKILL.md` — добавить `--runner`
 - [ ] Обновить `docs/guide/chains.md` — добавить описание `tool`-шагов
 - [ ] Обновить `config/chains.yaml.example` — добавить пример `tool`-шага
 
@@ -145,7 +145,7 @@ flowchart LR
 - [ ] [Отчёт Гэндальфа](docs/agents/reports/system-architect/)
 - [ ] [task-via-subagents SKILL.md](docs/agents/skills/task-via-subagents/SKILL.md)
 - [ ] [epic-via-subagents SKILL.md](docs/agents/skills/epic-via-subagents/SKILL.md)
-- [ ] [run-pi-subagent SKILL.md](docs/agents/skills/run-pi-subagent/SKILL.md)
+- [ ] [run-subagent SKILL.md](docs/agents/skills/run-subagent/SKILL.md)
 - [ ] [chains.yaml](config/chains.yaml)
 
 ## 10. Comments (Комментарии)
