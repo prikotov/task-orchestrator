@@ -97,8 +97,6 @@ php bin/console app:agent:run --role=<role> --task=<task> [options]
 | `--model` | `-m` | Модель LLM | — |
 | `--tools` | — | Список инструментов | — |
 | `--working-dir` | `-d` | Рабочая директория | — |
-| `--timeout` | — | Таймаут выполнения агента в секундах (0 = без лимита) | `300` |
-| `--context` | — | Дополнительный контекст для агента (JSON-строка) | — |
 
 **Примеры:**
 
@@ -108,15 +106,6 @@ php bin/console app:agent:run -r system_analyst -t "Analyze requirements for pay
 
 # С кастомной моделью
 php bin/console app:agent:run -r backend_developer -t "Implement DTO" -m claude-4-sonnet
-
-# С таймаутом 600 секунд
-php bin/console app:agent:run -r backend_developer -t "Implement DTO" --timeout 600
-
-# С дополнительным контекстом
-php bin/console app:agent:run -r backend_developer -t "Implement DTO" --context '{"project":"task-orchestrator","language":"PHP"}'
-
-# Без лимита времени
-php bin/console app:agent:run -r backend_developer -t "Refactor module" --timeout 0
 ```
 
 Метрики (tokens, cost, turns) отображаются при запуске с `-v`.

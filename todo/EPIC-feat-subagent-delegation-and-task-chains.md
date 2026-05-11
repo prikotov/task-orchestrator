@@ -7,9 +7,8 @@ complexity: C4
 priority: P1
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
-branch: task/epic-feat-subagent-delegation-and-task-chains
-status: done
-pr: https://github.com/prikotov/task-orchestrator/pull/194
+status: todo
+pr:
 ---
 
 # EPIC-feat-subagent-delegation-and-task-chains: Делегирование сабагентов и оцифровка task-workflow
@@ -114,10 +113,10 @@ flowchart LR
 
 ## 5. Implementation Plan (План реализации)
 
-- [x] [TASK-feat-watch-subagent-runner-param](done/TASK-feat-watch-subagent-runner-param.todo.md) — Параметризация `watch-subagent.sh`: `--runner`, `--model`, env-фолбэки, поддержка codex
-- [x] [TASK-feat-tool-step-type](done/TASK-feat-tool-step-type.todo.md) — Тип шага `tool` в цепочках: enum, handler, загрузка YAML, context propagation
-- [x] [TASK-feat-task-implement-chain](done/TASK-feat-task-implement-chain.todo.md) — Шаблонная цепочка `task-implement` в `chains.yaml` с fix_iterations
-- [x] [TASK-feat-agent-run-extensions](done/TASK-feat-agent-run-extensions.todo.md) — Расширение `app:agent:run`: `--timeout`, `--context`
+- [ ] [TASK-feat-watch-subagent-runner-param](TASK-feat-watch-subagent-runner-param.todo.md) — Параметризация `watch-subagent.sh`: `--runner`, `--model`, env-фолбэки, поддержка codex
+- [ ] [TASK-feat-tool-step-type](TASK-feat-tool-step-type.todo.md) — Тип шага `tool` в цепочках: enum, handler, загрузка YAML, context propagation
+- [ ] [TASK-feat-task-implement-chain](TASK-feat-task-implement-chain.todo.md) — Шаблонная цепочка `task-implement` в `chains.yaml` с fix_iterations
+- [ ] [TASK-feat-agent-run-extensions](TASK-feat-agent-run-extensions.todo.md) — Расширение `app:agent:run`: `--timeout`, `--context`
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [ ] `watch-subagent.sh --runner codex -s 600 -r <role>` запускает codex
@@ -130,7 +129,7 @@ flowchart LR
 - [ ] Deptrac не нарушен
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
-- [ ] Обновить документацию `docs/agents/skills/run-subagent/SKILL.md` — добавить `--runner`
+- [ ] Обновить документацию `docs/agents/skills/run-pi-subagent/SKILL.md` — добавить `--runner`
 - [ ] Обновить `docs/guide/chains.md` — добавить описание `tool`-шагов
 - [ ] Обновить `config/chains.yaml.example` — добавить пример `tool`-шага
 
@@ -145,7 +144,7 @@ flowchart LR
 - [ ] [Отчёт Гэндальфа](docs/agents/reports/system-architect/)
 - [ ] [task-via-subagents SKILL.md](docs/agents/skills/task-via-subagents/SKILL.md)
 - [ ] [epic-via-subagents SKILL.md](docs/agents/skills/epic-via-subagents/SKILL.md)
-- [ ] [run-subagent SKILL.md](docs/agents/skills/run-subagent/SKILL.md)
+- [ ] [run-pi-subagent SKILL.md](docs/agents/skills/run-pi-subagent/SKILL.md)
 - [ ] [chains.yaml](config/chains.yaml)
 
 ## 10. Comments (Комментарии)

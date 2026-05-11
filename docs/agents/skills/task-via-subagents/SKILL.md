@@ -4,7 +4,7 @@ description: >
   Конвейер обработки одиночной задачи: подготовка → реализация через сабагента →
   self-review → code review → доработка → commit/push → PR → merge.
 depends_on:
-  - run-subagent
+  - run-pi-subagent
 ---
 
 # Обработка одиночной задачи через сабагентов
@@ -51,7 +51,7 @@ main
 
 ### **Шаг 2:** Реализация
 
-Запусти сабагента-исполнителя через скилл [`run-subagent`](../run-subagent/SKILL.md).
+Запусти сабагента-исполнителя через скилл [`run-pi-subagent`](../run-pi-subagent/SKILL.md).
 
 > `<role-title>` — заголовок роли из поля `title` файла роли (например, `Бэкендер Левша`).
 

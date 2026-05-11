@@ -2,66 +2,70 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static;
 
-use Override;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
+use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Agent\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRoleConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\FallbackAttemptVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 
 /**
- * Стратегия выполнения agent-шага static-цепочки.
+ * Выполнение отдельного шага static-цепочки: agent-step, quality-gate, fallback.
  *
- * Выполняет AI-агента, обрабатывает fallback при ошибке,
- * усекает контекст при превышении лимита.
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ * @todo PHPMD bug: multi-file analysis inflates LOC counts. Recheck after PHPMD upgrade.
  */
-final readonly class AgentStepRunner implements StepRunnerInterface
+final readonly class ExecuteStaticStepService
 {
+    private const string QUALITY_GATE_RUNNER_NAME = 'shell';
+
     public function __construct(
         private RunAgentServiceInterface $agentRunner,
         private ResolveChainRunnerServiceInterface $runnerHelper,
         private FormatPromptServiceInterface $formatter,
+        private ?QualityGateRunnerInterface $qualityGateRunner = null,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
-    #[Override]
-    public function supports(ChainStepTypeEnum $type): bool
-    {
-        return $type === ChainStepTypeEnum::agent;
-    }
-
-    #[Override]
-    public function run(ExecutionStepVo $step, StepContextVo $context): StaticStepResultVo
-    {
+    public function runAgentStep(
+        ExecutionStepVo $step,
+        string $task,
+        ?string $workingDir,
+        int $timeout,
+        ?string $previousContext,
+        ?int $iterationNumber,
+        ?ExecutionRoleConfigVo $roleConfig,
+        bool $noContextFiles = false,
+    ): StaticStepResultVo {
         $role = $step->getRole() ?? '';
-        $formattedContext = $context->previousContext !== null
+        $context = $previousContext !== null
             ? $this->formatter->buildStaticContext(
                 $role,
-                $context->previousContext,
-                $context->task,
+                $previousContext,
+                $task,
             )
             : null;
 
         $runnerName = $step->getRunner();
         $request = new ChainRunRequestVo(
             role: $role,
-            task: $context->task,
+            task: $task,
             systemPrompt: null,
-            previousContext: $formattedContext,
+            previousContext: $context,
             model: $step->getModel(),
             tools: $step->getTools(),
-            workingDir: $context->workingDir,
-            timeout: $context->roleConfig?->getTimeout() ?? $context->timeout,
-            command: $context->roleConfig?->getCommand() ?? [],
+            workingDir: $workingDir,
+            timeout: $roleConfig?->getTimeout() ?? $timeout,
+            command: $roleConfig?->getCommand() ?? [],
             runnerName: $runnerName,
-            noContextFiles: $context->noContextFiles || $step->hasNoContextFiles(),
+            noContextFiles: $noContextFiles || $step->hasNoContextFiles(),
         );
 
         $start = microtime(true);
@@ -70,7 +74,7 @@ final readonly class AgentStepRunner implements StepRunnerInterface
         $duration = microtime(true) - $start;
 
         $fallbackRunnerUsed = null;
-        $fallbackConfig = $context->roleConfig?->getFallback();
+        $fallbackConfig = $roleConfig?->getFallback();
         $timedOut = $result->isTimedOut();
         if ($result->isError() && $fallbackConfig !== null) {
             $fallbackResult = $this->applyFallback(
@@ -79,7 +83,7 @@ final readonly class AgentStepRunner implements StepRunnerInterface
                 $runnerName,
                 $step,
                 $request,
-                $context->roleConfig?->getPromptFile(),
+                $roleConfig?->getPromptFile(),
             );
             $duration += $fallbackResult->extraDuration;
             $fallbackRunnerUsed = $fallbackResult->fallbackRunnerName;
@@ -114,13 +118,78 @@ final readonly class AgentStepRunner implements StepRunnerInterface
             isError: $result->isError(),
             errorMessage: $result->getErrorMessage(),
             fallbackRunnerUsed: $fallbackRunnerUsed,
-            iterationNumber: $context->iterationNumber,
+            iterationNumber: $iterationNumber,
             timedOut: $timedOut,
         );
     }
 
+    public function runQualityGate(
+        ExecutionStepVo $step,
+    ): StaticStepResultVo {
+        if ($this->qualityGateRunner === null) {
+            return new StaticStepResultVo(
+                role: 'quality_gate',
+                runner: self::QUALITY_GATE_RUNNER_NAME,
+                outputText: '',
+                inputTokens: 0,
+                outputTokens: 0,
+                cost: 0.0,
+                duration: 0.0,
+                isError: false,
+                label: $step->getLabel(),
+                passed: true,
+            );
+        }
+
+        $result = $this->qualityGateRunner->run($step->toQualityGateVo());
+        $duration = $result->durationMs / 1000.0;
+
+        if (!$result->passed) {
+            $this->logger?->warning(
+                sprintf(
+                    '[StaticChainExecutor] Quality gate "%s" failed (exit code %d): %s',
+                    $result->label,
+                    $result->exitCode,
+                    $result->output,
+                ),
+            );
+        }
+
+        return new StaticStepResultVo(
+            role: 'quality_gate',
+            runner: self::QUALITY_GATE_RUNNER_NAME,
+            outputText: $result->output,
+            inputTokens: 0,
+            outputTokens: 0,
+            cost: 0.0,
+            duration: $duration,
+            isError: false,
+            label: $result->label,
+            passed: $result->passed,
+            exitCode: $result->exitCode,
+        );
+    }
+
+    public function createAgentResultFromStep(
+        StaticStepResultVo $stepResult,
+    ): ChainRunResultVo {
+        if ($stepResult->isError) {
+            return ChainRunResultVo::createError(
+                $stepResult->errorMessage ?? 'unknown',
+                timedOut: $stepResult->timedOut,
+            );
+        }
+
+        return ChainRunResultVo::createSuccess(
+            $stepResult->outputText,
+            $stepResult->inputTokens,
+            $stepResult->outputTokens,
+            cost: $stepResult->cost,
+        );
+    }
+
     private function applyFallback(
-        \TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo $fallbackConfig,
+        ExecutionFallbackConfigVo $fallbackConfig,
         string $role,
         string $runnerName,
         ExecutionStepVo $step,
@@ -156,10 +225,10 @@ final readonly class AgentStepRunner implements StepRunnerInterface
 
     private function truncateRequestContext(ChainRunRequestVo $request): ChainRunRequestVo
     {
-        $contextStr = $request->getPreviousContext();
+        $context = $request->getPreviousContext();
         $maxLength = $request->getMaxContextLength();
 
-        if ($contextStr === null || strlen($contextStr) <= $maxLength) {
+        if ($context === null || strlen($context) <= $maxLength) {
             return $request;
         }
 
@@ -167,7 +236,7 @@ final readonly class AgentStepRunner implements StepRunnerInterface
             role: $request->getRole(),
             task: $request->getTask(),
             systemPrompt: $request->getSystemPrompt(),
-            previousContext: substr($contextStr, -$maxLength),
+            previousContext: substr($context, -$maxLength),
             model: $request->getModel(),
             tools: $request->getTools(),
             workingDir: $request->getWorkingDir(),

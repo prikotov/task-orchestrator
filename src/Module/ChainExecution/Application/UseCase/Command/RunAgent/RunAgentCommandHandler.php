@@ -32,7 +32,6 @@ final readonly class RunAgentCommandHandler
             role: $command->role,
             task: $command->task,
             systemPrompt: $systemPrompt,
-            previousContext: $command->previousContext,
             model: $command->model,
             tools: $command->tools,
             workingDir: $command->workingDir,

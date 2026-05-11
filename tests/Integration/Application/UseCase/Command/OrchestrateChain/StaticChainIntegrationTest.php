@@ -18,13 +18,10 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\Or
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStaticStepService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunStaticChainService;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\AgentStepRunner;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\QualityGateStepRunner;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\StepRunnerResolver;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ToolStepRunnerStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapper;
 
@@ -32,7 +29,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefin
  * Integration-тест: static chain end-to-end.
  *
  * Проверяет полный цикл: YAML-конфигурация → YamlChainLoader → OrchestrateChainCommandHandler
- * → StaticExecutionStrategy → RunStaticChainService → StepRunnerResolver → AgentStepRunner → RunAgentServiceInterface (stub)
+ * → StaticExecutionStrategy → RunStaticChainService → ExecuteStaticStepService → RunAgentServiceInterface (stub)
  * → OrchestrateChainResultDto.
  *
  * Внешние зависимости (AI-агент) подменяются стабом. Все внутренние слои — реальные объекты.
@@ -42,8 +39,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefin
 #[CoversClass(StaticExecutionStrategy::class)]
 #[CoversClass(ExecuteStaticChainService::class)]
 #[CoversClass(RunStaticChainService::class)]
-#[CoversClass(StepRunnerResolver::class)]
-#[CoversClass(AgentStepRunner::class)]
+#[CoversClass(ExecuteStaticStepService::class)]
 #[CoversClass(YamlChainLoader::class)]
 final class StaticChainIntegrationTest extends TestCase
 {
@@ -70,22 +66,18 @@ final class StaticChainIntegrationTest extends TestCase
             static fn(string $role, string $previousOutput, string $task): string => $previousOutput,
         );
 
-        $agentStepRunner = new AgentStepRunner(
+        $stepService = new ExecuteStaticStepService(
             $this->stubAgent,
             $runnerHelper,
             $formatter,
         );
-        $gateStepRunner = new QualityGateStepRunner();
-        $toolStepRunner = new ToolStepRunnerStrategy();
-        $stepRunnerResolver = new StepRunnerResolver([$agentStepRunner, $gateStepRunner, $toolStepRunner]);
-
         $hookExecutor = $this->createMock(HookExecutorInterface::class);
         $hookExecutor->method('execute')->willReturn(
             HookResultVo::createSkipped(),
         );
 
         $runStaticChainService = new RunStaticChainService(
-            $stepRunnerResolver,
+            $stepService,
             $budgetService,
             $hookExecutor,
         );
