@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ToolStepRunnerStrategy;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteToolStepService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ToolStepRunnerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionToolStepVo;
@@ -16,20 +16,20 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepR
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ToolStepResultVo;
 
-#[CoversClass(ToolStepRunnerStrategy::class)]
-final class ToolStepRunnerStrategyTest extends TestCase
+#[CoversClass(ExecuteToolStepService::class)]
+final class ExecuteToolStepServiceTest extends TestCase
 {
     #[Test]
     public function supportsReturnsTrueForToolType(): void
     {
-        $strategy = new ToolStepRunnerStrategy();
+        $strategy = new ExecuteToolStepService();
         self::assertTrue($strategy->supports(ChainStepTypeEnum::tool));
     }
 
     #[Test]
     public function supportsReturnsFalseForOtherTypes(): void
     {
-        $strategy = new ToolStepRunnerStrategy();
+        $strategy = new ExecuteToolStepService();
         self::assertFalse($strategy->supports(ChainStepTypeEnum::agent));
         self::assertFalse($strategy->supports(ChainStepTypeEnum::qualityGate));
     }
@@ -45,7 +45,7 @@ final class ToolStepRunnerStrategyTest extends TestCase
             durationMs: 50.0,
         ));
 
-        $strategy = new ToolStepRunnerStrategy(toolStepRunner: $toolRunner);
+        $strategy = new ExecuteToolStepService(toolStepRunner: $toolRunner);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::tool,
@@ -79,7 +79,7 @@ final class ToolStepRunnerStrategyTest extends TestCase
             durationMs: 10.0,
         ));
 
-        $strategy = new ToolStepRunnerStrategy(toolStepRunner: $toolRunner);
+        $strategy = new ExecuteToolStepService(toolStepRunner: $toolRunner);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::tool,
@@ -100,7 +100,7 @@ final class ToolStepRunnerStrategyTest extends TestCase
     #[Test]
     public function runNoOpWithoutRunner(): void
     {
-        $strategy = new ToolStepRunnerStrategy(toolStepRunner: null);
+        $strategy = new ExecuteToolStepService(toolStepRunner: null);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::tool,
@@ -134,7 +134,7 @@ final class ToolStepRunnerStrategyTest extends TestCase
             durationMs: 20.0,
         ));
 
-        $strategy = new ToolStepRunnerStrategy(toolStepRunner: $toolRunner);
+        $strategy = new ExecuteToolStepService(toolStepRunner: $toolRunner);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::tool,

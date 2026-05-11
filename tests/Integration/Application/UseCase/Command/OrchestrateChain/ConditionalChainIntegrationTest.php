@@ -24,10 +24,10 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckSta
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunStaticChainService;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\AgentStepRunner;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\QualityGateStepRunner;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\StepRunnerResolver;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ToolStepRunnerStrategy;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteAgentStepService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteQualityGateStepService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ResolveStepRunnerService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteToolStepService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\ConditionalStepService;
@@ -104,15 +104,15 @@ final class ConditionalChainIntegrationTest extends TestCase
         $staticFormatter->method('buildStaticContext')->willReturnCallback(
             static fn(string $role, string $previousOutput, string $task): string => $previousOutput,
         );
-        $staticAgentRunner = new AgentStepRunner(
+        $staticAgentRunner = new ExecuteAgentStepService(
             $staticAgent,
             $staticRunnerHelper,
             $staticFormatter,
         );
-        $staticGateRunner = new QualityGateStepRunner();
-        $staticToolRunner = new ToolStepRunnerStrategy();
-        $staticStepRunnerResolver = new StepRunnerResolver([$staticAgentRunner, $staticGateRunner, $staticToolRunner]);
-        $runStaticChainService = new RunStaticChainService($staticStepRunnerResolver, $staticBudgetService, $hookExecutor);
+        $staticGateRunner = new ExecuteQualityGateStepService();
+        $staticToolRunner = new ExecuteToolStepService();
+        $staticResolveStepRunnerService = new ResolveStepRunnerService([$staticAgentRunner, $staticGateRunner, $staticToolRunner]);
+        $runStaticChainService = new RunStaticChainService($staticResolveStepRunnerService, $staticBudgetService, $hookExecutor);
         $staticChainExecutor = new ExecuteStaticChainService($runStaticChainService);
         $definitionMapper = new ChainExecutionDefinitionMapper(new LoadRawChainQueryHandler($this->chainLoader));
         $staticStrategy = new StaticExecutionStrategy($staticChainExecutor, $definitionMapper);

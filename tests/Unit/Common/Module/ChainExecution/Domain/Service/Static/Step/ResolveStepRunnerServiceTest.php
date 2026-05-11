@@ -8,24 +8,24 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\AgentStepRunner;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\QualityGateStepRunner;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\StepRunnerInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\StepRunnerResolver;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ToolStepRunnerStrategy;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteAgentStepService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteQualityGateStepService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteStepServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ResolveStepRunnerService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteToolStepService;
 
-#[CoversClass(StepRunnerResolver::class)]
-final class StepRunnerResolverTest extends TestCase
+#[CoversClass(ResolveStepRunnerService::class)]
+final class ResolveStepRunnerServiceTest extends TestCase
 {
     #[Test]
     public function resolveReturnsAgentRunner(): void
     {
-        $agentRunner = $this->createMock(StepRunnerInterface::class);
+        $agentRunner = $this->createMock(ExecuteStepServiceInterface::class);
         $agentRunner->method('supports')->willReturnCallback(
             static fn(ChainStepTypeEnum $type): bool => $type === ChainStepTypeEnum::agent,
         );
 
-        $resolver = new StepRunnerResolver([$agentRunner]);
+        $resolver = new ResolveStepRunnerService([$agentRunner]);
 
         $result = $resolver->resolve(ChainStepTypeEnum::agent);
         self::assertSame($agentRunner, $result);
@@ -34,22 +34,22 @@ final class StepRunnerResolverTest extends TestCase
     #[Test]
     public function resolveReturnsCorrectRunnerForType(): void
     {
-        $agentRunner = $this->createMock(StepRunnerInterface::class);
+        $agentRunner = $this->createMock(ExecuteStepServiceInterface::class);
         $agentRunner->method('supports')->willReturnCallback(
             static fn(ChainStepTypeEnum $type): bool => $type === ChainStepTypeEnum::agent,
         );
 
-        $gateRunner = $this->createMock(StepRunnerInterface::class);
+        $gateRunner = $this->createMock(ExecuteStepServiceInterface::class);
         $gateRunner->method('supports')->willReturnCallback(
             static fn(ChainStepTypeEnum $type): bool => $type === ChainStepTypeEnum::qualityGate,
         );
 
-        $toolRunner = $this->createMock(StepRunnerInterface::class);
+        $toolRunner = $this->createMock(ExecuteStepServiceInterface::class);
         $toolRunner->method('supports')->willReturnCallback(
             static fn(ChainStepTypeEnum $type): bool => $type === ChainStepTypeEnum::tool,
         );
 
-        $resolver = new StepRunnerResolver([$agentRunner, $gateRunner, $toolRunner]);
+        $resolver = new ResolveStepRunnerService([$agentRunner, $gateRunner, $toolRunner]);
 
         self::assertSame($agentRunner, $resolver->resolve(ChainStepTypeEnum::agent));
         self::assertSame($gateRunner, $resolver->resolve(ChainStepTypeEnum::qualityGate));
@@ -59,10 +59,10 @@ final class StepRunnerResolverTest extends TestCase
     #[Test]
     public function resolveThrowsWhenNoRunnerFound(): void
     {
-        $resolver = new StepRunnerResolver([]);
+        $resolver = new ResolveStepRunnerService([]);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('No StepRunnerInterface found for step type "agent".');
+        $this->expectExceptionMessage('No ExecuteStepServiceInterface found for step type "agent".');
 
         $resolver->resolve(ChainStepTypeEnum::agent);
     }
@@ -70,7 +70,7 @@ final class StepRunnerResolverTest extends TestCase
     #[Test]
     public function resolveWithEmptyIterableThrows(): void
     {
-        $resolver = new StepRunnerResolver(new \ArrayIterator());
+        $resolver = new ResolveStepRunnerService(new \ArrayIterator());
 
         $this->expectException(\LogicException::class);
 

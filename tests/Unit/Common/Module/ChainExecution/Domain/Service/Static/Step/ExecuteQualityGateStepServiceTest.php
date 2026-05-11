@@ -9,26 +9,26 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\QualityGateStepRunner;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteQualityGateStepService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionQualityGateVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\QualityGateResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 
-#[CoversClass(QualityGateStepRunner::class)]
-final class QualityGateStepRunnerTest extends TestCase
+#[CoversClass(ExecuteQualityGateStepService::class)]
+final class ExecuteQualityGateStepServiceTest extends TestCase
 {
     #[Test]
     public function supportsReturnsTrueForQualityGateType(): void
     {
-        $runner = new QualityGateStepRunner();
+        $runner = new ExecuteQualityGateStepService();
         self::assertTrue($runner->supports(ChainStepTypeEnum::qualityGate));
     }
 
     #[Test]
     public function supportsReturnsFalseForOtherTypes(): void
     {
-        $runner = new QualityGateStepRunner();
+        $runner = new ExecuteQualityGateStepService();
         self::assertFalse($runner->supports(ChainStepTypeEnum::agent));
         self::assertFalse($runner->supports(ChainStepTypeEnum::tool));
     }
@@ -45,7 +45,7 @@ final class QualityGateStepRunnerTest extends TestCase
             durationMs: 150.0,
         ));
 
-        $runner = new QualityGateStepRunner(qualityGateRunner: $gateRunner);
+        $runner = new ExecuteQualityGateStepService(qualityGateRunner: $gateRunner);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::qualityGate,
@@ -77,7 +77,7 @@ final class QualityGateStepRunnerTest extends TestCase
             durationMs: 500.0,
         ));
 
-        $runner = new QualityGateStepRunner(qualityGateRunner: $gateRunner);
+        $runner = new ExecuteQualityGateStepService(qualityGateRunner: $gateRunner);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::qualityGate,
@@ -97,7 +97,7 @@ final class QualityGateStepRunnerTest extends TestCase
     #[Test]
     public function runNoOpWithoutRunner(): void
     {
-        $runner = new QualityGateStepRunner(qualityGateRunner: null);
+        $runner = new ExecuteQualityGateStepService(qualityGateRunner: null);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::qualityGate,
@@ -132,7 +132,7 @@ final class QualityGateStepRunnerTest extends TestCase
             durationMs: 200.0,
         ));
 
-        $runner = new QualityGateStepRunner(qualityGateRunner: $gateRunner);
+        $runner = new ExecuteQualityGateStepService(qualityGateRunner: $gateRunner);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::qualityGate,

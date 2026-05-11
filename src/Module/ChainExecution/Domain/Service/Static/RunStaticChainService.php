@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Entity\StaticChainExecution;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\StepRunnerResolver;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ResolveStepRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFixIterationGroupVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStaticChainConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
@@ -27,7 +27,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContext
 final readonly class RunStaticChainService
 {
     public function __construct(
-        private StepRunnerResolver $stepRunnerResolver,
+        private ResolveStepRunnerServiceInterface $stepRunnerResolver,
         private CheckStaticBudgetServiceInterface $budgetService,
         private HookExecutorInterface $hookExecutor,
         private ?LoggerInterface $logger = null,

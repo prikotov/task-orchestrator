@@ -13,15 +13,12 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepR
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 
 /**
- * Стратегия выполнения tool-шага static-цепочки.
+ * Сервис выполнения tool-шага static-цепочки.
  *
  * Делегирует выполнение ToolStepRunnerInterface.
  * Без runner'а шаг считается успешным (no-op).
- *
- * Имя ToolStepRunnerStrategy выбрано во избежание конфликта
- * с существующим интерфейсом ToolStepRunnerInterface.
  */
-final readonly class ToolStepRunnerStrategy implements StepRunnerInterface
+final readonly class ExecuteToolStepService implements ExecuteStepServiceInterface
 {
     private const string RUNNER_NAME = 'shell';
 
