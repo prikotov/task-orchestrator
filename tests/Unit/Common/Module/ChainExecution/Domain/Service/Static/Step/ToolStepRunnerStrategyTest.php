@@ -2,28 +2,40 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Tests\Unit\Common\Module\ChainExecution\Domain\Service\Static;
+namespace TaskOrchestrator\Tests\Unit\Common\Module\ChainExecution\Domain\Service\Static\Step;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Agent\RunAgentServiceInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStaticStepService;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ToolStepRunnerStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ToolStepRunnerInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionToolStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionToolStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ToolStepResultVo;
 
-#[CoversClass(ExecuteStaticStepService::class)]
-final class ExecuteStaticStepServiceToolTest extends TestCase
+#[CoversClass(ToolStepRunnerStrategy::class)]
+final class ToolStepRunnerStrategyTest extends TestCase
 {
     #[Test]
-    public function runToolStepReturnsSuccessfulResult(): void
+    public function supportsReturnsTrueForToolType(): void
+    {
+        $strategy = new ToolStepRunnerStrategy();
+        self::assertTrue($strategy->supports(ChainStepTypeEnum::tool));
+    }
+
+    #[Test]
+    public function supportsReturnsFalseForOtherTypes(): void
+    {
+        $strategy = new ToolStepRunnerStrategy();
+        self::assertFalse($strategy->supports(ChainStepTypeEnum::agent));
+        self::assertFalse($strategy->supports(ChainStepTypeEnum::qualityGate));
+    }
+
+    #[Test]
+    public function runReturnsSuccessfulResult(): void
     {
         $toolRunner = $this->createMock(ToolStepRunnerInterface::class);
         $toolRunner->method('run')->willReturn(new ToolStepResultVo(
@@ -33,13 +45,7 @@ final class ExecuteStaticStepServiceToolTest extends TestCase
             durationMs: 50.0,
         ));
 
-        $service = new ExecuteStaticStepService(
-            agentRunner: $this->createMock(RunAgentServiceInterface::class),
-            runnerHelper: $this->createMock(ResolveChainRunnerServiceInterface::class),
-            formatter: $this->createMock(FormatPromptServiceInterface::class),
-            qualityGateRunner: $this->createMock(QualityGateRunnerInterface::class),
-            toolStepRunner: $toolRunner,
-        );
+        $strategy = new ToolStepRunnerStrategy(toolStepRunner: $toolRunner);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::tool,
@@ -49,7 +55,8 @@ final class ExecuteStaticStepServiceToolTest extends TestCase
             outputKey: 'commit_hash',
         );
 
-        $result = $service->runToolStep($step);
+        $context = new StepContextVo(task: 'test task');
+        $result = $strategy->run($step, $context);
 
         self::assertFalse($result->isError);
         self::assertSame('abc123def', $result->outputText);
@@ -62,7 +69,7 @@ final class ExecuteStaticStepServiceToolTest extends TestCase
     }
 
     #[Test]
-    public function runToolStepReturnsErrorOnFailure(): void
+    public function runReturnsErrorOnFailure(): void
     {
         $toolRunner = $this->createMock(ToolStepRunnerInterface::class);
         $toolRunner->method('run')->willReturn(new ToolStepResultVo(
@@ -72,13 +79,7 @@ final class ExecuteStaticStepServiceToolTest extends TestCase
             durationMs: 10.0,
         ));
 
-        $service = new ExecuteStaticStepService(
-            agentRunner: $this->createMock(RunAgentServiceInterface::class),
-            runnerHelper: $this->createMock(ResolveChainRunnerServiceInterface::class),
-            formatter: $this->createMock(FormatPromptServiceInterface::class),
-            qualityGateRunner: $this->createMock(QualityGateRunnerInterface::class),
-            toolStepRunner: $toolRunner,
-        );
+        $strategy = new ToolStepRunnerStrategy(toolStepRunner: $toolRunner);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::tool,
@@ -86,7 +87,8 @@ final class ExecuteStaticStepServiceToolTest extends TestCase
             label: 'Git status',
         );
 
-        $result = $service->runToolStep($step);
+        $context = new StepContextVo(task: 'test task');
+        $result = $strategy->run($step, $context);
 
         self::assertTrue($result->isError);
         self::assertSame('fatal: not a git repository', $result->outputText);
@@ -96,15 +98,9 @@ final class ExecuteStaticStepServiceToolTest extends TestCase
     }
 
     #[Test]
-    public function runToolStepNoOpWithoutRunner(): void
+    public function runNoOpWithoutRunner(): void
     {
-        $service = new ExecuteStaticStepService(
-            agentRunner: $this->createMock(RunAgentServiceInterface::class),
-            runnerHelper: $this->createMock(ResolveChainRunnerServiceInterface::class),
-            formatter: $this->createMock(FormatPromptServiceInterface::class),
-            qualityGateRunner: $this->createMock(QualityGateRunnerInterface::class),
-            toolStepRunner: null,
-        );
+        $strategy = new ToolStepRunnerStrategy(toolStepRunner: null);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::tool,
@@ -112,7 +108,8 @@ final class ExecuteStaticStepServiceToolTest extends TestCase
             label: 'Echo',
         );
 
-        $result = $service->runToolStep($step);
+        $context = new StepContextVo(task: 'test task');
+        $result = $strategy->run($step, $context);
 
         self::assertFalse($result->isError);
         self::assertSame('', $result->outputText);
@@ -120,7 +117,7 @@ final class ExecuteStaticStepServiceToolTest extends TestCase
     }
 
     #[Test]
-    public function runToolStepPassesCorrectVoToRunner(): void
+    public function runPassesCorrectVoToRunner(): void
     {
         $toolRunner = $this->createMock(ToolStepRunnerInterface::class);
         $toolRunner->expects($this->once())->method('run')->with(
@@ -137,13 +134,7 @@ final class ExecuteStaticStepServiceToolTest extends TestCase
             durationMs: 20.0,
         ));
 
-        $service = new ExecuteStaticStepService(
-            agentRunner: $this->createMock(RunAgentServiceInterface::class),
-            runnerHelper: $this->createMock(ResolveChainRunnerServiceInterface::class),
-            formatter: $this->createMock(FormatPromptServiceInterface::class),
-            qualityGateRunner: $this->createMock(QualityGateRunnerInterface::class),
-            toolStepRunner: $toolRunner,
-        );
+        $strategy = new ToolStepRunnerStrategy(toolStepRunner: $toolRunner);
 
         $step = new ExecutionStepVo(
             type: ChainStepTypeEnum::tool,
@@ -153,6 +144,7 @@ final class ExecuteStaticStepServiceToolTest extends TestCase
             outputKey: 'last_msg',
         );
 
-        $service->runToolStep($step);
+        $context = new StepContextVo(task: 'test task');
+        $strategy->run($step, $context);
     }
 }
