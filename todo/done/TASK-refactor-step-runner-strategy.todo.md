@@ -3,8 +3,8 @@ epic: EPIC-refactor-step-runner-strategy
 title: Рефакторинг ExecuteStaticStepService: стратегия + фабрика
 assignee: Бэкендер Левша (pi)
 branch: task/refactor-step-runner-strategy
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/199
+status: done
 created: 2026-05-10
 ---
 
