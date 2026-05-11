@@ -3,7 +3,7 @@ name: epic-via-subagents
 description: >
   Конвейер обработки эпика: подготовка → реализация задач через сабагентов → ревью → мерж
 depends_on:
-  - run-pi-subagent
+  - run-subagent
 ---
 
 # Обработка эпика через сабагентов
