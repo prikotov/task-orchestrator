@@ -37,12 +37,6 @@ PROMPT
 | `--reasoning`     | —          | Reasoning/thinking effort (pi: `--thinking`, codex: `-c model_reasoning_effort=...`) | —            |
 | `[prompt text]`   | —          | Промпт. Если не указан — читается из stdin                   | —            |
 
-### Приоритет параметров
-
-Флаги командной строки приоритетнее env-переменных:
-- `--runner` → env `RUNNER` → default `pi`
-- `--model` → env `MODEL` → default (не задан)
-
 ### Раннеры
 
 #### pi (default)
