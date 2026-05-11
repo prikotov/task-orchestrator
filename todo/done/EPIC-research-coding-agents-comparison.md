@@ -7,7 +7,7 @@ complexity: C4
 priority: P2
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-status: done
+status: in_progress
 pr: "#171"
 branch: epic/research-coding-agents-comparison
 ---
@@ -108,6 +108,8 @@ flowchart LR
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
 - [x] [TASK-research-coding-agents-summary](TASK-research-coding-agents-summary.todo.md) — Сводная таблица и итоговые рекомендации
+
+- [ ] [TASK-research-oh-my-openagent](TASK-research-oh-my-openagent.todo.md) — Oh My OpenAgent / OmO (форк OpenCode, TypeScript)
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все 14 индивидуальных research-задач выполнены
