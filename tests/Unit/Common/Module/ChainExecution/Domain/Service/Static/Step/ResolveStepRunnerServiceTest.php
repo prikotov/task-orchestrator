@@ -8,11 +8,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteAgentStepService;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteQualityGateStepService;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteStepServiceInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ResolveStepRunnerService;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteToolStepService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteAgentStepService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteQualityGateStepService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStepServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerService;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteToolStepService;
 
 #[CoversClass(ResolveStepRunnerService::class)]
 final class ResolveStepRunnerServiceTest extends TestCase

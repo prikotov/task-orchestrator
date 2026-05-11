@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static;
 
 use Override;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;

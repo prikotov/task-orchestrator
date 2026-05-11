@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static;
 
 use Override;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ToolStepRunnerInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 
 /**
- * Сервис выполнения tool-шага static-цепочки.
+ * Сервис выполнения quality-gate шага static-цепочки.
  *
- * Делегирует выполнение ToolStepRunnerInterface.
+ * Делегирует выполнение QualityGateRunnerInterface.
  * Без runner'а шаг считается успешным (no-op).
  */
-final readonly class ExecuteToolStepService implements ExecuteStepServiceInterface
+final readonly class ExecuteQualityGateStepService implements ExecuteStepServiceInterface
 {
     private const string RUNNER_NAME = 'shell';
 
     public function __construct(
-        private ?ToolStepRunnerInterface $toolStepRunner = null,
+        private ?QualityGateRunnerInterface $qualityGateRunner = null,
         private ?LoggerInterface $logger = null,
     ) {
     }
@@ -31,15 +31,15 @@ final readonly class ExecuteToolStepService implements ExecuteStepServiceInterfa
     #[Override]
     public function supports(ChainStepTypeEnum $type): bool
     {
-        return $type === ChainStepTypeEnum::tool;
+        return $type === ChainStepTypeEnum::qualityGate;
     }
 
     #[Override]
     public function run(ExecutionStepVo $step, StepContextVo $context): StaticStepResultVo
     {
-        if ($this->toolStepRunner === null) {
+        if ($this->qualityGateRunner === null) {
             return new StaticStepResultVo(
-                role: 'tool',
+                role: 'quality_gate',
                 runner: self::RUNNER_NAME,
                 outputText: '',
                 inputTokens: 0,
@@ -48,39 +48,36 @@ final readonly class ExecuteToolStepService implements ExecuteStepServiceInterfa
                 duration: 0.0,
                 isError: false,
                 label: $step->getLabel(),
-                exitCode: 0,
+                passed: true,
             );
         }
 
-        $result = $this->toolStepRunner->run($step->toToolStepVo());
+        $result = $this->qualityGateRunner->run($step->toQualityGateVo());
         $duration = $result->durationMs / 1000.0;
 
-        if (!$result->success) {
+        if (!$result->passed) {
             $this->logger?->warning(
                 sprintf(
-                    '[StaticChainExecutor] Tool step "%s" failed (exit code %d): %s',
-                    $step->getLabel(),
+                    '[StaticChainExecutor] Quality gate "%s" failed (exit code %d): %s',
+                    $result->label,
                     $result->exitCode,
-                    $result->stdout,
+                    $result->output,
                 ),
             );
         }
 
         return new StaticStepResultVo(
-            role: 'tool',
+            role: 'quality_gate',
             runner: self::RUNNER_NAME,
-            outputText: $result->stdout,
+            outputText: $result->output,
             inputTokens: 0,
             outputTokens: 0,
             cost: 0.0,
             duration: $duration,
-            isError: !$result->success,
-            errorMessage: !$result->success
-                ? sprintf('Tool "%s" failed with exit code %d', $step->getLabel(), $result->exitCode)
-                : null,
-            label: $step->getLabel(),
+            isError: false,
+            label: $result->label,
+            passed: $result->passed,
             exitCode: $result->exitCode,
-            outputKey: $step->getOutputKey(),
         );
     }
 }
