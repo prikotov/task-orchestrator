@@ -21,13 +21,10 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\Hook
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Shared\PromptFormatterInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStaticStepService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunStaticChainService;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\AgentStepRunner;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\QualityGateStepRunner;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\StepRunnerResolver;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ToolStepRunnerStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\ConditionalStepService;
@@ -96,23 +93,20 @@ final class ConditionalChainIntegrationTest extends TestCase
 
         // --- Static strategy wiring (for backwards compatibility test) ---
         $staticAgent = new StubRunAgentService();
-        $staticBudgetService = $this->createMock(CheckStaticBudgetServiceInterface::class);
-        $staticBudgetService->method('shouldBreakBeforeStep')->willReturn(false);
-        $staticBudgetService->method('shouldBreakAfterStep')->willReturn(false);
-        $staticRunnerHelper = $this->createMock(ResolveChainRunnerServiceInterface::class);
-        $staticFormatter = $this->createMock(FormatPromptServiceInterface::class);
-        $staticFormatter->method('buildStaticContext')->willReturnCallback(
+        $budgetService = $this->createMock(CheckStaticBudgetServiceInterface::class);
+        $budgetService->method('shouldBreakBeforeStep')->willReturn(false);
+        $budgetService->method('shouldBreakAfterStep')->willReturn(false);
+        $runnerHelper = $this->createMock(ResolveChainRunnerServiceInterface::class);
+        $formatter = $this->createMock(FormatPromptServiceInterface::class);
+        $formatter->method('buildStaticContext')->willReturnCallback(
             static fn(string $role, string $previousOutput, string $task): string => $previousOutput,
         );
-        $staticAgentRunner = new AgentStepRunner(
+        $staticStepService = new ExecuteStaticStepService(
             $staticAgent,
-            $staticRunnerHelper,
-            $staticFormatter,
+            $runnerHelper,
+            $formatter,
         );
-        $staticGateRunner = new QualityGateStepRunner();
-        $staticToolRunner = new ToolStepRunnerStrategy();
-        $staticStepRunnerResolver = new StepRunnerResolver([$staticAgentRunner, $staticGateRunner, $staticToolRunner]);
-        $runStaticChainService = new RunStaticChainService($staticStepRunnerResolver, $staticBudgetService, $hookExecutor);
+        $runStaticChainService = new RunStaticChainService($staticStepService, $budgetService, $hookExecutor);
         $staticChainExecutor = new ExecuteStaticChainService($runStaticChainService);
         $definitionMapper = new ChainExecutionDefinitionMapper(new LoadRawChainQueryHandler($this->chainLoader));
         $staticStrategy = new StaticExecutionStrategy($staticChainExecutor, $definitionMapper);

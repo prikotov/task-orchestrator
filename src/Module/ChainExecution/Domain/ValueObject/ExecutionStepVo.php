@@ -29,7 +29,6 @@ final readonly class ExecutionStepVo
         private bool $noContextFiles = false,
         private ?ConditionExpressionVo $when = null,
         private ?string $postStep = null,
-        private ?string $outputKey = null,
     ) {
     }
 
@@ -119,22 +118,6 @@ final readonly class ExecutionStepVo
     }
 
     /**
-     * Является ли шаг tool-шагом (детерминированной командой с выводом в context).
-     */
-    public function isTool(): bool
-    {
-        return $this->type === ChainStepTypeEnum::tool;
-    }
-
-    /**
-     * Возвращает ключ для записи stdout в ChainContext (только для tool-шагов).
-     */
-    public function getOutputKey(): ?string
-    {
-        return $this->outputKey;
-    }
-
-    /**
      * Преобразует quality_gate-шаг в ExecutionQualityGateVo.
      *
      * @throws LogicException если шаг не является quality_gate
@@ -149,25 +132,6 @@ final readonly class ExecutionStepVo
             command: $this->command,
             label: $this->label,
             timeoutSeconds: $this->timeoutSeconds,
-        );
-    }
-
-    /**
-     * Преобразует tool-шаг в ExecutionToolStepVo.
-     *
-     * @throws LogicException если шаг не является tool
-     */
-    public function toToolStepVo(): ExecutionToolStepVo
-    {
-        if (!$this->isTool()) {
-            throw new LogicException('Only tool steps can be converted to ExecutionToolStepVo.');
-        }
-
-        return new ExecutionToolStepVo(
-            command: $this->command,
-            label: $this->label,
-            timeoutSeconds: $this->timeoutSeconds,
-            outputKey: $this->outputKey,
         );
     }
 }

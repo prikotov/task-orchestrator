@@ -215,7 +215,7 @@ final class YamlChainLoader implements ChainLoaderInterface
         return array_map(
             function (array $step) use ($name, $chainRetryPolicy, $chainNoContextFiles): ChainStepVo {
                 $stepType = ChainStepTypeEnum::tryFrom($step['type'] ?? '') ?? throw new InvalidArgumentException(
-                    sprintf('Step "type" is required in chain "%s" (expected: agent, quality_gate or tool).', $name),
+                    sprintf('Step "type" is required in chain "%s" (expected: agent or quality_gate).', $name),
                 );
 
                 // Парсим when-выражение (опционально)
@@ -227,33 +227,6 @@ final class YamlChainLoader implements ChainLoaderInterface
                 $postStep = isset($step['post_step']) && is_string($step['post_step']) && $step['post_step'] !== ''
                     ? $step['post_step']
                     : null;
-
-                if ($stepType === ChainStepTypeEnum::tool) {
-                    $command = $step['command'] ?? null;
-                    $label = $step['label'] ?? null;
-
-                    if ($command === null || $command === '') {
-                        throw new InvalidArgumentException(
-                            sprintf('Tool step must have "command" in chain "%s".', $name),
-                        );
-                    }
-
-                    if ($label === null || $label === '') {
-                        throw new InvalidArgumentException(
-                            sprintf('Tool step must have "label" in chain "%s".', $name),
-                        );
-                    }
-
-                    return ChainStepVo::createTool(
-                        command: $command,
-                        label: $label,
-                        timeoutSeconds: $step['timeout_seconds'] ?? 120,
-                        outputKey: $step['output_key'] ?? null,
-                        name: $step['name'] ?? null,
-                        when: $when,
-                        postStep: $postStep,
-                    );
-                }
 
                 if ($stepType === ChainStepTypeEnum::qualityGate) {
                     $command = $step['command'] ?? null;

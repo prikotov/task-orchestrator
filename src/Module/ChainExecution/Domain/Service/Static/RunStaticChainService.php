@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Entity\StaticChainExecution;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\StepRunnerResolver;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\StaticAuditServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFixIterationGroupVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStaticChainConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
@@ -16,7 +16,6 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticChain
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticProcessResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepAuditVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 
 /**
  * Доменная логика выполнения static-цепочки: линейное выполнение шагов с итерациями и budget.
@@ -27,7 +26,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContext
 final readonly class RunStaticChainService
 {
     public function __construct(
-        private StepRunnerResolver $stepRunnerResolver,
+        private ExecuteStaticStepService $stepExecution,
         private CheckStaticBudgetServiceInterface $budgetService,
         private HookExecutorInterface $hookExecutor,
         private ?LoggerInterface $logger = null,
@@ -119,14 +118,14 @@ final readonly class RunStaticChainService
         bool $noContextFiles = false,
     ): ?StaticProcessResultVo {
         $step = $steps[$execution->getStepIndex()];
-        $budgetRole = ($step->isAgent() ? $step->getRole() : null) ?? ($step->isTool() ? 'tool' : 'quality_gate');
+        $budgetRole = ($step->isAgent() ? $step->getRole() : null) ?? 'quality_gate';
 
         if ($this->budgetService->shouldBreakBeforeStep($execution, $chain->budget, $budgetRole)) {
             return null;
         }
 
         $stepIndex1 = $execution->getStepIndex() + 1;
-        $role = $step->isAgent() ? ($step->getRole() ?? '') : ($step->isTool() ? 'tool' : 'quality_gate');
+        $role = $step->isAgent() ? ($step->getRole() ?? '') : 'quality_gate';
         $stepResult = $this->executeStep(
             $step,
             $chain,
@@ -226,9 +225,31 @@ final readonly class RunStaticChainService
         string $role,
         bool $noContextFiles = false,
     ): StaticStepResultVo {
-        $runner = $this->stepRunnerResolver->resolve($step->getType());
+        if ($step->isQualityGate()) {
+            $auditService?->logStepStart(
+                $chain->name,
+                $stepIndex1,
+                $role,
+                'shell',
+            );
+            $stepResult = $this->stepExecution->runQualityGate($step);
+            $auditService?->logStepResult(
+                $chain->name,
+                $stepIndex1,
+                $role,
+                'shell',
+                $stepResult,
+                $stepResult->duration * 1000.0,
+            );
 
-        $runnerName = $step->isAgent() ? $step->getRunner() : 'shell';
+            return $stepResult;
+        }
+
+        $iterationGroup = $groupForStep[$execution->getStepIndex()] ?? null;
+        $iterationNumber = $iterationGroup !== null
+            ? $execution->getIterationNumber($iterationGroup->getGroup()) : null;
+        $roleConfig = $chain->getRoleConfig($role);
+        $runnerName = $step->getRunner();
         $auditService?->logStepStart(
             $chain->name,
             $stepIndex1,
@@ -236,22 +257,16 @@ final readonly class RunStaticChainService
             $runnerName,
         );
 
-        $iterationGroup = $groupForStep[$execution->getStepIndex()] ?? null;
-        $iterationNumber = $iterationGroup !== null
-            ? $execution->getIterationNumber($iterationGroup->getGroup()) : null;
-        $roleConfig = $chain->getRoleConfig($role);
-
-        $context = new StepContextVo(
-            task: $task,
-            workingDir: $workingDir,
-            timeout: $timeout,
-            previousContext: $execution->getPreviousContext(),
-            iterationNumber: $iterationNumber,
-            roleConfig: $roleConfig,
-            noContextFiles: $noContextFiles,
+        $stepResult = $this->stepExecution->runAgentStep(
+            $step,
+            $task,
+            $workingDir,
+            $timeout,
+            $execution->getPreviousContext(),
+            $iterationNumber,
+            $roleConfig,
+            $noContextFiles,
         );
-
-        $stepResult = $runner->run($step, $context);
         $auditService?->logStepResult(
             $chain->name,
             $stepIndex1,
@@ -330,7 +345,6 @@ final readonly class RunStaticChainService
                 exitCode: $last->exitCode,
                 label: $last->label,
                 timedOut: $last->timedOut,
-                outputKey: $last->outputKey,
             );
         }
 
@@ -410,7 +424,7 @@ final readonly class RunStaticChainService
             'chain_name' => $chainName,
             'step_name' => $step->getName(),
             'runner' => $step->isAgent() ? $step->getRunner() : 'shell',
-            'role' => $step->isAgent() ? ($step->getRole() ?? '') : ($step->isTool() ? 'tool' : 'quality_gate'),
+            'role' => $step->isAgent() ? ($step->getRole() ?? '') : 'quality_gate',
             'exit_code' => $stepResult->exitCode,
             'duration' => $stepResult->duration,
         ];

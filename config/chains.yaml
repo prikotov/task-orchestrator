@@ -532,33 +532,6 @@ chains:
         steps: [implement, review]
         max_iterations: 3
 
-  # ──────────────────────────────────────────────────────────────────────────
-  # task-implement — шаблонная цепочка реализации задачи
-  # Workflow: implement → self-review → review → quality_gate
-  # fix_iterations: implement ↔ review (max 3)
-  # ──────────────────────────────────────────────────────────────────────────
-
-  task-implement:
-    description: "Шаблонный workflow реализации задачи: implement → self-review → review → quality gate"
-    steps:
-      - type: agent
-        role: backend_developer_levsha
-        name: implement
-      - type: agent
-        role: backend_developer_levsha
-        name: self-review
-      - type: agent
-        role: code_reviewer_backend_puaro
-        name: review
-      - type: quality_gate
-        command: 'make check'
-        label: 'Quality Gate (phpunit + psalm + deptrac)'
-        timeout_seconds: 300
-    fix_iterations:
-      - group: implement-review
-        steps: [implement, review]
-        max_iterations: 3
-
   analyze:
     description: "Анализ без реализации"
     steps:

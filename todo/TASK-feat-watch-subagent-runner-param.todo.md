@@ -8,10 +8,10 @@ priority: P1
 depends_on:
 epic: EPIC-feat-subagent-delegation-and-task-chains
 author: Тимлид Алекс (pi)
-assignee: Бэкендер Тони (pi)
-branch: task/feat-watch-subagent-runner-param
-pr: https://github.com/prikotov/task-orchestrator/pull/195
-status: done
+assignee: Бэкендер Левша (pi)
+branch:
+pr:
+status: todo
 ---
 
 # TASK-feat-watch-subagent-runner-param: Параметризация watch-subagent.sh для pi и codex
@@ -85,19 +85,6 @@ bash docs/agents/skills/run-pi-subagent/scripts/watch-subagent.sh -h
 
 ## 9. Comments (Комментарии)
 Скрипт — fallback при неработающем оркестраторе. Не превращать в мини-оркестратор (Локи). Контракт с defaults (env + версия) — компромисс между параметризацией и стабильностью.
-
-## Инструкции для сабагента
-
-**Ветка:** task/feat-watch-subagent-runner-param (уже создана и активна)
-**PR:** уже создан (draft) из task/feat-watch-subagent-runner-param в task/epic-feat-subagent-delegation-and-task-chains — [PR #195](https://github.com/prikotov/task-orchestrator/pull/195)
-
-### Порядок действий
-1. Переключись в ветку `task/feat-watch-subagent-runner-param`: `git checkout task/feat-watch-subagent-runner-param`
-2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
-4. Делай промежуточные коммиты после каждого логического этапа.
-5. После реализации запусти проверки: `bash -n docs/agents/skills/run-pi-subagent/scripts/watch-subagent.sh`.
-6. Сделай `git push`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
