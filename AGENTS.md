@@ -35,7 +35,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 При загрузке роли:
 1. Прочитай файл роли — в нём указаны скиллы (YAML `skills:` и/или markdown-ссылки).
 2. Если роль ссылается на скилл — прочитай его `SKILL.md` по ссылке из файла роли.
-3. Скрипты и ресурсы скилла лежат **рядом с `SKILL.md`**. Путь к скрипту — относительный от каталога скилла. Пример: если `SKILL.md` прочитан из `docs/agents/skills/run-pi-subagent/SKILL.md`, то скрипт `scripts/watch-subagent.sh` находится в `docs/agents/skills/run-pi-subagent/scripts/watch-subagent.sh`.
+3. Скрипты и ресурсы скилла лежат **рядом с `SKILL.md`**. Путь к скрипту — относительный от каталога скилла. Пример: если `SKILL.md` прочитан из `docs/agents/skills/run-subagent/SKILL.md`, то скрипт `scripts/watch-subagent.sh` находится в `docs/agents/skills/run-subagent/scripts/watch-subagent.sh`.
 
 ---
 

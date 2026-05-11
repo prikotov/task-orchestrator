@@ -139,4 +139,78 @@ final class RunAgentCommandHandlerTest extends TestCase
         self::assertSame(1, $result->exitCode);
         self::assertSame('', $result->outputText);
     }
+
+    #[Test]
+    public function invokePassesTimeoutToRequest(): void
+    {
+        $expectedResult = ChainRunResultVo::createSuccess(outputText: 'ok');
+
+        $this->promptProvider->method('getPrompt')->willReturn('prompt');
+
+        $this->agentRunner
+            ->expects(self::once())
+            ->method('run')
+            ->willReturnCallback(function ($request) use ($expectedResult) {
+                self::assertSame(600, $request->getTimeout());
+
+                return $expectedResult;
+            });
+
+        $result = ($this->handler)(new RunAgentCommand(
+            role: 'test',
+            task: 'task',
+            timeout: 600,
+        ));
+
+        self::assertFalse($result->isError);
+    }
+
+    #[Test]
+    public function invokePassesPreviousContextToRequest(): void
+    {
+        $expectedResult = ChainRunResultVo::createSuccess(outputText: 'ok');
+
+        $this->promptProvider->method('getPrompt')->willReturn('prompt');
+
+        $this->agentRunner
+            ->expects(self::once())
+            ->method('run')
+            ->willReturnCallback(function ($request) use ($expectedResult) {
+                self::assertSame('{"key":"value"}', $request->getPreviousContext());
+
+                return $expectedResult;
+            });
+
+        $result = ($this->handler)(new RunAgentCommand(
+            role: 'test',
+            task: 'task',
+            previousContext: '{"key":"value"}',
+        ));
+
+        self::assertFalse($result->isError);
+    }
+
+    #[Test]
+    public function invokeDefaultsPreviousContextToNull(): void
+    {
+        $expectedResult = ChainRunResultVo::createSuccess(outputText: 'ok');
+
+        $this->promptProvider->method('getPrompt')->willReturn('prompt');
+
+        $this->agentRunner
+            ->expects(self::once())
+            ->method('run')
+            ->willReturnCallback(function ($request) use ($expectedResult) {
+                self::assertNull($request->getPreviousContext());
+
+                return $expectedResult;
+            });
+
+        $result = ($this->handler)(new RunAgentCommand(
+            role: 'test',
+            task: 'task',
+        ));
+
+        self::assertFalse($result->isError);
+    }
 }

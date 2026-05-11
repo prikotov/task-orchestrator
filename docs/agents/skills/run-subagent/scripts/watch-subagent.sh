@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
+# CONTRACT: v1
 #
-# watch-subagent.sh — запуск pi --mode json с контролем таймаутов по потоку событий.
+# watch-subagent.sh — запуск AI-агента (pi/codex) с контролем таймаутов по потоку событий.
 #
 # Использование:
-#   ./watch-subagent.sh -s <soft-timeout> [options] <<'PROMPT'
+#   ./watch-subagent.sh -s <soft-timeout> --runner <pi|codex> [options] <<'PROMPT'
 #   <prompt>
 #   PROMPT
 #
@@ -13,6 +14,9 @@
 #   -t, --stall-timeout  — секунд без событий до признания зависания (default: 120).
 #   -o, --output         — формат вывода через запятую: raw, text, tools, files (default: raw).
 #   -r, --role-file <file> — путь к файлу описания роли (обязателен).
+#   --runner <pi|codex>  — раннер (default: pi; env RUNNER).
+#   --model <string>     — модель (env MODEL).
+#   --reasoning <string> — reasoning/thinking effort (pi: → --thinking, codex: → -c model_reasoning_effort=...).
 #   [prompt text]        — промпт. Если не указан — читается из stdin.
 #
 # Выход:
@@ -27,6 +31,9 @@ STALL_TIMEOUT=120
 SOFT_TIMEOUT=""
 OUTPUT="raw"
 ROLE_FILE=""
+RUNNER="${RUNNER:-pi}"
+MODEL="${MODEL:-}"
+REASONING=""
 
 # Определяем пути относительно расположения скрипта
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -38,7 +45,10 @@ while [[ $# -gt 0 ]]; do
         -m|--hard-timeout)  HARD_TIMEOUT="$2"; shift 2 ;;
         -t|--stall-timeout) STALL_TIMEOUT="$2"; shift 2 ;;
         -o|--output)        OUTPUT="$2"; shift 2 ;;
-        -r|--role-file)    ROLE_FILE="$2"; shift 2 ;;
+        -r|--role-file)     ROLE_FILE="$2"; shift 2 ;;
+        --runner)           RUNNER="$2"; shift 2 ;;
+        --model)            MODEL="$2"; shift 2 ;;
+        --reasoning)        REASONING="$2"; shift 2 ;;
         -h|--help)
             echo "Использование: $0 -s <soft-timeout> [options] [prompt text]"
             echo "  -s, --soft-timeout   базовый таймаут в секундах (обязателен)"
@@ -46,6 +56,10 @@ while [[ $# -gt 0 ]]; do
             echo "  -t, --stall-timeout  секунд без событий до зависания (default: 120)"
             echo "  -o, --output         формат вывода через запятую: raw, text, tools, files (default: raw)"
             echo "  -r, --role-file <file> путь к файлу описания роли (обязателен)"
+            echo "  --runner <pi|codex>  раннер (default: pi; env RUNNER)"
+            echo "  --model <string>     модель (env MODEL)"
+            echo "  --reasoning <string> reasoning effort для codex"
+            echo "  -h, --help           эта справка"
             exit 0
             ;;
         *) break ;;
@@ -78,6 +92,15 @@ if [[ ! -f "$ROLE_FILE" ]]; then
     echo "Ошибка: файл роли не найден: $ROLE_FILE" >&2
     exit 1
 fi
+
+case "$RUNNER" in
+    pi|codex) ;;
+    *)
+        echo "Ошибка: неизвестный раннер '$RUNNER' (допустимо: pi, codex)" >&2
+        exit 1
+        ;;
+esac
+
 IFS=',' read -ra FORMATS <<< "$OUTPUT"
 VALID="raw text tools files"
 for fmt in "${FORMATS[@]}"; do
@@ -95,30 +118,111 @@ has_format() {
     return 1
 }
 
-filter_text() {
+# ============================================================================
+# Per-runner: построение команды
+# ============================================================================
+
+RUNNER_CMD=()
+
+build_runner_command() {
+    case "$RUNNER" in
+        pi)
+            RUNNER_CMD=(pi --mode json --no-session --system-prompt "$SYSTEM_PROMPT_FILE")
+            [[ -n "$MODEL" ]] && RUNNER_CMD+=(--model "$MODEL")
+            [[ -n "$REASONING" ]] && RUNNER_CMD+=(--thinking "$REASONING")
+            RUNNER_CMD+=(--append-system-prompt "Возьми на себя роль из файла: $ROLE_FILE")
+            ;;
+        codex)
+            RUNNER_CMD=(codex exec --json --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check --ephemeral)
+            [[ -n "$MODEL" ]] && RUNNER_CMD+=(--model "$MODEL")
+            [[ -n "$REASONING" ]] && RUNNER_CMD+=(-c "model_reasoning_effort=$REASONING")
+            # codex использует системный промпт через instructions
+            RUNNER_CMD+=(-c "model_instructions_file=$SYSTEM_PROMPT_FILE")
+            RUNNER_CMD+=(-c "additional_instructions=Возьми на себя роль из файла: $ROLE_FILE")
+            ;;
+    esac
+}
+
+# ============================================================================
+# Per-runner: фильтрация вывода
+# ============================================================================
+
+# --- pi ---
+
+filter_text_pi() {
     jq -r 'select(.type == "message_end" and .message.role == "assistant")
            | .message.content[]
            | select(.type == "text")
            | .text' "$1" 2>/dev/null || true
 }
 
-filter_tools() {
+filter_tools_pi() {
     jq -c 'select(.type == "tool_execution_start")
            | {toolName, args}' "$1" 2>/dev/null || true
 }
 
-filter_files() {
+filter_files_pi() {
     jq -c 'select(.type == "tool_execution_start"
                   and (.toolName == "edit" or .toolName == "write"))
            | {toolName, args}' "$1" 2>/dev/null || true
 }
+
+# --- codex ---
+
+filter_text_codex() {
+    # @todo Формат JSONL codex может отличаться — уточнить после реальных тестов
+    jq -r 'select(.type == "message_end" and .message.role == "assistant")
+           | .message.content[]
+           | select(.type == "text")
+           | .text' "$1" 2>/dev/null || true
+}
+
+filter_tools_codex() {
+    # @todo Формат JSONL codex может отличаться — уточнить после реальных тестов
+    jq -c 'select(.type == "tool_execution_start")
+           | {toolName, args}' "$1" 2>/dev/null || true
+}
+
+filter_files_codex() {
+    # @todo Формат JSONL codex может отличаться — уточнить после реальных тестов
+    jq -c 'select(.type == "tool_execution_start"
+                  and (.toolName == "edit" or .toolName == "write"))
+           | {toolName, args}' "$1" 2>/dev/null || true
+}
+
+# --- Dispatchers ---
+
+filter_text() {
+    case "$RUNNER" in
+        pi)    filter_text_pi "$@" ;;
+        codex) filter_text_codex "$@" ;;
+    esac
+}
+
+filter_tools() {
+    case "$RUNNER" in
+        pi)    filter_tools_pi "$@" ;;
+        codex) filter_tools_codex "$@" ;;
+    esac
+}
+
+filter_files() {
+    case "$RUNNER" in
+        pi)    filter_files_pi "$@" ;;
+        codex) filter_files_codex "$@" ;;
+    esac
+}
+
+# ============================================================================
+# Подготовка и запуск
+# ============================================================================
 
 TMPDIR=$(mktemp -d)
 PIPE="$TMPDIR/events.pipe"
 OUTFILE="$TMPDIR/events.ndjson"
 mkfifo "$PIPE"
 
-PI_PID=""
+AGENT_PID=""
 
 # Рекурсивно собрать все PID-потомки процесса
 _get_descendants() {
@@ -131,50 +235,47 @@ _get_descendants() {
     done
 }
 
-# Убиваем pi и ВСЕ его дочерние процессы (включая orphaned)
-kill_pi_tree() {
-    if [[ -n "$PI_PID" ]]; then
-        # 1. SIGTERM pi (даём шанс graceful shutdown)
-        kill "$PI_PID" 2>/dev/null || true
+# Убиваем агент и ВСЕ его дочерние процессы (включая orphaned)
+kill_agent_tree() {
+    if [[ -n "$AGENT_PID" ]]; then
+        # 1. SIGTERM (даём шанс graceful shutdown)
+        kill "$AGENT_PID" 2>/dev/null || true
         # 2. Ждём до 3 сек
         local waited=0
-        while [[ $waited -lt 3 ]] && kill -0 "$PI_PID" 2>/dev/null; do
+        while [[ $waited -lt 3 ]] && kill -0 "$AGENT_PID" 2>/dev/null; do
             sleep 1
             waited=$((waited + 1))
         done
         # 3. Собираем ВСЕХ потомков (pgrep -P рекурсивно)
-        #    pi запускает дочерние процессы bash-tool с detached=true,
-        #    которые могут выжить после SIGTERM pi и не входить в его process group
         local all_pids
-        all_pids=$(_get_descendants "$PI_PID")
+        all_pids=$(_get_descendants "$AGENT_PID")
         # 4. SIGKILL всех потомков (младшие → старшие)
         for pid in $(echo "$all_pids" | tac); do
             kill -9 "$pid" 2>/dev/null || true
         done
-        # 5. SIGKILL pi
-        kill -9 "$PI_PID" 2>/dev/null || true
-        PI_PID=""
+        # 5. SIGKILL агент
+        kill -9 "$AGENT_PID" 2>/dev/null || true
+        AGENT_PID=""
     fi
 }
 
 cleanup() {
-    kill_pi_tree
+    kill_agent_tree
     rm -rf "$TMPDIR"
 }
 trap cleanup EXIT
 
-# Парсим список форматов
+# Формируем команду раннера
+build_runner_command
 
-# Формируем команду pi с упрощённым системным промптом и ролью
-PI_CMD=(pi --mode json --no-session --system-prompt "$SYSTEM_PROMPT_FILE")
-PI_CMD+=(--append-system-prompt "Возьми на себя роль из файла: $ROLE_FILE")
-"${PI_CMD[@]}" <<< "$PROMPT" > "$PIPE" 2>/dev/null &
-PI_PID=$!
+# Запускаем
+"${RUNNER_CMD[@]}" <<< "$PROMPT" > "$PIPE" 2>/dev/null &
+AGENT_PID=$!
 
-# Даём pi 5 сек на запуск, проверяем что он жив
+# Даём агенту 5 сек на запуск, проверяем что он жив
 sleep 0.2
-if ! kill -0 "$PI_PID" 2>/dev/null; then
-    echo '{"type":"_watch_error","reason":"pi_start_failed"}' >&2
+if ! kill -0 "$AGENT_PID" 2>/dev/null; then
+    echo "{\"type\":\"_watch_error\",\"reason\":\"${RUNNER}_start_failed\"}" >&2
     exit 1
 fi
 
@@ -210,7 +311,7 @@ while IFS= read -r -t "$STALL_TIMEOUT" line; do
         if has_format text; then filter_text "$OUTFILE"; fi
         if has_format tools; then filter_tools "$OUTFILE"; fi
         if has_format files; then filter_files "$OUTFILE"; fi
-        wait "$PI_PID" 2>/dev/null || true
+        wait "$AGENT_PID" 2>/dev/null || true
         exit 0
     fi
 
@@ -240,9 +341,9 @@ if [[ $elapsed -ge $STALL_TIMEOUT ]]; then
     exit 1
 fi
 
-# Pipe закрылся — pi завершился нормально
+# Pipe закрылся — агент завершился нормально
 if has_format text; then filter_text "$OUTFILE"; fi
 if has_format tools; then filter_tools "$OUTFILE"; fi
 if has_format files; then filter_files "$OUTFILE"; fi
-wait "$PI_PID" 2>/dev/null || true
+wait "$AGENT_PID" 2>/dev/null || true
 exit 0
