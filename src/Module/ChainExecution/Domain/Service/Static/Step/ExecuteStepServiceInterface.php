@@ -10,15 +10,15 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepR
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 
 /**
- * Интерфейс стратегии выполнения одного шага static-цепочки.
+ * Интерфейс сервиса выполнения одного шага static-цепочки.
  *
- * Реализации: AgentStepRunner, QualityGateStepRunner, ToolStepRunnerStrategy.
- * Резолвится через StepRunnerResolver по ChainStepTypeEnum.
+ * Реализации: ExecuteAgentStepService, ExecuteQualityGateStepService, ExecuteToolStepService.
+ * Резолвится через ResolveStepRunnerService по ChainStepTypeEnum.
  */
-interface StepRunnerInterface
+interface ExecuteStepServiceInterface
 {
     /**
-     * Определяет, поддерживает ли стратегия данный тип шага.
+     * Определяет, поддерживает ли сервис данный тип шага.
      */
     public function supports(ChainStepTypeEnum $type): bool;
 

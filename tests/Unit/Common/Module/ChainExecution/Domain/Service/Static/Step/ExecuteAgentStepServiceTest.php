@@ -11,20 +11,20 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Agent\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\AgentStepRunner;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\Step\ExecuteAgentStepService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRoleConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 
-#[CoversClass(AgentStepRunner::class)]
-final class AgentStepRunnerTest extends TestCase
+#[CoversClass(ExecuteAgentStepService::class)]
+final class ExecuteAgentStepServiceTest extends TestCase
 {
     #[Test]
     public function supportsReturnsTrueForAgentType(): void
     {
-        $runner = new AgentStepRunner(
+        $runner = new ExecuteAgentStepService(
             $this->createMock(RunAgentServiceInterface::class),
             $this->createMock(ResolveChainRunnerServiceInterface::class),
             $this->createMock(FormatPromptServiceInterface::class),
@@ -35,7 +35,7 @@ final class AgentStepRunnerTest extends TestCase
     #[Test]
     public function supportsReturnsFalseForOtherTypes(): void
     {
-        $runner = new AgentStepRunner(
+        $runner = new ExecuteAgentStepService(
             $this->createMock(RunAgentServiceInterface::class),
             $this->createMock(ResolveChainRunnerServiceInterface::class),
             $this->createMock(FormatPromptServiceInterface::class),
@@ -55,7 +55,7 @@ final class AgentStepRunnerTest extends TestCase
         $formatter = $this->createMock(FormatPromptServiceInterface::class);
         $formatter->method('buildStaticContext')->willReturn('formatted context');
 
-        $runner = new AgentStepRunner(
+        $runner = new ExecuteAgentStepService(
             $agentRunner,
             $this->createMock(ResolveChainRunnerServiceInterface::class),
             $formatter,
@@ -96,7 +96,7 @@ final class AgentStepRunnerTest extends TestCase
             ChainRunResultVo::createError('Agent failed: timeout exceeded', timedOut: true),
         );
 
-        $runner = new AgentStepRunner(
+        $runner = new ExecuteAgentStepService(
             $agentRunner,
             $this->createMock(ResolveChainRunnerServiceInterface::class),
             $this->createMock(FormatPromptServiceInterface::class),
@@ -128,7 +128,7 @@ final class AgentStepRunnerTest extends TestCase
             ChainRunResultVo::createSuccess('Result', 50, 100, cost: 0.005),
         );
 
-        $runner = new AgentStepRunner(
+        $runner = new ExecuteAgentStepService(
             $agentRunner,
             $this->createMock(ResolveChainRunnerServiceInterface::class),
             $this->createMock(FormatPromptServiceInterface::class),
@@ -167,7 +167,7 @@ final class AgentStepRunnerTest extends TestCase
             'Test task',
         )->willReturn('formatted: previous output');
 
-        $runner = new AgentStepRunner(
+        $runner = new ExecuteAgentStepService(
             $agentRunner,
             $this->createMock(ResolveChainRunnerServiceInterface::class),
             $formatter,
@@ -199,7 +199,7 @@ final class AgentStepRunnerTest extends TestCase
             ChainRunResultVo::createSuccess('Result', 50, 100, cost: 0.005),
         );
 
-        $runner = new AgentStepRunner(
+        $runner = new ExecuteAgentStepService(
             $agentRunner,
             $this->createMock(ResolveChainRunnerServiceInterface::class),
             $this->createMock(FormatPromptServiceInterface::class),

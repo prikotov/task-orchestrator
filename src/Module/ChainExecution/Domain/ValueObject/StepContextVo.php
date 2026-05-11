@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject;
 /**
  * Value Object: контекст выполнения одного шага цепочки.
  *
- * Инкапсулирует параметры, необходимые StepRunnerInterface::run()
+ * Инкапсулирует параметры, необходимые ExecuteStepServiceInterface::run()
  * для выполнения agent-шага, quality-gate или tool-шага.
  */
 final readonly class StepContextVo

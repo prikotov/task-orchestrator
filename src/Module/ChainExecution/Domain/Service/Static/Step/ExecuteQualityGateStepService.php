@@ -13,12 +13,12 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepR
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 
 /**
- * Стратегия выполнения quality-gate шага static-цепочки.
+ * Сервис выполнения quality-gate шага static-цепочки.
  *
  * Делегирует выполнение QualityGateRunnerInterface.
  * Без runner'а шаг считается успешным (no-op).
  */
-final readonly class QualityGateStepRunner implements StepRunnerInterface
+final readonly class ExecuteQualityGateStepService implements ExecuteStepServiceInterface
 {
     private const string RUNNER_NAME = 'shell';
 

@@ -18,12 +18,12 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepR
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 
 /**
- * Стратегия выполнения agent-шага static-цепочки.
+ * Сервис выполнения agent-шага static-цепочки.
  *
  * Выполняет AI-агента, обрабатывает fallback при ошибке,
  * усекает контекст при превышении лимита.
  */
-final readonly class AgentStepRunner implements StepRunnerInterface
+final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterface
 {
     public function __construct(
         private RunAgentServiceInterface $agentRunner,
