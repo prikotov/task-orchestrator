@@ -9,9 +9,9 @@ depends_on:
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-branch:
-pr:
-status: todo
+branch: task/research-codebuff-duet-multica
+pr: "#204"
+status: done
 ---
 
 # TASK-research-multica: Multica (Project Management для Human + Agent Teams)
