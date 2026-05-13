@@ -6,7 +6,9 @@ value: V3
 complexity: C2
 priority: P2
 depends_on:
-epic: EPIC-research-coding-agents-comparison
+epic:
+  - EPIC-research-coding-agents-comparison
+  - EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-oh-my-openagent
