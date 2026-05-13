@@ -9,8 +9,8 @@ depends_on:
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-branch:
-pr:
+branch: task/research-codebuff-duet-multica
+pr: "#204"
 status: done
 ---
 
