@@ -1,7 +1,7 @@
 # Coding Agents — Сводная таблица сравнения (финальная версия)
 
 **Дата создания:** 2026-05-09
-**Дата обновления:** 2026-05-11 (15 исследований, добавлен Oh My OpenAgent)
+**Дата обновления:** 2026-05-13 (14 исследований, OmO перенесён в agent-frameworks)
 **Эпик:** [EPIC-research-coding-agents-comparison](../../todo/EPIC-research-coding-agents-comparison.todo.md)
 **Автор:** Аналитик (Шерлок)
 
@@ -28,16 +28,15 @@
 | 3 | **Claude Code** | Пропр. | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ✅ | ✅ | ❌ | ⚠️ | ❌ | **21** | ⚠️ Частично (7/10) |
 | 4 | **Goose** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | **24** | ⚠️ Частично (7/10) |
 | 5 | **OpenCode CLI** | MIT | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ | **26** | ⚠️ Частично (7/10) |
-| 6 | **Oh My OpenAgent** | SUL-1.0 | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | **25** | ⚠️ Частично (7/10) |
-| 7 | **Hermes Agent** | MIT | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | **25** | ⚠️ Частично (7/10) |
-| 8 | **Warp AI (Oz)** | AGPL | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **20** | ⚠️ Частично (7/10) |
-| 9 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
-| 10 | **Gemini CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | **22** | ⚠️ Частично (6/10) |
-| 11 | **Kilo Code CLI** | MIT | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | **22** | ⚠️ Частично (6/10) |
-| 12 | **Crush** | FSL | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | **20** | ⚠️ Частично (6/10) |
-| 13 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
-| 14 | **OpenClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ✅ | ✅ | **21** | ❌ Не подходит (4/10) |
-| 15 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
+| 6 | **Hermes Agent** | MIT | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | **25** | ⚠️ Частично (7/10) |
+| 7 | **Warp AI (Oz)** | AGPL | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **20** | ⚠️ Частично (7/10) |
+| 8 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
+| 9 | **Gemini CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | **22** | ⚠️ Частично (6/10) |
+| 10 | **Kilo Code CLI** | MIT | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | **22** | ⚠️ Частично (6/10) |
+| 11 | **Crush** | FSL | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | **20** | ⚠️ Частично (6/10) |
+| 12 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
+| 13 | **OpenClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ✅ | ✅ | **21** | ❌ Не подходит (4/10) |
+| 14 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
 
 > **Примечание:** Вердикт включает качественную оценку (числовой score не всегда совпадает с суммой баллов — учитывается вес критериев для конкретного сценария сабагентной интеграции).
 
@@ -424,7 +423,6 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 | 2 | Qwen Code | [qwen-cli-comparison.md](coding-agents/qwen-cli-comparison.md) | ✅ Подходит (8/10) |
 | 3 | Claude Code | [claude-code-agent-comparison.md](coding-agents/claude-code-agent-comparison.md) | ⚠️ Частично (7/10) |
 | 4 | OpenCode CLI | [opencode-cli-comparison.md](coding-agents/opencode-cli-comparison.md) | ⚠️ Частично (7/10) |
-| 5 | Oh My OpenAgent | [oh-my-openagent-comparison.md](coding-agents/oh-my-openagent-comparison.md) | ⚠️ Частично (7/10) |
 | 5 | Goose | [goose-agent-comparison.md](coding-agents/goose-agent-comparison.md) | ⚠️ Частично (7/10) |
 | 6 | Hermes Agent | [hermes-agent-comparison.md](coding-agents/hermes-agent-comparison.md) | ⚠️ Частично (7/10) |
 | 7 | Warp AI (Oz) | [warp-agent-comparison.md](coding-agents/warp-agent-comparison.md) | ⚠️ Частично (7/10) |
@@ -447,7 +445,6 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 | Pi Coding Agent | TypeScript/Node.js | MIT | 20+ | 10/10 |
 | Qwen Code | TypeScript/Node.js | Apache-2.0 | 3 протокола | 8/10 |
 | OpenCode CLI | TypeScript/Go | MIT | 75+ | 7/10 |
-| Oh My OpenAgent | TypeScript/Bun (plugin) | SUL-1.0 | 75+ (OpenCode) | 7/10 |
 | Hermes Agent | Python | MIT | 30+ | 7/10 |
 | Goose | Rust | Apache-2.0 | 30+ | 7/10 |
 | Warp Oz | Rust | AGPL-3.0/MIT | 4 BYOK + 4 harness | 7/10 |

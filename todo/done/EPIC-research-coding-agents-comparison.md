@@ -109,7 +109,7 @@ flowchart LR
 
 - [x] [TASK-research-coding-agents-summary](TASK-research-coding-agents-summary.todo.md) — Сводная таблица и итоговые рекомендации
 
-- [ ] [TASK-research-oh-my-openagent](TASK-research-oh-my-openagent.todo.md) — Oh My OpenAgent / OmO (форк OpenCode, TypeScript)
+- [x] ~~TASK-research-oh-my-openagent~~ → перенесён в EPIC-research-agent-frameworks-comparison (OmO — система оркестрации, не кодинг-агент)
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все 14 индивидуальных research-задач выполнены
