@@ -11,7 +11,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch:
 pr:
-status: todo
+status: done
 ---
 
 # TASK-research-duet: Duet (AI-агент для командной работы)
