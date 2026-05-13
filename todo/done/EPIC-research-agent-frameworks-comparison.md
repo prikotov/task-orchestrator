@@ -90,6 +90,12 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 - [ ] [TASK-research-sandcastle](../TASK-research-sandcastle.todo.md) — Sandcastle (Matt Pocock)
 - [ ] [TASK-research-hermes-agent](../TASK-research-hermes-agent.todo.md) — Hermes Agent (Nous Research)
+- [x] [TASK-research-oh-my-openagent](../done/TASK-research-oh-my-openagent.todo.md) — Oh My OpenAgent (форк OpenCode, TypeScript + паттерны оркестрации)
+
+### Этап 1d: Дополнительные исследования (2026-05-13)
+
+- [ ] [TASK-research-duet](../TASK-research-duet.todo.md) — Duet (Aomni, cloud/SaaS, team AI-агент)
+- [ ] [TASK-research-multica](../TASK-research-multica.todo.md) — Multica (open-source, project management для human + agent teams)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 

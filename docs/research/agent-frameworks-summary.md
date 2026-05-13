@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 22 / 22 исследования
+> **Статус заполнения:** 23 / 23 исследования
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -33,6 +33,7 @@
 | 20 | Sandcastle (Matt Pocock) | TypeScript (Node.js) | `sandbox-orchestration` | `agent invocation loop` (run agent in sandbox → collect commits → iterate) | `git worktrees + commit collection` (без persistent DB) | `typed error hierarchy (20+ error types) + idle timeout + AbortSignal + worktree preservation on failure` | `AgentProvider (4 built-in: Claude Code/Codex/Pi/OpenCode) + SandboxProvider (Docker/Podman/Vercel/Daytona/custom) + Hooks + Templates (5) + Structured Output (Zod) + Completion Signal` | 🟡 заимствовать отдельные паттерны | [sandcastle-comparison.md](framework-comparisons/sandcastle-comparison.md) ✅ |
 | 21 | Kilo Code | TypeScript (Bun, Effect-TS) | `CLI-agent + SDK` | `agent-loop` (LLM → tool call → observation → LLM → ...) + subagent delegation (task tool: wave-based parallel execution) | `in-memory + context compaction (LLM summarization) + session persistence (SQLite)` | `error classification (ContextOverflow/API 5xx/rate limit/Kilo errors) + exponential backoff + Retry-After header parsing` | `Custom agents (JSON/Markdown/CLI) + MCP + Skills (SKILL.md) + Plugins + Workflows (slash commands) + Permission system (glob patterns) + 7 built-in agents` | 🟡 заимствовать отдельные паттерны | [opencode-orchestrator-comparison.md](framework-comparisons/opencode-orchestrator-comparison.md) ✅ |
 | 22 | OpenCode (anomalyco) | TypeScript (Bun, Effect-TS) | `CLI-agent + Desktop + SDK` | `agent-loop` (LLM → tool call → observation → LLM → ...) + subagent delegation (task tool: isolated session + resume) | `persistent` (SQLite через Drizzle ORM + event-sourced sync) | `error classification (ContextOverflow/API 5xx/rate limit/FreeUsageLimitError/GoUsageLimitError) + exponential backoff + Retry-After parsing + doom loop detection` | `7 built-in agents + custom agents (MD) + AI-generated agents + Skills (SKILL.md) + MCP + Plugins + Permission system (glob patterns) + Git Worktrees + ACP + LSP + 23+ LLM providers` | 🟡 заимствовать отдельные паттерны | [opencode-comparison.md](framework-comparisons/opencode-comparison.md) ✅ |
+| 23 | Oh My OpenAgent (OmO) | TypeScript (Bun, plugin для OpenCode) | `CLI-agent + multi-agent` | `agent-loop` (LLM → tool call → LLM → ...) + Discipline Agents (11) + Category System (8) + IntentGate (pre-routing) + Team Mode (lead + 8 members, shared mailbox + task list) | `persistent` (SQLite через OpenCode) + shared mailbox + shared task list + proactive context management (monitor + compaction + pruning) | `runtime fallback (per-agent provider chains, 429/503/529, cooldown) + doom loop detection (3 identical → ask) + error classification (унаследовано от OpenCode)` | `50+ hooks + Skill-Embedded MCPs + 11 Discipline Agents + 8 categories + custom agents + plugins + Agent-Model matching (per-agent fallback chains) + 75+ LLM providers` | 🟡 заимствовать отдельные паттерны | [oh-my-openagent-comparison.md](framework-comparisons/oh-my-openagent-comparison.md) ✅ |
 
 ### Легенда колонок
 
@@ -49,7 +50,7 @@
 
 ## Резюме для принятия решений (Executive Summary)
 
-По результатам исследования 22 AI-agent фреймворков и инструментов можно сделать **три главных вывода**:
+По результатам исследования 23 AI-agent фреймворков и инструментов можно сделать **три главных вывода**:
 
 1. **task-orchestrator обладает уникальной комбинацией возможностей**, которой нет ни у одного из исследованных проектов: YAML-цепочки + retry с backoff + circuit breaker + quality gates (shell) + бюджетный контроль + fix_iterations + fallback routing + JSONL audit trail. Ни один фреймворк — ни open-source, ни проприетарный — не предлагает все эти механизмы вместе. **Paperclip AI** — ближайший аналог по уровню (мета-оркестратор), но работает на уровне компании/агентов, а не chain steps.
 
@@ -136,7 +137,7 @@
 
 | Паттерн | Источники | Суть | Обоснование |
 |---|---|---|---|
-| **Auto-compaction / summarization** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, Kilo Code, **OpenCode** (7-секционный structured summary template: Goal/Constraints/Progress/Key Decisions/Next Steps/Critical Context/Relevant Files + pruning + preserve recent turns + replay) | LLM-суммаризация при context overflow | Широко распространённый паттерн (10/22). Для длинных цепочек и dynamic loops. OpenCode добавляет pruning, preserve recent и replay — три дополнительных механизма |
+| **Auto-compaction / summarization** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, Kilo Code, **OpenCode** (7-секционный structured summary template: Goal/Constraints/Progress/Key Decisions/Next Steps/Critical Context/Relevant Files + pruning + preserve recent turns + replay) | LLM-суммаризация при context overflow | Широко распространённый паттерн (11/23). Для длинных цепочек и dynamic loops. OpenCode добавляет pruning, preserve recent и replay — три дополнительных механизма. OmO добавляет proactive compaction |
 | **Bootstrap budget** | OpenClaw | Ограничение на размер context injection (AGENTS.md, skills, system prompts) | Защита от oversized промптов — context injection не превышает N% context window |
 | **Pluggable context engine** | OpenClaw (ingest/assemble/compact/maintain) | Формализованный интерфейс для context management lifecycle | Самый продвинутый подход к context management из исследованных |
 
@@ -321,14 +322,20 @@
 * Kilo Code: custom agent config (JSON/markdown/CLI create + AI-генерация — модель для переиспользуемых chain templates) — 🟡 P3
 * Kilo Code: session resume (task_id для продолжения subagent session — для возобновления прерванных chain runs) — 🟡 P3
 * OpenCode: doom loop detection (3 идентичных tool call → permission ask — защита от зацикливания в fix_iterations) — P2
+* **OmO: IntentGate — pre-orchestration routing** (классификация намерения: research/implementation/fix/investigation → выбор цепочки — Application-сервис, без Domain-изменений, quick win) — P2
+* **OmO: Skill-Embedded Requires** (скиллы объявляют зависимости: инструменты, env-переменные — валидация при загрузке цепочки, защита от «скилл без инструмента») — P2
 * OpenCode: error classification для retry (ContextOverflow → compact, 5xx → retry, rate limit → retry с Retry-After — модель для RetryingAgentRunner) — P2
 * OpenCode: permission system с glob patterns (allow/ask/deny per tool + session-level overrides — для CI/CD sandboxing без Docker) — P2
 * OpenCode: cost tracking (per-step tokens + cache + reasoning + provider-specific pricing — детализация для BudgetVo) — P2
 * OpenCode: context compaction (7-секционный structured template + pruning + preserve recent turns + replay — для длинных цепочек и dynamic loops) — P3
+* **OmO: Category-based Runner Resolution** (категория задачи deep/quick/default → routing к оптимальному runner'у — требует ADR и расширения ChainStepVo) — P2
+* **OmO: Per-role Permissions** (RolePermissionsVo — ограничение операций для роли: read-only/file-write/shell-exec, вдохновлено Discipline Agent Oracle) — P2
+* **OmO: Proactive Context Management** (мониторинг context window + проактивная компакция до ошибки + dynamic pruning dedup/supersede/purge — ценный для длинных цепочек и fix_iterations) — P3
 * OpenCode: subagent task tool (isolated session + permission inheritance + resume по task_id + no recursive delegation — модель для future dynamic chains) — P3
 * OpenCode: custom agents через Markdown (.opencode/agent/*.md + AI-генерация — модель для переиспользуемых chain templates) — P3
 * OpenCode: git worktree management (create/remove/reset + submodule update — для параллельных chain runs) — P3
 * OpenCode: snapshot tracking + revert (file diff per step + откат failed chains — audit trail на уровне файловых изменений) — P3
+* **OmO: Team Mode Architecture для DynamicLoop** (Lead + параллельные members, shared mailbox + task list — Blackboard Architecture, research-задача для пост-MVP) — P3
 
 </details>
 
@@ -336,13 +343,15 @@
 
 ## Общие тренды
 
-> Анализ выполнен на основе всех 22 исследований. Тренды сгруппированы по значимости для архитектуры task-orchestrator.
+> Анализ выполнен на основе всех 23 исследований. Тренды сгруппированы по значимости для архитектуры task-orchestrator.
 
 ### 1. Уникальная позиция task-orchestrator
 
-**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 22 фреймворков.
+**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 23 фреймворков.
 
 **Ни один проприетарный продукт** (Claude Code, GitHub Copilot Cloud Agent, OpenAI Codex) не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны даже против крупнейших коммерческих AI-agent продуктов (включая Factory Missions — SaaS-продукт для multi-day autonomous software engineering, оценённый в $1.5B).
+
+**Oh My OpenAgent (OmO, #23)** — plugin для OpenCode, добавляющий мультиагентную координацию (Team Mode), pre-orchestration routing (IntentGate) и proactive context management. OmO работает на уровне agent loop, не цепочек — его вклад в исследование — уникальные паттерны маршрутизации и координации.
 
 **Ближайший аналог** по уровню абстракции — Archon (TypeScript/Bun), который тоже оркестирует внешние AI-ассистенты через subprocess SDK. Однако Archon не имеет circuit breaker, quality gates или бюджетного контроля. **Sandcastle** (TypeScript/Node.js) — ближайший аналог по sandbox management (Docker/Podman/Vercel), но работает на уровне sandbox lifecycle, не chain orchestration: нет retry, circuit breaker, quality gates, budget. Agno (Python SDK) предлагает наиболее развитый workflow engine из исследованных (6 строительных блоков + вложенные workflows), но работает на уровне прямых LLM API, а не оркестрации внешних runner'ов.
 
@@ -350,7 +359,7 @@
 
 ### 2. Agent Loop — доминирующая модель выполнения
 
-**15 из 22 фреймворков** (исключая AgentCraft, Oz и Sandcastle, см. ниже) используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, AutoGen, OpenHands SDK, MetaGPT, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Hermes Agent, Kilo Code, **OpenCode**). LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK), Paperclip AI (heartbeat-based мета-оркестрация), Factory Missions (orchestrator-worker delegation с auto-injected validators) и Sandcastle (agent invocation loop в песочнице) используют принципиально другие модели.
+**16 из 23 фреймворков** (исключая AgentCraft, Oz и Sandcastle, см. ниже) используют базовую модель `LLM → tool call → observation → LLM → ...` (Crush, pi_agent_rust, CrewAI, AutoGen, OpenHands SDK, MetaGPT, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Hermes Agent, Kilo Code, **OpenCode**, **OmO**). LangGraph (graph/DAG с superstep execution), Archon (DAG + subprocess SDK), Paperclip AI (heartbeat-based мета-оркестрация), Factory Missions (orchestrator-worker delegation с auto-injected validators) и Sandcastle (agent invocation loop в песочнице) используют принципиально другие модели. OmO использует agent loop унаследованно от OpenCode, добавляя поверх Team Mode (Blackboard Architecture).
 
 **AgentCraft не учитывается в этом подсчёте:** он не имеет собственной модели выполнения, а выступает как GUI wrapper, делегируя выполнение подключённым внешним агентам (Claude Code, OpenCode, Cursor, OpenClaw). Эти агенты сами используют agent loop — AgentCraft лишь управляет их запуском и визуализирует прогресс. Таким образом, AgentCraft не является ни «agent loop», ни «другой моделью выполнения» — это управляющий слой поверх существующих сред.
 
@@ -362,11 +371,11 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 3. Разделение на семь уровней абстракции
 
-**Все 22 проекта** чётко делятся на семь уровней:
+**Все 23 проекта** чётко делятся на семь уровней:
 
 | Уровень | Проекты | Что делают | Аналог в task-orchestrator |
 |---|---|---|---|
-| **SDK / Agent runtime** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, OpenClaw, Agno, Hermes Agent, Kilo Code, **OpenCode** | Работают на уровне прямых LLM API | Runner'ы (pi, codex) |
+| **SDK / Agent runtime** | Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, OpenClaw, Agno, Hermes Agent, Kilo Code, **OpenCode**, **OmO** | Работают на уровне прямых LLM API | Runner'ы (pi, codex) |
 | **Оркестратор / Workflow engine** | CrewAI, LangGraph, AutoGen, Archon, MetaGPT, Copilot Workspace | Управляют потоком выполнения между агентами/шагами | Chain executor |
 | **Sandbox orchestration** | Sandcastle | Управляет жизненным циклом песочниц (Docker/Podman/Vercel), git worktrees, branch strategies для внешних AI-агентов | — (нет аналога) |
 | **GUI Manager / Launcher** | AgentCraft | Визуальный интерфейс для запуска и мониторинга внешних агентов, без собственной логики выполнения | — (нет аналога) |
@@ -378,8 +387,8 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 4. SKILL.md / AGENTS.md — де-факто стандарт
 
-**14 из 22 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
-- Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex, Agno, Factory Missions (.factory/skills/), Hermes Agent, Oz (Warp) (oz-skills), Kilo Code, **OpenCode** (.opencode/skills/ + remote URLs + .claude/skills/ + .agents/skills/)
+**15 из 23 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
+- Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex, Agno, Factory Missions (.factory/skills/), Hermes Agent, Oz (Warp) (oz-skills), Kilo Code, **OpenCode** (.opencode/skills/ + remote URLs + .claude/skills/ + .agents/skills/), **OmO** (Skill-Embedded MCPs: SKILL.md + собственные MCP-серверы)
 - Формат: YAML frontmatter + markdown body, discovery из нескольких мест, валидация
 - Стандарт [agentskills.io](https://agentskills.io) получает широкое распространение
 - Paperclip AI добавляет Company Skills: managed skill registry с import/export, trust levels, compatibility checks
@@ -388,16 +397,16 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 5. MCP (Model Context Protocol) — повсеместный протокол расширения
 
-**15 из 22 проектов** поддерживают MCP:
-- Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Paperclip AI, Hermes Agent, Oz (Warp), Kilo Code, **OpenCode** (full MCP client: tools + resources + OAuth)
+**16 из 23 проектов** поддерживают MCP:
+- Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Paperclip AI, Hermes Agent, Oz (Warp), Kilo Code, **OpenCode** (full MCP client: tools + resources + OAuth), **OmO** (Skill-Embedded MCPs: MCP-серверы внутри скиллов, per-session изоляция)
 - MCP — стандарт де-факто для расширения возможностей AI-агентов через внешние tool-серверы
 
 **Вывод:** MCP-поддержка в task-orchestrator — вопрос времени. Но реализовывать нужно на уровне runner'ов, не оркестратора.
 
 ### 6. Контекст-менеджмент — повсеместная проблема
 
-**10 из 22 проектов** реализуют auto-compaction / auto-summarization при context overflow:
-- Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, Agno, Hermes Agent, Kilo Code, **OpenCode** (7-секционный structured template + pruning + preserve recent turns + replay)
+**11 из 23 проектов** реализуют auto-compaction / auto-summarization при context overflow:
+- Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, Agno, Hermes Agent, Kilo Code, **OpenCode** (7-секционный structured template + pruning + preserve recent turns + replay), **OmO** (proactive compaction: monitor + compact **до** ошибки + dynamic context pruning: dedup/supersede/purge)
 - Все используют LLM-суммаризацию для сжатия истории
 - Hermes Agent — наиболее продвинутый подход: 14-секционный structured summary template, tool result pruning + deduplication, anti-thrashing protection, iterative summary updates, tool_call/result pair integrity, last-user-message anchoring (~1500 LOC)
 - OpenClaw: формализованный `ContextEngine` interface (ingest → assemble → compact → maintain) с tokenBudget
@@ -428,8 +437,8 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 8. Sub-agents / Multi-agent — тренд к иерархической декомпозиции
 
-**14 из 22 проектов** поддерживают sub-agents или multi-agent:
-- Crush (Coder → Task), Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat), Agno (Team с 4 режимами), Factory Missions (Task tool для subagents: investigation, review, research), Hermes Agent (delegate_task: parallel spawning, orchestrator/leaf roles, depth control до 3), Kilo Code (task tool: isolated session, permission inheritance, cost propagation, resume, parallel invocation), **OpenCode** (task tool: isolated session + permission inheritance + resume по task_id + no recursive delegation)
+**15 из 23 проектов** поддерживают sub-agents или multi-agent:
+- Crush (Coder → Task), Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat), Agno (Team с 4 режимами), Factory Missions (Task tool для subagents: investigation, review, research), Hermes Agent (delegate_task: parallel spawning, orchestrator/leaf roles, depth control до 3), Kilo Code (task tool: isolated session, permission inheritance, cost propagation, resume, parallel invocation), **OpenCode** (task tool: isolated session + permission inheritance + resume по task_id + no recursive delegation), **OmO** (Team Mode: Lead + до 8 параллельных members, shared mailbox + shared task list, 12 team_* инструментов)
 
 Oz (Warp) не имеет sub-agents в традиционном понимании, но поддерживает **unlimited parallel cloud agents** — одновременный запуск множества независимых agent runs через API. Это горизонтальное масштабирование, не иерархическая декомпозиция.
 
@@ -504,6 +513,7 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 * **Sandcastle — наиболее продвинутый sandbox orchestration layer** из исследованных: plug-and-play SandboxProvider (Docker/Podman/Vercel/Daytona/custom), 3 branch strategies (head/merge-to-head/branch), git worktree management со stale pruning и dirty preservation, AgentProvider interface (4 built-in: Claude Code/Codex/Pi/OpenCode), structured output (Zod), completion signal, prompt template engine ({{KEY}} + !`command`), 5 multi-agent templates. Построен на Effect-TS — функциональной effect system. Не workflow engine и не chain orchestrator — инфраструктурный слой для запуска агентов в песочницах. Наиболее зрелая реализация sandbox management из исследованных: SELinux labels, UID/GID alignment, Windows path compatibility, worktree locking. Подтверждает тренд separation of concerns: sandbox orchestration (Sandcastle) → chain orchestrator (task-orchestrator) → cloud agent platform (Oz).
 * **Kilo Code — наиболее развитая AI-агентная платформа для разработки** из исследованных: VS Code extension + CLI + JetBrains plugin, 19K звёзд, MIT лицензия, 7 built-in агентов (code/plan/debug/ask/orchestrator/general/explore), custom agents через JSON/markdown/CLI, permission system с glob patterns, context compaction с structured template, error classification для retry policy, subagent delegation через task tool (isolated session, permission inheritance, cost propagation, resume, parallel invocation), MCP, Skills (SKILL.md), Plugins, Workflows (slash commands), autonomous CI/CD mode (`kilo run --auto`). Orchestrator Mode объявлен **deprecated** — subagents встроены в каждый primary agent. Wave-based execution pattern (parallel waves, dependency classification) — модель для будущих dynamic chains. Построен на Effect-TS + Bun + Vercel AI SDK. Подтверждает тренд: оркестрация — не отдельный режим, а capability каждого агента.
 * **OpenCode — наиболее популярный open source AI-coding agent** из исследованных: 156K+ звёзд, 18K+ форков, TypeScript/Bun, MIT лицензия. TUI + Desktop App + VS Code/JetBrains/Zed extensions + клиент-серверная архитектура (HTTP API + WebSocket + mDNS). 23+ LLM провайдеров через Vercel AI SDK (provider-agnostic). 7 built-in агентов (build/plan/general/explore/compaction/title/summary) + custom agents через Markdown (.opencode/agent/*.md) + AI-генерация. Doom loop detection (3 идентичных tool call → ask). Permission system с glob patterns (allow/ask/deny per tool, session-level overrides, inherited для subagents). Context compaction с 7-секционным structured template + pruning + preserve recent + replay. Subagent delegation через task tool (isolated session + resume по task_id). Error classification с Retry-After header parsing. Git worktree management (create/remove/reset + submodule update). Snapshot tracking + revert (file diff per step). Skills (SKILL.md), MCP, Plugins, ACP (Agent Client Protocol). Cost tracking с provider-specific pricing (cache tokens, reasoning tokens). Подтверждает тренды: provider-agnostic, клиент-серверная архитектура, structured compaction, doom loop detection.
+* **Oh My OpenAgent (OmO) — plugin-оркестратор поверх OpenCode**, добавляющий три уникальных паттерна, не встреченных в других 22 проектах: (1) IntentGate — pre-orchestration routing через классификацию намерения **до** выполнения; (2) Skill-Embedded MCPs — скиллы, несущие собственные MCP-серверы с per-session изоляцией; (3) proactive context management — мониторинг + компакция + pruning **до** ошибки, а не реактивно при переполнении. OmO = plugin, не standalone продукт. Лицензия SUL-1.0 ограничивает коммерческое распространение, но разрешает внутреннее бизнес-использование. Архитектурное ревью (Гэндальф): 2 паттерна — заимствовать (IntentGate, Skill-Embedded Tools), 3 — наблюдать (Discipline Agents, Team Mode, Category System), 1 — антипаттерн (Dual-Prompt: нарушение слоистой архитектуры).
 
 ---
 
@@ -536,3 +546,4 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 | 2026-05-07 | Аналитик (Шерлок) | Создан отчёт sandcastle-comparison.md, заполнена строка Sandcastle (#20). Пересчитаны тренды (19→20): agent loop 13/20, SKILL.md 12/20, MCP 13/20, sub-agents 12/20, compression 8/20. Добавлен седьмой уровень абстракции (Sandbox orchestration). Добавлены рекомендации Sandcastle (P2: Sandbox Provider Interface, structured output, completion signal, prompt template engine, typed error hierarchy, idle timeout; P3: branch strategy/git worktrees, multi-agent templates, lifecycle hooks, AbortSignal, worktree preservation). Добавлено наблюдение: Sandcastle — наиболее продвинутый sandbox orchestration layer из исследованных. Все 20 исследований завершены. |
 | 2026-05-08 | Аналитик (Шерлок) | Создан отчёт opencode-orchestrator-comparison.md, заполнена строка Kilo Code (#21). Пересчитаны тренды (20→21): agent loop 14/21, SKILL.md 13/21, MCP 14/21, sub-agents 13/21, compression 9/21, error classification 5/21. Добавлены рекомендации Kilo Code (P2: subagent isolation, permission system, error classification, steps limit; P3: cost propagation, wave-based parallel execution, context compaction, custom agent config, session resume). Добавлено наблюдение: Kilo Code — наиболее развитая AI-агентная платформа для разработки (19K звёзд, MIT, deprecated Orchestrator Mode). Все 21 исследование завершены. |
 | 2026-05-08 | Аналитик (Шерлок) | Создан отчёт opencode-comparison.md, заполнена строка OpenCode (#22). Пересчитаны тренды (21→22): agent loop 15/22, SKILL.md 14/22, MCP 15/22, sub-agents 14/22, compression 10/22, error classification 6/22. Добавлены рекомендации OpenCode (P2: doom loop detection, error classification, permission system, cost tracking; P3: context compaction, subagent task tool, custom agents, git worktrees, snapshot tracking). Добавлено наблюдение: OpenCode — наиболее популярный open source AI-coding agent (156K+ звёзд, 18K+ форков, 23+ LLM провайдеров, 7 built-in агентов, клиент-серверная архитектура). Все 22 исследования завершены. |
+| 2026-05-13 | Аналитик (Шерлок) | Создан отчёт oh-my-openagent-comparison.md, заполнена строка OmO (#23). Пересчитаны тренды (22→23): agent loop 16/23, SKILL.md 15/23, MCP 16/23, sub-agents 15/23, compression 11/23. Добавлены рекомендации OmO (P2: IntentGate, Skill-Embedded Requires, Category-based Runner Resolution, Per-role Permissions; P3: Proactive Context Management, Team Mode для DynamicLoop). Добавлено наблюдение: OmO — plugin-оркестратор с уникальными паттернами (IntentGate, Skill-Embedded MCPs, proactive context management). Все 23 исследования завершены. |
