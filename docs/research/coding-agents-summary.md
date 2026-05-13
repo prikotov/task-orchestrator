@@ -1,7 +1,7 @@
 # Coding Agents — Сводная таблица сравнения (финальная версия)
 
 **Дата создания:** 2026-05-09
-**Дата обновления:** 2026-05-13 (14 исследований)
+**Дата обновления:** 2026-05-13 (15 исследований)
 **Эпик:** [EPIC-research-coding-agents-comparison](../../todo/EPIC-research-coding-agents-comparison.todo.md)
 **Автор:** Аналитик (Шерлок)
 
@@ -344,13 +344,13 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 
 Текущая система скиллов (`docs/agents/skills/*/SKILL.md`) совместима со всеми агентами, поддерживающими Agent Skills standard, при соблюдении условий:
 
-| Условие | Pi | Qwen | Claude | OpenCode | Goose | Hermes | Warp |
-|---------|-----|------|--------|----------|-------|--------|------|
-| `--skill` CLI | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| `.agents/skills/` symlink | — | ✅ | ❌ (`.claude/`) | ✅ | ✅ | ✅ | ✅ |
-| `skills.paths` / `external_dirs` | — | — | — | ✅ | — | ✅ | — |
+| Условие | Pi | Qwen | Claude | OpenCode | Goose | Hermes | Warp | Codebuff |
+|---------|-----|------|--------|----------|-------|--------|------|----------|
+| `--skill` CLI | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ |
+| `.agents/skills/` symlink | — | ✅ | ❌ (`.claude/`) | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `skills.paths` / `external_dirs` | — | — | — | ✅ | — | ✅ | — | SDK `skillsDir` |
 
-**Рекомендация:** Создать symlink `.agents/skills/ → docs/agents/skills/` в корне проекта. Это обеспечит автосканирование для 10 из 14 агентов.
+**Рекомендация:** Создать symlink `.agents/skills/ → docs/agents/skills/` в корне проекта. Это обеспечит автосканирование для 11 из 15 агентов.
 
 ---
 
@@ -360,16 +360,16 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 
 | Паттерн | Агенты | Частота |
 |---------|--------|---------|
-| **Agent Skills standard** (agentskills.io) | Pi, Qwen, OpenCode, Goose, Crush, Hermes, Warp, Kilo, Codex, Gemini, OpenClaw | 11/14 (79%) |
+| **Agent Skills standard** (agentskills.io) | Pi, Qwen, OpenCode, Goose, Crush, Hermes, Warp, Kilo, Codex, Gemini, OpenClaw, Codebuff | 12/15 (80%) |
 | **AGENTS.md автосканирование** | Pi, Qwen, OpenCode, Hermes, Goose, Codex, Gemini, Kilo, Crush, Warp | 10/14 (71%) |
-| **`.agents/skills/` автосканирование** | Pi, Qwen, OpenCode, Hermes, Goose, Gemini, Kilo, Crush, OpenClaw, Warp | 10/14 (71%) |
+| **`.agents/skills/` автосканирование** | Pi, Qwen, OpenCode, Hermes, Goose, Gemini, Kilo, Crush, OpenClaw, Warp, Codebuff | 11/15 (73%) |
 | **JSON/JSONL-режим** | Pi, Qwen, Claude, OpenCode, Goose, Gemini, Kilo, Codex, Warp | 9/14 (64%) |
 | **`--yolo` / auto-approve** | Qwen, Gemini, Crush, Kilo, Hermes | 5/14 (36%) |
 | **Ephemeral / no-session** | Pi, Goose, Codex | 3/14 (21%) |
 | **`--append-system-prompt`** | Pi, Qwen, Claude | 3/14 (21%) |
 | **`--skill` CLI-флаг** | Pi, Hermes, Warp | 3/14 (21%) |
 | **Стоимость в $ в CLI** | Pi, Claude, OpenCode | 3/14 (21%) |
-| **Кастомные агенты (файлы)** | OpenCode, Kilo, Claude, Droid | 4/14 (29%) |
+| **Кастомные агенты (файлы)** | OpenCode, Kilo, Claude, Droid, Codebuff | 5/15 (33%) |
 
 ### 5.2. Пробелы — что не покрывается ни одним агентом
 
@@ -388,6 +388,7 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 3. **Мультипровайдерность** — тренд к поддержке множества LLM-провайдеров. Исключения: Gemini CLI (Google only), Copilot CLI (GitHub only), Claude Code (Anthropic only).
 4. **Harness-делегирование** — Warp Oz может делегировать другим CLI-агентам (Claude, OpenCode, Gemini, Codex). Потенциальный паттерн для мультиагентной оркестрации.
 5. **ACP (Agent Client Protocol)** — поддерживается Goose, Kilo Code, Hermes, OpenClaw. Потенциальный стандарт для межагентной коммуникации.
+6. **SDK-first мультиагентность** — Codebuff использует SDK для программного управления агентами (handleSteps generators, AgentDefinition). Паттерн "mix of AI generation with programmatic control" уникален среди исследованных агентов.
 
 ### 5.4. Рекомендации по дальнейшему развитию
 
@@ -396,9 +397,10 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 | **P0** | Pi остаётся основным сабагентом | Идеальное сочетание CLI API, JSONL, скиллов, телеметрии |
 | **P1** | Qwen Code — первый резервный сабагент | Идентичный CLI API, stream-json, Apache-2.0, миграция wrapper за 1 час |
 | **P2** | Claude Code — для задач с Claude-моделями | Идентичный API промпта, guard rails, богатая телеметрия |
-| **P3** | Создать symlink `.agents/skills/ → docs/agents/skills/` | Обеспечит автосканирование для 10/14 агентов |
+| **P3** | Создать symlink `.agents/skills/ → docs/agents/skills/` | Обеспечит автосканирование для 11/15 агентов |
 | **P4** | Исследовать Warp Oz как платформу оркестрации | Inter-agent messaging + harness delegation для будущей мультиагентной архитектуры |
 | **P5** | Инициировать обсуждение стандарта JSONL-событий | Нет общего протокола — каждый wrapper приходится писать отдельно |
+| **P6** | Изучить Codebuff SDK как паттерн для Node.js adapter | handleSteps + AgentDefinition + OpenRouter — архитектурный референс для мультиагентной координации |
 
 ---
 
@@ -419,13 +421,14 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 | 11 | Crush | [crush-agent-comparison.md](coding-agents/crush-agent-comparison.md) | ⚠️ Частично (6/10) |
 | 12 | Factory Droid | [droid-agent-comparison.md](coding-agents/droid-agent-comparison.md) | ⚠️ Частично (6/10) |
 | 13 | OpenClaw | [openclaw-agent-comparison.md](coding-agents/openclaw-agent-comparison.md) | ❌ Не подходит (4/10) |
-| 14 | GitHub Copilot CLI | [copilot-cli-comparison.md](coding-agents/copilot-cli-comparison.md) | ❌ Не подходит (3/10) |
+| 14 | **Codebuff** | [codebuff-comparison.md](coding-agents/codebuff-comparison.md) | ⚠️ Частично (6/10) |
+| 15 | GitHub Copilot CLI | [copilot-cli-comparison.md](coding-agents/copilot-cli-comparison.md) | ❌ Не подходит (3/10) |
 
 ---
 
 ## Приложение. Сводка по группам
 
-### Open Source (11 агентов)
+### Open Source (12 агентов)
 
 | Агент | Язык | Лицензия | Провайдеры | Score |
 |-------|------|----------|-----------|-------|
@@ -439,6 +442,7 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 | Gemini CLI | TypeScript/Node.js | Apache-2.0 | Google only | 6/10 |
 | Kilo Code CLI | TypeScript/Bun | MIT | 4 AI SDK + Cloud | 6/10 |
 | Crush | Go | FSL-1.1-MIT | 20+ | 6/10 |
+| Codebuff | TypeScript/Bun | Apache-2.0 | 5+ (OpenRouter 100+) | 6/10 |
 | OpenClaw | TypeScript/Node.js | MIT | 40+ | 4/10 |
 
 ### Проприетарные (3 агента)
