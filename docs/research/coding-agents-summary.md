@@ -199,7 +199,6 @@
 | **Pi** | MIT | ✅ | ✅ | ❌ Нет |
 | **Qwen Code** | Apache-2.0 | ✅ | ✅ | ❌ Нет |
 | **OpenCode** | MIT | ✅ | ✅ | ❌ Нет |
-
 | **Hermes** | MIT | ✅ | ✅ | ❌ Нет |
 | **Goose** | Apache-2.0 (Linux Foundation) | ✅ | ✅ | ❌ Нет |
 | **Codex CLI** | Apache-2.0 | ✅ | ✅ | ❌ Нет |
@@ -248,7 +247,6 @@
 | `.agents/skills/` | Автосканирование из коробки |
 | 3 протокола API | OpenAI, Anthropic, Google GenAI — покрывает основных провайдеров |
 | Apache-2.0 | Open source |
-
 | Ограничение | Описание |
 |-------------|----------|
 | Нет `--skill` CLI | Невозможно явно загрузить/фильтровать скиллы |
@@ -266,7 +264,6 @@
 | Богатая телеметрия | По-модельная разбивка `modelUsage`, `total_cost_usd`, `duration_ms` |
 | `--json-schema` | Валидация выхода по JSON Schema |
 | `--fallback-model` | Graceful degradation при перегрузке |
-
 | Ограничение | Описание |
 |-------------|----------|
 | Только Anthropic | Архитектурный lock-in на одного провайдера |
