@@ -10,8 +10,8 @@
 #
 # Параметры:
 #   -s, --soft-timeout   — базовый таймаут в секундах (обязателен).
-#   -m, --hard-timeout   — абсолютный максимум в секундах (default: 1200).
-#   -t, --stall-timeout  — секунд без событий до признания зависания (default: 120).
+#   -m, --hard-timeout   — абсолютный максимум в секундах (default: 1800).
+#   -t, --stall-timeout  — секунд без событий до признания зависания (default: 180).
 #   -o, --output         — формат вывода через запятую: raw, text, tools, files (default: raw).
 #   -r, --role-file <file> — путь к файлу описания роли (обязателен).
 #   --runner <pi|codex>  — раннер (default: pi; env RUNNER).
@@ -26,8 +26,8 @@
 
 set -euo pipefail
 
-HARD_TIMEOUT=1200
-STALL_TIMEOUT=120
+HARD_TIMEOUT=1800
+STALL_TIMEOUT=180
 SOFT_TIMEOUT=""
 OUTPUT="raw"
 ROLE_FILE=""
@@ -52,8 +52,8 @@ while [[ $# -gt 0 ]]; do
         -h|--help)
             echo "Использование: $0 -s <soft-timeout> [options] [prompt text]"
             echo "  -s, --soft-timeout   базовый таймаут в секундах (обязателен)"
-            echo "  -m, --hard-timeout   абсолютный максимум в секундах (default: 1200)"
-            echo "  -t, --stall-timeout  секунд без событий до зависания (default: 120)"
+            echo "  -m, --hard-timeout   абсолютный максимум в секундах (default: 1800)"
+            echo "  -t, --stall-timeout  секунд без событий до зависания (default: 180)"
             echo "  -o, --output         формат вывода через запятую: raw, text, tools, files (default: raw)"
             echo "  -r, --role-file <file> путь к файлу описания роли (обязателен)"
             echo "  --runner <pi|codex>  раннер (default: pi; env RUNNER)"
@@ -281,7 +281,7 @@ fi
 
 # Вычисляем таймауты: soft — основной, hard — абсолютный потолок
 # SOFT_TIMEOUT обязателен, hard не может быть < soft
-# Если -m не задан явно, hard = max(soft*2, 1200)
+# Если -m не задан явно, hard = max(soft*2, 1800)
 EFFECTIVE_HARD=${HARD_TIMEOUT}
 if [[ -n "$SOFT_TIMEOUT" ]]; then
     computed_hard=$((SOFT_TIMEOUT * 2))
