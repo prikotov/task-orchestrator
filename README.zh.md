@@ -140,15 +140,7 @@ TasK-orchestrator 相對於已研究方案的優勢：
 - **技能作為指令**：由代理自主執行的文字流程，或 YAML 鏈條的封裝
 - **品質檢查**：直接在步驟鏈條中執行的 linter 和測試
 
-限制（詳情請參閱 [ROADMAP](docs/releases/ROADMAP-2026-Q2-Q3.md)）：
-
-- **平行執行** — Roadmap
-- **任務圖（DAG / StateGraph）** — Roadmap
-- **內建子代理** — Backlog
-- **工作階段間的持久記憶** — R&D
-- **Docker 沙箱** — Backlog
-- **Python / TypeScript SDK** — 未規劃
-- **圖形化介面** — 未規劃
+發展路線圖——請參閱 [ROADMAP](docs/releases/ROADMAP-2026-Q2-Q3.md)。
 
 ---
 
