@@ -140,15 +140,7 @@ Strengths of TasK-orchestrator compared to the solutions studied:
 - **Skills as instructions**: text-based processes that the agent drives itself, or wrappers over YAML chains
 - **Quality checks**: linters and tests right inside the step chain
 
-Limitations (details in [ROADMAP](docs/releases/ROADMAP-2026-Q2-Q3.md)):
-
-- **Parallel execution** — Roadmap
-- **Task graphs (DAG / StateGraph)** — Roadmap
-- **Built-in subagents** — Backlog
-- **Persistent memory between sessions** — R&D
-- **Docker sandbox** — Backlog
-- **Python / TypeScript SDK** — not planned
-- **Graphical interface** — not planned
+Development roadmap — see [ROADMAP](docs/releases/ROADMAP-2026-Q2-Q3.md).
 
 ---
 

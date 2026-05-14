@@ -17,6 +17,11 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 
 $projectDir = dirname(__DIR__);
 
+// Load .env.local if exists (e.g. CODEX_HTTP_PROXY)
+if (is_file($projectDir . '/.env.local')) {
+    (new Symfony\Component\Dotenv\Dotenv())->usePutenv(true)->load($projectDir . '/.env.local');
+}
+
 $container = new ContainerBuilder();
 $container->setParameter('kernel.project_dir', $projectDir);
 
