@@ -156,7 +156,7 @@ final readonly class ReportTextMapper implements ReportFormatMapperInterface
             ? sprintf(' → %s', $step->fallbackRunnerUsed)
             : '';
 
-        return sprintf(
+        $header = sprintf(
             '[%d/%d] %s @ %s%s%s ... %s (↑%s ↓%s $%.4f, %ds)',
             $num,
             $total,
@@ -170,6 +170,12 @@ final readonly class ReportTextMapper implements ReportFormatMapperInterface
             $step->cost,
             $duration,
         );
+
+        if ($step->outputText !== '') {
+            $header .= "\n" . $step->outputText;
+        }
+
+        return $header;
     }
 
     /**

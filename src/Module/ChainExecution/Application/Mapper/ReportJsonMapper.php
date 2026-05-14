@@ -65,6 +65,7 @@ final readonly class ReportJsonMapper implements ReportFormatMapperInterface
                 'role' => $step->role,
                 'runner' => $step->runner,
                 'status' => $this->resolveStepStatus($step),
+                'output_text' => $step->outputText,
                 'input_tokens' => $step->inputTokens,
                 'output_tokens' => $step->outputTokens,
                 'cost' => round($step->cost, 6),

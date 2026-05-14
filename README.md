@@ -1,360 +1,213 @@
-# TasK Orchestrator
+[![Read in English](https://img.shields.io/badge/Lang-English-blue)](README.en.md)
+[![Read in 繁體中文](https://img.shields.io/badge/Lang-繁體中文-blue)](README.zh.md)
 
-[![PHP 8.4](https://img.shields.io/badge/PHP-8.4-777BB4.svg)](https://php.net)
-[![PHPUnit](https://img.shields.io/badge/PHPUnit-10.5-green.svg)](https://phpunit.de)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+# TasK-orchestrator
 
-> Chain-based AI agent orchestration with retry, circuit breaker, quality gates and dynamic loops.
+### Оркестратор CLI-агентов
 
-TasK Orchestrator is a PHP library for orchestrating AI agents into deterministic and dynamic workflows. Define agent chains in YAML, run them with built-in resilience patterns (retry, circuit breaker, fallback), and get full audit trails of every execution.
+Продолжительная и разностороняя работа с AI-агентом в одной длинной сессии перегружает его контекст. Агент одновременно держит в памяти инструкции по процессу, детали каждого шага и ваши случайные оговорки. Чем дольше сессия, тем больше шума и тем хуже результат. Происходит деградация контекста и ухудшается качество ответов.
 
-Built with **DDD principles**, minimal dependencies in the domain layer (only `psr/log`), and shipped as a **Symfony Bundle** for easy integration.
+С другой стороны, вы ведёте несколько задач параллельно: переключаетесь между агентами, руками запускаете каждый следующий шаг, теряете контекст, забывая, что просили несколько минут назад, тратите время на его восстановление. Когнитивная нагрузка растёт, вы устаёте, и качество вашей работы тоже падает.
+
+К тому же разные модели сильны в разном: Gemini хорошо пишет тексты, GPT модели точнее следуют инструкциям и работают с кодом, Opus решает сложные задачи с глубоким анализом, новые модели из Китая активно догоняют. Модель — это только часть связки: она работает внутри харнеса, управляющей оболочки вроде Codex, Claude Code или pi, с определённым набором инструментов и своим подходом к контексту. Codex хорошо работает с моделями OpenAI, Claude Code с Anthropic, а OpenCode, Kilocode и pi поддерживают нескольких провайдеров. На каждый участок работы хочется поставить подходящую связку из консольного агента, модели, роли и навыков, но настраивать, переключаться вручную и копировать контекст между окнами утомительно.
+
+TasK-orchestrator решает эти проблемы через имитацию работы реальной команды, где у каждого участника своя роль, свои навыки и свой контекст, а задачи передаются как поручения — ведь у людей нет общего мозга. Для этого предусмотрены четыре инструмента:
+
+**Роли** — Markdown-файл с описанием личности агента: поведенческий профиль (DISC, Big Five), экспертиза, стиль работы, сильные и слабые стороны. К роли привязываются скиллы, которыми она владеет. Модель получает файл как системную инструкцию и действует в рамках этой роли.
+
+**YAML-конфиг** — для процессов, где порядок шагов известен заранее. Вы описываете роли, привязываете к каждой консольного агента, модель и параметры запуска, выстраиваете шаги и условия ветвления. Оркестратор проходит цепочку без отклонений.
+
+**Скиллы** — навыки, которыми владеет роль. Скилл описывается Markdown-файлом с пошаговой инструкцией и вспомогательными скриптами. Роль сама выбирает подходящий скилл и применяет по ситуации.
+
+**Сабагенты** — способ запуска роли как агента в чистом контексте. Агент получает роль, поручение и другой контекст в виде текста и файлов. Никакой истории чата и артефактов предыдущих сессий.
+
+Оркестрация работает в двух режимах. В первом процесс задаёт YAML-конфиг, а исполняет его оркестратор, последовательно запуская агентов для выполнения шага. Во втором процесс ведёт агент: тимлид получает скилл как инструкцию и сам определяет, какого сабагента запустить, когда отправить на доработку и когда эскалировать проблему.
 
 ---
 
-## Overview
+## Роли
 
-### Key features
+Роль — Markdown-файл, который модель получает как системную инструкцию. В front matter описывается личность через несколько поведенческих моделей (DISC, Big Five, Адизес, Белбин, юнгианские архетипы), экспертиза и привязанные скиллы. Тело файла раскрывает личность, заданную во front matter: описание роли, личные особенности, стиль работы, принципы и правила поведения.
 
-| Feature | Description |
+Одна специализация может иметь несколько ролей с разными поведенческими профилями. Два архитектора с одним поручением, но разными профилями дадут разные решения — один строго следует стандартам, другой ищет слепые зоны и альтернативы. Два бэкендера: один пишет чистый код по всем правилам, другой ценит скорость и простоту. Такая конфронтация взглядов — осознанный выбор, так как приносит пользу как и в реальной команде. Она особенно важна там, где нужен конфликт интересов: на ревью кода проверяющий смотрит на решение под другим углом — его приоритеты простота и скорость работы, а не аккуратность кода; на мозговом штурме участники с разными профилями генерируют больше идей, чем один агент, который склонен соглашаться с собой и другими. Классические системы оркестрации, которые мы изучали, не работают с поведенческими профилями: там не уделяется внимание «личностям» ролей.
+
+Пользователь создаёт новые роли как Markdown-файлы — с уникальной личностью, экспертизой и набором скиллов. Рекомендации по описанию ролей — в [ROLE-CREATION.md](docs/agents/roles/ROLE-CREATION.md).
+
+Примеры ролей: [`docs/agents/roles/team/`](docs/agents/roles/team/).
+
+---
+
+## YAML-конфиг
+
+YAML-файл задаёт детерминированный процесс: вы описываете роли, привязываете к каждой AI-агента, модель и параметры запуска, выстраиваете шаги и условия ветвления. Оркестратор — это PHP-движок, который обходит цепочку шаг за шагом. Поведение определяется конфигом: какие шаги, в каком порядке, с какими условиями.
+
+Поддерживаются два типа цепочек. `static` — фиксированная последовательность шагов, где порядок известен заранее: аналитик разбирает требования → бэкендер реализует → ревьювер проверяет. `dynamic` — ведущий сам решает, кто и когда действует: управляет процессом, назначает исполнителей, отправляет на доработку.
+
+В цепочках поддерживаются: повтор с задержкой при сбоях, предохранитель (временная блокировка при повторных ошибках), запасной исполнитель (fallback), проверки через shell-команды (quality gates), ограничения по лимитам, ветвление через `when:`, журналирование каждого шага в JSONL.
+
+Пример — мозговой штурм, где четыре роли обсуждают архитектурное решение:
+
+```yaml
+# config/chains.yaml
+roles:
+  team_lead_alex:
+    prompt_file: docs/agents/roles/team/team_lead_alex.ru.md
+    command: [pi, --mode, json, -p, --no-session, --provider, zai, --model, glm-5-turbo, --system-prompt, "@system-prompt"]
+
+  system_architect_gandalf:
+    prompt_file: docs/agents/roles/team/system_architect_gandalf.ru.md
+    command: [codex, exec, --dangerously-bypass-approvals-and-sandbox, --json, --model, gpt-5.5]
+
+  system_architect_loki:
+    prompt_file: docs/agents/roles/team/system_architect_loki.ru.md
+    command: [codex, exec, --dangerously-bypass-approvals-and-sandbox, --json, --model, gpt-5.5]
+
+  backend_developer_tony:
+    prompt_file: docs/agents/roles/team/backend_developer_tony.ru.md
+    command: [pi, --mode, json, -p, --no-session, --provider, zai, --model, glm-5-turbo, --system-prompt, "@system-prompt"]
+
+chains:
+  brainstorm:
+    type: dynamic
+    description: "Фасилитируемый brainstorm с конструктивным конфликтом"
+    timeout: 600
+    facilitator: team_lead_alex
+    participants: [system_architect_gandalf, system_architect_loki, backend_developer_tony]
+    max_rounds: 20
+    max_time: 3600
+    prompts:
+      brainstorm_system: prompts/brainstorm/brainstorm_system.txt
+      facilitator_append: prompts/brainstorm/facilitator_append.txt
+      facilitator_start: prompts/brainstorm/facilitator_start.txt
+      facilitator_continue: prompts/brainstorm/facilitator_continue.txt
+      facilitator_finalize: prompts/brainstorm/facilitator_finalize.txt
+      participant_append: prompts/brainstorm/participant_append.txt
+      participant_user: prompts/brainstorm/participant_user.txt
+```
+
+```bash
+TasK-orchestrator app:agent:orchestrate \
+  "Какие модули выделить из AgentRunner?" \
+  --chain=brainstorm
+```
+
+Подробности: [документация цепочек](docs/guide/chains.md), [надёжность](docs/guide/reliability.md). Пример конфига: [`config/chains.yaml`](config/chains.yaml).
+
+---
+
+## Скиллы
+
+Скилл — навык, которым владеет роль. Описывается Markdown-файлом (`SKILL.md`) с пошаговой инструкцией и вспомогательными скриптами. Роль сама выбирает и загружает подходящий скилл по ситуации.
+
+Это возможность реализации оркестрации через скилл: роль получает инструкцию и сама решает, как действовать — какого сабагента запустить, когда отправить на доработку, когда эскалировать проблему. Например, тимлид через [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) ведёт эпик от постановки до merge, а через [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) — отдельную задачу. Подход гибче YAML-цепочки, но менее надёжен: агент может забыть шаг, отклониться от инструкции или выбрать неоптимальный путь. Поэтому для процессов, которые можно описать через YAML, лучше использовать YAML-конфиг. А скилл — для orchestration через агента или как обёртка над YAML-цепочкой: например, скилл [`brainstorm`](docs/agents/skills/brainstorm/SKILL.md) описывает, как провести мозговой штурм, а сам штурм реализован как YAML-цепочка.
+
+Скилл привязывается к роли в front matter. Роль получает только те скиллы, которые нужны для её работы.
+
+Доступные скиллы:
+
+| Скилл | Что делает |
 |---|---|
-| **Static chains** | Fixed sequence of agent steps with retry groups, fix iterations, and quality gates |
-| **Dynamic loops** | Facilitator-driven multi-agent discussions with budget control and round tracking |
-| **Retry** | Exponential backoff with configurable policy (max retries, delays, multiplier) |
-| **Circuit breaker** | Stateful runner protection (closed → open → half-open) with configurable thresholds |
-| **Fallback runners** | Alternative commands when the primary agent runner is unavailable |
-| **Quality gates** | Cross-model validation — one agent verifies another agent's output |
-| **Budget control** | Per-chain and per-step cost limits |
-| **Audit trail** | JSONL-based logging of every chain step, turn, and result |
-| **Prompt management** | Role-based prompts loaded from `.md` files with variable substitution |
+| [`run-subagent`](docs/agents/skills/run-subagent/SKILL.md) | Запускает подчинённого агента: роль + поручение + контекст. Контроль таймаутов, stall-детекция, фильтрация вывода |
+| [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | Проводит задачу от постановки до merge: реализация → self-review → code review → доработка → PR |
+| [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | Проводит эпик из нескольких задач через сабагентов |
+| [`brainstorm`](docs/agents/skills/brainstorm/SKILL.md) | Мозговой штурм: фасилитатор ведёт дискуссию, участники спорят, итог — протокол с решениями |
+| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | Ретроспектива после эпика: анализ качества процесса, предложения по улучшению |
+| [`agent-report`](docs/agents/skills/agent-report/SKILL.md) | Сохраняет отчёт агента в файл для прослеживаемости |
 
-### Architecture
-
-```
-┌─────────────────────────────────────────────────┐
-│                  Application                     │
-│  Use Cases: OrchestrateChain, RunAgent,          │
-│  GenerateReport, GetRunners                      │
-│  Events: RoundCompleted, SessionCompleted         │
-├─────────────────────────────────────────────────┤
-│                    Domain                        │
-│  Entities, Value Objects, Enums,                 │
-│  Service Interfaces (ports)                      │
-├─────────────────────────────────────────────────┤
-│                Infrastructure                    │
-│  PiAgentRunner, YamlChainLoader,                 │
-│  Audit Logger, QualityGateRunner, etc.           │
-│  Symfony Bundle + DependencyInjection             │
-└─────────────────────────────────────────────────┘
-```
-
-- **Domain** — pure business logic. Only external dependency: `psr/log` for observability. Entities, value objects, enums, service interfaces.
-- **Application** — use case handlers, DTOs, events, mappers. Depends only on Domain.
-- **Infrastructure** — concrete implementations (agent runners, chain loaders, loggers). Symfony Bundle for DI.
+Пользователь может создавать новые скиллы как каталог с `SKILL.md` и скриптами — по аналогии с существующими. Рекомендации: [SKILL-CREATION.md](docs/agents/skills/SKILL-CREATION.md). Примеры: [`docs/agents/skills/`](docs/agents/skills/).
 
 ---
 
-## Installation
+## Сабагенты
 
-### Requirements
+Сабагент — способ запуска роли как отдельного агента в чистом контексте. Агент получает роль, поручение и контекст в виде текста и файлов. Никакой истории чата — каждый запуск с чистого листа, как если бы вы передавали поручение другому члену команды.
 
-- PHP >= 8.4
+Это решает проблему деградации контекста: вместо одной длинной сессии, где агент копит шум, задача разбивается на поручения. Каждый сабагент делает свою часть и возвращает результат. Тимлид или другая выделенная роль координирует результаты, не загружая контекст исполнителя деталями предыдущих шагов и не перегружая свой собственный контекст лишними деталями реализации.
 
-### Install via Composer (recommended)
+Запуск через скилл [`run-subagent`](docs/agents/skills/run-subagent/SKILL.md).
 
-```bash
-composer global require prikotov/task-orchestrator
-```
+---
 
-Verify:
+## Сравнение с другими решениями
 
-```bash
-~/.composer/vendor/bin/task-orchestrator --version
-```
+Команда ИИ-ролей изучила 25+ фреймворков для оркестрации AI-агентов — LangGraph, CrewAI, Archon и другие. Полное сравнение: [исследование фреймворков](docs/research/agent-frameworks-summary.md) и [сравнение coding-агентов](docs/research/coding-agents-summary.md).
 
-To add to an existing project instead:
+Сильные стороны TasK-orchestrator относительно изученных решений:
+
+- **Процессный контроль**: детерминированные цепочки шагов через YAML, повтор при сбоях, предохранитель, ограничения по лимитам
+- **Поведенческие профили ролей**: конфронтирующие роли с разными личностями в рамках одной специализации
+- **Делегирование в чистый контекст**: сабагенты без наследия чата, координация через выделенную роль
+- **Скиллы как инструкции**: текстовые процессы, которые агент ведёт сам, или обёртки над YAML-цепочками
+- **Проверки качества**: линтеры и тесты прямо в цепочке шагов
+
+Ограничения (подробности — в [ROADMAP](docs/releases/ROADMAP-2026-Q2-Q3.md)):
+
+- **Параллельное выполнение** — Roadmap
+- **Графы задач (DAG / StateGraph)** — Roadmap
+- **Встроенные сабагенты** — Backlog
+- **Постоянная память между сессиями** — R&D
+- **Docker-песочница** — Backlog
+- **Python / TypeScript SDK** — не планируется
+- **Графический интерфейс** — не планируется
+
+---
+
+## Быстрый старт
+
+TasK-orchestrator — CLI-инструмент. Минимальные требования: PHP >= 8.4 и CLI-агент (например, [pi CLI](https://github.com/prikotov/pi) или [Codex CLI](https://github.com/openi/codex)).
+
+Установка:
 
 ```bash
 composer require prikotov/task-orchestrator
-vendor/bin/task-orchestrator --version
 ```
 
-### Install via Phar (alternative)
-
-Download the latest Phar from [GitHub Releases](https://github.com/prikotov/task-orchestrator/releases):
-
-```bash
-curl -L -o task-orchestrator.phar https://github.com/prikotov/task-orchestrator/releases/latest/download/task-orchestrator.phar
-chmod +x task-orchestrator.phar
-mv task-orchestrator.phar /usr/local/bin/task-orchestrator
-task-orchestrator --version
-```
-
-> **Note:** Phar is published on a best-effort basis. For full feature support and easy updates, use Composer.
-
----
-
-## Configuration
-
-### Bundle parameters
-
-Create `config/packages/task_orchestrator.yaml` in your Symfony project:
-
-```yaml
-task_orchestrator:
-    # Path to role prompt .md files
-    roles_dir: '%kernel.project_dir%/docs/agents/roles/team'
-
-    # Path to chains YAML configuration
-    chains_yaml: '%kernel.project_dir%/apps/console/config/agent_chains.yaml'
-
-    # Path to JSONL audit log file
-    audit_log_path: '%kernel.project_dir%/var/log/agent_audit.jsonl'
-
-    # Path to chains session directory (runtime state)
-    chains_session_dir: '%kernel.project_dir%/var/agent/chains'
-
-    # Project root for path relativization in logs
-    base_path: '%kernel.project_dir%'
-```
-
-All five parameters are **required**.
-
-### Chains YAML
-
-Define your agent roles and chains in a YAML file:
+Минимальный `config/chains.yaml` — две роли и цепочка из двух шагов:
 
 ```yaml
 roles:
   analyst:
     prompt_file: prompts/analyst.md
-    command:
-      - pi
-      - --mode
-      - json
-      - -p
-      - --no-session
-      - --model
-      - gpt-4o
-      - --system-prompt
-      - "@system-prompt"   # resolved to the path of prompt_file
+    command: [pi, --mode, json, -p, --no-session, --model, gpt-4o, --system-prompt, "@system-prompt"]
 
-  developer:
-    prompt_file: prompts/developer.md
-    command:
-      - pi
-      - --mode
-      - json
-      - -p
-      - --no-session
-      - --model
-      - gpt-4o
-      - --system-prompt
-      - "@system-prompt"   # resolved to the path of prompt_file
-
-  reviewer:
-    prompt_file: prompts/reviewer.md
-    command:
-      - pi
-      - --mode
-      - json
-      - -p
-      - --no-session
-      - --model
-      - gpt-4o
-      - --system-prompt
-      - "@system-prompt"   # resolved to the path of prompt_file
-
-chains:
-  implement:
-    description: "Analyze → Implement → Review cycle"
-    retry_policy:
-      max_retries: 3
-      initial_delay_ms: 1000
-      max_delay_ms: 30000
-      multiplier: 2.0
-    steps:
-      - type: agent
-        role: analyst
-        name: analyze
-      - type: agent
-        role: developer
-        name: implement
-      - type: quality_gate            # Shell command validation (pass/fail)
-        role: reviewer
-        name: review
-    fix_iterations:
-      - group: dev-review
-        steps: [implement, review]
-        max_iterations: 3
-
-  # Dynamic loop — facilitator picks who speaks each round
-  brainstorm:
-    type: dynamic
-    description: "Facilitated brainstorm with dynamic routing"
-    facilitator: analyst
-    participants: [developer, reviewer]
-    max_rounds: 10
-    prompts:
-      facilitator_append: prompts/facilitator_append.txt
-      participant_append: prompts/participant_append.txt
-```
-
-#### Step types
-
-| Type | YAML value | Description |
-|---|---|---|
-| **Agent** | `agent` | AI agent execution in a specific role |
-| **Quality gate** | `quality_gate` | Shell command validation (pass/fail) |
-
-#### Chain types
-
-| Type | Key | Description |
-|---|---|---|
-| **Static chain** | `steps` | Fixed sequence of agent steps, executed in order |
-| **Dynamic loop** | `dynamic` | Facilitator selects which agent speaks in each round |
-
-#### Resilience options
-
-```yaml
-# Retry policy — per-chain or per-step
-retry_policy:
-    max_retries: 3
-    initial_delay_ms: 1000
-    max_delay_ms: 30000
-    multiplier: 2.0
-
-# Budget — cost limits
-budget:
-    max_cost_total: 5.0          # Max $5 for the entire chain
-    max_cost_per_step: 1.5       # Max $1.50 per step
-
-# Fallback runner — alternative command when primary fails
-roles:
   developer:
     prompt_file: prompts/developer.md
     command: [pi, --mode, json, -p, --no-session, --model, gpt-4o, --system-prompt, "@system-prompt"]
-    fallback:
-      command:
-        - codex
-        - --model
-        - gpt-4o
-        - --full-auto
-        - --system-prompt
-        - "@system-prompt"   # resolved to the path of prompt_file
+
+chains:
+  implement:
+    steps:
+      - { type: agent, role: analyst, name: analyze }
+      - { type: agent, role: developer, name: implement }
+      - { type: quality_gate, command: "vendor/bin/phpunit", label: "Tests", timeout_seconds: 120 }
 ```
+
+Запуск:
+
+```bash
+TasK-orchestrator app:agent:orchestrate "Add user registration endpoint"
+```
+
+Как настроить исполнителей, выбрать опции YAML и подключить к проекту — в [документации](docs/guide/chains.md).
 
 ---
 
-## Usage
+## Документация
 
-All handlers are registered as services by the Bundle. Inject them via Symfony DI:
-
-```php
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
-
-// $handler is injected via Symfony DI (autowired)
-$command = new OrchestrateChainCommand(
-    chainName: 'implement',
-    task: 'Create a REST API endpoint for user registration',
-);
-
-$result = $handler->__invoke($command);
-
-echo $result->totalCost;        // Total cost in USD
-foreach ($result->stepResults as $step) {
-    echo $step->role;             // Agent role name
-    echo $step->outputText;       // Agent output
-}
-```
-
-### Run a single agent
-
-```php
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommand;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
-
-$command = new RunAgentCommand(
-    role: 'analyst',
-    task: 'Analyze this codebase for performance issues',
-);
-
-$result = $handler->__invoke($command);
-
-echo $result->outputText;
-echo $result->cost;
-```
-
-### Generate a report
-
-```php
-use TaskOrchestrator\Common\Module\Orchestrator\Application\Enum\ReportFormatEnum;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
-use TaskOrchestrator\Common\Module\Orchestrator\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
-
-$query = new GenerateReportQuery(
-    result: $chainResult,              // OrchestrateChainResultDto from chain execution
-    chainName: 'implement',
-    task: 'Create a REST API endpoint',
-    format: ReportFormatEnum::text,    // ReportFormatEnum::text | ReportFormatEnum::json
-);
-
-$result = $handler->__invoke($query);
-echo $result->content;
-```
-
----
-
-## Architecture
-
-### Layers and dependency direction
-
-```
-Presentation (your app)
-    │
-    ▼
-Application (Use Cases, DTOs, Events)
-    │
-    ▼
-Domain (Entities, VOs, Interfaces)
-    ▲
-    │
-Infrastructure (Implementations, Bundle)
-```
-
-- **Domain** has minimal external dependencies — only `psr/log` (`LoggerInterface`) for observability. No framework imports.
-- **Application** depends on Domain only.
-- **Infrastructure** implements Domain interfaces and provides the Symfony Bundle.
-- **Presentation** (your CLI, controllers, etc.) calls Application use cases.
-
-### Key interfaces (ports)
-
-| Interface | Layer | Purpose |
-|---|---|---|
-| `AgentRunnerInterface` | Domain | Run an AI agent and return results |
-| `ChainLoaderInterface` | Domain | Load chain definitions from storage |
-| `PromptProviderInterface` | Domain | Provide role prompts from `.md` files |
-| `AuditLoggerInterface` | Domain | Log chain execution steps |
-| `QualityGateRunnerInterface` | Domain | Validate step output via cross-model check |
-| `FacilitatorResponseParserInterface` | Domain | Parse facilitator decisions in dynamic loops |
-| `CheckDynamicBudgetServiceInterface` | Domain | Check budget constraints for dynamic loops |
-
-### Events
-
-| Event | When |
+| Документ | Описание |
 |---|---|
-| `OrchestrateRoundCompletedEvent` | After each dynamic loop round |
-| `OrchestrateSessionCompletedEvent` | After chain session finishes |
-
-Subscribe to these events in your Symfony project for custom notifications or logging.
+| [Архитектура](docs/guide/architecture.md) | DDD-слои, модули, CQRS |
+| [Цепочки](docs/guide/chains.md) | Static / Dynamic / Conditional, YAML DSL |
+| [Роли](docs/guide/roles.md) | Конфигурация ролей, prompt files, runners |
+| [Надёжность](docs/guide/reliability.md) | Retry, Circuit Breaker, Fallback, Sessions/Resume |
+| [Observability](docs/guide/observability.md) | Audit trail, hooks, metrics |
+| [Hooks](docs/guide/hooks.md) | Post-step hooks |
+| [Расширение](docs/guide/extension.md) | Добавление runners и strategies |
+| [Конвенции](docs/conventions/index.md) | DDD-паттерны, слои, стиль кода |
+| [Исследование 25+ фреймворков](docs/research/agent-frameworks-summary.md) | LangGraph, CrewAI, Archon и 22 других |
 
 ---
-
-## Contributing
-
-This library is part of the [TasK](https://github.com/prikotov/TasK) project. Contributions are welcome via pull requests.
 
 ## License
 
-[MIT](https://opensource.org/licenses/MIT)
+[MIT](LICENSE) · Copyright © 2025–2026 prikotov

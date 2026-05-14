@@ -58,6 +58,34 @@ final class ReportJsonMapperTest extends TestCase
     }
 
     #[Test]
+    public function mapStepContainsOutputText(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            stepResults: [
+                new StepResultDto(
+                    role: 'technical_writer',
+                    runner: 'pi',
+                    outputText: '# Hello World\n\nThis is the output.',
+                    inputTokens: 1000,
+                    outputTokens: 500,
+                    cost: 0.02,
+                    duration: 10.0,
+                    isError: false,
+                ),
+            ],
+            totalTime: 10.0,
+            totalInputTokens: 1000,
+            totalOutputTokens: 500,
+            totalCost: 0.02,
+        );
+
+        $json = $this->mapper->map($result, 'write-readme', 'Write README');
+        $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame('# Hello World\n\nThis is the output.', $data['steps'][0]['output_text']);
+    }
+
+    #[Test]
     public function mapStaticChainReportContainsSteps(): void
     {
         $result = new OrchestrateChainResultDto(
@@ -96,6 +124,7 @@ final class ReportJsonMapperTest extends TestCase
         self::assertSame('analyst', $data['steps'][0]['role']);
         self::assertSame('pi', $data['steps'][0]['runner']);
         self::assertSame('success', $data['steps'][0]['status']);
+        self::assertSame('', $data['steps'][0]['output_text']);
         self::assertSame(3000, $data['steps'][0]['input_tokens']);
         self::assertSame(800, $data['steps'][0]['output_tokens']);
         self::assertSame(5000, $data['steps'][0]['duration_ms']);

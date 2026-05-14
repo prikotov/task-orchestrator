@@ -295,6 +295,34 @@ final class ReportTextMapperTest extends TestCase
     }
 
     #[Test]
+    public function mapAgentStepContainsOutputText(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            stepResults: [
+                new StepResultDto(
+                    role: 'technical_writer',
+                    runner: 'pi',
+                    outputText: '# Hello World\n\nThis is the output.',
+                    inputTokens: 1000,
+                    outputTokens: 500,
+                    cost: 0.02,
+                    duration: 10.0,
+                    isError: false,
+                ),
+            ],
+            totalTime: 10.0,
+            totalInputTokens: 1000,
+            totalOutputTokens: 500,
+            totalCost: 0.02,
+        );
+
+        $report = $this->mapper->map($result, 'write-readme', 'Write README');
+
+        self::assertStringContainsString('# Hello World', $report);
+        self::assertStringContainsString('This is the output.', $report);
+    }
+
+    #[Test]
     public function formatTimeFormatsMinutesAndSeconds(): void
     {
         $result = new OrchestrateChainResultDto(
