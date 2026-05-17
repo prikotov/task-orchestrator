@@ -82,10 +82,10 @@ php bin/console app:agent:orchestrate task-implement
 - **Роли:** нужно подобрать существующие роли или создать tasks для agent-шагов
 
 ## 8. Sources (Источники)
-- [ ] [chains.yaml](config/chains.yaml)
-- [ ] [ChainTypeEnum](src/Module/Orchestrator/Domain/)
-- [ ] [roles/team/](docs/agents/roles/team/)
-- [ ] [Отчёт Локи](docs/agents/reports/system-architect/2026-05-10_blind-spots-task-workflow-chains.md)
+- [ ] [chains.yaml](../../config/chains.yaml)
+- [ ] [ChainTypeEnum](../src/Module/Orchestrator/Domain/)
+- [ ] [roles/team/](../../docs/agents/roles/team/)
+- [ ] [Отчёт Локи](../../docs/agents/reports/system-architect/2026-05-10_blind-spots-task-workflow-chains.md)
 
 ## 9. Comments (Комментарии)
 PoC — начинаем с одной цепочки `task-implement`. Если опыт успешный — добавить `task-hotfix`. Git-операции пока оставляем тимлиду (Локи прав — нет idempotency).

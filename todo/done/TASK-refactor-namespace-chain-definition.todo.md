@@ -142,13 +142,13 @@ php vendor/prikotov/coding-standard/bin/run-sniff-tests.php
 
 ## 8. Sources (Источники)
 
-- [Brainstorm #6 protocol](../var/sessions/brainstorm/2026-05-04_01-59-17/discussion_history.md) — декомпозиция по ответственности
-- [ADR-006: ExecutionStrategy Composition](../docs/adr/006-execution-strategy-composition.md)
-- [ADR-007: VO ACL Boundary](../docs/adr/007-vo-acl-boundary.md)
-- [ADR-008: Shared Kernel Contract](../docs/adr/008-shared-kernel-contract.md)
-- [ADR-009: Dynamic Split Decision](../docs/adr/009-dynamic-split-decision.md) — суперседится данным эпиком
-- [Конвенции: layers.md](../docs/conventions/layers/layers.md) — правила зависимостей Domain → никто
-- [Конвенции: service.md](../docs/conventions/core_patterns/service.md) — alias Interface → Implementation
+- [Brainstorm #6 protocol](../../var/sessions/brainstorm/2026-05-04_01-59-17/discussion_history.md) — декомпозиция по ответственности
+- [ADR-006: ExecutionStrategy Composition](../../docs/adr/006-execution-strategy-composition.md)
+- [ADR-007: VO ACL Boundary](../../docs/adr/007-vo-acl-boundary.md)
+- [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md)
+- [ADR-009: Dynamic Split Decision](../../docs/adr/009-dynamic-split-decision.md) — суперседится данным эпиком
+- [Конвенции: layers.md](../../docs/conventions/layers/layers.md) — правила зависимостей Domain → никто
+- [Конвенции: service.md](../../docs/conventions/core_patterns/service.md) — alias Interface → Implementation
 
 ## 9. Comments (Комментарии)
 
@@ -169,7 +169,7 @@ Presentation-слой не входит в scope декомпозиции. Ди�
 ### Порядок действий
 1. Переключись в ветку `task/refactor-namespace-chain-definition`: `git checkout task/refactor-namespace-chain-definition`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
 6. Сделай `git push`.

@@ -17,10 +17,10 @@ status: in_progress
 
 ## 1. Concept and Goal (Концепция и Цель)
 ### Story (Job Story)
-> Когда YAML DSL поддерживает `when:` expressions, а [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) подтверждён ADR-006 как точка расширения для conditional branching, я хочу реализовать третью стратегию `ConditionalExecutionStrategy`, чтобы цепочки с `when:` conditions выполнялись с ветвлением по результатам предыдущих шагов.
+> Когда YAML DSL поддерживает `when:` expressions, а [`ExecutionStrategyInterface`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) подтверждён ADR-006 как точка расширения для conditional branching, я хочу реализовать третью стратегию `ConditionalExecutionStrategy`, чтобы цепочки с `when:` conditions выполнялись с ветвлением по результатам предыдущих шагов.
 
 ### Goal (Цель по SMART)
-Реализовать `ConditionalExecutionStrategy` — третью реализацию [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php). Стратегия поддерживает `when:` branching logic: evaluate condition → execute/skip step. Автоматически подхватывается tagged iterator в [`OrchestrateChainCommandHandler`](../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php). Unit-тесты ≥80%. Срок: Sprint 8 (третья задача).
+Реализовать `ConditionalExecutionStrategy` — третью реализацию [`ExecutionStrategyInterface`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php). Стратегия поддерживает `when:` branching logic: evaluate condition → execute/skip step. Автоматически подхватывается tagged iterator в [`OrchestrateChainCommandHandler`](../../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php). Unit-тесты ≥80%. Срок: Sprint 8 (третья задача).
 
 ## 2. Context and Scope (Контекст и Границы)
 ### Где делаем
@@ -29,10 +29,10 @@ status: in_progress
 - `src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php` — диспетчер (не меняется, tagged iterator уже есть)
 
 ### Текущее поведение
-- [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — 3 метода: `execute()`, `resume()`, `supports()`
-- [`StaticExecutionStrategy`](../../src/Module/Orchestrator/Application/Service/Chain/StaticExecutionStrategy.php) — delegates to `ExecuteStaticChainServiceInterface`, `supports()` → `ChainTypeEnum::staticType`
-- [`DynamicExecutionStrategy`](../../src/Module/Orchestrator/Application/Service/Chain/DynamicExecutionStrategy.php) — delegates to Dynamic path, `supports()` → `ChainTypeEnum::dynamicType`
-- [`OrchestrateChainCommandHandler`](../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php) — диспетчер (58 LOC), итерирует стратегии через `resolveStrategy()`
+- [`ExecutionStrategyInterface`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — 3 метода: `execute()`, `resume()`, `supports()`
+- [`StaticExecutionStrategy`](../../../src/Module/Orchestrator/Application/Service/Chain/StaticExecutionStrategy.php) — delegates to `ExecuteStaticChainServiceInterface`, `supports()` → `ChainTypeEnum::staticType`
+- [`DynamicExecutionStrategy`](../../../src/Module/Orchestrator/Application/Service/Chain/DynamicExecutionStrategy.php) — delegates to Dynamic path, `supports()` → `ChainTypeEnum::dynamicType`
+- [`OrchestrateChainCommandHandler`](../../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php) — диспетчер (58 LOC), итерирует стратегии через `resolveStrategy()`
 
 ### Границы (Out of Scope)
 - Не меняем `ExecutionStrategyInterface` (контракт стабилен)
@@ -42,7 +42,7 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] `ConditionalExecutionStrategy` реализует [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php):
+- [ ] `ConditionalExecutionStrategy` реализует [`ExecutionStrategyInterface`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php):
   - `supports(ChainDefinitionVo $chain): bool` — `true` для `ChainTypeEnum::conditionalType`
   - `execute(ChainDefinitionVo $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto` — выполнение с ветвлением
   - `resume()` — `LogicException` (MVP: conditional chains не поддерживают resume)
@@ -50,7 +50,7 @@ status: in_progress
   - Evaluator в Domain-слое (чистая логика, без I/O)
   - Context = map of step results: `{stepName: {passed: bool, exitCode: int, status: string}}`
 - [ ] Step execution: iterate steps → evaluate `when:` → execute or skip → collect results
-  - Skipped steps: записываются в `OrchestrateChainResultDto` с маркером `skipped` (новое поле в [`StepResultDto`](../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/StepResultDto.php))
+  - Skipped steps: записываются в `OrchestrateChainResultDto` с маркером `skipped` (новое поле в [`StepResultDto`](../../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/StepResultDto.php))
 - [ ] Зарегистрировать стратегию в DI (tagged iterator `ExecutionStrategyInterface`)
 
 ### 🟡 Should Have (Желательно)
@@ -71,10 +71,10 @@ status: in_progress
 1. [ ] ...
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] `ConditionalExecutionStrategy` реализует все 3 метода [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
+- [ ] `ConditionalExecutionStrategy` реализует все 3 метода [`ExecutionStrategyInterface`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
 - [ ] Condition evaluator корректно вычисляет `steps.<name>.passed`, `steps.<name>.exitCode`, `result.status`
 - [ ] Skipped steps отражены в результате (`StepResultDto` с маркером)
-- [ ] Стратегия подхватывается `resolveStrategy()` в [`OrchestrateChainCommandHandler`](../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php) для `ChainTypeEnum::conditionalType`
+- [ ] Стратегия подхватывается `resolveStrategy()` в [`OrchestrateChainCommandHandler`](../../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php) для `ChainTypeEnum::conditionalType`
 - [ ] Unit-тесты ≥80% покрытия
 - [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
 
@@ -91,9 +91,9 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ## 8. Sources (Источники)
 - [ ] [ADR-006: ExecutionStrategy composition](../../docs/adr/006-execution-strategy-composition.md)
-- [ ] [ExecutionStrategyInterface](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
-- [ ] [StaticExecutionStrategy](../../src/Module/Orchestrator/Application/Service/Chain/StaticExecutionStrategy.php) — референс для третьей стратегии
-- [ ] [OrchestrateChainCommandHandler](../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php) — диспетчер
+- [ ] [ExecutionStrategyInterface](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
+- [ ] [StaticExecutionStrategy](../../../src/Module/Orchestrator/Application/Service/Chain/StaticExecutionStrategy.php) — референс для третьей стратегии
+- [ ] [OrchestrateChainCommandHandler](../../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php) — диспетчер
 
 ## 9. Comments (Комментарии)
 - `ConditionalExecutionStrategy` логически ближе к `StaticExecutionStrategy` (линейное выполнение + ветвление), чем к `DynamicExecutionStrategy` (фасилитатор + участники). Можно было бы расширить StaticExecution, но ADR-006 фиксирует: каждая стратегия — отдельный класс.
@@ -108,7 +108,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 ### Порядок действий
 1. Переключись в ветку `task/feat-conditional-execution-strategy`: `git checkout task/feat-conditional-execution-strategy`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`.
 6. Сделай `git push`.

@@ -63,8 +63,8 @@ vendor/bin/psalm
 - Минимальный риск — изолированное изменение в одном методе
 
 ## 8. Sources (Источники)
-- [ ] [FacilitatorResponseParserService](../src/Module/Orchestrator/Infrastructure/Service/Chain/FacilitatorResponseParserService.php)
-- [ ] [Существующие тесты](../tests/Unit/Infrastructure/Service/Chain/FacilitatorResponseParserServiceTest.php)
+- [ ] [FacilitatorResponseParserService](../../src/Module/Orchestrator/Infrastructure/Service/Chain/FacilitatorResponseParserService.php)
+- [ ] [Существующие тесты](../../tests/Unit/Infrastructure/Service/Chain/FacilitatorResponseParserServiceTest.php)
 
 ## 9. Comments (Комментарии)
 Баг обнаружен в сессии `var/sessions/brainstorm/2026-04-27_12-29-03/` — `result.md` содержит `## Synthesis\nArray`.
@@ -77,7 +77,7 @@ vendor/bin/psalm
 ### Порядок действий
 1. Переключись в ветку `task/fix-brainstorm-synthesis-array`: `git checkout task/fix-brainstorm-synthesis-array`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
 6. Сделай `git push`.

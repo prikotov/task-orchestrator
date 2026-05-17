@@ -80,9 +80,9 @@ php bin/task-orchestrator app:agent:orchestrate --validate-config --chain=implem
 
 ## 8. Sources (Источники)
 - [ ] [Отчёт Локи](../../docs/agents/reports/system-architect/2026-04-25_12-00_validate-chain-config-layer-audit.md)
-- [ ] [ValidateChainConfigService](../../src/Module/Orchestrator/Application/Service/ValidateChainConfigService.php)
-- [ ] [ChainDefinitionVo](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php)
-- [ ] [ChainStepVo](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php)
+- [ ] [ValidateChainConfigService](../../../src/Module/Orchestrator/Application/Service/ValidateChainConfigService.php)
+- [ ] [ChainDefinitionVo](../../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php)
+- [ ] [ChainStepVo](../../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php)
 
 ## 9. Comments (Комментарии)
 Архитектурный отчёт Локи: `docs/agents/reports/system-architect/2026-04-25_12-00_validate-chain-config-layer-audit.md`

@@ -80,7 +80,7 @@ php vendor/bin/phpcs --standard=phpcs.xml.dist src/
 
 ## 8. Sources (Источники)
 - [ ] [ADR-006: ExecutionStrategy](../../docs/adr/006-execution-strategy-composition.md)
-- [ ] [Протокол brainstorm (решение 2)](../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
+- [ ] [Протокол brainstorm (решение 2)](../../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
 
 ## 9. Comments (Комментарии)
 Brainstorm-раунды 4-7: Гэндальф предложил Strategy, Локи — tagged union (отвергнуто). Консенсус: composition через интерфейс в Application-слое.

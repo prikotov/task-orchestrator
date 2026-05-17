@@ -99,7 +99,7 @@ cat docs/research/rfc/cli-distribution-rfc.md
 **Участники:** Архитектор Гэндальф, Архитектор Локи, Бэкендер Тони
 **Фасилитатор:** Тимлид Алекс
 **Раунды:** 21 (31 мин, завершён естественно)
-**RFC:** [docs/research/rfc/cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md)
+**RFC:** [docs/research/rfc/cli-distribution-rfc.md](../../docs/research/rfc/cli-distribution-rfc.md)
 **Сессия:** `var/sessions/cli-distribution/2026-04-22_16-22-53/`
 
 #### Принятые решения

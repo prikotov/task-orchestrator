@@ -83,10 +83,10 @@ php bin/console app:agent:run --help
 - Context размер может превышить token limit — валидация размера (won't have для первой версии)
 
 ## 8. Sources (Источники)
-- [ ] [RunCommand.php](apps/console/src/Command/RunCommand.php)
-- [ ] [AgentRunRequestVo](src/Module/AgentRunner/Application/)
-- [ ] [PiAgentRunner](src/Module/AgentRunner/Infrastructure/Service/)
-- [ ] [Отчёт Гэндальфа — Вопрос 1](docs/agents/reports/system-architect/2026-05-10_10-48_three-architecture-questions.md)
+- [ ] [RunCommand.php](../apps/console/src/Command/RunCommand.php)
+- [ ] [AgentRunRequestVo](../../src/Module/AgentRunner/Application/)
+- [ ] [PiAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/)
+- [ ] [Отчёт Гэндальфа — Вопрос 1](../../docs/agents/reports/system-architect/2026-05-10_10-48_three-architecture-questions.md)
 
 ## 9. Comments (Комментарии)
 Гэндальф рекомендовал расширить `app:agent:run` вместо создания новой команды `delegate`. Это первая итерация — только timeout + context. Остальные опции (--reasoning-effort, --provider, --report-file) — отдельные задачи.

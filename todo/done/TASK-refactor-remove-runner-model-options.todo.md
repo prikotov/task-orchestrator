@@ -89,8 +89,8 @@ php vendor/prikotov/coding-standard/bin/run-sniff-tests.php
 
 ## 8. Sources (Источники)
 - [OrchestrateCommand.php](../../apps/console/src/Module/Orchestrator/Command/OrchestrateCommand.php)
-- [OrchestrateChainCommand.php](../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommand.php)
-- [OrchestrateChainCommandHandler.php](../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php)
+- [OrchestrateChainCommand.php](../../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommand.php)
+- [OrchestrateChainCommandHandler.php](../../../src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php)
 - [config/chains.yaml](../../config/chains.yaml) — секция `roles`, поле `command`
 
 ## 9. Comments (Комментарии)

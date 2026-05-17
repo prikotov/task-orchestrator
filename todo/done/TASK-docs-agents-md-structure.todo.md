@@ -64,8 +64,8 @@ status: done
 - Правки в AGENTS.md влияют на поведение AI-агента во всех последующих задачах
 
 ## 8. Sources (Источники)
-- [ ] [architecture.md](../docs/guide/architecture.md)
-- [ ] [composer.json](../composer.json)
+- [ ] [architecture.md](../../docs/guide/architecture.md)
+- [ ] [composer.json](../../composer.json)
 
 ## 9. Comments (Комментарии)
 Выявлено при аудите 2026-04-20: плоская структура в AGENTS.md vs двухмодульная в architecture.md.

@@ -71,8 +71,8 @@ vendor/bin/psalm
 - Необходимость добавить поле в DTO — возможное влияние на существующие тесты
 
 ## 8. Sources (Источники)
-- [ ] [OrchestrateExitCodeEnum.php](../../src/Module/Orchestrator/Application/Enum/OrchestrateExitCodeEnum.php) — @todo на строке 33
-- [ ] [ResolveExitCodeService](../../src/Module/Orchestrator/Application/Service/ResolveExitCodeService.php)
+- [ ] [OrchestrateExitCodeEnum.php](../../../src/Module/Orchestrator/Application/Enum/OrchestrateExitCodeEnum.php) — @todo на строке 33
+- [ ] [ResolveExitCodeService](../../../src/Module/Orchestrator/Application/Service/ResolveExitCodeService.php)
 - [ ] [PiAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/Pi/PiAgentRunner.php)
 
 ## 9. Comments (Комментарии)

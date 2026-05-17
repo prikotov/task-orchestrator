@@ -33,8 +33,8 @@ status: done
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [x] Ссылка на architecture.md оформлена как `[docs/guide/architecture.md](docs/guide/architecture.md)` — уже была кликабельной, фикс не потребовался
-- [x] Таблица инструментов: PHP_CodeSniffer — указан путь [`docs/conventions/examples/phpcs.xml.dist`](docs/conventions/examples/phpcs.xml.dist)
+- [x] Ссылка на architecture.md оформлена как `[docs/guide/architecture.md](../../docs/guide/architecture.md)` — уже была кликабельной, фикс не потребовался
+- [x] Таблица инструментов: PHP_CodeSniffer — указан путь [`docs/conventions/examples/phpcs.xml.dist`](../../docs/conventions/examples/phpcs.xml.dist)
 ### 🟡 Should Have (Желательно)
 - [x] Комментарий в секции структуры про назначение `docs/releases/` vs `docs/git-workflow/releases/`
 ### 🟢 Could Have (Опционально)

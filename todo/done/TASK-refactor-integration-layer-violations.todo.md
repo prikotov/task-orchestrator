@@ -112,9 +112,9 @@ vendor/bin/psalm
 - **Риск:** Тесты могут ссылаться на старые namespace — обновить все импорты
 
 ## 8. Sources (Источники)
-- [Отчёт Архитектора Гэндальфа](../docs/agents/reports/system-architect/2026-05-06_10-00_deptrac-violations-analysis.md)
-- [Критический анализ Архитектора Локи](../docs/agents/reports/system-architect/2026-05-06_12-00_critical-review-deptrac-violations.md)
-- [`docs/conventions/layers/layers.md`](../docs/conventions/layers/layers.md) — Integration-слой: разрешённые зависимости
+- [Отчёт Архитектора Гэндальфа](../../docs/agents/reports/system-architect/2026-05-06_10-00_deptrac-violations-analysis.md)
+- [Критический анализ Архитектора Локи](../../docs/agents/reports/system-architect/2026-05-06_12-00_critical-review-deptrac-violations.md)
+- [`docs/conventions/layers/layers.md`](../../docs/conventions/layers/layers.md) — Integration-слой: разрешённые зависимости
 
 ## 9. Comments (Комментарии)
 ### Классификация violations

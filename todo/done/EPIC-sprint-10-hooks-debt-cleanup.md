@@ -15,23 +15,23 @@ status: done
 
 ## 1. Concept and Goal (Концепция и цель)
 ### Story (Job Story)
-> Когда нужно добавить custom-логику после выполнения шага цепочки (webhook-уведомление, запись метрики, нотификация) — единственный способ: писать новый сервис и тащить его в DI. Когда [`ChainDefinitionVo`](../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) остаётся God-VO (546 LOC, 17 параметров, 3 фабричных метода) — ISP violation, каждая стратегия видит поля, которые ей не нужны. Когда static/conditional стратегии не поддерживают resume — падение на 8-м из 10 шагов = всё сначала для дорогих LLM-вызовов. Я хочу добавить `post_step` hooks через Symfony Process, завершить ChainDefinitionVo split и зафиксировать ADR паттерна checkpoint + resume, чтобы цепочки получили observability, код — чистые контракты, а команда — план на Q4.
+> Когда нужно добавить custom-логику после выполнения шага цепочки (webhook-уведомление, запись метрики, нотификация) — единственный способ: писать новый сервис и тащить его в DI. Когда [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) остаётся God-VO (546 LOC, 17 параметров, 3 фабричных метода) — ISP violation, каждая стратегия видит поля, которые ей не нужны. Когда static/conditional стратегии не поддерживают resume — падение на 8-м из 10 шагов = всё сначала для дорогих LLM-вызовов. Я хочу добавить `post_step` hooks через Symfony Process, завершить ChainDefinitionVo split и зафиксировать ADR паттерна checkpoint + resume, чтобы цепочки получили observability, код — чистые контракты, а команда — план на Q4.
 
 ### Goal (Цель по SMART)
-Реализовать `post_step` hooks MVP (shell-скрипты через Symfony Process, таймаут 30с, hook failure = warning, не failure цепочки, stdout/stderr → audit log), завершить расщепление [`ChainDefinitionVo`](../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) (546 LOC) на `StaticChainDefinitionVo`, `DynamicChainDefinitionVo`, `ConditionalChainDefinitionVo` с общим `ChainDefinitionInterface`, зафиксировать ADR паттерна checkpoint + resume для static/conditional стратегий. Срок: Sprint 10 (22 сентября — 05 октября).
+Реализовать `post_step` hooks MVP (shell-скрипты через Symfony Process, таймаут 30с, hook failure = warning, не failure цепочки, stdout/stderr → audit log), завершить расщепление [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) (546 LOC) на `StaticChainDefinitionVo`, `DynamicChainDefinitionVo`, `ConditionalChainDefinitionVo` с общим `ChainDefinitionInterface`, зафиксировать ADR паттерна checkpoint + resume для static/conditional стратегий. Срок: Sprint 10 (22 сентября — 05 октября).
 
 ## 2. Context and Scope (Контекст и границы)
 ### Предпосылки
 - ExecutionStrategyInterface (Sprint 3) ✅ — 3 стратегии: Static, Dynamic, Conditional
 - CommandHandler rewrite (Sprint 4) ✅ — диспетчер через tagged iterator
-- [`SharedChainDefinitionVo`](../src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php) (Sprint 4) ✅ — создан, но не подключён как тип параметра
+- [`SharedChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php) (Sprint 4) ✅ — создан, но не подключён как тип параметра
 - Conditional Branching (Sprint 8) ✅ — `when:` expressions + ConditionalExecutionStrategy
 - Model failover + Error classification + MetricsCollector (Sprint 9) ✅ — observability foundation
 - ADR-008: Shared Kernel Contract ✅ — заложен контракт для ChainDefinitionVo split
 
 ### Источники
-- Roadmap: [`docs/releases/ROADMAP-2026-Q2-Q3.md`](../docs/releases/ROADMAP-2026-Q2-Q3.md) — секция Sprint 10
-- Анализ Локи: [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../docs/research/analytical/loki-roadmap-review-2026-05.md) — рекомендованный состав Sprint 10
+- Roadmap: [`docs/releases/ROADMAP-2026-Q2-Q3.md`](../../docs/releases/ROADMAP-2026-Q2-Q3.md) — секция Sprint 10
+- Анализ Локи: [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — рекомендованный состав Sprint 10
 
 ### In Scope (Что делаем)
 - `post_step` hooks MVP: shell-скрипты через Symfony Process, таймаут 30с, failure = warning
@@ -76,8 +76,8 @@ status: done
 ### Архитектурный подход
 
 Sprint 10 фокусируется на observability через hooks и устранении техдолга God-VO:
-1. **Hooks system** — `post_step` hook = shell-скрипт через [`Symfony\Process`](https://symfony.com/doc/current/components/process.html). Hook executor в Infrastructure-слое. Hook config в [`ChainStepVo`](../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) (`?string $postStep`). Вызов после успешного выполнения шага в стратегии.
-2. **ChainDefinitionVo split** — завершение работы, начатой в Sprint 4: [`ChainDefinitionVo`](../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) (546 LOC) → `StaticChainDefinitionVo`, `DynamicChainDefinitionVo`, `ConditionalChainDefinitionVo` + общий `ChainDefinitionInterface`. `SharedChainDefinitionVo` уже существует.
+1. **Hooks system** — `post_step` hook = shell-скрипт через [`Symfony\Process`](https://symfony.com/doc/current/components/process.html). Hook executor в Infrastructure-слое. Hook config в [`ChainStepVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) (`?string $postStep`). Вызов после успешного выполнения шага в стратегии.
+2. **ChainDefinitionVo split** — завершение работы, начатой в Sprint 4: [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) (546 LOC) → `StaticChainDefinitionVo`, `DynamicChainDefinitionVo`, `ConditionalChainDefinitionVo` + общий `ChainDefinitionInterface`. `SharedChainDefinitionVo` уже существует.
 3. **ADR** — чисто документальная задача, без кода.
 
 ### Поток данных: Post-Step Hook
@@ -121,16 +121,16 @@ sequenceDiagram
 
 Порядок задач — по зависимостям:
 
-- [x] [TASK-refactor-chain-definition-split](done/TASK-refactor-chain-definition-split.todo.md) ✅ — ChainDefinitionVo split завершение (основа для hooks — step config изменится)
-- [x] [TASK-feat-hooks-post-step](done/TASK-feat-hooks-post-step.todo.md) ✅ — Hooks system: post_step MVP (зависит от обновлённого ChainStepVo)
-- [x] [TASK-docs-resume-adr](done/TASK-docs-resume-adr.todo.md) ✅ — ADR: Resume для static цепочек (ADR, не блокирует код)
+- [x] [TASK-refactor-chain-definition-split](TASK-refactor-chain-definition-split.todo.md) ✅ — ChainDefinitionVo split завершение (основа для hooks — step config изменится)
+- [x] [TASK-feat-hooks-post-step](TASK-feat-hooks-post-step.todo.md) ✅ — Hooks system: post_step MVP (зависит от обновлённого ChainStepVo)
+- [x] [TASK-docs-resume-adr](TASK-docs-resume-adr.todo.md) ✅ — ADR: Resume для static цепочек (ADR, не блокирует код)
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [ ] Все задачи из **Must Have** выполнены и протестированы
 - [ ] `post_step` hooks работают (shell-скрипты через Symfony Process, таймаут 30с)
 - [x] Hook failure = warning в лог, не failure цепочки
 - [x] Hook stdout/stderr — в audit log
-- [ ] [`ChainDefinitionVo`](../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) расщеплён на `StaticChainDefinitionVo`, `DynamicChainDefinitionVo`, `ConditionalChainDefinitionVo`
+- [ ] [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) расщеплён на `StaticChainDefinitionVo`, `DynamicChainDefinitionVo`, `ConditionalChainDefinitionVo`
 - [ ] `ChainDefinitionInterface` введён и все стратегии типизированы через него
 - [ ] Resume ADR записан в `docs/adr/`
 - [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
@@ -144,22 +144,22 @@ sequenceDiagram
 
 ## 8. Risks and Dependencies (Риски и зависимости)
 - **Shell-скрипты = attack surface.** Если мы отменили Security Policy как security theater, добавление shell-скриптов как хуков — потенциально противоречиво. Митигация: `post_step` hooks — observability/notification, не control flow. Выполняются с правами процесса оркестратора. Контроль доступа — через OS sandbox при необходимости.
-- **ChainDefinitionVo split — ~15 файлов.** Sprint 4 создал [`SharedChainDefinitionVo`](../src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php), но оригинальный `ChainDefinitionVo` не стал легче (546 LOC). Зависимости от Sprint 4 (ChainDefinitionVo split) ✅ и ADR-008 (Shared Kernel Contract) ✅.
+- **ChainDefinitionVo split — ~15 файлов.** Sprint 4 создал [`SharedChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php), но оригинальный `ChainDefinitionVo` не стал легче (546 LOC). Зависимости от Sprint 4 (ChainDefinitionVo split) ✅ и ADR-008 (Shared Kernel Contract) ✅.
 - **Hook executor location:** Infrastructure-слой (Symfony Process — техническая зависимость). Interface — в Domain. Проверить Deptrac на правильность зависимостей.
 - **Зависимость от Sprint 9:** MetricsCollector (in-memory) может использоваться hook executor'ом для записи метрик hook execution.
 
 ## 9. Sources (Источники)
-- [ ] [Roadmap 2026 Q2–Q3: Sprint 10](../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [ ] [Анализ Локи: Sprint 9–10](../docs/research/analytical/loki-roadmap-review-2026-05.md)
-- [ ] [ADR-006: ExecutionStrategy composition](../docs/adr/006-execution-strategy-composition.md)
-- [ ] [ADR-008: Shared Kernel Contract](../docs/adr/008-shared-kernel-contract.md)
-- [ ] [Конвенции проекта](../docs/conventions/index.md)
+- [ ] [Roadmap 2026 Q2–Q3: Sprint 10](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
+- [ ] [Анализ Локи: Sprint 9–10](../../docs/research/analytical/loki-roadmap-review-2026-05.md)
+- [ ] [ADR-006: ExecutionStrategy composition](../../docs/adr/006-execution-strategy-composition.md)
+- [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md)
+- [ ] [Конвенции проекта](../../docs/conventions/index.md)
 
 ## 10. Comments (Комментарии)
-- Sprint 10 полностью основан на рекомендациях Локи из [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../docs/research/analytical/loki-roadmap-review-2026-05.md). Sub-agent ADR — отложен до Q4.
+- Sprint 10 полностью основан на рекомендациях Локи из [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../../docs/research/analytical/loki-roadmap-review-2026-05.md). Sub-agent ADR — отложен до Q4.
 - Порядок выполнения: сначала `TASK-refactor-chain-definition-split` (основа), потом `TASK-feat-hooks-post-step` (зависит от обновлённого `ChainStepVo`), параллельно — `TASK-docs-resume-adr` (ADR, не блокирует код).
 - Hooks MVP scope: только `post_step` (observability/notification). `pre_step` = conditional branching (уже есть через `when:`), отдельная задача с другим risk profile.
-- ChainDefinitionVo split — техдолг от Sprint 4: [`SharedChainDefinitionVo`](../src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php) создан, но оригинальный VO (546 LOC, 17 параметров, 3 фабричных метода) не стал легче.
+- ChainDefinitionVo split — техдолг от Sprint 4: [`SharedChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php) создан, но оригинальный VO (546 LOC, 17 параметров, 3 фабричных метода) не стал легче.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

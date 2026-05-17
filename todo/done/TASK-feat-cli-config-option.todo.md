@@ -78,7 +78,7 @@ php bin/task-orchestrator app:agent:orchestrate --config=custom-chains.yaml --va
 - Зависит от завершения EPIC-feat-standalone-cli (merge PR #68)
 
 ## 8. Sources (Источники)
-- [ ] [YamlChainLoader](../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php)
+- [ ] [YamlChainLoader](../../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php)
 - [ ] [OrchestrateCommand](../../apps/console/src/Module/Orchestrator/Command/OrchestrateCommand.php)
 - [ ] [Configuration.php](../../src/DependencyInjection/Configuration.php)
 

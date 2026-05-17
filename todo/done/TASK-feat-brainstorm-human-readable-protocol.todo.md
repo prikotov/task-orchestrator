@@ -70,8 +70,8 @@ vendor/bin/psalm
 - `FacilitatorResponse` парсит JSON из ответа агента, не из discussion_history — изменение discussion_history не влияет на парсинг
 
 ## 8. Sources (Источники)
-- [ ] [FormatDynamicJournalService](../../src/Module/Orchestrator/Domain/Service/Chain/Dynamic/FormatDynamicJournalService.php)
-- [ ] [RunDynamicLoopService — appendDiscussionHistory для фасилитатора](../../src/Module/Orchestrator/Domain/Service/Chain/Dynamic/RunDynamicLoopService.php)
+- [ ] [FormatDynamicJournalService](../../../src/Module/Orchestrator/Domain/Service/Chain/Dynamic/FormatDynamicJournalService.php)
+- [ ] [RunDynamicLoopService — appendDiscussionHistory для фасилитатора](../../../src/Module/Orchestrator/Domain/Service/Chain/Dynamic/RunDynamicLoopService.php)
 
 ## 9. Comments (Комментарии)
 Проблема обнаружена при ретроспективе brainstorm 2026-04-27: discussion_history на 200K содержит JSON-блоки фасилитатора, которые нечитаемы для человека. Участники пишут prose — с ними всё ок.

@@ -70,7 +70,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ## 8. Sources (Источники)
 - [ ] [Roadmap AI#17](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [ ] [Протокол brainstorm #2](../var/sessions/brainstorm/2026-04-30_16-02-26/result.md) — компромисс Sprint 7
+- [ ] [Протокол brainstorm #2](../../var/sessions/brainstorm/2026-04-30_16-02-26/result.md) — компромисс Sprint 7
 - [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md)
 
 ## 9. Comments (Комментарии)
@@ -84,7 +84,7 @@ Roadmap Sprint 7 (вторая половина). Новая задача из b
 ### Порядок действий
 1. Переключись в ветку `task/refactor-static-execution-split`: `git checkout task/refactor-static-execution-split`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `make check`.
 6. Сделай `git push`.

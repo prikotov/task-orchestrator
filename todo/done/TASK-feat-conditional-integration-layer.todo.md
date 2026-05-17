@@ -113,7 +113,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - [ ] [Конвенция: Integration Layer](../../docs/conventions/layers/integration.md)
 - [ ] [Конвенция: Service](../../docs/conventions/core_patterns/service.md)
 - [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md)
-- [ ] [StaticExecution Integration](../../src/Module/StaticExecution/Integration/) — референс паттерна
+- [ ] [StaticExecution Integration](../../../src/Module/StaticExecution/Integration/) — референс паттерна
 - [ ] [Roadmap: G6 trigger](../../docs/releases/ROADMAP-2026-Q2-Q3.md) — Integration-паттерн работает для ≥2 стратегий
 
 ## 9. Comments (Комментарии)
@@ -129,7 +129,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 ### Порядок действий
 1. Переключись в ветку `task/feat-conditional-integration-layer`: `git checkout task/feat-conditional-integration-layer`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`.
 6. Сделай `git push`.

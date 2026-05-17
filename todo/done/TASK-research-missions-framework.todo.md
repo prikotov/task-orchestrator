@@ -69,7 +69,7 @@ status: done
 
 ## 8. Sources (Источники)
 - [Доклад: Missions — Managing Autonomous Agent Teams](https://www.youtube.com/watch?v=ow1we5PzK-o)
-- [Сводная таблица фреймворков](../docs/research/agent-frameworks-summary.md)
+- [Сводная таблица фреймворков](../../docs/research/agent-frameworks-summary.md)
 
 ## 9. Comments (Комментарии)
 Аннотация к докладу: «Luke Alvoeiro introduces Missions, a framework designed to manage autonomous agent teams that execute long-running software engineering tasks. By combining delegation, verification, and structured communication, this approach shifts the focus from managing individual agent outputs to overseeing complex, multi-day workflows that maintain system coherence and code quality over time.»

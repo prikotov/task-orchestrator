@@ -80,7 +80,7 @@ ls docs/research/framework-comparisons/crewai-langgraph-autogen-comparison.md
 ### Порядок действий
 1. Переключись в ветку `task/research-crewai-langgraph-autogen`: `git checkout task/research-crewai-langgraph-autogen`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
 6. Сделай `git push`.

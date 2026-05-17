@@ -62,7 +62,7 @@ vendor/bin/psalm
 - Текущая структура `apps/console/` может не совпадать с ожиданиями от `bin/` — нужно проверить совместимость
 
 ## 8. Sources
-- [RFC: cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md) — Решение 2
+- [RFC: cli-distribution-rfc.md](../../docs/research/rfc/cli-distribution-rfc.md) — Решение 2
 - [Composer vendor binaries](https://getcomposer.org/doc/articles/vendor-binaries.md)
 
 ## Инструкции для сабагента
@@ -74,7 +74,7 @@ vendor/bin/psalm
 ### Порядок действий
 1. Переключись в ветку `task/chore-composer-library-type`: `git checkout task/chore-composer-library-type`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
 6. Сделай `git push`.

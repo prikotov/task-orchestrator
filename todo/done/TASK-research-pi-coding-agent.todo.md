@@ -79,7 +79,7 @@ grep "Pi Coding Agent" docs/research/coding-agents-summary.md
 ## 8. Sources (Источники)
 - [ ] [Pi CLI — помощь](cli --help)
 - [ ] [Официальный репозиторий](https://github.com/mariozechner/pi-coding-agent)
-- [ ] [Pi документация](README.md и docs/)
+- [ ] [Pi документация](../README.md и docs/)
 
 ## 9. Comments (Комментарии)
 Pi уже подключён как сабагент — его исследование должно быть наиболее полным и служить бенчмарком для остальных 13 агентов.
@@ -92,7 +92,7 @@ Pi уже подключён как сабагент — его исследов
 ### Порядок действий
 1. Переключись в ветку `task/research-pi-coding-agent`: `git checkout task/research-pi-coding-agent`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](../../../../docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `make check`.
 6. Сделай `git push`.

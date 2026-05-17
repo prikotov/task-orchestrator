@@ -74,10 +74,10 @@ status: done
 - **Зависимость:** Протокол brainstorm `var/sessions/brainstorm/2026-04-29_08-06-49/result.md`
 
 ## 8. Sources (Источники)
-- [x] [Протокол brainstorm (40 раундов)](../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
+- [x] [Протокол brainstorm (40 раундов)](../../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
 - [x] [Эпик декомпозиции](EPIC-refactor-orchestrator-decomposition.md)
-- [ ] [Существующие ADR](../docs/adr/) — для формата
-- [ ] [Шаблон задачи](../docs/todo-md/templates/task.md) — для создания задач
+- [ ] [Существующие ADR](../../docs/adr/) — для формата
+- [ ] [Шаблон задачи](../../docs/todo-md/templates/task.md) — для создания задач
 
 ## 9. Comments (Комментарии)
 Это задача Фазы 2 эпика EPIC-refactor-orchestrator-decomposition. Результат — вход для Фазы 3 (реализация P1-action items).

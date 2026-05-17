@@ -76,7 +76,7 @@ MetaGPT интересен SOP-подходом — стандартные оп�
 ### Порядок действий
 1. Переключись в ветку `task/research-metagpt-openclaw`: `git checkout task/research-metagpt-openclaw`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
 6. Сделай `git push`.

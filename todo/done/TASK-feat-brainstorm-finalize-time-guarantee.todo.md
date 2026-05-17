@@ -72,7 +72,7 @@ vendor/bin/psalm
 - Нужна аккуратная работа с таймингами: elapsed time vs wall clock — проверить, как сейчас считается
 
 ## 8. Sources (Источники)
-- [ ] [RunDynamicLoopService](../../src/Module/Orchestrator/Domain/Service/Chain/Dynamic/RunDynamicLoopService.php)
+- [ ] [RunDynamicLoopService](../../../src/Module/Orchestrator/Domain/Service/Chain/Dynamic/RunDynamicLoopService.php)
 - [ ] [Ретроспектива — проблема P0: таймаут убил синтез](../../var/sessions/brainstorm/2026-04-27_06-46-57/session.json)
 
 ## 9. Comments (Комментарии)

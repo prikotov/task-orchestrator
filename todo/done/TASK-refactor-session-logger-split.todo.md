@@ -74,7 +74,7 @@ Roadmap Sprint 7. Выполняется параллельно с AI#16 (Shared
 ### Порядок действий
 1. Переключись в ветку `task/refactor-session-logger-split`: `git checkout task/refactor-session-logger-split`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `make check`.
 6. Сделай `git push`.

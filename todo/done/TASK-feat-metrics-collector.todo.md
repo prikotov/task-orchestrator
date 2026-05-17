@@ -17,7 +17,7 @@ status: todo
 
 ## 1. Concept and Goal (Концепция и Цель)
 ### Story (Job Story)
-> Когда [`AuditLoggerInterface`](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) пишет в JSONL-файл, но нет способа агрегировать метрики — какая цепочка дольше, какая роль дороже, какой runner чаще падает — я хочу добавить `MetricsCollectorInterface` в Domain с in-memory реализацией, чтобы заложить observability-фундамент и дать команде данные для приоритизации оптимизаций.
+> Когда [`AuditLoggerInterface`](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) пишет в JSONL-файл, но нет способа агрегировать метрики — какая цепочка дольше, какая роль дороже, какой runner чаще падает — я хочу добавить `MetricsCollectorInterface` в Domain с in-memory реализацией, чтобы заложить observability-фундамент и дать команде данные для приоритизации оптимизаций.
 
 ### Goal (Цель по SMART)
 Создать [`Interface`](../../docs/conventions/core_patterns/external-service.md) `MetricsCollectorInterface` в Domain (AgentRunner или Orchestrator) с методами для записи и чтения метрик. In-memory реализация в Infrastructure. Интеграция в decorator'ы ([`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php), [`CircuitBreakerAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php)). Foundation для hooks system в Sprint 10. Срок: 1 день.
@@ -32,7 +32,7 @@ status: todo
 - DI-конфигурация
 
 ### Текущее поведение
-- [`AuditLoggerInterface`](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) пишет в JSONL — есть granular log, нет агрегации
+- [`AuditLoggerInterface`](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) пишет в JSONL — есть granular log, нет агрегации
 - Нет способа ответить на вопросы: какая цепочка дольше всего? какой runner чаще падает? какая роль тратит больше токенов?
 - Observability gap — мы не знаем, какая боль самая острая, потому что не измеряем
 
@@ -118,7 +118,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ## 8. Sources (Источники)
 - [ ] [Анализ Локи: Observability gap](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — MetricsCollector как упущенная потребность
-- [ ] [AuditLoggerInterface](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) — существующий observability механизм
+- [ ] [AuditLoggerInterface](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) — существующий observability механизм
 - [ ] [RetryingAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php)
 - [ ] [CircuitBreakerAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php)
 - [ ] [Конвенция: External Service (Interface)](../../docs/conventions/core_patterns/external-service.md)

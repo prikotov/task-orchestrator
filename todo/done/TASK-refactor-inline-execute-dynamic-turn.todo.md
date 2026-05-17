@@ -71,8 +71,8 @@ php vendor/prikotov/coding-standard/bin/run-sniff-tests.php
 - **Зависимость:** ADR-006 (ExecutionStrategy) — задача независима, но результат может упростить будущую DynamicExecutionStrategy
 
 ## 8. Sources (Источники)
-- [ ] [Протокол brainstorm (решение 3)](../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
-- [ ] [ADR-006: ExecutionStrategy](../docs/adr/006-execution-strategy-composition.md)
+- [ ] [Протокол brainstorm (решение 3)](../../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
+- [ ] [ADR-006: ExecutionStrategy](../../docs/adr/006-execution-strategy-composition.md)
 
 ## 9. Comments (Комментарии)
 Brainstorm-раунд 11: Левша обнаружил «service sandwich» — Domain-сервис между двумя другими, добавляющий один `implode()`. Консенсус всех 4 участников.

@@ -66,8 +66,8 @@ vendor/bin/phpunit
 - Может потребоваться каскадное изменение: если Command передаёт Domain VO дальше в Application-хендлеры
 
 ## 8. Sources
-- [Конвенция: слои и зависимости](docs/conventions/index.md)
-- [Архитектура](docs/guide/architecture.md)
+- [Конвенция: слои и зависимости](../../docs/conventions/index.md)
+- [Архитектура](../../docs/guide/architecture.md)
 
 ## Change History
 | Дата | Автор (роль) | Изменение |

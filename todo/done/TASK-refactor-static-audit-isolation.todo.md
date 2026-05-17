@@ -81,8 +81,8 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 ## 8. Sources (Источники)
 - [ ] [Конвенция: Integration Layer](../../docs/conventions/layers/integration.md)
 - [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md)
-- [ ] [RunStaticChainService](../../src/Module/StaticExecution/Domain/Service/RunStaticChainService.php) — текущая реализация с audit-зависимостью
-- [ ] [AuditLoggerInterface](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) — Orchestrator audit interface
+- [ ] [RunStaticChainService](../../../src/Module/StaticExecution/Domain/Service/RunStaticChainService.php) — текущая реализация с audit-зависимостью
+- [ ] [AuditLoggerInterface](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) — Orchestrator audit interface
 
 ## 9. Comments (Комментарии)
 Tech debt от архитектора Локи: StaticExecution Domain конструирует Orchestrator DTO (`ChainResultAuditDto`, `StepAuditStatusDto`). Это единственное нарушение границ модулей после Static split (Sprint 7). Должно быть устранено до ConditionalExecutionStrategy, иначе Conditional унаследует ту же проблему.
@@ -95,7 +95,7 @@ Tech debt от архитектора Локи: StaticExecution Domain конс�
 ### Порядок действий
 1. Переключись в ветку `task/refactor-static-audit-isolation`: `git checkout task/refactor-static-audit-isolation`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`.
 6. Сделай `git push`.

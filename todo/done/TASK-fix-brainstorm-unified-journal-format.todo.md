@@ -62,8 +62,8 @@ vendor/bin/phpunit tests/Unit/Infrastructure/Service/Chain/PromptFormatterServic
 - ⚠️ Зависимость от TASK-fix-brainstorm-empty-participant-section: если regex в PromptFormatterService обновляется в той задаче, нужно убедиться, что новый заголовок тоже удаляется корректно. Рекомендуется выполнять **после** TASK-fix-brainstorm-empty-participant-section
 
 ## 8. Sources (Источники)
-- [ ] [participant_user.txt](../config/prompts/brainstorm/participant_user.txt)
-- [ ] [facilitator_continue.txt](../config/prompts/brainstorm/facilitator_continue.txt)
+- [ ] [participant_user.txt](../../config/prompts/brainstorm/participant_user.txt)
+- [ ] [facilitator_continue.txt](../../config/prompts/brainstorm/facilitator_continue.txt)
 
 ## 9. Comments (Комментарии)
 Формат в `facilitator_continue.txt` («файлы — прочитай их») более информативен — он даёт прямую инструкцию агенту. Убираем `#` из заголовка participant, чтобы он совпадал по стилю с facilitator (без Markdown-заголовка).
@@ -76,7 +76,7 @@ vendor/bin/phpunit tests/Unit/Infrastructure/Service/Chain/PromptFormatterServic
 ### Порядок действий
 1. Переключись в ветку `task/fix-brainstorm-unified-journal-format`: `git checkout task/fix-brainstorm-unified-journal-format`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit`.
 6. Сделай `git push`.

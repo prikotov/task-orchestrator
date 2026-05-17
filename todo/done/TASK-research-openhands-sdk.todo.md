@@ -74,7 +74,7 @@ OpenHands — один из самых активных open-source AI-agent п�
 ### Порядок действий
 1. Переключись в ветку `task/research-openhands-sdk`: `git checkout task/research-openhands-sdk`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
 6. Сделай `git push`.

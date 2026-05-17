@@ -74,9 +74,9 @@ vendor/bin/psalm
 - Задача зависит от корректности данных `role` в `$roundData` — проверено: поле заполняется в `logRound()` (строка 155 ChainSessionLogger.php)
 
 ## 8. Sources (Источники)
-- [ ] [ChainSessionLogger](../src/Module/Orchestrator/Infrastructure/Service/Chain/ChainSessionLogger.php)
-- [ ] [ExecuteDynamicTurnService](../src/Module/Orchestrator/Domain/Service/Chain/Dynamic/ExecuteDynamicTurnService.php)
-- [ ] [step_043 — текущий формат списка файлов](../var/sessions/brainstorm/2026-04-27_12-29-03/step_043_round_022_team_lead_alex_3_user.md)
+- [ ] [ChainSessionLogger](../../src/Module/Orchestrator/Infrastructure/Service/Chain/ChainSessionLogger.php)
+- [ ] [ExecuteDynamicTurnService](../../src/Module/Orchestrator/Domain/Service/Chain/Dynamic/ExecuteDynamicTurnService.php)
+- [ ] [step_043 — текущий формат списка файлов](../../var/sessions/brainstorm/2026-04-27_12-29-03/step_043_round_022_team_lead_alex_3_user.md)
 
 ## 9. Comments (Комментарии)
 `$roundData` уже содержит `role` (строка 155 в ChainSessionLogger.php) — нужно только использовать его при формировании списка файлов.
@@ -89,7 +89,7 @@ vendor/bin/psalm
 ### Порядок действий
 1. Переключись в ветку `task/fix-brainstorm-file-list-with-roles`: `git checkout task/fix-brainstorm-file-list-with-roles`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
 6. Сделай `git push`.
