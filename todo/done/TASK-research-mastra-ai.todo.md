@@ -78,7 +78,7 @@ Mastra AI — TypeScript-фреймворк для построения AI-аг�
 ### Порядок действий
 1. Переключись в ветку `task/research-mastra-ai`: `git checkout task/research-mastra-ai`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
 6. Сделай `git push`.

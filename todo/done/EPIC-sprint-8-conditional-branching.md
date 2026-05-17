@@ -15,10 +15,10 @@ status: done
 
 ## 1. Concept and Goal (Концепция и цель)
 ### Story (Job Story)
-> Когда static-цепочки поддерживают только линейное выполнение шагов, а AI-agent фреймворки (LangGraph, Archon, Mastra AI, Agno) подтверждают потребность в conditional branching, я хочу добавить `when:` expressions в YAML DSL и третью реализацию [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php), чтобы цепочки могли ветвиться по результатам предыдущих шагов (exit code, status, output patterns).
+> Когда static-цепочки поддерживают только линейное выполнение шагов, а AI-agent фреймворки (LangGraph, Archon, Mastra AI, Agno) подтверждают потребность в conditional branching, я хочу добавить `when:` expressions в YAML DSL и третью реализацию [`ExecutionStrategyInterface`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php), чтобы цепочки могли ветвиться по результатам предыдущих шагов (exit code, status, output patterns).
 
 ### Goal (Цель по SMART)
-Реализовать условное ветвление (`when:` expressions) в YAML-chain DSL + [`ConditionalExecutionStrategy`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) как третью реализацию `ExecutionStrategyInterface`. Integration-паттерн валидируется на ≥2 стратегиях (G6). Обратная совместимость: цепочки без `when:` работают без изменений. Срок: Sprint 8 (11 августа — 24 августа).
+Реализовать условное ветвление (`when:` expressions) в YAML-chain DSL + [`ConditionalExecutionStrategy`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) как третью реализацию `ExecutionStrategyInterface`. Integration-паттерн валидируется на ≥2 стратегиях (G6). Обратная совместимость: цепочки без `when:` работают без изменений. Срок: Sprint 8 (11 августа — 24 августа).
 
 ## 2. Context and Scope (Контекст и границы)
 ### Предпосылки
@@ -31,7 +31,7 @@ status: done
 ### In Scope (Что делаем)
 - Audit isolation в StaticExecution (tech debt от Локи: RunStaticChainService конструирует Orchestrator DTO)
 - YAML DSL: `when:` expressions — условное ветвление внутри цепочки
-- [`ConditionalExecutionStrategy`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — третья реализация `ExecutionStrategyInterface`
+- [`ConditionalExecutionStrategy`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — третья реализация `ExecutionStrategyInterface`
 - Integration-слой для ConditionalExecutionStrategy (валидация G6)
 - Unit + Integration тесты
 
@@ -46,8 +46,8 @@ status: done
 ### 🔴 Must Have (Блокирующие требования)
 - [x] Audit-ответственность вынесена из `RunStaticChainService` в отдельный сервис StaticExecution Domain
 - [x] YAML поддерживает `when:` expressions на уровне шага
-- [x] [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) расширен для хранения conditional branches
-- [x] `ConditionalExecutionStrategy` реализует [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
+- [x] [`ChainDefinitionVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) расширен для хранения conditional branches
+- [x] `ConditionalExecutionStrategy` реализует [`ExecutionStrategyInterface`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
 - [x] Integration-слой для Conditional Branching создан по тому же паттерну, что StaticExecution
 - [x] Обратная совместимость: цепочки без `when:` работают без изменений
 - [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
@@ -130,7 +130,7 @@ chains:
 | Модуль | Изменения |
 |---|---|
 | `StaticExecution` | Audit isolation: вынос AuditLoggerInterface-зависимости |
-| `Orchestrator\Domain` | Расширение `ChainTypeEnum`, [`ChainStepVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php), новый VO для conditions |
+| `Orchestrator\Domain` | Расширение `ChainTypeEnum`, [`ChainStepVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php), новый VO для conditions |
 | `Orchestrator\Infrastructure` | Расширение `YamlChainLoader` для `when:` parsing |
 | `Orchestrator\Application` | `ConditionalExecutionStrategy` (новый) |
 | `Orchestrator\Integration` | Integration Service для ConditionalExecution (если отдельный модуль) |
@@ -147,7 +147,7 @@ chains:
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все 4 задачи выполнены и протестированы
 - [x] YAML поддерживает `when:` expressions; цепочки без `when:` работают без изменений
-- [x] `ConditionalExecutionStrategy` — третья реализация [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
+- [x] `ConditionalExecutionStrategy` — третья реализация [`ExecutionStrategyInterface`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php)
 - [x] Integration-паттерн валидирован на 3-й стратегии (G6): Integration-слой < 200 LOC, без God-interface
 - [x] Audit isolation: `RunStaticChainService` не зависит от Orchestrator Domain DTO
 - [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
@@ -166,11 +166,11 @@ chains:
 - **Зависимость (внутренняя):** Audit isolation (Task 4) должна быть завершена до ConditionalExecutionStrategy (Task 2), чтобы ConditionalStrategy не унаследовала Audit-зависимость от StaticExecution.
 
 ## 9. Sources (Источники)
-- [ ] [Roadmap 2026 Q2–Q3: Sprint 8](../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [ ] [ADR-006: ExecutionStrategy composition](../docs/adr/006-execution-strategy-composition.md)
-- [ ] [ADR-008: Shared Kernel Contract](../docs/adr/008-shared-kernel-contract.md)
+- [ ] [Roadmap 2026 Q2–Q3: Sprint 8](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
+- [ ] [ADR-006: ExecutionStrategy composition](../../docs/adr/006-execution-strategy-composition.md)
+- [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md)
 - [ ] [EPIC-refactor-orchestrator-p3 (P3 завершён)](EPIC-refactor-orchestrator-p3.md)
-- [ ] [Research: AI-agent frameworks summary](../docs/research/agent-frameworks-summary.md)
+- [ ] [Research: AI-agent frameworks summary](../../docs/research/agent-frameworks-summary.md)
 
 ## 10. Comments (Комментарии)
 - Conditional Branching — первая roadmap-фича (не декомпозиция). Качество реализации задаст паттерн для последующих фич (parallel execution, sub-agents).

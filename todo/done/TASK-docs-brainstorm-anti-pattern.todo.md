@@ -58,7 +58,7 @@ status: done
 - Нет технических рисков — задача docs-only
 
 ## 8. Sources (Источники)
-- [ ] [brainstorm SKILL.md](docs/agents/skills/brainstorm/SKILL.md)
+- [ ] [brainstorm SKILL.md](../../docs/agents/skills/brainstorm/SKILL.md)
 
 ## 9. Comments (Комментарии)
 Контекст: на практике агент (Тимлид Алекс) провёл «brainstorm» сам с собой, выдумав реплики четырёх участников вместо запуска реальной сессии. Пользователь счёл это неприемлемым. Задача — предотвратить повторение через явный запрет в документации скилла.

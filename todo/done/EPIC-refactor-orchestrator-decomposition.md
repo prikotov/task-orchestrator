@@ -44,7 +44,7 @@ pr: https://github.com/prikotov/task-orchestrator/pull/98
 
 ### Учёт исследований
 
-Анализ должен учитывать паттерны из 16 исследованных фреймворков ([agent-frameworks-summary.md](../docs/research/agent-frameworks-summary.md)):
+Анализ должен учитывать паттерны из 16 исследованных фреймворков ([agent-frameworks-summary.md](../../docs/research/agent-frameworks-summary.md)):
 - **Archon, Agno, Mastra AI** — модели workflow engine с типизированными шагами, conditional branching, parallel execution
 - **LangGraph** — graph/DAG с durable execution, checkpoint
 - **Paperclip AI** — мета-оркестратор с plugin system, scoped budgets, execution policies
@@ -95,10 +95,10 @@ pr: https://github.com/prikotov/task-orchestrator/pull/98
 ## 5. Implementation Plan (План реализации)
 
 ### Фаза 1: Анализ (P1)
-- [x] [TASK-refactor-orchestrator-brainstorm-analysis](done/TASK-refactor-orchestrator-brainstorm-analysis.todo.md) — Глубокий brainstorm-анализ Orchestrator: 40 раундов, 81 шаг, 2ч 42мин, 10 решений, 16 action items. [Протокол](../var/sessions/brainstorm/2026-04-29_08-06-49/result.md).
+- [x] [TASK-refactor-orchestrator-brainstorm-analysis](TASK-refactor-orchestrator-brainstorm-analysis.todo.md) — Глубокий brainstorm-анализ Orchestrator: 40 раундов, 81 шаг, 2ч 42мин, 10 решений, 16 action items. [Протокол](../../var/sessions/brainstorm/2026-04-29_08-06-49/result.md).
 
 ### Фаза 2: Планирование (P1)
-- [x] [TASK-refactor-orchestrator-decomposition-plan](done/TASK-refactor-orchestrator-decomposition-plan.todo.md) — Оформление плана: 3 ADR (ExecutionStrategy, VO ACL, Shared Kernel), черновой roadmap, задачи на P1-action items.
+- [x] [TASK-refactor-orchestrator-decomposition-plan](TASK-refactor-orchestrator-decomposition-plan.todo.md) — Оформление плана: 3 ADR (ExecutionStrategy, VO ACL, Shared Kernel), черновой roadmap, задачи на P1-action items.
 
 ### Фаза 3: Реализация P1 (P1)
 - [x] TASK-refactor-inline-execute-dynamic-turn — Инлайнинг ExecuteDynamicTurnService в RunDynamicLoopService. Вложенность 7→5. — PR #101
@@ -132,10 +132,10 @@ pr: https://github.com/prikotov/task-orchestrator/pull/98
 - **Зависимость:** Результаты `docs/research/agent-frameworks-summary.md` должны быть доступны участникам brainstorm
 
 ## 9. Sources (Источники)
-- [ ] [Архитектура проекта](../docs/guide/architecture.md)
-- [ ] [Сводная таблица исследований](../docs/research/agent-frameworks-summary.md)
-- [ ] [Протокол brainstorm от 2026-04-29](../var/sessions/brainstorm/2026-04-29_03-42-46/result.md)
-- [ ] [Конвенции](../docs/conventions/index.md)
+- [ ] [Архитектура проекта](../../docs/guide/architecture.md)
+- [ ] [Сводная таблица исследований](../../docs/research/agent-frameworks-summary.md)
+- [ ] [Протокол brainstorm от 2026-04-29](../../var/sessions/brainstorm/2026-04-29_03-42-46/result.md)
+- [ ] [Конвенции](../../docs/conventions/index.md)
 
 ## 10. Comments (Комментарии)
 Контекст: на предыдущем brainstorm (2026-04-29, 13 раундов) было принято решение «не декомпозировать сейчас». Владелец проекта не согласился — признаки оверсложности налицо (связанность, размер, вложенность, VO-дублирование). Запускаем глубокий анализ для принятия взвешенного решения.

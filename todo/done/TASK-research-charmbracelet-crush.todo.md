@@ -73,7 +73,7 @@ Charmbracelet — авторы Bubbletea, Lip Gloss, VHS. Качество их 
 ### Порядок действий
 1. Переключись в ветку `task/research-charmbracelet-crush`: `git checkout task/research-charmbracelet-crush`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
 6. Сделай `git push`.

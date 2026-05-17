@@ -68,7 +68,7 @@ Roadmap Sprint 5 (буферный). Буфер для завершения P2 +
 ### Порядок действий
 1. Переключись в ветку `task/chore-p2-integration-testing`: `git checkout task/chore-p2-integration-testing`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `make check`.
 6. Сделай `git push`.

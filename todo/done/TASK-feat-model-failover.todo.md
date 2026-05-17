@@ -17,22 +17,22 @@ status: done
 
 ## 1. Concept and Goal (Концепция и Цель)
 ### Story (Job Story)
-> Когда [`CircuitBreakerAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php) переходит в open-состояние и блокирует вызов, цепочка падает — хотя fallback runner может быть уже сконфигурирован через [`FallbackConfigVo`](../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php). Я хочу, чтобы CB open автоматически триггерил fallback runner, чтобы цепочка продолжала работу при недоступности основного runner'а.
+> Когда [`CircuitBreakerAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php) переходит в open-состояние и блокирует вызов, цепочка падает — хотя fallback runner может быть уже сконфигурирован через [`FallbackConfigVo`](../../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php). Я хочу, чтобы CB open автоматически триггерил fallback runner, чтобы цепочка продолжала работу при недоступности основного runner'а.
 
 ### Goal (Цель по SMART)
-Связать [`CircuitBreakerAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php) с [`FallbackConfigVo`](../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php) через [`RoleConfigVo::$fallback`](../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php): при CB open → автоматически триггерить fallback runner (если сконфигурирован). Wiring существующего кода, не новая архитектура. Срок: 1 день.
+Связать [`CircuitBreakerAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php) с [`FallbackConfigVo`](../../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php) через [`RoleConfigVo::$fallback`](../../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php): при CB open → автоматически триггерить fallback runner (если сконфигурирован). Wiring существующего кода, не новая архитектура. Срок: 1 день.
 
 ## 2. Context and Scope (Контекст и Границы)
 ### Где делаем
 - [`src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php) — основной файл изменений
-- [`src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php`](../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php) — источник fallback-конфигурации
-- [`src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php`](../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php) — конфигурация fallback-команды
+- [`src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php`](../../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php) — источник fallback-конфигурации
+- [`src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php`](../../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php) — конфигурация fallback-команды
 - DI-конфигурация: wiring CB → fallback runner
 
 ### Текущее поведение
 - [`CircuitBreakerAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php) при open-состоянии (строка ~60): возвращает `AgentResultVo::createFromError("Circuit breaker is open")` — цепочка падает
-- [`FallbackConfigVo`](../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php) существует и содержит fallback-команду, но не используется при CB open
-- [`RoleConfigVo::$fallback`](../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php) возвращает `?FallbackConfigVo` — уже есть в конфигурации
+- [`FallbackConfigVo`](../../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php) существует и содержит fallback-команду, но не используется при CB open
+- [`RoleConfigVo::$fallback`](../../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php) возвращает `?FallbackConfigVo` — уже есть в конфигурации
 
 ### Границы (Out of Scope)
 - Не создаём отдельный `FailoverAgentRunner` decorator (Вариант B из отчёта Локи — overengineering)
@@ -51,7 +51,7 @@ status: done
 
 ### 🟡 Should Have (Желательно)
 - [ ] Логирование: при fallback trigger — warning в log с указанием runner name + fallback runner name
-- [ ] Audit: fallback activation зафиксирован в [`AuditLoggerInterface`](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php)
+- [ ] Audit: fallback activation зафиксирован в [`AuditLoggerInterface`](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php)
 
 ### 🟢 Could Have (Опционально)
 - [ ] Метрика: counter `fallback_triggered` в MetricsCollector (если TASK-feat-metrics-collector уже завершена)
@@ -106,8 +106,8 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - [ ] [Roadmap: Sprint 9](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
 - [ ] [Анализ Локи: Model Failover](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — Вариант A (через RoleConfigVo fallback)
 - [ ] [CircuitBreakerAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php)
-- [ ] [FallbackConfigVo](../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php)
-- [ ] [RoleConfigVo](../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php)
+- [ ] [FallbackConfigVo](../../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php)
+- [ ] [RoleConfigVo](../../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php)
 
 ## 9. Comments (Комментарии)
 - Pain level: 7/10 — реальная production боль. LLM API rate limits, 529 overloaded, 503 service unavailable — обычное дело. Сейчас вся цепочка падает при недоступности модели.

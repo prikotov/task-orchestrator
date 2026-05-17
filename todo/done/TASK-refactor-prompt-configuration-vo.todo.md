@@ -74,7 +74,7 @@ php vendor/prikotov/coding-standard/bin/run-sniff-tests.php
 - **Зависимость:** Нет внешних зависимостей
 
 ## 8. Sources (Источники)
-- [ ] [Протокол brainstorm (решение 1)](../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
+- [ ] [Протокол brainstorm (решение 1)](../../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
 
 ## 9. Comments (Комментарии)
 Brainstorm-раунды 2-3: Локи первым идентифицировал проблему (7 промптов через 4 слоя), Левша предложил PromptConfigurationVo как quick fix с `@deprecated`. Все согласны — ROI > 0, back-compat change.

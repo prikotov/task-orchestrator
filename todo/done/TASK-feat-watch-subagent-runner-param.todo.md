@@ -78,10 +78,10 @@ bash docs/agents/skills/run-pi-subagent/scripts/watch-subagent.sh -h
 - codex может не поддерживать `--system-prompt` — нужно использовать `-c model_instructions_file=...`
 
 ## 8. Sources (Источники)
-- [ ] [watch-subagent.sh](docs/agents/skills/run-pi-subagent/scripts/watch-subagent.sh)
-- [ ] [run-pi-subagent SKILL.md](docs/agents/skills/run-pi-subagent/SKILL.md)
-- [ ] [Отчёт Гэндальфа](docs/agents/reports/system-architect/2026-05-10_10-48_three-architecture-questions.md)
-- [ ] [Отчёт Локи](docs/agents/reports/system-architect/2026-05-10_blind-spots-task-workflow-chains.md)
+- [ ] [watch-subagent.sh](../docs/agents/skills/run-pi-subagent/scripts/watch-subagent.sh)
+- [ ] [run-pi-subagent SKILL.md](../docs/agents/skills/run-pi-subagent/SKILL.md)
+- [ ] [Отчёт Гэндальфа](../../docs/agents/reports/system-architect/2026-05-10_10-48_three-architecture-questions.md)
+- [ ] [Отчёт Локи](../../docs/agents/reports/system-architect/2026-05-10_blind-spots-task-workflow-chains.md)
 
 ## 9. Comments (Комментарии)
 Скрипт — fallback при неработающем оркестраторе. Не превращать в мини-оркестратор (Локи). Контракт с defaults (env + версия) — компромисс между параметризацией и стабильностью.

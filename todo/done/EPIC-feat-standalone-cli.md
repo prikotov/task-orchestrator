@@ -74,23 +74,23 @@ pr:
 ## 5. Implementation Plan (План реализации)
 
 ### Фаза 1: Исследование и выбор решения
-- [x] [TASK-research-cli-distribution-options](done/TASK-research-cli-distribution-options.todo.md) — Мозговой штурм: исследовать варианты дистрибуции, оформить RFC, согласовано с владельцем проекта
+- [x] [TASK-research-cli-distribution-options](TASK-research-cli-distribution-options.todo.md) — Мозговой штурм: исследовать варианты дистрибуции, оформить RFC, согласовано с владельцем проекта
 
 ### Фаза 2: Реализация (P0)
-- [x] [TASK-chore-composer-library-type](done/TASK-chore-composer-library-type.todo.md) — Изменить type на library + добавить bin в composer.json (~1.5 ч)
-- [ ] [TASK-chore-packagist-register](backlog/TASK-chore-packagist-register.todo.md) — Регистрация пакета на Packagist (~10 мин)
-- [x] [TASK-feat-typed-exit-codes](done/TASK-feat-typed-exit-codes.todo.md) — Typed exit codes для CLI-команды (~2–2.5 ч)
+- [x] [TASK-chore-composer-library-type](TASK-chore-composer-library-type.todo.md) — Изменить type на library + добавить bin в composer.json (~1.5 ч)
+- [ ] [TASK-chore-packagist-register](../backlog/TASK-chore-packagist-register.todo.md) — Регистрация пакета на Packagist (~10 мин)
+- [x] [TASK-feat-typed-exit-codes](TASK-feat-typed-exit-codes.todo.md) — Typed exit codes для CLI-команды (~2–2.5 ч)
 
 ### Фаза 3: Реализация (P1)
-- [x] [TASK-feat-validate-config](done/TASK-feat-validate-config.todo.md) — Флаг --validate-config для проверки конфигурации (~2–2.5 ч)
-- [x] [TASK-chore-phar-build](done/TASK-chore-phar-build.todo.md) — Настройка сборки Phar через box-project/box (~45 мин)
-- [x] [TASK-docs-install-skill](done/TASK-docs-install-skill.todo.md) — SKILL.md для установки AI-агентами + README (~2 ч)
+- [x] [TASK-feat-validate-config](TASK-feat-validate-config.todo.md) — Флаг --validate-config для проверки конфигурации (~2–2.5 ч)
+- [x] [TASK-chore-phar-build](TASK-chore-phar-build.todo.md) — Настройка сборки Phar через box-project/box (~45 мин)
+- [x] [TASK-docs-install-skill](TASK-docs-install-skill.todo.md) — SKILL.md для установки AI-агентами + README (~2 ч)
 
 ### Backlog (P2, после v1.0)
-- [x] [TASK-refactor-validate-config-dedup](done/TASK-refactor-validate-config-dedup.todo.md) — Вынести валидационные инварианты в Domain Specification
-- [x] [TASK-feat-cli-config-option](done/TASK-feat-cli-config-option.todo.md) — CLI-опция --config для указания chains.yaml
-- [x] [TASK-feat-timeout-exit-code](done/TASK-feat-timeout-exit-code.todo.md) — Propagation таймаута в CLI exit code 6
-- [x] [TASK-chore-presentation-domain-decouple](done/TASK-chore-presentation-domain-decouple.todo.md) — Presentation→Domain dependency removal
+- [x] [TASK-refactor-validate-config-dedup](TASK-refactor-validate-config-dedup.todo.md) — Вынести валидационные инварианты в Domain Specification
+- [x] [TASK-feat-cli-config-option](TASK-feat-cli-config-option.todo.md) — CLI-опция --config для указания chains.yaml
+- [x] [TASK-feat-timeout-exit-code](TASK-feat-timeout-exit-code.todo.md) — Propagation таймаута в CLI exit code 6
+- [x] [TASK-chore-presentation-domain-decouple](TASK-chore-presentation-domain-decouple.todo.md) — Presentation→Domain dependency removal
 - [ ] GPG-подпись Phar
 - [ ] Windows CI для Phar
 - [ ] JSON Schema для chains.yaml
@@ -115,7 +115,7 @@ pr:
 - Текущая структура бандла (DependencyInjection, Extension) рассчитана на интеграцию в Symfony-приложение — может потребоваться адаптация для standalone-режима
 
 ## 9. Sources (Источники)
-- [ ] [composer.json](../composer.json) — текущие зависимости и автозагрузка
+- [ ] [composer.json](../../composer.json) — текущие зависимости и автозагрузка
 - [ ] [Symfony Console Component](https://symfony.com/doc/current/components/console.html)
 - [ ] [Box — Phar builder](https://github.com/box-project/box)
 - [ ] [Composer binary vendor bins](https://getcomposer.org/doc/articles/vendor-binaries.md)

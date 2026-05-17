@@ -18,7 +18,7 @@ status: done
 > Когда Circuit Breaker agent runner переходит в open-состояние и блокирует вызов, вся цепочка падает, хотя fallback runner может быть уже сконфигурирован через `FallbackConfigVo`. Когда RetryingAgentRunner retry-all без разбора между FATAL и TRANSIENT ошибками. Когда нет агрегированных метрик о работе цепочек — я хочу добавить model failover (CB open → fallback), упрощённую error classification и MetricsCollector, чтобы цепочки стали отказоустойчивыми, а команда получила observability-фундамент.
 
 ### Goal (Цель по SMART)
-Реализовать model failover (CB open → trigger fallback runner, если сконфигурирован через [`FallbackConfigVo`](../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php)), упрощённую error classification (FATAL/TRANSIENT по `exitCode`/`isTimedOut()` в [`RetryingAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php)), [`MetricsCollectorInterface`](../src/Module/AgentRunner/Domain/Service/AgentRunnerInterface.php) в Domain с in-memory реализацией в Infrastructure, и зафиксировать ADR о Dynamic split. Срок: Sprint 9 (08 сентября — 21 сентября).
+Реализовать model failover (CB open → trigger fallback runner, если сконфигурирован через [`FallbackConfigVo`](../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php)), упрощённую error classification (FATAL/TRANSIENT по `exitCode`/`isTimedOut()` в [`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php)), [`MetricsCollectorInterface`](../../src/Module/AgentRunner/Domain/Service/AgentRunnerInterface.php) в Domain с in-memory реализацией в Infrastructure, и зафиксировать ADR о Dynamic split. Срок: Sprint 9 (08 сентября — 21 сентября).
 
 ## 2. Context and Scope (Контекст и границы)
 ### Предпосылки
@@ -31,12 +31,12 @@ status: done
 - RetryingAgentRunner retry-all без разбора FATAL/TRANSIENT
 
 ### Источники
-- Roadmap: [`docs/releases/ROADMAP-2026-Q2-Q3.md`](../docs/releases/ROADMAP-2026-Q2-Q3.md) — секция Sprint 9
-- Анализ Локи: [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../docs/research/analytical/loki-roadmap-review-2026-05.md) — рекомендованный состав Sprint 9
+- Roadmap: [`docs/releases/ROADMAP-2026-Q2-Q3.md`](../../docs/releases/ROADMAP-2026-Q2-Q3.md) — секция Sprint 9
+- Анализ Локи: [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — рекомендованный состав Sprint 9
 
 ### In Scope (Что делаем)
-- Model failover: CB open → автоматически триггерит fallback runner (wiring через [`RoleConfigVo::$fallback`](../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php))
-- Error classification: [`ErrorClassificationVo`](../src/Module/AgentRunner/Domain/ValueObject/AgentResultVo.php) в Domain AgentRunner (FATAL/TRANSIENT/UNKNOWN)
+- Model failover: CB open → автоматически триггерит fallback runner (wiring через [`RoleConfigVo::$fallback`](../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php))
+- Error classification: [`ErrorClassificationVo`](../../src/Module/AgentRunner/Domain/ValueObject/AgentResultVo.php) в Domain AgentRunner (FATAL/TRANSIENT/UNKNOWN)
 - MetricsCollectorInterface в Domain + in-memory реализация в Infrastructure
 - ADR: Dynamic split — решение принято и зафиксировано
 
@@ -50,8 +50,8 @@ status: done
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Блокирующие требования)
-- [x] Model failover: CB open → автоматически триггерит fallback runner (если сконфигурирован через [`FallbackConfigVo`](../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php))
-- [x] Error classification: [`RetryingAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php) различает FATAL/TRANSIENT по exitCode/timeout, не retry на FATAL
+- [x] Model failover: CB open → автоматически триггерит fallback runner (если сконфигурирован через [`FallbackConfigVo`](../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php))
+- [x] Error classification: [`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php) различает FATAL/TRANSIENT по exitCode/timeout, не retry на FATAL
 - [x] `MetricsCollectorInterface` в Domain + in-memory реализация в Infrastructure
 - [x] ADR: Dynamic split — решение принято и зафиксировано
 - [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
@@ -59,7 +59,7 @@ status: done
 
 ### 🟡 Should Have (Важные требования)
 - [x] Unit-тесты ≥80% покрытия нового кода
-- [x] Интеграция MetricsCollector в существующие decorator'ы ([`RetryingAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php), [`CircuitBreakerAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php))
+- [x] Интеграция MetricsCollector в существующие decorator'ы ([`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php), [`CircuitBreakerAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php))
 
 ### 🟢 Could Have (Желательно)
 - [ ] MetricsCollector: простые агрегации (avg duration per chain, error rate per runner)
@@ -75,9 +75,9 @@ status: done
 ### Архитектурный подход
 
 Sprint 9 фокусируется на wiring существующих механизмов, а не на новой архитектуре:
-1. **Model failover** — связать [`CircuitBreakerAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php) с [`FallbackConfigVo`](../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php) через [`RoleConfigVo::$fallback`](../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php). Вариант A из отчёта Локи: CB open → trigger fallback
-2. **Error classification** — [`Value Object`](../docs/conventions/core_patterns/value-object.md) `ErrorClassificationVo` в Domain AgentRunner, интеграция в [`RetryingAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php)
-3. **MetricsCollector** — [`Interface`](../docs/conventions/core_patterns/external-service.md) в Domain (AgentRunner или Orchestrator), in-memory реализация в Infrastructure
+1. **Model failover** — связать [`CircuitBreakerAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php) с [`FallbackConfigVo`](../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php) через [`RoleConfigVo::$fallback`](../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php). Вариант A из отчёта Локи: CB open → trigger fallback
+2. **Error classification** — [`Value Object`](../../docs/conventions/core_patterns/value-object.md) `ErrorClassificationVo` в Domain AgentRunner, интеграция в [`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php)
+3. **MetricsCollector** — [`Interface`](../../docs/conventions/core_patterns/external-service.md) в Domain (AgentRunner или Orchestrator), in-memory реализация в Infrastructure
 4. **ADR** — чисто документальная задача
 
 ### Поток данных: Model Failover
@@ -123,7 +123,7 @@ flowchart TD
 
 | Модуль | Изменения |
 |---|---|
-| `AgentRunner\Domain` | `ErrorClassificationVo` (новый [`Value Object`](../docs/conventions/core_patterns/value-object.md)), `MetricsCollectorInterface` (новый [`Interface`](../docs/conventions/core_patterns/external-service.md)) |
+| `AgentRunner\Domain` | `ErrorClassificationVo` (новый [`Value Object`](../../docs/conventions/core_patterns/value-object.md)), `MetricsCollectorInterface` (новый [`Interface`](../../docs/conventions/core_patterns/external-service.md)) |
 | `AgentRunner\Infrastructure` | `CircuitBreakerAgentRunner` — fallback wiring, `RetryingAgentRunner` — classification, `InMemoryMetricsCollector` (новый) |
 | `Orchestrator\Domain` | Чтение `RoleConfigVo::$fallback` для передачи в CB runner |
 | `docs/adr/` | ADR Dynamic split |
@@ -132,15 +132,15 @@ flowchart TD
 
 Порядок задач — по зависимостям и pain level:
 
-- [x] [TASK-feat-model-failover](done/TASK-feat-model-failover.todo.md) — Model failover: CB open → trigger fallback (pain 7/10, 1 день) ✅
-- [x] [TASK-feat-error-classification](done/TASK-feat-error-classification.todo.md) — Error classification: упрощённая по exitCode/timeout (pain 2/10, 0.5 дня) ✅
-- [x] [TASK-feat-metrics-collector](done/TASK-feat-metrics-collector.todo.md) — MetricsCollectorInterface + in-memory реализация (pain 5/10, 1 день) ✅
-- [x] [TASK-docs-dynamic-split-adr](done/TASK-docs-dynamic-split-adr.todo.md) — ADR: Dynamic split — решение (2 часа) ✅
+- [x] [TASK-feat-model-failover](TASK-feat-model-failover.todo.md) — Model failover: CB open → trigger fallback (pain 7/10, 1 день) ✅
+- [x] [TASK-feat-error-classification](TASK-feat-error-classification.todo.md) — Error classification: упрощённая по exitCode/timeout (pain 2/10, 0.5 дня) ✅
+- [x] [TASK-feat-metrics-collector](TASK-feat-metrics-collector.todo.md) — MetricsCollectorInterface + in-memory реализация (pain 5/10, 1 день) ✅
+- [x] [TASK-docs-dynamic-split-adr](TASK-docs-dynamic-split-adr.todo.md) — ADR: Dynamic split — решение (2 часа) ✅
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все задачи из **Must Have** выполнены и протестированы
-- [x] CB open → fallback runner (если сконфигурирован через [`FallbackConfigVo`](../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php))
-- [x] [`RetryingAgentRunner`](../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php) классифицирует ошибки по `exitCode`/`isTimedOut`/`isError` (FATAL/TRANSIENT)
+- [x] CB open → fallback runner (если сконфигурирован через [`FallbackConfigVo`](../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php))
+- [x] [`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php) классифицирует ошибки по `exitCode`/`isTimedOut`/`isError` (FATAL/TRANSIENT)
 - [x] `MetricsCollectorInterface` в Domain + in-memory реализация в Infrastructure
 - [x] ADR Dynamic split записан в `docs/adr/`
 - [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
@@ -159,14 +159,14 @@ flowchart TD
 - **Deptrac:** Новый `MetricsCollectorInterface` в AgentRunner\Domain может создать нежелательные зависимости от Orchestrator. Митигация: MetricsCollectorInterface в AgentRunner (агностичный к Orchestrator).
 
 ## 9. Sources (Источники)
-- [ ] [Roadmap 2026 Q2–Q3: Sprint 9](../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [ ] [Анализ Локи: Sprint 9–10](../docs/research/analytical/loki-roadmap-review-2026-05.md)
-- [ ] [ADR-006: ExecutionStrategy composition](../docs/adr/006-execution-strategy-composition.md)
-- [ ] [ADR-008: Shared Kernel Contract](../docs/adr/008-shared-kernel-contract.md)
-- [ ] [Конвенции проекта](../docs/conventions/index.md)
+- [ ] [Roadmap 2026 Q2–Q3: Sprint 9](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
+- [ ] [Анализ Локи: Sprint 9–10](../../docs/research/analytical/loki-roadmap-review-2026-05.md)
+- [ ] [ADR-006: ExecutionStrategy composition](../../docs/adr/006-execution-strategy-composition.md)
+- [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md)
+- [ ] [Конвенции проекта](../../docs/conventions/index.md)
 
 ## 10. Comments (Комментарии)
-- Sprint 9 полностью основан на рекомендациях Локи из [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../docs/research/analytical/loki-roadmap-review-2026-05.md). Loop detection, Typed I/O, Sub-agent ADR — отменены или отложены.
+- Sprint 9 полностью основан на рекомендациях Локи из [`docs/research/analytical/loki-roadmap-review-2026-05.md`](../../docs/research/analytical/loki-roadmap-review-2026-05.md). Loop detection, Typed I/O, Sub-agent ADR — отменены или отложены.
 - Model failover — wiring существующего кода (CB + FallbackConfigVo), не новая архитектура. Это снижает риск.
 - MetricsCollector — foundation для hooks system в Sprint 10. Hook pipeline будет использовать metrics.
 - ADR Dynamic split закрывает OQ-6 из roadmap. Sprint 8 валидировал Integration-паттерн на 2 стратегиях — пора принимать решение.

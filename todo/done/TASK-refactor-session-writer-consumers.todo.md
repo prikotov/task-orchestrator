@@ -65,7 +65,7 @@ php vendor/prikotov/coding-standard/bin/run-sniff-tests.php
 - **Зависимость:** Нет внешних зависимостей
 
 ## 8. Sources (Источники)
-- [ ] [Протокол brainstorm (решение 4)](../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
+- [ ] [Протокол brainstorm (решение 4)](../../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
 
 ## 9. Comments (Комментарии)
 Brainstorm-раунд 15: Левша обнаружил, что 0 потребителей используют Writer/Reader напрямую — интерфейсы расщеплены в Domain, но мертвы в реальности. Blast radius: всего 3 файла + DI config.

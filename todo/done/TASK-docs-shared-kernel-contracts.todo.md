@@ -69,8 +69,8 @@ status: done
 - **Зависимость:** TASK-refactor-cross-module-dependencies — желательно завершить до документирования
 
 ## 8. Sources (Источники)
-- [Решение Гэндальфа](../docs/agents/reports/system-architect/2026-05-06_16-00_cross-module-dependencies-solution.md)
-- [Критический разбор Локи](../docs/agents/reports/system-architect/2026-05-06_17-00_critical-review-cross-module-solution.md)
+- [Решение Гэндальфа](../../docs/agents/reports/system-architect/2026-05-06_16-00_cross-module-dependencies-solution.md)
+- [Критический разбор Локи](../../docs/agents/reports/system-architect/2026-05-06_17-00_critical-review-cross-module-solution.md)
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

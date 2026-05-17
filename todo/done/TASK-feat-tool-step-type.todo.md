@@ -95,11 +95,11 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - **Idempotency:** git-операции не idempotent → пока не решаем, пользователь отвечает за корректность команд
 
 ## 8. Sources (Источники)
-- [ ] [ChainStepTypeEnum](src/Module/Orchestrator/Domain/)
-- [ ] [chains.yaml](config/chains.yaml)
-- [ ] [Отчёт Гэндальфа — Вопрос 3](docs/agents/reports/system-architect/2026-05-10_10-48_three-architecture-questions.md)
-- [ ] [Отчёт Локи — Предложение 1](docs/agents/reports/system-architect/2026-05-10_blind-spots-task-workflow-chains.md)
-- [ ] [Гайд architecture.md](docs/guide/architecture.md)
+- [ ] [ChainStepTypeEnum](../src/Module/Orchestrator/Domain/)
+- [ ] [chains.yaml](../../config/chains.yaml)
+- [ ] [Отчёт Гэндальфа — Вопрос 3](../../docs/agents/reports/system-architect/2026-05-10_10-48_three-architecture-questions.md)
+- [ ] [Отчёт Локи — Предложение 1](../../docs/agents/reports/system-architect/2026-05-10_blind-spots-task-workflow-chains.md)
+- [ ] [Гайд architecture.md](../../docs/guide/architecture.md)
 
 ## 9. Comments (Комментарии)
 Команда сошлась на урезанной версии (Тони, Гэндальф). Локи предупредил о риске разрастания — принято, scope ограничен. Если tool-шаг понадобится расширить — отдельная задача с обоснованием.

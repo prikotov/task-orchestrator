@@ -90,20 +90,20 @@ flowchart LR
 
 ### Этап 1: Индивидуальные исследования (параллельные)
 
-- [x] [TASK-research-pi-coding-agent](done/TASK-research-pi-coding-agent.todo.md) — Pi Coding Agent (Node.js/TypeScript, @earendil-works/pi-coding-agent)
-- [x] [TASK-research-codex-cli](done/TASK-research-codex-cli.todo.md) — Codex CLI (OpenAI, Rust) ✅ Частично подходит (6/10)
-- [x] [TASK-research-opencode-cli](done/TASK-research-opencode-cli.todo.md) — OpenCode (Go)
-- [x] [TASK-research-kilocode-cli](done/TASK-research-kilocode-cli.todo.md) — Kilo Code CLI (TypeScript)
-- [x] [TASK-research-gemini-cli](done/TASK-research-gemini-cli.todo.md) — Gemini CLI (Google, TypeScript)
-- [x] [TASK-research-claude-code-agent](done/TASK-research-claude-code-agent.todo.md) — Claude Code (Anthropic, проприетарный)
-- [x] [TASK-research-qwen-cli](done/TASK-research-qwen-cli.todo.md) — Qwen CLI (Alibaba/Qwen, Python)
-- [x] [TASK-research-goose-agent](done/TASK-research-goose-agent.todo.md) — Goose (Block/Square, Go)
+- [x] [TASK-research-pi-coding-agent](TASK-research-pi-coding-agent.todo.md) — Pi Coding Agent (Node.js/TypeScript, @earendil-works/pi-coding-agent)
+- [x] [TASK-research-codex-cli](TASK-research-codex-cli.todo.md) — Codex CLI (OpenAI, Rust) ✅ Частично подходит (6/10)
+- [x] [TASK-research-opencode-cli](TASK-research-opencode-cli.todo.md) — OpenCode (Go)
+- [x] [TASK-research-kilocode-cli](TASK-research-kilocode-cli.todo.md) — Kilo Code CLI (TypeScript)
+- [x] [TASK-research-gemini-cli](TASK-research-gemini-cli.todo.md) — Gemini CLI (Google, TypeScript)
+- [x] [TASK-research-claude-code-agent](TASK-research-claude-code-agent.todo.md) — Claude Code (Anthropic, проприетарный)
+- [x] [TASK-research-qwen-cli](TASK-research-qwen-cli.todo.md) — Qwen CLI (Alibaba/Qwen, Python)
+- [x] [TASK-research-goose-agent](TASK-research-goose-agent.todo.md) — Goose (Block/Square, Go)
 - [x] [TASK-research-droid-agent](TASK-research-droid-agent.todo.md) — Droid
 - [x] [TASK-research-warp-agent](TASK-research-warp-agent.todo.md) — Warp (Warp AI, Rust-терминал)
-- [x] [TASK-research-crush-agent](done/TASK-research-crush-agent.todo.md) — Crush (Charmbracelet, Go)
-- [x] [TASK-research-openclaw-agent](done/TASK-research-openclaw-agent.todo.md) — OpenClaw (Python)
-- [x] [TASK-research-copilot-cli](done/TASK-research-copilot-cli.todo.md) — GitHub Copilot CLI (проприетарный)
-- [x] [TASK-research-hermes-agent](done/TASK-research-hermes-agent.todo.md) — Hermes (Nous Research)
+- [x] [TASK-research-crush-agent](TASK-research-crush-agent.todo.md) — Crush (Charmbracelet, Go)
+- [x] [TASK-research-openclaw-agent](TASK-research-openclaw-agent.todo.md) — OpenClaw (Python)
+- [x] [TASK-research-copilot-cli](TASK-research-copilot-cli.todo.md) — GitHub Copilot CLI (проприетарный)
+- [x] [TASK-research-hermes-agent](TASK-research-hermes-agent.todo.md) — Hermes (Nous Research)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
@@ -111,7 +111,7 @@ flowchart LR
 
 ### Этап 1d: Дополнительные исследования (2026-05-13)
 
-- [ ] [TASK-research-codebuff](../TASK-research-codebuff.todo.md) — Codebuff (TypeScript, Apache-2.0, мультиагентный)
+- [ ] [TASK-research-codebuff](TASK-research-codebuff.todo.md) — Codebuff (TypeScript, Apache-2.0, мультиагентный)
 
 - [x] ~~TASK-research-oh-my-openagent~~ → перенесён в EPIC-research-agent-frameworks-comparison (OmO — система оркестрации, не кодинг-агент)
 

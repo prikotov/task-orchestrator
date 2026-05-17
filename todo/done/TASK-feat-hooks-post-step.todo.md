@@ -24,11 +24,11 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 ### Где делаем
-- [`src/Module/Orchestrator/Domain/`](../../src/Module/Orchestrator/Domain/) — hook interface (`HookExecutorInterface`), hook result VO (`HookResultVo`)
-- [`src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php`](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) — добавить `?string $postStep` (hook config)
-- [`src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — strategy execution вызывает hook executor
-- [`src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php`](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) — audit logging hook stdout/stderr
-- [`src/Module/Orchestrator/Infrastructure/`](../../src/Module/Orchestrator/Infrastructure/) — `ShellHookExecutor` (через Symfony Process)
+- [`src/Module/Orchestrator/Domain/`](../../../src/Module/Orchestrator/Domain/) — hook interface (`HookExecutorInterface`), hook result VO (`HookResultVo`)
+- [`src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) — добавить `?string $postStep` (hook config)
+- [`src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — strategy execution вызывает hook executor
+- [`src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php`](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) — audit logging hook stdout/stderr
+- [`src/Module/Orchestrator/Infrastructure/`](../../../src/Module/Orchestrator/Infrastructure/) — `ShellHookExecutor` (через Symfony Process)
 - [`config/chains.yaml`](../../config/chains.yaml) — YAML DSL для `post_step`
 
 ### Текущее поведение
@@ -48,9 +48,9 @@ status: done
 - [ ] `HookExecutorInterface` в Domain: `execute(scriptPath: string, context: HookContextVo): HookResultVo`
 - [ ] `ShellHookExecutor` в Infrastructure: выполняет shell-скрипт через `Symfony\Process` с таймаутом 30с
 - [ ] `HookResultVo` в Domain: `success()`, `warning()`, `skipped()` — immutable VO
-- [ ] `?string $postStep` в [`ChainStepVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) — путь к hook-скрипту (nullable = hook не сконфигурирован)
+- [ ] `?string $postStep` в [`ChainStepVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) — путь к hook-скрипту (nullable = hook не сконфигурирован)
 - [ ] Hook failure (exit code !== 0 или timeout) = warning в audit log, цепочка продолжает выполнение
-- [ ] Hook stdout/stderr — в audit log через [`AuditLoggerInterface`](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php)
+- [ ] Hook stdout/stderr — в audit log через [`AuditLoggerInterface`](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php)
 - [ ] YAML DSL: `post_step: "scripts/notify.sh"` на уровне шага (опционально)
 - [ ] Unit-тесты: hook success, hook failure → warning, hook timeout → warning, no hook → skipped
 - [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
@@ -76,7 +76,7 @@ status: done
 1. [ ] Создать `HookResultVo` в Domain (`success()`, `warning(reason, stdout, stderr)`, `skipped()`) — immutable [`Value Object`](../../docs/conventions/core_patterns/value-object.md)
 2. [ ] Создать `HookContextVo` в Domain — context для hook execution (step name, chain name, step result summary)
 3. [ ] Создать `HookExecutorInterface` в Domain — `execute(string $scriptPath, HookContextVo $context): HookResultVo`
-4. [ ] Добавить `?string $postStep` в [`ChainStepVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) — через конструктор (nullable, default null)
+4. [ ] Добавить `?string $postStep` в [`ChainStepVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) — через конструктор (nullable, default null)
 5. [ ] Обновить `YamlChainLoader` — парсинг `post_step` поля из YAML в `ChainStepVo`
 6. [ ] Создать `ShellHookExecutor` в Infrastructure — реализация через `Symfony\Process`:
    - `new Process(['sh', $scriptPath])` с env vars из HookContextVo
@@ -84,7 +84,7 @@ status: done
    - `run()` + обработка результата
    - Exception / timeout → `HookResultVo::warning()`
 7. [ ] Интегрировать hook executor в стратегии выполнения (Static/Dynamic/Conditional) — вызов `hookExecutor->execute()` после успешного шага
-8. [ ] Audit logging: hook stdout/stderr → [`AuditLoggerInterface`](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php)
+8. [ ] Audit logging: hook stdout/stderr → [`AuditLoggerInterface`](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php)
 9. [ ] Unit-тесты: HookResultVo, ShellHookExecutor (mock Process), ChainStepVo с postStep
 10. [ ] Integration-тест: цепочка с `post_step` → hook вызывается
 11. [ ] Psalm + phpunit — зелёные

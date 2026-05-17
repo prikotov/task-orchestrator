@@ -150,19 +150,19 @@ DynamicLoop → ChainExecution = FORBIDDEN
 ## 5. Implementation Plan (План реализации)
 
 ### PR#1: Namespace-миграция Orchestrator → ChainDefinition
-- [x] [TASK-refactor-namespace-chain-definition](done/TASK-refactor-namespace-chain-definition.todo.md) — Механический rename `Orchestrator` → `ChainDefinition` во всех файлах, тестах, services.yaml, docs. Без изменения логики. `StaticExecution` пока ссылается на старый namespace — правим импорты. **Не зависит от других задач — выполняется первой.**
+- [x] [TASK-refactor-namespace-chain-definition](TASK-refactor-namespace-chain-definition.todo.md) — Механический rename `Orchestrator` → `ChainDefinition` во всех файлах, тестах, services.yaml, docs. Без изменения логики. `StaticExecution` пока ссылается на старый namespace — правим импорты. **Не зависит от других задач — выполняется первой.**
 
 ### PR#2: Выделение DynamicLoop
-- [x] [TASK-refactor-extract-dynamic-loop](done/TASK-refactor-extract-dynamic-loop.todo.md) — Создать модуль `DynamicLoop`, перенести все Dynamic-специфичные файлы (entity, VO, сервисы, infrastructure, стратегии). Создать Integration-маппер DynamicLoop ← ChainDefinition. Создать DynamicLoopAuditLoggerInterface. Обновить services.yaml. **Зависит от PR#1. ~600 LOC новых файлов.**
+- [x] [TASK-refactor-extract-dynamic-loop](TASK-refactor-extract-dynamic-loop.todo.md) — Создать модуль `DynamicLoop`, перенести все Dynamic-специфичные файлы (entity, VO, сервисы, infrastructure, стратегии). Создать Integration-маппер DynamicLoop ← ChainDefinition. Создать DynamicLoopAuditLoggerInterface. Обновить services.yaml. **Зависит от PR#1. ~600 LOC новых файлов.**
 
 ### PR#3: Вливание StaticExecution + Integration-мапперы
-- [x] [TASK-refactor-merge-static-execution](done/TASK-refactor-merge-static-execution.todo.md) — Влить StaticExecution в ChainExecution. Перенести файлы, обновить namespace. Создать Integration-маппер ChainExecution ← ChainDefinition (Definition VO → Execution VO). Удалить старый модуль StaticExecution. Обновить services.yaml. **Зависит от PR#1. Рекомендуется после PR#2. ~1110 LOC новых файлов.**
+- [x] [TASK-refactor-merge-static-execution](TASK-refactor-merge-static-execution.todo.md) — Влить StaticExecution в ChainExecution. Перенести файлы, обновить namespace. Создать Integration-маппер ChainExecution ← ChainDefinition (Definition VO → Execution VO). Удалить старый модуль StaticExecution. Обновить services.yaml. **Зависит от PR#1. Рекомендуется после PR#2. ~1110 LOC новых файлов.**
 
 ### PR#4: Рефакторинг — устранение кросс-модульных зависимостей
-- [x] [TASK-refactor-cross-module-dependencies](done/TASK-refactor-cross-module-dependencies.todo.md) — Упразднить `Domain\Contract\`, переписать Integration-мапперы через foreign Application (QueryHandler/CommandHandler), разделить JsonlAuditLogger. Deptrac → 0 violations без изменений правил. **PR #156 (merged).**
+- [x] [TASK-refactor-cross-module-dependencies](TASK-refactor-cross-module-dependencies.todo.md) — Упразднить `Domain\Contract\`, переписать Integration-мапперы через foreign Application (QueryHandler/CommandHandler), разделить JsonlAuditLogger. Deptrac → 0 violations без изменений правил. **PR #156 (merged).**
 
 ### PR#5: ~~Рефакторинг — перенос классов в Integration~~ (MERGED #154)
-- [x] [TASK-refactor-integration-layer-violations](done/TASK-refactor-integration-layer-violations.todo.md) — Перенести 4 класса в Integration-слой, убрать прослойку GetRunnersQueryHandlerInterface, встроить exit code resolution в Presentation. 15→5 violations. **MERGED.**
+- [x] [TASK-refactor-integration-layer-violations](TASK-refactor-integration-layer-violations.todo.md) — Перенести 4 класса в Integration-слой, убрать прослойку GetRunnersQueryHandlerInterface, встроить exit code resolution в Presentation. 15→5 violations. **MERGED.**
 
 ### PR#6: Документирование межмодульного взаимодействия
 - [ ] [TASK-docs-shared-kernel-contracts](TASK-docs-shared-kernel-contracts.todo.md) — ADR на модель Integration → foreign Application. Обновить architecture.md. **Зависит от PR#4.**
@@ -191,12 +191,12 @@ DynamicLoop → ChainExecution = FORBIDDEN
 - **Предыдущие brainstorm-ы**: 5 сессий (protocols в `var/sessions/brainstorm/2026-05-03_*`) — привели к решению «декомпозиция по стратегии нежизнеспособна»
 
 ## 9. Sources (Источники)
-- [Brainstorm #6 protocol](../var/sessions/brainstorm/2026-05-04_01-59-17/discussion_history.md) — декомпозиция по ответственности
-- [Brainstorm #3 result](../var/sessions/brainstorm/2026-05-03_11-03-40/result.md) — LOC-анализ
-- [ADR-006](../docs/adr/006-execution-strategy-composition.md) — ExecutionStrategy
-- [ADR-009](../docs/adr/009-dynamic-split-decision.md) — Dynamic split
-- [Конвенции: layers.md](../docs/conventions/layers/layers.md)
-- [Конвенции: service.md](../docs/conventions/core_patterns/service.md)
+- [Brainstorm #6 protocol](../../var/sessions/brainstorm/2026-05-04_01-59-17/discussion_history.md) — декомпозиция по ответственности
+- [Brainstorm #3 result](../../var/sessions/brainstorm/2026-05-03_11-03-40/result.md) — LOC-анализ
+- [ADR-006](../../docs/adr/006-execution-strategy-composition.md) — ExecutionStrategy
+- [ADR-009](../../docs/adr/009-dynamic-split-decision.md) — Dynamic split
+- [Конвенции: layers.md](../../docs/conventions/layers/layers.md)
+- [Конвенции: service.md](../../docs/conventions/core_patterns/service.md)
 
 ## 10. Comments (Комментарии)
 - Неймспейс: `TaskOrchestrator\Common\Module\ChainDefinition\`, `ChainExecution\`, `DynamicLoop\`

@@ -58,8 +58,8 @@ status: done
 
 ## 8. Sources (Источники)
 - [ ] [Roadmap AI#14, OQ-3](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [ ] [Протокол brainstorm #2](../var/sessions/brainstorm/2026-04-30_16-02-26/result.md)
-- [ ] [Исследование фреймворков](../docs/research/agent-frameworks-summary.md)
+- [ ] [Протокол brainstorm #2](../../var/sessions/brainstorm/2026-04-30_16-02-26/result.md)
+- [ ] [Исследование фреймворков](../../docs/research/agent-frameworks-summary.md)
 
 ## 9. Comments (Комментарии)
 Roadmap Sprint 2, AI#14. Результат анализа — входные данные для Sprint 9 (Security Policy implementation).
@@ -72,7 +72,7 @@ Roadmap Sprint 2, AI#14. Результат анализа — входные д
 ### Порядок действий
 1. Переключись в ветку `task/docs-security-policy-analysis`: `git checkout task/docs-security-policy-analysis`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `make check`.
 6. Сделай `git push`.

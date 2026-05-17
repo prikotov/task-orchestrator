@@ -86,9 +86,9 @@ status: done
 - **Зависимость:** P1 + P2 завершены ✅
 
 ## 7. Sources (Источники)
-- [ ] [Roadmap 2026 Q2–Q3](../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [ ] [Протокол brainstorm #2](../var/sessions/brainstorm/2026-04-30_16-02-26/result.md)
-- [ ] [EPIC-refactor-orchestrator-decomposition (P1+P2)](done/EPIC-refactor-orchestrator-decomposition.md)
+- [ ] [Roadmap 2026 Q2–Q3](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
+- [ ] [Протокол brainstorm #2](../../var/sessions/brainstorm/2026-04-30_16-02-26/result.md)
+- [ ] [EPIC-refactor-orchestrator-decomposition (P1+P2)](EPIC-refactor-orchestrator-decomposition.md)
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |

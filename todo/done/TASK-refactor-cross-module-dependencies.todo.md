@@ -115,12 +115,12 @@ grep -r 'Domain.Contract' src/  # → пусто
 - **Риск:** Разделение JsonlAuditLogger может потребовать создания нового Infrastructure-класса в ChainExecution
 
 ## 8. Sources (Источники)
-- [Аудит кросс-модульных зависимостей](../docs/agents/reports/system-architect/2026-05-06_15-00_cross-module-dependencies-audit.md)
-- [Решение Гэндальфа](../docs/agents/reports/system-architect/2026-05-06_16-00_cross-module-dependencies-solution.md)
-- [Критический разбор Локи](../docs/agents/reports/system-architect/2026-05-06_17-00_critical-review-cross-module-solution.md)
-- [Конвенции: mapper.md](../docs/conventions/core-patterns/mapper.md)
-- [Конвенции: service.md](../docs/conventions/core-patterns/service.md)
-- [Конвенции: layers.md](../docs/conventions/layers/layers.md)
+- [Аудит кросс-модульных зависимостей](../../docs/agents/reports/system-architect/2026-05-06_15-00_cross-module-dependencies-audit.md)
+- [Решение Гэндальфа](../../docs/agents/reports/system-architect/2026-05-06_16-00_cross-module-dependencies-solution.md)
+- [Критический разбор Локи](../../docs/agents/reports/system-architect/2026-05-06_17-00_critical-review-cross-module-solution.md)
+- [Конвенции: mapper.md](../../docs/conventions/core-patterns/mapper.md)
+- [Конвенции: service.md](../../docs/conventions/core-patterns/service.md)
+- [Конвенции: layers.md](../../docs/conventions/layers/layers.md)
 
 ## 9. Comments (Комментарии)
 Консенсус обоих архитекторов: проблема в коде, а не в Deptrac-правилах. Предыдущая задача TASK-refactor-crossmodule-deptrac-rule была основана на ошибочной посылке «добавить исключения в rule». Правильный подход — рефакторинг кода.

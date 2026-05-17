@@ -73,7 +73,7 @@ Archon — "AI agent that builds AI agents". Мета-оркестрация —
 ### Порядок действий
 1. Переключись в ветку `task/research-archon-ai-planner`: `git checkout task/research-archon-ai-planner`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
 6. Сделай `git push`.

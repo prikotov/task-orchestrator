@@ -92,7 +92,7 @@ vendor/bin/psalm
 ### Порядок действий
 1. Переключись в ветку `task/agent-runner-proxy`: `git checkout task/agent-runner-proxy`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
 6. Сделай `git push`.

@@ -57,7 +57,7 @@ status: done
 
 ## 8. Sources (Источники)
 - [ ] [Roadmap AI#13](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [ ] [Протокол brainstorm #2](../var/sessions/brainstorm/2026-04-30_16-02-26/result.md) — данные Шерлока по инвентаризации
+- [ ] [Протокол brainstorm #2](../../var/sessions/brainstorm/2026-04-30_16-02-26/result.md) — данные Шерлока по инвентаризации
 
 ## 9. Comments (Комментарии)
 Roadmap Sprint 2, AI#13. Предшественник — brainstorm-протокол, где Шерлок уже провёл частичную инвентаризацию (cross-references = 0 между Static/ и Dynamic/, 3 кластера по LOC).
@@ -70,7 +70,7 @@ Roadmap Sprint 2, AI#13. Предшественник — brainstorm-прото�
 ### Порядок действий
 1. Переключись в ветку `task/docs-domain-inventory`: `git checkout task/docs-domain-inventory`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `make check`.
 6. Сделай `git push`.

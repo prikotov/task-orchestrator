@@ -73,7 +73,7 @@ pi_agent_rust — реализация AI-agent orchestration на Rust. Мож�
 ### Порядок действий
 1. Переключись в ветку `task/research-pi-agent-rust`: `git checkout task/research-pi-agent-rust`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
 6. Сделай `git push`.

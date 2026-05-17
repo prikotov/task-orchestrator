@@ -71,10 +71,10 @@ vendor/bin/psalm
 - Regex может быть слишком жадным — нужно убедиться, что он не удаляет лишнее
 
 ## 8. Sources (Источники)
-- [ ] [PromptFormatterService](../src/Module/Orchestrator/Infrastructure/Service/Chain/PromptFormatterService.php)
-- [ ] [participant_user.txt](../config/prompts/brainstorm/participant_user.txt)
-- [ ] [Существующие тесты](../tests/Unit/Infrastructure/Service/Chain/PromptFormatterServiceTest.php)
-- [ ] [step_002_round_001 — пример проблемного промпта](../var/sessions/brainstorm/2026-04-27_12-29-03/step_002_round_001_system_architect_gandalf_3_user.md)
+- [ ] [PromptFormatterService](../../src/Module/Orchestrator/Infrastructure/Service/Chain/PromptFormatterService.php)
+- [ ] [participant_user.txt](../../config/prompts/brainstorm/participant_user.txt)
+- [ ] [Существующие тесты](../../tests/Unit/Infrastructure/Service/Chain/PromptFormatterServiceTest.php)
+- [ ] [step_002_round_001 — пример проблемного промпта](../../var/sessions/brainstorm/2026-04-27_12-29-03/step_002_round_001_system_architect_gandalf_3_user.md)
 
 ## 9. Comments (Комментарии)
 Пример проблемного вывода (раунд 1, step_002):
@@ -93,7 +93,7 @@ vendor/bin/psalm
 ### Порядок действий
 1. Переключись в ветку `task/fix-brainstorm-empty-participant-section`: `git checkout task/fix-brainstorm-empty-participant-section`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
 6. Сделай `git push`.

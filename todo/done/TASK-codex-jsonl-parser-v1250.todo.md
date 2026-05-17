@@ -77,7 +77,7 @@ vendor/bin/psalm
 - Нет документации на формат JSONL codex CLI — опираемся на реальный вывод
 
 ## 8. Sources (Источники)
-- [TASK-agent-runner-proxy](done/TASK-agent-runner-proxy.todo.md) — задача, в ходе которой обнаружен баг
+- [TASK-agent-runner-proxy](TASK-agent-runner-proxy.todo.md) — задача, в ходе которой обнаружен баг
 - Реальный JSONL-вывод codex v0.125.0:
   ```jsonl
   {"type":"thread.started","thread_id":"..."}

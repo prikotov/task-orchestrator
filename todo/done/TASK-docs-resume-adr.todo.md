@@ -17,7 +17,7 @@ status: done
 
 ## 1. Concept and Goal (Концепция и Цель)
 ### Story (Job Story)
-> Когда static или conditional цепочка из 10 шагов падает на 8-м — всё начинается с начала. Для дорогих LLM-вызовов ($0.50–2.00 за шаг) это реальная потеря денег ($3.50–14.00 потеряно). Dynamic стратегия уже поддерживает resume через [`ChainSessionLogger`](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) (checkpoint в JSONL). Я хочу зафиксировать архитектурное решение: паттерн checkpoint + resume для static/conditional стратегий, чтобы команда имела план на Q4 и понимала, как resume интегрируется с ExecutionStrategy pattern.
+> Когда static или conditional цепочка из 10 шагов падает на 8-м — всё начинается с начала. Для дорогих LLM-вызовов ($0.50–2.00 за шаг) это реальная потеря денег ($3.50–14.00 потеряно). Dynamic стратегия уже поддерживает resume через [`ChainSessionLogger`](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) (checkpoint в JSONL). Я хочу зафиксировать архитектурное решение: паттерн checkpoint + resume для static/conditional стратегий, чтобы команда имела план на Q4 и понимала, как resume интегрируется с ExecutionStrategy pattern.
 
 ### Goal (Цель по SMART)
 Создать ADR (Architecture Decision Record) в `docs/adr/`, фиксирующий паттерн checkpoint + resume для static/conditional цепочек: формат checkpoint, точка сохранения, resume flow, интеграция с `ExecutionStrategyInterface::resume()`. Реализация — Q4. Только документация, без кода. Срок: 0.5 дня.
@@ -25,7 +25,7 @@ status: done
 ## 2. Context and Scope (Контекст и Границы)
 ### Где делаем
 - `docs/adr/` — новый ADR (номер определить по существующим)
-- Ссылки на: [`ExecutionStrategyInterface`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) (метод `resume()` уже существует), [`AuditLoggerInterface`](../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) (JSONL audit)
+- Ссылки на: [`ExecutionStrategyInterface`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) (метод `resume()` уже существует), [`AuditLoggerInterface`](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) (JSONL audit)
 
 ### Текущее поведение
 - `StaticExecutionStrategy::resume()` → `LogicException('Static chain does not support resume.')`
@@ -94,7 +94,7 @@ grep -r "resume()" src/Module/Orchestrator/Application/Service/Chain/
 ## 8. Sources (Источники)
 - [ ] [Roadmap: Sprint 10](../../docs/releases/ROADMAP-2026-Q2-Q3.md) — Sprint 10, Задача 3
 - [ ] [Анализ Локи: Resume для static цепочек](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — Упущенная боль #4
-- [ ] [ExecutionStrategyInterface](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — метод `resume()`
+- [ ] [ExecutionStrategyInterface](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — метод `resume()`
 - [ ] [ADR-006: ExecutionStrategy composition](../../docs/adr/006-execution-strategy-composition.md) — архитектурный контекст
 - [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md) — архитектурный контекст
 

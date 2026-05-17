@@ -75,7 +75,7 @@ Claude Code — один из ведущих coding-агентов. Их под�
 ### Порядок действий
 1. Переключись в ветку `task/research-claude-code`: `git checkout task/research-claude-code`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты.
 5. Проверок PHPUnit/Psalm не требуется — задача docs-only.
 6. Сделай `git push`.

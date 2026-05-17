@@ -255,12 +255,12 @@ vendor/bin/phpunit tests/Integration/Application/UseCase/Command/OrchestrateChai
 
 ## 8. Sources (Источники)
 
-- [Brainstorm #6 protocol](../var/sessions/brainstorm/2026-05-04_01-59-17/discussion_history.md) — раунды 1-7
-- [ADR-006: ExecutionStrategy](../docs/adr/006-execution-strategy-composition.md)
-- [ADR-007: VO ACL Boundary](../docs/adr/007-vo-acl-boundary.md) — паттерн ACL для VO
-- [ADR-009: Dynamic Split Decision](../docs/adr/009-dynamic-split-decision.md) — суперседируется
-- [Конвенции: layers.md](../docs/conventions/layers/layers.md) — Domain → никто
-- [Конвенции: integration.md](../docs/conventions/layers/integration.md)
+- [Brainstorm #6 protocol](../../var/sessions/brainstorm/2026-05-04_01-59-17/discussion_history.md) — раунды 1-7
+- [ADR-006: ExecutionStrategy](../../docs/adr/006-execution-strategy-composition.md)
+- [ADR-007: VO ACL Boundary](../../docs/adr/007-vo-acl-boundary.md) — паттерн ACL для VO
+- [ADR-009: Dynamic Split Decision](../../docs/adr/009-dynamic-split-decision.md) — суперседируется
+- [Конвенции: layers.md](../../docs/conventions/layers/layers.md) — Domain → никто
+- [Конвенции: integration.md](../../docs/conventions/layers/integration.md)
 
 ## 9. Comments (Комментарии)
 

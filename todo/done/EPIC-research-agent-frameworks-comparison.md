@@ -69,17 +69,17 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1: Индивидуальные исследования (параллельные)
 
-- [x] [TASK-research-charmbracelet-crush](done/TASK-research-charmbracelet-crush.todo.md) — Charmbracelet Crush (Go, CLI-agent)
-- [x] [TASK-research-pi-agent-rust](done/TASK-research-pi-agent-rust.todo.md) — pi_agent_rust (Rust)
-- [x] [TASK-research-crewai-langgraph-autogen](done/TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
-- [x] [TASK-research-openhands-sdk](done/TASK-research-openhands-sdk.todo.md) — OpenHands SDK (Python, SDK-подход)
-- [x] [TASK-research-archon-ai-planner](done/TASK-research-archon-ai-planner.todo.md) — Archon (Python, мета-оркестрация)
-- [x] [TASK-research-metagpt-openclaw](done/TASK-research-metagpt-openclaw.todo.md) — MetaGPT, OpenClaw (Python, SOP/роли)
-- [x] [TASK-research-mastra-ai](done/TASK-research-mastra-ai.todo.md) — Mastra AI (TypeScript, workflows)
-- [x] [TASK-research-claude-code](done/TASK-research-claude-code.todo.md) — Claude Code (проприетарный, agent loop)
-- [x] [TASK-research-copilot-agent-hq](done/TASK-research-copilot-agent-hq.todo.md) — GitHub Copilot Agent HQ (проприетарный, cloud)
-- [x] [TASK-research-docker-agent-codex](done/TASK-research-docker-agent-codex.todo.md) — Docker Agent, OpenAI Codex (проприетарный, sandboxing)
-- [x] [TASK-research-agno](done/TASK-research-agno.todo.md) — Agno / бывший Phi (Python, multi-agent teams)
+- [x] [TASK-research-charmbracelet-crush](TASK-research-charmbracelet-crush.todo.md) — Charmbracelet Crush (Go, CLI-agent)
+- [x] [TASK-research-pi-agent-rust](TASK-research-pi-agent-rust.todo.md) — pi_agent_rust (Rust)
+- [x] [TASK-research-crewai-langgraph-autogen](TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
+- [x] [TASK-research-openhands-sdk](TASK-research-openhands-sdk.todo.md) — OpenHands SDK (Python, SDK-подход)
+- [x] [TASK-research-archon-ai-planner](TASK-research-archon-ai-planner.todo.md) — Archon (Python, мета-оркестрация)
+- [x] [TASK-research-metagpt-openclaw](TASK-research-metagpt-openclaw.todo.md) — MetaGPT, OpenClaw (Python, SOP/роли)
+- [x] [TASK-research-mastra-ai](TASK-research-mastra-ai.todo.md) — Mastra AI (TypeScript, workflows)
+- [x] [TASK-research-claude-code](TASK-research-claude-code.todo.md) — Claude Code (проприетарный, agent loop)
+- [x] [TASK-research-copilot-agent-hq](TASK-research-copilot-agent-hq.todo.md) — GitHub Copilot Agent HQ (проприетарный, cloud)
+- [x] [TASK-research-docker-agent-codex](TASK-research-docker-agent-codex.todo.md) — Docker Agent, OpenAI Codex (проприетарный, sandboxing)
+- [x] [TASK-research-agno](TASK-research-agno.todo.md) — Agno / бывший Phi (Python, multi-agent teams)
 
 ### Этап 1b: Дополнительные исследования (2026-04-28)
 
@@ -88,18 +88,18 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1c: Дополнительные исследования (2026-05-04)
 
-- [ ] [TASK-research-sandcastle](../TASK-research-sandcastle.todo.md) — Sandcastle (Matt Pocock)
-- [ ] [TASK-research-hermes-agent](../TASK-research-hermes-agent.todo.md) — Hermes Agent (Nous Research)
+- [ ] [TASK-research-sandcastle](TASK-research-sandcastle.todo.md) — Sandcastle (Matt Pocock)
+- [ ] [TASK-research-hermes-agent](TASK-research-hermes-agent.todo.md) — Hermes Agent (Nous Research)
 - [x] [TASK-research-oh-my-openagent](../done/TASK-research-oh-my-openagent.todo.md) — Oh My OpenAgent (форк OpenCode, TypeScript + паттерны оркестрации)
 
 ### Этап 1d: Дополнительные исследования (2026-05-13)
 
-- [ ] [TASK-research-duet](../TASK-research-duet.todo.md) — Duet (Aomni, cloud/SaaS, team AI-агент)
-- [ ] [TASK-research-multica](../TASK-research-multica.todo.md) — Multica (open-source, project management для human + agent teams)
+- [ ] [TASK-research-duet](TASK-research-duet.todo.md) — Duet (Aomni, cloud/SaaS, team AI-агент)
+- [ ] [TASK-research-multica](TASK-research-multica.todo.md) — Multica (open-source, project management для human + agent teams)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
-- [x] [TASK-research-agent-frameworks-summary](done/TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
+- [x] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все индивидуальные research-задачи выполнены

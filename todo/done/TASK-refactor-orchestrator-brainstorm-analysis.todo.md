@@ -101,11 +101,11 @@ status: done
 - **Зависимость:** Наличие chains.yaml с цепочкой `brainstorm`
 
 ## 8. Sources (Источники)
-- [ ] [Архитектура проекта](../docs/guide/architecture.md)
-- [ ] [Сводная таблица исследований](../docs/research/agent-frameworks-summary.md)
-- [x] [Протокол нового brainstorm (40 раундов)](../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
-- [x] [Протокол предыдущего brainstorm (17 раундов)](../var/sessions/brainstorm/2026-04-29_03-42-46/result.md)
-- [ ] [Brainstorm SKILL.md](../docs/agents/skills/brainstorm/SKILL.md)
+- [ ] [Архитектура проекта](../../docs/guide/architecture.md)
+- [ ] [Сводная таблица исследований](../../docs/research/agent-frameworks-summary.md)
+- [x] [Протокол нового brainstorm (40 раундов)](../../var/sessions/brainstorm/2026-04-29_08-06-49/result.md)
+- [x] [Протокол предыдущего brainstorm (17 раундов)](../../var/sessions/brainstorm/2026-04-29_03-42-46/result.md)
+- [ ] [Brainstorm SKILL.md](../../docs/agents/skills/brainstorm/SKILL.md)
 
 ## 9. Comments (Комментарии)
 Это первая задача эпика EPIC-refactor-orchestrator-decomposition. Результат brainstorm — вход для задачи на планирование (Фаза 2) и создания задач на реализацию (Фаза 3).

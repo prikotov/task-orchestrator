@@ -20,12 +20,12 @@ status: done
 > Когда цепочка должна ветвиться по результатам предыдущих шагов (тесты прошли → деплой, тесты упали → откат), я хочу добавить `when:` expressions в YAML-chain конфигурацию, чтобы пользователь мог declaratively задать условия выполнения каждого шага без изменения кода.
 
 ### Goal (Цель по SMART)
-Расширить YAML-chain DSL для условного ветвления: `when:` expression syntax на уровне шага. Обновить [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php), [`ChainStepVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) и [`YamlChainLoader`](../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php). Цепочки без `when:` работают без изменений. Срок: Sprint 8 (вторая задача).
+Расширить YAML-chain DSL для условного ветвления: `when:` expression syntax на уровне шага. Обновить [`ChainDefinitionVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php), [`ChainStepVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) и [`YamlChainLoader`](../../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php). Цепочки без `when:` работают без изменений. Срок: Sprint 8 (вторая задача).
 
 ## 2. Context and Scope (Контекст и Границы)
 ### Где делаем
 - `config/chains.yaml` — формат YAML-конфигурации
-- `src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php` — парсер YAML → [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php)
+- `src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php` — парсер YAML → [`ChainDefinitionVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php)
 - `src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php` — определение шага
 - `src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php` — определение цепочки
 - `src/Module/Orchestrator/Domain/Enum/ChainTypeEnum.php` — типы цепочек (`static`, `dynamic`)
@@ -55,10 +55,10 @@ status: done
   - Поддержка простых сравнений: `==`, `!=`
   - Поддержка path references: `steps.<name>.passed`, `steps.<name>.exitCode`, `result.status`
   - Immutable, validated в конструкторе
-- [ ] Расширить [`ChainStepVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php): добавить `?ConditionExpressionVo $when` (опциональное поле)
-- [ ] Расширить [`ChainTypeEnum`](../../src/Module/Orchestrator/Domain/Enum/ChainTypeEnum.php): добавить `conditionalType = 'conditional'` (или обосновать, что conditional — это subtype static)
-- [ ] Обновить [`YamlChainLoader`](../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php): парсинг `when:` поля в шагах
-- [ ] Обновить [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php): factory-метод для conditional chains (если новый тип)
+- [ ] Расширить [`ChainStepVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php): добавить `?ConditionExpressionVo $when` (опциональное поле)
+- [ ] Расширить [`ChainTypeEnum`](../../../src/Module/Orchestrator/Domain/Enum/ChainTypeEnum.php): добавить `conditionalType = 'conditional'` (или обосновать, что conditional — это subtype static)
+- [ ] Обновить [`YamlChainLoader`](../../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php): парсинг `when:` поля в шагах
+- [ ] Обновить [`ChainDefinitionVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php): factory-метод для conditional chains (если новый тип)
 - [ ] Обратная совместимость: цепочки без `when:` парсятся и работают как раньше
 
 ### 🟡 Should Have (Желательно)
@@ -95,8 +95,8 @@ status: done
 
 ## 5. Definition of Done (Критерии приёмки)
 - [x] `ConditionExpressionVo` создан в `Orchestrator\Domain\ValueObject\`
-- [x] [`ChainStepVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) расширен полем `?ConditionExpressionVo $when`
-- [x] [`YamlChainLoader`](../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php) парсит `when:` expressions
+- [x] [`ChainStepVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) расширен полем `?ConditionExpressionVo $when`
+- [x] [`YamlChainLoader`](../../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php) парсит `when:` expressions
 - [x] Обратная совместимость: существующие YAML-конфигурации парсятся корректно
 - [x] Unit-тесты на parsing и validation
 - [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные
@@ -116,8 +116,8 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - [ ] [Roadmap: Sprint 8 — Conditional Branching](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
 - [ ] [ADR-006: ExecutionStrategy composition](../../docs/adr/006-execution-strategy-composition.md)
 - [ ] [Конвенция: Value Object](../../docs/conventions/core_patterns/value-object.md)
-- [ ] [YamlChainLoader](../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php) — текущий парсер
-- [ ] [ChainStepVo](../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) — текущее определение шага
+- [ ] [YamlChainLoader](../../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php) — текущий парсер
+- [ ] [ChainStepVo](../../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) — текущее определение шага
 
 ## 9. Comments (Комментарии)
 - DSL syntax proposal основан на исследовании 4+ фреймворков: Archon (`when:`), Mastra AI (`.branch()`), LangGraph (conditional edges), Agno (Condition + Router). Выбран `when:` как наиболее declarative и YAML-friendly.
@@ -132,7 +132,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 ### Порядок действий
 1. Переключись в ветку `task/feat-conditional-yaml-dsl`: `git checkout task/feat-conditional-yaml-dsl`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`.
 6. Сделай `git push`.

@@ -282,12 +282,12 @@ vendor/bin/phpunit tests/Integration/Application/UseCase/Command/OrchestrateChai
 
 ## 8. Sources (Источники)
 
-- [Brainstorm #6 protocol](../var/sessions/brainstorm/2026-05-04_01-59-17/discussion_history.md) — раунды 1-7: декомпозиция, AuditLogger, Shared Kernel
-- [ADR-006: ExecutionStrategy](../docs/adr/006-execution-strategy-composition.md) — контракт стратегий
-- [ADR-007: VO ACL Boundary](../docs/adr/007-vo-acl-boundary.md) — паттерн ACL для VO
-- [ADR-009: Dynamic Split Decision](../docs/adr/009-dynamic-split-decision.md) — суперседируется
-- [Конвенции: layers.md](../docs/conventions/layers/layers.md) — Domain → никто
-- [Конвенции: integration.md](../docs/conventions/layers/integration.md) — Integration → Application, Domain (контракты)
+- [Brainstorm #6 protocol](../../var/sessions/brainstorm/2026-05-04_01-59-17/discussion_history.md) — раунды 1-7: декомпозиция, AuditLogger, Shared Kernel
+- [ADR-006: ExecutionStrategy](../../docs/adr/006-execution-strategy-composition.md) — контракт стратегий
+- [ADR-007: VO ACL Boundary](../../docs/adr/007-vo-acl-boundary.md) — паттерн ACL для VO
+- [ADR-009: Dynamic Split Decision](../../docs/adr/009-dynamic-split-decision.md) — суперседируется
+- [Конвенции: layers.md](../../docs/conventions/layers/layers.md) — Domain → никто
+- [Конвенции: integration.md](../../docs/conventions/layers/integration.md) — Integration → Application, Domain (контракты)
 
 ## 9. Comments (Комментарии)
 
@@ -314,7 +314,7 @@ ADR-009 принял решение «Dynamic остаётся в Orchestrator»
 ### Порядок действий
 1. Переключись в ветку `task/refactor-extract-dynamic-loop`: `git checkout task/refactor-extract-dynamic-loop`
 2. Реализуй задачу согласно описанию в todo/TASK-refactor-extract-dynamic-loop.todo.md
-3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
 6. Сделай `git push`.

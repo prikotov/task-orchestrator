@@ -74,7 +74,7 @@ Roadmap Sprint 7. Выполняется перед AI#17 (физический 
 ### Порядок действий
 1. Переключись в ветку `task/refactor-shared-reorg`: `git checkout task/refactor-shared-reorg`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `make check`.
 6. Сделай `git push`.

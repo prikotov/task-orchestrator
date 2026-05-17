@@ -68,7 +68,7 @@ vendor/bin/psalm
 
 ## 8. Sources (Источники)
 - [ ] [Roadmap AI#11](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [ ] [Протокол brainstorm #2](../var/sessions/brainstorm/2026-04-30_16-02-26/result.md) — аргументы Левши и Локи о декомпозиции
+- [ ] [Протокол brainstorm #2](../../var/sessions/brainstorm/2026-04-30_16-02-26/result.md) — аргументы Левши и Локи о декомпозиции
 - [ ] [ADR-006: ExecutionStrategy](../../docs/adr/006-execution-strategy-composition.md)
 
 ## 9. Comments (Комментарии)
@@ -82,7 +82,7 @@ Roadmap Sprint 6. Предусловие для Sprint 7 (split Static). Brainst
 ### Порядок действий
 1. Переключись в ветку `task/refactor-dynamic-loop-decomposition`: `git checkout task/refactor-dynamic-loop-decomposition`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `make check`.
 6. Сделай `git push`.

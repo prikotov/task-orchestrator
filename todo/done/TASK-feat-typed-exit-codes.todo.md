@@ -71,8 +71,8 @@ vendor/bin/psalm
 - Обратная совместимость: существующие CI-скрипты могут проверять только exit code 0/1 — но проект в v0.x, breaking change допустим
 
 ## 8. Sources
-- [RFC: cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md) — Brainstorm #2, решение про typed exit codes
-- [OrchestrateCommand.php](../apps/console/src/Module/Orchestrator/Command/OrchestrateCommand.php) — текущая реализация
+- [RFC: cli-distribution-rfc.md](../../docs/research/rfc/cli-distribution-rfc.md) — Brainstorm #2, решение про typed exit codes
+- [OrchestrateCommand.php](../../apps/console/src/Module/Orchestrator/Command/OrchestrateCommand.php) — текущая реализация
 
 ## Инструкции для сабагента
 
@@ -83,7 +83,7 @@ vendor/bin/psalm
 ### Порядок действий
 1. Переключись в ветку `task/feat-typed-exit-codes`: `git checkout task/feat-typed-exit-codes`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
 6. Сделай `git push`.

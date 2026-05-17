@@ -63,9 +63,9 @@ cat docs/agents/skills/install-task-orchestrator/SKILL.md
 - Инструкция может устареть при изменении CLI-интерфейса — привязать к `--help`
 
 ## 8. Sources
-- [SKILL-CREATION.md](../docs/agents/skills/SKILL-CREATION.md) — формат
-- [Пример SKILL](../docs/agents/skills/) — существующие skill'ы
-- [RFC: cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md) — Решение владельца #3
+- [SKILL-CREATION.md](../../docs/agents/skills/SKILL-CREATION.md) — формат
+- [Пример SKILL](../../docs/agents/skills/) — существующие skill'ы
+- [RFC: cli-distribution-rfc.md](../../docs/research/rfc/cli-distribution-rfc.md) — Решение владельца #3
 
 ## Change History
 | Дата | Автор (роль) | Изменение |

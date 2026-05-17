@@ -141,7 +141,7 @@ vendor/bin/psalm
 - Порт может быть занят — использовать `0` (ОС назначит свободный) или перебор портов
 
 ## 8. Sources (Источники)
-- [TASK-agent-runner-proxy](done/TASK-agent-runner-proxy.todo.md) — реализация передачи прокси в env
+- [TASK-agent-runner-proxy](TASK-agent-runner-proxy.todo.md) — реализация передачи прокси в env
 - Python-прототип моста (30 строк), проверенный в E2E: работает с codex через `***:***`
 - [PHP stream sockets](https://www.php.net/manual/en/function.stream-socket-server.php)
 - [reqwest proxy limitations](https://github.com/seanmonstar/reqwest/issues/26) — reqwest не поддерживает HTTPS-прокси

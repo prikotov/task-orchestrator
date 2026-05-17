@@ -74,7 +74,7 @@ ls docs/research/framework-comparisons/paperclip-ai-comparison.md
 3. При недостатке документации — анализируй исходный код.
 4. Создай отчёт docs/research/framework-comparisons/paperclip-ai-comparison.md по формату существующих comparison-документов (как docs/research/framework-comparisons/crush-comparison.md).
 5. Заполни строку Paperclip AI (#15) в сводной таблице docs/research/agent-frameworks-summary.md.
-6. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+6. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 7. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm` (хотя для docs-only они могут быть пропущены — укажи это в отчёте).
 8. Сделай `git push`.
 

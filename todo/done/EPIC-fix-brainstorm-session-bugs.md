@@ -65,10 +65,10 @@ flowchart TD
 
 ## 5. Implementation Plan (План реализации)
 
-- [x] [TASK-fix-brainstorm-synthesis-array](done/TASK-fix-brainstorm-synthesis-array.todo.md) — Исправление бага synthesis=Array в FacilitatorResponseParserService → **Бэкендер Левша**, P0
-- [x] [TASK-fix-brainstorm-empty-participant-section](done/TASK-fix-brainstorm-empty-participant-section.todo.md) — Удаление пустой секции + рекомендательной строки в PromptFormatterService → **Бэкендер Левша**, P0
-- [x] [TASK-fix-brainstorm-file-list-with-roles](done/TASK-fix-brainstorm-file-list-with-roles.todo.md) — Добавление ролей в список файлов выступлений → **Бэкендер Левша**, P1
-- [x] [TASK-fix-brainstorm-unified-journal-format](done/TASK-fix-brainstorm-unified-journal-format.todo.md) — Унификация формата заголовка секции файлов в промптах → **Бэкендер Тони**, P2
+- [x] [TASK-fix-brainstorm-synthesis-array](TASK-fix-brainstorm-synthesis-array.todo.md) — Исправление бага synthesis=Array в FacilitatorResponseParserService → **Бэкендер Левша**, P0
+- [x] [TASK-fix-brainstorm-empty-participant-section](TASK-fix-brainstorm-empty-participant-section.todo.md) — Удаление пустой секции + рекомендательной строки в PromptFormatterService → **Бэкендер Левша**, P0
+- [x] [TASK-fix-brainstorm-file-list-with-roles](TASK-fix-brainstorm-file-list-with-roles.todo.md) — Добавление ролей в список файлов выступлений → **Бэкендер Левша**, P1
+- [x] [TASK-fix-brainstorm-unified-journal-format](TASK-fix-brainstorm-unified-journal-format.todo.md) — Унификация формата заголовка секции файлов в промптах → **Бэкендер Тони**, P2
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все задачи Must Have выполнены и протестированы
@@ -84,11 +84,11 @@ flowchart TD
 - Задача 4 (унификация промптов) меняет текст промпта — агенты должны адаптироваться автоматически
 
 ## 9. Sources (Источники)
-- [ ] [Сессия brainstorm](../var/sessions/brainstorm/2026-04-27_12-29-03/)
-- [ ] [Ретроспектива brainstorm-improvements](../docs/agents/team-retro/2026-04-27_17-58-brainstorm-improvements.md)
-- [ ] [FacilitatorResponseParserService](../src/Module/Orchestrator/Infrastructure/Service/Chain/FacilitatorResponseParserService.php)
-- [ ] [PromptFormatterService](../src/Module/Orchestrator/Infrastructure/Service/Chain/PromptFormatterService.php)
-- [ ] [ChainSessionLogger](../src/Module/Orchestrator/Infrastructure/Service/Chain/ChainSessionLogger.php)
+- [ ] [Сессия brainstorm](../../var/sessions/brainstorm/2026-04-27_12-29-03/)
+- [ ] [Ретроспектива brainstorm-improvements](../../docs/agents/team-retro/2026-04-27_17-58-brainstorm-improvements.md)
+- [ ] [FacilitatorResponseParserService](../../src/Module/Orchestrator/Infrastructure/Service/Chain/FacilitatorResponseParserService.php)
+- [ ] [PromptFormatterService](../../src/Module/Orchestrator/Infrastructure/Service/Chain/PromptFormatterService.php)
+- [ ] [ChainSessionLogger](../../src/Module/Orchestrator/Infrastructure/Service/Chain/ChainSessionLogger.php)
 
 ## 10. Comments (Комментарии)
 Баги выявлены при ретроспективном анализе brainstorm-сессии на 45 раундов (декомпозиция Orchestrator). Сессия завершилась успешно по результатам обсуждения, но `result.md` оказался непригоден (synthesis = «Array»). Формат промптов не оптимальный — в первом раунде участник получает пустой блок. Файлы выступлений не содержат информации о ролях, что затрудняет контекст.

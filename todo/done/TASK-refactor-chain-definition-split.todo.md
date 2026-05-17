@@ -17,16 +17,16 @@ status: done
 
 ## 1. Concept and Goal (Концепция и Цель)
 ### Story (Job Story)
-> Когда [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) содержит 546 строк, 17 параметров конструктора и 3 фабричных метода (`createFromSteps`, `createFromDynamic`, `createFromConditionalSteps`) — каждая стратегия видит поля, которые ей не нужны. ConditionalExecutionStrategy вызывает `getFacilitator()`, который актуален только для dynamic. StaticExecutionStrategy видит `getMaxIterations()`, который только для fix_iterations. Я хочу расщепить God-VO на Static/Dynamic/Conditional sub-VO с общим `ChainDefinitionInterface`, чтобы каждая стратегия зависела только от нужных ей данных — ISP compliance.
+> Когда [`ChainDefinitionVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) содержит 546 строк, 17 параметров конструктора и 3 фабричных метода (`createFromSteps`, `createFromDynamic`, `createFromConditionalSteps`) — каждая стратегия видит поля, которые ей не нужны. ConditionalExecutionStrategy вызывает `getFacilitator()`, который актуален только для dynamic. StaticExecutionStrategy видит `getMaxIterations()`, который только для fix_iterations. Я хочу расщепить God-VO на Static/Dynamic/Conditional sub-VO с общим `ChainDefinitionInterface`, чтобы каждая стратегия зависела только от нужных ей данных — ISP compliance.
 
 ### Goal (Цель по SMART)
-Завершить расщепление [`ChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) (546 LOC, 17 параметров): создать `StaticChainDefinitionVo`, `DynamicChainDefinitionVo`, `ConditionalChainDefinitionVo` с общим `ChainDefinitionInterface` ([`SharedChainDefinitionVo`](../../src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php) уже существует). Обновить все потребители (~15 файлов). Заложено в [ADR-008](../../docs/adr/008-shared-kernel-contract.md), не реализовано. Срок: 1.5 дня.
+Завершить расщепление [`ChainDefinitionVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) (546 LOC, 17 параметров): создать `StaticChainDefinitionVo`, `DynamicChainDefinitionVo`, `ConditionalChainDefinitionVo` с общим `ChainDefinitionInterface` ([`SharedChainDefinitionVo`](../../../src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php) уже существует). Обновить все потребители (~15 файлов). Заложено в [ADR-008](../../docs/adr/008-shared-kernel-contract.md), не реализовано. Срок: 1.5 дня.
 
 ## 2. Context and Scope (Контекст и Границы)
 ### Где делаем
-- [`src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php`](../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) — God-VO 546 LOC — основной объект рефакторинга
-- [`src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php`](../../src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php) — уже существует (shared kernel data)
-- [`src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php`](../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — `supports()` проверяет тип ChainDefinition
+- [`src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainDefinitionVo.php) — God-VO 546 LOC — основной объект рефакторинга
+- [`src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php`](../../../src/Module/Orchestrator/Domain/ValueObject/SharedChainDefinitionVo.php) — уже существует (shared kernel data)
+- [`src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php`](../../../src/Module/Orchestrator/Application/Service/Chain/ExecutionStrategyInterface.php) — `supports()` проверяет тип ChainDefinition
 - Все 3 стратегии: StaticExecutionStrategy, DynamicExecutionStrategy, ConditionalExecutionStrategy
 - YamlChainLoader — фабрика ChainDefinitionVo
 - Все сервисы, зависящие от ChainDefinitionVo

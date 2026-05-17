@@ -89,7 +89,7 @@ vendor/bin/psalm --no-cache
 ### Порядок действий
 1. Переключись в ветку `task/feat-chain-step-timeout-yaml`: `git checkout task/feat-chain-step-timeout-yaml`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
 6. Сделай `git push`.

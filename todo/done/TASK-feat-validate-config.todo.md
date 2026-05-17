@@ -66,8 +66,8 @@ vendor/bin/psalm
 - Валидация может не покрывать все edge cases — начать с обязательных полей
 
 ## 8. Sources
-- [RFC: cli-distribution-rfc.md](../docs/research/rfc/cli-distribution-rfc.md) — Brainstorm #2
-- [chains.yaml](../config/chains.yaml) — структура конфигурации
+- [RFC: cli-distribution-rfc.md](../../docs/research/rfc/cli-distribution-rfc.md) — Brainstorm #2
+- [chains.yaml](../../config/chains.yaml) — структура конфигурации
 
 ## Инструкции для сабагента
 
@@ -78,7 +78,7 @@ vendor/bin/psalm
 ### Порядок действий
 1. Переключись в ветку `task/feat-validate-config`: `git checkout task/feat-validate-config`
 2. Реализуй задачу согласно описанию.
-3. Следуй [Конвенциям](../docs/conventions/index.md) проекта.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта.
 4. Делай промежуточные коммиты после каждого логического этапа.
 5. После реализации запусти проверки: `vendor/bin/phpunit` и `vendor/bin/psalm`.
 6. Сделай `git push`.
