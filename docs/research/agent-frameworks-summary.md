@@ -1,7 +1,7 @@
 # Сводная таблица: AI-agent фреймворки и оркестраторы
 
 > **Цель:** Сравнить исследованные AI-agent фреймворки с task-orchestrator, определить паттерны для заимствования.
-> **Эпик:** [EPIC-research-agent-frameworks-comparison](framework-comparisons/../todo/EPIC-research-agent-frameworks-comparison.md)
+> **Эпик:** [EPIC-research-agent-frameworks-comparison](../../todo/done/EPIC-research-agent-frameworks-comparison.md)
 
 ---
 

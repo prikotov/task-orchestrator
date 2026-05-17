@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-10
 **Объект:** OpenClaw (`openclaw`, TypeScript/Node.js, 362k★ GitHub)
-**Задача:** [TASK-research-openclaw-agent](../../../todo/TASK-research-openclaw-agent.todo.md)
+**Задача:** [TASK-research-openclaw-agent](../../../todo/done/TASK-research-openclaw-agent.todo.md)
 
 ---
 

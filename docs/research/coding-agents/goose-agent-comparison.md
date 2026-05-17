@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-10
 **Объект:** Goose (Block/AAIF Goose AI Agent, Rust), репозиторий migrated → `aaif-goose/goose` (Linux Foundation)
-**Задача:** [TASK-research-goose-agent](../../../todo/TASK-research-goose-agent.todo.md)
+**Задача:** [TASK-research-goose-agent](../../../todo/done/TASK-research-goose-agent.todo.md)
 
 ---
 

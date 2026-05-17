@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-13
 **Объект:** Codebuff v1.0.0 CLI + `@codebuff/sdk` v0.10.7 (`github.com/CodebuffAI/codebuff`, TypeScript/Bun)
-**Задача:** [TASK-research-codebuff](../../../todo/TASK-research-codebuff.todo.md)
+**Задача:** [TASK-research-codebuff](../../../todo/done/TASK-research-codebuff.todo.md)
 
 ---
 

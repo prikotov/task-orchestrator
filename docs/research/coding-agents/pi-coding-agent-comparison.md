@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-09
 **Объект:** Pi Coding Agent v0.74.0 (`@earendil-works/pi-coding-agent`, Node.js/TypeScript)
-**Задача:** [TASK-research-pi-coding-agent](../../../todo/TASK-research-pi-coding-agent.todo.md)
+**Задача:** [TASK-research-pi-coding-agent](../../../todo/done/TASK-research-pi-coding-agent.todo.md)
 
 ---
 

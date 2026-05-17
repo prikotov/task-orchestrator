@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-10
 **Объект:** Warp AI / Oz Agent CLI (`oz`, Rust, Denver Technologies / Warp.dev)
-**Задача:** [TASK-research-warp-agent](../../../todo/TASK-research-warp-agent.todo.md)
+**Задача:** [TASK-research-warp-agent](../../../todo/done/TASK-research-warp-agent.todo.md)
 
 ---
 

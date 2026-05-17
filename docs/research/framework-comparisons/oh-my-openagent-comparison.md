@@ -5,7 +5,7 @@
 > **Язык:** TypeScript (Bun), plugin для OpenCode CLI v1.4.0+
 > **Лицензия:** SUL-1.0 (Sustainable Use License — некоммерческое использование, internal business OK)
 > **Аналитик:** Аналитик (Шерлок)
-> **Архитектурное ревью:** Архитектор (Гэндальф) — [oh-my-openagent-review.md](../coding-agents/oh-my-openagent-review.md)
+> **Архитектурное ревью:** Архитектор (Гэндальф) — [oh-my-openagent-review.md](oh-my-openagent-review.md)
 > **Смежные исследования:** OpenCode CLI (#22) — [opencode-comparison.md](opencode-comparison.md), Kilo Code (#21) — [opencode-orchestrator-comparison.md](opencode-orchestrator-comparison.md)
 
 ---
@@ -508,7 +508,7 @@ OmO — **не фреймворк оркестрации** в нашем пон�
 
 ## 6. Паттерны для заимствования
 
-> На основе архитектурного ревью Гэндальфа ([oh-my-openagent-review.md](../coding-agents/oh-my-openagent-review.md)).
+> На основе архитектурного ревью Гэндальфа ([oh-my-openagent-review.md](oh-my-openagent-review.md)).
 
 ### ✅ Заимствовать — Quick wins (P2)
 
@@ -625,8 +625,8 @@ Presentation (Console Command)
 - [docs/guide/installation.md](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/docs/guide/installation.md) — установка и конфигурация
 - [docs/reference/features.md](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/docs/reference/features.md) — полный справочник фич
 - [LICENSE.md](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/LICENSE.md) — полный текст SUL-1.0
-- [oh-my-openagent-comparison.md](../coding-agents/oh-my-openagent-comparison.md) — отчёт по 10 критериям сабагента (Шерлок)
-- [oh-my-openagent-review.md](../coding-agents/oh-my-openagent-review.md) — архитектурное ревью паттернов (Гэндальф)
+- [oh-my-openagent-comparison.md](oh-my-openagent-comparison.md) — отчёт по 10 критериям сабагента (Шерлок)
+- [oh-my-openagent-review.md](oh-my-openagent-review.md) — архитектурное ревью паттернов (Гэндальф)
 - [opencode-comparison.md](opencode-comparison.md) — исследование OpenCode (#22)
 - [opencode-orchestrator-comparison.md](opencode-orchestrator-comparison.md) — исследование Kilo Code (#21)
 
@@ -637,4 +637,4 @@ Presentation (Console Command)
 2. [OpenCode CLI — GitHub](https://github.com/anomalyco/opencode) — базовый продукт
 3. [LICENSE.md](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/LICENSE.md) — SUL-1.0
 4. [docs/reference/features.md](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/docs/reference/features.md) — справочник фич
-5. [oh-my-openagent-review.md](../coding-agents/oh-my-openagent-review.md) — архитектурное ревью (Гэндальф)
+5. [oh-my-openagent-review.md](oh-my-openagent-review.md) — архитектурное ревью (Гэндальф)

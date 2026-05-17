@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-10
 **Объект:** Hermes Agent v0.8.x (Nous Research, Python)
-**Задача:** [TASK-research-hermes-agent](../../../todo/TASK-research-hermes-agent.todo.md)
+**Задача:** [TASK-research-hermes-agent](../../../todo/done/TASK-research-hermes-agent.todo.md)
 
 ---
 

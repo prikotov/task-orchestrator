@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-10
 **Объект:** Crush v0.66.1 (`github.com/charmbracelet/crush`, Go)
-**Задача:** [TASK-research-crush-agent](../../../todo/TASK-research-crush-agent.todo.md)
+**Задача:** [TASK-research-crush-agent](../../../todo/done/TASK-research-crush-agent.todo.md)
 
 ---
 

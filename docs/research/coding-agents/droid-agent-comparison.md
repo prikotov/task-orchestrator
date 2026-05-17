@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-10
 **Объект:** Factory Droid CLI v0.25.1 (proprietary, Factory AI)
-**Задача:** [TASK-research-droid-agent](../../../todo/TASK-research-droid-agent.todo.md)
+**Задача:** [TASK-research-droid-agent](../../../todo/done/TASK-research-droid-agent.todo.md)
 
 ---
 
