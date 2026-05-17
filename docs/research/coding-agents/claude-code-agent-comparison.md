@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-09
 **Объект:** Claude Code v2.1.138 (Anthropic, проприетарный CLI-агент, TypeScript/Node.js)
-**Задача:** [TASK-research-claude-code-agent](../../../todo/TASK-research-claude-code-agent.todo.md)
+**Задача:** [TASK-research-claude-code-agent](../../../todo/done/TASK-research-claude-code-agent.todo.md)
 
 ---
 

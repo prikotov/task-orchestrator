@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-10
 **Объект:** GitHub Copilot CLI (`gh copilot`, проприетарный)
-**Задача:** [TASK-research-copilot-cli](../../../todo/TASK-research-copilot-cli.todo.md)
+**Задача:** [TASK-research-copilot-cli](../../../todo/done/TASK-research-copilot-cli.todo.md)
 
 ---
 

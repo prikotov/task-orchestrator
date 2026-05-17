@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-09
 **Объект:** Gemini CLI v0.37.2 (`@google/gemini-cli`, TypeScript)
-**Задача:** [TASK-research-gemini-cli](../../../todo/TASK-research-gemini-cli.todo.md)
+**Задача:** [TASK-research-gemini-cli](../../../todo/done/TASK-research-gemini-cli.todo.md)
 
 ---
 

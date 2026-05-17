@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-10
 **Объект:** Kilo Code CLI v7.1.21 (`@kilocode/cli`, TypeScript/Bun, форк OpenCode)
-**Задача:** [TASK-research-kilocode-cli](../../../todo/TASK-research-kilocode-cli.todo.md)
+**Задача:** [TASK-research-kilocode-cli](../../../todo/done/TASK-research-kilocode-cli.todo.md)
 
 ---
 

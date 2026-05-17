@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-10
 **Объект:** Qwen Code v0.15.9 (`@qwen-code/qwen-code`, Node.js/TypeScript)
-**Задача:** [TASK-research-qwen-cli](../../../todo/TASK-research-qwen-cli.todo.md)
+**Задача:** [TASK-research-qwen-cli](../../../todo/done/TASK-research-qwen-cli.todo.md)
 
 ---
 
