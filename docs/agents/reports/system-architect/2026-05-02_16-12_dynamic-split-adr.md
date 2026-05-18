@@ -3,7 +3,7 @@
 **Роль:** Архитектор (Гэндальф)
 **Дата:** 2026-05-02
 **Объект:** Архитектурное решение о fate Dynamic-стратегии — физический split или оставание в Orchestrator
-**Задача:** [TASK-docs-dynamic-split-adr.todo.md](../../../todo/TASK-docs-dynamic-split-adr.todo.md)
+**Задача:** [TASK-docs-dynamic-split-adr.todo.md](../../../../todo/done/TASK-docs-dynamic-split-adr.todo.md)
 
 ---
 

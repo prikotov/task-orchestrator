@@ -15,8 +15,8 @@ TasK Orchestrator — PHP-оркестратор AI-агентов, которы
 | [Руководства](guide/index.md) | Архитектура, цепочки, роли, надёжность, расширение |
 | [Конвенции](conventions/index.md) | DDD, паттерны, слои, тестирование, стиль кода |
 | [Git Workflow](git-workflow/index.md) | Ветки, коммиты, PR, релизы, code review |
-| [Исследования](research/) | Сравнение с аналогами |
-| [Агенты](agents/roles/team/) | Роли AI-агентов |
+| [Исследования](research/agent-frameworks-summary.md) | Сравнение с аналогами |
+| [Агенты](agents/roles/team/team_lead_alex.ru.md) | Роли AI-агентов |
 
 ### CLI Integration
 

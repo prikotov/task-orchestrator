@@ -3,13 +3,13 @@
 **Роль:** Архитектор Гэндальф  
 **Дата:** 2026-05-01  
 **Объект:** `src/Module/ChainDefinition/` — Static/Dynamic стратегии, ExecutionStrategy, RunAgentService, QualityGateRunner  
-**Задача:** [TASK-docs-security-policy-analysis](../../../todo/TASK-docs-security-policy-analysis.todo.md)
+**Задача:** [TASK-docs-security-policy-analysis](../../../../todo/done/TASK-docs-security-policy-analysis.todo.md)
 
 ---
 
 ## Результат
 
-Создан документ: [docs/releases/security-policy-cross-cutting-analysis.md](../../../docs/releases/security-policy-cross-cutting-analysis.md)
+Создан документ: [docs/releases/security-policy-cross-cutting-analysis.md](../../../releases/security-policy-cross-cutting-analysis.md)
 
 ## Ключевые выводы
 
@@ -47,7 +47,7 @@ AI#14 статус: 📋 → ✅ Done, добавлена ссылка на до
 
 ## Источники
 
-- [Roadmap 2026 Q2–Q3](../../../docs/releases/ROADMAP-2026-Q2-Q3.md)
-- [Протокол brainstorm #2](../../../var/sessions/brainstorm/2026-04-30_16-02-26/result.md)
-- [Исследование фреймворков](../../../docs/research/agent-frameworks-summary.md) — Кластер 2: Безопасность
-- [ADR-006](../../../docs/adr/006-execution-strategy-composition.md), [ADR-008](../../../docs/adr/008-shared-kernel-contract.md)
+- [Roadmap 2026 Q2–Q3](../../../releases/ROADMAP-2026-Q2-Q3.md)
+- [Протокол brainstorm #2](../../../../var/sessions/brainstorm/2026-04-30_16-02-26/result.md)
+- [Исследование фреймворков](../../../research/agent-frameworks-summary.md) — Кластер 2: Безопасность
+- [ADR-006](../../../adr/006-execution-strategy-composition.md), [ADR-008](../../../adr/008-shared-kernel-contract.md)

@@ -10,7 +10,7 @@
 - [Таймаут выполнения](#таймаут-выполнения)
 - [Ошибка парсинга JSONL](#ошибка-парсинга-jsonl)
 - [Circuit Breaker заблокировал вызов](#circuit-breaker-заблокировал-вызов)
-- [Budget exceeded — цепочка прервана](#budget-exceeded--цепочка-прервана)
+- [Budget exceeded — цепочка прервана](#budget-exceeded-цепочка-прервана)
 - [Fallback runner не сработал](#fallback-runner-не-сработал)
 - [Quality Gate упал](#quality-gate-упал)
 - [Bundle configuration errors](#bundle-configuration-errors)

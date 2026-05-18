@@ -85,7 +85,7 @@ personality:
 | `S` — Steadiness | Стабильность | Темп, согласованность, процессы |
 | `C` — Conscientiousness | Добросовестность | Процедуры, стандарты, качество |
 
-📚 Справочник: [disc/](references/disc/)
+📚 Справочник: [disc](references/disc/index.md)
 
 #### big_five — Большая пятёрка (OCEAN)
 
@@ -99,7 +99,7 @@ personality:
 | `A` — Agreeableness | Доброжелательность | Дружелюбный, кооперативный |
 | `N` — Neuroticism | Нейротизм | Чувствительный, тревожный |
 
-📚 Справочник: [big5/](references/big5/)
+📚 Справочник: [big5](references/big5/ocean.md)
 
 #### adizes — модель Адизеса
 
@@ -112,7 +112,7 @@ personality:
 | `Entrepreneur` | E | Идеения, видение, рефакторинг, новые технологии. |
 | `Integrator` | I | Команда, согласие, связность модулей. |
 
-📚 Справочник: [adizes/](references/adizes/)
+📚 Справочник: [adizes](references/adizes/producer.md)
 
 #### belbin — роли Белбина
 
@@ -130,7 +130,7 @@ personality:
 | `Monitor Evaluator` | Стратег | Оценка рисков, стратегическое мышление, скептицизм. |
 | `Teamworker` | Душа команды | Кооперация, дипломатия, сглаживание конфликтов. |
 
-📚 Справочник: [belbin/](references/belbin/)
+📚 Справочник: [belbin](references/belbin/coordinator.md)
 
 #### jung — Юнгианские архетипы
 
@@ -151,7 +151,7 @@ personality:
 | `Ruler` | Правитель | Контроль, лидерство, распределение ресурсов. |
 | `Sage` | Мудрец | Аналитика, объективность, поиск истины. |
 
-📚 Справочник: [jung/](references/jung/)
+📚 Справочник: [jung](references/jung/sage.md)
 
 ## Тело файла (Markdown)
 

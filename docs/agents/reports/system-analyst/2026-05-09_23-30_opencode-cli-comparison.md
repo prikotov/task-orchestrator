@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-09
 **Объект:** OpenCode v1.3.17 (SST/opencode-ai)
-**Задача:** [TASK-research-opencode-cli](../../../todo/TASK-research-opencode-cli.todo.md)
+**Задача:** [TASK-research-opencode-cli](../../../../todo/done/TASK-research-opencode-cli.todo.md)
 
 ---
 
@@ -44,5 +44,5 @@ OpenCode CLI частично подходит для использования
 
 ### Файлы
 
-- Отчёт: [docs/research/coding-agents/opencode-cli-comparison.md](../../../docs/research/coding-agents/opencode-cli-comparison.md)
-- Сводная таблица: [docs/research/coding-agents-summary.md](../../../docs/research/coding-agents-summary.md)
+- Отчёт: [docs/research/coding-agents/opencode-cli-comparison.md](../../../research/coding-agents/opencode-cli-comparison.md)
+- Сводная таблица: [docs/research/coding-agents-summary.md](../../../research/coding-agents-summary.md)

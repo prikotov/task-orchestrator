@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-09
 **Объект:** Codex CLI v0.129.0 (`@openai/codex`, Rust/Node.js), 10 критериев интеграции
-**Задача:** [TASK-research-codex-cli](../../../todo/TASK-research-codex-cli.todo.md)
+**Задача:** [TASK-research-codex-cli](../../../../todo/done/TASK-research-codex-cli.todo.md)
 
 ---
 

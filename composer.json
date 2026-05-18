@@ -17,17 +17,18 @@
         "symfony/process": "^8.0",
         "symfony/yaml": "^8.0",
         "symfony/finder": "^8.0",
-        "prikotov/coding-standard": "^0.10.2",
+        "prikotov/coding-standard": "v0.11.1",
         "symfony/dotenv": "^8.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5",
         "prikotov/todo-md": "^0.0",
-        "prikotov/git-workflow": "^0.0",
+        "prikotov/git-workflow": "^0.1.0",
         "vimeo/psalm": "^6.16",
         "psalm/plugin-symfony": "^5.3",
         "deptrac/deptrac": "^2.0",
-        "phpmd/phpmd": "^3.0"
+        "phpmd/phpmd": "^3.0",
+        "ramsey/conventional-commits": "^1.7"
     },
     "repositories": [
         {"type": "vcs", "url": "https://github.com/prikotov/coding-standard"},
@@ -52,6 +53,13 @@
         ],
         "post-update-cmd": [
             "@php bin/create-symlink.php"
+        ],
+        "validate-docs": "php vendor/prikotov/coding-standard/bin/validate-docs.php",
+        "validate-md-links": "php vendor/prikotov/coding-standard/bin/validate-md-links.php",
+        "check": [
+            "@test",
+            "@validate-md-links",
+            "@validate-docs"
         ]
     },
     "config": {

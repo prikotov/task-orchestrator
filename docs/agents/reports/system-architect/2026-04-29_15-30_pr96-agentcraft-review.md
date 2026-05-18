@@ -3,7 +3,7 @@
 **Роль:** Архитектор Локи
 **Дата:** 2026-04-29
 **Объект:** PR #96 (research(agentcraft): исследование AgentCraft для сравнения с task-orchestrator) — уже смёрджен
-**Задача:** [todo/done/TASK-research-agentcraft.todo.md](../../../todo/done/TASK-research-agentcraft.todo.md)
+**Задача:** [todo/done/TASK-research-agentcraft.todo.md](../../../../todo/done/TASK-research-agentcraft.todo.md)
 
 ---
 

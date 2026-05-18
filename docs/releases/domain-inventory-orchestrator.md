@@ -2,7 +2,7 @@
 
 **Дата:** 2026-05-01
 **Аналитик:** Шерлок (system_analyst_sherlock)
-**Задача:** [TASK-docs-domain-inventory](../../todo/TASK-docs-domain-inventory.todo.md)
+**Задача:** [TASK-docs-domain-inventory](../../todo/done/TASK-docs-domain-inventory.todo.md)
 **Epic:** EPIC-refactor-orchestrator-p3
 **Объект:** `src/Module/ChainDefinition/Domain/`
 
