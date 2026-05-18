@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06e6dacb5443e1b9fc74ba127fcc69c3",
+    "content-hash": "342f78e299ab05c4dd37a0c1b850cac0",
     "packages": [
         {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
@@ -151,16 +151,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.10.2",
+            "version": "v0.11.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:prikotov/coding-standard.git",
-                "reference": "c9fb5780ff006d76036cad5bfcf1c05f11d33e45"
+                "reference": "07ba13c428c40a8f714f77b53357e1253c085d52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/c9fb5780ff006d76036cad5bfcf1c05f11d33e45",
-                "reference": "c9fb5780ff006d76036cad5bfcf1c05f11d33e45",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/07ba13c428c40a8f714f77b53357e1253c085d52",
+                "reference": "07ba13c428c40a8f714f77b53357e1253c085d52",
                 "shasum": ""
             },
             "require": {
@@ -205,10 +205,14 @@
                 "validate-docs": [
                     "php bin/validate-docs.php"
                 ],
+                "validate-md-links": [
+                    "php bin/validate-md-links.php"
+                ],
                 "check": [
                     "@test",
                     "@sniff-test",
                     "@validate-docs",
+                    "@validate-md-links",
                     "phpcs src/"
                 ]
             },
@@ -227,7 +231,7 @@
                 "phpcs",
                 "sniffs"
             ],
-            "time": "2026-05-10T02:41:57+00:00"
+            "time": "2026-05-18T12:41:44+00:00"
         },
         {
             "name": "psr/container",
@@ -3896,6 +3900,72 @@
             "time": "2025-08-14T07:29:31+00:00"
         },
         {
+            "name": "jawira/case-converter",
+            "version": "v3.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jawira/case-converter.git",
+                "reference": "de9956122568743a83e0fc7e2eaa92c1b0de3f18"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jawira/case-converter/zipball/de9956122568743a83e0fc7e2eaa92c1b0de3f18",
+                "reference": "de9956122568743a83e0fc7e2eaa92c1b0de3f18",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "behat/behat": "^3.0",
+                "phpstan/phpstan": "^v2",
+                "phpunit/phpunit": "^9.0"
+            },
+            "suggest": {
+                "pds/skeleton": "PHP Package Development Standards",
+                "phing/phing": "PHP Build Tool"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jawira\\CaseConverter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jawira Portugal",
+                    "email": "dev@tugal.be"
+                }
+            ],
+            "description": "Convert strings between 13 naming conventions: Snake case, Camel case, Pascal case, Kebab case, Ada case, Train case, Cobol case, Macro case, Upper case, Lower case, Sentence case, Title case and Dot notation.",
+            "homepage": "https://jawira.github.io/case-converter/",
+            "keywords": [
+                "Ada case",
+                "Cobol case",
+                "Macro case",
+                "Train case",
+                "camel case",
+                "dot notation",
+                "kebab case",
+                "lower case",
+                "pascal case",
+                "sentence case",
+                "snake case",
+                "title case",
+                "upper case"
+            ],
+            "support": {
+                "issues": "https://github.com/jawira/case-converter/issues",
+                "source": "https://github.com/jawira/case-converter/tree/v3.6.0"
+            },
+            "time": "2025-06-13T21:12:55+00:00"
+        },
+        {
             "name": "kelunik/certificate",
             "version": "v1.1.3",
             "source": {
@@ -4303,6 +4373,196 @@
                 "source": "https://github.com/nikic/PHP-Parser/tree/v5.7.0"
             },
             "time": "2025-12-06T11:56:16+00:00"
+        },
+        {
+            "name": "opis/json-schema",
+            "version": "2.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/opis/json-schema.git",
+                "reference": "8458763e0dd0b6baa310e04f1829fc73da4e8c8a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/opis/json-schema/zipball/8458763e0dd0b6baa310e04f1829fc73da4e8c8a",
+                "reference": "8458763e0dd0b6baa310e04f1829fc73da4e8c8a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "opis/string": "^2.1",
+                "opis/uri": "^1.0",
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "ext-bcmath": "*",
+                "ext-intl": "*",
+                "phpunit/phpunit": "^9.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Opis\\JsonSchema\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Sorin Sarca",
+                    "email": "sarca_sorin@hotmail.com"
+                },
+                {
+                    "name": "Marius Sarca",
+                    "email": "marius.sarca@gmail.com"
+                }
+            ],
+            "description": "Json Schema Validator for PHP",
+            "homepage": "https://opis.io/json-schema",
+            "keywords": [
+                "json",
+                "json-schema",
+                "schema",
+                "validation",
+                "validator"
+            ],
+            "support": {
+                "issues": "https://github.com/opis/json-schema/issues",
+                "source": "https://github.com/opis/json-schema/tree/2.6.0"
+            },
+            "time": "2025-10-17T12:46:48+00:00"
+        },
+        {
+            "name": "opis/string",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/opis/string.git",
+                "reference": "3e4d2aaff518ac518530b89bb26ed40f4503635e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/opis/string/zipball/3e4d2aaff518ac518530b89bb26ed40f4503635e",
+                "reference": "3e4d2aaff518ac518530b89bb26ed40f4503635e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-iconv": "*",
+                "ext-json": "*",
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Opis\\String\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Marius Sarca",
+                    "email": "marius.sarca@gmail.com"
+                },
+                {
+                    "name": "Sorin Sarca",
+                    "email": "sarca_sorin@hotmail.com"
+                }
+            ],
+            "description": "Multibyte strings as objects",
+            "homepage": "https://opis.io/string",
+            "keywords": [
+                "multi-byte",
+                "opis",
+                "string",
+                "string manipulation",
+                "utf-8"
+            ],
+            "support": {
+                "issues": "https://github.com/opis/string/issues",
+                "source": "https://github.com/opis/string/tree/2.1.0"
+            },
+            "time": "2025-10-17T12:38:41+00:00"
+        },
+        {
+            "name": "opis/uri",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/opis/uri.git",
+                "reference": "0f3ca49ab1a5e4a6681c286e0b2cc081b93a7d5a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/opis/uri/zipball/0f3ca49ab1a5e4a6681c286e0b2cc081b93a7d5a",
+                "reference": "0f3ca49ab1a5e4a6681c286e0b2cc081b93a7d5a",
+                "shasum": ""
+            },
+            "require": {
+                "opis/string": "^2.0",
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Opis\\Uri\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Marius Sarca",
+                    "email": "marius.sarca@gmail.com"
+                },
+                {
+                    "name": "Sorin Sarca",
+                    "email": "sarca_sorin@hotmail.com"
+                }
+            ],
+            "description": "Build, parse and validate URIs and URI-templates",
+            "homepage": "https://opis.io",
+            "keywords": [
+                "URI Template",
+                "parse url",
+                "punycode",
+                "uri",
+                "uri components",
+                "url",
+                "validate uri"
+            ],
+            "support": {
+                "issues": "https://github.com/opis/uri/issues",
+                "source": "https://github.com/opis/uri/tree/1.1.0"
+            },
+            "time": "2021-05-22T15:57:08+00:00"
         },
         {
             "name": "pdepend/pdepend",
@@ -5194,23 +5454,27 @@
         },
         {
             "name": "prikotov/git-workflow",
-            "version": "v0.0.2",
+            "version": "v0.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/prikotov/git-workflow.git",
-                "reference": "47815e8e10ef5570ffb43fb9c53a014db932d198"
+                "url": "git@github.com:prikotov/git-workflow.git",
+                "reference": "4b6d210ba185ccf5ad23deea9b10249956ebfcf7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/47815e8e10ef5570ffb43fb9c53a014db932d198",
-                "reference": "47815e8e10ef5570ffb43fb9c53a014db932d198",
+                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/4b6d210ba185ccf5ad23deea9b10249956ebfcf7",
+                "reference": "4b6d210ba185ccf5ad23deea9b10249956ebfcf7",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.4"
             },
+            "require-dev": {
+                "ramsey/conventional-commits": "^1.7"
+            },
             "bin": [
-                "bin/git-workflow-init"
+                "bin/git-workflow-init",
+                "bin/validate-commit"
             ],
             "type": "library",
             "extra": {
@@ -5235,18 +5499,14 @@
                 "release",
                 "workflow"
             ],
-            "support": {
-                "source": "https://github.com/prikotov/git-workflow/tree/v0.0.2",
-                "issues": "https://github.com/prikotov/git-workflow/issues"
-            },
-            "time": "2026-04-20T11:22:30+00:00"
+            "time": "2026-05-18T11:06:53+00:00"
         },
         {
             "name": "prikotov/todo-md",
             "version": "v0.0.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/prikotov/todo-md.git",
+                "url": "git@github.com:prikotov/todo-md.git",
                 "reference": "86b1dd8577139a1b785f275d7606c550b0905438"
             },
             "dist": {
@@ -5283,10 +5543,6 @@
                 "task-management",
                 "todo"
             ],
-            "support": {
-                "source": "https://github.com/prikotov/todo-md/tree/v0.0.4",
-                "issues": "https://github.com/prikotov/todo-md/issues"
-            },
             "time": "2026-04-20T11:53:59+00:00"
         },
         {
@@ -5511,6 +5767,109 @@
                 "source": "https://github.com/php-fig/http-message/tree/2.0"
             },
             "time": "2023-04-04T09:54:51+00:00"
+        },
+        {
+            "name": "ramsey/conventional-commits",
+            "version": "1.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ramsey/conventional-commits.git",
+                "reference": "2d24a17b3505f03948c315ff55c14b03d6f8bc61"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ramsey/conventional-commits/zipball/2d24a17b3505f03948c315ff55c14b03d6f8bc61",
+                "reference": "2d24a17b3505f03948c315ff55c14b03d6f8bc61",
+                "shasum": ""
+            },
+            "require": {
+                "composer-runtime-api": "^2.0",
+                "ext-json": "*",
+                "jawira/case-converter": "^3.5",
+                "opis/json-schema": "^2.3",
+                "php": "^8.1",
+                "symfony/console": "^6.0 || ^7.0 || ^8.0",
+                "symfony/filesystem": "^6.0 || ^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "captainhook/captainhook": "^5.15",
+                "captainhook/plugin-composer": "^5.3",
+                "ergebnis/composer-normalize": "^2.30",
+                "hamcrest/hamcrest-php": "^2.0",
+                "mockery/mockery": "^1.6.12",
+                "php-parallel-lint/php-console-highlighter": "^1.0",
+                "php-parallel-lint/php-parallel-lint": "^1.3",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-mockery": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpunit/phpunit": "^10.5.63",
+                "ramsey/coding-standard": "^2.3",
+                "ramsey/composer-repl": "^1.5",
+                "ramsey/composer-repl-lib": "^1.4.0",
+                "roave/security-advisories": "dev-latest",
+                "sebastianfeldmann/cli": "^3.4",
+                "sebastianfeldmann/git": "^3.8",
+                "spatie/phpunit-snapshot-assertions": "^5.1",
+                "symfony/process": "^6.0 || ^7.0 || ^8.0"
+            },
+            "suggest": {
+                "captainhook/captainhook": "Manage your project's Git hooks with CaptainHook, and use ramsey/conventional-commits in your commit-msg and prepare-commit-msg hooks."
+            },
+            "bin": [
+                "bin/conventional-commits"
+            ],
+            "type": "library",
+            "extra": {
+                "captainhook": {
+                    "force-install": true
+                },
+                "branch-alias": {
+                    "dev-main": "1.x-dev"
+                },
+                "ramsey/conventional-commits": {
+                    "configFile": "conventional-commits.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ramsey\\CaptainHook\\": "src/CaptainHook/",
+                    "Ramsey\\ConventionalCommits\\": "src/ConventionalCommits/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ben Ramsey",
+                    "email": "ben@benramsey.com",
+                    "homepage": "https://benramsey.com"
+                }
+            ],
+            "description": "A PHP library for creating and validating commit messages according to the Conventional Commits specification. Includes a CaptainHook action!",
+            "keywords": [
+                "HOOK",
+                "captainhook",
+                "commit",
+                "commit-msg",
+                "conventional",
+                "conventional-commits",
+                "git",
+                "plugin"
+            ],
+            "support": {
+                "issues": "https://github.com/ramsey/conventional-commits/issues",
+                "source": "https://github.com/ramsey/conventional-commits/tree/1.7.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/ramsey",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-04T06:55:21+00:00"
         },
         {
             "name": "react/child-process",

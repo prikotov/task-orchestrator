@@ -6,7 +6,7 @@
 | Дата        | 2026-05-02                                                      |
 | Автор       | Архитектор (Гэндальф)                                          |
 | Участники   | Гэндальф, Шерлок                                                |
-| Источник    | [TASK-docs-resume-adr](../../todo/TASK-docs-resume-adr.todo.md) |
+| Источник    | [TASK-docs-resume-adr](../../todo/done/TASK-docs-resume-adr.todo.md) |
 
 ## Контекст
 
@@ -302,7 +302,7 @@ interface CheckpointReaderInterface {
 - [ADR-006: ExecutionStrategy Composition](006-execution-strategy-composition.md) — архитектурный контракт стратегий
 - [ADR-008: Shared Kernel Contract](008-shared-kernel-contract.md) — общий kernel для модулей
 - [ADR-009: Dynamic остаётся в Orchestrator](009-dynamic-split-decision.md) — почему Dynamic не выделен в отдельный модуль
-- [ExecutionStrategyInterface](../../src/Module/ChainDefinition/Application/Service/Chain/ExecutionStrategyInterface.php) — контракт `resume()`
-- [ChainSessionLoggerInterface](../../src/Module/ChainDefinition/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) — reference implementation JSONL session
-- [StaticChainExecution](../../src/Module/StaticExecution/Domain/Entity/StaticChainExecution.php) — in-memory state static-цепочки
-- [RunStaticChainService](../../src/Module/StaticExecution/Domain/Service/RunStaticChainService.php) — цикл выполнения static-цепочки
+- [ExecutionStrategyInterface](../../src/Module/ChainExecution/Application/Contract/Chain/ExecutionStrategyInterface.php) — контракт `resume()`
+- [ChainSessionLogger](../../src/Module/DynamicLoop/Infrastructure/Service/ChainSessionLogger.php) — reference implementation JSONL session
+- [StaticChainExecution](../../src/Module/ChainExecution/Domain/Entity/StaticChainExecution.php) — in-memory state static-цепочки
+- [RunStaticChainService](../../src/Module/ChainExecution/Domain/Service/Static/RunStaticChainService.php) — цикл выполнения static-цепочки

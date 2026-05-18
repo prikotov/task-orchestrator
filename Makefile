@@ -62,8 +62,14 @@ phpcs: ## Запустить PHP_CodeSniffer
 	@echo "PHPCS:"
 	@vendor/bin/phpcs --standard=phpcs.xml.dist --no-colors -n src/ 2>&1; ec=$$?; if [ "$$ec" -eq 0 ]; then echo "PHPCS: OK"; fi; exit $$ec
 
+.PHONY: md-links
+md-links: ## Валидация внутренних ссылок в Markdown
+	@echo
+	@echo "MD-Links:"
+	@php vendor/prikotov/coding-standard/bin/validate-md-links.php
+
 .PHONY: check
-check: ## Запустить все проверки (deptrac + psalm + phpmd + phpcs + tests)
-	@${MAKE} --no-print-directory deptrac psalm phpmd phpcs tests && \
+check: ## Запустить все проверки (deptrac + psalm + phpmd + phpcs + md-links + tests)
+	@${MAKE} --no-print-directory deptrac psalm phpmd phpcs md-links tests && \
 		{ echo; echo "✅ Все проверки завершены успешно."; } || \
 		{ echo; echo "❌ Проверки завершены с ошибками."; exit 1; }

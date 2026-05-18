@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-13
 **Объект:** Multica (github.com/multica-ai/multica, ~28K звёзд, Go + TypeScript/Next.js)
-**Задача:** [TASK-research-multica](../../../todo/TASK-research-multica.todo.md)
+**Задача:** [TASK-research-multica](../../../../todo/done/TASK-research-multica.todo.md)
 
 ---
 

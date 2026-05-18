@@ -3,7 +3,7 @@
 **Роль:** Бэкендер (Левша)
 **Дата:** 2026-04-20
 **Объект:** `docs/conventions/` — все `.md` файлы, внутренние markdown-ссылки
-**Задача:** [TASK-fix-conventions-broken-links](../../todo/TASK-fix-conventions-broken-links.todo.md)
+**Задача:** [TASK-fix-conventions-broken-links](../../../../todo/done/TASK-fix-conventions-broken-links.todo.md)
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Автор:** Архитектор Гэндальф  
 **Дата:** 2026-05-01  
-**Задача:** [TASK-docs-security-policy-analysis](../../todo/TASK-docs-security-policy-analysis.todo.md)  
+**Задача:** [TASK-docs-security-policy-analysis](../../todo/done/TASK-docs-security-policy-analysis.todo.md)  
 **Roadmap:** AI#14, Sprint 2 → входные данные для Sprint 9 (Security Policy implementation)  
 **Источники:**
 - [Roadmap 2026 Q2–Q3](ROADMAP-2026-Q2-Q3.md) — OQ-3, триггер G4, Sprint 9 plan

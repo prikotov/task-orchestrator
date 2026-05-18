@@ -3,7 +3,7 @@
 **Роль:** Архитектор Локи
 **Дата:** 2026-04-28
 **Объект:** PR #95 (task/research-paperclip-ai → task/research-agent-frameworks-comparison)
-**Задача:** [TASK-research-paperclip-ai.todo.md](../../../todo/TASK-research-paperclip-ai.todo.md)
+**Задача:** [TASK-research-paperclip-ai.todo.md](../../../../todo/done/TASK-research-paperclip-ai.todo.md)
 
 ---
 

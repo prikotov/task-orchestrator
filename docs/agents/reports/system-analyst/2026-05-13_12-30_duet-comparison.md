@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-13
 **Объект:** Duet (duet.so, github.com/aomni-com)
-**Задача:** [TASK-research-duet](../../../../todo/TASK-research-duet.todo.md)
+**Задача:** [TASK-research-duet](../../../../todo/done/TASK-research-duet.todo.md)
 
 ---
 

@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро
 **Дата:** 2026-05-04
 **Объект:** Ветка `refactor/responsibility-decomposition` — PR #147, #148, #149 (все слиты). Модули `ChainDefinition`, `ChainExecution`, `DynamicLoop`.
-**Задача:** [EPIC-refactor-responsibility-decomposition](../../../todo/EPIC-refactor-responsibility-decomposition.md)
+**Задача:** [EPIC-refactor-responsibility-decomposition](../../../../todo/done/EPIC-refactor-responsibility-decomposition.md)
 
 ---
 
