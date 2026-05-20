@@ -10,7 +10,7 @@ epic: EPIC-research-coding-agents-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-zeroclaw-agent
-pr:
+pr: "#212"
 status: done
 ---
 
