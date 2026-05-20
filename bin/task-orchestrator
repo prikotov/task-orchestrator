@@ -7,8 +7,13 @@ declare(strict_types=1);
  * Task Orchestrator — CLI entry point.
  *
  * Works in two contexts:
- * 1. Standalone: running from the project root (bin/task-orchestrator)
+ * 1. Standalone: running from the package root (bin/task-orchestrator)
+ *    — paths resolve relative to the package root
  * 2. Vendor binary: installed via composer require (vendor/bin/task-orchestrator)
+ *    — paths resolve relative to the host project (CWD)
+ *
+ * In vendor context, the tool searches for config and roles in the host project.
+ * If a file is not found in the host project, it falls back to the package defaults.
  */
 
 use Symfony\Component\Config\FileLocator;
@@ -17,11 +22,18 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use TaskOrchestrator\Common\DependencyInjection\TaskOrchestratorExtension;
 
-// Find Composer autoloader (vendor dependency or standalone project)
-if (file_exists(__DIR__ . '/../../../autoload.php')) {
-    require __DIR__ . '/../../../autoload.php';
-} elseif (file_exists(__DIR__ . '/../vendor/autoload.php')) {
-    require __DIR__ . '/../vendor/autoload.php';
+// Find Composer autoloader and detect execution context
+// vendor:    __DIR__ = <project>/vendor/prikotov/task-orchestrator/bin
+// standalone: __DIR__ = <package>/bin
+$vendorAutoload = dirname(__DIR__, 3) . '/autoload.php';
+$localAutoload = dirname(__DIR__) . '/vendor/autoload.php';
+
+if (file_exists($vendorAutoload)) {
+    require $vendorAutoload;
+    $isVendor = true;
+} elseif (file_exists($localAutoload)) {
+    require $localAutoload;
+    $isVendor = false;
 } else {
     throw new LogicException('Dependencies are missing. Try running "composer install".');
 }
@@ -29,8 +41,13 @@ if (file_exists(__DIR__ . '/../../../autoload.php')) {
 // Package root: always the directory containing this package's composer.json
 $packageRoot = dirname(__DIR__);
 
+// Project root: directory of the host project
+// — In vendor context: CWD (the caller's project directory)
+// — In standalone context: package root (running from the repository)
+$projectRoot = $isVendor ? getcwd() : $packageRoot;
+
 $container = new ContainerBuilder();
-$container->setParameter('kernel.project_dir', $packageRoot);
+$container->setParameter('kernel.project_dir', $projectRoot);
 
 // Resolve version: prefer installed package version, fall back to root package, then default
 $version = '0.1.0';
@@ -41,14 +58,27 @@ if (class_exists(\Composer\InstalledVersions::class)) {
 }
 $container->setParameter('app.version', ltrim($version, 'v'));
 
-// Load bundle services (Domain, Application, Infrastructure)
+// Resolve paths: search in project root first, fall back to package defaults
+$rolesDir = $projectRoot . '/docs/agents/roles/team';
+if (!is_dir($rolesDir)) {
+    $rolesDir = $packageRoot . '/docs/agents/roles/team';
+}
+
+$chainsYaml = $projectRoot . '/config/chains.yaml';
+if (!file_exists($chainsYaml)) {
+    $chainsYaml = $packageRoot . '/config/chains.yaml';
+}
+
+$chainsSessionDir = $projectRoot . '/var/sessions';
+
+// Load services (Domain, Application, Infrastructure)
 $extension = new TaskOrchestratorExtension();
 $extension->load([
     [
-        'roles_dir' => $packageRoot . '/docs/agents/roles/team',
-        'base_path' => $packageRoot,
-        'chains_yaml' => $packageRoot . '/config/chains.yaml',
-        'chains_session_dir' => $packageRoot . '/var/sessions',
+        'roles_dir' => $rolesDir,
+        'base_path' => $projectRoot,
+        'chains_yaml' => $chainsYaml,
+        'chains_session_dir' => $chainsSessionDir,
     ],
 ], $container);
 
