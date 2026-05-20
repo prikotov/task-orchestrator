@@ -465,15 +465,13 @@ src/Module/DynamicLoop/
         └── JsonlAuditLoggerFactory.php
 ```
 
-### Bundle Infrastructure
+### DI Infrastructure
 
 ```
 src/
 ├── DependencyInjection/
-│   ├── TaskOrchestratorExtension.php                    # Extension для параметров bundle
+│   ├── TaskOrchestratorExtension.php                    # Extension для параметров конфигурации
 │   └── Configuration.php                               # TreeBuilder-валидация
-├── Infrastructure/Symfony/
-│   └── TaskOrchestratorBundle.php                       # Symfony Bundle
 config/
 └── services.yaml                                       # DI-конфигурация
 ```
@@ -495,19 +493,25 @@ apps/console/src/Module/Agent/
 apps/console/config/agent_chains.yaml
 ```
 
-## Symfony Bundle
+## Конфигурация CLI
 
-Интеграция в проект осуществляется через `TaskOrchestratorBundle`:
+Интеграция осуществляется через CLI entry point (`bin/task-orchestrator`).
+Extension загружается напрямую без Symfony Kernel:
 
 ```php
-// apps/console/config/bundles.php
-return [
-    // ...
-    \TaskOrchestrator\Common\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
-];
+// bin/task-orchestrator
+$extension = new TaskOrchestratorExtension();
+$extension->load([
+    [
+        'roles_dir' => $packageRoot . '/docs/agents/roles/team',
+        'base_path' => $packageRoot,
+        'chains_yaml' => $packageRoot . '/config/chains.yaml',
+        'chains_session_dir' => $packageRoot . '/var/sessions',
+    ],
+], $container);
 ```
 
-### Bundle-параметры
+### Параметры конфигурации
 
 | Параметр | Описание |
 |---|---|
@@ -520,13 +524,12 @@ return [
 ### Конфигурация
 
 ```yaml
-# config/packages/task_orchestrator.yaml
+# Конфигурация по умолчанию (задаётся в bin/task-orchestrator)
 task_orchestrator:
-    roles_dir: '%kernel.project_dir%/docs/agents/roles/team'
-    chains_yaml: '%kernel.project_dir%/apps/console/config/agent_chains.yaml'
-    audit_log_path: '%kernel.project_dir%/var/log/agent_audit.jsonl'
-    chains_session_dir: '%kernel.project_dir%/var/agent/chains'
-    base_path: '%kernel.project_dir%'
+    roles_dir: '<package_root>/docs/agents/roles/team'
+    chains_yaml: '<package_root>/config/chains.yaml'
+    chains_session_dir: '<package_root>/var/sessions'
+    base_path: '<package_root>'
 ```
 
 ## Мультидвижковая архитектура
