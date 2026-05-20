@@ -11,7 +11,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-zeroclaw
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-zeroclaw: Исследовать Zeroclaw для сравнения с task-orchestrator
@@ -50,17 +50,17 @@ status: in_progress
 
 ## 4. Implementation Plan (План реализации)
 *Заполняется исполнителем перед стартом.*
-1. [ ] Изучить репозиторий: https://github.com/zeroclaw-labs/zeroclaw
-2. [ ] Оценить архитектуру по 4 осям
-3. [ ] Сравнить с task-orchestrator и OpenClaw
-4. [ ] Создать отчёт в `docs/research/framework-comparisons/zeroclaw-comparison.md`
-5. [ ] Добавить строку в `docs/research/agent-frameworks-summary.md`
+1. [x] Изучить репозиторий: https://github.com/zeroclaw-labs/zeroclaw
+2. [x] Оценить архитектуру по 4 осям
+3. [x] Сравнить с task-orchestrator и OpenClaw
+4. [x] Создать отчёт в `docs/research/framework-comparisons/zeroclaw-comparison.md`
+5. [x] Добавить строку в `docs/research/agent-frameworks-summary.md`
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт `docs/research/framework-comparisons/zeroclaw-comparison.md` создан по формату существующих comparison-документов
-- [ ] Все 4 оси оценены
-- [ ] Вердикт с обоснованием
-- [ ] Строка Zeroclaw добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
+- [x] Отчёт `docs/research/framework-comparisons/zeroclaw-comparison.md` создан по формату существующих comparison-документов
+- [x] Все 4 оси оценены
+- [x] Вердикт с обоснованием
+- [x] Строка Zeroclaw добавлена в сводную таблицу `docs/research/agent-frameworks-summary.md`
 
 ## 6. Verification (Самопроверка)
 ```bash
