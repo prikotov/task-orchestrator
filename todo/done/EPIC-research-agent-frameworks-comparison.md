@@ -99,7 +99,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1e: Дополнительные исследования (2026-05-20)
 
-- [ ] [TASK-research-zeroclaw](TASK-research-zeroclaw.todo.md) — Zeroclaw (zeroclaw-labs, AI-agent orchestration)
+- [x] [TASK-research-zeroclaw](done/TASK-research-zeroclaw.todo.md) — Zeroclaw (zeroclaw-labs, AI-agent orchestration)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
