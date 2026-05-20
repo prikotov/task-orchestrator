@@ -97,6 +97,10 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 - [ ] [TASK-research-duet](TASK-research-duet.todo.md) — Duet (Aomni, cloud/SaaS, team AI-агент)
 - [ ] [TASK-research-multica](TASK-research-multica.todo.md) — Multica (open-source, project management для human + agent teams)
 
+### Этап 1e: Дополнительные исследования (2026-05-20)
+
+- [ ] [TASK-research-zeroclaw](TASK-research-zeroclaw.todo.md) — Zeroclaw (zeroclaw-labs, AI-agent orchestration)
+
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
 - [x] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
