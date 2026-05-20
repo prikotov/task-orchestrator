@@ -113,6 +113,10 @@ flowchart LR
 
 - [ ] [TASK-research-codebuff](TASK-research-codebuff.todo.md) — Codebuff (TypeScript, Apache-2.0, мультиагентный)
 
+### Этап 1e: Дополнительные исследования (2026-05-20)
+
+- [ ] [TASK-research-zeroclaw-agent](TASK-research-zeroclaw-agent.todo.md) — Zeroclaw (zeroclaw-labs, Rust, agent runtime)
+
 - [x] ~~TASK-research-oh-my-openagent~~ → перенесён в EPIC-research-agent-frameworks-comparison (OmO — система оркестрации, не кодинг-агент)
 
 ## 6. Definition of Done (Критерии приёмки эпика)
