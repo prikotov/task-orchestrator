@@ -493,38 +493,22 @@ apps/console/src/Module/Agent/
 apps/console/config/agent_chains.yaml
 ```
 
-## Конфигурация CLI
+## Конфигурация
 
-Интеграция осуществляется через CLI entry point (`bin/task-orchestrator`).
-Extension загружается напрямую без Symfony Kernel:
+Инструмент настраивается через параметры, которые передаются при запуске (`bin/task-orchestrator`).
 
-```php
-// bin/task-orchestrator
-$extension = new TaskOrchestratorExtension();
-$extension->load([
-    [
-        'roles_dir' => $packageRoot . '/docs/agents/roles/team',
-        'base_path' => $packageRoot,
-        'chains_yaml' => $packageRoot . '/config/chains.yaml',
-        'chains_session_dir' => $packageRoot . '/var/sessions',
-    ],
-], $container);
-```
-
-### Параметры конфигурации
+### Параметры
 
 | Параметр | Описание |
 |---|---|
-| `%task_orchestrator.roles_dir%` | Путь к role prompt файлам |
-| `%task_orchestrator.chains_yaml%` | Путь к YAML-конфигурации цепочек |
-| `%task_orchestrator.audit_log_path%` | Путь к JSONL audit log |
-| `%task_orchestrator.chains_session_dir%` | Путь к каталогу сессий оркестрации |
-| `%task_orchestrator.base_path%` | Корень проекта для path relativization |
+| `roles_dir` | Путь к role prompt файлам (`.md`) |
+| `chains_yaml` | Путь к YAML-конфигурации цепочек |
+| `chains_session_dir` | Путь к каталогу сессий оркестрации |
+| `base_path` | Корень проекта для path relativization |
 
-### Конфигурация
+### Значения по умолчанию
 
 ```yaml
-# Конфигурация по умолчанию (задаётся в bin/task-orchestrator)
 task_orchestrator:
     roles_dir: '<package_root>/docs/agents/roles/team'
     chains_yaml: '<package_root>/config/chains.yaml'
