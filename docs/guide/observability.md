@@ -41,7 +41,7 @@ Infrastructure:
 
 ### Конфигурация пути
 
-Путь к audit-логу настраивается через параметр bundle:
+Путь к audit-логу настраивается через параметр конфигурации:
 
 ```yaml
 # config/packages/task_orchestrator.yaml

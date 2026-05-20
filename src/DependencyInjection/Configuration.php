@@ -9,9 +9,9 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
- * Конфигурация TaskOrchestratorBundle.
+ * Конфигурация TaskOrchestrator.
  *
- * Определяет схему параметров bundle:
+ * Определяет схему параметров:
  * - roles_dir: путь к .md файлам ролей
  * - chains_yaml: путь к YAML-конфигурации цепочек
  * - chains_session_dir: путь к каталогу сессий оркестрации

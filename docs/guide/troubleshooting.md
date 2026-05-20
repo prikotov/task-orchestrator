@@ -13,7 +13,7 @@
 - [Budget exceeded — цепочка прервана](#budget-exceeded-цепочка-прервана)
 - [Fallback runner не сработал](#fallback-runner-не-сработал)
 - [Quality Gate упал](#quality-gate-упал)
-- [Bundle configuration errors](#bundle-configuration-errors)
+- [Ошибки конфигурации](#ошибки-конфигурации)
 - [Отладочные команды](#отладочные-команды)
 - [Таблица исключений](#таблица-исключений)
 
@@ -89,10 +89,10 @@ Agent role "verifier" not found.
    Описание роли...
    ```
 
-4. Проверьте параметр `task_orchestrator.roles_dir` в конфигурации bundle:
+4. Проверьте параметр `task_orchestrator.roles_dir` в конфигурации:
    ```yaml
    task_orchestrator:
-       roles_dir: '%kernel.project_dir%/docs/agents/roles/team'
+       roles_dir: '<package_root>/docs/agents/roles/team'
    ```
 
 ---
@@ -268,40 +268,31 @@ Quality gate "PHP CodeSniffer" failed (exit code 1)
 
 ---
 
-## Bundle configuration errors
+## Ошибки конфигурации
 
 **Симптом:**
 ```
 The service "TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Prompt\RolePromptBuilder" has a dependency on a non-existent parameter "task_orchestrator.roles_dir".
 ```
 
-**Причина:** `TaskOrchestratorBundle` не зарегистрирован в приложении, или параметры bundle не сконфигурированы.
+**Причина:** Параметры конфигурации не были переданы в `TaskOrchestratorExtension` при загрузке DI-контейнера.
 
 **Решение:**
 
-1. Убедитесь, что bundle зарегистрирован:
+1. Убедитесь, что в CLI entry point (`bin/task-orchestrator`) вызывается `TaskOrchestratorExtension::load()` с корректными путями:
    ```php
-   // apps/console/config/bundles.php
-   return [
-       \TaskOrchestrator\Common\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
-   ];
+   $extension = new TaskOrchestratorExtension();
+   $extension->load([
+       [
+           'roles_dir' => $packageRoot . '/docs/agents/roles/team',
+           'base_path' => $packageRoot,
+           'chains_yaml' => $packageRoot . '/config/chains.yaml',
+           'chains_session_dir' => $packageRoot . '/var/sessions',
+       ],
+   ], $container);
    ```
 
-2. Создайте файл конфигурации:
-   ```yaml
-   # config/packages/task_orchestrator.yaml
-   task_orchestrator:
-       roles_dir: '%kernel.project_dir%/docs/agents/roles/team'
-       chains_yaml: '%kernel.project_dir%/apps/console/config/agent_chains.yaml'
-       audit_log_path: '%kernel.project_dir%/var/log/agent_audit.jsonl'
-       chains_session_dir: '%kernel.project_dir%/var/agent/chains'
-       base_path: '%kernel.project_dir%'
-   ```
-
-3. Очистите кэш:
-   ```bash
-   bin/console cache:clear
-   ```
+2. Проверьте, что YAML-файл цепочек существует по указанному пути.
 
 ---
 

@@ -12,7 +12,6 @@
         "symfony/console": "^8.0",
         "symfony/dependency-injection": "^8.0",
         "symfony/event-dispatcher": "^8.0",
-        "symfony/http-kernel": "^8.0",
         "symfony/lock": "^8.0",
         "symfony/process": "^8.0",
         "symfony/yaml": "^8.0",

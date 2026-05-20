@@ -22,7 +22,6 @@ services:
       - '../src/Module/*/Domain/Exception/'
       - '../src/Module/*/Domain/ValueObject/'
       - '../src/DependencyInjection/'
-      - '../src/Infrastructure/Symfony/'
       - '../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php'
       - '../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
       - '../src/Module/AgentRunner/Infrastructure/Service/Codex/Resources/'

@@ -465,15 +465,13 @@ src/Module/DynamicLoop/
         └── JsonlAuditLoggerFactory.php
 ```
 
-### Bundle Infrastructure
+### DI Infrastructure
 
 ```
 src/
 ├── DependencyInjection/
-│   ├── TaskOrchestratorExtension.php                    # Extension для параметров bundle
+│   ├── TaskOrchestratorExtension.php                    # Extension для параметров конфигурации
 │   └── Configuration.php                               # TreeBuilder-валидация
-├── Infrastructure/Symfony/
-│   └── TaskOrchestratorBundle.php                       # Symfony Bundle
 config/
 └── services.yaml                                       # DI-конфигурация
 ```
@@ -495,38 +493,27 @@ apps/console/src/Module/Agent/
 apps/console/config/agent_chains.yaml
 ```
 
-## Symfony Bundle
+## Конфигурация
 
-Интеграция в проект осуществляется через `TaskOrchestratorBundle`:
+Инструмент настраивается через параметры, которые передаются при запуске (`bin/task-orchestrator`).
 
-```php
-// apps/console/config/bundles.php
-return [
-    // ...
-    \TaskOrchestrator\Common\Infrastructure\Symfony\TaskOrchestratorBundle::class => ['all' => true],
-];
-```
-
-### Bundle-параметры
+### Параметры
 
 | Параметр | Описание |
 |---|---|
-| `%task_orchestrator.roles_dir%` | Путь к role prompt файлам |
-| `%task_orchestrator.chains_yaml%` | Путь к YAML-конфигурации цепочек |
-| `%task_orchestrator.audit_log_path%` | Путь к JSONL audit log |
-| `%task_orchestrator.chains_session_dir%` | Путь к каталогу сессий оркестрации |
-| `%task_orchestrator.base_path%` | Корень проекта для path relativization |
+| `roles_dir` | Путь к role prompt файлам (`.md`) |
+| `chains_yaml` | Путь к YAML-конфигурации цепочек |
+| `chains_session_dir` | Путь к каталогу сессий оркестрации |
+| `base_path` | Корень проекта для path relativization |
 
-### Конфигурация
+### Значения по умолчанию
 
 ```yaml
-# config/packages/task_orchestrator.yaml
 task_orchestrator:
-    roles_dir: '%kernel.project_dir%/docs/agents/roles/team'
-    chains_yaml: '%kernel.project_dir%/apps/console/config/agent_chains.yaml'
-    audit_log_path: '%kernel.project_dir%/var/log/agent_audit.jsonl'
-    chains_session_dir: '%kernel.project_dir%/var/agent/chains'
-    base_path: '%kernel.project_dir%'
+    roles_dir: '<package_root>/docs/agents/roles/team'
+    chains_yaml: '<package_root>/config/chains.yaml'
+    chains_session_dir: '<package_root>/var/sessions'
+    base_path: '<package_root>'
 ```
 
 ## Мультидвижковая архитектура

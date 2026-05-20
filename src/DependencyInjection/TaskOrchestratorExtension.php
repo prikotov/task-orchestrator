@@ -11,10 +11,13 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /**
- * Extension для TaskOrchestratorBundle.
+ * Extension для TaskOrchestrator.
  *
  * Загружает config/services.yaml и регистрирует параметры конфигурации
  * (roles_dir, chains_yaml, chains_session_dir, base_path).
+ *
+ * Используется напрямую в CLI entry point (bin/task-orchestrator)
+ * без Symfony Kernel.
  */
 class TaskOrchestratorExtension extends Extension
 {
