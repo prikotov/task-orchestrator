@@ -11,7 +11,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-zeroclaw-agent
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-zeroclaw-agent: Zeroclaw (zeroclaw-labs)
@@ -55,16 +55,16 @@ status: in_progress
 
 ## 4. Implementation Plan (План реализации)
 *Заполняется исполнителем перед стартом.*
-1. [ ] Изучить репозиторий https://github.com/zeroclaw-labs/zeroclaw (CLI-параметры, TOML-конфигурация, personality system)
-2. [ ] Оценить каждый из 10 критериев с примерами CLI-команд или конфигурации
-3. [ ] Создать отчёт в `docs/research/coding-agents/zeroclaw-agent-comparison.md`
-4. [ ] Добавить строку #16 в `docs/research/coding-agents-summary.md`
+1. [x] Изучить репозиторий https://github.com/zeroclaw-labs/zeroclaw (CLI-параметры, TOML-конфигурация, personality system)
+2. [x] Оценить каждый из 10 критериев с примерами CLI-команд или конфигурации
+3. [x] Создать отчёт в `docs/research/coding-agents/zeroclaw-agent-comparison.md`
+4. [x] Добавить строку в `docs/research/coding-agents-summary.md` (вставлен как #8 по score 23/30)
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт создан в `docs/research/coding-agents/zeroclaw-agent-comparison.md`
-- [ ] Каждый из 10 критериев оценён с примерами CLI-команд или конфигурации
-- [ ] Вердикт: подходит / частично подходит / не подходит — с обоснованием
-- [ ] Строка агента #16 добавлена в `docs/research/coding-agents-summary.md`
+- [x] Отчёт создан в `docs/research/coding-agents/zeroclaw-agent-comparison.md`
+- [x] Каждый из 10 критериев оценён с примерами CLI-команд или конфигурации
+- [x] Вердикт: подходит / частично подходит / не подходит — с обоснованием
+- [x] Строка агента добавлена в `docs/research/coding-agents-summary.md` (ранжирована как #8 по score)
 
 ## 6. Verification (Самопроверка)
 ```bash

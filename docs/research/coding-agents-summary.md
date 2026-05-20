@@ -1,7 +1,7 @@
 # Coding Agents — Сводная таблица сравнения (финальная версия)
 
 **Дата создания:** 2026-05-09
-**Дата обновления:** 2026-05-13 (15 исследований)
+**Дата обновления:** 2026-05-20 (16 исследований)
 **Эпик:** [EPIC-research-coding-agents-comparison](../../todo/done/EPIC-research-coding-agents-comparison.md)
 **Автор:** Аналитик (Шерлок)
 
@@ -30,13 +30,14 @@
 | 5 | **OpenCode CLI** | MIT | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ | **26** | ⚠️ Частично (7/10) |
 | 6 | **Hermes Agent** | MIT | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | **25** | ⚠️ Частично (7/10) |
 | 7 | **Warp AI (Oz)** | AGPL | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **20** | ⚠️ Частично (7/10) |
-| 8 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
-| 9 | **Gemini CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | **22** | ⚠️ Частично (6/10) |
-| 10 | **Kilo Code CLI** | MIT | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | **22** | ⚠️ Частично (6/10) |
-| 11 | **Crush** | FSL | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | **20** | ⚠️ Частично (6/10) |
-| 12 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
-| 13 | **OpenClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ✅ | ✅ | **21** | ❌ Не подходит (4/10) |
-| 14 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
+| 8 | **Zeroclaw** | MIT/A-2.0 | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | **23** | ⚠️ Частично (6/10) |
+| 9 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
+| 10 | **Gemini CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | **22** | ⚠️ Частично (6/10) |
+| 11 | **Kilo Code CLI** | MIT | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | **22** | ⚠️ Частично (6/10) |
+| 12 | **Crush** | FSL | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | **20** | ⚠️ Частично (6/10) |
+| 13 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
+| 14 | **OpenClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ✅ | ✅ | **21** | ❌ Не подходит (4/10) |
+| 15 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
 
 > **Примечание:** Вердикт включает качественную оценку (числовой score не всегда совпадает с суммой баллов — учитывается вес критериев для конкретного сценария сабагентной интеграции).
 
@@ -59,6 +60,7 @@
 | **Gemini CLI** | `GEMINI_SYSTEM_MD` env ⚠️ | ❌ Нет | `.gemini/system.md` ⚠️ | — |
 | **Kilo Code** | Агенты `.kilo/agent/*.md` ⚠️ | `instructions[]` в конфиге ⚠️ | — | — |
 | **Crush** | ❌ Нет CLI | ❌ Нет CLI | `context_paths` в crush.json ⚠️ | — |
+| **Zeroclaw** | ❌ Нет CLI-флагов | ❌ Нет CLI-флагов | Personality files (SOUL.md, AGENTS.md) ⚠️ | ✅ Все 7 personality files |
 | **OpenClaw** | ❌ Нет CLI | ❌ Нет CLI | Workspace-файлы (SOUL.md) ⚠️ | — |
 | **Warp Oz** | ❌ Нет CLI | ❌ Нет CLI | Config file / profile ⚠️ | — |
 
@@ -71,6 +73,7 @@
 | **OpenCode** | `--agent <name>`, полная изоляция tools/permissions ✅ | ✅ Да (отдельный агент) |
 | **Hermes** | `HERMES_EPHEMERAL_SYSTEM_PROMPT` env / профили ⚠️ | ✅ Да (профили) |
 | **Goose** | `--system <text>` / рецепты (YAML) ⚠️ | ⚠️ Через рецепты |
+| **Zeroclaw** | Workspace SOUL.md / AGENTS.md ⚠️ | ✅ Да (отдельные workspace) |
 | **Codex CLI** | User prompt / profiles ⚠️ | ⚠️ Через profiles |
 | **Gemini CLI** | User prompt `-p` ⚠️ | Нет |
 | **Kilo Code** | Агенты `.kilo/agent/*.md` ⚠️ | ✅ Да (отдельный агент) |
@@ -93,6 +96,7 @@
 | **Kilo Code** | ⚠️ Из коробки | ❌ Нет CLI | ❌ Все глобальны |
 | **Crush** | ✅ Lazy loading | ❌ Нет CLI | ❌ Все глобальны |
 | **OpenClaw** | ⚠️ Per-agent allowlist | ❌ Нет CLI | ⚠️ Через config |
+| **Zeroclaw** | ✅ SKILL.md + SKILL.toml + SkillForge | ❌ Нет CLI | ⚠️ Через отдельные workspace |
 
 #### Критерий 4. AGENTS.md (контекстные файлы)
 
@@ -109,6 +113,7 @@
 | **Crush** | ✅ Авто | ✅ | `CRUSH.md` | Нет |
 | **OpenClaw** | ⚠️ Только workspace | — | `SOUL.md` | `skipBootstrap` в config |
 | **Warp Oz** | ⚠️ Частично | — | `WARP.md` | Нет |
+| **Zeroclaw** | ⚠️ Из daemon workspace | — | Personality files (7) | Нет CLI-отключения |
 
 #### Критерий 5. `.agents/skills/` автосканирование
 
@@ -125,6 +130,7 @@
 | **Crush** | ✅ | `.crush/skills/`, `skills_paths` | `skills_paths` в конфиге |
 | **OpenClaw** | ✅ (workspace-scoped) | `extraDirs` в config | `skills.load.extraDirs` |
 | **Warp Oz** | ✅ | `.warp/skills/`, `.codex/skills/` | `--skill <path>` |
+| **Zeroclaw** | ❌ | `<workspace>/skills/`, open-skills (opt-in) | `zeroclaw skills install` или симлинк |
 
 #### Критерий 6. Запуск как сабагент (JSON-режим)
 
@@ -142,6 +148,7 @@
 | **Crush** | ❌ Plain text (`crush run`) | Нет | Внешний timeout | ❌ Нет |
 | **OpenClaw** | ❌ Нет (gateway RPC) | Нет | Внутренний runTimeoutSeconds | ❌ Нет |
 | **Warp Oz** | `--output-format ndjson` ⚠️ | Нет | Внешний timeout | ⚠️ Не подтверждено |
+| **Zeroclaw** | ✅ ACP (JSON-RPC 2.0 over stdio) | ✅ `session/new` isolated | ✅ `sessionTimeoutSecs`, `session/cancel` | ✅ `tool_call` / `tool_call_update` |
 
 #### Критерий 7. Токены и стоимость
 
@@ -159,6 +166,7 @@
 | **Crush** | ❌ Нет в stdout (crush run) | ❌ Нет в stdout | ✅ SQLite / crush stats HTML |
 | **OpenClaw** | ⚠️ Через gateway | ❌ Нет CLI-вывода | ❌ |
 | **Warp Oz** | ❌ Серверно (Warp cloud) | ❌ Нет CLI-доступа | ❌ |
+| **Zeroclaw** | ✅ Prometheus + gateway `done` frame | ✅ `cost_usd` в WebSocket + `costs.jsonl` | ✅ `[cost.prices]` per-model |
 
 #### Критерий 8. Free tier / стоимость
 
@@ -175,6 +183,7 @@
 | **Crush** | FSL-1.1-MIT | ✅ | ✅ | ✅ Кастомные провайдеры |
 | **OpenClaw** | MIT | ✅ | ✅ | ✅ Через config |
 | **Warp Oz** | AGPL-3.0/MIT | ⚠️ Ограниченный free tier | ✅ 4 провайдера | ❌ Нет напрямую |
+| **Zeroclaw** | MIT/Apache-2.0 | ✅ Полностью бесплатный | ✅ | ✅ Ollama (native), LM Studio (compatible) |
 
 #### Критерий 9. Провайдеры и модели
 
@@ -191,6 +200,7 @@
 | **Warp Oz** | 4 BYOK + 4 harness | Google, Anthropic, OpenAI, OpenRouter + делегирование | ✅ | ❌ Нет напрямую |
 | **Gemini CLI** | 1 | Только Google Gemini | ❌ | ❌ Нет |
 | **Codex CLI** | 1 + OSS + BYOK | OpenAI, Ollama, LM Studio | ❌ (только через BYOK) | ✅ Ollama, LM Studio |
+| **Zeroclaw** | 25+ (15 native + 20 compatible) | Anthropic, OpenAI, Ollama, Gemini, Bedrock, OpenRouter... | ✅ | ✅ Ollama (native), LM Studio (compatible) |
 
 #### Критерий 10. Лицензия
 
@@ -207,6 +217,7 @@
 | **Crush** | FSL-1.1-MIT (→ MIT через 2 года) | ✅ | ⚠️ Ограничен конкурентное использование | ❌ Нет |
 | **OpenClaw** | MIT | ✅ | ✅ | ❌ Нет |
 | **Warp Oz** | AGPL-3.0 + MIT | ✅ (клиент) | ✅ | ⚠️ Сервер проприетарный |
+| **Zeroclaw** | MIT OR Apache-2.0 (dual) | ✅ | ✅ | ❌ Нет (только trademark на бренд) |
 
 ### 2.2. Проприетарные агенты (3)
 
@@ -415,20 +426,21 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 | 5 | Goose | [goose-agent-comparison.md](coding-agents/goose-agent-comparison.md) | ⚠️ Частично (7/10) |
 | 6 | Hermes Agent | [hermes-agent-comparison.md](coding-agents/hermes-agent-comparison.md) | ⚠️ Частично (7/10) |
 | 7 | Warp AI (Oz) | [warp-agent-comparison.md](coding-agents/warp-agent-comparison.md) | ⚠️ Частично (7/10) |
-| 8 | Codex CLI | [codex-cli-comparison.md](coding-agents/codex-cli-comparison.md) | ⚠️ Частично (6/10) |
-| 9 | Gemini CLI | [gemini-cli-comparison.md](coding-agents/gemini-cli-comparison.md) | ⚠️ Частично (6/10) |
-| 10 | Kilo Code CLI | [kilocode-cli-comparison.md](coding-agents/kilocode-cli-comparison.md) | ⚠️ Частично (6/10) |
-| 11 | Crush | [crush-agent-comparison.md](coding-agents/crush-agent-comparison.md) | ⚠️ Частично (6/10) |
-| 12 | Factory Droid | [droid-agent-comparison.md](coding-agents/droid-agent-comparison.md) | ⚠️ Частично (6/10) |
-| 13 | OpenClaw | [openclaw-agent-comparison.md](coding-agents/openclaw-agent-comparison.md) | ❌ Не подходит (4/10) |
-| 14 | **Codebuff** | [codebuff-comparison.md](coding-agents/codebuff-comparison.md) | ⚠️ Частично (6/10) |
-| 15 | GitHub Copilot CLI | [copilot-cli-comparison.md](coding-agents/copilot-cli-comparison.md) | ❌ Не подходит (3/10) |
+| 8 | Zeroclaw | [zeroclaw-agent-comparison.md](coding-agents/zeroclaw-agent-comparison.md) | ⚠️ Частично (6/10) |
+| 9 | Codex CLI | [codex-cli-comparison.md](coding-agents/codex-cli-comparison.md) | ⚠️ Частично (6/10) |
+| 10 | Gemini CLI | [gemini-cli-comparison.md](coding-agents/gemini-cli-comparison.md) | ⚠️ Частично (6/10) |
+| 11 | Kilo Code CLI | [kilocode-cli-comparison.md](coding-agents/kilocode-cli-comparison.md) | ⚠️ Частично (6/10) |
+| 12 | Crush | [crush-agent-comparison.md](coding-agents/crush-agent-comparison.md) | ⚠️ Частично (6/10) |
+| 13 | Factory Droid | [droid-agent-comparison.md](coding-agents/droid-agent-comparison.md) | ⚠️ Частично (6/10) |
+| 14 | OpenClaw | [openclaw-agent-comparison.md](coding-agents/openclaw-agent-comparison.md) | ❌ Не подходит (4/10) |
+| 15 | **Codebuff** | [codebuff-comparison.md](coding-agents/codebuff-comparison.md) | ⚠️ Частично (6/10) |
+| 16 | GitHub Copilot CLI | [copilot-cli-comparison.md](coding-agents/copilot-cli-comparison.md) | ❌ Не подходит (3/10) |
 
 ---
 
 ## Приложение. Сводка по группам
 
-### Open Source (12 агентов)
+### Open Source (13 агентов)
 
 | Агент | Язык | Лицензия | Провайдеры | Score |
 |-------|------|----------|-----------|-------|
@@ -439,6 +451,7 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 | Goose | Rust | Apache-2.0 | 30+ | 7/10 |
 | Warp Oz | Rust | AGPL-3.0/MIT | 4 BYOK + 4 harness | 7/10 |
 | Codex CLI | Rust/Node.js | Apache-2.0 | OpenAI + OSS | 6/10 |
+| Zeroclaw | Rust | MIT/Apache-2.0 | 25+ (15 native + routing) | 6/10 |
 | Gemini CLI | TypeScript/Node.js | Apache-2.0 | Google only | 6/10 |
 | Kilo Code CLI | TypeScript/Bun | MIT | 4 AI SDK + Cloud | 6/10 |
 | Crush | Go | FSL-1.1-MIT | 20+ | 6/10 |
