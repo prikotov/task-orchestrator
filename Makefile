@@ -28,12 +28,6 @@ phpmd: ## Запустить PHP Mess Detector
 	@echo "PHPMD:"
 	@vendor/bin/phpmd analyze src --format=text --ruleset=phpmd.xml --baseline-file=phpmd.baseline.xml && echo "No violations."
 
-.PHONY: phpmd-full
-phpmd-full: ## Запустить PHPMD без baseline
-	@echo
-	@echo "PHPMD (full):"
-	@vendor/bin/phpmd analyze src --format=text --ruleset=phpmd.xml
-
 .PHONY: tests-unit
 tests-unit: ## Запустить unit-тесты
 	@echo
