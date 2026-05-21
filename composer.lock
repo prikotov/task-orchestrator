@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9dd1387d75c41ab7dd0589baf20a707e",
+    "content-hash": "597c3752660318823f8e5b80d17bde77",
     "packages": [
         {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
@@ -151,16 +151,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.11.1",
+            "version": "v0.12.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:prikotov/coding-standard.git",
-                "reference": "07ba13c428c40a8f714f77b53357e1253c085d52"
+                "reference": "201e6012ad90c1f4a7c558172942c8dcb8542fff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/07ba13c428c40a8f714f77b53357e1253c085d52",
-                "reference": "07ba13c428c40a8f714f77b53357e1253c085d52",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/201e6012ad90c1f4a7c558172942c8dcb8542fff",
+                "reference": "201e6012ad90c1f4a7c558172942c8dcb8542fff",
                 "shasum": ""
             },
             "require": {
@@ -177,7 +177,8 @@
                 "deptrac/deptrac": "For using ServiceContractDependencyRule — custom Deptrac rule that enforces service contract boundaries"
             },
             "bin": [
-                "bin/coding-standard-init"
+                "bin/coding-standard-init",
+                "bin/validate-md-links"
             ],
             "type": "phpcodesniffer-standard",
             "extra": {
@@ -206,7 +207,7 @@
                     "php bin/validate-docs.php"
                 ],
                 "validate-md-links": [
-                    "php bin/validate-md-links.php"
+                    "php bin/validate-md-links"
                 ],
                 "check": [
                     "@test",
@@ -231,7 +232,7 @@
                 "phpcs",
                 "sniffs"
             ],
-            "time": "2026-05-18T12:41:44+00:00"
+            "time": "2026-05-21T15:06:04+00:00"
         },
         {
             "name": "psr/container",
@@ -5075,23 +5076,24 @@
         },
         {
             "name": "prikotov/todo-md",
-            "version": "v0.0.4",
+            "version": "v0.0.6",
             "source": {
                 "type": "git",
                 "url": "git@github.com:prikotov/todo-md.git",
-                "reference": "86b1dd8577139a1b785f275d7606c550b0905438"
+                "reference": "4524ee6e5cb972fd719eb4b4d7544934a0b6be46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/todo-md/zipball/86b1dd8577139a1b785f275d7606c550b0905438",
-                "reference": "86b1dd8577139a1b785f275d7606c550b0905438",
+                "url": "https://api.github.com/repos/prikotov/todo-md/zipball/4524ee6e5cb972fd719eb4b4d7544934a0b6be46",
+                "reference": "4524ee6e5cb972fd719eb4b4d7544934a0b6be46",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.4"
             },
             "bin": [
-                "bin/todo-md-init"
+                "bin/todo-md-init",
+                "bin/todo-md-validate"
             ],
             "type": "library",
             "extra": {
@@ -5115,7 +5117,7 @@
                 "task-management",
                 "todo"
             ],
-            "time": "2026-04-20T11:53:59+00:00"
+            "time": "2026-05-21T14:08:31+00:00"
         },
         {
             "name": "psalm/plugin-symfony",

@@ -68,8 +68,14 @@ md-links: ## Валидация внутренних ссылок в Markdown
 	@echo "MD-Links:"
 	@php vendor/prikotov/coding-standard/bin/validate-md-links.php
 
+.PHONY: validate-todo
+validate-todo: ## Валидация задач todo-md
+	@echo
+	@echo "Validate-Todo:"
+	@php vendor/prikotov/todo-md/bin/todo-md-validate
+
 .PHONY: check
-check: ## Запустить все проверки (deptrac + psalm + phpmd + phpcs + md-links + tests)
-	@${MAKE} --no-print-directory deptrac psalm phpmd phpcs md-links tests && \
+check: ## Запустить все проверки (deptrac + psalm + phpmd + phpcs + md-links + validate-todo + tests)
+	@${MAKE} --no-print-directory deptrac psalm phpmd phpcs md-links validate-todo tests && \
 		{ echo; echo "✅ Все проверки завершены успешно."; } || \
 		{ echo; echo "❌ Проверки завершены с ошибками."; exit 1; }
