@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Pi;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunner;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiJsonlParser;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Pi\PiAgentRunner;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Pi\PiJsonlParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

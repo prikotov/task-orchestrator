@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Chain\YamlChainLoader;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static;
 
+use LogicException;
 use Override;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
 
@@ -32,7 +33,7 @@ final readonly class ResolveStepRunnerService implements ResolveStepRunnerServic
             }
         }
 
-        throw new \LogicException(
+        throw new LogicException(
             sprintf('No ExecuteStepServiceInterface found for step type "%s".', $type->value),
         );
     }

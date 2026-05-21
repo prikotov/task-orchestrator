@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidator;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Validator\ChainDefinitionValidator;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainConfigViolationVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainDefinitionVo;

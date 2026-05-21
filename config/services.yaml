@@ -22,9 +22,9 @@ services:
       - '../src/Module/*/Domain/Exception/'
       - '../src/Module/*/Domain/ValueObject/'
       - '../src/DependencyInjection/'
-      - '../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php'
-      - '../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php'
-      - '../src/Module/AgentRunner/Infrastructure/Service/Codex/Resources/'
+      - '../src/Module/AgentRunner/Infrastructure/RetryingAgentRunner.php'
+      - '../src/Module/AgentRunner/Infrastructure/CircuitBreakerAgentRunner.php'
+      - '../src/Module/AgentRunner/Infrastructure/Codex/Resources/'
 
   # ─── DynamicLoop module ─────────────────────────────────────────────
 
@@ -81,7 +81,7 @@ services:
     tags: ['orchestrator.execution_strategy']
 
   TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration\ChainDefinitionProviderInterface:
-    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapper
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\ChainDefinition\DynamicLoopDefinitionMapper
 
   # Infrastructure Service parameters
   TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger:
@@ -93,10 +93,10 @@ services:
 
   # Integration Service alias (Interface → Implementation)
   TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainLoaderInterface:
-    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Chain\YamlChainLoader
 
   # Parameters
-  TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader:
+  TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Chain\YamlChainLoader:
     arguments:
       $yamlPath: '%task_orchestrator.chains_yaml%'
 
@@ -107,10 +107,10 @@ services:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\RunAgentService
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\PromptProviderInterface:
-    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Prompt\RolePromptBuilder
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Prompt\RolePromptBuilder
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Audit\AuditLoggerInterface:
-    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Audit\JsonlAuditLogger
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Audit\JsonlAuditLogger
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Shared\PromptFormatterInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\PromptFormatterService
@@ -120,7 +120,7 @@ services:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\ExecuteConditionalStepService
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface:
-    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\Hook\ShellHookExecutor
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Hook\ShellHookExecutor
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionService
@@ -136,13 +136,16 @@ services:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerInterface:
-    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\QualityGate\QualityGateRunner
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\QualityGate\QualityGateRunner
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ToolStepRunnerInterface:
-    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\ToolStep\ToolStepRunner
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\ToolStep\ToolStepRunner
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Agent\ResolveChainRunnerService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunStaticChainServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunStaticChainService
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetService
@@ -163,7 +166,7 @@ services:
         json: '@TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportJsonMapper'
 
   # Parameters
-  TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Prompt\RolePromptBuilder:
+  TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Prompt\RolePromptBuilder:
     arguments:
       $rolesDir: '%task_orchestrator.roles_dir%'
       $basePath: '%task_orchestrator.base_path%'
@@ -171,7 +174,7 @@ services:
   # ─── AgentRunner module ─────────────────────────────────────────────
 
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
-    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunner
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Pi\PiAgentRunner
 
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService
@@ -180,7 +183,7 @@ services:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Metrics\InMemoryMetricsCollector
 
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface:
-    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\RetryableRunnerFactory
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\RetryableRunnerFactory
 
   # Registry с tagged iterator
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService:

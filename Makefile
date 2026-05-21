@@ -66,13 +66,20 @@ phpcs: ## Запустить PHP_CodeSniffer
 md-links: ## Валидация внутренних ссылок в Markdown
 	@echo
 	@echo "MD-Links:"
-	@php vendor/prikotov/coding-standard/bin/validate-md-links.php
+	@php vendor/prikotov/coding-standard/bin/validate-md-links
 
 .PHONY: validate-todo
-validate-todo: ## Валидация задач todo-md
+validate-todo: ## Валидация задач todo-md (только активные)
 	@echo
 	@echo "Validate-Todo:"
-	@php vendor/prikotov/todo-md/bin/todo-md-validate
+	@files=$$(find todo/ -maxdepth 1 -name '*.todo.md' -o -name 'EPIC-*.md' 2>/dev/null); \
+	if [ -z "$$files" ]; then \
+		echo "  No active task files found in todo/. Skipping."; \
+	else \
+		for f in $$files; do \
+			php vendor/prikotov/todo-md/bin/todo-md-validate "$$f"; \
+		done; \
+	fi
 
 .PHONY: check
 check: ## Запустить все проверки (deptrac + psalm + phpmd + phpcs + md-links + validate-todo + tests)

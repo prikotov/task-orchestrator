@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Codex;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexAgentRunner;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexJsonlParser;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Codex\CodexAgentRunner;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Codex\CodexJsonlParser;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Codex\HttpsProxyBridge;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

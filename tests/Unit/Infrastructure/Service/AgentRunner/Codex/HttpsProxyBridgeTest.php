@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Codex;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Codex\HttpsProxyBridge;
 
 #[CoversClass(HttpsProxyBridge::class)]
 final class HttpsProxyBridgeTest extends TestCase

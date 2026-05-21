@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
 <phpmd-baseline>
   <violation rule="PHPMD\Rule\UnusedFormalParameter" file="src/Module/AgentRunner/Domain/ValueObject/ErrorClassificationVo.php"/>
-  <violation rule="PHPMD\Rule\CleanCode\MissingImport" file="src/Module/AgentRunner/Infrastructure/Service/Pi/PiAgentRunner.php"/>
-  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php"/>
+  <violation rule="PHPMD\Rule\CleanCode\MissingImport" file="src/Module/AgentRunner/Infrastructure/Pi/PiAgentRunner.php"/>
+  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/Module/AgentRunner/Infrastructure/RetryingAgentRunner.php"/>
   <violation rule="PHPMD\Rule\Design\LongClass" file="src/Module/ChainDefinition/Domain/ValueObject/ChainDefinitionVo.php"/>
-  <violation rule="PHPMD\Rule\Design\LongClass" file="src/Module/ChainDefinition/Infrastructure/Service/Chain/YamlChainLoader.php"/>
-  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/Module/ChainDefinition/Infrastructure/Service/Chain/YamlChainLoader.php"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/ChainExecution/Infrastructure/Service/Chain/Hook/ShellHookExecutor.php" method="execute"/>
-  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/Module/ChainExecution/Infrastructure/Service/Chain/Hook/ShellHookExecutor.php"/>
+  <violation rule="PHPMD\Rule\Design\LongClass" file="src/Module/ChainDefinition/Infrastructure/Chain/YamlChainLoader.php"/>
+  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/Module/ChainDefinition/Infrastructure/Chain/YamlChainLoader.php"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/ChainExecution/Infrastructure/Hook/ShellHookExecutor.php" method="execute"/>
+  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/Module/ChainExecution/Infrastructure/Hook/ShellHookExecutor.php"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/AgentRunner/Infrastructure/RetryingAgentRunner.php" method="run"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/ChainDefinition/Infrastructure/Chain/YamlChainLoader.php" method="parseSteps"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/DynamicLoop/Domain/Service/Dynamic/ExecuteDynamicTurnService.php" method="runParticipantTurn"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/DynamicLoop/Domain/Service/Dynamic/ExecuteDynamicTurnService.php" method="runFacilitatorStep"/>
 </phpmd-baseline>

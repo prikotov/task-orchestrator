@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Tests\Unit\Common\Module\ChainExecution\Infrastructur
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\ChainResultAuditDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\StepAuditStatusDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Audit\JsonlAuditLogger;
+use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Audit\JsonlAuditLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

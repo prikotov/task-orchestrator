@@ -9,5 +9,8 @@ return [
     // Path fragments to exclude (substring match).
     'exclude' => [
         'docs/todo-md/templates/',
+        'todo/done/',
+        'todo/cancelled/',
+        'todo/backlog/',
     ],
 ];

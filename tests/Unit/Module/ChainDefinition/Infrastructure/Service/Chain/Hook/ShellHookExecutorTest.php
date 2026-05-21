@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\Hook\ShellHookExecutor;
+use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Hook\ShellHookExecutor;
 
 #[CoversClass(ShellHookExecutor::class)]
 final class ShellHookExecutorTest extends TestCase

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Codex;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexJsonlParser;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Codex\CodexJsonlParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

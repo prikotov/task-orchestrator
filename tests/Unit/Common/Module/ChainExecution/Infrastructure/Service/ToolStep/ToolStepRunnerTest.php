@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Common\Module\ChainExecution\Infrastructure\Service\ToolStep;
 
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionToolStepVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\ToolStep\ToolStepRunner;
+use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\ToolStep\ToolStepRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

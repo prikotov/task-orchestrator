@@ -7,7 +7,7 @@ namespace Tests\Integration\Infrastructure\Service\AgentRunner\Codex;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Codex\HttpsProxyBridge;
 
 /**
  * Integration-тест для HttpsProxyBridge.

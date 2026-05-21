@@ -10,8 +10,8 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Chain\YamlChainLoader;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Chain\StaticExecutionStrategy;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
@@ -26,7 +26,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteQ
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteToolStepService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapper;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\ChainDefinition\ChainExecutionDefinitionMapper;
 
 /**
  * Integration-тест: static chain end-to-end.
