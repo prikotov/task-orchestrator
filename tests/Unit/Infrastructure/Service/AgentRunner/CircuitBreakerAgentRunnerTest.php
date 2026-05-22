@@ -9,7 +9,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterfa
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\CircuitBreakerStateVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Metrics\InMemoryMetricsCollector;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Metrics\InMemoryMetricsCollectorService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\CircuitBreakerAgentRunnerService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -757,7 +757,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $this->logger->method('warning');
 
-        $metrics = new InMemoryMetricsCollector();
+        $metrics = new InMemoryMetricsCollectorService();
 
         $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
@@ -789,7 +789,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $this->logger->method('warning');
 
-        $metrics = new InMemoryMetricsCollector();
+        $metrics = new InMemoryMetricsCollectorService();
 
         $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
@@ -832,7 +832,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $this->logger->method('warning');
 
-        $metrics = new InMemoryMetricsCollector();
+        $metrics = new InMemoryMetricsCollectorService();
 
         $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
@@ -871,7 +871,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $this->logger->method('info');
 
-        $metrics = new InMemoryMetricsCollector();
+        $metrics = new InMemoryMetricsCollectorService();
 
         $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
@@ -900,7 +900,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $this->logger->method('warning');
 
-        $metrics = new InMemoryMetricsCollector();
+        $metrics = new InMemoryMetricsCollectorService();
 
         $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,

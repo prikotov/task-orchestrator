@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Tests\Unit\Module\AgentRunner\Infrastructure\Metrics;
+namespace TaskOrchestrator\Tests\Unit\Module\AgentRunner\Infrastructure\Service\Metrics;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Metrics\InMemoryMetricsCollector;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Metrics\InMemoryMetricsCollectorService;
 
-#[CoversClass(InMemoryMetricsCollector::class)]
-final class InMemoryMetricsCollectorTest extends TestCase
+#[CoversClass(InMemoryMetricsCollectorService::class)]
+final class InMemoryMetricsCollectorServiceTest extends TestCase
 {
-    private InMemoryMetricsCollector $collector;
+    private InMemoryMetricsCollectorService $collector;
 
     protected function setUp(): void
     {
-        $this->collector = new InMemoryMetricsCollector();
+        $this->collector = new InMemoryMetricsCollectorService();
     }
 
     // ─── Counter ───────────────────────────────────────────────────────────
