@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - 2026-05-22
+
+### Changed
+
+- Rename `InMemoryMetricsCollector` → `InMemoryMetricsCollectorService`, move to `Infrastructure/Service/Metrics/` (PHPCS convention)
+- Require `prikotov/coding-standard` ^0.16.0 (was ^0.14.0)
+
+## [0.1.5] - 2026-05-22
+
+### Changed
+
+- Move `prikotov/coding-standard` from `require` to `require-dev`
+
 ## [0.1.4] - 2026-05-22
 
 ### Added
