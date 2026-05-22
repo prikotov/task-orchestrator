@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8a06e209bbcb399ed3f108eb56ae136d",
+    "content-hash": "881098245a4fd98b5c3b4a9040767769",
     "packages": [
         {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
@@ -151,16 +151,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.13.1",
+            "version": "v0.14.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:prikotov/coding-standard.git",
-                "reference": "216ddf9c43771dce6e4aff48784e0a2ec3451c51"
+                "reference": "b485e642ae309bd4465464356e835c1cec470b2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/216ddf9c43771dce6e4aff48784e0a2ec3451c51",
-                "reference": "216ddf9c43771dce6e4aff48784e0a2ec3451c51",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/b485e642ae309bd4465464356e835c1cec470b2a",
+                "reference": "b485e642ae309bd4465464356e835c1cec470b2a",
                 "shasum": ""
             },
             "require": {
@@ -171,10 +171,12 @@
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
                 "deptrac/deptrac": "^2.0",
+                "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^10.5"
             },
             "suggest": {
-                "deptrac/deptrac": "For using ServiceContractDependencyRule — custom Deptrac rule that enforces service contract boundaries"
+                "deptrac/deptrac": "For using ServiceContractDependencyRule — custom Deptrac rule that enforces service contract boundaries",
+                "phpstan/phpstan": "For static analysis — recommended replacement for PHPMD"
             },
             "bin": [
                 "bin/coding-standard-init",
@@ -197,6 +199,9 @@
                 }
             },
             "scripts": {
+                "phpstan": [
+                    "phpstan analyse --no-progress"
+                ],
                 "test": [
                     "phpunit"
                 ],
@@ -214,6 +219,7 @@
                     "@sniff-test",
                     "@validate-docs",
                     "@validate-md-links",
+                    "@phpstan",
                     "phpcs src/"
                 ]
             },
@@ -232,7 +238,7 @@
                 "phpcs",
                 "sniffs"
             ],
-            "time": "2026-05-22T00:28:12+00:00"
+            "time": "2026-05-22T04:39:51+00:00"
         },
         {
             "name": "psr/container",
@@ -4594,6 +4600,59 @@
                 }
             ],
             "time": "2026-04-02T14:49:19+00:00"
+        },
+        {
+            "name": "phpstan/phpstan",
+            "version": "2.1.55",
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9eaac3826ed5e9b8427350a43cac825eeca3f566",
+                "reference": "9eaac3826ed5e9b8427350a43cac825eeca3f566",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4|^8.0"
+            },
+            "conflict": {
+                "phpstan/phpstan-shim": "*"
+            },
+            "bin": [
+                "phpstan",
+                "phpstan.phar"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHPStan - PHP Static Analysis Tool",
+            "keywords": [
+                "dev",
+                "static analysis"
+            ],
+            "support": {
+                "docs": "https://phpstan.org/user-guide/getting-started",
+                "forum": "https://github.com/phpstan/phpstan/discussions",
+                "issues": "https://github.com/phpstan/phpstan/issues",
+                "security": "https://github.com/phpstan/phpstan/security/policy",
+                "source": "https://github.com/phpstan/phpstan-src"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/ondrejmirtes",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/phpstan",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-05-18T11:57:34+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

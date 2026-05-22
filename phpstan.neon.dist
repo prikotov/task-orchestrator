@@ -1,0 +1,8 @@
+parameters:
+    level: 8
+    paths:
+        - src/
+        - apps/console/src/
+    excludePaths:
+        - */migrations/*
+    reportUnmatchedIgnoredErrors: false
