@@ -92,7 +92,7 @@ final readonly class FinalizeDynamicLoopService implements FinalizeDynamicLoopSe
             totalInputTokens: $execution->getTotals()['in'],
             totalOutputTokens: $execution->getTotals()['out'],
             totalCost: $execution->getTotals()['cost'],
-            budgetExceeded: $execution->getBudgetBreak()?->budgetExceeded ?? false,
+            budgetExceeded: $execution->getBudgetBreak()?->budgetExceeded ?? false, // @phpstan-ignore nullsafe.neverNull
             stepsCount: count($execution->getRoundResults()),
             stepStatuses: array_map(
                 static fn(DynamicRoundResultVo $round): DynLoopStepAuditDto => new DynLoopStepAuditDto(

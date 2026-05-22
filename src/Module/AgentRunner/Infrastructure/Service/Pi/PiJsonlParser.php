@@ -78,6 +78,7 @@ final readonly class PiJsonlParser
     /**
      * Извлекает usage-метрики из message_end.
      *
+     * @param array<string, mixed> $decoded
      * @return array{inputTokens: int, outputTokens: int, turns: int, cacheReadTokens: int, cacheWriteTokens: int, cost: float, model: string|null}
      */
     private function extractUsageMetrics(array $decoded): array
@@ -102,6 +103,7 @@ final readonly class PiJsonlParser
      * Извлекает текст последнего assistant-сообщения из agent_end.
      *
      * Идёт с конца массива messages и ищет последний assistant message с текстом.
+     * @param array<string, mixed> $decoded
      */
     private function extractLastAssistantText(array $decoded): string
     {
@@ -135,6 +137,7 @@ final readonly class PiJsonlParser
 
     /**
      * Извлекает text_delta из message_update (fallback для single-turn).
+     * @param array<string, mixed> $decoded
      */
     private function extractTextDelta(array $decoded): string
     {

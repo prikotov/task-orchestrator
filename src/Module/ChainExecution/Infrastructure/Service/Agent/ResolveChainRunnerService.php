@@ -17,7 +17,6 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRe
 /**
  * Резолвит fallback runner при ошибке основного.
  *
- * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  * @todo Разбить tryFallbackRunner на buildFallbackRequest + executeFallback — TASK-agent-orchestrator-decompose-step2.
  */
 final readonly class ResolveChainRunnerService implements ResolveChainRunnerServiceInterface

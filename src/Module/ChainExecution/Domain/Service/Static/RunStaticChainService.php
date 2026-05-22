@@ -22,7 +22,6 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContext
 /**
  * Доменная логика выполнения static-цепочки: линейное выполнение шагов с итерациями и budget.
  *
- * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  * @todo 2026-05-21: PHPMD bug: multi-file analysis counts 82 LOC for processStep(), single-file = 74. Recheck after PHPMD upgrade.
  */
 final readonly class RunStaticChainService implements RunStaticChainServiceInterface
@@ -181,7 +180,7 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
         array $fixIterations,
         array $nameToIndexMap,
         array $results,
-    ): ?StaticProcessResultVo {
+    ): StaticProcessResultVo {
         if (
             $this->budgetService->shouldBreakAfterStep(
                 $execution,
@@ -339,7 +338,11 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
         return $results;
     }
 
-    /** @param list<ExecutionStepVo> $steps @return array<string, int> */
+    /**
+     * @param list<ExecutionStepVo> $steps
+     *
+     * @return array<string, int>
+     */
     private function buildNameToIndexMap(array $steps): array
     {
         $map = [];
@@ -382,7 +385,7 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
     ): void {
         $this->logger?->info(sprintf(
             '[StaticChainExecutor] Iteration %d/%d for group "%s".',
-            $execution->getIterationNumber($retryGroup->getGroup()) ?? 0,
+            $execution->getIterationNumber($retryGroup->getGroup()),
             $retryGroup->getMaxIterations(),
             $retryGroup->getGroup(),
         ));

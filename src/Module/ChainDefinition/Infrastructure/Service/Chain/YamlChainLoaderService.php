@@ -109,6 +109,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     /**
      * Маппит raw-массив из YAML в специализированный ChainDefinitionInterface VO.
      *
+     * @param array<string, mixed> $raw
      * @param array<string, RoleConfigVo> $roles
      */
     private function parseChainDefinition(string $name, array $raw, array $roles): ChainDefinitionInterface
@@ -125,6 +126,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     /**
      * Парсит static-цепочку (обратная совместимость).
      *
+     * @param array<string, mixed> $raw
      * @param array<string, RoleConfigVo> $roles
      */
     private function parseStaticChain(string $name, array $raw, array $roles): ChainDefinitionInterface
@@ -178,6 +180,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
      *
      * То же самое что static, но тип всегда conditional (явное указание).
      *
+     * @param array<string, mixed> $raw
      * @param array<string, RoleConfigVo> $roles
      */
     private function parseConditionalChain(string $name, array $raw, array $roles): ChainDefinitionInterface
@@ -368,6 +371,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     /**
      * Парсит dynamic-цепочку.
      *
+     * @param array<string, mixed> $raw
      * @param array<string, RoleConfigVo> $roles
      */
     private function parseDynamicChain(string $name, array $raw, array $roles): ChainDefinitionInterface
@@ -546,6 +550,11 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
      *
      * @param string $name имя цепочки
      * @param array{prompts?: array<string, string>} $raw
+     *
+     * @return array<string, string>
+     */
+    /**
+     * @param array<string, mixed> $raw
      *
      * @return array<string, string>
      */

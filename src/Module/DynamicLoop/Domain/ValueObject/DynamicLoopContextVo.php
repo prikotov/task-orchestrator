@@ -10,10 +10,11 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject;
  * Перенесён из ChainDefinition.Domain.
  * Зависимость на PromptConfigurationVo заменена на DynamicLoopPromptConfigVo.
  *
- * @param array<int, string> $participants
+ * @param list<string> $participants
  */
 final readonly class DynamicLoopContextVo
 {
+    /** @param list<string> $participants */
     public function __construct(
         public string $facilitatorRole,
         public array $participants,

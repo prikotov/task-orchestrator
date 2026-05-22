@@ -80,7 +80,7 @@ final readonly class CodexAgentRunnerService implements CodexAgentRunnerServiceI
                 $command[] = '--model';
                 $command[] = $request->getModel();
             }
-        } elseif ($command[0] !== 'codex' && !str_contains($command[0] ?? '', 'codex')) {
+        } elseif ($command[0] !== 'codex' && !str_contains($command[0], 'codex')) {
             throw new InvalidArgumentException(sprintf(
                 'AgentRunRequestVo::$command must be either empty (runner default) or a full CLI command starting with "codex". '
                 . 'Got: %s',

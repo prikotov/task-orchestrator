@@ -19,8 +19,6 @@ use const LOCK_EX;
  *
  * Реализует AuditLoggerInterface из ChainExecution.Domain —
  * Infrastructure своего модуля, реализует Port своего Domain.
- *
- * @SuppressWarnings(PHPMD.ErrorControlOperator)
  */
 final readonly class JsonlAuditLoggerService implements JsonlAuditLoggerServiceInterface
 {

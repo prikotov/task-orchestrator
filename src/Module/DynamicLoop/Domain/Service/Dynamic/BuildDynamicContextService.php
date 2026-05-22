@@ -80,6 +80,7 @@ final readonly class BuildDynamicContextService implements BuildDynamicContextSe
         );
     }
 
+    /** @param list<string> $participants */
     private function formatAppendPrompt(string $template, array $participants): string
     {
         return sprintf($template, implode(', ', $participants));

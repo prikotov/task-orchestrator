@@ -16,7 +16,7 @@
         "symfony/process": "^8.0",
         "symfony/yaml": "^8.0",
         "symfony/finder": "^8.0",
-        "prikotov/coding-standard": "^0.13.0",
+        "prikotov/coding-standard": "^0.14.0",
         "symfony/dotenv": "^8.0"
     },
     "require-dev": {
@@ -27,7 +27,8 @@
         "psalm/plugin-symfony": "^5.3",
         "deptrac/deptrac": "^2.0",
         "phpmd/phpmd": "^3.0",
-        "ramsey/conventional-commits": "^1.7"
+        "ramsey/conventional-commits": "^1.7",
+        "phpstan/phpstan": "^2.1"
     },
     "repositories": [
         {"type": "vcs", "url": "https://github.com/prikotov/coding-standard"},

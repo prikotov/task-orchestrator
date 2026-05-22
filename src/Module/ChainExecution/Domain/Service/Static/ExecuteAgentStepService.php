@@ -23,7 +23,6 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContext
  * Выполняет AI-агента, обрабатывает fallback при ошибке,
  * усекает контекст при превышении лимита.
  *
- * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  * @todo 2026-05-21: PHPMD bug: multi-file analysis reports 80 LOC for run(), single-file = 61. Recheck after PHPMD upgrade.
  */
 final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterface
@@ -84,7 +83,7 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
                 $step,
                 $request,
                 $duration,
-                $context->roleConfig?->getPromptFile(),
+                $context->roleConfig?->getPromptFile(), // @phpstan-ignore nullsafe.neverNull
                 $result,
                 $timedOut,
             );

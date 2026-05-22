@@ -105,6 +105,7 @@ final readonly class CodexJsonlParser
      *   }
      * }
      *
+     * @param array<string, mixed> $decoded
      * @return array{outputText: string, inputTokens: int, outputTokens: int, cacheReadTokens: int, reasoningOutputTokens: int, cost: float, model: string|null}
      */
     private function extractTurnCompleted(array $decoded): array
@@ -183,6 +184,7 @@ final readonly class CodexJsonlParser
      *   "item": {"type": "agent_message", "content": [{"type": "text", "text": "..."}]}
      * }
      *
+     * @param array<string, mixed> $decoded
      * @return string текст элемента или пустая строка
      */
     private function extractItemText(array $decoded): string

@@ -136,7 +136,7 @@ final class ChainSessionWriter
         }
         $this->chainName = $data['chain'] ?? '';
         $this->facilitator = $data['facilitator'] ?? '';
-        $this->participants = $data['participants'] ?? [];
+        $this->participants = array_values($data['participants'] ?? []);
         $this->maxRounds = $data['max_rounds'] ?? 0;
         $this->roundFiles = $this->parseRoundFiles($data['rounds'] ?? []);
         $this->topic = $this->readSessionFile($sessionDir, $data['topic_file'] ?? '');
@@ -203,7 +203,11 @@ final class ChainSessionWriter
         }
     }
 
-    /** @param list<array<string, mixed>> $roundsData */
+    /**
+     * @param list<array<string, mixed>> $roundsData
+     *
+     * @return array<int, array{system: string, user: string, response: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float}>
+     */
     private function parseRoundFiles(array $roundsData): array
     {
         $result = [];

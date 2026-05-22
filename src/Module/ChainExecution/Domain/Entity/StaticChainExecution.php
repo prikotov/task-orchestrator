@@ -127,7 +127,7 @@ final class StaticChainExecution
      *
      * Если шаг не в группе — возвращает null.
      */
-    public function getIterationNumber(string $groupName): ?int
+    public function getIterationNumber(string $groupName): int
     {
         if (!isset($this->groupIterations[$groupName])) {
             $this->groupIterations[$groupName] = 1;

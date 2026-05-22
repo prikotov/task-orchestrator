@@ -17,8 +17,14 @@ deptrac: ## Запустить анализ зависимостей
 	@echo "Deptrac:"
 	@out=$$(vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress --no-ansi 2>&1); ec=$$?; echo "$$out" | grep -vE '^[[:space:]]*$$'; exit $$ec
 
+.PHONY: phpstan
+phpstan: ## Запустить PHPStan
+	@echo
+	@echo "PHPStan:"
+	@vendor/bin/phpstan analyse --no-progress 2>&1; ec=$$?; if [ "$$ec" -eq 0 ]; then echo "PHPStan: OK"; fi; exit $$ec
+
 .PHONY: psalm
-psalm: ## Запустить статический анализ
+psalm: ## Запустить статический анализ Psalm
 	@echo
 	@out=$$(vendor/bin/psalm --no-cache --no-progress --output-format=compact --monochrome 2>&1); ec=$$?; if [ "$$ec" -eq 0 ]; then echo "Psalm: OK"; else echo "$$out" | grep -vE '^(Running custom Psalm bootstrap|[[:space:]]*$$)'; fi; exit $$ec
 
@@ -82,7 +88,7 @@ validate-roles: ## Валидация файлов ролей AI-агентов
 	@php bin/validate-roles
 
 .PHONY: check
-check: ## Запустить все проверки (deptrac + psalm + phpmd + phpcs + md-links + validate-todo + validate-roles + tests)
-	@${MAKE} --no-print-directory deptrac psalm phpmd phpcs md-links validate-todo validate-roles tests && \
+check: ## Запустить все проверки (phpstan + deptrac + psalm + phpmd + phpcs + md-links + validate-todo + validate-roles + tests)
+	@${MAKE} --no-print-directory phpstan deptrac psalm phpmd phpcs md-links validate-todo validate-roles tests && \
 		{ echo; echo "✅ Все проверки завершены успешно."; } || \
 		{ echo; echo "❌ Проверки завершены с ошибками."; exit 1; }
