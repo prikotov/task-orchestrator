@@ -8,7 +8,7 @@ use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Chain\StaticExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategyService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
@@ -19,18 +19,18 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionSt
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticChainResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
 
-#[CoversClass(StaticExecutionStrategy::class)]
+#[CoversClass(StaticExecutionStrategyService::class)]
 final class StaticExecutionStrategyTest extends TestCase
 {
     private ExecuteStaticChainServiceInterface $staticChainExecutor;
     private ChainDefinitionProviderInterface $chainProvider;
-    private StaticExecutionStrategy $strategy;
+    private StaticExecutionStrategyService $strategy;
 
     protected function setUp(): void
     {
         $this->staticChainExecutor = $this->createMock(ExecuteStaticChainServiceInterface::class);
         $this->chainProvider = $this->createMock(ChainDefinitionProviderInterface::class);
-        $this->strategy = new StaticExecutionStrategy($this->staticChainExecutor, $this->chainProvider);
+        $this->strategy = new StaticExecutionStrategyService($this->staticChainExecutor, $this->chainProvider);
     }
 
     // --- supports() ---

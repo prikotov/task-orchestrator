@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Prompt;
 
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Exception\RoleNotFoundException;
-use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Prompt\RolePromptBuilder;
+use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Prompt\RolePromptBuilderService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(RolePromptBuilder::class)]
+#[CoversClass(RolePromptBuilderService::class)]
 final class RolePromptBuilderTest extends TestCase
 {
     private string $fixtureDir;
-    private RolePromptBuilder $builder;
+    private RolePromptBuilderService $builder;
 
     protected function setUp(): void
     {
@@ -30,7 +30,7 @@ final class RolePromptBuilderTest extends TestCase
             "# Backend Developer (Бэкендер)\n\nWrite code.",
         );
 
-        $this->builder = new RolePromptBuilder($this->fixtureDir, sys_get_temp_dir());
+        $this->builder = new RolePromptBuilderService($this->fixtureDir, sys_get_temp_dir());
     }
 
     protected function tearDown(): void

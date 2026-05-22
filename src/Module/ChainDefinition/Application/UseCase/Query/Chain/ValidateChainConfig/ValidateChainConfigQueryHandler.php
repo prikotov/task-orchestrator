@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig;
 
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainConfigViolationDtoMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidatorService;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Validator\ChainDefinitionValidator;
 
 /**
  * Валидирует конфигурацию цепочки (или всех цепочек).
@@ -17,7 +17,7 @@ class ValidateChainConfigQueryHandler
 {
     public function __construct(
         private ChainLoaderInterface $chainLoader,
-        private ChainDefinitionValidator $chainValidator,
+        private ChainDefinitionValidatorService $chainValidator,
         private ChainConfigViolationDtoMapper $violationMapper,
     ) {
     }

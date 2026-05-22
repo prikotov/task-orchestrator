@@ -10,9 +10,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Chain\YamlChainLoader;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Chain\ConditionalExecutionStrategy;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Chain\StaticExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ConditionalExecutionStrategyService;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategyService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
@@ -31,13 +31,13 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteT
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\ConditionalStepService;
-use TaskOrchestrator\Common\Module\ChainExecution\Integration\ChainDefinition\ChainExecutionDefinitionMapper;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapperService;
 
 /**
  * Integration-тест: conditional chain end-to-end.
  *
- * Проверяет полный цикл: YAML с when-conditions → YamlChainLoader
- * → OrchestrateChainCommandHandler → ConditionalExecutionStrategy
+ * Проверяет полный цикл: YAML с when-conditions → YamlChainLoaderService
+ * → OrchestrateChainCommandHandler → ConditionalExecutionStrategyService
  * → EvaluateConditionService (real) → ExecuteConditionalStepService (real)
  * → RunAgentServiceInterface (stub) → OrchestrateChainResultDto.
  *
@@ -46,18 +46,18 @@ use TaskOrchestrator\Common\Module\ChainExecution\Integration\ChainDefinition\Ch
  * - Quality gate failed → conditional step skipped
  * - Mixed unconditional + conditional steps
  * - Explicit type: conditional
- * - Обратная совместимость: static chain → StaticExecutionStrategy
+ * - Обратная совместимость: static chain → StaticExecutionStrategyService
  * - Conditional resume → LogicException
  *
  * G6 Validation: Integration-паттерн воспроизводится на 3-й стратегии (conditional)
- * без God-interface: ConditionalExecutionStrategy < 200 LOC, ≤15 методов.
+ * без God-interface: ConditionalExecutionStrategyService < 200 LOC, ≤15 методов.
  */
 #[Group('integration')]
 #[CoversClass(OrchestrateChainCommandHandler::class)]
-#[CoversClass(ConditionalExecutionStrategy::class)]
+#[CoversClass(ConditionalExecutionStrategyService::class)]
 #[CoversClass(EvaluateConditionService::class)]
 #[CoversClass(ConditionalStepService::class)]
-#[CoversClass(YamlChainLoader::class)]
+#[CoversClass(YamlChainLoaderService::class)]
 final class ConditionalChainIntegrationTest extends TestCase
 {
     private const string FIXTURES_DIR = __DIR__ . '/../../../../_fixtures';
@@ -72,7 +72,7 @@ final class ConditionalChainIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->chainLoader = new YamlChainLoader(self::FIXTURES_DIR . '/test_chains.yaml');
+        $this->chainLoader = new YamlChainLoaderService(self::FIXTURES_DIR . '/test_chains.yaml');
         $this->conditionalAgent = new StubConditionalAgentService();
 
         // --- Conditional strategy wiring ---
@@ -86,8 +86,8 @@ final class ConditionalChainIntegrationTest extends TestCase
         $hookExecutor = $this->createMock(HookExecutorInterface::class);
         $hookExecutor->method('execute')->willReturn(HookResultVo::createSkipped());
 
-        $conditionalDefinitionMapper = new ChainExecutionDefinitionMapper(new LoadRawChainQueryHandler($this->chainLoader));
-        $conditionalStrategy = new ConditionalExecutionStrategy(
+        $conditionalDefinitionMapper = new ChainExecutionDefinitionMapperService(new LoadRawChainQueryHandler($this->chainLoader));
+        $conditionalStrategy = new ConditionalExecutionStrategyService(
             $conditionEvaluator,
             $stepExecutor,
             $hookExecutor,
@@ -114,8 +114,8 @@ final class ConditionalChainIntegrationTest extends TestCase
         $staticResolveStepRunnerService = new ResolveStepRunnerService([$staticAgentRunner, $staticGateRunner, $staticToolRunner]);
         $runStaticChainService = new RunStaticChainService($staticResolveStepRunnerService, $staticBudgetService, $hookExecutor);
         $staticChainExecutor = new ExecuteStaticChainService($runStaticChainService);
-        $definitionMapper = new ChainExecutionDefinitionMapper(new LoadRawChainQueryHandler($this->chainLoader));
-        $staticStrategy = new StaticExecutionStrategy($staticChainExecutor, $definitionMapper);
+        $definitionMapper = new ChainExecutionDefinitionMapperService(new LoadRawChainQueryHandler($this->chainLoader));
+        $staticStrategy = new StaticExecutionStrategyService($staticChainExecutor, $definitionMapper);
 
         // --- Handler with both strategies ---
         $this->handler = new OrchestrateChainCommandHandler(
@@ -282,12 +282,12 @@ final class ConditionalChainIntegrationTest extends TestCase
         self::assertFalse($result->stepResults[2]->skipped);
     }
 
-    // --- Backwards compatibility: static chain without when → StaticExecutionStrategy ---
+    // --- Backwards compatibility: static chain without when → StaticExecutionStrategyService ---
 
     #[Test]
     public function staticChainStillWorksWithBothStrategiesRegistered(): void
     {
-        // Arrange: static_simple — без when-conditions, должен выбрать StaticExecutionStrategy
+        // Arrange: static_simple — без when-conditions, должен выбрать StaticExecutionStrategyService
         $this->staticAgent->pushSuccess('Analysis result', inputTokens: 100, outputTokens: 200, cost: 0.01);
         $this->staticAgent->pushSuccess('Implementation result', inputTokens: 150, outputTokens: 300, cost: 0.02);
 

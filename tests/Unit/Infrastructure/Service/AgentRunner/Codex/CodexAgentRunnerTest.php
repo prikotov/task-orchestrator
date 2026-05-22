@@ -5,24 +5,24 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Codex;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Codex\CodexAgentRunner;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Codex\CodexJsonlParser;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Codex\HttpsProxyBridge;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexAgentRunnerService;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexJsonlParser;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(CodexAgentRunner::class)]
+#[CoversClass(CodexAgentRunnerService::class)]
 final class CodexAgentRunnerTest extends TestCase
 {
-    private CodexAgentRunner $runner;
+    private CodexAgentRunnerService $runner;
 
     /** @var HttpsProxyBridge|null Мост для очистки в tearDown */
     private ?HttpsProxyBridge $bridgeToCleanup = null;
 
     protected function setUp(): void
     {
-        $this->runner = new CodexAgentRunner(new CodexJsonlParser());
+        $this->runner = new CodexAgentRunnerService(new CodexJsonlParser());
     }
 
     protected function tearDown(): void

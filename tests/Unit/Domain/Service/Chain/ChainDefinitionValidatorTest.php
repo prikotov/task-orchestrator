@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Validator\ChainDefinitionValidator;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidatorService;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainConfigViolationVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainDefinitionVo;
@@ -20,15 +20,15 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\PromptConf
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 
-#[CoversClass(ChainDefinitionValidator::class)]
+#[CoversClass(ChainDefinitionValidatorService::class)]
 final class ChainDefinitionValidatorTest extends TestCase
 {
-    private ChainDefinitionValidator $validator;
+    private ChainDefinitionValidatorService $validator;
 
     #[Override]
     protected function setUp(): void
     {
-        $this->validator = new ChainDefinitionValidator();
+        $this->validator = new ChainDefinitionValidatorService();
     }
 
     // ─── Static chain: valid → no violations ──

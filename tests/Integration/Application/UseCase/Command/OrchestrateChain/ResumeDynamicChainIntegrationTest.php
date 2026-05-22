@@ -8,12 +8,12 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Chain\YamlChainLoader;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Integration\ChainDefinition\ChainExecutionDefinitionMapper;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapperService;
 use TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\DynamicExecutionStrategy;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerFactoryInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextService;
@@ -21,12 +21,12 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\SessionCom
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSessionStateVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Integration\ChainDefinition\DynamicLoopDefinitionMapper;
+use TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapperService;
 
 /**
  * Integration-тест: resume dynamic chain end-to-end.
  *
- * Проверяет полный цикл возобновления: YAML → YamlChainLoader → OrchestrateChainCommandHandler
+ * Проверяет полный цикл возобновления: YAML → YamlChainLoaderService → OrchestrateChainCommandHandler
  * → DynamicExecutionStrategy::resume() → session restore → context build → loop run → finalize.
  *
  * Session logger и dynamic loop runner подменяются стабами.
@@ -35,7 +35,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Integration\ChainDefinition\Dynam
 #[CoversClass(OrchestrateChainCommandHandler::class)]
 #[CoversClass(DynamicExecutionStrategy::class)]
 #[CoversClass(BuildDynamicContextService::class)]
-#[CoversClass(YamlChainLoader::class)]
+#[CoversClass(YamlChainLoaderService::class)]
 final class ResumeDynamicChainIntegrationTest extends TestCase
 {
     private const string FIXTURES_DIR = __DIR__ . '/../../../../_fixtures';
@@ -48,12 +48,12 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        $chainLoader = new YamlChainLoader(self::FIXTURES_DIR . '/test_chains.yaml');
+        $chainLoader = new YamlChainLoaderService(self::FIXTURES_DIR . '/test_chains.yaml');
         $this->stubLoopRunner = new ResumeStubDynamicLoopService();
         $this->stubSessionLogger = new ResumeStubSessionLogger();
 
         $contextBuilder = new BuildDynamicContextService();
-        $configMapper = new DynamicLoopDefinitionMapper(new \TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler($chainLoader));
+        $configMapper = new DynamicLoopDefinitionMapperService(new \TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler($chainLoader));
         $auditFactory = $this->createMock(DynamicLoopAuditLoggerFactoryInterface::class);
         $sessionNotifier = $this->createMock(SessionCompletedNotifierInterface::class);
         $sessionNotifier->method('notifySessionCompleted');
@@ -67,7 +67,7 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
             sessionNotifier: $sessionNotifier,
         );
 
-        $chainDefinitionProvider = new ChainExecutionDefinitionMapper(new \TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler($chainLoader));
+        $chainDefinitionProvider = new ChainExecutionDefinitionMapperService(new \TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler($chainLoader));
         $this->handler = new OrchestrateChainCommandHandler(
             $chainDefinitionProvider,
             new \ArrayIterator([$dynamicStrategy]),

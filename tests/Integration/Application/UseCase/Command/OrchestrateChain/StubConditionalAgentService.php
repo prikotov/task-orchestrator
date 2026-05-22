@@ -14,7 +14,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRes
  * Стаб RunAgentServiceInterface (Orchestrator) для conditional integration-тестов.
  *
  * Вместо реального AI-агента возвращает предзаданный результат.
- * Позволяет тестировать ConditionalExecutionStrategy через все слои без внешних зависимостей.
+ * Позволяет тестировать ConditionalExecutionStrategyService через все слои без внешних зависимостей.
  */
 final class StubConditionalAgentService implements RunAgentServiceInterface
 {

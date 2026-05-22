@@ -29,7 +29,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Cha
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportResult;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Chain\YamlChainLoader;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\OrchestrateCommand;
 
 #[CoversClass(OrchestrateCommand::class)]
@@ -232,7 +232,7 @@ chains:
 YAML);
 
         try {
-            $chainLoader = new YamlChainLoader('/nonexistent/default.yaml');
+            $chainLoader = new YamlChainLoaderService('/nonexistent/default.yaml');
             $mapper = new \TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainDefinitionDtoMapper();
             $loadHandler = new LoadChainQueryHandler($chainLoader, $mapper);
 
@@ -284,8 +284,8 @@ chains:
 YAML);
 
         try {
-            $chainLoader = new YamlChainLoader('/nonexistent/default.yaml');
-            $chainValidator = new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Validator\ChainDefinitionValidator();
+            $chainLoader = new YamlChainLoaderService('/nonexistent/default.yaml');
+            $chainValidator = new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidatorService();
             $violationMapper = new \TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainConfigViolationDtoMapper();
             $validateHandler = new ValidateChainConfigQueryHandler($chainLoader, $chainValidator, $violationMapper);
 
