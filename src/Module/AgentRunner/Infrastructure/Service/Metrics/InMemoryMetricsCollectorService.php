@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Metrics;
+namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Metrics;
 
 use Override;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\MetricsCollectorInterface;
@@ -14,7 +14,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\MetricsCollectorIn
  * Не предназначена для production с persistent storage —
  * при перезапуске процесса данные теряются.
  */
-final class InMemoryMetricsCollector implements MetricsCollectorInterface
+final class InMemoryMetricsCollectorService implements MetricsCollectorInterface
 {
     /** @var array<string, array<string, int>> metric → [tagsKey → count] */
     private array $counters = [];

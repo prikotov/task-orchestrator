@@ -9,7 +9,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\MetricsCollectorIn
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Metrics\InMemoryMetricsCollector;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Metrics\InMemoryMetricsCollectorService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\RetryingAgentRunnerService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -451,7 +451,7 @@ final class RetryingAgentRunnerTest extends TestCase
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($successResult);
 
-        $metrics = new InMemoryMetricsCollector();
+        $metrics = new InMemoryMetricsCollectorService();
 
         $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
         $runner = new RetryingAgentRunnerService($this->innerRunner, $policy, $this->logger, $metrics);
@@ -478,7 +478,7 @@ final class RetryingAgentRunnerTest extends TestCase
                 $successResult,
             );
 
-        $metrics = new InMemoryMetricsCollector();
+        $metrics = new InMemoryMetricsCollectorService();
 
         $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
         $runner = new RetryingAgentRunnerService($this->innerRunner, $policy, $this->logger, $metrics);
@@ -506,7 +506,7 @@ final class RetryingAgentRunnerTest extends TestCase
                 $successResult,
             );
 
-        $metrics = new InMemoryMetricsCollector();
+        $metrics = new InMemoryMetricsCollectorService();
 
         $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
         $runner = new RetryingAgentRunnerService($this->innerRunner, $policy, $this->logger, $metrics);
@@ -529,7 +529,7 @@ final class RetryingAgentRunnerTest extends TestCase
             ->method('run')
             ->willReturnOnConsecutiveCalls($errorResult, $successResult);
 
-        $metrics = new InMemoryMetricsCollector();
+        $metrics = new InMemoryMetricsCollectorService();
 
         $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
         $runner = new RetryingAgentRunnerService($this->innerRunner, $policy, $this->logger, $metrics);
@@ -548,7 +548,7 @@ final class RetryingAgentRunnerTest extends TestCase
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($successResult);
 
-        $metrics = new InMemoryMetricsCollector();
+        $metrics = new InMemoryMetricsCollectorService();
 
         $policy = new RetryPolicyVo(maxRetries: 3, initialDelayMs: 0);
         $runner = new RetryingAgentRunnerService($this->innerRunner, $policy, $this->logger, $metrics);
@@ -574,7 +574,7 @@ final class RetryingAgentRunnerTest extends TestCase
             ->method('run')
             ->willThrowException(new RuntimeException('Fail'));
 
-        $metrics = new InMemoryMetricsCollector();
+        $metrics = new InMemoryMetricsCollectorService();
 
         $policy = new RetryPolicyVo(maxRetries: 1, initialDelayMs: 0);
         $runner = new RetryingAgentRunnerService($this->innerRunner, $policy, $this->logger, $metrics);
