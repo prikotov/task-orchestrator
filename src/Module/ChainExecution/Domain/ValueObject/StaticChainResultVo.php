@@ -14,6 +14,9 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject;
  */
 final readonly class StaticChainResultVo
 {
+    /**
+     * @param list<StaticStepResultVo> $stepResults
+     */
     public function __construct(
         public array $stepResults,
         public float $totalTime,

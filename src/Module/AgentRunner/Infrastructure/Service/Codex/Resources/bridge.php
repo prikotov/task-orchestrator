@@ -222,7 +222,6 @@ while (true) {
  *
  * @param resource $source
  * @param resource $dest
- * @SuppressWarnings(PHPMD.ErrorControlOperator)
  */
 function pipeStream($source, $dest): void
 {
@@ -249,7 +248,6 @@ function pipeStream($source, $dest): void
  *
  * @param resource $client
  * @param resource $upstream
- * @SuppressWarnings(PHPMD.ErrorControlOperator)
  */
 function forwardSelect($client, $upstream): void
 {

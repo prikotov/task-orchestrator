@@ -60,7 +60,7 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
 
         if ($command === []) {
             $command = ['pi', '--mode', 'json', '-p', '--no-session'];
-        } elseif ($command[0] !== 'pi' && !str_contains($command[0] ?? '', 'pi')) {
+        } elseif ($command[0] !== 'pi' && !str_contains($command[0], 'pi')) {
             throw new InvalidArgumentException(sprintf(
                 'AgentRunRequestVo::$command must be either empty (runner default) or a full CLI command starting with an executable. '
                 . 'Got: %s',

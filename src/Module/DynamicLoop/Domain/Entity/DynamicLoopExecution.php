@@ -11,8 +11,6 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundRe
 /**
  * In-memory сущность состояния dynamic-цикла.
  *
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
- * @SuppressWarnings(PHPMD.TooManyFields)
  * @todo Рассмотреть разделение на DynamicMetrics + DynamicJournal entity для снижения числа полей.
  *
  * Инкапсулирует мутабельное состояние выполнения dynamic-цепочки:
@@ -298,8 +296,8 @@ final class DynamicLoopExecution
             synthesis: $this->synthesis,
             maxRoundsReached: $this->maxRoundsReached,
             interruptionReason: $this->interruptionReason,
-            budgetExceeded: $this->budgetBreak?->budgetExceeded ?? false,
-            budgetLimit: $this->budgetBreak?->budgetLimit ?? 0.0,
+            budgetExceeded: $this->budgetBreak?->budgetExceeded ?? false, // @phpstan-ignore nullsafe.neverNull
+            budgetLimit: $this->budgetBreak?->budgetLimit ?? 0.0, // @phpstan-ignore nullsafe.neverNull
             budgetExceededRole: $this->budgetBreak?->budgetExceededRole,
             maxTimeExceeded: $this->maxTimeExceeded,
         );

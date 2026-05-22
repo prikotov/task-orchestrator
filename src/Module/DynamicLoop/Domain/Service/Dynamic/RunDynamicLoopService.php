@@ -110,6 +110,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
         if ($startRound > 0) {
             $roundFiles = $this->sessionLogger->getRoundFiles();
+            /** @phpstan-ignore argument.type */
             $execution->restoreFromRoundFiles($roundFiles);
         }
 

@@ -19,8 +19,6 @@ use const LOCK_EX;
  *
  * Реализует только DynamicLoopAuditLoggerInterface (Port своего модуля).
  * ChainExecution имеет собственную реализацию AuditLoggerInterface.
- *
- * @SuppressWarnings(PHPMD.ErrorControlOperator)
  */
 final readonly class JsonlAuditLogger implements DynamicLoopAuditLoggerInterface
 {

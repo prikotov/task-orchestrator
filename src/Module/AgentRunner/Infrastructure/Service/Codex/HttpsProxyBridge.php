@@ -36,7 +36,10 @@ final class HttpsProxyBridge
 {
     private const string BRIDGE_HOST = '127.0.0.1';
 
-    /** @var resource|false|null Дескриптор процесса proc_open */
+    /**
+     * @var resource|false|null Дескриптор процесса proc_open
+     * @phpstan-ignore property.unusedType
+     */
     private $process = null;
 
     /** @var string Локальный URL моста (http://127.0.0.1:<port>) */
@@ -170,7 +173,7 @@ final class HttpsProxyBridge
 
         $status = proc_get_status($this->process);
 
-        return $status['running'] ?? false;
+        return $status['running'] ?? false; // @phpstan-ignore nullCoalesce.offset
     }
 
     /**

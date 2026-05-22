@@ -290,6 +290,8 @@ final class OrchestrateCommand extends Command
 
     /**
      * Показать план без запуска (--dry-run).
+     *
+     * @param list<string>|null $participants
      */
     private function renderDryRun(
         SymfonyStyle $io,
