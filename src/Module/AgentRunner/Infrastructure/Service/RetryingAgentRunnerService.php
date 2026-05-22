@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\MetricsCollectorInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryingAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\ErrorClassificationVo;
@@ -24,7 +25,7 @@ use Throwable;
  *
  * Не изменяет AgentRunnerInterface — чистый Decorator pattern.
  */
-final readonly class RetryingAgentRunner implements AgentRunnerInterface
+final readonly class RetryingAgentRunnerService implements RetryingAgentRunnerServiceInterface
 {
     public function __construct(
         private AgentRunnerInterface $innerRunner,

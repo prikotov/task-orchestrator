@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chai
 use LogicException;
 use Override;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ConditionalExecutionStrategyServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\StepResultDto;
@@ -28,7 +28,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionSt
  * Конфигурация загружается через ChainDefinitionProviderInterface по имени цепочки.
  * Resume не поддерживается — LogicException.
  */
-final readonly class ConditionalExecutionStrategy implements ExecutionStrategyInterface
+final readonly class ConditionalExecutionStrategyService implements ConditionalExecutionStrategyServiceInterface
 {
     private const int DEFAULT_CONDITIONAL_TIMEOUT = 300;
 

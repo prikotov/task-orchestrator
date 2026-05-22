@@ -9,7 +9,7 @@ use DateTimeZone;
 use Override;
 use RuntimeException;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Audit\AuditLoggerInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Audit\JsonlAuditLoggerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use const FILE_APPEND;
 use const LOCK_EX;
@@ -22,7 +22,7 @@ use const LOCK_EX;
  *
  * @SuppressWarnings(PHPMD.ErrorControlOperator)
  */
-final readonly class JsonlAuditLogger implements AuditLoggerInterface
+final readonly class JsonlAuditLoggerService implements JsonlAuditLoggerServiceInterface
 {
     private const string DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 

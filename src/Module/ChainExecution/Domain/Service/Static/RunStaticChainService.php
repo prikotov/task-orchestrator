@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static;
 
+use Override;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Entity\StaticChainExecution;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
@@ -22,9 +23,9 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContext
  * Доменная логика выполнения static-цепочки: линейное выполнение шагов с итерациями и budget.
  *
  * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
- * @todo PHPMD bug: multi-file analysis counts 82 LOC for processStep(), single-file = 74. Recheck after PHPMD upgrade.
+ * @todo 2026-05-21: PHPMD bug: multi-file analysis counts 82 LOC for processStep(), single-file = 74. Recheck after PHPMD upgrade.
  */
-final readonly class RunStaticChainService
+final readonly class RunStaticChainService implements RunStaticChainServiceInterface
 {
     public function __construct(
         private ResolveStepRunnerServiceInterface $stepRunnerResolver,
@@ -37,6 +38,7 @@ final readonly class RunStaticChainService
     /**
      * @return StaticChainResultVo
      */
+    #[Override]
     public function execute(
         ExecutionStaticChainConfigVo $chain,
         string $task,

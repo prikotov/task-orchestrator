@@ -11,7 +11,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\DynamicLoopConfigMapperInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration\ChainDefinitionProviderInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration\DynamicLoopDefinitionMapperServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPromptConfigVo;
@@ -24,7 +24,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRol
  * ACL (Anti-Corruption Layer) на границе модулей.
  * Обращается к foreign Application (LoadRawChainQueryHandler), а не к foreign Domain.
  */
-final readonly class DynamicLoopDefinitionMapper implements DynamicLoopConfigMapperInterface, ChainDefinitionProviderInterface
+final readonly class DynamicLoopDefinitionMapperService implements DynamicLoopConfigMapperInterface, DynamicLoopDefinitionMapperServiceInterface
 {
     public function __construct(
         private LoadRawChainQueryHandler $loadRawChainHandler,

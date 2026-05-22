@@ -6,14 +6,14 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\T
 
 use Override;
 use Symfony\Component\Process\Process;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ToolStepRunnerInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ToolStepRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionToolStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ToolStepResultVo;
 
 /**
  * Выполнение tool-шага через Symfony Process.
  */
-final readonly class ToolStepRunner implements ToolStepRunnerInterface
+final readonly class ToolStepRunnerService implements ToolStepRunnerServiceInterface
 {
     #[Override]
     public function run(ExecutionToolStepVo $tool): ToolStepResultVo

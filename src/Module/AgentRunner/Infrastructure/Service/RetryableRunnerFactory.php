@@ -13,7 +13,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFac
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
 
 /**
- * Фабрика для создания RetryingAgentRunner.
+ * Фабрика для создания RetryingAgentRunnerService.
  *
  * Инкапсулирует создание Infrastructure-декоратора,
  * позволяя Application-слою не зависеть от конкретной реализации.
@@ -35,7 +35,7 @@ final readonly class RetryableRunnerFactory implements RetryableRunnerFactoryInt
             return $runner;
         }
 
-        return new RetryingAgentRunner(
+        return new RetryingAgentRunnerService(
             $runner,
             $retryPolicy,
             $this->logger ?? new NullLogger(),

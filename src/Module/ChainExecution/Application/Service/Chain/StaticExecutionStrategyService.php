@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chai
 
 use LogicException;
 use Override;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategyServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
@@ -24,7 +24,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepR
  * Конфигурация загружается через ChainDefinitionProviderInterface по имени цепочки.
  * Resume не поддерживается — брошено LogicException.
  */
-final readonly class StaticExecutionStrategy implements ExecutionStrategyInterface
+final readonly class StaticExecutionStrategyService implements StaticExecutionStrategyServiceInterface
 {
     private const int DEFAULT_STATIC_TIMEOUT = 300;
 

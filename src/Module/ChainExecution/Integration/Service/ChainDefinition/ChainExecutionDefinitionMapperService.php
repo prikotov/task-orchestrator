@@ -18,7 +18,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionType
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ConditionOperatorEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\ChainConfigMapperInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainDefinitionProviderInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainExecutionDefinitionMapperServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionBudgetVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
@@ -37,7 +37,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionSt
  * ACL (Anti-Corruption Layer) на границе модулей.
  * Обращается к foreign Application (LoadRawChainQueryHandler), а не к foreign Domain.
  */
-final readonly class ChainExecutionDefinitionMapper implements ChainDefinitionProviderInterface, ChainConfigMapperInterface
+final readonly class ChainExecutionDefinitionMapperService implements ChainExecutionDefinitionMapperServiceInterface, ChainConfigMapperInterface
 {
     public function __construct(
         private LoadRawChainQueryHandler $loadRawChainHandler,

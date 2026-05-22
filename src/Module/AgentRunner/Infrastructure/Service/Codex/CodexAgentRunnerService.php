@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Code
 use InvalidArgumentException;
 use Override;
 use Symfony\Component\Process\Process;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\CodexAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 
@@ -35,7 +35,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunReques
  * Если CODEX_HTTP_PROXY содержит https:// схему, автоматически запускается
  * локальный HTTP-прокси-мост, пересылающий CONNECT-запросы через TLS.
  */
-final readonly class CodexAgentRunner implements AgentRunnerInterface
+final readonly class CodexAgentRunnerService implements CodexAgentRunnerServiceInterface
 {
     public function __construct(
         private CodexJsonlParser $parser,
@@ -68,6 +68,7 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
      *
      * @return list<string> готовый массив аргументов для Symfony Process
      */
+    #[Override]
     public function buildCommand(AgentRunRequestVo $request): array
     {
         $command = $request->getCommand();

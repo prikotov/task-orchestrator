@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Common\Module\ChainExecution\Infrastructure\Service\ToolStep;
 
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionToolStepVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\ToolStep\ToolStepRunner;
+use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\ToolStep\ToolStepRunnerService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(ToolStepRunner::class)]
+#[CoversClass(ToolStepRunnerService::class)]
 final class ToolStepRunnerTest extends TestCase
 {
-    private ToolStepRunner $runner;
+    private ToolStepRunnerService $runner;
 
     protected function setUp(): void
     {
-        $this->runner = new ToolStepRunner();
+        $this->runner = new ToolStepRunnerService();
     }
 
     #[Test]

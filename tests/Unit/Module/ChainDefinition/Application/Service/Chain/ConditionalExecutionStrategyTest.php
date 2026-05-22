@@ -8,7 +8,7 @@ use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ConditionalExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\ConditionalExecutionStrategyService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
@@ -29,7 +29,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
     private HookExecutorInterface&MockObject $hookExecutor;
     private ChainDefinitionProviderInterface&MockObject $chainProvider;
     private LoggerInterface&MockObject $logger;
-    private ConditionalExecutionStrategy $strategy;
+    private ConditionalExecutionStrategyService $strategy;
 
     protected function setUp(): void
     {
@@ -42,7 +42,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         // По умолчанию hook executor возвращает skipped (hook не сконфигурирован)
         $this->hookExecutor->method('execute')->willReturn(HookResultVo::createSkipped());
 
-        $this->strategy = new ConditionalExecutionStrategy(
+        $this->strategy = new ConditionalExecutionStrategyService(
             $this->conditionEvaluator,
             $this->stepExecutor,
             $this->hookExecutor,

@@ -22,6 +22,9 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContext
  *
  * Выполняет AI-агента, обрабатывает fallback при ошибке,
  * усекает контекст при превышении лимита.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ * @todo 2026-05-21: PHPMD bug: multi-file analysis reports 80 LOC for run(), single-file = 61. Recheck after PHPMD upgrade.
  */
 final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterface
 {
@@ -69,39 +72,22 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
         $request = $this->truncateRequestContext($request);
         $result = $this->agentRunner->run($request, $step->getRetryPolicy());
         $duration = microtime(true) - $start;
-
-        $fallbackRunnerUsed = null;
-        $fallbackConfig = $context->roleConfig?->getFallback();
         $timedOut = $result->isTimedOut();
+
+        $fallbackConfig = $context->roleConfig?->getFallback();
+        $fallbackRunnerUsed = null;
         if ($result->isError() && $fallbackConfig !== null) {
-            $fallbackResult = $this->applyFallback(
+            [$result, $duration, $fallbackRunnerUsed, $timedOut] = $this->tryFallback(
                 $fallbackConfig,
                 $role,
                 $runnerName,
                 $step,
                 $request,
+                $duration,
                 $context->roleConfig?->getPromptFile(),
+                $result,
+                $timedOut,
             );
-            $duration += $fallbackResult->extraDuration;
-            $fallbackRunnerUsed = $fallbackResult->fallbackRunnerName;
-            if ($fallbackResult->fallbackRunnerName !== null) {
-                $result = $fallbackResult->isError
-                    ? ChainRunResultVo::createError(
-                        $fallbackResult->errorMessage ?? 'unknown',
-                        timedOut: $fallbackResult->timedOut,
-                    )
-                    : ChainRunResultVo::createSuccess(
-                        $fallbackResult->outputText,
-                        $fallbackResult->inputTokens,
-                        $fallbackResult->outputTokens,
-                        cost: $fallbackResult->cost,
-                    );
-                if (!$fallbackResult->isError) {
-                    $timedOut = false;
-                } elseif ($fallbackResult->timedOut) {
-                    $timedOut = true;
-                }
-            }
         }
 
         return new StaticStepResultVo(
@@ -118,6 +104,51 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
             iterationNumber: $context->iterationNumber,
             timedOut: $timedOut,
         );
+    }
+
+    /**
+     * @return array{ChainRunResultVo, float, ?string, bool}
+     */
+    private function tryFallback(
+        ExecutionFallbackConfigVo $fallbackConfig,
+        string $role,
+        string $runnerName,
+        ExecutionStepVo $step,
+        ChainRunRequestVo $request,
+        float $duration,
+        ?string $promptFile,
+        ChainRunResultVo $originalResult,
+        bool $originalTimedOut,
+    ): array {
+        $fallbackResult = $this->applyFallback(
+            $fallbackConfig,
+            $role,
+            $runnerName,
+            $step,
+            $request,
+            $promptFile,
+        );
+        $duration += $fallbackResult->extraDuration;
+        $fallbackRunnerName = $fallbackResult->fallbackRunnerName;
+
+        if ($fallbackRunnerName !== null) {
+            $result = $fallbackResult->isError
+                ? ChainRunResultVo::createError(
+                    $fallbackResult->errorMessage ?? 'unknown',
+                    timedOut: $fallbackResult->timedOut,
+                )
+                : ChainRunResultVo::createSuccess(
+                    $fallbackResult->outputText,
+                    $fallbackResult->inputTokens,
+                    $fallbackResult->outputTokens,
+                    cost: $fallbackResult->cost,
+                );
+            $timedOut = !$fallbackResult->isError ? false : $fallbackResult->timedOut;
+
+            return [$result, $duration, $fallbackRunnerName, $timedOut];
+        }
+
+        return [$originalResult, $duration, null, $originalTimedOut];
     }
 
     private function applyFallback(

@@ -6,14 +6,14 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\P
 
 use Override;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Exception\RoleNotFoundException;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\PromptProviderInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\RolePromptBuilderServiceInterface;
 
 /**
  * Реализация PromptProviderInterface — чтение .md файлов ролей из директории.
  *
  * Путь к директории — параметр конструктора (specific to the bundle).
  */
-final class RolePromptBuilder implements PromptProviderInterface
+final class RolePromptBuilderService implements RolePromptBuilderServiceInterface
 {
     private const DEFAULT_LOCALE = 'ru';
 

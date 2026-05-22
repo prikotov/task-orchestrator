@@ -10,7 +10,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\CircuitBreakerStateVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Metrics\InMemoryMetricsCollector;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\CircuitBreakerAgentRunner;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\CircuitBreakerAgentRunnerService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-#[CoversClass(CircuitBreakerAgentRunner::class)]
+#[CoversClass(CircuitBreakerAgentRunnerService::class)]
 final class CircuitBreakerAgentRunnerTest extends TestCase
 {
     private AgentRunnerInterface&MockObject $innerRunner;
@@ -50,7 +50,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->expects(self::once())->method('run')->willReturn($successResult);
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $this->defaultState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $this->defaultState, $this->logger);
 
         $result = $runner->run($this->request);
 
@@ -66,7 +66,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($successResult);
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $this->defaultState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $this->defaultState, $this->logger);
         $runner->run($this->request);
 
         $state = $runner->getCircuitState('pi');
@@ -82,7 +82,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($errorResult);
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $this->defaultState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $this->defaultState, $this->logger);
         $result = $runner->run($this->request);
 
         // Результат возвращается как есть, но состояние изменяется
@@ -100,7 +100,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willThrowException(new RuntimeException('Connection timeout'));
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $this->defaultState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $this->defaultState, $this->logger);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Connection timeout');
@@ -120,7 +120,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         // Логируется только переход Closed → Open (1 warning)
         $this->logger->expects(self::once())->method('warning');
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $this->defaultState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $this->defaultState, $this->logger);
 
         // failureThreshold = 3
         $runner->run($this->request); // failure 1
@@ -145,7 +145,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $this->logger->method('warning');
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $this->defaultState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $this->defaultState, $this->logger);
 
         // Доводим до Open
         $runner->run($this->request);
@@ -177,7 +177,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->logger->method('warning');
         $this->logger->method('info');
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -220,7 +220,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->logger->method('warning');
         $this->logger->method('info');
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -254,7 +254,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->logger->method('warning');
         $this->logger->method('error');
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -285,7 +285,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->logger->method('warning');
         $this->logger->method('error');
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -355,7 +355,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->logger->method('warning');
         $this->logger->method('info');
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -403,7 +403,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->logger->method('info');
 
         // fallbackCommand не передана (default = [])
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -443,7 +443,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
                 $infoCalls[] = $message;
             });
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -487,7 +487,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
                 $errorCalls[] = $message;
             });
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -529,7 +529,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         // Логируем переход HalfOpen → Closed
         $this->logger->expects(self::once())->method('info');
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $openState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $openState, $this->logger);
 
         $result = $runner->run($this->request);
 
@@ -563,7 +563,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $this->logger->method('warning');
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $openState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $openState, $this->logger);
 
         $result = $runner->run($this->request);
 
@@ -598,7 +598,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $this->logger->method('warning');
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $openState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $openState, $this->logger);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Connection refused');
@@ -622,7 +622,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     {
         $this->innerRunner->method('getName')->willReturn('codex');
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $this->defaultState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $this->defaultState, $this->logger);
 
         self::assertSame('codex', $runner->getName());
     }
@@ -632,7 +632,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
     {
         $this->innerRunner->method('isAvailable')->willReturn(true);
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $this->defaultState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $this->defaultState, $this->logger);
 
         self::assertTrue($runner->isAvailable());
     }
@@ -647,7 +647,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->innerRunner->method('getName')->willReturn('pi');
         $this->innerRunner->method('run')->willReturn($successResult);
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $this->defaultState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $this->defaultState, $this->logger);
         $runner->run($this->request);
 
         // Проверяем состояние для 'pi'
@@ -673,7 +673,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->logger->method('warning');
         $this->logger->method('info');
 
-        $runner = new CircuitBreakerAgentRunner($this->innerRunner, $this->defaultState, $this->logger);
+        $runner = new CircuitBreakerAgentRunnerService($this->innerRunner, $this->defaultState, $this->logger);
 
         // 1-3: failures → Open (failureThreshold=3)
         $runner->run($this->request);
@@ -703,7 +703,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $halfOpenRunner->method('getName')->willReturn('pi');
         $halfOpenRunner->method('run')->willReturn($successResult);
 
-        $runner2 = new CircuitBreakerAgentRunner($halfOpenRunner, $halfOpenState, $this->logger);
+        $runner2 = new CircuitBreakerAgentRunnerService($halfOpenRunner, $halfOpenState, $this->logger);
 
         $result = $runner2->run($this->request);
         self::assertFalse($result->isError());
@@ -727,7 +727,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->logger->method('warning');
 
         // Конструктор только с 3 обязательными параметрами (как раньше)
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -759,7 +759,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $metrics = new InMemoryMetricsCollector();
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -791,7 +791,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $metrics = new InMemoryMetricsCollector();
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -834,7 +834,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $metrics = new InMemoryMetricsCollector();
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $openState,
             $this->logger,
@@ -873,7 +873,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $metrics = new InMemoryMetricsCollector();
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $openState,
             $this->logger,
@@ -902,7 +902,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
 
         $metrics = new InMemoryMetricsCollector();
 
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,
@@ -932,7 +932,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         $this->innerRunner->method('run')->willReturn($successResult);
 
         // Metrics = null (default)
-        $runner = new CircuitBreakerAgentRunner(
+        $runner = new CircuitBreakerAgentRunnerService(
             $this->innerRunner,
             $this->defaultState,
             $this->logger,

@@ -28,12 +28,6 @@ phpmd: ## Запустить PHP Mess Detector
 	@echo "PHPMD:"
 	@vendor/bin/phpmd analyze src --format=text --ruleset=phpmd.xml --baseline-file=phpmd.baseline.xml && echo "No violations."
 
-.PHONY: phpmd-full
-phpmd-full: ## Запустить PHPMD без baseline
-	@echo
-	@echo "PHPMD (full):"
-	@vendor/bin/phpmd analyze src --format=text --ruleset=phpmd.xml
-
 .PHONY: tests-unit
 tests-unit: ## Запустить unit-тесты
 	@echo
@@ -66,10 +60,23 @@ phpcs: ## Запустить PHP_CodeSniffer
 md-links: ## Валидация внутренних ссылок в Markdown
 	@echo
 	@echo "MD-Links:"
-	@php vendor/prikotov/coding-standard/bin/validate-md-links.php
+	@php vendor/prikotov/coding-standard/bin/validate-md-links
+
+.PHONY: validate-todo
+validate-todo: ## Валидация задач todo-md (только активные)
+	@echo
+	@echo "Validate-Todo:"
+	@files=$$(find todo/ -maxdepth 1 -name '*.todo.md' -o -name 'EPIC-*.md' 2>/dev/null); \
+	if [ -z "$$files" ]; then \
+		echo "  No active task files found in todo/. Skipping."; \
+	else \
+		for f in $$files; do \
+			php vendor/prikotov/todo-md/bin/todo-md-validate "$$f"; \
+		done; \
+	fi
 
 .PHONY: check
-check: ## Запустить все проверки (deptrac + psalm + phpmd + phpcs + md-links + tests)
-	@${MAKE} --no-print-directory deptrac psalm phpmd phpcs md-links tests && \
+check: ## Запустить все проверки (deptrac + psalm + phpmd + phpcs + md-links + validate-todo + tests)
+	@${MAKE} --no-print-directory deptrac psalm phpmd phpcs md-links validate-todo tests && \
 		{ echo; echo "✅ Все проверки завершены успешно."; } || \
 		{ echo; echo "❌ Проверки завершены с ошибками."; exit 1; }

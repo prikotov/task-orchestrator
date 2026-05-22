@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-05-20
 **Объект:** Zeroclaw v0.7.5 (`zeroclaw`, Rust, zeroclaw-labs/zeroclaw, 31.5k★)
-**Задача:** [TASK-research-zeroclaw-agent](../../../todo/TASK-research-zeroclaw-agent.todo.md)
+**Задача:** [TASK-research-zeroclaw-agent](../../../todo/done/TASK-research-zeroclaw-agent.todo.md)
 
 ---
 

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi;
 
+use InvalidArgumentException;
 use Override;
 use Symfony\Component\Process\Process;
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\PiAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 
@@ -20,7 +21,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunReques
  * как абсолютные пути — Pi читает файлы самостоятельно через existsSync-эвристику.
  * Значения с префиксом @ разрешаются как пути к файлам (содержимое подставляется inline).
  */
-final readonly class PiAgentRunner implements AgentRunnerInterface
+final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterface
 {
     public function __construct(
         private PiJsonlParser $parser,
@@ -52,6 +53,7 @@ final readonly class PiAgentRunner implements AgentRunnerInterface
      *
      * @return list<string> готовый массив аргументов для Symfony Process
      */
+    #[Override]
     public function buildCommand(AgentRunRequestVo $request): array
     {
         $command = $request->getCommand();
@@ -59,7 +61,7 @@ final readonly class PiAgentRunner implements AgentRunnerInterface
         if ($command === []) {
             $command = ['pi', '--mode', 'json', '-p', '--no-session'];
         } elseif ($command[0] !== 'pi' && !str_contains($command[0] ?? '', 'pi')) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'AgentRunRequestVo::$command must be either empty (runner default) or a full CLI command starting with an executable. '
                 . 'Got: %s',
                 implode(' ', $command),

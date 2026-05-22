@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain;
 
+use Override;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainConfigViolationVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
@@ -21,13 +22,14 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChai
  * Validator работает с уже сконструированными VO (дополнительный уровень защиты).
  * Guard-проверки в VO (fail-fast при конструировании) остаются без изменений.
  */
-final readonly class ChainDefinitionValidator
+final readonly class ChainDefinitionValidatorService implements ChainDefinitionValidatorServiceInterface
 {
     /**
      * Валидирует определение цепочки и возвращает список нарушений.
      *
      * @return list<ChainConfigViolationVo> пустой список = нарушений нет
      */
+    #[Override]
     public function validate(ChainDefinitionInterface $chain): array
     {
         if ($chain instanceof DynamicChainDefinitionVo) {

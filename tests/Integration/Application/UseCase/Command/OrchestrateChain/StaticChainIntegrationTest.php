@@ -10,8 +10,8 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainLoaderInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoader;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategy;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategyService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
@@ -26,25 +26,25 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteQ
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteToolStepService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapper;
+use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapperService;
 
 /**
  * Integration-тест: static chain end-to-end.
  *
- * Проверяет полный цикл: YAML-конфигурация → YamlChainLoader → OrchestrateChainCommandHandler
- * → StaticExecutionStrategy → RunStaticChainService → ResolveStepRunnerService → ExecuteAgentStepService → RunAgentServiceInterface (stub)
+ * Проверяет полный цикл: YAML-конфигурация → YamlChainLoaderService → OrchestrateChainCommandHandler
+ * → StaticExecutionStrategyService → RunStaticChainService → ResolveStepRunnerService → ExecuteAgentStepService → RunAgentServiceInterface (stub)
  * → OrchestrateChainResultDto.
  *
  * Внешние зависимости (AI-агент) подменяются стабом. Все внутренние слои — реальные объекты.
  */
 #[Group('integration')]
 #[CoversClass(OrchestrateChainCommandHandler::class)]
-#[CoversClass(StaticExecutionStrategy::class)]
+#[CoversClass(StaticExecutionStrategyService::class)]
 #[CoversClass(ExecuteStaticChainService::class)]
 #[CoversClass(RunStaticChainService::class)]
 #[CoversClass(ResolveStepRunnerService::class)]
 #[CoversClass(ExecuteAgentStepService::class)]
-#[CoversClass(YamlChainLoader::class)]
+#[CoversClass(YamlChainLoaderService::class)]
 final class StaticChainIntegrationTest extends TestCase
 {
     private const string FIXTURES_DIR = __DIR__ . '/../../../../_fixtures';
@@ -57,7 +57,7 @@ final class StaticChainIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->chainLoader = new YamlChainLoader(self::FIXTURES_DIR . '/test_chains.yaml');
+        $this->chainLoader = new YamlChainLoaderService(self::FIXTURES_DIR . '/test_chains.yaml');
         $this->stubAgent = new StubRunAgentService();
 
         $budgetService = $this->createMock(CheckStaticBudgetServiceInterface::class);
@@ -90,8 +90,8 @@ final class StaticChainIntegrationTest extends TestCase
             $hookExecutor,
         );
         $staticChainExecutor = new ExecuteStaticChainService($runStaticChainService);
-        $definitionMapper = new ChainExecutionDefinitionMapper(new LoadRawChainQueryHandler($this->chainLoader));
-        $staticStrategy = new StaticExecutionStrategy($staticChainExecutor, $definitionMapper);
+        $definitionMapper = new ChainExecutionDefinitionMapperService(new LoadRawChainQueryHandler($this->chainLoader));
+        $staticStrategy = new StaticExecutionStrategyService($staticChainExecutor, $definitionMapper);
 
         $this->handler = new OrchestrateChainCommandHandler(
             $definitionMapper,

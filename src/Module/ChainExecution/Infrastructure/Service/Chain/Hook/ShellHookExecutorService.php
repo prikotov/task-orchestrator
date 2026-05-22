@@ -8,7 +8,7 @@ use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\ShellHookExecutorServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
 
 /**
@@ -18,7 +18,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultV
  * Hook failure = warning в лог, не прерывает цепочку.
  * stdout/stderr логируются через LoggerInterface.
  */
-final readonly class ShellHookExecutor implements HookExecutorInterface
+final readonly class ShellHookExecutorService implements ShellHookExecutorServiceInterface
 {
     /** @var int Таймаут выполнения hook в секундах */
     private const int HOOK_TIMEOUT = 30;

@@ -9,13 +9,13 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
-use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\Hook\ShellHookExecutor;
+use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\Hook\ShellHookExecutorService;
 
-#[CoversClass(ShellHookExecutor::class)]
+#[CoversClass(ShellHookExecutorService::class)]
 final class ShellHookExecutorTest extends TestCase
 {
     private string $tempDir;
-    private ShellHookExecutor $executor;
+    private ShellHookExecutorService $executor;
     private LoggerInterface $logger;
 
     protected function setUp(): void
@@ -24,7 +24,7 @@ final class ShellHookExecutorTest extends TestCase
         mkdir($this->tempDir, 0777, true);
 
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->executor = new ShellHookExecutor($this->logger);
+        $this->executor = new ShellHookExecutorService($this->logger);
     }
 
     protected function tearDown(): void

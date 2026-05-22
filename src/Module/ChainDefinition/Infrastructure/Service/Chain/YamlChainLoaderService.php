@@ -12,7 +12,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterfa
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\ChainNotFoundException;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainLoaderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\YamlChainLoaderServiceInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
@@ -35,7 +35,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChai
  * Также парсит секцию `roles` с per-role конфигурацией
  * (command, timeout, prompt_file, fallback) и `retry_policy` на уровне цепочки и шага.
  */
-final class YamlChainLoader implements ChainLoaderInterface
+final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
 {
     private string $yamlPath;
 

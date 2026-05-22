@@ -6,14 +6,14 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Q
 
 use Override;
 use Symfony\Component\Process\Process;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionQualityGateVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\QualityGateResultVo;
 
 /**
  * Выполнение quality gate через Symfony Process.
  */
-final readonly class QualityGateRunner implements QualityGateRunnerInterface
+final readonly class QualityGateRunnerService implements QualityGateRunnerServiceInterface
 {
     #[Override]
     public function run(ExecutionQualityGateVo $gate): QualityGateResultVo

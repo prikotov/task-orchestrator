@@ -8,6 +8,7 @@ use Override;
 use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Enum\CircuitStateEnum;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\CircuitBreakerAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\MetricsCollectorInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
@@ -28,7 +29,7 @@ use Throwable;
  *
  * Не изменяет AgentRunnerInterface — чистый Decorator pattern.
  */
-final class CircuitBreakerAgentRunner implements AgentRunnerInterface
+final class CircuitBreakerAgentRunnerService implements CircuitBreakerAgentRunnerServiceInterface
 {
     /** @var array<string, CircuitBreakerStateVo> in-memory хранилище состояний */
     private array $states = [];
@@ -205,6 +206,7 @@ final class CircuitBreakerAgentRunner implements AgentRunnerInterface
     /**
      * Возвращает текущее состояние circuit breaker для runner'а.
      */
+    #[Override]
     public function getCircuitState(string $runnerName): CircuitBreakerStateVo
     {
         return $this->getState($runnerName);

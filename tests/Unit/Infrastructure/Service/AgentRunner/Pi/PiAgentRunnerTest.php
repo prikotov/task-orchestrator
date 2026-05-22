@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Pi;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunner;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunnerService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiJsonlParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(PiAgentRunner::class)]
+#[CoversClass(PiAgentRunnerService::class)]
 final class PiAgentRunnerTest extends TestCase
 {
-    private PiAgentRunner $runner;
+    private PiAgentRunnerService $runner;
 
     protected function setUp(): void
     {
-        $this->runner = new PiAgentRunner(new PiJsonlParser());
+        $this->runner = new PiAgentRunnerService(new PiJsonlParser());
     }
 
     // ──── getName / isAvailable ─────────────────────────────────────────
