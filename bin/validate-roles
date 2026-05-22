@@ -1,0 +1,379 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * validate-roles — validate AI agent role files.
+ *
+ * Checks:
+ *   1. YAML front matter present with required fields (agent, role, name, title, description).
+ *   2. `agent` matches filename (without .{locale}.md).
+ *   3. `role` is snake_case, Latin, no person name.
+ *   4. `personality` subsections are valid (if present).
+ *   5. `skills` is a list of strings (if present).
+ *   6. Filename follows `{agent}.{locale}.md` pattern.
+ *   7. Body starts with H1 heading.
+ *
+ * Based on: docs/agents/roles/ROLE-CREATION.md
+ *
+ * Usage:
+ *   php bin/validate-roles [path]
+ *
+ *   path — roles directory (default: docs/agents/roles).
+ *
+ * Exit codes:
+ *   0 — all checks passed
+ *   1 — validation errors found
+ */
+
+// ── Config ─────────────────────────────────────────────────────────────────
+
+$rolesDir = $argv[1] ?? 'docs/agents/roles';
+$errors = [];
+
+/** Required fields in YAML front matter. */
+const REQUIRED_FIELDS = ['agent', 'role', 'name', 'title', 'description'];
+
+/** Valid personality subsections. */
+const PERSONALITY_SECTIONS = ['disc', 'big_five', 'adizes', 'belbin', 'jung'];
+
+/** Directories to skip (reference materials, not role definitions). */
+const SKIP_DIRS = ['references'];
+
+/** Files to skip (instructions, not role definitions). */
+const SKIP_FILES = ['ROLE-CREATION.md'];
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+/**
+ * Parse YAML front matter from markdown content.
+ * Returns ['fields' => [...], 'body' => string] or null if no front matter.
+ *
+ * @return array{fields: array<string, string>, body: string}|null
+ */
+function parseFrontMatter(string $content): ?array
+{
+    if (!str_starts_with($content, "---\n")) {
+        return null;
+    }
+
+    $end = strpos($content, "\n---\n", 4);
+    if ($end === false) {
+        return null;
+    }
+
+    $yaml = substr($content, 4, $end - 4);
+    $body = substr($content, $end + 5);
+
+    return ['fields' => parseSimpleYaml($yaml), 'body' => $body];
+}
+
+/**
+ * Parse simple YAML key-value pairs and basic structures (arrays, nested objects).
+ * Handles:
+ *   - scalar: key: value
+ *   - quoted: key: "value" or key: 'value'
+ *   - array: lines starting with "  - ..."
+ *   - nested: key followed by indented lines
+ *
+ * @return array<string, mixed>
+ */
+function parseSimpleYaml(string $yaml): array
+{
+    $fields = [];
+    $lines = explode("\n", $yaml);
+    $currentKey = null;
+    $inArray = false;
+    $arrayValues = [];
+
+    foreach ($lines as $line) {
+        $trimmed = trim($line);
+
+        if ($trimmed === '' || str_starts_with($trimmed, '#')) {
+            continue;
+        }
+
+        // Array item: "  - value"
+        if (preg_match('/^- (.+)$/', $trimmed, $m)) {
+            if ($currentKey !== null) {
+                $val = trim($m[1]);
+                // Remove quotes
+                if (preg_match('/^["\'](.*)["\']\s*$/', $val, $q)) {
+                    $val = $q[1];
+                }
+                $arrayValues[] = $val;
+                $inArray = true;
+            }
+            continue;
+        }
+
+        // Flush previous array
+        if ($inArray && $currentKey !== null) {
+            $fields[$currentKey] = $arrayValues;
+            $arrayValues = [];
+            $inArray = false;
+        }
+
+        // Key-value: "key: value"
+        $colon = strpos($trimmed, ':');
+        if ($colon === false) {
+            continue;
+        }
+
+        $key = trim(substr($trimmed, 0, $colon));
+        $value = trim(substr($trimmed, $colon + 1));
+
+        // Nested object: "key:" with no value on same line
+        if ($value === '') {
+            $currentKey = $key;
+            $arrayValues = [];
+            $inArray = false;
+            continue;
+        }
+
+        // Remove surrounding quotes
+        if (preg_match('/^["\'](.*)["\']\s*$/', $value, $m)) {
+            $value = $m[1];
+        }
+
+        $fields[$key] = $value;
+        $currentKey = null;
+    }
+
+    // Flush last array
+    if ($inArray && $currentKey !== null) {
+        $fields[$currentKey] = $arrayValues;
+    }
+
+    return $fields;
+}
+
+/**
+ * Extract the first H1 heading from markdown body.
+ */
+function extractH1(string $body): ?string
+{
+    foreach (explode("\n", $body) as $line) {
+        $trimmed = ltrim($line);
+        if ($trimmed === '') {
+            continue;
+        }
+        if (preg_match('/^# (.+)/', $trimmed, $m)) {
+            return trim($m[1]);
+        }
+        // Stop at first non-empty, non-H1 line
+        break;
+    }
+
+    return null;
+}
+
+/**
+ * Check if path is inside a skip directory.
+ */
+function isSkipped(string $relativePath): bool
+{
+    $parts = explode('/', $relativePath);
+    foreach ($parts as $part) {
+        if (in_array($part, SKIP_DIRS, true)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// ── Collect files ──────────────────────────────────────────────────────────
+
+$iterator = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($rolesDir, RecursiveDirectoryIterator::SKIP_DOTS),
+    RecursiveIteratorIterator::SELF_FIRST,
+);
+
+$mdFiles = [];
+
+foreach ($iterator as $item) {
+    if (!$item->isFile() || $item->getExtension() !== 'md') {
+        continue;
+    }
+
+    $relativePath = substr($item->getPathname(), strlen($rolesDir) + 1);
+    $basename = $item->getFilename();
+
+    if (in_array($basename, SKIP_FILES, true)) {
+        continue;
+    }
+
+    if (isSkipped($relativePath)) {
+        continue;
+    }
+
+    $mdFiles[] = $item->getPathname();
+}
+
+sort($mdFiles);
+
+echo "Validating " . count($mdFiles) . " role file(s) in {$rolesDir}/\n\n";
+
+// ── Check 1: Filename pattern ──────────────────────────────────────────────
+
+echo "## Filename pattern ({agent}.{locale}.md)\n";
+$filenameErrors = 0;
+
+foreach ($mdFiles as $filePath) {
+    $basename = basename($filePath);
+    // Pattern: {agent}.{2-3 letter locale}.md
+    if (!preg_match('/^(.+)\.([a-z]{2,3})\.md$/', $basename, $m)) {
+        $relativePath = substr($filePath, strlen($rolesDir) + 1);
+        echo "  ✗ {$relativePath}: filename does not match {agent}.{locale}.md pattern\n";
+        $errors[] = "filename: {$relativePath}";
+        $filenameErrors++;
+    }
+}
+
+if ($filenameErrors === 0) {
+    echo "  ✓ All filenames match pattern\n";
+}
+echo "\n";
+
+// ── Check 2: Front matter ──────────────────────────────────────────────────
+
+echo "## Front matter\n";
+$fmErrors = 0;
+
+foreach ($mdFiles as $filePath) {
+    $relativePath = substr($filePath, strlen($rolesDir) + 1);
+    $basename = basename($filePath);
+    $content = file_get_contents($filePath);
+    if ($content === false) {
+        continue;
+    }
+
+    $parsed = parseFrontMatter($content);
+
+    if ($parsed === null) {
+        echo "  ✗ {$relativePath}: missing front matter\n";
+        $errors[] = "front-matter: {$relativePath} missing";
+        $fmErrors++;
+        continue;
+    }
+
+    $fields = $parsed['fields'];
+
+    // Required fields
+    foreach (REQUIRED_FIELDS as $field) {
+        if (!isset($fields[$field]) || (is_string($fields[$field]) && trim($fields[$field]) === '')) {
+            echo "  ✗ {$relativePath}: missing field \"{$field}\"\n";
+            $errors[] = "front-matter: {$relativePath} missing \"{$field}\"";
+            $fmErrors++;
+        }
+    }
+
+    // agent matches filename
+    $agent = $fields['agent'] ?? null;
+    if ($agent !== null) {
+        // Extract agent from filename: strip .{locale}.md
+        $expectedAgent = preg_replace('/\.[a-z]{2,3}\.md$/', '', $basename);
+        if ($agent !== $expectedAgent) {
+            echo "  ✗ {$relativePath}: agent \"{$agent}\" does not match filename (expected \"{$expectedAgent}\")\n";
+            $errors[] = "front-matter: {$relativePath} agent mismatch";
+            $fmErrors++;
+        }
+    }
+
+    // role is snake_case Latin
+    $role = $fields['role'] ?? null;
+    if ($role !== null && !preg_match('/^[a-z][a-z0-9]*(_[a-z0-9]+)*$/', $role)) {
+        echo "  ✗ {$relativePath}: role \"{$role}\" is not snake_case Latin\n";
+        $errors[] = "front-matter: {$relativePath} invalid role \"{$role}\"";
+        $fmErrors++;
+    }
+
+    // personality subsections
+    $personality = $fields['personality'] ?? null;
+    if ($personality !== null) {
+        if (!is_array($personality)) {
+            echo "  ✗ {$relativePath}: personality is not a mapping\n";
+            $errors[] = "front-matter: {$relativePath} personality not a mapping";
+            $fmErrors++;
+        } else {
+            $personalityKeys = array_keys($personality);
+            foreach ($personalityKeys as $section) {
+                if (!in_array($section, PERSONALITY_SECTIONS, true)) {
+                    echo "  ✗ {$relativePath}: unknown personality section \"{$section}\"\n";
+                    $errors[] = "front-matter: {$relativePath} unknown personality \"{$section}\"";
+                    $fmErrors++;
+                }
+            }
+        }
+    }
+
+    // skills is array of strings
+    $skills = $fields['skills'] ?? null;
+    if ($skills !== null) {
+        if (!is_array($skills)) {
+            echo "  ✗ {$relativePath}: skills is not an array\n";
+            $errors[] = "front-matter: {$relativePath} skills not array";
+            $fmErrors++;
+        } else {
+            foreach ($skills as $idx => $skill) {
+                if (!is_string($skill)) {
+                    echo "  ✗ {$relativePath}: skills[{$idx}] is not a string\n";
+                    $errors[] = "front-matter: {$relativePath} skills[{$idx}] not string";
+                    $fmErrors++;
+                }
+            }
+        }
+    }
+}
+
+if ($fmErrors === 0) {
+    echo "  ✓ All front matter valid\n";
+}
+echo "\n";
+
+// ── Check 3: Body starts with H1 ──────────────────────────────────────────
+
+echo "## Body structure\n";
+$bodyErrors = 0;
+
+foreach ($mdFiles as $filePath) {
+    $relativePath = substr($filePath, strlen($rolesDir) + 1);
+    $content = file_get_contents($filePath);
+    if ($content === false) {
+        continue;
+    }
+
+    $parsed = parseFrontMatter($content);
+    $body = $parsed['body'] ?? $content;
+
+    $h1 = extractH1($body);
+    if ($h1 === null) {
+        echo "  ✗ {$relativePath}: body does not start with H1 heading\n";
+        $errors[] = "body: {$relativePath} missing H1";
+        $bodyErrors++;
+    }
+}
+
+if ($bodyErrors === 0) {
+    echo "  ✓ All files start with H1 heading\n";
+}
+echo "\n";
+
+// ── Summary ────────────────────────────────────────────────────────────────
+
+$totalErrors = count($errors);
+
+if ($totalErrors > 0) {
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    echo "✗ Found {$totalErrors} error(s)\n";
+    echo "  Filename:    {$filenameErrors}\n";
+    echo "  Front matter: {$fmErrors}\n";
+    echo "  Body:        {$bodyErrors}\n";
+    exit(1);
+}
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+echo "✓ All checks passed\n";
+exit(0);

@@ -75,8 +75,14 @@ validate-todo: ## Валидация задач todo-md (только актив
 		done; \
 	fi
 
+.PHONY: validate-roles
+validate-roles: ## Валидация файлов ролей AI-агентов
+	@echo
+	@echo "Validate-Roles:"
+	@php bin/validate-roles
+
 .PHONY: check
-check: ## Запустить все проверки (deptrac + psalm + phpmd + phpcs + md-links + validate-todo + tests)
-	@${MAKE} --no-print-directory deptrac psalm phpmd phpcs md-links validate-todo tests && \
+check: ## Запустить все проверки (deptrac + psalm + phpmd + phpcs + md-links + validate-todo + validate-roles + tests)
+	@${MAKE} --no-print-directory deptrac psalm phpmd phpcs md-links validate-todo validate-roles tests && \
 		{ echo; echo "✅ Все проверки завершены успешно."; } || \
 		{ echo; echo "❌ Проверки завершены с ошибками."; exit 1; }
