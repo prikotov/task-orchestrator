@@ -19,7 +19,7 @@
         "symfony/dotenv": "^8.0"
     },
     "require-dev": {
-        "prikotov/coding-standard": "^0.17.0",
+        "prikotov/coding-standard": "^0.17.1",
         "phpunit/phpunit": "^10.5",
         "prikotov/todo-md": "^0.0",
         "prikotov/git-workflow": "^0.1.0",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ab708d8a9915f61208850a2ef6323b37",
+    "content-hash": "b1218bd3c16224dd776e78d46ebe34a2",
     "packages": [
         {
             "name": "psr/container",
@@ -4851,16 +4851,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.17.0",
+            "version": "v0.17.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:prikotov/coding-standard.git",
-                "reference": "f11e53b0e755ef1b5a9920e5c555e9dafb9c58e2"
+                "reference": "6d8b39a96b05b41ce53f7f81ff84b9084e923a52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/f11e53b0e755ef1b5a9920e5c555e9dafb9c58e2",
-                "reference": "f11e53b0e755ef1b5a9920e5c555e9dafb9c58e2",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/6d8b39a96b05b41ce53f7f81ff84b9084e923a52",
+                "reference": "6d8b39a96b05b41ce53f7f81ff84b9084e923a52",
                 "shasum": ""
             },
             "require": {
@@ -4938,7 +4938,7 @@
                 "phpcs",
                 "sniffs"
             ],
-            "time": "2026-05-23T01:35:36+00:00"
+            "time": "2026-05-23T02:44:56+00:00"
         },
         {
             "name": "prikotov/git-workflow",
