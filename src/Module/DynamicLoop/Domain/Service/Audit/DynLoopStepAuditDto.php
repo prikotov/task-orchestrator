@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Dto;
+namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit;
 
 /**
  * DTO статуса выполнения одного шага dynamic-цикла для audit-лога.

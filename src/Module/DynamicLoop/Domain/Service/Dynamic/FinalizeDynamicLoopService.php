@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic;
 
 use Override;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Dto\DynamicLoopAuditDto;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Dto\DynLoopStepAuditDto;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditDto;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynLoopStepAuditDto;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;

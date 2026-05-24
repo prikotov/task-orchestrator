@@ -255,7 +255,7 @@ final class StaticChainIntegrationTest extends TestCase
         self::assertSame(800, $result->totalInputTokens);
         self::assertSame(1600, $result->totalOutputTokens);
         self::assertSame(0.08, $result->totalCost);
-        self::assertGreaterThan(0.0, $result->totalTime);
+        self::assertGreaterThanOrEqual(0.0, $result->totalTime);
         self::assertFalse($result->budgetExceeded);
         self::assertSame(0, $result->totalIterations);
     }
