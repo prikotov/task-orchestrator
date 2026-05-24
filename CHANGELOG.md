@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9] - 2026-05-23
+
+### Changed
+
+- Bump `prikotov/coding-standard` ^0.18.0 (was ^0.17.1)
+- Move Domain DTOs from `Domain/Dto/` to `Domain/Service/Audit/` (new PHPCS convention)
+
+### Fixed
+
+- Fix flaky test `staticChainAggregatedMetricsAreAccumulated` — `assertGreaterThan` → `assertGreaterThanOrEqual`
+
 ## [0.1.8] - 2026-05-23
 
 ### Changed
