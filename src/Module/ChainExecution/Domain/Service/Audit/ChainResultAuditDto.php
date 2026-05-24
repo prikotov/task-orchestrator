@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Audit;
 
 /**
  * DTO финального результата цепочки для audit-лога.

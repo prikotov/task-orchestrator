@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Override;
 use RuntimeException;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\ChainResultAuditDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Audit\ChainResultAuditDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Audit\JsonlAuditLoggerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use const FILE_APPEND;

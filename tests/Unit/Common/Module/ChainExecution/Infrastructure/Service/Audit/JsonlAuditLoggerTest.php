@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Common\Module\ChainExecution\Infrastructure\Service\Audit;
 
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\ChainResultAuditDto;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Dto\StepAuditStatusDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Audit\ChainResultAuditDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Audit\StepAuditStatusDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Audit\JsonlAuditLoggerService;
 use PHPUnit\Framework\Attributes\CoversClass;
