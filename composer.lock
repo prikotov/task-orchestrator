@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0a6dff8f7471233bddcefeccd149dba5",
+    "content-hash": "372a1dc8207345cf1fb4731bcd13bf6a",
     "packages": [
         {
             "name": "psr/container",
@@ -4851,16 +4851,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.18.0",
+            "version": "v0.19.0",
             "source": {
                 "type": "git",
-                "url": "git@github.com:prikotov/coding-standard.git",
-                "reference": "5245de34ea752733184d037abc0329c269213529"
+                "url": "https://github.com/prikotov/coding-standard.git",
+                "reference": "749ea3a64680bb0e59049e8e32dc8dae9ec2a0f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/5245de34ea752733184d037abc0329c269213529",
-                "reference": "5245de34ea752733184d037abc0329c269213529",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/749ea3a64680bb0e59049e8e32dc8dae9ec2a0f3",
+                "reference": "749ea3a64680bb0e59049e8e32dc8dae9ec2a0f3",
                 "shasum": ""
             },
             "require": {
@@ -4944,7 +4944,11 @@
                 "phpcs",
                 "sniffs"
             ],
-            "time": "2026-05-24T11:38:12+00:00"
+            "support": {
+                "source": "https://github.com/prikotov/coding-standard/tree/v0.19.0",
+                "issues": "https://github.com/prikotov/coding-standard/issues"
+            },
+            "time": "2026-05-24T16:54:16+00:00"
         },
         {
             "name": "prikotov/git-workflow",
