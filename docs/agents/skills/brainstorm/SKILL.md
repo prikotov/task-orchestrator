@@ -47,7 +47,7 @@ description: >
 ### **Шаг 3:** Запуск brainstorm
 
 ```bash
-    php bin/console app:agent:orchestrate "<тема>" --chain=brainstorm [опции]
+    php vendor/bin/task-orchestrator "<тема>" --chain=brainstorm [опции]
 ```
 
 > ⚠️ Опция `--chain=brainstorm` **обязательна**: по умолчанию команда запускает цепочку `implement`, а не `brainstorm`.
@@ -79,16 +79,16 @@ description: >
 
 ```bash
     # Стандартный brainstorm
-    php bin/console app:agent:orchestrate "Какие модули выделить из AgentRunner" --chain=brainstorm
+    php vendor/bin/task-orchestrator "Какие модули выделить из AgentRunner" --chain=brainstorm
 
     # Переопределение участников и лимита раундов
-    php bin/console app:agent:orchestrate "Стратегия тестирования" \
+    php vendor/bin/task-orchestrator "Стратегия тестирования" \
         --chain=brainstorm \
         --participants=system_analyst_sherlock,system_architect_gandalf,system_architect_loki \
         --max-rounds=15
 
     # Другой фасилитатор + отчёт в файл
-    php bin/console app:agent:orchestrate "Кэширование в оркестраторе" \
+    php vendor/bin/task-orchestrator "Кэширование в оркестраторе" \
         --chain=brainstorm \
         --facilitator=team_lead_alex \
         --participants=backend_developer_levsha,system_architect_gandalf \
@@ -96,10 +96,10 @@ description: >
         --report-file=var/sessions/brainstorm/cache-strategy-$(date +%Y-%m-%d_%H-%M-%S).md
 
     # Dry run — посмотреть план без запуска
-    php bin/console app:agent:orchestrate "Паттерн retry" --chain=brainstorm --dry-run
+    php vendor/bin/task-orchestrator "Паттерн retry" --chain=brainstorm --dry-run
 
     # Resume прерванной сессии
-    php bin/console app:agent:orchestrate "Продолжение brainstorm" \
+    php vendor/bin/task-orchestrator "Продолжение brainstorm" \
         --chain=brainstorm \
         --resume=var/sessions/brainstorm/2026-04-23_03-02-36
 ```
@@ -123,7 +123,7 @@ Brainstorm может быть прерван по таймауту шага, и
 2. Запусти команду с `--resume`:
 
 ```bash
-    php bin/console app:agent:orchestrate "<тема>" --chain=brainstorm \
+    php vendor/bin/task-orchestrator "<тема>" --chain=brainstorm \
         --resume=var/sessions/brainstorm/<timestamp>
 ```
 

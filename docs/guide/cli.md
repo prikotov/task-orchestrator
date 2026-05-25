@@ -6,7 +6,7 @@
 
 ```bash
 composer install
-php bin/console list
+php vendor/bin/task-orchestrator list
 ```
 
 ## Команды
@@ -16,7 +16,7 @@ php bin/console list
 Основная команда оркестрации — запускает цепочку агентов (static или dynamic).
 
 ```bash
-php bin/console app:agent:orchestrate <task> [options]
+php vendor/bin/task-orchestrator <task> [options]
 ```
 
 | Опция | Сокращение | Описание | По умолчанию |
@@ -45,19 +45,19 @@ php bin/console app:agent:orchestrate <task> [options]
 
 ```bash
 # Запуск цепочки "implement" с задачей
-php bin/console app:agent:orchestrate "Add user registration endpoint"
+php vendor/bin/task-orchestrator "Add user registration endpoint"
 
 # Dry run — показать план без запуска
-php bin/console app:agent:orchestrate "Refactor billing" --dry-run
+php vendor/bin/task-orchestrator "Refactor billing" --dry-run
 
 # Dynamic-цепочка с кастомными участниками
-php bin/console app:agent:orchestrate "Design API" -c dynamic --participants "architect,analyst" --max-rounds 5
+php vendor/bin/task-orchestrator "Design API" -c dynamic --participants "architect,analyst" --max-rounds 5
 
 # Resume прерванной сессии
-php bin/console app:agent:orchestrate "Fix bug" --resume var/sessions/2026-04-16_abc123
+php vendor/bin/task-orchestrator "Fix bug" --resume var/sessions/2026-04-16_abc123
 
 # Запуск с кастомной моделью и audit-логом
-php bin/console app:agent:orchestrate "Add tests" -m claude-4-sonnet --audit-log var/log/audit.jsonl
+php vendor/bin/task-orchestrator "Add tests" -m claude-4-sonnet --audit-log var/log/audit.jsonl
 
 # Кастомный конфиг цепочек
 task-orchestrator app:agent:orchestrate --config=path/to/chains.yaml "Задача"
@@ -86,7 +86,7 @@ task-orchestrator app:agent:orchestrate --config=path/to/chains.yaml --validate-
 Запуск одного агента с указанной ролью.
 
 ```bash
-php bin/console app:agent:run --role=<role> --task=<task> [options]
+php vendor/bin/task-orchestrator app:agent:run --role=<role> --task=<task> [options]
 ```
 
 | Опция | Сокращение | Описание | По умолчанию |
@@ -104,19 +104,19 @@ php bin/console app:agent:run --role=<role> --task=<task> [options]
 
 ```bash
 # Запуск аналитика
-php bin/console app:agent:run -r system_analyst -t "Analyze requirements for payment module"
+php vendor/bin/task-orchestrator app:agent:run -r system_analyst -t "Analyze requirements for payment module"
 
 # С кастомной моделью
-php bin/console app:agent:run -r backend_developer -t "Implement DTO" -m claude-4-sonnet
+php vendor/bin/task-orchestrator app:agent:run -r backend_developer -t "Implement DTO" -m claude-4-sonnet
 
 # С таймаутом 600 секунд
-php bin/console app:agent:run -r backend_developer -t "Implement DTO" --timeout 600
+php vendor/bin/task-orchestrator app:agent:run -r backend_developer -t "Implement DTO" --timeout 600
 
 # С дополнительным контекстом
-php bin/console app:agent:run -r backend_developer -t "Implement DTO" --context '{"project":"task-orchestrator","language":"PHP"}'
+php vendor/bin/task-orchestrator app:agent:run -r backend_developer -t "Implement DTO" --context '{"project":"task-orchestrator","language":"PHP"}'
 
 # Без лимита времени
-php bin/console app:agent:run -r backend_developer -t "Refactor module" --timeout 0
+php vendor/bin/task-orchestrator app:agent:run -r backend_developer -t "Refactor module" --timeout 0
 ```
 
 Метрики (tokens, cost, turns) отображаются при запуске с `-v`.
@@ -128,7 +128,7 @@ php bin/console app:agent:run -r backend_developer -t "Refactor module" --timeou
 Показать список зарегистрированных движков и их доступность.
 
 ```bash
-php bin/console app:agent:runners
+php vendor/bin/task-orchestrator app:agent:runners
 ```
 
 Вывод — таблица с колонками `Runner` и `Status` (Available/Unavailable).
