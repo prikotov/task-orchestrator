@@ -45,19 +45,19 @@ php vendor/bin/task-orchestrator <task> [options]
 
 ```bash
 # Запуск цепочки "implement" с задачей
-php vendor/bin/task-orchestrator "Add user registration endpoint"
+php vendor/bin/task-orchestrator agent:orchestrate "Add user registration endpoint"
 
 # Dry run — показать план без запуска
-php vendor/bin/task-orchestrator "Refactor billing" --dry-run
+php vendor/bin/task-orchestrator agent:orchestrate "Refactor billing" --dry-run
 
 # Dynamic-цепочка с кастомными участниками
-php vendor/bin/task-orchestrator "Design API" -c dynamic --participants "architect,analyst" --max-rounds 5
+php vendor/bin/task-orchestrator agent:orchestrate "Design API" -c dynamic --participants "architect,analyst" --max-rounds 5
 
 # Resume прерванной сессии
-php vendor/bin/task-orchestrator "Fix bug" --resume var/sessions/2026-04-16_abc123
+php vendor/bin/task-orchestrator agent:orchestrate "Fix bug" --resume var/sessions/2026-04-16_abc123
 
 # Запуск с кастомной моделью и audit-логом
-php vendor/bin/task-orchestrator "Add tests" -m claude-4-sonnet --audit-log var/log/audit.jsonl
+php vendor/bin/task-orchestrator agent:orchestrate "Add tests" -m claude-4-sonnet --audit-log var/log/audit.jsonl
 
 # Кастомный конфиг цепочек
 php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml "Задача"
