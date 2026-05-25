@@ -38,7 +38,7 @@ jobs:
 
       - run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-      - run: box compile --no-configuration
+      - run: box compile --no-config
 
       - name: Smoke test
         run: php task-orchestrator.phar --version
