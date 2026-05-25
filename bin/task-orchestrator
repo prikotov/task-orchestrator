@@ -102,21 +102,4 @@ foreach ($container->findTaggedServiceIds('console.command') as $id => $tags) {
 }
 $application->addCommands($commands);
 
-// Set orchestrate as default command so "task-orchestrator <task> --chain=..." works
-// without explicitly typing "app:agent:orchestrate"
-// We detect if the first argument looks like a task (not a known command) and inject
-// the command name transparently.
-$argv = $_SERVER['argv'];
-$knownCommands = [];
-foreach ($application->all() as $name => $cmd) {
-    $knownCommands[] = $name;
-    foreach ($cmd->getAliases() as $alias) {
-        $knownCommands[] = $alias;
-    }
-}
-if (isset($argv[1]) && !in_array($argv[1], $knownCommands, true) && !str_starts_with($argv[1], '-')) {
-    array_splice($argv, 1, 0, ['app:agent:orchestrate']);
-    $_SERVER['argv'] = $argv;
-}
-
 $application->run();

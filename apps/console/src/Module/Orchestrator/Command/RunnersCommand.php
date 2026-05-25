@@ -15,7 +15,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunn
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersResultDto;
 
 #[AsCommand(
-    name: 'app:agent:runners',
+    name: 'agent:runners',
     description: 'Показать доступные движки AI-агентов',
 )]
 final class RunnersCommand extends Command

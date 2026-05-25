@@ -48,13 +48,13 @@ task-orchestrator --version
 Проверить конфигурацию цепочек:
 
 ```bash
-task-orchestrator app:agent:orchestrate --validate-config "check"
+task-orchestrator agent:orchestrate --validate-config "check"
 ```
 
 Запустить цепочку:
 
 ```bash
-task-orchestrator app:agent:orchestrate "Ваша задача"
+task-orchestrator agent:orchestrate "Ваша задача"
 ```
 
 ## Конфигурация (`chains.yaml`)
@@ -66,7 +66,7 @@ task-orchestrator app:agent:orchestrate "Ваша задача"
 По умолчанию используется путь к `chains.yaml` из Symfony-конфигурации. Чтобы указать произвольный конфиг — опция `--config`:
 
 ```bash
-task-orchestrator app:agent:orchestrate --config=path/to/chains.yaml "Задача"
+task-orchestrator agent:orchestrate --config=path/to/chains.yaml "Задача"
 ```
 
 ## Troubleshooting

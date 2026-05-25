@@ -28,7 +28,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Gene
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 
 #[AsCommand(
-    name: 'app:agent:orchestrate',
+    name: 'agent:orchestrate',
     description: 'Оркестрация AI-агентов по цепочке (static/dynamic)',
 )]
 
