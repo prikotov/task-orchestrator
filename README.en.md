@@ -86,7 +86,7 @@ chains:
 ```
 
 ```bash
-task-orchestrator agent:orchestrate \
+php vendor/bin/task-orchestrator agent:orchestrate \
   "Which modules should be extracted from AgentRunner?" \
   --chain=brainstorm
 ```
@@ -174,10 +174,10 @@ chains:
       - { type: quality_gate, command: "vendor/bin/phpunit", label: "Tests", timeout_seconds: 120 }
 ```
 
-Launch:
+Run from the project root:
 
 ```bash
-task-orchestrator agent:orchestrate "Add user registration endpoint"
+php vendor/bin/task-orchestrator agent:orchestrate "Add user registration endpoint"
 ```
 
 How to configure executors, choose YAML options, and connect to a project — see the [documentation](docs/guide/chains.md).

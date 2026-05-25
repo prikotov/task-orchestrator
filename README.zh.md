@@ -86,7 +86,7 @@ chains:
 ```
 
 ```bash
-task-orchestrator agent:orchestrate \
+php vendor/bin/task-orchestrator agent:orchestrate \
   "哪些模組應從 AgentRunner 中分離？" \
   --chain=brainstorm
 ```
@@ -174,10 +174,10 @@ chains:
       - { type: quality_gate, command: "vendor/bin/phpunit", label: "Tests", timeout_seconds: 120 }
 ```
 
-執行：
+從專案根目錄執行：
 
 ```bash
-task-orchestrator agent:orchestrate "Add user registration endpoint"
+php vendor/bin/task-orchestrator agent:orchestrate "Add user registration endpoint"
 ```
 
 如何設定執行者、選擇 YAML 選項並連接到專案——請參閱[文件](docs/guide/chains.md)。

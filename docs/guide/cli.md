@@ -60,10 +60,10 @@ php vendor/bin/task-orchestrator "Fix bug" --resume var/sessions/2026-04-16_abc1
 php vendor/bin/task-orchestrator "Add tests" -m claude-4-sonnet --audit-log var/log/audit.jsonl
 
 # Кастомный конфиг цепочек
-task-orchestrator agent:orchestrate --config=path/to/chains.yaml "Задача"
+php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml "Задача"
 
 # Валидация кастомного конфига
-task-orchestrator agent:orchestrate --config=path/to/chains.yaml --validate-config "check"
+php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml --validate-config "check"
 ```
 
 **Exit codes:**
