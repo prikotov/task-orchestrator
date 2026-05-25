@@ -48,6 +48,7 @@ $projectRoot = $isVendor ? getcwd() : $packageRoot;
 
 $container = new ContainerBuilder();
 $container->setParameter('kernel.project_dir', $projectRoot);
+$container->setParameter('task_orchestrator.package_dir', $packageRoot);
 
 // Resolve version: prefer installed package version, fall back to root package, then default
 $version = '0.1.0';
