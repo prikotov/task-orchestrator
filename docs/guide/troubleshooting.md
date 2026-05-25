@@ -311,7 +311,7 @@ bin/console agent:runners
 ### Показать план без запуска
 
 ```bash
-vendor/bin/task-orchestrator "Test task" --chain=implement --dry-run
+vendor/bin/task-orchestrator agent:orchestrate "Test task" --chain=implement --dry-run
 ```
 
 Выводит список шагов цепочки с ролями и runner'ами без фактического запуска.
