@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support short CLI syntax: `task-orchestrator "task" --chain=brainstorm` without explicit `app:agent:orchestrate` command name
+- Rename CLI commands: `app:agent:*` → `agent:*` (drop redundant `app:` prefix)
 
 ## [0.1.13] - 2026-05-25
 

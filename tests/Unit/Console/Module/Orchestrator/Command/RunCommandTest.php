@@ -230,7 +230,7 @@ final class RunCommandTest extends TestCase
 
         $application = new Application();
         $application->addCommand(new RunCommand($handler));
-        $command = $application->find('app:agent:run');
+        $command = $application->find('agent:run');
         $tester = new CommandTester($command);
 
         $exitCode = $tester->execute([
@@ -251,6 +251,6 @@ final class RunCommandTest extends TestCase
         $application = new Application();
         $application->addCommand(new RunCommand($handler));
 
-        return new CommandTester($application->find('app:agent:run'));
+        return new CommandTester($application->find('agent:run'));
     }
 }

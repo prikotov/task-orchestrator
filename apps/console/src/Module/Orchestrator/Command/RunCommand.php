@@ -16,7 +16,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\Ru
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\RunAgent\RunAgentResultDto;
 
 #[AsCommand(
-    name: 'app:agent:run',
+    name: 'agent:run',
     description: 'Запустить одного AI-агента с указанной ролью',
 )]
 final class RunCommand extends Command

@@ -263,7 +263,7 @@ that are not directly required by the topic. Apply YAGNI ruthlessly.
 **Решение:**
 - Новый `ChainStepTypeEnum::GATE` = `gate`
 - Шаг типа `gate` приостанавливает цепочку и ждёт ввода из CLI
-- `app:agent:orchestrate` приостанавливается и показывает prompt: «Approve design? [Y/n]»
+- `agent:orchestrate` приостанавливается и показывает prompt: «Approve design? [Y/n]»
 
 **Архитектурное влияние:**
 - Новое значение в `ChainStepTypeEnum`: `GATE = 'gate'`

@@ -184,7 +184,7 @@ PHPUnit проходит, потому что `CoversClass` с несущест�
 | Integration-мапперы корректны | ⚠️ | Работают, но нарушают слой (Critical-1) |
 | Все тесты проходят | ✅ | 843 тестов |
 | Psalm проходит | ✅ | No errors |
-| CLI app:agent:orchestrate | ✅ (косвенно) | Проверено через integration-тесты |
+| CLI agent:orchestrate | ✅ (косвенно) | Проверено через integration-тесты |
 | Удалён Orchestrator | ✅ | |
 | Удалён StaticExecution | ✅ | |
 | Deptrac-правила | ⬜ | Отдельная задача (PR#4) |

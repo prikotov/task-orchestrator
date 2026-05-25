@@ -11,7 +11,7 @@ php vendor/bin/task-orchestrator list
 
 ## Команды
 
-### `app:agent:orchestrate`
+### `agent:orchestrate`
 
 Основная команда оркестрации — запускает цепочку агентов (static или dynamic).
 
@@ -60,10 +60,10 @@ php vendor/bin/task-orchestrator "Fix bug" --resume var/sessions/2026-04-16_abc1
 php vendor/bin/task-orchestrator "Add tests" -m claude-4-sonnet --audit-log var/log/audit.jsonl
 
 # Кастомный конфиг цепочек
-task-orchestrator app:agent:orchestrate --config=path/to/chains.yaml "Задача"
+php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml "Задача"
 
 # Валидация кастомного конфига
-task-orchestrator app:agent:orchestrate --config=path/to/chains.yaml --validate-config "check"
+php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml --validate-config "check"
 ```
 
 **Exit codes:**
@@ -81,12 +81,12 @@ task-orchestrator app:agent:orchestrate --config=path/to/chains.yaml --validate-
 
 ---
 
-### `app:agent:run`
+### `agent:run`
 
 Запуск одного агента с указанной ролью.
 
 ```bash
-php vendor/bin/task-orchestrator app:agent:run --role=<role> --task=<task> [options]
+php vendor/bin/task-orchestrator agent:run --role=<role> --task=<task> [options]
 ```
 
 | Опция | Сокращение | Описание | По умолчанию |
@@ -104,31 +104,31 @@ php vendor/bin/task-orchestrator app:agent:run --role=<role> --task=<task> [opti
 
 ```bash
 # Запуск аналитика
-php vendor/bin/task-orchestrator app:agent:run -r system_analyst -t "Analyze requirements for payment module"
+php vendor/bin/task-orchestrator agent:run -r system_analyst -t "Analyze requirements for payment module"
 
 # С кастомной моделью
-php vendor/bin/task-orchestrator app:agent:run -r backend_developer -t "Implement DTO" -m claude-4-sonnet
+php vendor/bin/task-orchestrator agent:run -r backend_developer -t "Implement DTO" -m claude-4-sonnet
 
 # С таймаутом 600 секунд
-php vendor/bin/task-orchestrator app:agent:run -r backend_developer -t "Implement DTO" --timeout 600
+php vendor/bin/task-orchestrator agent:run -r backend_developer -t "Implement DTO" --timeout 600
 
 # С дополнительным контекстом
-php vendor/bin/task-orchestrator app:agent:run -r backend_developer -t "Implement DTO" --context '{"project":"task-orchestrator","language":"PHP"}'
+php vendor/bin/task-orchestrator agent:run -r backend_developer -t "Implement DTO" --context '{"project":"task-orchestrator","language":"PHP"}'
 
 # Без лимита времени
-php vendor/bin/task-orchestrator app:agent:run -r backend_developer -t "Refactor module" --timeout 0
+php vendor/bin/task-orchestrator agent:run -r backend_developer -t "Refactor module" --timeout 0
 ```
 
 Метрики (tokens, cost, turns) отображаются при запуске с `-v`.
 
 ---
 
-### `app:agent:runners`
+### `agent:runners`
 
 Показать список зарегистрированных движков и их доступность.
 
 ```bash
-php vendor/bin/task-orchestrator app:agent:runners
+php vendor/bin/task-orchestrator agent:runners
 ```
 
 Вывод — таблица с колонками `Runner` и `Status` (Available/Unavailable).

@@ -90,8 +90,8 @@ final class OrchestrateCommandTest extends TestCase
         $app = new Application();
         $app->addCommand($command);
 
-        $tester1 = new CommandTester($app->find('app:agent:orchestrate'));
-        $tester2 = new CommandTester($app->find('app:agent:orchestrate'));
+        $tester1 = new CommandTester($app->find('agent:orchestrate'));
+        $tester2 = new CommandTester($app->find('agent:orchestrate'));
 
         // Первая команда захватит lock и будет ждать
         $this->orchestrateHandler
@@ -246,7 +246,7 @@ YAML);
 
             $application = new Application();
             $application->addCommand($command);
-            $tester = new CommandTester($application->find('app:agent:orchestrate'));
+            $tester = new CommandTester($application->find('agent:orchestrate'));
 
             $this->orchestrateHandler
                 ->method('__invoke')
@@ -299,7 +299,7 @@ YAML);
 
             $application = new Application();
             $application->addCommand($command);
-            $tester = new CommandTester($application->find('app:agent:orchestrate'));
+            $tester = new CommandTester($application->find('agent:orchestrate'));
 
             $tester->execute([
                 'task' => '_',
@@ -388,7 +388,7 @@ YAML);
         $application = new Application();
         $application->addCommand($command);
 
-        return new CommandTester($application->find('app:agent:orchestrate'));
+        return new CommandTester($application->find('agent:orchestrate'));
     }
 
     private function createStaticChainDefinition(): ChainDefinitionDto

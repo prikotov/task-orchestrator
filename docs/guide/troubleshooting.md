@@ -303,7 +303,7 @@ The service "TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Servi
 ### Проверить доступные движки
 
 ```bash
-bin/console app:agent:runners
+bin/console agent:runners
 ```
 
 Вывод: таблица Runner | Status (available/unavailable).
@@ -319,7 +319,7 @@ vendor/bin/task-orchestrator "Test task" --chain=implement --dry-run
 ### Ручной запуск одного агента
 
 ```bash
-bin/console app:agent:run --role=system_analyst --task="Analyze codebase"
+bin/console agent:run --role=system_analyst --task="Analyze codebase"
 ```
 
 Полезно для проверки, что pi корректно запускается и возвращает валидный JSONL.
