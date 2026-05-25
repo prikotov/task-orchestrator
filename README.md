@@ -86,7 +86,7 @@ chains:
 ```
 
 ```bash
-TasK-orchestrator agent:orchestrate \
+task-orchestrator agent:orchestrate \
   "Какие модули выделить из AgentRunner?" \
   --chain=brainstorm
 ```
@@ -177,7 +177,7 @@ chains:
 Запуск:
 
 ```bash
-TasK-orchestrator agent:orchestrate "Add user registration endpoint"
+task-orchestrator agent:orchestrate "Add user registration endpoint"
 ```
 
 Как настроить исполнителей, выбрать опции YAML и подключить к проекту — в [документации](docs/guide/chains.md).

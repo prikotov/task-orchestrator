@@ -86,7 +86,7 @@ chains:
 ```
 
 ```bash
-TasK-orchestrator agent:orchestrate \
+task-orchestrator agent:orchestrate \
   "哪些模組應從 AgentRunner 中分離？" \
   --chain=brainstorm
 ```
@@ -177,7 +177,7 @@ chains:
 執行：
 
 ```bash
-TasK-orchestrator agent:orchestrate "Add user registration endpoint"
+task-orchestrator agent:orchestrate "Add user registration endpoint"
 ```
 
 如何設定執行者、選擇 YAML 選項並連接到專案——請參閱[文件](docs/guide/chains.md)。
