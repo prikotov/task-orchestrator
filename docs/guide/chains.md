@@ -170,10 +170,10 @@ chains:
 
 ```bash
 # Запуск одного агента без контекстных файлов
-php bin/console app:agent:run -r system_analyst -t "Analyze this text" --no-context-files
+php vendor/bin/task-orchestrator app:agent:run -r system_analyst -t "Analyze this text" --no-context-files
 
 # Запуск цепочки без контекстных файлов
-php bin/console app:agent:orchestrate implement --no-context-files
+php vendor/bin/task-orchestrator implement --no-context-files
 ```
 
 CLI-флаг `--no-context-files` комбинируется с YAML-настройкой через OR-логику: если включён хотя бы один из них — контекст отключается.
