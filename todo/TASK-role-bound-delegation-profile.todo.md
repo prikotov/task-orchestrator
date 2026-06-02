@@ -9,8 +9,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Бэкендер Левша
 branch: task/role-bound-delegation-profile
-pr:
-status: in_progress
+pr: "#232"
+status: review
 ---
 
 # TASK-role-bound-delegation-profile: Учитывать профиль роли при делегировании сабагентов
