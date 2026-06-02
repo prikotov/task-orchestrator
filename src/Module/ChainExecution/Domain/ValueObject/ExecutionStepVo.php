@@ -15,6 +15,8 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
  */
 final readonly class ExecutionStepVo
 {
+    private readonly bool $runnerExplicit;
+
     public function __construct(
         private ChainStepTypeEnum $type,
         private ?string $role = null,
@@ -30,7 +32,9 @@ final readonly class ExecutionStepVo
         private ?ConditionExpressionVo $when = null,
         private ?string $postStep = null,
         private ?string $outputKey = null,
+        ?bool $runnerExplicit = null,
     ) {
+        $this->runnerExplicit = $runnerExplicit ?? $runner !== 'pi';
     }
 
     public function getType(): ChainStepTypeEnum
@@ -46,6 +50,14 @@ final readonly class ExecutionStepVo
     public function getRunner(): string
     {
         return $this->runner;
+    }
+
+    /**
+     * Был ли runner явно задан на уровне шага цепочки.
+     */
+    public function hasExplicitRunner(): bool
+    {
+        return $this->runnerExplicit;
     }
 
     public function getTools(): ?string

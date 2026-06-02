@@ -52,7 +52,10 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
             )
             : null;
 
-        $runnerName = $step->getRunner();
+        $roleConfig = $context->roleConfig;
+        $roleCommand = $roleConfig?->getCommand() ?? [];
+        $runnerName = $this->resolveRunnerName($step, $roleCommand);
+        $command = $this->resolveCommand($step, $roleCommand, $runnerName);
         $request = new ChainRunRequestVo(
             role: $role,
             task: $context->task,
@@ -61,8 +64,8 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
             model: $step->getModel(),
             tools: $step->getTools(),
             workingDir: $context->workingDir,
-            timeout: $context->roleConfig?->getTimeout() ?? $context->timeout,
-            command: $context->roleConfig?->getCommand() ?? [],
+            timeout: $roleConfig?->getTimeout() ?? $context->timeout,
+            command: $command,
             runnerName: $runnerName,
             noContextFiles: $context->noContextFiles || $step->hasNoContextFiles(),
         );
@@ -73,7 +76,7 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
         $duration = microtime(true) - $start;
         $timedOut = $result->isTimedOut();
 
-        $fallbackConfig = $context->roleConfig?->getFallback();
+        $fallbackConfig = $roleConfig?->getFallback();
         $fallbackRunnerUsed = null;
         if ($result->isError() && $fallbackConfig !== null) {
             [$result, $duration, $fallbackRunnerUsed, $timedOut] = $this->tryFallback(
@@ -83,7 +86,7 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
                 $step,
                 $request,
                 $duration,
-                $context->roleConfig?->getPromptFile(), // @phpstan-ignore nullsafe.neverNull
+                $roleConfig?->getPromptFile(), // @phpstan-ignore nullsafe.neverNull
                 $result,
                 $timedOut,
             );
@@ -103,6 +106,53 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
             iterationNumber: $context->iterationNumber,
             timedOut: $timedOut,
         );
+    }
+
+    /**
+     * @param list<string> $roleCommand
+     */
+    private function resolveRunnerName(ExecutionStepVo $step, array $roleCommand): string
+    {
+        if ($step->hasExplicitRunner()) {
+            return $step->getRunner();
+        }
+
+        return $this->extractRunnerNameFromCommand($roleCommand) ?? $step->getRunner();
+    }
+
+    /**
+     * @param list<string> $roleCommand
+     * @return list<string>
+     */
+    private function resolveCommand(ExecutionStepVo $step, array $roleCommand, string $runnerName): array
+    {
+        $profileRunnerName = $this->extractRunnerNameFromCommand($roleCommand);
+        if ($profileRunnerName === null) {
+            return $roleCommand;
+        }
+
+        if (!$step->hasExplicitRunner()) {
+            return $roleCommand;
+        }
+
+        if ($profileRunnerName === $runnerName) {
+            return $roleCommand;
+        }
+
+        return [];
+    }
+
+    /**
+     * @param list<string> $command
+     */
+    private function extractRunnerNameFromCommand(array $command): ?string
+    {
+        $candidate = $command[0] ?? null;
+        if ($candidate === null || $candidate === '' || str_starts_with($candidate, '-')) {
+            return null;
+        }
+
+        return basename($candidate);
     }
 
     /**

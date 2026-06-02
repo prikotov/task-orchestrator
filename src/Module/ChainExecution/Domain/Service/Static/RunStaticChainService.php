@@ -10,6 +10,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Entity\StaticChainExecu
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFixIterationGroupVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRoleConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStaticChainConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticChainAuditVo;
@@ -229,7 +230,10 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
     ): StaticStepResultVo {
         $runner = $this->stepRunnerResolver->resolve($step->getType());
 
-        $runnerName = $step->isAgent() ? $step->getRunner() : 'shell';
+        $roleConfig = $chain->getRoleConfig($role);
+        $runnerName = $step->isAgent()
+            ? $this->resolveAgentRunnerName($step, $roleConfig)
+            : 'shell';
         $auditService?->logStepStart(
             $chain->name,
             $stepIndex1,
@@ -240,7 +244,6 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
         $iterationGroup = $groupForStep[$execution->getStepIndex()] ?? null;
         $iterationNumber = $iterationGroup !== null
             ? $execution->getIterationNumber($iterationGroup->getGroup()) : null;
-        $roleConfig = $chain->getRoleConfig($role);
 
         $context = new StepContextVo(
             task: $task,
@@ -263,6 +266,21 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
         );
 
         return $stepResult;
+    }
+
+    private function resolveAgentRunnerName(ExecutionStepVo $step, ?ExecutionRoleConfigVo $roleConfig): string
+    {
+        if ($step->hasExplicitRunner()) {
+            return $step->getRunner();
+        }
+
+        $command = $roleConfig?->getCommand() ?? [];
+        $candidate = $command[0] ?? null;
+        if ($candidate === null || $candidate === '' || str_starts_with($candidate, '-')) {
+            return $step->getRunner();
+        }
+
+        return basename($candidate);
     }
 
     /**
@@ -414,7 +432,7 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
         $hookContext = [
             'chain_name' => $chainName,
             'step_name' => $step->getName(),
-            'runner' => $step->isAgent() ? $step->getRunner() : 'shell',
+            'runner' => $stepResult->runner,
             'role' => $step->isAgent() ? ($step->getRole() ?? '') : ($step->isTool() ? 'tool' : 'quality_gate'),
             'exit_code' => $stepResult->exitCode,
             'duration' => $stepResult->duration,

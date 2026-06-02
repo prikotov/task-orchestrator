@@ -219,4 +219,79 @@ final class ExecuteAgentStepServiceTest extends TestCase
 
         $runner->run($step, $context);
     }
+
+    #[Test]
+    public function runUsesRoleCommandRunnerWhenStepRunnerIsImplicit(): void
+    {
+        $agentRunner = $this->createMock(RunAgentServiceInterface::class);
+        $agentRunner->expects($this->once())->method('run')->with(
+            $this->callback(function (ChainRunRequestVo $request): bool {
+                return $request->getRunnerName() === 'codex'
+                    && $request->getCommand() === ['codex', 'exec', '--model', 'gpt-5.5'];
+            }),
+        )->willReturn(
+            ChainRunResultVo::createSuccess('Result', 50, 100, cost: 0.005),
+        );
+
+        $runner = new ExecuteAgentStepService(
+            $agentRunner,
+            $this->createMock(ResolveChainRunnerServiceInterface::class),
+            $this->createMock(FormatPromptServiceInterface::class),
+        );
+
+        $step = new ExecutionStepVo(
+            type: ChainStepTypeEnum::agent,
+            role: 'architect',
+        );
+
+        $context = new StepContextVo(
+            task: 'Test task',
+            roleConfig: new ExecutionRoleConfigVo(
+                command: ['codex', 'exec', '--model', 'gpt-5.5'],
+            ),
+        );
+
+        $result = $runner->run($step, $context);
+
+        self::assertSame('codex', $result->runner);
+    }
+
+    #[Test]
+    public function runKeepsExplicitStepRunnerAndDropsIncompatibleRoleCommandRunner(): void
+    {
+        $agentRunner = $this->createMock(RunAgentServiceInterface::class);
+        $agentRunner->expects($this->once())->method('run')->with(
+            $this->callback(function (ChainRunRequestVo $request): bool {
+                return $request->getRunnerName() === 'pi'
+                    && $request->getCommand() === []
+                    && !in_array('codex', $request->getCommand(), true);
+            }),
+        )->willReturn(
+            ChainRunResultVo::createSuccess('Result', 50, 100, cost: 0.005),
+        );
+
+        $runner = new ExecuteAgentStepService(
+            $agentRunner,
+            $this->createMock(ResolveChainRunnerServiceInterface::class),
+            $this->createMock(FormatPromptServiceInterface::class),
+        );
+
+        $step = new ExecutionStepVo(
+            type: ChainStepTypeEnum::agent,
+            role: 'architect',
+            runner: 'pi',
+            runnerExplicit: true,
+        );
+
+        $context = new StepContextVo(
+            task: 'Test task',
+            roleConfig: new ExecutionRoleConfigVo(
+                command: ['codex', 'exec', '--model', 'gpt-5.5'],
+            ),
+        );
+
+        $result = $runner->run($step, $context);
+
+        self::assertSame('pi', $result->runner);
+    }
 }
