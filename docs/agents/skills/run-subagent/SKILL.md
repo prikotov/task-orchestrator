@@ -32,14 +32,39 @@ PROMPT
 | `--stall-timeout` | `-t`       | Нет событий N секунд → агент завис → завершить принудительно | 180          |
 | `--output`        | `-o`       | Формат вывода через запятую (см. ниже)                       | `raw`        |
 | `--role-file`     | `-r`       | Путь к файлу описания роли (обязателен)                      | —            |
-| `--runner`        | —          | Раннер: `pi` или `codex` (env `RUNNER`)                      | `pi`         |
-| `--model`         | —          | Модель (env `MODEL`)                                         | —            |
-| `--reasoning`     | —          | Reasoning/thinking effort (pi: `--thinking`, codex: `-c model_reasoning_effort=...`) | —            |
+| `--runner`        | —          | Раннер: `pi` или `codex` (env `RUNNER`)                      | `roles.<role>.command[0]`, иначе `pi` |
+| `--model`         | —          | Модель (env `MODEL`)                                         | `roles.<role>.command --model`, иначе — |
+| `--reasoning`     | —          | Reasoning/thinking effort (pi: `--thinking`, codex: `-c model_reasoning_effort=...`) | `roles.<role>.command`, иначе — |
 | `[prompt text]`   | —          | Промпт. Если не указан — читается из stdin                   | —            |
+
+### Профиль делегирования роли
+
+Если `--runner`/`RUNNER`, `--model`/`MODEL`, `--reasoning`/`REASONING` не заданы явно,
+скрипт берёт значения из `config/chains.yaml` секции `roles.<role>.command`.
+Имя роли вычисляется по `--role-file`: например,
+`docs/agents/roles/team/backend_developer_levsha.ru.md` → `backend_developer_levsha`.
+
+Приоритеты резолва (resolution priority):
+
+1. CLI option (опция CLI): `--runner`, `--model`, `--reasoning`.
+2. Env (переменная окружения): `RUNNER`, `MODEL`, `REASONING`.
+3. Role delegation profile (профиль делегирования роли): `roles.<role>.command`.
+4. Default (значение по умолчанию): `pi` только для runner.
+
+Из `command` извлекаются:
+- runner — первый элемент команды, например `codex` в `command: [codex, exec, ...]`;
+- model — значение после `--model`;
+- reasoning — значение после `--thinking`/`--reasoning` или `model_reasoning_effort=...`.
+
+Явные значения не затираются профилем роли.
+`model`/`reasoning` из профиля роли применяются как связанная пара с profile runner (раннером профиля):
+- если `runner` не задан явно и берётся из профиля роли — profile `model`/`reasoning` применяются;
+- если `runner` задан явно через CLI/env и совпадает с profile runner — profile `model`/`reasoning` можно применять как defaults (значения по умолчанию);
+- если `runner` задан явно через CLI/env и отличается от profile runner — profile `model`/`reasoning` не применяются; они остаются пустыми, пока не заданы явно через CLI/env.
 
 ### Раннеры
 
-#### pi (default)
+#### pi (default или профиль роли)
 
 ```bash
 scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
@@ -52,7 +77,7 @@ PROMPT
 #### codex
 
 ```bash
-scripts/watch-subagent.sh --runner codex -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
+scripts/watch-subagent.sh --runner codex -s 600 -r docs/agents/roles/team/system_architect_gandalf.ru.md <<'PROMPT'
 <prompt>
 PROMPT
 ```
@@ -88,7 +113,7 @@ PROMPT
 ### Примеры
 
 ```bash
-# Делегирование Бэкендеру (pi, default)
+# Делегирование Бэкендеру (runner/model/reasoning берутся из config/chains.yaml, default runner = pi)
 scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
 Выполни задачу: todo/TASK-feat-example.todo.md.
 Следуй инструкциям из секции 'Инструкции для сабагента' в файле задачи и AGENTS.md.
@@ -96,9 +121,18 @@ PROMPT
 ```
 
 ```bash
-# Делегирование через codex
-scripts/watch-subagent.sh --runner codex -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
+# Делегирование Архитектору через профиль роли: если roles.system_architect_gandalf.command начинается с codex,
+# явный --runner не нужен.
+scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/system_architect_gandalf.ru.md <<'PROMPT'
 Выполни задачу: todo/TASK-feat-example.todo.md.
+PROMPT
+```
+
+```bash
+# Явный override (переопределение) сильнее профиля роли
+RUNNER=codex MODEL=o3 scripts/watch-subagent.sh --runner pi --model gpt-4o-mini -s 600 \
+    -r docs/agents/roles/team/system_architect_gandalf.ru.md <<'PROMPT'
+Проверь реализацию без изменения файлов.
 PROMPT
 ```
 

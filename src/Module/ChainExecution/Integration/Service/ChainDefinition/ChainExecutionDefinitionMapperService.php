@@ -143,6 +143,7 @@ final readonly class ChainExecutionDefinitionMapperService implements ChainExecu
             when: $conditionVo,
             postStep: $step->getPostStep(),
             outputKey: $step->getOutputKey(),
+            runnerExplicit: $step->hasExplicitRunner(),
         );
     }
 

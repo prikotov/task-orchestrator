@@ -20,6 +20,8 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionE
  */
 final readonly class ChainStepVo
 {
+    private readonly bool $runnerExplicit;
+
     /**
      * @param ChainStepTypeEnum $type тип шага (agent | quality_gate | tool)
      * @param string|null $role роль агента (обязательно для agent, null для quality_gate/tool)
@@ -52,7 +54,10 @@ final readonly class ChainStepVo
         private ?ConditionExpressionVo $when = null,
         private ?string $postStep = null,
         private ?string $outputKey = null,
+        ?bool $runnerExplicit = null,
     ) {
+        $this->runnerExplicit = $runnerExplicit ?? $runner !== 'pi';
+
         if ($type === ChainStepTypeEnum::agent && ($role === null || $role === '')) {
             throw new InvalidArgumentException('Agent step must have a role.');
         }
@@ -83,7 +88,7 @@ final readonly class ChainStepVo
      */
     public static function createAgent(
         string $role,
-        string $runner = 'pi',
+        ?string $runner = null,
         ?string $tools = null,
         ?string $model = null,
         ?ChainRetryPolicyVo $retryPolicy = null,
@@ -91,11 +96,12 @@ final readonly class ChainStepVo
         bool $noContextFiles = false,
         ?ConditionExpressionVo $when = null,
         ?string $postStep = null,
+        ?bool $runnerExplicit = null,
     ): self {
         return new self(
             type: ChainStepTypeEnum::agent,
             role: $role,
-            runner: $runner,
+            runner: $runner ?? 'pi',
             tools: $tools,
             model: $model,
             retryPolicy: $retryPolicy,
@@ -103,6 +109,7 @@ final readonly class ChainStepVo
             noContextFiles: $noContextFiles,
             when: $when,
             postStep: $postStep,
+            runnerExplicit: $runnerExplicit ?? $runner !== null,
         );
     }
 
@@ -168,6 +175,14 @@ final readonly class ChainStepVo
     public function getRunner(): string
     {
         return $this->runner;
+    }
+
+    /**
+     * Был ли runner явно задан на уровне шага цепочки.
+     */
+    public function hasExplicitRunner(): bool
+    {
+        return $this->runnerExplicit;
     }
 
     public function getTools(): ?string

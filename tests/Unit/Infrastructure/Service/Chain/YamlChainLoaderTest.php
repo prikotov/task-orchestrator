@@ -118,6 +118,8 @@ YAML;
         self::assertCount(2, $chain->getSteps());
         self::assertSame('system_analyst', $chain->getSteps()[0]->getRole());
         self::assertSame('backend_developer', $chain->getSteps()[1]->getRole());
+        self::assertTrue($chain->getSteps()[0]->hasExplicitRunner());
+        self::assertFalse($chain->getSteps()[1]->hasExplicitRunner());
         self::assertFalse($chain->isDynamic());
     }
 
@@ -132,6 +134,7 @@ YAML;
         self::assertSame([], $chain->getFixIterations());
         self::assertSame('system_analyst', $chain->getSteps()[0]->getRole());
         self::assertSame('pi', $chain->getSteps()[0]->getRunner());
+        self::assertFalse($chain->getSteps()[0]->hasExplicitRunner());
         self::assertNull($chain->getSteps()[0]->getTools());
     }
 

@@ -300,6 +300,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
                     noContextFiles: $stepNoContextFiles,
                     when: $when,
                     postStep: $postStep,
+                    runnerExplicit: array_key_exists('runner', $step),
                 );
             },
             $stepsData,

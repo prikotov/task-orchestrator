@@ -14,9 +14,9 @@
 #   -t, --stall-timeout  — секунд без событий до признания зависания (default: 180).
 #   -o, --output         — формат вывода через запятую: raw, text, tools, files (default: raw).
 #   -r, --role-file <file> — путь к файлу описания роли (обязателен).
-#   --runner <pi|codex>  — раннер (default: pi; env RUNNER).
-#   --model <string>     — модель (env MODEL).
-#   --reasoning <string> — reasoning/thinking effort (pi: → --thinking, codex: → -c model_reasoning_effort=...).
+#   --runner <pi|codex>  — раннер (priority: CLI > env RUNNER > role profile > pi).
+#   --model <string>     — модель (priority: CLI > env MODEL > role profile).
+#   --reasoning <string> — reasoning/thinking effort (priority: CLI > env REASONING > role profile).
 #   [prompt text]        — промпт. Если не указан — читается из stdin.
 #
 # Выход:
@@ -31,13 +31,21 @@ STALL_TIMEOUT=180
 SOFT_TIMEOUT=""
 OUTPUT="raw"
 ROLE_FILE=""
-RUNNER="${RUNNER:-pi}"
+RUNNER="${RUNNER:-}"
 MODEL="${MODEL:-}"
-REASONING=""
+REASONING="${REASONING:-}"
+RUNNER_EXPLICIT=false
+MODEL_EXPLICIT=false
+REASONING_EXPLICIT=false
+[[ -n "$RUNNER" ]] && RUNNER_EXPLICIT=true
+[[ -n "$MODEL" ]] && MODEL_EXPLICIT=true
+[[ -n "$REASONING" ]] && REASONING_EXPLICIT=true
 
 # Определяем пути относительно расположения скрипта
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
 SYSTEM_PROMPT_FILE="$SCRIPT_DIR/subagent_system.txt"
+CHAINS_CONFIG="${CHAINS_CONFIG:-$PROJECT_ROOT/config/chains.yaml}"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -46,9 +54,9 @@ while [[ $# -gt 0 ]]; do
         -t|--stall-timeout) STALL_TIMEOUT="$2"; shift 2 ;;
         -o|--output)        OUTPUT="$2"; shift 2 ;;
         -r|--role-file)     ROLE_FILE="$2"; shift 2 ;;
-        --runner)           RUNNER="$2"; shift 2 ;;
-        --model)            MODEL="$2"; shift 2 ;;
-        --reasoning)        REASONING="$2"; shift 2 ;;
+        --runner)           RUNNER="$2"; RUNNER_EXPLICIT=true; shift 2 ;;
+        --model)            MODEL="$2"; MODEL_EXPLICIT=true; shift 2 ;;
+        --reasoning)        REASONING="$2"; REASONING_EXPLICIT=true; shift 2 ;;
         -h|--help)
             echo "Использование: $0 -s <soft-timeout> [options] [prompt text]"
             echo "  -s, --soft-timeout   базовый таймаут в секундах (обязателен)"
@@ -56,9 +64,9 @@ while [[ $# -gt 0 ]]; do
             echo "  -t, --stall-timeout  секунд без событий до зависания (default: 180)"
             echo "  -o, --output         формат вывода через запятую: raw, text, tools, files (default: raw)"
             echo "  -r, --role-file <file> путь к файлу описания роли (обязателен)"
-            echo "  --runner <pi|codex>  раннер (default: pi; env RUNNER)"
-            echo "  --model <string>     модель (env MODEL)"
-            echo "  --reasoning <string> reasoning effort для codex"
+            echo "  --runner <pi|codex>  раннер (priority: CLI > env RUNNER > role profile > pi)"
+            echo "  --model <string>     модель (priority: CLI > env MODEL > role profile)"
+            echo "  --reasoning <string> reasoning effort (priority: CLI > env REASONING > role profile)"
             echo "  -h, --help           эта справка"
             exit 0
             ;;
@@ -91,6 +99,153 @@ fi
 if [[ ! -f "$ROLE_FILE" ]]; then
     echo "Ошибка: файл роли не найден: $ROLE_FILE" >&2
     exit 1
+fi
+
+derive_role_name() {
+    local role_file="$1"
+    local file_name role_name
+    file_name="$(basename "$role_file")"
+    role_name="${file_name%.md}"
+    role_name="${role_name%.[a-z][a-z]}"
+    echo "$role_name"
+}
+
+load_role_profile() {
+    local role_name="$1"
+
+    [[ -f "$CHAINS_CONFIG" ]] || return 0
+    command -v php >/dev/null 2>&1 || return 0
+
+    ROLE_PROFILE_PROJECT_ROOT="$PROJECT_ROOT" \
+    ROLE_PROFILE_CONFIG="$CHAINS_CONFIG" \
+    ROLE_PROFILE_NAME="$role_name" \
+    php <<'PHP'
+<?php
+
+declare(strict_types=1);
+
+$projectRoot = getenv('ROLE_PROFILE_PROJECT_ROOT') ?: '';
+$configPath = getenv('ROLE_PROFILE_CONFIG') ?: '';
+$roleName = getenv('ROLE_PROFILE_NAME') ?: '';
+$autoload = $projectRoot . '/vendor/autoload.php';
+
+if ($projectRoot === '' || $configPath === '' || $roleName === '' || !is_file($autoload) || !is_file($configPath)) {
+    exit(0);
+}
+
+require $autoload;
+
+try {
+    $config = \Symfony\Component\Yaml\Yaml::parseFile($configPath);
+} catch (\Throwable) {
+    exit(0);
+}
+
+$command = $config['roles'][$roleName]['command'] ?? [];
+if (!is_array($command)) {
+    $command = [];
+}
+
+$command = array_map(
+    static fn(mixed $value): string => is_scalar($value) ? (string) $value : '',
+    array_values($command),
+);
+
+$extractOption = static function (array $command, array $options): string {
+    foreach ($command as $index => $argument) {
+        foreach ($options as $option) {
+            if ($argument === $option && isset($command[$index + 1])) {
+                return $command[$index + 1];
+            }
+
+            $prefix = $option . '=';
+            if (str_starts_with($argument, $prefix)) {
+                return substr($argument, strlen($prefix));
+            }
+        }
+    }
+
+    return '';
+};
+
+$extractRunner = static function (array $command): string {
+    $candidate = $command[0] ?? '';
+    if ($candidate === '' || str_starts_with($candidate, '-')) {
+        return '';
+    }
+
+    return basename($candidate);
+};
+
+$extractReasoningConfig = static function (string $value): string {
+    if (preg_match('/model_reasoning_effort\s*=\s*["\']?([^"\'\s]+)["\']?/', $value, $matches) === 1) {
+        return $matches[1];
+    }
+
+    return '';
+};
+
+$extractReasoning = static function (array $command) use ($extractOption, $extractReasoningConfig): string {
+    $reasoning = $extractOption($command, ['--reasoning', '--thinking']);
+    if ($reasoning !== '') {
+        return trim($reasoning, "\"'");
+    }
+
+    foreach ($command as $index => $argument) {
+        if ($argument === '-c' && isset($command[$index + 1])) {
+            $reasoning = $extractReasoningConfig($command[$index + 1]);
+            if ($reasoning !== '') {
+                return $reasoning;
+            }
+        }
+
+        $reasoning = $extractReasoningConfig($argument);
+        if ($reasoning !== '') {
+            return $reasoning;
+        }
+    }
+
+    return '';
+};
+
+echo $extractRunner($command), "\n";
+echo trim($extractOption($command, ['--model']), "\"'"), "\n";
+echo $extractReasoning($command), "\n";
+PHP
+}
+
+apply_role_profile_defaults() {
+    local role_name="$1"
+    local profile_output profile_runner profile_model profile_reasoning
+    local apply_profile_pair=true
+
+    profile_output="$(load_role_profile "$role_name" 2>/dev/null || true)"
+    profile_runner="$(sed -n '1p' <<< "$profile_output")"
+    profile_model="$(sed -n '2p' <<< "$profile_output")"
+    profile_reasoning="$(sed -n '3p' <<< "$profile_output")"
+
+    if [[ "$RUNNER_EXPLICIT" == true && "$RUNNER" != "$profile_runner" ]]; then
+        apply_profile_pair=false
+    fi
+
+    if [[ "$RUNNER_EXPLICIT" == false && -z "$RUNNER" && -n "$profile_runner" ]]; then
+        RUNNER="$profile_runner"
+    fi
+
+    if [[ "$apply_profile_pair" == true && "$MODEL_EXPLICIT" == false && -z "$MODEL" && -n "$profile_model" ]]; then
+        MODEL="$profile_model"
+    fi
+
+    if [[ "$apply_profile_pair" == true && "$REASONING_EXPLICIT" == false && -z "$REASONING" && -n "$profile_reasoning" ]]; then
+        REASONING="$profile_reasoning"
+    fi
+}
+
+ROLE_NAME="$(derive_role_name "$ROLE_FILE")"
+apply_role_profile_defaults "$ROLE_NAME"
+
+if [[ -z "$RUNNER" ]]; then
+    RUNNER="pi"
 fi
 
 case "$RUNNER" in

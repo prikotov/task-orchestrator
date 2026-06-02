@@ -34,6 +34,7 @@ final class ChainStepVoTest extends TestCase
         self::assertNull($step->getRetryPolicy());
         self::assertNull($step->getName());
         self::assertFalse($step->hasNoContextFiles());
+        self::assertFalse($step->hasExplicitRunner());
         self::assertTrue($step->isAgent());
         self::assertFalse($step->isQualityGate());
     }
@@ -70,6 +71,7 @@ final class ChainStepVoTest extends TestCase
         self::assertSame(ChainStepTypeEnum::agent, $step->getType());
         self::assertSame('backend_developer', $step->getRole());
         self::assertSame('codex', $step->getRunner());
+        self::assertTrue($step->hasExplicitRunner());
         self::assertSame('implement', $step->getName());
         self::assertTrue($step->isAgent());
     }
