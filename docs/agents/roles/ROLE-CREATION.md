@@ -195,3 +195,16 @@ personality:
 - [ ] `personality`: заполнены все 5 подсекций (disc, big_five, adizes, belbin, jung)
 - [ ] Тело файла начинается с `# <Title>`
 
+## Валидация
+
+После создания или изменения роли запустите:
+
+```bash
+make validate-roles
+```
+
+Для проверки произвольного каталога используйте:
+
+```bash
+php bin/validate-roles --path docs/agents/roles
+```
