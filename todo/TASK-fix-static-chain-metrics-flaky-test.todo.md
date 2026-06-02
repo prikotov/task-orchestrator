@@ -10,8 +10,8 @@ epic:
 author: Бэкендер Левша
 assignee: Бэкендер Тони
 branch: task/fix-static-chain-metrics-flaky-test
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/234
+status: review
 ---
 
 # TASK-fix-static-chain-metrics-flaky-test: Стабилизировать флаким-тест staticChainAggregatedMetricsAreAccumulated
