@@ -9,8 +9,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Бэкендер Левша
 branch: task/feat-validate-roles
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/233
+status: review
 ---
 
 # TASK-feat-validate-roles: Валидатор файлов ролей AI-агентов
