@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер Левша
 branch: task/role-bound-delegation-profile
 pr: "#232"
-status: review
+status: done
 ---
 
 # TASK-role-bound-delegation-profile: Учитывать профиль роли при делегировании сабагентов
