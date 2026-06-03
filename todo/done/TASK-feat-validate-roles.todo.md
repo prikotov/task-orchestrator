@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер Левша
 branch: task/feat-validate-roles
 pr: https://github.com/prikotov/task-orchestrator/pull/233
-status: review
+status: done
 ---
 
 # TASK-feat-validate-roles: Валидатор файлов ролей AI-агентов
