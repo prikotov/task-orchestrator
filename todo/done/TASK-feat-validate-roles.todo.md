@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic:
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер Левша
+branch: task/feat-validate-roles
+pr: https://github.com/prikotov/task-orchestrator/pull/233
+status: done
 ---
 
 # TASK-feat-validate-roles: Валидатор файлов ролей AI-агентов
@@ -42,20 +42,20 @@ PHP CLI-скрипт `bin/validate-roles` с интеграцией в `make val
 ## 3. Requirements (MoSCoW)
 
 ### 🔴 Must Have
-- [ ] Скрипт `bin/validate-roles` проверяет все `*.md` в `docs/agents/roles/team/` (и других подкаталогах, кроме `references/`)
-- [ ] **Front matter — обязательные поля:** `agent`, `role`, `name`, `title`, `description`
-- [ ] **Front matter — `agent` совпадает с именем файла** без `.{locale}.md`
-- [ ] **Front matter — `role`** в формате `snake_case`, латиница, без имени персонажа
-- [ ] **Front matter — `personality`**: если есть, проверить что содержит валидные подсекции (`disc`, `big_five`, `adizes`, `belbin`, `jung`)
-- [ ] **Front matter — `skills`**: если есть, проверить что это массив строк
-- [ ] **Имя файла**: соответствует паттерну `{agent}.{locale}.md` (locale = 2-3 буквы)
-- [ ] **Тело файла**: начинается с H1 заголовка
-- [ ] **Makefile**: target `validate-roles` + добавить в `check`
-- [ ] Все существующие роли проходят валидацию
+- [x] Скрипт `bin/validate-roles` проверяет все `*.md` в `docs/agents/roles/team/` (и других подкаталогах, кроме `references/`)
+- [x] **Front matter — обязательные поля:** `agent`, `role`, `name`, `title`, `description`
+- [x] **Front matter — `agent` совпадает с именем файла** без `.{locale}.md`
+- [x] **Front matter — `role`** в формате `snake_case`, латиница, без имени персонажа
+- [x] **Front matter — `personality`**: если есть, проверить что содержит валидные подсекции (`disc`, `big_five`, `adizes`, `belbin`, `jung`)
+- [x] **Front matter — `skills`**: если есть, проверить что это массив строк
+- [x] **Имя файла**: соответствует паттерну `{agent}.{locale}.md` (locale = 2-3 буквы)
+- [x] **Тело файла**: начинается с H1 заголовка
+- [x] **Makefile**: target `validate-roles` + добавить в `check`
+- [x] Все существующие роли проходят валидацию
 
 ### 🟡 Should Have
-- [ ] Поддержка `--path` для указания произвольного каталога
-- [ ] Цветной вывод ошибок (красный) как в `validate-docs.php`
+- [x] Поддержка `--path` для указания произвольного каталога
+- [x] Цветной вывод ошибок (красный) как в `validate-docs.php`
 
 ### ⚫ Won't Have (Не будем делать)
 - Валидация содержимого справочников (`references/`)
@@ -63,14 +63,18 @@ PHP CLI-скрипт `bin/validate-roles` с интеграцией в `make val
 - Проверка `personality` на корректность значений (только наличие подсекций)
 
 ## 4. Implementation Plan
-*Заполняется исполнителем.*
+1. Сверить существующие `bin/validate-roles` и `Makefile` с требованиями задачи и `ROLE-CREATION.md`.
+2. Доработать только недостающие проверки: `--path`, nested YAML для `personality`/`skills`, связь `role` ↔ `agent`, красный вывод ошибок и fail-fast для некорректного пути.
+3. Добавить интеграционные тесты CLI-скрипта на успешную валидацию, `--path` и негативные кейсы front matter.
+4. Обновить краткую документацию по запуску валидатора в `ROLE-CREATION.md`.
+5. Запустить `php bin/validate-roles`, `make validate-roles`, `vendor/bin/phpunit`, `vendor/bin/psalm` и `make check`.
 
 ## 5. Definition of Done
-- [ ] `php bin/validate-roles` проходит на текущих 10 ролях
-- [ ] `make validate-roles` работает
-- [ ] `make check` включает `validate-roles`
-- [ ] `make check` зелёный
-- [ ] PHPUnit + Psalm без ошибок
+- [x] `php bin/validate-roles` проходит на текущих 10 ролях
+- [x] `make validate-roles` работает
+- [x] `make check` включает `validate-roles`
+- [x] `make check` зелёный
+- [x] PHPUnit + Psalm без ошибок
 
 ## 6. Verification
 ```bash
@@ -92,3 +96,4 @@ make check
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-05-22 | Тимлид (Алекс) | Создание задачи |
+| 2026-06-02 | Бэкендер Левша | Заполнен план реализации, отмечены закрытые критерии и DoD по результатам проверки реализации. |

@@ -3,6 +3,11 @@
 
 declare(strict_types=1);
 
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
 /**
  * validate-roles — validate AI agent role files.
  *
@@ -18,9 +23,10 @@ declare(strict_types=1);
  * Based on: docs/agents/roles/ROLE-CREATION.md
  *
  * Usage:
+ *   php bin/validate-roles [--path <path>]
  *   php bin/validate-roles [path]
  *
- *   path — roles directory (default: docs/agents/roles).
+ *   --path — roles directory (default: docs/agents/roles).
  *
  * Exit codes:
  *   0 — all checks passed
@@ -29,11 +35,13 @@ declare(strict_types=1);
 
 // ── Config ─────────────────────────────────────────────────────────────────
 
-$rolesDir = $argv[1] ?? 'docs/agents/roles';
-$errors = [];
+const DEFAULT_ROLES_DIR = 'docs/agents/roles';
 
 /** Required fields in YAML front matter. */
 const REQUIRED_FIELDS = ['agent', 'role', 'name', 'title', 'description'];
+
+/** snake_case Latin identifier used for agent and role fields. */
+const SNAKE_CASE_LATIN_PATTERN = '/^[a-z][a-z0-9]*(_[a-z0-9]+)*$/';
 
 /** Valid personality subsections. */
 const PERSONALITY_SECTIONS = ['disc', 'big_five', 'adizes', 'belbin', 'jung'];
@@ -44,13 +52,113 @@ const SKIP_DIRS = ['references'];
 /** Files to skip (instructions, not role definitions). */
 const SKIP_FILES = ['ROLE-CREATION.md'];
 
+$errors = [];
+$rolesDir = parseRolesDir($argv);
+
+if (!is_dir($rolesDir)) {
+    writeError("Path does not exist or is not a directory: {$rolesDir}");
+    exit(1);
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────────
+
+/**
+ * Parse CLI arguments and return the roles directory path.
+ *
+ * @param list<string> $arguments
+ */
+function parseRolesDir(array $arguments): string
+{
+    $rolesDir = DEFAULT_ROLES_DIR;
+    $pathIsSet = false;
+
+    for ($i = 1; $i < count($arguments); $i++) {
+        $argument = $arguments[$i];
+
+        if ($argument === '--help' || $argument === '-h') {
+            printUsage();
+            exit(0);
+        }
+
+        if ($argument === '--path') {
+            if ($pathIsSet) {
+                writeError('Path is specified more than once.');
+                exit(1);
+            }
+
+            $nextIndex = $i + 1;
+            if (!isset($arguments[$nextIndex]) || str_starts_with($arguments[$nextIndex], '-')) {
+                writeError('Missing value for --path.');
+                exit(1);
+            }
+
+            $rolesDir = $arguments[$nextIndex];
+            $pathIsSet = true;
+            $i++;
+            continue;
+        }
+
+        if (str_starts_with($argument, '--path=')) {
+            if ($pathIsSet) {
+                writeError('Path is specified more than once.');
+                exit(1);
+            }
+
+            $rolesDir = substr($argument, strlen('--path='));
+            if (trim($rolesDir) === '') {
+                writeError('Missing value for --path.');
+                exit(1);
+            }
+
+            $pathIsSet = true;
+            continue;
+        }
+
+        if (str_starts_with($argument, '-')) {
+            writeError("Unknown option: {$argument}");
+            exit(1);
+        }
+
+        if ($pathIsSet) {
+            writeError('Path is specified more than once.');
+            exit(1);
+        }
+
+        $rolesDir = $argument;
+        $pathIsSet = true;
+    }
+
+    return rtrim($rolesDir, DIRECTORY_SEPARATOR);
+}
+
+function printUsage(): void
+{
+    echo "Usage:\n";
+    echo "  php bin/validate-roles [--path <path>]\n";
+    echo "  php bin/validate-roles [path]\n";
+    echo "\n";
+    echo "Options:\n";
+    echo "  --path <path>  Roles directory (default: " . DEFAULT_ROLES_DIR . ")\n";
+}
+
+function red(string $message): string
+{
+    return "\033[31m{$message}\033[0m";
+}
+
+function writeError(string $message): void
+{
+    echo red($message) . "\n";
+}
 
 /**
  * Parse YAML front matter from markdown content.
  * Returns ['fields' => [...], 'body' => string] or null if no front matter.
  *
- * @return array{fields: array<string, string>, body: string}|null
+ * @return array{fields: array<string, mixed>, body: string}|null
+ *
+ * @throws ParseException
+ * @throws UnexpectedValueException
  */
 function parseFrontMatter(string $content): ?array
 {
@@ -65,88 +173,18 @@ function parseFrontMatter(string $content): ?array
 
     $yaml = substr($content, 4, $end - 4);
     $body = substr($content, $end + 5);
+    $fields = Yaml::parse($yaml);
 
-    return ['fields' => parseSimpleYaml($yaml), 'body' => $body];
-}
-
-/**
- * Parse simple YAML key-value pairs and basic structures (arrays, nested objects).
- * Handles:
- *   - scalar: key: value
- *   - quoted: key: "value" or key: 'value'
- *   - array: lines starting with "  - ..."
- *   - nested: key followed by indented lines
- *
- * @return array<string, mixed>
- */
-function parseSimpleYaml(string $yaml): array
-{
-    $fields = [];
-    $lines = explode("\n", $yaml);
-    $currentKey = null;
-    $inArray = false;
-    $arrayValues = [];
-
-    foreach ($lines as $line) {
-        $trimmed = trim($line);
-
-        if ($trimmed === '' || str_starts_with($trimmed, '#')) {
-            continue;
-        }
-
-        // Array item: "  - value"
-        if (preg_match('/^- (.+)$/', $trimmed, $m)) {
-            if ($currentKey !== null) {
-                $val = trim($m[1]);
-                // Remove quotes
-                if (preg_match('/^["\'](.*)["\']\s*$/', $val, $q)) {
-                    $val = $q[1];
-                }
-                $arrayValues[] = $val;
-                $inArray = true;
-            }
-            continue;
-        }
-
-        // Flush previous array
-        if ($inArray && $currentKey !== null) {
-            $fields[$currentKey] = $arrayValues;
-            $arrayValues = [];
-            $inArray = false;
-        }
-
-        // Key-value: "key: value"
-        $colon = strpos($trimmed, ':');
-        if ($colon === false) {
-            continue;
-        }
-
-        $key = trim(substr($trimmed, 0, $colon));
-        $value = trim(substr($trimmed, $colon + 1));
-
-        // Nested object: "key:" with no value on same line
-        if ($value === '') {
-            $currentKey = $key;
-            $arrayValues = [];
-            $inArray = false;
-            continue;
-        }
-
-        // Remove surrounding quotes
-        if (preg_match('/^["\'](.*)["\']\s*$/', $value, $m)) {
-            $value = $m[1];
-        }
-
-        $fields[$key] = $value;
-        $currentKey = null;
+    if ($fields === null) {
+        $fields = [];
     }
 
-    // Flush last array
-    if ($inArray && $currentKey !== null) {
-        $fields[$currentKey] = $arrayValues;
+    if (!is_array($fields)) {
+        throw new UnexpectedValueException('front matter root is not a mapping');
     }
 
-    return $fields;
+    /** @var array<string, mixed> $fields */
+    return ['fields' => $fields, 'body' => $body];
 }
 
 /**
@@ -159,10 +197,12 @@ function extractH1(string $body): ?string
         if ($trimmed === '') {
             continue;
         }
-        if (preg_match('/^# (.+)/', $trimmed, $m)) {
-            return trim($m[1]);
+
+        if (preg_match('/^# (.+)/', $trimmed, $matches) === 1) {
+            return trim($matches[1]);
         }
-        // Stop at first non-empty, non-H1 line
+
+        // Stop at first non-empty, non-H1 line.
         break;
     }
 
@@ -174,7 +214,9 @@ function extractH1(string $body): ?string
  */
 function isSkipped(string $relativePath): bool
 {
-    $parts = explode('/', $relativePath);
+    $normalizedPath = str_replace(DIRECTORY_SEPARATOR, '/', $relativePath);
+    $parts = explode('/', $normalizedPath);
+
     foreach ($parts as $part) {
         if (in_array($part, SKIP_DIRS, true)) {
             return true;
@@ -182,6 +224,53 @@ function isSkipped(string $relativePath): bool
     }
 
     return false;
+}
+
+function relativePath(string $filePath, string $baseDir): string
+{
+    $basePrefix = rtrim($baseDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+
+    if (str_starts_with($filePath, $basePrefix)) {
+        return substr($filePath, strlen($basePrefix));
+    }
+
+    return $filePath;
+}
+
+function readFileContent(string $filePath): ?string
+{
+    $content = file_get_contents($filePath);
+
+    if ($content === false) {
+        return null;
+    }
+
+    return $content;
+}
+
+function isSnakeCaseLatinIdentifier(string $value): bool
+{
+    return preg_match(SNAKE_CASE_LATIN_PATTERN, $value) === 1;
+}
+
+/**
+ * @param array<string, mixed> $fields
+ */
+function nonEmptyStringField(array $fields, string $field): ?string
+{
+    $value = $fields[$field] ?? null;
+
+    if (!is_string($value)) {
+        return null;
+    }
+
+    $value = trim($value);
+
+    if ($value === '') {
+        return null;
+    }
+
+    return $value;
 }
 
 // ── Collect files ──────────────────────────────────────────────────────────
@@ -198,7 +287,7 @@ foreach ($iterator as $item) {
         continue;
     }
 
-    $relativePath = substr($item->getPathname(), strlen($rolesDir) + 1);
+    $relativePath = relativePath($item->getPathname(), $rolesDir);
     $basename = $item->getFilename();
 
     if (in_array($basename, SKIP_FILES, true)) {
@@ -214,7 +303,8 @@ foreach ($iterator as $item) {
 
 sort($mdFiles);
 
-echo "Validating " . count($mdFiles) . " role file(s) in {$rolesDir}/\n\n";
+$displayRolesDir = rtrim($rolesDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+echo 'Validating ' . count($mdFiles) . " role file(s) in {$displayRolesDir}\n\n";
 
 // ── Check 1: Filename pattern ──────────────────────────────────────────────
 
@@ -223,11 +313,20 @@ $filenameErrors = 0;
 
 foreach ($mdFiles as $filePath) {
     $basename = basename($filePath);
+    $relativePath = relativePath($filePath, $rolesDir);
+
     // Pattern: {agent}.{2-3 letter locale}.md
-    if (!preg_match('/^(.+)\.([a-z]{2,3})\.md$/', $basename, $m)) {
-        $relativePath = substr($filePath, strlen($rolesDir) + 1);
-        echo "  ✗ {$relativePath}: filename does not match {agent}.{locale}.md pattern\n";
+    if (preg_match('/^(.+)\.([a-z]{2,3})\.md$/', $basename, $matches) !== 1) {
+        writeError("  ✗ {$relativePath}: filename does not match {agent}.{locale}.md pattern");
         $errors[] = "filename: {$relativePath}";
+        $filenameErrors++;
+        continue;
+    }
+
+    $filenameAgent = $matches[1];
+    if (!isSnakeCaseLatinIdentifier($filenameAgent)) {
+        writeError("  ✗ {$relativePath}: filename agent part \"{$filenameAgent}\" is not snake_case Latin");
+        $errors[] = "filename: {$relativePath} invalid agent \"{$filenameAgent}\"";
         $filenameErrors++;
     }
 }
@@ -243,17 +342,25 @@ echo "## Front matter\n";
 $fmErrors = 0;
 
 foreach ($mdFiles as $filePath) {
-    $relativePath = substr($filePath, strlen($rolesDir) + 1);
+    $relativePath = relativePath($filePath, $rolesDir);
     $basename = basename($filePath);
-    $content = file_get_contents($filePath);
-    if ($content === false) {
+    $content = readFileContent($filePath);
+
+    if ($content === null) {
         continue;
     }
 
-    $parsed = parseFrontMatter($content);
+    try {
+        $parsed = parseFrontMatter($content);
+    } catch (ParseException | UnexpectedValueException $exception) {
+        writeError("  ✗ {$relativePath}: invalid front matter YAML ({$exception->getMessage()})");
+        $errors[] = "front-matter: {$relativePath} invalid YAML";
+        $fmErrors++;
+        continue;
+    }
 
     if ($parsed === null) {
-        echo "  ✗ {$relativePath}: missing front matter\n";
+        writeError("  ✗ {$relativePath}: missing front matter");
         $errors[] = "front-matter: {$relativePath} missing";
         $fmErrors++;
         continue;
@@ -261,66 +368,86 @@ foreach ($mdFiles as $filePath) {
 
     $fields = $parsed['fields'];
 
-    // Required fields
+    // Required fields.
     foreach (REQUIRED_FIELDS as $field) {
-        if (!isset($fields[$field]) || (is_string($fields[$field]) && trim($fields[$field]) === '')) {
-            echo "  ✗ {$relativePath}: missing field \"{$field}\"\n";
+        if (nonEmptyStringField($fields, $field) === null) {
+            writeError("  ✗ {$relativePath}: missing or empty string field \"{$field}\"");
             $errors[] = "front-matter: {$relativePath} missing \"{$field}\"";
             $fmErrors++;
         }
     }
 
-    // agent matches filename
-    $agent = $fields['agent'] ?? null;
+    // Agent matches filename.
+    $agent = nonEmptyStringField($fields, 'agent');
     if ($agent !== null) {
-        // Extract agent from filename: strip .{locale}.md
+        if (!isSnakeCaseLatinIdentifier($agent)) {
+            writeError("  ✗ {$relativePath}: agent \"{$agent}\" is not snake_case Latin");
+            $errors[] = "front-matter: {$relativePath} invalid agent \"{$agent}\"";
+            $fmErrors++;
+        }
+
+        // Extract agent from filename: strip .{locale}.md.
         $expectedAgent = preg_replace('/\.[a-z]{2,3}\.md$/', '', $basename);
         if ($agent !== $expectedAgent) {
-            echo "  ✗ {$relativePath}: agent \"{$agent}\" does not match filename (expected \"{$expectedAgent}\")\n";
+            writeError(
+                "  ✗ {$relativePath}: agent \"{$agent}\" does not match filename "
+                . "(expected \"{$expectedAgent}\")",
+            );
             $errors[] = "front-matter: {$relativePath} agent mismatch";
             $fmErrors++;
         }
     }
 
-    // role is snake_case Latin
-    $role = $fields['role'] ?? null;
-    if ($role !== null && !preg_match('/^[a-z][a-z0-9]*(_[a-z0-9]+)*$/', $role)) {
-        echo "  ✗ {$relativePath}: role \"{$role}\" is not snake_case Latin\n";
+    // Role is snake_case Latin and does not include the persona name.
+    $role = nonEmptyStringField($fields, 'role');
+    $roleIsSnakeCase = $role !== null && isSnakeCaseLatinIdentifier($role);
+
+    if ($role !== null && !$roleIsSnakeCase) {
+        writeError("  ✗ {$relativePath}: role \"{$role}\" is not snake_case Latin");
         $errors[] = "front-matter: {$relativePath} invalid role \"{$role}\"";
         $fmErrors++;
     }
 
-    // personality subsections
-    $personality = $fields['personality'] ?? null;
-    if ($personality !== null) {
-        if (!is_array($personality)) {
-            echo "  ✗ {$relativePath}: personality is not a mapping\n";
+    if ($agent !== null && $role !== null && $roleIsSnakeCase && !str_starts_with($agent, $role . '_')) {
+        writeError(
+            "  ✗ {$relativePath}: role \"{$role}\" must be a role type without the persona name "
+            . "(agent must start with \"{$role}_\")",
+        );
+        $errors[] = "front-matter: {$relativePath} role includes persona name or does not match agent";
+        $fmErrors++;
+    }
+
+    // Personality subsections.
+    if (array_key_exists('personality', $fields)) {
+        $personality = $fields['personality'];
+        if (!is_array($personality) || array_is_list($personality)) {
+            writeError("  ✗ {$relativePath}: personality is not a mapping");
             $errors[] = "front-matter: {$relativePath} personality not a mapping";
             $fmErrors++;
         } else {
-            $personalityKeys = array_keys($personality);
-            foreach ($personalityKeys as $section) {
-                if (!in_array($section, PERSONALITY_SECTIONS, true)) {
-                    echo "  ✗ {$relativePath}: unknown personality section \"{$section}\"\n";
-                    $errors[] = "front-matter: {$relativePath} unknown personality \"{$section}\"";
+            foreach (array_keys($personality) as $section) {
+                if (!is_string($section) || !in_array($section, PERSONALITY_SECTIONS, true)) {
+                    $sectionName = is_string($section) ? $section : (string) $section;
+                    writeError("  ✗ {$relativePath}: unknown personality section \"{$sectionName}\"");
+                    $errors[] = "front-matter: {$relativePath} unknown personality \"{$sectionName}\"";
                     $fmErrors++;
                 }
             }
         }
     }
 
-    // skills is array of strings
-    $skills = $fields['skills'] ?? null;
-    if ($skills !== null) {
-        if (!is_array($skills)) {
-            echo "  ✗ {$relativePath}: skills is not an array\n";
+    // Skills is array of strings.
+    if (array_key_exists('skills', $fields)) {
+        $skills = $fields['skills'];
+        if (!is_array($skills) || !array_is_list($skills)) {
+            writeError("  ✗ {$relativePath}: skills is not an array");
             $errors[] = "front-matter: {$relativePath} skills not array";
             $fmErrors++;
         } else {
-            foreach ($skills as $idx => $skill) {
+            foreach ($skills as $index => $skill) {
                 if (!is_string($skill)) {
-                    echo "  ✗ {$relativePath}: skills[{$idx}] is not a string\n";
-                    $errors[] = "front-matter: {$relativePath} skills[{$idx}] not string";
+                    writeError("  ✗ {$relativePath}: skills[{$index}] is not a string");
+                    $errors[] = "front-matter: {$relativePath} skills[{$index}] not string";
                     $fmErrors++;
                 }
             }
@@ -339,18 +466,24 @@ echo "## Body structure\n";
 $bodyErrors = 0;
 
 foreach ($mdFiles as $filePath) {
-    $relativePath = substr($filePath, strlen($rolesDir) + 1);
-    $content = file_get_contents($filePath);
-    if ($content === false) {
+    $relativePath = relativePath($filePath, $rolesDir);
+    $content = readFileContent($filePath);
+
+    if ($content === null) {
         continue;
     }
 
-    $parsed = parseFrontMatter($content);
+    try {
+        $parsed = parseFrontMatter($content);
+    } catch (ParseException | UnexpectedValueException) {
+        continue;
+    }
+
     $body = $parsed['body'] ?? $content;
 
     $h1 = extractH1($body);
     if ($h1 === null) {
-        echo "  ✗ {$relativePath}: body does not start with H1 heading\n";
+        writeError("  ✗ {$relativePath}: body does not start with H1 heading");
         $errors[] = "body: {$relativePath} missing H1";
         $bodyErrors++;
     }
@@ -367,10 +500,10 @@ $totalErrors = count($errors);
 
 if ($totalErrors > 0) {
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    echo "✗ Found {$totalErrors} error(s)\n";
-    echo "  Filename:    {$filenameErrors}\n";
+    writeError("✗ Found {$totalErrors} error(s)");
+    echo "  Filename:     {$filenameErrors}\n";
     echo "  Front matter: {$fmErrors}\n";
-    echo "  Body:        {$bodyErrors}\n";
+    echo "  Body:         {$bodyErrors}\n";
     exit(1);
 }
 
