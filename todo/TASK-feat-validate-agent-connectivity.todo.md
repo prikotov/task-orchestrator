@@ -9,8 +9,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Бэкендер Тони
 branch: task/feat-validate-agent-connectivity
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/235
+status: review
 ---
 
 # TASK-feat-validate-agent-connectivity: Верификатор связности ролей — проверка что агент запускается и отвечает
