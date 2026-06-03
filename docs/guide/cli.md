@@ -81,6 +81,50 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml 
 
 ---
 
+### `validate:connectivity`
+
+Проверяет, что top-level `roles` из `chains.yaml` запускаются и возвращают непустой stdout.
+Команда читает только секцию `roles`, резолвит `@system-prompt`/`@append-system-prompt`, запускает каждую `command` как argv array (без shell-строки) и добавляет user prompt последним argv-аргументом: `Ответь ровно ok без Markdown.`
+
+```bash
+php vendor/bin/task-orchestrator validate:connectivity [options]
+```
+
+| Опция | Сокращение | Описание | По умолчанию |
+|---|---|---|---|
+| `--config` | — | Путь к файлу `chains.yaml` | `config/chains.yaml` из конфигурации |
+| `--role` | — | Проверить только одну роль | — |
+| `--timeout` | — | Таймаут на одну роль в секундах, положительное целое | `30` |
+| `--dry-run` | — | Показать роли и resolved command preview (превью разрешённой команды) без запуска процессов | — |
+
+Успех роли: exit code процесса `0`, stdout после `trim()` не пустой, timeout не сработал.
+Вывод — таблица `Role | Status | Time | Error`.
+
+**Примеры:**
+
+```bash
+# Проверить все роли из конфига по умолчанию
+php vendor/bin/task-orchestrator validate:connectivity
+
+# Показать команды без запуска LLM/процессов
+php vendor/bin/task-orchestrator validate:connectivity --dry-run
+
+# Проверить одну роль
+php vendor/bin/task-orchestrator validate:connectivity --role=backend_developer_tony
+
+# Кастомный конфиг и таймаут
+php vendor/bin/task-orchestrator validate:connectivity --config=path/to/chains.yaml --timeout=60
+```
+
+**Exit codes:**
+
+| Code | Meaning |
+|------|---------|
+| `0` | Все выбранные роли ответили успешно |
+| `1` | Хотя бы одна роль завершилась с ошибкой, timeout, пустым stdout или входные параметры невалидны |
+
+---
+
 ### `agent:run`
 
 Запуск одного агента с указанной ролью.

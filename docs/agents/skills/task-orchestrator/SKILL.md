@@ -13,6 +13,7 @@ description: Запуск оркестрации AI-агентов по цепо
 - Нужно выполнить задачу через последовательность AI-агентов
 - Требуется dynamic-обсуждение (brainstorm, code review)
 - Нужно проверить конфигурацию цепочек
+- Нужно проверить, что настроенные роли запускаются и отвечают
 
 ## Конфигурация
 
@@ -70,6 +71,21 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml 
 `<task>` обязателен, но при `--validate-config` игнорируется — подойдёт любая строка.
 
 Exit codes: `0` — конфиг валиден, `5` — ошибки (подробности в выводе).
+
+### Проверка связности ролей
+
+```bash
+# Показать роли и команды без запуска процессов
+php vendor/bin/task-orchestrator validate:connectivity --dry-run
+
+# Проверить все роли из config/chains.yaml
+php vendor/bin/task-orchestrator validate:connectivity
+
+# Проверить одну роль с кастомным таймаутом
+php vendor/bin/task-orchestrator validate:connectivity --role=backend_developer_tony --timeout=60
+```
+
+Команда читает top-level `roles`, резолвит `@system-prompt`/`@append-system-prompt`, запускает каждую `command` как argv array и добавляет минимальный user prompt `Ответь ровно ok без Markdown.` последним argv-аргументом. Exit codes: `0` — все роли OK, `1` — есть fail/timeout/empty output/invalid input.
 
 ### План без запуска (dry-run)
 

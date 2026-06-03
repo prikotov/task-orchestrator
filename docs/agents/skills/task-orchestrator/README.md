@@ -51,6 +51,13 @@ task-orchestrator --version
 php vendor/bin/task-orchestrator agent:orchestrate --validate-config "check"
 ```
 
+Проверить, что роли из `chains.yaml` запускаются и отвечают:
+
+```bash
+php vendor/bin/task-orchestrator validate:connectivity --dry-run
+php vendor/bin/task-orchestrator validate:connectivity --timeout=30
+```
+
 Запустить цепочку:
 
 ```bash

@@ -98,10 +98,27 @@ services:
   TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\YamlChainLoaderServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService
 
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityRoleTargetProviderInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\YamlConnectivityRoleTargetProviderService
+
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityCommandResolverInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\ProductionLikeConnectivityCommandResolverService
+
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityProcessRunnerInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\SymfonyConnectivityProcessRunnerService
+
   # Parameters
   TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService:
     arguments:
       $yamlPath: '%task_orchestrator.chains_yaml%'
+
+  TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\YamlConnectivityRoleTargetProviderService:
+    arguments:
+      $yamlPath: '%task_orchestrator.chains_yaml%'
+
+  TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\SymfonyConnectivityProcessRunnerService:
+    arguments:
+      $basePath: '%task_orchestrator.base_path%'
 
   # ─── ChainExecution module ───────────────────────────────────────────
 

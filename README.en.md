@@ -180,6 +180,13 @@ Run from the project root:
 php vendor/bin/task-orchestrator agent:orchestrate "Add user registration endpoint"
 ```
 
+Check configured role connectivity without running a chain:
+
+```bash
+php vendor/bin/task-orchestrator validate:connectivity --dry-run
+php vendor/bin/task-orchestrator validate:connectivity --role=system_analyst_sherlock --timeout=30
+```
+
 How to configure executors, choose YAML options, and connect to a project — see the [documentation](docs/guide/chains.md).
 
 ---
@@ -189,6 +196,7 @@ How to configure executors, choose YAML options, and connect to a project — se
 | Document | Description |
 |---|---|
 | [Architecture](docs/guide/architecture.md) | DDD layers, modules, CQRS |
+| [CLI commands](docs/guide/cli.md) | Orchestration, single-agent run, role connectivity check |
 | [Chains](docs/guide/chains.md) | Static / Dynamic / Conditional, YAML DSL |
 | [Roles](docs/guide/roles.md) | Role configuration, prompt files, runners |
 | [Reliability](docs/guide/reliability.md) | Retry, Circuit Breaker, Fallback, Sessions/Resume |

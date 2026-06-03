@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic:
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Бэкендер Тони
+branch: task/feat-validate-agent-connectivity
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-validate-agent-connectivity: Верификатор связности ролей — проверка что агент запускается и отвечает
@@ -65,18 +65,18 @@ CLI-команда `validate:connectivity` в группе `validate`, инте�
 ## 3. Requirements (MoSCoW)
 
 ### 🔴 Must Have
-- [ ] Команда `validate:connectivity` — читает конфиг, перебирает роли, запускает каждую
-- [ ] Тестовый промпт: минимальный, требующий короткий ответ
-- [ ] Проверка exit code = 0, stdout не пустой
-- [ ] Таймаут на каждый агент (default: 30 сек, configurable через `--timeout`)
-- [ ] Таблица с результатами: роль, статус ✓/✗, время ответа, ошибка
-- [ ] Exit code: 0 если все ок, 1 если хотя бы один агент не ответил
-- [ ] Поддержка `--config` для указания произвольного `chains.yaml`
-- [ ] Опция `--role=<name>` для проверки конкретной роли (не всех)
-- [ ] Опция `--dry-run` — показать что будет запущено, без реального запуска
+- [x] Команда `validate:connectivity` — читает конфиг, перебирает роли, запускает каждую
+- [x] Тестовый промпт: минимальный, требующий короткий ответ
+- [x] Проверка exit code = 0, stdout не пустой
+- [x] Таймаут на каждый агент (default: 30 сек, configurable через `--timeout`)
+- [x] Таблица с результатами: роль, статус ✓/✗, время ответа, ошибка
+- [x] Exit code: 0 если все ок, 1 если хотя бы один агент не ответил
+- [x] Поддержка `--config` для указания произвольного `chains.yaml`
+- [x] Опция `--role=<name>` для проверки конкретной роли (не всех)
+- [x] Опция `--dry-run` — показать что будет запущено, без реального запуска
 
 ### 🟡 Should Have
-- [ ] Цветной вывод (зелёный ✓, красный ✗)
+- [x] Цветной вывод (зелёный ✓, красный ✗)
 - [ ] Опция `--format=json` — машинно-читаемый результат
 - [ ] Проверка что `command[0]` (бинарник) существует в `$PATH` перед запуском (быстрая проверка без таймаута)
 
@@ -86,16 +86,21 @@ CLI-команда `validate:connectivity` в группе `validate`, инте�
 - Параллельный запуск агентов (последовательно, чтобы не перегружать API)
 
 ## 4. Implementation Plan
-*Заполняется исполнителем.*
+1. Добавить Application use case (`ValidateConnectivityCommandHandler`) в `ChainDefinition` (модуль определения chain/role config), который возвращает Presentation-friendly DTO без Domain VO в CLI.
+2. Ввести Domain interfaces (контракты) для чтения top-level `roles` из YAML и запуска процесса; реализации оставить в Infrastructure.
+3. Реализовать Symfony Process runner (запуск процесса) только через argv array, последовательно по ролям, с timeout и проверкой `exitCode=0` + non-empty stdout.
+4. Добавить CLI command (команду CLI) `validate:connectivity` с опциями `--config`, `--role`, `--timeout`, `--dry-run`, таблицей `Role | Status | Time | Error` и exit code `0/1`.
+5. Покрыть handler unit-тестами через fakes/stubs и command integration-тестом через fake PHP agent без реальных LLM/внешних сервисов.
+6. Обновить CLI documentation (документацию CLI), затем запустить targeted PHPUnit, полный PHPUnit, Psalm и при возможности `make check`.
 
 ## 5. Definition of Done
-- [ ] Команда `validate:connectivity` работает для всех ролей из `chains.yaml`
-- [ ] `--dry-run` показывает команды без запуска
-- [ ] Exit code корректный (0/1)
-- [ ] Unit-тесты на логику валидации
-- [ ] Integration-тест на команду с mock-агентом
-- [ ] Psalm + PHPUnit зелёные
-- [ ] Документация: `docs/guide/cli.md` обновлён
+- [x] Команда `validate:connectivity` работает для всех ролей из `chains.yaml`
+- [x] `--dry-run` показывает команды без запуска
+- [x] Exit code корректный (0/1)
+- [x] Unit-тесты на логику валидации
+- [x] Integration-тест на команду с mock-агентом
+- [x] Psalm + PHPUnit зелёные
+- [x] Документация: `docs/guide/cli.md` обновлён
 
 ## 6. Verification
 ```bash
