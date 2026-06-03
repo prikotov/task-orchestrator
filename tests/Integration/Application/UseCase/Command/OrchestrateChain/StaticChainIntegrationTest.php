@@ -138,7 +138,7 @@ final class StaticChainIntegrationTest extends TestCase
         self::assertSame(250, $result->totalInputTokens);
         self::assertSame(500, $result->totalOutputTokens);
         self::assertSame(0.03, $result->totalCost);
-        self::assertGreaterThan(0.0, $result->totalTime);
+        self::assertTotalTimeAggregatedFromSteps($result);
         self::assertFalse($result->timedOut);
     }
 
@@ -255,8 +255,21 @@ final class StaticChainIntegrationTest extends TestCase
         self::assertSame(800, $result->totalInputTokens);
         self::assertSame(1600, $result->totalOutputTokens);
         self::assertSame(0.08, $result->totalCost);
-        self::assertGreaterThanOrEqual(0.0, $result->totalTime);
+        self::assertTotalTimeAggregatedFromSteps($result);
         self::assertFalse($result->budgetExceeded);
         self::assertSame(0, $result->totalIterations);
+    }
+
+    private static function assertTotalTimeAggregatedFromSteps(OrchestrateChainResultDto $result): void
+    {
+        $totalDuration = 0.0;
+
+        foreach ($result->stepResults as $stepResult) {
+            self::assertGreaterThanOrEqual(0.0, $stepResult->duration);
+            $totalDuration += $stepResult->duration;
+        }
+
+        self::assertGreaterThanOrEqual(0.0, $result->totalTime);
+        self::assertEqualsWithDelta($totalDuration, $result->totalTime, 0.000_001);
     }
 }
