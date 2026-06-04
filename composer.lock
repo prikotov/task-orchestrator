@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "372a1dc8207345cf1fb4731bcd13bf6a",
+    "content-hash": "7ba5e1ecd0605cc02f794d3b89927991",
     "packages": [
         {
             "name": "psr/container",
@@ -5038,16 +5038,16 @@
         },
         {
             "name": "prikotov/git-workflow",
-            "version": "v0.1.0",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:prikotov/git-workflow.git",
-                "reference": "4b6d210ba185ccf5ad23deea9b10249956ebfcf7"
+                "reference": "f946d111123d9434372f210787fa069e84448c20"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/4b6d210ba185ccf5ad23deea9b10249956ebfcf7",
-                "reference": "4b6d210ba185ccf5ad23deea9b10249956ebfcf7",
+                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/f946d111123d9434372f210787fa069e84448c20",
+                "reference": "f946d111123d9434372f210787fa069e84448c20",
                 "shasum": ""
             },
             "require": {
@@ -5083,7 +5083,7 @@
                 "release",
                 "workflow"
             ],
-            "time": "2026-05-18T11:06:53+00:00"
+            "time": "2026-06-04T10:02:32+00:00"
         },
         {
             "name": "prikotov/todo-md",
