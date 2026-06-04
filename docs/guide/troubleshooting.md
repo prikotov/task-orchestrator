@@ -316,7 +316,7 @@ vendor/bin/task-orchestrator agent:orchestrate "Test task" --chain=implement --d
 
 Выводит список шагов цепочки с ролями и runner'ами без фактического запуска.
 
-### Проверить связность ролей
+### Проверка запуска ролей из chains.yaml (`validate:connectivity`)
 
 ```bash
 vendor/bin/task-orchestrator validate:connectivity --dry-run

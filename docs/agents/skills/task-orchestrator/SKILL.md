@@ -72,7 +72,7 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml 
 
 Exit codes: `0` — конфиг валиден, `5` — ошибки (подробности в выводе).
 
-### Проверка связности ролей
+### Проверка запуска ролей из chains.yaml (`validate:connectivity`)
 
 ```bash
 # Показать роли и команды без запуска процессов

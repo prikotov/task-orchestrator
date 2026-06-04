@@ -196,7 +196,7 @@ php vendor/bin/task-orchestrator validate:connectivity --role=system_analyst_she
 | Документ | Описание |
 |---|---|
 | [Архитектура](docs/guide/architecture.md) | DDD-слои, модули, CQRS |
-| [CLI-команды](docs/guide/cli.md) | Оркестрация, запуск агента, проверка связности ролей |
+| [CLI-команды](docs/guide/cli.md) | Оркестрация, запуск агента, проверка запуска ролей из chains.yaml |
 | [Цепочки](docs/guide/chains.md) | Static / Dynamic / Conditional, YAML DSL |
 | [Роли](docs/guide/roles.md) | Конфигурация ролей, prompt files, runners |
 | [Надёжность](docs/guide/reliability.md) | Retry, Circuit Breaker, Fallback, Sessions/Resume |
