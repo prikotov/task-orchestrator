@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.18] - 2026-06-04
+
+### Added
+
+- Add `validate:connectivity` CLI command to check startup of roles configured in `chains.yaml`.
+- Strengthen AI agent role-file validation and support role runner profiles for subagent delegation.
+
+### Fixed
+
+- Stabilize static chain metrics integration test.
+
+### Security
+
+- Update `prikotov/*` tooling dependencies and Symfony security patches; `composer audit` reports no advisories.
+
 ## [0.1.17] - 2026-05-25
 
 ### Changed
