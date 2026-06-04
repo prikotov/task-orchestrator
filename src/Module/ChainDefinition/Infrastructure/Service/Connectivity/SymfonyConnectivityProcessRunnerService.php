@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\
 use Override;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityProcessRunnerInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityProcessRunnerInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityProcessRequestVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityProcessResultVo;
 

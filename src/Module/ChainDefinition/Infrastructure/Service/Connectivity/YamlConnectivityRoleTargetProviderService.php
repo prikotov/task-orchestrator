@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use Override;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityRoleTargetProviderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityRoleTargetProviderInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityRoleTargetVo;
 
 /**

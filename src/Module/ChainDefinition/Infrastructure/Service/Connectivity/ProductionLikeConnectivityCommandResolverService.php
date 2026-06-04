@@ -6,7 +6,7 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\
 
 use Override;
 use RuntimeException;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityCommandResolverInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityCommandResolverInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityResolvedCommandVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityRoleTargetVo;
 

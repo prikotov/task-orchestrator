@@ -6,9 +6,9 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Com
 
 use InvalidArgumentException;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Enum\ConnectivityStatusEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityCommandResolverInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityProcessRunnerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityRoleTargetProviderInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityCommandResolverInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityProcessRunnerInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityRoleTargetProviderInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityProcessRequestVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityProcessResultVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityResolvedCommandVo;

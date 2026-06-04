@@ -98,13 +98,13 @@ services:
   TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\YamlChainLoaderServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService
 
-  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityRoleTargetProviderInterface:
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityRoleTargetProviderInterface:
     alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\YamlConnectivityRoleTargetProviderService
 
-  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityCommandResolverInterface:
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityCommandResolverInterface:
     alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\ProductionLikeConnectivityCommandResolverService
 
-  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration\ConnectivityProcessRunnerInterface:
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityProcessRunnerInterface:
     alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\SymfonyConnectivityProcessRunnerService
 
   # Parameters

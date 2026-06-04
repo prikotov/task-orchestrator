@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Integration;
+namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity;
 
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityProcessRequestVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityProcessResultVo;
