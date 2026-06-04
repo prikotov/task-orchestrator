@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\ValidateConnectivity;
+namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck;
 
 use InvalidArgumentException;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Enum\ConnectivityStatusEnum;
@@ -17,7 +17,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\Connectivi
 /**
  * Use case (сценарий) проверки, что роли из top-level `roles` запускаются и отвечают.
  */
-final readonly class ValidateConnectivityCommandHandler
+final readonly class RunRoleStartupCheckCommandHandler
 {
     public function __construct(
         private ConnectivityRoleTargetProviderInterface $targetProvider,
@@ -26,7 +26,7 @@ final readonly class ValidateConnectivityCommandHandler
     ) {
     }
 
-    public function __invoke(ValidateConnectivityCommand $command): ValidateConnectivityResultDto
+    public function __invoke(RunRoleStartupCheckCommand $command): RunRoleStartupCheckResultDto
     {
         if ($command->timeout <= 0) {
             throw new InvalidArgumentException('--timeout must be a positive integer.');
@@ -70,7 +70,7 @@ final readonly class ValidateConnectivityCommandHandler
             }
         }
 
-        return new ValidateConnectivityResultDto($results, $hasFailures, $command->dryRun);
+        return new RunRoleStartupCheckResultDto($results, $hasFailures, $command->dryRun);
     }
 
     /**

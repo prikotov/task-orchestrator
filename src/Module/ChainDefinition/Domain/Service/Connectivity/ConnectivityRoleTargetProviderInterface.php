@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connecti
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityRoleTargetVo;
 
 /**
- * Контракт чтения top-level `roles` из конфигурации цепочек для проверки связности.
+ * Контракт чтения top-level `roles` из конфигурации цепочек для проверки запуска ролей из chains.yaml.
  */
 interface ConnectivityRoleTargetProviderInterface
 {

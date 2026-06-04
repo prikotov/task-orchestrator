@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject;
 use InvalidArgumentException;
 
 /**
- * Resolved command (разрешённая команда) проверки связности с production-like argv.
+ * Resolved command (разрешённая команда) проверки запуска ролей из chains.yaml с production-like argv.
  */
 final readonly class ConnectivityResolvedCommandVo
 {

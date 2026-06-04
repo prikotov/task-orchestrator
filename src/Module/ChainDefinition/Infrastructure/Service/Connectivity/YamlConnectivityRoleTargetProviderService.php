@@ -12,7 +12,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\C
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityRoleTargetVo;
 
 /**
- * YAML implementation (реализация) чтения top-level roles для проверки связности.
+ * YAML implementation (реализация) чтения top-level roles для проверки запуска ролей из chains.yaml.
  */
 final readonly class YamlConnectivityRoleTargetProviderService implements ConnectivityRoleTargetProviderInterface
 {

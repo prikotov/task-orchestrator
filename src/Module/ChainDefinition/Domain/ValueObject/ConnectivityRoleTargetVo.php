@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject;
 use InvalidArgumentException;
 
 /**
- * Target (цель) проверки связности роли из top-level `roles` в chains.yaml.
+ * Target (цель) роли из top-level `roles` для проверки запуска ролей из chains.yaml.
  */
 final readonly class ConnectivityRoleTargetVo
 {

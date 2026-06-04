@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\ValidateConnectivity;
+namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck;
 
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Enum\ConnectivityStatusEnum;
 
 /**
- * DTO результата проверки связности одной роли.
+ * DTO результата проверки запуска одной роли из chains.yaml.
  */
 final readonly class ConnectivityRoleResultDto
 {

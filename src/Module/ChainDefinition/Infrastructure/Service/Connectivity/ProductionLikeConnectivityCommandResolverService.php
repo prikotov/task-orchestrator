@@ -11,7 +11,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\Connectivi
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityRoleTargetVo;
 
 /**
- * Собирает production-like argv (массив аргументов) для проверки связности роли.
+ * Собирает production-like argv (массив аргументов) для проверки запуска роли из chains.yaml.
  *
  * Подставляет минимальные prompt-файлы/инструкции вместо `@system-prompt` и
  * `@append-system-prompt`, затем добавляет user prompt последним positional argument (позиционным аргументом).

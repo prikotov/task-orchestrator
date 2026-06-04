@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject;
 
 /**
- * Result (результат) процесса проверки связности роли.
+ * Result (результат) процесса для проверки запуска роли из chains.yaml.
  */
 final readonly class ConnectivityProcessResultVo
 {

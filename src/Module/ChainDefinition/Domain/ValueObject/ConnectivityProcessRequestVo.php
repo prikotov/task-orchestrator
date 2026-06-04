@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject;
 use InvalidArgumentException;
 
 /**
- * Request (запрос) на запуск процесса проверки связности роли.
+ * Request (запрос) на запуск процесса для проверки запуска роли из chains.yaml.
  */
 final readonly class ConnectivityProcessRequestVo
 {

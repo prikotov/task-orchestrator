@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Command\ValidateConnectivity;
+namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Command\RunRoleStartupCheck;
 
 use InvalidArgumentException;
 use Override;
@@ -10,10 +10,10 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Enum\ConnectivityStatusEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\ValidateConnectivity\ConnectivityRoleResultDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\ValidateConnectivity\ValidateConnectivityCommand;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\ValidateConnectivity\ValidateConnectivityCommandHandler;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\ValidateConnectivity\ValidateConnectivityResultDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\ConnectivityRoleResultDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\RunRoleStartupCheckCommand;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\RunRoleStartupCheckCommandHandler;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\RunRoleStartupCheckResultDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityCommandResolverInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityProcessRunnerInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityRoleTargetProviderInterface;
@@ -22,16 +22,16 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\Connectivi
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityResolvedCommandVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityRoleTargetVo;
 
-#[CoversClass(ValidateConnectivityCommandHandler::class)]
-#[CoversClass(ValidateConnectivityCommand::class)]
-#[CoversClass(ValidateConnectivityResultDto::class)]
+#[CoversClass(RunRoleStartupCheckCommandHandler::class)]
+#[CoversClass(RunRoleStartupCheckCommand::class)]
+#[CoversClass(RunRoleStartupCheckResultDto::class)]
 #[CoversClass(ConnectivityRoleResultDto::class)]
-final class ValidateConnectivityCommandHandlerTest extends TestCase
+final class RunRoleStartupCheckCommandHandlerTest extends TestCase
 {
     private FakeRoleTargetProvider $provider;
     private FakeConnectivityCommandResolver $resolver;
     private FakeConnectivityProcessRunner $runner;
-    private ValidateConnectivityCommandHandler $handler;
+    private RunRoleStartupCheckCommandHandler $handler;
 
     #[Override]
     protected function setUp(): void
@@ -42,13 +42,13 @@ final class ValidateConnectivityCommandHandlerTest extends TestCase
         ]);
         $this->resolver = new FakeConnectivityCommandResolver();
         $this->runner = new FakeConnectivityProcessRunner();
-        $this->handler = new ValidateConnectivityCommandHandler($this->provider, $this->resolver, $this->runner);
+        $this->handler = new RunRoleStartupCheckCommandHandler($this->provider, $this->resolver, $this->runner);
     }
 
     #[Test]
     public function dryRunReturnsTargetsWithoutProcessExecution(): void
     {
-        $result = ($this->handler)(new ValidateConnectivityCommand(dryRun: true));
+        $result = ($this->handler)(new RunRoleStartupCheckCommand(dryRun: true));
 
         self::assertFalse($result->hasFailures);
         self::assertTrue($result->dryRun);
@@ -64,7 +64,7 @@ final class ValidateConnectivityCommandHandlerTest extends TestCase
     {
         $this->runner->queueResult(new ConnectivityProcessResultVo(0, 'ok', '', 0.1));
 
-        $result = ($this->handler)(new ValidateConnectivityCommand(roleName: 'developer', timeout: 7));
+        $result = ($this->handler)(new RunRoleStartupCheckCommand(roleName: 'developer', timeout: 7));
 
         self::assertFalse($result->hasFailures);
         self::assertCount(1, $result->results);
@@ -87,13 +87,13 @@ final class ValidateConnectivityCommandHandlerTest extends TestCase
             new ConnectivityRoleTargetVo('empty', ['fake-agent']),
             new ConnectivityRoleTargetVo('timeout', ['fake-agent']),
         ]);
-        $this->handler = new ValidateConnectivityCommandHandler($this->provider, $this->resolver, $this->runner);
+        $this->handler = new RunRoleStartupCheckCommandHandler($this->provider, $this->resolver, $this->runner);
         $this->runner->queueResult(new ConnectivityProcessResultVo(0, 'ok', '', 0.1));
         $this->runner->queueResult(new ConnectivityProcessResultVo(2, '', 'model not found', 0.2));
         $this->runner->queueResult(new ConnectivityProcessResultVo(0, "\n", '', 0.3));
         $this->runner->queueResult(new ConnectivityProcessResultVo(1, '', 'timeout', 1.0, true));
 
-        $result = ($this->handler)(new ValidateConnectivityCommand(timeout: 5));
+        $result = ($this->handler)(new RunRoleStartupCheckCommand(timeout: 5));
 
         self::assertTrue($result->hasFailures);
         self::assertSame([
@@ -113,7 +113,7 @@ final class ValidateConnectivityCommandHandlerTest extends TestCase
         $this->runner->queueResult(new ConnectivityProcessResultVo(0, 'ok', '', 0.1));
         $this->runner->queueResult(new ConnectivityProcessResultVo(0, 'ok', '', 0.1));
 
-        ($this->handler)(new ValidateConnectivityCommand());
+        ($this->handler)(new RunRoleStartupCheckCommand());
 
         self::assertSame(['analyst', 'developer'], $this->runner->requestRoleNames);
     }
@@ -124,7 +124,7 @@ final class ValidateConnectivityCommandHandlerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Role "missing" not found');
 
-        ($this->handler)(new ValidateConnectivityCommand(roleName: 'missing'));
+        ($this->handler)(new RunRoleStartupCheckCommand(roleName: 'missing'));
     }
 
     #[Test]
@@ -133,7 +133,7 @@ final class ValidateConnectivityCommandHandlerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('--timeout must be a positive integer.');
 
-        ($this->handler)(new ValidateConnectivityCommand(timeout: 0));
+        ($this->handler)(new RunRoleStartupCheckCommand(timeout: 0));
     }
 }
 

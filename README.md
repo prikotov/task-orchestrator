@@ -180,7 +180,7 @@ chains:
 php vendor/bin/task-orchestrator agent:orchestrate "Add user registration endpoint"
 ```
 
-Проверка связности настроенных ролей без запуска цепочки:
+Проверка запуска настроенных ролей из chains.yaml без запуска цепочки:
 
 ```bash
 php vendor/bin/task-orchestrator validate:connectivity --dry-run

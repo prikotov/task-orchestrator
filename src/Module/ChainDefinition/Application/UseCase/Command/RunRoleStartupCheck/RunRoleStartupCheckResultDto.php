@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\ValidateConnectivity;
+namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck;
 
 /**
- * DTO результата проверки связности ролей.
+ * DTO результата проверки запуска ролей из chains.yaml.
  */
-final readonly class ValidateConnectivityResultDto
+final readonly class RunRoleStartupCheckResultDto
 {
     /**
      * @param list<ConnectivityRoleResultDto> $results

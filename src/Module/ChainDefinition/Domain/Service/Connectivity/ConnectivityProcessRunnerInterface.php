@@ -8,7 +8,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\Connectivi
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityProcessResultVo;
 
 /**
- * Контракт запуска процесса проверки связности роли.
+ * Контракт запуска процесса для проверки запуска роли из chains.yaml.
  */
 interface ConnectivityProcessRunnerInterface
 {

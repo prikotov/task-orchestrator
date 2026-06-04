@@ -13,7 +13,7 @@ pr: https://github.com/prikotov/task-orchestrator/pull/235
 status: review
 ---
 
-# TASK-feat-validate-agent-connectivity: Верификатор связности ролей — проверка что агент запускается и отвечает
+# TASK-feat-validate-agent-connectivity: Верификатор запуска ролей — проверка что агент запускается и отвечает
 
 ## 0. Простое описание (Human Brief)
 Создать CLI-команду `validate:connectivity`, которая берёт роли из `chains.yaml`, подставляет тестовый промпт и проверяет, что каждый настроенный агент (command) реально запускается и возвращает валидный ответ.
@@ -86,7 +86,7 @@ CLI-команда `validate:connectivity` в группе `validate`, инте�
 - Параллельный запуск агентов (последовательно, чтобы не перегружать API)
 
 ## 4. Implementation Plan
-1. Добавить Application use case (`ValidateConnectivityCommandHandler`) в `ChainDefinition` (модуль определения chain/role config), который возвращает Presentation-friendly DTO без Domain VO в CLI.
+1. Добавить Application use case (`RunRoleStartupCheckCommandHandler`) в `ChainDefinition` (модуль определения chain/role config), который возвращает Presentation-friendly DTO без Domain VO в CLI.
 2. Ввести Domain interfaces (контракты) для чтения top-level `roles` из YAML и запуска процесса; реализации оставить в Infrastructure.
 3. Реализовать Symfony Process runner (запуск процесса) только через argv array, последовательно по ролям, с timeout и проверкой `exitCode=0` + non-empty stdout.
 4. Добавить CLI command (команду CLI) `validate:connectivity` с опциями `--config`, `--role`, `--timeout`, `--dry-run`, таблицей `Role | Status | Time | Error` и exit code `0/1`.

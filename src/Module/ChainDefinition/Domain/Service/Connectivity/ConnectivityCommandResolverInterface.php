@@ -8,7 +8,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\Connectivi
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityRoleTargetVo;
 
 /**
- * Контракт сборки production-like argv (массив аргументов) для проверки связности роли.
+ * Контракт сборки production-like argv (массив аргументов) для проверки запуска роли из chains.yaml.
  */
 interface ConnectivityCommandResolverInterface
 {

@@ -12,14 +12,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Enum\ConnectivityStatusEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\ValidateConnectivity\ConnectivityRoleResultDto;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\ValidateConnectivity\ValidateConnectivityCommand as ValidateConnectivityUseCaseCommand;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\ValidateConnectivity\ValidateConnectivityCommandHandler;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\ValidateConnectivity\ValidateConnectivityResultDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\ConnectivityRoleResultDto;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\RunRoleStartupCheckCommand as RunRoleStartupCheckUseCaseCommand;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\RunRoleStartupCheckCommandHandler;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\RunRoleStartupCheckResultDto;
 
 #[AsCommand(
     name: 'validate:connectivity',
-    description: 'Проверить, что top-level роли из chains.yaml запускаются и отвечают',
+    description: 'Проверить запуск ролей из chains.yaml',
 )]
 final class ValidateConnectivityCommand extends Command
 {
@@ -29,7 +29,7 @@ final class ValidateConnectivityCommand extends Command
     private const string OPT_DRY_RUN = 'dry-run';
 
     public function __construct(
-        private readonly ValidateConnectivityCommandHandler $handler,
+        private readonly RunRoleStartupCheckCommandHandler $handler,
     ) {
         parent::__construct();
     }
@@ -50,7 +50,7 @@ final class ValidateConnectivityCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $result = ($this->handler)(new ValidateConnectivityUseCaseCommand(
+            $result = ($this->handler)(new RunRoleStartupCheckUseCaseCommand(
                 configPath: $this->normalizeOptionalString($input->getOption(self::OPT_CONFIG)),
                 roleName: $this->normalizeOptionalString($input->getOption(self::OPT_ROLE)),
                 timeout: $this->parsePositiveInt($input->getOption(self::OPT_TIMEOUT), '--timeout'),
@@ -94,12 +94,12 @@ final class ValidateConnectivityCommand extends Command
         return $intValue;
     }
 
-    private function renderResult(SymfonyStyle $io, ValidateConnectivityResultDto $result): void
+    private function renderResult(SymfonyStyle $io, RunRoleStartupCheckResultDto $result): void
     {
         if ($result->dryRun) {
-            $io->section('Connectivity targets (dry-run)');
+            $io->section('Role startup targets (dry-run)');
         } else {
-            $io->section('Connectivity results');
+            $io->section('Role startup results');
         }
 
         $io->table(
@@ -133,7 +133,7 @@ final class ValidateConnectivityCommand extends Command
         };
     }
 
-    private function renderSummary(SymfonyStyle $io, ValidateConnectivityResultDto $result): void
+    private function renderSummary(SymfonyStyle $io, RunRoleStartupCheckResultDto $result): void
     {
         if ($result->dryRun) {
             $io->success(sprintf('%d target(s), dry-run: no processes started.', count($result->results)));

@@ -12,7 +12,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\Connectivi
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConnectivityProcessResultVo;
 
 /**
- * Symfony Process implementation (реализация) проверки связности роли через argv array.
+ * Symfony Process implementation (реализация) проверки запуска роли из chains.yaml через argv array.
  */
 final readonly class SymfonyConnectivityProcessRunnerService implements ConnectivityProcessRunnerInterface
 {

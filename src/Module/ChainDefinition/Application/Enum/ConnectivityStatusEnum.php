@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainDefinition\Application\Enum;
 
 /**
- * Status (статус) проверки связности роли.
+ * Status (статус) проверки запуска роли из chains.yaml.
  */
 enum ConnectivityStatusEnum: string
 {
