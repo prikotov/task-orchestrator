@@ -180,6 +180,13 @@ chains:
 php vendor/bin/task-orchestrator agent:orchestrate "Add user registration endpoint"
 ```
 
+Проверка запуска настроенных ролей из chains.yaml без запуска цепочки:
+
+```bash
+php vendor/bin/task-orchestrator validate:connectivity --dry-run
+php vendor/bin/task-orchestrator validate:connectivity --role=system_analyst_sherlock --timeout=30
+```
+
 Как настроить исполнителей, выбрать опции YAML и подключить к проекту — в [документации](docs/guide/chains.md).
 
 ---
@@ -189,6 +196,7 @@ php vendor/bin/task-orchestrator agent:orchestrate "Add user registration endpoi
 | Документ | Описание |
 |---|---|
 | [Архитектура](docs/guide/architecture.md) | DDD-слои, модули, CQRS |
+| [CLI-команды](docs/guide/cli.md) | Оркестрация, запуск агента, проверка запуска ролей из chains.yaml |
 | [Цепочки](docs/guide/chains.md) | Static / Dynamic / Conditional, YAML DSL |
 | [Роли](docs/guide/roles.md) | Конфигурация ролей, prompt files, runners |
 | [Надёжность](docs/guide/reliability.md) | Retry, Circuit Breaker, Fallback, Sessions/Resume |

@@ -180,6 +180,13 @@ chains:
 php vendor/bin/task-orchestrator agent:orchestrate "Add user registration endpoint"
 ```
 
+不啟動鏈條也能檢查已配置角色的連通性：
+
+```bash
+php vendor/bin/task-orchestrator validate:connectivity --dry-run
+php vendor/bin/task-orchestrator validate:connectivity --role=system_analyst_sherlock --timeout=30
+```
+
 如何設定執行者、選擇 YAML 選項並連接到專案——請參閱[文件](docs/guide/chains.md)。
 
 ---
@@ -189,6 +196,7 @@ php vendor/bin/task-orchestrator agent:orchestrate "Add user registration endpoi
 | 文件 | 說明 |
 |---|---|
 | [架構](docs/guide/architecture.md) | DDD 分層、模組、CQRS |
+| [CLI 命令](docs/guide/cli.md) | 編排、單一代理執行、角色連通性檢查 |
 | [鏈條](docs/guide/chains.md) | Static / Dynamic / Conditional、YAML DSL |
 | [角色](docs/guide/roles.md) | 角色配置、prompt files、runners |
 | [可靠性](docs/guide/reliability.md) | Retry、Circuit Breaker、Fallback、Sessions/Resume |

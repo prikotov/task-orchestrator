@@ -110,7 +110,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 * **Integration** (если требуется): ACL между модулями. → `Domain` (interfaces only), другой модуль `Application`.
 * **Infrastructure**: реализации интерфейсов Domain/Application. → `Domain` (interfaces only).
 
-**Именование:** Не используйте терминологию Ports & Adapters (Hexagonal Architecture). Интерфейсы внешних систем — `Domain\Service\Integration\*Interface`, реализация — `Infrastructure\*`. Запрещено `Port/` или `Adapter/` в путях и именах классов.
+**Именование:** Не используйте терминологию Ports & Adapters (Hexagonal Architecture). Запрещено `Port/` или `Adapter/` в путях и именах классов.
 
 ---
 

@@ -316,6 +316,15 @@ vendor/bin/task-orchestrator agent:orchestrate "Test task" --chain=implement --d
 
 Выводит список шагов цепочки с ролями и runner'ами без фактического запуска.
 
+### Проверка запуска ролей из chains.yaml (`validate:connectivity`)
+
+```bash
+vendor/bin/task-orchestrator validate:connectivity --dry-run
+vendor/bin/task-orchestrator validate:connectivity --role=system_analyst_sherlock --timeout=30
+```
+
+Проверяет top-level `roles` из `chains.yaml`: резолвит `@system-prompt`/`@append-system-prompt`, запускает `command` как argv array, добавляет минимальный user prompt последним argv-аргументом и считает роль успешной при exit code `0` и непустом stdout.
+
 ### Ручной запуск одного агента
 
 ```bash
