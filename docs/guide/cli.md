@@ -81,7 +81,7 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml 
 
 ---
 
-### `validate:connectivity`
+### Проверка связности ролей (`validate:connectivity`)
 
 Проверяет, что top-level `roles` из `chains.yaml` запускаются и возвращают непустой stdout.
 Команда читает только секцию `roles`, резолвит `@system-prompt`/`@append-system-prompt`, запускает каждую `command` как argv array (без shell-строки) и добавляет user prompt последним argv-аргументом: `Ответь ровно ok без Markdown.`
