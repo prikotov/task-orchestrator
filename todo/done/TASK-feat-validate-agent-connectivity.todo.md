@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер Тони
 branch: task/feat-validate-agent-connectivity
 pr: https://github.com/prikotov/task-orchestrator/pull/235
-status: review
+status: done
 ---
 
 # TASK-feat-validate-agent-connectivity: Верификатор запуска ролей — проверка что агент запускается и отвечает
