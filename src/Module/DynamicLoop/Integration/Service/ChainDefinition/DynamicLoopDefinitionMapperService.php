@@ -10,8 +10,8 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Cha
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\ChainDefinition\DynamicLoopDefinitionMapperServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\DynamicLoopConfigMapperInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration\DynamicLoopDefinitionMapperServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPromptConfigVo;

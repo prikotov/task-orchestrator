@@ -42,7 +42,7 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 
 | Subdomain | Файлов | LOC | % LOC | Описание |
 |---|---|---|---|---|
-| ROOT | 46 | 3 567 | 59.8% | VO, Entity, Enum, Exception, Dto, Service/Budget, Service/Chain/Audit, Service/Chain/Session, Service/Integration, Service/Prompt |
+| ROOT | 46 | 3 567 | 59.8% | VO, Entity, Enum, Exception, Dto, Service/Budget, Service/Chain/Audit, Service/Chain/Session, Service/Agent, Service/Prompt |
 | DYNAMIC | 9 | 1 366 | 22.9% | `Service/Chain/Dynamic/` — логика динамических цепей |
 | STATIC | 4 | 771 | 12.9% | `Service/Chain/Static/` — логика статических цепей |
 | SHARED | 7 | 260 | 4.4% | `Service/Chain/Shared/` — общие интерфейсы |
@@ -144,11 +144,11 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 | 2 | `Service/Chain/Session/ChainSessionReaderInterface.php` | 37 | interface | Чтение состояния сессии |
 | 3 | `Service/Chain/Session/ChainSessionLoggerInterface.php` | 32 | interface | Логирование сессии |
 
-#### Service/Integration (1 файл)
+#### Service/Agent (1 файл)
 
 | # | Файл | LOC | Type | Описание |
 |---|---|---|---|---|
-| 1 | `Service/Integration/RunAgentServiceInterface.php` | 27 | interface | Запуск AI-агента |
+| 1 | `Service/Agent/RunAgentServiceInterface.php` | 27 | interface | Запуск AI-агента |
 
 #### Service/Prompt (1 файл)
 

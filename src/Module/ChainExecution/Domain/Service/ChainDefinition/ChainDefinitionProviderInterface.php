@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ChainDefinition;
 
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionConditionalChainConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStaticChainConfigVo;
 
 /**
- * Integration-интерфейс для загрузки конфигурации цепочки из ChainDefinition.
+ * Контракт загрузки конфигурации цепочки из ChainDefinition.
  *
  * Реализация (ChainExecutionDefinitionMapper) находится в Integration-слое
  * и маппит ChainDefinition VO → Execution VO.
