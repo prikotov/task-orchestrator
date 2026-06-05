@@ -9,8 +9,8 @@ epic:
 author: Пользователь
 assignee: Бэкендер (Левша)
 branch: task/remove-service-integration-path
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/249
+status: review
 ---
 
 # TASK-refactor-domain-service-chain-definition-path: Убрать технический путь Domain Service Integration
@@ -76,7 +76,7 @@ make check
 - [ ] Prompt пользователя: «к тебе пробралась дичь в виде путя Service\\Integration».
 
 ## 9. Comments
-PR будет заполнен после создания Pull Request.
+PR: https://github.com/prikotov/task-orchestrator/pull/249
 
 ## Change History
 | Дата | Автор (роль) | Изменение |
