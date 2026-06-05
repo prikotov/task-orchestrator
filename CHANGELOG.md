@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.21] - 2026-06-05
+
+### Fixed
+
+- Fix `Release Phar` workflow to build Phar with `box.json.dist` (`box compile --config=box.json.dist`), so release assets include bundled configuration files such as `config/services.yaml`, `config/console_services.yaml`, and `config/chains.yaml`.
+
 ## [0.1.20] - 2026-06-05
 
 ### Fixed
