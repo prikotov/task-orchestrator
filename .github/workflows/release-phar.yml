@@ -1,13 +1,13 @@
 # Release Phar
 #
-# При пуше тега v* (например, v1.0.0) собирает task-orchestrator.phar
+# При пуше тега v* (например, v1.0.0) собирает bin/task-orchestrator.phar
 # и прикрепляет его к GitHub Release.
 #
 # Как работает:
 #   1. composer install (без dev-зависимостей)
-#   2. box compile → task-orchestrator.phar (конфиг: box.json.dist)
-#   3. Smoke test: php task-orchestrator.phar --version
-#   4. Загрузка Phar в assets релиза
+#   2. box compile --no-config → bin/task-orchestrator.phar
+#   3. Smoke test: php bin/task-orchestrator.phar --version
+#   4. Загрузка bin/task-orchestrator.phar в assets релиза
 #
 # Ошибка сборки Phar = warning, не блокирует релиз (continue-on-error).
 # Box установлен как standalone tool через setup-php (не через Composer,
@@ -41,9 +41,9 @@ jobs:
       - run: box compile --no-config
 
       - name: Smoke test
-        run: php task-orchestrator.phar --version
+        run: php bin/task-orchestrator.phar --version
 
       - name: Upload Phar to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: task-orchestrator.phar
+          files: bin/task-orchestrator.phar
