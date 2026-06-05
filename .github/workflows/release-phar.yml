@@ -5,12 +5,12 @@
 #
 # Как работает:
 #   1. composer install (без dev-зависимостей)
-#   2. box compile --config=box.json.dist → task-orchestrator.phar
-#      (box.json.dist включает src, apps/console/src, vendor и config/*)
-#   3. Smoke test: php task-orchestrator.phar --version
-#   4. Загрузка task-orchestrator.phar в assets релиза
+#   2. make phar-smoke:
+#      - box compile --config=box.json.dist → task-orchestrator.phar
+#      - php task-orchestrator.phar --version
+#   3. Загрузка task-orchestrator.phar в assets релиза
 #
-# Ошибка сборки Phar = warning, не блокирует релиз (continue-on-error).
+# Ошибка сборки или smoke-теста блокирует публикацию Phar asset.
 # Box установлен как standalone tool через setup-php (не через Composer,
 # т.к. humbug/box конфликтует с Symfony 8.x).
 
@@ -21,10 +21,12 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build-phar:
     runs-on: ubuntu-latest
-    continue-on-error: true
     name: Build & publish Phar
 
     steps:
@@ -39,10 +41,7 @@ jobs:
 
       - run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-      - run: box compile --config=box.json.dist
-
-      - name: Smoke test
-        run: php task-orchestrator.phar --version
+      - run: make phar-smoke
 
       - name: Upload Phar to GitHub Release
         uses: softprops/action-gh-release@v2

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PHAR_PATH="${ROOT_DIR}/task-orchestrator.phar"
+BOX_CONFIG="${ROOT_DIR}/box.json.dist"
+
+if ! command -v box >/dev/null 2>&1; then
+  cat >&2 <<'MESSAGE'
+ERROR: Box is required for Phar smoke check but was not found in PATH.
+Install Box locally or use GitHub Actions setup-php with: tools: box
+MESSAGE
+  exit 127
+fi
+
+cd "${ROOT_DIR}"
+rm -f "${PHAR_PATH}"
+
+box compile --config="${BOX_CONFIG}"
+
+if [[ ! -f "${PHAR_PATH}" ]]; then
+  echo "ERROR: Expected Phar was not created: ${PHAR_PATH}" >&2
+  exit 1
+fi
+
+php "${PHAR_PATH}" --version

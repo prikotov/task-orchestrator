@@ -13,18 +13,21 @@ services:
       tags: ['chain_execution.step_runner']
 
   # --- Auto-discovery (Application + Infrastructure, Domain исключён) ---
+  # Используем абсолютный package_dir: внутри Phar Symfony не нормализует
+  # config/../src для exclude-паттернов, из-за чего resource PHP-файлы могут
+  # ошибочно импортироваться как services.
   TaskOrchestrator\Common\:
-    resource: '../src/*'
+    resource: '%task_orchestrator.package_dir%/src/*'
     exclude:
-      - '../src/Module/*/Domain/Dto/'
-      - '../src/Module/*/Domain/Entity/'
-      - '../src/Module/*/Domain/Enum/'
-      - '../src/Module/*/Domain/Exception/'
-      - '../src/Module/*/Domain/ValueObject/'
-      - '../src/DependencyInjection/'
-      - '../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunnerService.php'
-      - '../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunnerService.php'
-      - '../src/Module/AgentRunner/Infrastructure/Service/Codex/Resources/'
+      - '%task_orchestrator.package_dir%/src/Module/*/Domain/Dto/'
+      - '%task_orchestrator.package_dir%/src/Module/*/Domain/Entity/'
+      - '%task_orchestrator.package_dir%/src/Module/*/Domain/Enum/'
+      - '%task_orchestrator.package_dir%/src/Module/*/Domain/Exception/'
+      - '%task_orchestrator.package_dir%/src/Module/*/Domain/ValueObject/'
+      - '%task_orchestrator.package_dir%/src/DependencyInjection/'
+      - '%task_orchestrator.package_dir%/src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunnerService.php'
+      - '%task_orchestrator.package_dir%/src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunnerService.php'
+      - '%task_orchestrator.package_dir%/src/**/Resources/'
 
   # ─── DynamicLoop module ─────────────────────────────────────────────
 
