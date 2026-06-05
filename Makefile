@@ -87,6 +87,12 @@ validate-roles: ## Валидация файлов ролей AI-агентов
 	@echo "Validate-Roles:"
 	@php bin/validate-roles
 
+.PHONY: phar-smoke
+phar-smoke: ## Собрать Phar через Box и проверить запуск --version
+	@echo
+	@echo "Phar smoke:"
+	@bin/phar-smoke
+
 .PHONY: check
 check: ## Запустить все проверки (phpstan + deptrac + psalm + phpmd + phpcs + md-links + validate-todo + validate-roles + tests)
 	@${MAKE} --no-print-directory phpstan deptrac psalm phpmd phpcs md-links validate-todo validate-roles tests && \
