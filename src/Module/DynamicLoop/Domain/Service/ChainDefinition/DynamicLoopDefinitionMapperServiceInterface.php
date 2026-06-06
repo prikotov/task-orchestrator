@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration;
+namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\ChainDefinition;
 
 /**
  * Интерфейс маппера определений цепочек DynamicLoop.
