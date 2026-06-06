@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/fix-phpmd-errorclassificationvo
 pr: https://github.com/prikotov/task-orchestrator/pull/252
-status: review
+status: done
 ---
 
 # TASK-fix-phpmd-errorclassificationvo: Устранить UnusedFormalParameter в ErrorClassificationVo
@@ -91,3 +91,4 @@ make check
 | 2026-06-06 | Бэкендер (Левша) | Реализация исправления, проверки зелёные |
 | 2026-06-06 | Бэкендер (Левша) | Создан PR #252, задача переведена в review |
 | 2026-06-06 | Бэкендер (Левша) | Убрана искусственная классификация через FQCN, параметр удалён |
+| 2026-06-06 | Бэкендер (Левша) | Задача принята, переведена в done перед merge |
