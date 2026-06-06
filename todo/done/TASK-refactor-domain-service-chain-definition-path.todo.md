@@ -10,7 +10,7 @@ author: Пользователь
 assignee: Бэкендер (Левша)
 branch: task/remove-service-integration-path
 pr: https://github.com/prikotov/task-orchestrator/pull/249
-status: review
+status: done
 ---
 
 # TASK-refactor-domain-service-chain-definition-path: Убрать технический путь Domain Service Integration
@@ -83,3 +83,4 @@ PR: https://github.com/prikotov/task-orchestrator/pull/249
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-06-05 | Бэкендер (Левша) | Создание задачи |
+| 2026-06-06 | Тимлид (Алекс) | Задача принята, переведена в done перед merge |
