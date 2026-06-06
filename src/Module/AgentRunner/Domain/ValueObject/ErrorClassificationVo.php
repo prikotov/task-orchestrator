@@ -61,7 +61,11 @@ final readonly class ErrorClassificationVo
      */
     public static function createFromClassException(Throwable $throwable): self
     {
-        return new self(ErrorClassificationEnum::transient);
+        return new self(
+            match ($throwable::class) {
+                default => ErrorClassificationEnum::transient,
+            },
+        );
     }
 
     public function getClassification(): ErrorClassificationEnum

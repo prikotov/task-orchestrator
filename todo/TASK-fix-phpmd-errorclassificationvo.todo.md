@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic: EPIC-refactor-phpmd-baseline-elimination
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Бэкендер (Левша)
+branch: task/fix-phpmd-errorclassificationvo
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-fix-phpmd-errorclassificationvo: Устранить UnusedFormalParameter в ErrorClassificationVo
@@ -53,22 +53,24 @@ PHPMD baseline пуст, `make phpmd-full` = 0 violations.
 
 ## 3. Requirements (MoSCoW)
 ### 🔴 Must Have
-- [ ] PHPMD не ругается на UnusedFormalParameter
-- [ ] Все тесты проходят
-- [ ] Удалить запись из `phpmd.baseline.xml`
+- [x] PHPMD не ругается на UnusedFormalParameter
+- [x] Все тесты проходят
+- [x] Удалить запись из `phpmd.baseline.xml`
 
 ### ⚫ Won't Have (Не будем делать)
 - Изменение классификации ошибок
 - Изменение порогов в phpmd.xml
 
 ## 4. Implementation Plan
-*Заполняется исполнителем. Варианты:*
-1. Использовать `$throwable` для классификации (например, получить FQCN исключения)
-2. Убрать параметр, если он не нужен по смыслу
+1. [x] Найти все вызовы `createFromClassException()`.
+2. [x] Использовать `$throwable` в классификации через FQCN без изменения результата классификации.
+3. [x] Проверить вызовы и unit-тесты.
+4. [x] Удалить запись из `phpmd.baseline.xml`.
+5. [x] Запустить `make phpmd` и `make check`.
 
 ## 5. Definition of Done
-- [ ] `phpmd` не ругается на ErrorClassificationVo
-- [ ] `make check` зелёный
+- [x] `phpmd` не ругается на ErrorClassificationVo
+- [x] `make check` зелёный
 
 ## 6. Verification
 ```bash
@@ -86,3 +88,4 @@ make check
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-05-21 | Тимлид (Алекс) | Создание задачи |
+| 2026-06-06 | Бэкендер (Левша) | Реализация исправления, проверки зелёные |
