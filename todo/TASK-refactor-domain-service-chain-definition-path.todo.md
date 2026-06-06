@@ -43,12 +43,13 @@ status: review
 ### 🔴 Must Have
 - [x] Перенести контракты в `Domain/Service/ChainDefinition`.
 - [x] Обновить DI aliases, imports и тесты.
-- [x] Добавить защитный архитектурный unit-тест.
+- [x] Не добавлять прикладной архитектурный unit-тест; контроль правила вынести в `prikotov/coding-conventions`.
 - [x] Запустить `make check`.
 
 ### ⚫ Won't Have (Не будем делать)
 - Менять бизнес-логику выполнения цепочек.
 - Переписывать исторические документы и закрытые задачи.
+- Добавлять проверку конвенций в unit-тесты проекта.
 
 ## 4. Implementation Plan
 1. [x] Проверить текущие вхождения `Domain/Service/Integration`.
@@ -59,7 +60,7 @@ status: review
 
 ## 5. Definition of Done
 - [x] Активный код не содержит `Domain/Service/Integration`.
-- [x] Unit-тест защищает от возврата технического пути.
+- [x] В PR нет прикладного теста конвенций; активный код очищен от технического пути.
 - [x] `make check` зелёный.
 
 ## 6. Verification
