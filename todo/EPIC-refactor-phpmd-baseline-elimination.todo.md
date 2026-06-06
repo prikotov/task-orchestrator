@@ -58,7 +58,7 @@ status: todo
 2. [ ] [TASK-refactor-phpmd-chaindefinition-classes](TASK-refactor-phpmd-chaindefinition-classes.todo.md) — ChainDefinitionVo 528 строк, YamlChainLoaderService 553 строк + parseSteps() 92 строки
 3. [ ] [TASK-refactor-phpmd-chainexecution-methods](TASK-refactor-phpmd-chainexecution-methods.todo.md) — ShellHookExecutorService::execute() 107 строк, ExecuteAgentStepService::run() PHPMD bug @todo
 4. [ ] [TASK-refactor-phpmd-dynamicloop-methods](TASK-refactor-phpmd-dynamicloop-methods.todo.md) — ExecuteDynamicTurnService::runParticipantTurn() 82 строки, runFacilitatorStep() 81 строка
-5. [ ] [TASK-fix-phpmd-errorclassificationvo](TASK-fix-phpmd-errorclassificationvo.todo.md) — ErrorClassificationVo::createFromClassException() unused parameter $throwable
+5. [x] [TASK-fix-phpmd-errorclassificationvo](done/TASK-fix-phpmd-errorclassificationvo.todo.md) — ErrorClassificationVo::createFromClassException() unused parameter $throwable
 
 ## 5. Definition of Done
 - [ ] `phpmd.baseline.xml` пуст или удалён
@@ -84,18 +84,17 @@ make check
 
 ## 9. Comments
 
-### Текущие baseline записи (8 штук)
+### Оставшиеся baseline записи (7 штук)
 
 | # | Правило | Файл | Метод | Значение | Порог |
 |---|---------|------|-------|----------|-------|
-| 1 | UnusedFormalParameter | ErrorClassificationVo.php | createFromClassException | $throwable | — |
-| 2 | LongMethod | RetryingAgentRunnerService.php | run() | 112 LOC | 80 |
-| 3 | LongClass | ChainDefinitionVo.php | — | 528 LOC | 500 |
-| 4 | LongClass | YamlChainLoaderService.php | — | 553 LOC | 500 |
-| 5 | LongMethod | YamlChainLoaderService.php | parseSteps() | 92 LOC | 80 |
-| 6 | LongMethod | ShellHookExecutorService.php | execute() | 107 LOC | 80 |
-| 7 | LongMethod | ExecuteDynamicTurnService.php | runParticipantTurn() | 82 LOC | 80 |
-| 8 | LongMethod | ExecuteDynamicTurnService.php | runFacilitatorStep() | 81 LOC | 80 |
+| 1 | LongMethod | RetryingAgentRunnerService.php | run() | 112 LOC | 80 |
+| 2 | LongClass | ChainDefinitionVo.php | — | 528 LOC | 500 |
+| 3 | LongClass | YamlChainLoaderService.php | — | 553 LOC | 500 |
+| 4 | LongMethod | YamlChainLoaderService.php | parseSteps() | 92 LOC | 80 |
+| 5 | LongMethod | ShellHookExecutorService.php | execute() | 107 LOC | 80 |
+| 6 | LongMethod | ExecuteDynamicTurnService.php | runParticipantTurn() | 82 LOC | 80 |
+| 7 | LongMethod | ExecuteDynamicTurnService.php | runFacilitatorStep() | 81 LOC | 80 |
 
 ### Дополнительный техдолг (не в baseline)
 
@@ -108,3 +107,4 @@ make check
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-05-21 | Тимлид (Алекс) | Создание эпика |
+| 2026-06-06 | Бэкендер (Левша) | TASK-fix-phpmd-errorclassificationvo выполнена, baseline обновлён |
