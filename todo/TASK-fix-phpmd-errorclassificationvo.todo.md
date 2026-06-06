@@ -9,8 +9,8 @@ epic: EPIC-refactor-phpmd-baseline-elimination
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/fix-phpmd-errorclassificationvo
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/252
+status: review
 ---
 
 # TASK-fix-phpmd-errorclassificationvo: Устранить UnusedFormalParameter в ErrorClassificationVo
@@ -89,3 +89,4 @@ make check
 | :--- | :--- | :--- |
 | 2026-05-21 | Тимлид (Алекс) | Создание задачи |
 | 2026-06-06 | Бэкендер (Левша) | Реализация исправления, проверки зелёные |
+| 2026-06-06 | Бэкендер (Левша) | Создан PR #252, задача переведена в review |
