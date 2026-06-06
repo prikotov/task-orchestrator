@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration;
+namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ChainDefinition;
 
 /**
  * Интерфейс маппера определений цепочек ChainExecution.

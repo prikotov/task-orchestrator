@@ -83,7 +83,10 @@ services:
   TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\DynamicExecutionStrategy:
     tags: ['orchestrator.execution_strategy']
 
-  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration\ChainDefinitionProviderInterface:
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\ChainDefinition\ChainDefinitionProviderInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapperService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\ChainDefinition\DynamicLoopDefinitionMapperServiceInterface:
     alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapperService
 
   # Infrastructure Service parameters
@@ -156,6 +159,12 @@ services:
 
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ChainDefinition\ChainDefinitionProviderInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapperService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ChainDefinition\ChainExecutionDefinitionMapperServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapperService
 
   # Static services (from merged StaticExecution module)
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface:

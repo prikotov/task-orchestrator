@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Integration;
+namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\ChainDefinition;
 
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 
 /**
- * Integration-интерфейс для загрузки конфигурации dynamic-цикла из ChainDefinition.
+ * Контракт загрузки конфигурации dynamic-цикла из ChainDefinition.
  *
  * Реализация (DynamicLoopDefinitionMapper) находится в Integration-слое
  * и маппит ChainDefinition VO → DynamicLoop VO.
