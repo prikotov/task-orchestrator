@@ -33,34 +33,36 @@ PROMPT
 | `--output`        | `-o`       | Формат вывода через запятую (см. ниже)                       | `raw`        |
 | `--role-file`     | `-r`       | Путь к файлу описания роли (обязателен)                      | —            |
 | `--runner`        | —          | Раннер: `pi` или `codex` (env `RUNNER`)                      | `roles.<role>.command[0]`, иначе `pi` |
+| `--provider`      | —          | Provider (провайдер) для `pi` (env `PROVIDER`)               | `roles.<role>.command --provider`, иначе — |
 | `--model`         | —          | Модель (env `MODEL`)                                         | `roles.<role>.command --model`, иначе — |
 | `--reasoning`     | —          | Reasoning/thinking effort (pi: `--thinking`, codex: `-c model_reasoning_effort=...`) | `roles.<role>.command`, иначе — |
 | `[prompt text]`   | —          | Промпт. Если не указан — читается из stdin                   | —            |
 
 ### Профиль делегирования роли
 
-Если `--runner`/`RUNNER`, `--model`/`MODEL`, `--reasoning`/`REASONING` не заданы явно,
+Если `--runner`/`RUNNER`, `--provider`/`PROVIDER`, `--model`/`MODEL`, `--reasoning`/`REASONING` не заданы явно,
 скрипт берёт значения из `config/chains.yaml` секции `roles.<role>.command`.
 Имя роли вычисляется по `--role-file`: например,
 `docs/agents/roles/team/backend_developer_levsha.ru.md` → `backend_developer_levsha`.
 
 Приоритеты резолва (resolution priority):
 
-1. CLI option (опция CLI): `--runner`, `--model`, `--reasoning`.
-2. Env (переменная окружения): `RUNNER`, `MODEL`, `REASONING`.
+1. CLI option (опция CLI): `--runner`, `--provider`, `--model`, `--reasoning`.
+2. Env (переменная окружения): `RUNNER`, `PROVIDER`, `MODEL`, `REASONING`.
 3. Role delegation profile (профиль делегирования роли): `roles.<role>.command`.
 4. Default (значение по умолчанию): `pi` только для runner.
 
 Из `command` извлекаются:
 - runner — первый элемент команды, например `codex` в `command: [codex, exec, ...]`;
+- provider — значение после `--provider` (применяется только для `pi`);
 - model — значение после `--model`;
 - reasoning — значение после `--thinking`/`--reasoning` или `model_reasoning_effort=...`.
 
 Явные значения не затираются профилем роли.
-`model`/`reasoning` из профиля роли применяются как связанная пара с profile runner (раннером профиля):
-- если `runner` не задан явно и берётся из профиля роли — profile `model`/`reasoning` применяются;
-- если `runner` задан явно через CLI/env и совпадает с profile runner — profile `model`/`reasoning` можно применять как defaults (значения по умолчанию);
-- если `runner` задан явно через CLI/env и отличается от profile runner — profile `model`/`reasoning` не применяются; они остаются пустыми, пока не заданы явно через CLI/env.
+`provider`/`model`/`reasoning` из профиля роли применяются как связанная группа с profile runner (раннером профиля):
+- если `runner` не задан явно и берётся из профиля роли — profile `provider`/`model`/`reasoning` применяются;
+- если `runner` задан явно через CLI/env и совпадает с profile runner — profile `provider`/`model`/`reasoning` можно применять как defaults (значения по умолчанию);
+- если `runner` задан явно через CLI/env и отличается от profile runner — profile `provider`/`model`/`reasoning` не применяются; они остаются пустыми, пока не заданы явно через CLI/env.
 
 ### Раннеры
 
@@ -72,7 +74,7 @@ scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer_lev
 PROMPT
 ```
 
-Команда: `pi --mode json --no-session --system-prompt <file> --append-system-prompt "Возьми на себя роль из файла: <role>"`
+Команда: `pi --mode json -p --no-session --system-prompt <file> [--provider <provider>] --append-system-prompt "Возьми на себя роль из файла: <role>"`
 
 #### codex
 
