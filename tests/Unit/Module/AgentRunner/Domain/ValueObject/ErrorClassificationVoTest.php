@@ -7,7 +7,6 @@ namespace TaskOrchestrator\Tests\Unit\Module\AgentRunner\Domain\ValueObject;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Enum\ErrorClassificationEnum;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\ErrorClassificationVo;
@@ -168,9 +167,7 @@ final class ErrorClassificationVoTest extends TestCase
     #[Test]
     public function exceptionClassifiedAsTransient(): void
     {
-        $throwable = new RuntimeException('Connection refused');
-
-        $classification = ErrorClassificationVo::createFromClassException($throwable);
+        $classification = ErrorClassificationVo::createFromClassException();
 
         self::assertSame(ErrorClassificationEnum::transient, $classification->getClassification());
         self::assertTrue($classification->shouldRetry());
