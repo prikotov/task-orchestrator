@@ -15,6 +15,7 @@
 #   -o, --output         — формат вывода через запятую: raw, text, tools, files (default: raw).
 #   -r, --role-file <file> — путь к файлу описания роли (обязателен).
 #   --runner <pi|codex>  — раннер (priority: CLI > env RUNNER > role profile > pi).
+#   --provider <string>  — провайдер pi (priority: CLI > env PROVIDER > role profile).
 #   --model <string>     — модель (priority: CLI > env MODEL > role profile).
 #   --reasoning <string> — reasoning/thinking effort (priority: CLI > env REASONING > role profile).
 #   [prompt text]        — промпт. Если не указан — читается из stdin.
@@ -32,12 +33,16 @@ SOFT_TIMEOUT=""
 OUTPUT="raw"
 ROLE_FILE=""
 RUNNER="${RUNNER:-}"
+PROVIDER="${PROVIDER:-}"
 MODEL="${MODEL:-}"
 REASONING="${REASONING:-}"
 RUNNER_EXPLICIT=false
+PROVIDER_EXPLICIT=false
+PROVIDER_CLI_EXPLICIT=false
 MODEL_EXPLICIT=false
 REASONING_EXPLICIT=false
 [[ -n "$RUNNER" ]] && RUNNER_EXPLICIT=true
+[[ -n "$PROVIDER" ]] && PROVIDER_EXPLICIT=true
 [[ -n "$MODEL" ]] && MODEL_EXPLICIT=true
 [[ -n "$REASONING" ]] && REASONING_EXPLICIT=true
 
@@ -55,6 +60,7 @@ while [[ $# -gt 0 ]]; do
         -o|--output)        OUTPUT="$2"; shift 2 ;;
         -r|--role-file)     ROLE_FILE="$2"; shift 2 ;;
         --runner)           RUNNER="$2"; RUNNER_EXPLICIT=true; shift 2 ;;
+        --provider)         PROVIDER="$2"; PROVIDER_EXPLICIT=true; PROVIDER_CLI_EXPLICIT=true; shift 2 ;;
         --model)            MODEL="$2"; MODEL_EXPLICIT=true; shift 2 ;;
         --reasoning)        REASONING="$2"; REASONING_EXPLICIT=true; shift 2 ;;
         -h|--help)
@@ -65,6 +71,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -o, --output         формат вывода через запятую: raw, text, tools, files (default: raw)"
             echo "  -r, --role-file <file> путь к файлу описания роли (обязателен)"
             echo "  --runner <pi|codex>  раннер (priority: CLI > env RUNNER > role profile > pi)"
+            echo "  --provider <string>  провайдер pi (priority: CLI > env PROVIDER > role profile)"
             echo "  --model <string>     модель (priority: CLI > env MODEL > role profile)"
             echo "  --reasoning <string> reasoning effort (priority: CLI > env REASONING > role profile)"
             echo "  -h, --help           эта справка"
@@ -209,6 +216,7 @@ $extractReasoning = static function (array $command) use ($extractOption, $extra
 };
 
 echo $extractRunner($command), "\n";
+echo trim($extractOption($command, ['--provider']), "\"'"), "\n";
 echo trim($extractOption($command, ['--model']), "\"'"), "\n";
 echo $extractReasoning($command), "\n";
 PHP
@@ -216,13 +224,14 @@ PHP
 
 apply_role_profile_defaults() {
     local role_name="$1"
-    local profile_output profile_runner profile_model profile_reasoning
+    local profile_output profile_runner profile_provider profile_model profile_reasoning
     local apply_profile_pair=true
 
     profile_output="$(load_role_profile "$role_name" 2>/dev/null || true)"
     profile_runner="$(sed -n '1p' <<< "$profile_output")"
-    profile_model="$(sed -n '2p' <<< "$profile_output")"
-    profile_reasoning="$(sed -n '3p' <<< "$profile_output")"
+    profile_provider="$(sed -n '2p' <<< "$profile_output")"
+    profile_model="$(sed -n '3p' <<< "$profile_output")"
+    profile_reasoning="$(sed -n '4p' <<< "$profile_output")"
 
     if [[ "$RUNNER_EXPLICIT" == true && "$RUNNER" != "$profile_runner" ]]; then
         apply_profile_pair=false
@@ -230,6 +239,10 @@ apply_role_profile_defaults() {
 
     if [[ "$RUNNER_EXPLICIT" == false && -z "$RUNNER" && -n "$profile_runner" ]]; then
         RUNNER="$profile_runner"
+    fi
+
+    if [[ "$apply_profile_pair" == true && "$PROVIDER_EXPLICIT" == false && -z "$PROVIDER" && -n "$profile_provider" ]]; then
+        PROVIDER="$profile_provider"
     fi
 
     if [[ "$apply_profile_pair" == true && "$MODEL_EXPLICIT" == false && -z "$MODEL" && -n "$profile_model" ]]; then
@@ -255,6 +268,14 @@ case "$RUNNER" in
         exit 1
         ;;
 esac
+
+if [[ "$RUNNER" != "pi" && "$PROVIDER_CLI_EXPLICIT" == true && -n "$PROVIDER" ]]; then
+    echo "Ошибка: --provider поддерживается только для раннера pi" >&2
+    exit 1
+fi
+if [[ "$RUNNER" != "pi" ]]; then
+    PROVIDER=""
+fi
 
 IFS=',' read -ra FORMATS <<< "$OUTPUT"
 VALID="raw text tools files"
@@ -282,7 +303,8 @@ RUNNER_CMD=()
 build_runner_command() {
     case "$RUNNER" in
         pi)
-            RUNNER_CMD=(pi --mode json --no-session --system-prompt "$SYSTEM_PROMPT_FILE")
+            RUNNER_CMD=(pi --mode json -p --no-session --system-prompt "$SYSTEM_PROMPT_FILE")
+            [[ -n "$PROVIDER" ]] && RUNNER_CMD+=(--provider "$PROVIDER")
             [[ -n "$MODEL" ]] && RUNNER_CMD+=(--model "$MODEL")
             [[ -n "$REASONING" ]] && RUNNER_CMD+=(--thinking "$REASONING")
             RUNNER_CMD+=(--append-system-prompt "Возьми на себя роль из файла: $ROLE_FILE")
@@ -375,6 +397,7 @@ filter_files() {
 TMPDIR=$(mktemp -d)
 PIPE="$TMPDIR/events.pipe"
 OUTFILE="$TMPDIR/events.ndjson"
+ERRFILE="$TMPDIR/runner.stderr"
 mkfifo "$PIPE"
 
 AGENT_PID=""
@@ -414,6 +437,32 @@ kill_agent_tree() {
     fi
 }
 
+wait_agent() {
+    local exit_code=0
+
+    if [[ -n "$AGENT_PID" ]]; then
+        set +e
+        wait "$AGENT_PID" 2>/dev/null
+        exit_code=$?
+        set -e
+        AGENT_PID=""
+    fi
+
+    return "$exit_code"
+}
+
+print_runner_error() {
+    local reason="$1"
+    local exit_code="$2"
+
+    echo "{\"type\":\"_watch_error\",\"reason\":\"${reason}\",\"runner\":\"${RUNNER}\",\"exit_code\":${exit_code}}" >&2
+
+    if [[ -s "$ERRFILE" ]]; then
+        echo "--- ${RUNNER} stderr (last 80 lines) ---" >&2
+        tail -n 80 "$ERRFILE" >&2
+    fi
+}
+
 cleanup() {
     kill_agent_tree
     rm -rf "$TMPDIR"
@@ -424,15 +473,8 @@ trap cleanup EXIT
 build_runner_command
 
 # Запускаем
-"${RUNNER_CMD[@]}" <<< "$PROMPT" > "$PIPE" 2>/dev/null &
+"${RUNNER_CMD[@]}" <<< "$PROMPT" > "$PIPE" 2> "$ERRFILE" &
 AGENT_PID=$!
-
-# Даём агенту 5 сек на запуск, проверяем что он жив
-sleep 0.2
-if ! kill -0 "$AGENT_PID" 2>/dev/null; then
-    echo "{\"type\":\"_watch_error\",\"reason\":\"${RUNNER}_start_failed\"}" >&2
-    exit 1
-fi
 
 # Вычисляем таймауты: soft — основной, hard — абсолютный потолок
 # SOFT_TIMEOUT обязателен, hard не может быть < soft
@@ -462,11 +504,17 @@ while IFS= read -r -t "$STALL_TIMEOUT" line; do
 
     # Агент завершился сам
     if [[ "$line" == *"agent_end"* ]]; then
+        runner_exit_code=0
+        wait_agent || runner_exit_code=$?
+        if [[ $runner_exit_code -ne 0 ]]; then
+            print_runner_error "runner_failed_after_agent_end" "$runner_exit_code"
+            exit 1
+        fi
+
         # Выводим все не-raw форматы
         if has_format text; then filter_text "$OUTFILE"; fi
         if has_format tools; then filter_tools "$OUTFILE"; fi
         if has_format files; then filter_files "$OUTFILE"; fi
-        wait "$AGENT_PID" 2>/dev/null || true
         exit 0
     fi
 
@@ -496,9 +544,13 @@ if [[ $elapsed -ge $STALL_TIMEOUT ]]; then
     exit 1
 fi
 
-# Pipe закрылся — агент завершился нормально
-if has_format text; then filter_text "$OUTFILE"; fi
-if has_format tools; then filter_tools "$OUTFILE"; fi
-if has_format files; then filter_files "$OUTFILE"; fi
-wait "$AGENT_PID" 2>/dev/null || true
-exit 0
+# Pipe закрылся без agent_end — считаем запуск некорректным
+runner_exit_code=0
+wait_agent || runner_exit_code=$?
+if [[ $runner_exit_code -ne 0 ]]; then
+    print_runner_error "runner_failed" "$runner_exit_code"
+    exit 1
+fi
+
+print_runner_error "missing_agent_end" "$runner_exit_code"
+exit 1
