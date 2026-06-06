@@ -39,7 +39,7 @@
 
 ### Связь через Integration-слой (Clean Architecture)
 
-Модули связаны через Integration-слой Orchestrator. Orchestrator Domain определяет интерфейс `RunAgentServiceInterface` в `Domain/Service/Integration/`. Integration-слой реализует `RunAgentService`, который:
+Модули связаны через Integration-слой Orchestrator. Orchestrator Domain определяет интерфейс `RunAgentServiceInterface` в бизнес-контексте `Domain/Service/Agent/`. Integration-слой реализует `RunAgentService`, который:
 
 1. Маппит Orchestrator VO → AgentRunner Application DTO через `AgentDtoMapper`
 2. Делегирует вызовы в `RunAgentCommandHandler` (Application-слой AgentRunner)

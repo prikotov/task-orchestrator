@@ -18,7 +18,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionType
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ConditionOperatorEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\ChainConfigMapperInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Integration\ChainExecutionDefinitionMapperServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ChainDefinition\ChainExecutionDefinitionMapperServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionBudgetVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
