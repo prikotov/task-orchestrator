@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-odysseus-ai-workspace
 pr: https://github.com/prikotov/task-orchestrator/pull/254
-status: review
+status: done
 ---
 
 # TASK-research-odysseus-ai-workspace: Исследовать Odysseus (PewDiePie) для сравнения с task-orchestrator

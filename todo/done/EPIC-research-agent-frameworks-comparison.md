@@ -103,7 +103,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1f: Дополнительные исследования (2026-06-12)
 
-- [ ] [TASK-research-odysseus-ai-workspace](../TASK-research-odysseus-ai-workspace.todo.md) — Odysseus (PewDiePie archdaemon, self-hosted AI workspace)
+- [x] [TASK-research-odysseus-ai-workspace](TASK-research-odysseus-ai-workspace.todo.md) — Odysseus (PewDiePie archdaemon, self-hosted AI workspace)
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
