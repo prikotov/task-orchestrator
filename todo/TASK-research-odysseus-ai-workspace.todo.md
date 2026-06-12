@@ -9,8 +9,8 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-odysseus-ai-workspace
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/254
+status: review
 ---
 
 # TASK-research-odysseus-ai-workspace: Исследовать Odysseus (PewDiePie) для сравнения с task-orchestrator
