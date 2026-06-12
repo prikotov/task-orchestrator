@@ -4944,7 +4944,7 @@
             "version": "v0.19.3",
             "source": {
                 "type": "git",
-                "url": "git@github.com:prikotov/coding-standard.git",
+                "url": "https://github.com/prikotov/coding-standard.git",
                 "reference": "f5af793dcc79775b1cc5532ceaac160e2f391766"
             },
             "dist": {
@@ -5034,6 +5034,10 @@
                 "phpcs",
                 "sniffs"
             ],
+            "support": {
+                "source": "https://github.com/prikotov/coding-standard/tree/v0.19.3",
+                "issues": "https://github.com/prikotov/coding-standard/issues"
+            },
             "time": "2026-06-04T04:57:24+00:00"
         },
         {
@@ -5041,7 +5045,7 @@
             "version": "v0.2.0",
             "source": {
                 "type": "git",
-                "url": "git@github.com:prikotov/git-workflow.git",
+                "url": "https://github.com/prikotov/git-workflow.git",
                 "reference": "f946d111123d9434372f210787fa069e84448c20"
             },
             "dist": {
@@ -5083,6 +5087,10 @@
                 "release",
                 "workflow"
             ],
+            "support": {
+                "source": "https://github.com/prikotov/git-workflow/tree/v0.2.0",
+                "issues": "https://github.com/prikotov/git-workflow/issues"
+            },
             "time": "2026-06-04T10:02:32+00:00"
         },
         {
@@ -5090,7 +5098,7 @@
             "version": "v0.0.7",
             "source": {
                 "type": "git",
-                "url": "git@github.com:prikotov/todo-md.git",
+                "url": "https://github.com/prikotov/todo-md.git",
                 "reference": "f235345f46c207234faea24f1ff6bf4867677aad"
             },
             "dist": {
@@ -5128,6 +5136,10 @@
                 "task-management",
                 "todo"
             ],
+            "support": {
+                "source": "https://github.com/prikotov/todo-md/tree/v0.0.7",
+                "issues": "https://github.com/prikotov/todo-md/issues"
+            },
             "time": "2026-06-04T03:45:19+00:00"
         },
         {
