@@ -7,7 +7,7 @@
 
 ## Сравнительная таблица
 
-> **Статус заполнения:** 26 / 26 исследований
+> **Статус заполнения:** 27 / 27 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -37,6 +37,7 @@
 | 24 | Duet (Aomni) | TypeScript (Bun, проприетарный) | `business-agent SaaS` | `skill-driven` (intent → skill selection → multi-phase autonomous execution) | `cloud-managed` (workspace + channels + file artifacts + Convex tables) | `prompt-driven` (gotchas в SKILL.md, нет retry/CB/fallback) | `SKILL.md skills (19 default + 12 industry) + UseCase surface placements + Composio integrations (19+) + Chat SDK adapters (8 platforms) + Cron tool + Build-apps tool` | 🟡 заимствовать отдельные паттерны | [duet-comparison.md](framework-comparisons/duet-comparison.md) ✅ |
 | 25 | Multica | TypeScript + Go | `project-management platform` | `daemon-based task queue (poll + WS wakeup) + autopilot (cron/webhook) + session resumption` | `persistent` (PostgreSQL 17, 28 таблиц, ACID) + event-sourced (activity_log + WS broadcast) | `task-level failure classification (4 категории) + poisoned session detection + runtime health (heartbeat + sweeper) + admission check + orphan recovery` | `Skills (SKILL.md, import) + 11 agent providers + autopilot + comprehensive CLI + MCP per agent + autopilot triggers (cron/webhook/API)` | 🟡 заимствовать отдельные паттерны | [multica-comparison.md](framework-comparisons/multica-comparison.md) ✅ |
 | 26 | Zeroclaw | Rust (edition 2024) | `CLI-agent + agent-runtime` | `agent-loop (LLM → tool call → obs → LLM) + SOP engine (triggered procedures: MQTT/webhook/cron/peripheral) + loop detection (3 patterns)` | `pluggable Memory trait (SQLite/PostgreSQL/Qdrant) + session persistence + namespaced isolation + history pruning + context compression` | `ReliableProvider (fallback chain + retry 2x exponential) + error classification (retryable/non-retryable/context window) + loop detection (Warning/Block/Break)` | `Trait-driven (Provider/Channel/Tool/Memory/Observer/RuntimeAdapter/Sandbox/Peripheral) + WASM plugins + MCP client + SkillForge + 30+ channels + hardware` | 🟡 заимствовать отдельные паттерны | [zeroclaw-comparison.md](framework-comparisons/zeroclaw-comparison.md) ✅ |
+| 27 | Odysseus (PewDiePie archdaemon) | Python (FastAPI) | `self-hosted AI workspace` | `agent-loop (ReAct) + Deep Research (multi-step runs) + Skills (SKILL.md) + Memory (ChromaDB)` | `session persistence (SQLite) + ChromaDB (memory/skills) + vector + keyword retrieval` | `retry max 3 + host health (cooldown 20s after 2 consecutive failures) + tool timeout (60s)` | `Tools (bash/python/web_search/etc.) + MCP servers + Skills (SKILL.md) + custom endpoints + Deep Research workflow` | 🔴 не dependency, 🟡 feature candidates for independent implementation | [odysseus-comparison.md](framework-comparisons/odysseus-comparison.md) ✅ |
 
 ### Легенда колонок
 

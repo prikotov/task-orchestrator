@@ -101,6 +101,10 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 - [x] [TASK-research-zeroclaw](done/TASK-research-zeroclaw.todo.md) — Zeroclaw (zeroclaw-labs, AI-agent orchestration)
 
+### Этап 1f: Дополнительные исследования (2026-06-12)
+
+- [x] [TASK-research-odysseus-ai-workspace](TASK-research-odysseus-ai-workspace.todo.md) — Odysseus (PewDiePie archdaemon, self-hosted AI workspace)
+
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
 - [x] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
