@@ -9,7 +9,7 @@ epic:
 author: codex-cli
 assignee: codex-cli
 branch: task/update-prikotov-dependencies
-pr:
+pr: https://github.com/prikotov/task-orchestrator/pull/255
 status: done
 ---
 
