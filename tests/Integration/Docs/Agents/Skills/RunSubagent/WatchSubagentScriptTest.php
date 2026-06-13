@@ -195,6 +195,7 @@ YAML);
             env: [
                 'FAKE_RUNNER_AGENT_END' => '0',
             ],
+            roleFile: $this->piRoleFile,
             expectSuccess: false,
         );
 
@@ -218,6 +219,53 @@ YAML);
         self::assertStringContainsString('"reason":"runner_failed"', $process->getErrorOutput());
         self::assertStringContainsString('"exit_code":42', $process->getErrorOutput());
         self::assertStringContainsString('No API key found for opencode.', $process->getErrorOutput());
+    }
+
+    #[Test]
+    public function codexRunnerCompletesOnTurnCompletedAndExtractsItemText(): void
+    {
+        $process = $this->runScript(
+            arguments: ['--runner', 'codex', '-o', 'text'],
+            env: [
+                'FAKE_RUNNER_EVENTS' => implode("\n", [
+                    '{"type":"item.completed","item":{"type":"agent_message","text":"Codex OK"}}',
+                    '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}',
+                ]) . "\n",
+            ],
+        );
+
+        self::assertSame("Codex OK\n", $process->getOutput());
+    }
+
+    #[Test]
+    public function codexRunnerPrefersTurnCompletedItemsOverItemCompletedFallback(): void
+    {
+        $process = $this->runScript(
+            arguments: ['--runner', 'codex', '-o', 'text'],
+            env: [
+                'FAKE_RUNNER_EVENTS' => implode("\n", [
+                    '{"type":"item.completed","item":{"type":"agent_message","content":[{"type":"text","text":"Fallback text"}]}}',
+                    '{"type":"turn.completed","turn":{"items":[{"type":"command_execution","command":"ls","result":"files"},{"type":"agent_message","content":[{"type":"text","text":"Turn text"}]}]}}',
+                ]) . "\n",
+            ],
+        );
+
+        self::assertSame("Turn text\n", $process->getOutput());
+    }
+
+    #[Test]
+    public function codexRunnerFailsOnTurnFailed(): void
+    {
+        $process = $this->runScript(
+            arguments: ['--runner', 'codex'],
+            env: [
+                'FAKE_RUNNER_EVENTS' => '{"type":"turn.failed","error":{"message":"boom"}}' . "\n",
+            ],
+            expectSuccess: false,
+        );
+
+        self::assertFalse($process->isSuccessful());
+        self::assertStringContainsString('"reason":"runner_failed_event"', $process->getErrorOutput());
     }
 
     /**
@@ -271,7 +319,7 @@ YAML);
                 $process->isSuccessful(),
                 $process->getErrorOutput() . $process->getOutput(),
             );
-            self::assertStringContainsString('"agent_end"', $process->getOutput());
+            self::assertNotSame('', trim($process->getOutput()));
         }
 
         return $process;
@@ -289,7 +337,16 @@ cat > "$STDIN_CAPTURE_FILE"
 if [[ -n "${FAKE_RUNNER_STDERR:-}" ]]; then
     printf '%s\n' "$FAKE_RUNNER_STDERR" >&2
 fi
-if [[ "${FAKE_RUNNER_AGENT_END:-1}" == "1" ]]; then
+if [[ -n "${FAKE_RUNNER_EVENTS:-}" ]]; then
+    printf '%s' "$FAKE_RUNNER_EVENTS"
+elif [[ "$(basename "$0")" == "codex" ]]; then
+    if [[ "${FAKE_RUNNER_AGENT_END:-1}" == "1" ]]; then
+        printf '{"type":"item.completed","item":{"type":"agent_message","text":"codex fake output"}}\n'
+        printf '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}\n'
+    else
+        printf '{"type":"session"}\n'
+    fi
+elif [[ "${FAKE_RUNNER_AGENT_END:-1}" == "1" ]]; then
     printf '{"type":"agent_end"}\n'
 else
     printf '{"type":"session"}\n'

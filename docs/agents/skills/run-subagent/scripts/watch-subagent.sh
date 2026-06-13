@@ -22,7 +22,7 @@
 #
 # Выход:
 #   stdout — отфильтрованный вывод (зависит от -o).
-#   exit 0 — агент завершился сам (agent_end).
+#   exit 0 — агент завершился сам (pi: agent_end, codex: turn.completed).
 #   exit 1 — агент убит по таймауту или ошибке.
 
 set -euo pipefail
@@ -320,6 +320,19 @@ build_runner_command() {
     esac
 }
 
+apply_proxy_env_defaults() {
+    local proxy="${ALL_PROXY:-${all_proxy:-}}"
+
+    if [[ -z "$proxy" ]]; then
+        return 0
+    fi
+
+    export HTTP_PROXY="${HTTP_PROXY:-$proxy}"
+    export HTTPS_PROXY="${HTTPS_PROXY:-$proxy}"
+    export http_proxy="${http_proxy:-$proxy}"
+    export https_proxy="${https_proxy:-$proxy}"
+}
+
 # ============================================================================
 # Per-runner: фильтрация вывода
 # ============================================================================
@@ -347,24 +360,60 @@ filter_files_pi() {
 # --- codex ---
 
 filter_text_codex() {
-    # @todo Формат JSONL codex может отличаться — уточнить после реальных тестов
-    jq -r 'select(.type == "message_end" and .message.role == "assistant")
-           | .message.content[]
-           | select(.type == "text")
-           | .text' "$1" 2>/dev/null || true
+    jq -Rrn '
+        def item_text($item):
+            if (($item.type // "") != "agent_message") then
+                ""
+            elif (($item.text // "") != "") then
+                $item.text
+            elif (($item.content // null) | type) == "array" then
+                [$item.content[]? | select(type == "object" and (.type // "") == "text") | (.text // "")]
+                | join("")
+            elif (($item.content // null) | type) == "string" then
+                $item.content
+            else
+                ""
+            end;
+
+        def turn_text($event):
+            [($event.turn.items // [])[]? | select((.type // "") == "agent_message") | item_text(.) | select(. != "")]
+            | last // "";
+
+        reduce (inputs | fromjson? | select(type == "object")) as $event ({item: "", turn: ""};
+            if (($event.type // "") == "item.completed") then
+                (item_text($event.item // {}) as $text
+                 | if $text != "" and .turn == "" then .item = $text else . end)
+            elif (($event.type // "") == "turn.completed") then
+                (turn_text($event) as $text
+                 | if $text != "" then .turn = $text else . end)
+            else
+                .
+            end
+        )
+        | if .turn != "" then .turn else .item end' "$1" 2>/dev/null || true
 }
 
 filter_tools_codex() {
-    # @todo Формат JSONL codex может отличаться — уточнить после реальных тестов
-    jq -c 'select(.type == "tool_execution_start")
-           | {toolName, args}' "$1" 2>/dev/null || true
+    jq -Rrc 'fromjson?
+           | select(type == "object" and .type == "item.completed")
+           | .item as $item
+           | select(($item.type // "") | test("tool|function_call|custom_tool_call|local_shell_call|command_execution"))
+           | {
+               toolName: ($item.name // $item.call_type // $item.type),
+               args: ($item.arguments // $item.input // $item)
+             }' "$1" 2>/dev/null || true
 }
 
 filter_files_codex() {
-    # @todo Формат JSONL codex может отличаться — уточнить после реальных тестов
-    jq -c 'select(.type == "tool_execution_start"
-                  and (.toolName == "edit" or .toolName == "write"))
-           | {toolName, args}' "$1" 2>/dev/null || true
+    jq -Rrc 'fromjson?
+           | select(type == "object" and .type == "item.completed")
+           | .item as $item
+           | select(($item.type // "") | test("tool|function_call|custom_tool_call|local_shell_call|command_execution"))
+           | {
+               toolName: ($item.name // $item.call_type // $item.type),
+               args: ($item.arguments // $item.input // $item)
+             }
+           | select((((.toolName | tostring) + " " + (.args | tostring)) | test("apply_patch|edit|write|file"; "i")))' "$1" 2>/dev/null || true
 }
 
 # --- Dispatchers ---
@@ -463,6 +512,60 @@ print_runner_error() {
     fi
 }
 
+is_runner_success_event() {
+    local line="$1"
+
+    case "$RUNNER" in
+        pi)
+            [[ "$line" == *"agent_end"* ]]
+            ;;
+        codex)
+            jq -Rre 'fromjson? | select(type == "object" and .type == "turn.completed")' <<< "$line" >/dev/null 2>&1
+            ;;
+    esac
+}
+
+is_runner_failure_event() {
+    local line="$1"
+
+    case "$RUNNER" in
+        pi)
+            return 1
+            ;;
+        codex)
+            jq -Rre 'fromjson? | select(type == "object" and .type == "turn.failed")' <<< "$line" >/dev/null 2>&1
+            ;;
+    esac
+}
+
+outfile_has_success_event() {
+    case "$RUNNER" in
+        pi)
+            grep -q 'agent_end' "$OUTFILE" 2>/dev/null
+            ;;
+        codex)
+            jq -Rre 'fromjson? | select(type == "object" and .type == "turn.completed")' "$OUTFILE" >/dev/null 2>&1
+            ;;
+    esac
+}
+
+outfile_has_failure_event() {
+    case "$RUNNER" in
+        pi)
+            return 1
+            ;;
+        codex)
+            jq -Rre 'fromjson? | select(type == "object" and .type == "turn.failed")' "$OUTFILE" >/dev/null 2>&1
+            ;;
+    esac
+}
+
+print_filtered_output() {
+    if has_format text; then filter_text "$OUTFILE"; fi
+    if has_format tools; then filter_tools "$OUTFILE"; fi
+    if has_format files; then filter_files "$OUTFILE"; fi
+}
+
 cleanup() {
     kill_agent_tree
     rm -rf "$TMPDIR"
@@ -471,6 +574,7 @@ trap cleanup EXIT
 
 # Формируем команду раннера
 build_runner_command
+apply_proxy_env_defaults
 
 # Запускаем
 "${RUNNER_CMD[@]}" <<< "$PROMPT" > "$PIPE" 2> "$ERRFILE" &
@@ -503,19 +607,27 @@ while IFS= read -r -t "$STALL_TIMEOUT" line; do
     $STREAM_RAW && echo "$line"
 
     # Агент завершился сам
-    if [[ "$line" == *"agent_end"* ]]; then
+    if is_runner_success_event "$line"; then
         runner_exit_code=0
         wait_agent || runner_exit_code=$?
         if [[ $runner_exit_code -ne 0 ]]; then
-            print_runner_error "runner_failed_after_agent_end" "$runner_exit_code"
+            if [[ "$RUNNER" == "pi" ]]; then
+                print_runner_error "runner_failed_after_agent_end" "$runner_exit_code"
+            else
+                print_runner_error "runner_failed_after_success_event" "$runner_exit_code"
+            fi
             exit 1
         fi
 
-        # Выводим все не-raw форматы
-        if has_format text; then filter_text "$OUTFILE"; fi
-        if has_format tools; then filter_tools "$OUTFILE"; fi
-        if has_format files; then filter_files "$OUTFILE"; fi
+        print_filtered_output
         exit 0
+    fi
+
+    if is_runner_failure_event "$line"; then
+        runner_exit_code=0
+        wait_agent || runner_exit_code=$?
+        print_runner_error "runner_failed_event" "$runner_exit_code"
+        exit 1
     fi
 
     # Проверяем soft timeout — предупреждаем, но НЕ убиваем
@@ -552,5 +664,19 @@ if [[ $runner_exit_code -ne 0 ]]; then
     exit 1
 fi
 
-print_runner_error "missing_agent_end" "$runner_exit_code"
+if outfile_has_success_event; then
+    print_filtered_output
+    exit 0
+fi
+
+if outfile_has_failure_event; then
+    print_runner_error "runner_failed_event" "$runner_exit_code"
+    exit 1
+fi
+
+if [[ "$RUNNER" == "pi" ]]; then
+    print_runner_error "missing_agent_end" "$runner_exit_code"
+else
+    print_runner_error "missing_success_event" "$runner_exit_code"
+fi
 exit 1
