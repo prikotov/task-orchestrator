@@ -37,7 +37,7 @@ status: review
 ## 2. Context and Scope (Контекст и Границы)
 *   **Где делаем:** `docs/agents/skills/run-subagent/scripts/watch-subagent.sh`.
 *   **Текущее поведение:** `codex exec` возвращает `turn.completed`, но wrapper (обёртка) ждёт `agent_end` и завершает запуск ошибкой `missing_agent_end`.
-*   **Границы (Out of Scope):** не меняем авторизацию `pi openai-codex`, не меняем системные proxy-настройки, не переписываем протокол `pi`.
+*   **Границы (Out of Scope):** не меняем глобальные системные proxy-настройки, не переписываем протокол `pi`.
 
 ## 3. Requirements (MoSCoW)
 ### 🔴 Must Have
@@ -45,9 +45,9 @@ status: review
 - [x] `watch-subagent.sh --runner codex -o text` выводит текст `agent_message`.
 - [x] `watch-subagent.sh --runner codex` корректно распознаёт `turn.failed` как ошибку.
 - [x] Поведение `pi` runner (раннер) не ломается.
+- [x] `watch-subagent.sh` прокидывает `ALL_PROXY` в `HTTP_PROXY`/`HTTPS_PROXY` для runner-процесса, если явные proxy-переменные не заданы.
 
 ### ⚫ Won't Have (Не будем делать)
-- Не лечим expired token (истёкший токен) у `pi --provider openai-codex`.
 - Не меняем глобальные значения `ALL_PROXY`, `HTTP_PROXY`, `HTTPS_PROXY`.
 
 ## 4. Implementation Plan (План реализации)
@@ -56,10 +56,12 @@ status: review
 3. [x] Добавить fallback-проверку success/failure events после закрытия pipe (канал событий).
 4. [x] Проверить `codex` runner локальным запуском.
 5. [x] Проверить `pi` runner на regression (регрессия).
+6. [x] Проверить `pi --provider openai-codex` после re-login (повторного входа).
 
 ## 5. Definition of Done (Критерии приёмки)
 - [x] `watch-subagent.sh --runner codex -o text` возвращает `OK` и exit code 0.
 - [x] `watch-subagent.sh --provider zai --model glm-5 -o text` возвращает `OK` и exit code 0.
+- [x] `watch-subagent.sh` с role profile (профилем роли) `system_analyst_sherlock` запускает `pi --provider openai-codex` и возвращает `OK`.
 - [x] Диагностика proxy/auth зафиксирована в отчёте пользователю.
 
 ## 6. Verification (Самопроверка)
@@ -70,7 +72,7 @@ docs/agents/skills/run-subagent/scripts/watch-subagent.sh -s 60 -t 60 -o text --
 
 ## 7. Risks and Dependencies (Риски и зависимости)
 - `codex exec` может писать предупреждения о WebSocket proxy (прокси для WebSocket) в stderr, но при успешном fallback всё равно завершаться `turn.completed`.
-- У `pi --provider openai-codex` отдельно истёк authentication token (токен авторизации); это не исправляется изменением wrapper-скрипта.
+- `pi --provider openai-codex` требует валидный ChatGPT OAuth token (токен OAuth); при отзыве refresh token (токена обновления) нужен ручной device login.
 
 ## 8. Sources (Источники)
 - `docs/agents/skills/run-subagent/scripts/watch-subagent.sh`
@@ -85,6 +87,8 @@ docs/agents/skills/run-subagent/scripts/watch-subagent.sh -s 60 -t 60 -o text --
 - `vendor/bin/psalm` — OK, No errors found.
 - Live `watch-subagent.sh --runner codex -o text` — OK, stdout `OK`, exit code 0.
 - Live `watch-subagent.sh --provider zai --model glm-5 -o text` — OK, stdout `OK`, exit code 0.
+- Live `watch-subagent.sh` с role profile `system_analyst_sherlock` (`pi --provider openai-codex`) — OK, stdout `OK`, exit code 0.
+- `pi --provider openai-codex --model gpt-5.5 --thinking high` после device login — OK, stdout содержит `OK`, exit code 0.
 
 Codex self-review через исправленный `watch-subagent.sh --runner codex` нашёл замечания по backward compatibility (обратная совместимость), `turn.completed`/`item.completed` и сохранению `pi` error reasons; замечания учтены.
 

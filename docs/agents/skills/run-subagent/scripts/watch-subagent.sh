@@ -320,6 +320,19 @@ build_runner_command() {
     esac
 }
 
+apply_proxy_env_defaults() {
+    local proxy="${ALL_PROXY:-${all_proxy:-}}"
+
+    if [[ -z "$proxy" ]]; then
+        return 0
+    fi
+
+    export HTTP_PROXY="${HTTP_PROXY:-$proxy}"
+    export HTTPS_PROXY="${HTTPS_PROXY:-$proxy}"
+    export http_proxy="${http_proxy:-$proxy}"
+    export https_proxy="${https_proxy:-$proxy}"
+}
+
 # ============================================================================
 # Per-runner: фильтрация вывода
 # ============================================================================
@@ -561,6 +574,7 @@ trap cleanup EXIT
 
 # Формируем команду раннера
 build_runner_command
+apply_proxy_env_defaults
 
 # Запускаем
 "${RUNNER_CMD[@]}" <<< "$PROMPT" > "$PIPE" 2> "$ERRFILE" &
