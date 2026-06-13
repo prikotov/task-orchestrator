@@ -9,8 +9,8 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-agent-skills
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/258
+status: review
 ---
 
 # TASK-research-agent-skills: Исследовать addyosmani/agent-skills для сравнения с task-orchestrator
@@ -70,7 +70,7 @@ status: in_progress
 4. [x] Сравнить findings (находки) с нашими `docs/agents/skills/` и `docs/agents/roles/team/`.
 5. [x] Написать `docs/research/framework-comparisons/agent-skills-comparison.md`.
 6. [x] Обновить `docs/research/agent-frameworks-summary.md`: строка `Agent Skills`, счётчик `28 / 28`, рекомендации/паттерны при необходимости.
-7. [x] Подготовить задачу к review без перевода в `done`, без переноса в `todo/done/` и без заполнения `pr` — по явной инструкции оркестратора.
+7. [x] Провести self-review (саморевью), external review (внешнее ревью), создать PR и оставить задачу в `review` до merge finalization (финализации перед слиянием).
 
 ## 5. Definition of Done (Критерии приёмки)
 - [x] Отчёт `docs/research/framework-comparisons/agent-skills-comparison.md` создан и содержит сравнение с `task-orchestrator`.
@@ -109,10 +109,15 @@ make validate-todo
 - Создан comparison report: `docs/research/framework-comparisons/agent-skills-comparison.md`.
 - Обновлена сводная таблица: строка `Agent Skills` (#28), счётчик `28 / 28`, рекомендации по authoring/governance patterns.
 - Сохранён self-contained отчёт аналитика: `docs/agents/reports/system-analyst/2026-06-13_21-51_agent-skills-analysis.md`.
-- Задача оставлена в `status: in_progress`, `pr` не заполнен, файл не перенесён в `todo/done/` — по инструкции оркестратора до review.
+- Пройдены self-review и external review с Approval после доработок:
+  - `docs/agents/reports/system-analyst/2026-06-13_22-17_agent-skills-implementation-self-review.md`;
+  - `docs/agents/reports/technical-writer/2026-06-13_22-25_agent-skills-doc-review.md`.
+- Создан PR: https://github.com/prikotov/task-orchestrator/pull/258.
+- Задача оставлена в `status: review`, файл не перенесён в `todo/done/` до merge finalization.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-06-13 | Тимлид (Алекс) | Создание задачи и постановка исследования |
 | 2026-06-13 | Аналитик (Шерлок) | Выполнено исследование Agent Skills, создан comparison report, обновлена сводная таблица и подготовлен отчёт agent-report; задача оставлена на review без переноса в done. |
+| 2026-06-13 | Тимлид (Алекс) | Создан PR #258, задача переведена в `review`; финализация `done` и перенос в `todo/done/` будут выполнены перед merge. |

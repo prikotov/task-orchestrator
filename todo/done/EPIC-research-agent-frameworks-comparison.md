@@ -107,7 +107,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1g: Дополнительные исследования (2026-06-13)
 
-- [ ] [TASK-research-agent-skills](../TASK-research-agent-skills.todo.md) — Agent Skills (Addy Osmani, production-grade engineering skills for AI coding agents) *(исследование подготовлено, ожидает review/orchestrator finalization)*
+- [ ] [TASK-research-agent-skills](../TASK-research-agent-skills.todo.md) — Agent Skills (Addy Osmani, production-grade engineering skills for AI coding agents) *(PR #258, ожидает review/orchestrator finalization)*
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
