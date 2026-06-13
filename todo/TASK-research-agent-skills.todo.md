@@ -30,7 +30,7 @@ status: todo
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
 - [ ] Изучить репозиторий `https://github.com/addyosmani/agent-skills`: структура, README, лицензия, поддерживаемые агенты/IDE.
-- [ ] Изучить anatomy (анатомию) `SKILL.md`: frontmatter, workflow sections, rationalizations (анти-рационализации), red flags (красные флаги), verification (проверки), progressive disclosure (прогрессивное раскрытие контекста).
+- [ ] Изучить anatomy (анатомию) `SKILL.md`: frontmatter, workflow sections, anti-rationalizations (анти-рационализации), red flags (красные флаги), verification (проверки), progressive disclosure (прогрессивное раскрытие контекста).
 - [ ] Изучить orchestration model (модель оркестрации): lifecycle commands `/spec` → `/plan` → `/build` → `/test` → `/review` → `/ship`, personas, fan-out review, запрет persona-calls-persona.
 - [ ] Сравнить с нашей моделью `docs/agents/skills/*`, `docs/agents/roles/team/*`, `task-via-subagents`, `epic-via-subagents`, `brainstorm`.
 - [ ] Оформить отчёт `docs/research/framework-comparisons/agent-skills-comparison.md` по формату существующих comparison-документов.
@@ -59,7 +59,7 @@ status: todo
 
 ## 5. Definition of Done (Критерии приёмки)
 - [ ] Отчёт `docs/research/framework-comparisons/agent-skills-comparison.md` создан и содержит сравнение с `task-orchestrator`.
-- [ ] В отчёте есть таблица: orchestration model, state management, error handling, extensibility, applicability.
+- [ ] В отчёте есть стандартная comparison table (таблица сравнения): orchestration model, state management, error handling, extensibility, applicability. Колонки `state management` и `error handling` должны явно комментировать applicability для skill pack (пакета скиллов): `N/A`, `host-dependent` или delegated to host agent (делегировано агенту-хосту).
 - [ ] В `docs/research/agent-frameworks-summary.md` добавлена строка `Agent Skills` и обновлён счётчик.
 - [ ] В отчёте перечислены 3–7 concrete patterns (конкретных паттернов) для возможного заимствования.
 - [ ] Указаны sources (источники) и дата анализа.
@@ -83,9 +83,11 @@ grep -n "28 / 28" docs/research/agent-frameworks-summary.md
 - https://github.com/addyosmani/agent-skills/blob/main/docs/skill-anatomy.md
 - https://github.com/addyosmani/agent-skills/blob/main/references/orchestration-patterns.md
 - https://github.com/addyosmani/agent-skills/blob/main/AGENTS.md
+- https://github.com/addyosmani/agent-skills/blob/main/agents/README.md
+- https://github.com/addyosmani/agent-skills/tree/main/commands
 
 ## 9. Comments (Комментарии)
-По первичной разведке проект позиционируется как “Production-grade engineering skills for AI coding agents”, содержит 24 skills (скилла), 7 lifecycle slash commands (команд жизненного цикла), agent personas (персоны), reference checklists (чеклисты) и plugin manifests (манифесты плагинов). Особенно интересны: единая anatomy (анатомия) скилла, anti-rationalization (анти-рационализация), progressive disclosure (прогрессивное раскрытие), fan-out review (параллельное ревью) и явный запрет nested persona orchestration (вложенной оркестрации персон).
+По первичной разведке проект позиционируется как “Production-grade engineering skills for AI coding agents”, содержит 24 skills (скилла), 6 lifecycle slash commands + 2 utility commands = 8 total commands (6 команд жизненного цикла + 2 служебные команды), agent personas (персоны), reference checklists (чеклисты) и plugin manifests (манифесты плагинов). Особенно интересны: единая anatomy (анатомия) скилла, anti-rationalization (анти-рационализация), progressive disclosure (прогрессивное раскрытие), fan-out review (параллельное ревью) и явный запрет nested persona orchestration (вложенной оркестрации персон).
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
