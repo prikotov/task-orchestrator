@@ -1,19 +1,34 @@
 ---
-type: research
+type: docs
 created: 2026-06-13
 value: V3
 complexity: C2
 priority: P2
-depends_on: []
+depends_on:
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-branch:
+branch: task/research-agent-skills
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-research-agent-skills: Исследовать addyosmani/agent-skills для сравнения с task-orchestrator
+
+## 0. Простое описание (Human Brief)
+
+### Проблема простыми словами (Problem)
+- В проекте развивается собственная модель `skills`, ролей и workflow orchestration (оркестрации рабочих процессов).
+- Нужно понять, какие практики из `addyosmani/agent-skills` полезны для наших агентных инструкций и какие не подходят.
+
+### Варианты или путь решения (Solution Sketch)
+- Изучить первичные источники репозитория `addyosmani/agent-skills`.
+- Сравнить skill pack (пакет скиллов) с нашими `docs/agents/skills/*`, ролями и orchestration skills.
+- Зафиксировать выводы в comparison report и сводной таблице исследований.
+
+### Ожидаемый результат (Expected Result)
+- Есть отдельный отчёт по Agent Skills, строка в сводной таблице и понятный verdict (вердикт): не dependency, но источник паттернов.
+- Оркестратор может отправить задачу на review без ручного восстановления контекста.
 
 ## 1. Concept and Goal (Концепция и Цель)
 ### Story (Job Story)
@@ -29,46 +44,47 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Изучить репозиторий `https://github.com/addyosmani/agent-skills`: структура, README, лицензия, поддерживаемые агенты/IDE.
-- [ ] Изучить anatomy (анатомию) `SKILL.md`: frontmatter, workflow sections, anti-rationalizations (анти-рационализации), red flags (красные флаги), verification (проверки), progressive disclosure (прогрессивное раскрытие контекста).
-- [ ] Изучить orchestration model (модель оркестрации): lifecycle commands `/spec` → `/plan` → `/build` → `/test` → `/review` → `/ship`, personas, fan-out review, запрет persona-calls-persona.
-- [ ] Сравнить с нашей моделью `docs/agents/skills/*`, `docs/agents/roles/team/*`, `task-via-subagents`, `epic-via-subagents`, `brainstorm`.
-- [ ] Оформить отчёт `docs/research/framework-comparisons/agent-skills-comparison.md` по формату существующих comparison-документов.
-- [ ] Добавить строку `Agent Skills` в `docs/research/agent-frameworks-summary.md` и обновить счётчик заполнения.
-- [ ] Дать чёткий verdict (вердикт): dependency / заимствовать паттерны / не подходит.
+- [x] Изучить репозиторий `https://github.com/addyosmani/agent-skills`: структура, README, лицензия, поддерживаемые агенты/IDE.
+- [x] Изучить anatomy (анатомию) `SKILL.md`: frontmatter, workflow sections, anti-rationalizations (анти-рационализации), red flags (красные флаги), verification (проверки), progressive disclosure (прогрессивное раскрытие контекста).
+- [x] Изучить orchestration model (модель оркестрации): lifecycle commands `/spec` → `/plan` → `/build` → `/test` → `/review` → `/ship`, personas, fan-out review, запрет persona-calls-persona.
+- [x] Сравнить с нашей моделью `docs/agents/skills/*`, `docs/agents/roles/team/*`, `task-via-subagents`, `epic-via-subagents`, `brainstorm`.
+- [x] Оформить отчёт `docs/research/framework-comparisons/agent-skills-comparison.md` по формату существующих comparison-документов.
+- [x] Добавить строку `Agent Skills` в `docs/research/agent-frameworks-summary.md` и обновить счётчик заполнения.
+- [x] Дать чёткий verdict (вердикт): dependency / заимствовать паттерны / не подходит.
 ### 🟡 Should Have (Желательно)
-- [ ] Выделить конкретные паттерны для улучшения наших скиллов: anti-rationalization tables, skill anatomy validator, lifecycle command mapping, reference checklists.
-- [ ] Оценить совместимость MIT license (лицензии MIT) и риски прямого копирования текстов.
-- [ ] Сравнить plugin manifests (манифесты плагинов) Claude/Antigravity с нашими plugin/skill conventions (конвенциями).
+- [x] Выделить конкретные паттерны для улучшения наших скиллов: anti-rationalization tables, skill anatomy validator, lifecycle command mapping, reference checklists.
+- [x] Оценить совместимость MIT license (лицензии MIT) и риски прямого копирования текстов.
+- [x] Сравнить plugin manifests (манифесты плагинов) Claude/Antigravity с нашими plugin/skill conventions (конвенциями).
 ### 🟢 Could Have (Опционально)
-- [ ] Предложить backlog tasks (задачи бэклога) на улучшение нашего skill authoring guide (гайда написания скиллов).
-- [ ] Составить маленькую Mermaid-диаграмму сопоставления lifecycle команд с нашими ролями.
+- [x] Предложить backlog tasks (задачи бэклога) на улучшение нашего skill authoring guide (гайда написания скиллов).
+- [x] Составить маленькую Mermaid-диаграмму сопоставления lifecycle команд с нашими ролями.
 ### ⚫ Won't Have (Не будем делать)
-- [ ] Интеграция `agent-skills` как runtime dependency.
-- [ ] Массовое копирование чужих `SKILL.md` в проект.
-- [ ] Изменение существующих production workflows (рабочих процессов) без отдельной задачи.
+- [x] Интеграция `agent-skills` как runtime dependency.
+- [x] Массовое копирование чужих `SKILL.md` в проект.
+- [x] Изменение существующих production workflows (рабочих процессов) без отдельной задачи.
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Изучить metadata (метаданные) GitHub repo: description, license, stars/forks, default branch, topics.
-2. [ ] Изучить `README.md`, `docs/skill-anatomy.md`, `AGENTS.md`, `agents/README.md`, `references/orchestration-patterns.md`.
-3. [ ] Просмотреть 3–5 representative skills (репрезентативных скиллов): `using-agent-skills`, `spec-driven-development`, `planning-and-task-breakdown`, `code-review-and-quality`, `git-workflow-and-versioning`.
-4. [ ] Сравнить findings (находки) с нашими `docs/agents/skills/` и `docs/agents/roles/team/`.
-5. [ ] Написать `docs/research/framework-comparisons/agent-skills-comparison.md`.
-6. [ ] Обновить `docs/research/agent-frameworks-summary.md`: строка `Agent Skills`, счётчик `28 / 28`, рекомендации/паттерны при необходимости.
-7. [ ] Перевести задачу в `done`, перенести в `todo/done/`, обновить ссылку в epic (эпике).
+1. [x] Изучить metadata (метаданные) GitHub repo: description, license, stars/forks, default branch, topics.
+2. [x] Изучить `README.md`, `docs/skill-anatomy.md`, `AGENTS.md`, `agents/README.md`, `references/orchestration-patterns.md`.
+3. [x] Просмотреть 3–5 representative skills (репрезентативных скиллов): `using-agent-skills`, `spec-driven-development`, `planning-and-task-breakdown`, `code-review-and-quality`, `git-workflow-and-versioning`.
+4. [x] Сравнить findings (находки) с нашими `docs/agents/skills/` и `docs/agents/roles/team/`.
+5. [x] Написать `docs/research/framework-comparisons/agent-skills-comparison.md`.
+6. [x] Обновить `docs/research/agent-frameworks-summary.md`: строка `Agent Skills`, счётчик `28 / 28`, рекомендации/паттерны при необходимости.
+7. [x] Подготовить задачу к review без перевода в `done`, без переноса в `todo/done/` и без заполнения `pr` — по явной инструкции оркестратора.
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт `docs/research/framework-comparisons/agent-skills-comparison.md` создан и содержит сравнение с `task-orchestrator`.
-- [ ] В отчёте есть стандартная comparison table (таблица сравнения): orchestration model, state management, error handling, extensibility, applicability. Колонки `state management` и `error handling` должны явно комментировать applicability для skill pack (пакета скиллов): `N/A`, `host-dependent` или delegated to host agent (делегировано агенту-хосту).
-- [ ] В `docs/research/agent-frameworks-summary.md` добавлена строка `Agent Skills` и обновлён счётчик.
-- [ ] В отчёте перечислены 3–7 concrete patterns (конкретных паттернов) для возможного заимствования.
-- [ ] Указаны sources (источники) и дата анализа.
+- [x] Отчёт `docs/research/framework-comparisons/agent-skills-comparison.md` создан и содержит сравнение с `task-orchestrator`.
+- [x] В отчёте есть стандартная comparison table (таблица сравнения): orchestration model, state management, error handling, extensibility, applicability. Колонки `state management` и `error handling` должны явно комментировать applicability для skill pack (пакета скиллов): `N/A`, `host-dependent` или delegated to host agent (делегировано агенту-хосту).
+- [x] В `docs/research/agent-frameworks-summary.md` добавлена строка `Agent Skills` и обновлён счётчик.
+- [x] В отчёте перечислены 3–7 concrete patterns (конкретных паттернов) для возможного заимствования.
+- [x] Указаны sources (источники) и дата анализа.
 
 ## 6. Verification (Самопроверка)
 ```bash
 ls docs/research/framework-comparisons/agent-skills-comparison.md
 grep -c "Agent Skills" docs/research/agent-frameworks-summary.md
 grep -n "28 / 28" docs/research/agent-frameworks-summary.md
+make validate-todo
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)
@@ -89,7 +105,14 @@ grep -n "28 / 28" docs/research/agent-frameworks-summary.md
 ## 9. Comments (Комментарии)
 По первичной разведке проект позиционируется как “Production-grade engineering skills for AI coding agents”, содержит 24 skills (скилла), 6 lifecycle slash commands + 2 utility commands = 8 total commands (6 команд жизненного цикла + 2 служебные команды), agent personas (персоны), reference checklists (чеклисты) и plugin manifests (манифесты плагинов). Особенно интересны: единая anatomy (анатомия) скилла, anti-rationalization (анти-рационализация), progressive disclosure (прогрессивное раскрытие), fan-out review (параллельное ревью) и явный запрет nested persona orchestration (вложенной оркестрации персон).
 
+## 10. Result (Результат выполнения)
+- Создан comparison report: `docs/research/framework-comparisons/agent-skills-comparison.md`.
+- Обновлена сводная таблица: строка `Agent Skills` (#28), счётчик `28 / 28`, рекомендации по authoring/governance patterns.
+- Сохранён self-contained отчёт аналитика: `docs/agents/reports/system-analyst/2026-06-13_21-51_agent-skills-analysis.md`.
+- Задача оставлена в `status: in_progress`, `pr` не заполнен, файл не перенесён в `todo/done/` — по инструкции оркестратора до review.
+
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-06-13 | Тимлид (Алекс) | Создание задачи и постановка исследования |
+| 2026-06-13 | Аналитик (Шерлок) | Выполнено исследование Agent Skills, создан comparison report, обновлена сводная таблица и подготовлен отчёт agent-report; задача оставлена на review без переноса в done. |
