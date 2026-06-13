@@ -9,8 +9,8 @@ epic:
 author: codex-cli
 assignee: codex-cli
 branch: task/fix-codex-subagent-runner
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/257
+status: review
 ---
 
 # TASK-fix-codex-subagent-runner: Исправить запуск Codex CLI через run-subagent
