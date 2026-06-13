@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-agent-skills
 pr: https://github.com/prikotov/task-orchestrator/pull/258
-status: review
+status: done
 ---
 
 # TASK-research-agent-skills: Исследовать addyosmani/agent-skills для сравнения с task-orchestrator
@@ -113,7 +113,7 @@ make validate-todo
   - `docs/agents/reports/system-analyst/2026-06-13_22-17_agent-skills-implementation-self-review.md`;
   - `docs/agents/reports/technical-writer/2026-06-13_22-25_agent-skills-doc-review.md`.
 - Создан PR: https://github.com/prikotov/task-orchestrator/pull/258.
-- Задача оставлена в `status: review`, файл не перенесён в `todo/done/` до merge finalization.
+- Задача переведена в `status: done` перед merge finalization и перенесена в `todo/done/`.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
@@ -121,3 +121,4 @@ make validate-todo
 | 2026-06-13 | Тимлид (Алекс) | Создание задачи и постановка исследования |
 | 2026-06-13 | Аналитик (Шерлок) | Выполнено исследование Agent Skills, создан comparison report, обновлена сводная таблица и подготовлен отчёт agent-report; задача оставлена на review без переноса в done. |
 | 2026-06-13 | Тимлид (Алекс) | Создан PR #258, задача переведена в `review`; финализация `done` и перенос в `todo/done/` будут выполнены перед merge. |
+| 2026-06-13 | Тимлид (Алекс) | После acceptance (принятия) PR #258 задача переведена в `done` перед merge. |
