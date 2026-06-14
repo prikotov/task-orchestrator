@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/refactor-phpmd-retrying-runner-run
 pr: https://github.com/prikotov/task-orchestrator/pull/259
-status: review
+status: done
 ---
 
 # TASK-refactor-phpmd-retrying-runner-run: Уменьшить RetryingAgentRunnerService::run() с 112 до ≤79 строк
@@ -109,3 +109,4 @@ make check
 | 2026-06-13 | Бэкендер (Левша) | Реализация: `run()` 112 → 45 LOC (while + экстракция 6 приватных методов), запись удалена из baseline. PHPUnit 963 OK, Psalm 0 ошибок, `make check` зелёный. Найден и задокументирован PHPMD directory-bug |
 | 2026-06-13 | Ревьювер (Пуаро) | Code review: эквивалентность поведения подтверждена построчно (backoff-тайминг, метрики, ветки); архитектура/типизация/покрытие (26 кейсов) ок. Nit устранён: `finalizeExhausted` warning/createError унифицированы на `$runnerName`. APPROVE |
 | 2026-06-13 | Бэкендер (Левша) | PR #259 создан (base=main, label=pi), статус → review |
+| 2026-06-13 | Тимлид (Алекс) | Пользователь апрувил merge; задача → done, файл перенесён в done/, Epic обновлён |
