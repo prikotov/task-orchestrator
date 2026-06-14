@@ -7,14 +7,14 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject;
 use InvalidArgumentException;
 use LogicException;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Helper\ChainFixIterationsValidatorHelper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 
 /**
  * Value Object определения цепочки оркестрации.
  *
- * @deprecated Используйте специализированные sub-VO:
+ * @deprecated Используйте {@see \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory}
+ *     со специализированными sub-VO:
  *     - StaticChainDefinitionVo для static-цепочек
  *     - DynamicChainDefinitionVo для dynamic-цепочек
  *     - ConditionalChainDefinitionVo для conditional-цепочек
@@ -166,9 +166,11 @@ final readonly class ChainDefinitionVo
             );
         }
 
-        if ($fixIterations !== []) {
-            ChainFixIterationsValidatorHelper::assertValidReferences($name, $steps, $fixIterations);
-        }
+        // Валидация ссылочной целостности fix-итераций не выполняется в deprecated VO:
+        // она перенесена в ChainDefinitionFactory (FixIterationsReferenceIntegritySpecification).
+        // Этот класс — compatibility shim до удаления; боевой код создаёт цепочки через фабрику.
+        // DomainVo не может зависеть от DomainSpecification (правило Deptrac), поэтому здесь
+        // нет ни алгоритма проверки, ни выброса исключения по инварианту fix-итераций.
 
         return new self(
             name: $name,

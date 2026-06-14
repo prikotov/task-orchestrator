@@ -64,7 +64,6 @@
     </rule>
     <rule ref="rulesets/cleancode.xml/StaticAccess">
         <properties>
-            <property name="exceptions" value="TaskOrchestrator\Common\Module\ChainDefinition\Domain\Helper\ChainFixIterationsValidatorHelper"/>
             <property name="ignorepattern" value="/^(create|createFrom|from|tryFrom|cases|normalize|parse|build|format|clean)/"/>
         </properties>
     </rule>

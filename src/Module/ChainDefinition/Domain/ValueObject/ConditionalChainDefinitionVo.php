@@ -33,6 +33,9 @@ final readonly class ConditionalChainDefinitionVo implements ChainDefinitionInte
      * @param list<ChainStepVo> $steps шаги conditional-цепочки (могут содержать when-выражения)
      * @param list<FixIterationGroupVo> $fixIterations группы итераций фикса
      * @param ChainRetryPolicyVo|null $defaultRetryPolicy политика retry по умолчанию для шагов
+     *
+     * @internal Используйте {@see \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory::createFromConditionalSteps()} —
+     *     фабрика внедряет доменную спецификацию fix-итераций через DI и кидает исключение при нарушении инварианта.
      */
     // phpcs:ignore
     public function __construct(
@@ -49,6 +52,11 @@ final readonly class ConditionalChainDefinitionVo implements ChainDefinitionInte
      * @param list<ChainStepVo> $steps
      * @param list<FixIterationGroupVo> $fixIterations
      * @param array<string, RoleConfigVo> $roles per-role конфигурация
+     *
+     * @deprecated Используйте {@see \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory::createFromConditionalSteps()}.
+     *     Проверка инварианта ссылочной целостности fix-итераций перенесена в фабрику
+     *     (FixIterationsReferenceIntegritySpecification); этот static factory оставлен для BC
+     *     и не валидирует fix-итерации.
      */
     public static function createFromConditionalSteps(
         string $name,
@@ -64,43 +72,6 @@ final readonly class ConditionalChainDefinitionVo implements ChainDefinitionInte
             throw new InvalidArgumentException(
                 sprintf('Chain "%s" must have at least one step.', $name),
             );
-        }
-
-        if ($fixIterations !== []) {
-            $nameMap = [];
-            foreach ($steps as $index => $step) {
-                $stepName = $step->getName();
-                if ($stepName !== null) {
-                    $nameMap[$stepName] = $index;
-                }
-            }
-            $allGroupStepNames = [];
-            foreach ($fixIterations as $group) {
-                foreach ($group->getStepNames() as $stepName) {
-                    if (!isset($nameMap[$stepName])) {
-                        throw new InvalidArgumentException(
-                            sprintf(
-                                'Chain "%s": fix iteration group "%s" references unknown step name "%s".',
-                                $name,
-                                $group->getGroup(),
-                                $stepName,
-                            ),
-                        );
-                    }
-                    if (isset($allGroupStepNames[$stepName])) {
-                        throw new InvalidArgumentException(
-                            sprintf(
-                                'Chain "%s": step name "%s" belongs to multiple fix iteration groups ("%s" and "%s").',
-                                $name,
-                                $stepName,
-                                $allGroupStepNames[$stepName],
-                                $group->getGroup(),
-                            ),
-                        );
-                    }
-                    $allGroupStepNames[$stepName] = $group->getGroup();
-                }
-            }
         }
 
         return new self(

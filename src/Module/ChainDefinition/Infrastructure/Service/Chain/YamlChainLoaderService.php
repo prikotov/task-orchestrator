@@ -11,15 +11,13 @@ use Symfony\Component\Yaml\Yaml;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\ChainNotFoundException;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\YamlChainLoaderServiceInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FallbackConfigVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\Helper\ChainStepParserHelper;
 
 /**
@@ -40,8 +38,10 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     /** @var array<string, ChainDefinitionInterface>|null */
     private ?array $chains = null;
 
-    public function __construct(string $yamlPath)
-    {
+    public function __construct(
+        string $yamlPath,
+        private readonly ChainDefinitionFactory $chainDefinitionFactory,
+    ) {
         $this->yamlPath = $yamlPath;
     }
 
@@ -149,7 +149,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
         if ($hasConditions) {
             $this->validateWhenReferences($name, $steps);
 
-            return ConditionalChainDefinitionVo::createFromConditionalSteps(
+            return $this->chainDefinitionFactory->createFromConditionalSteps(
                 name: $name,
                 description: $raw['description'] ?? '',
                 steps: $steps,
@@ -161,7 +161,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
             );
         }
 
-        return StaticChainDefinitionVo::createFromSteps(
+        return $this->chainDefinitionFactory->createFromSteps(
             name: $name,
             description: $raw['description'] ?? '',
             steps: $steps,
@@ -193,7 +193,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
 
         $this->validateWhenReferences($name, $steps);
 
-        return ConditionalChainDefinitionVo::createFromConditionalSteps(
+        return $this->chainDefinitionFactory->createFromConditionalSteps(
             name: $name,
             description: $raw['description'] ?? '',
             steps: $steps,
@@ -292,7 +292,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
         $prompts = $this->resolvePrompts($name, $raw);
         $budget = $this->parseBudget($raw['budget'] ?? null);
 
-        return DynamicChainDefinitionVo::createFromDynamic(
+        return $this->chainDefinitionFactory->createFromDynamic(
             name: $name,
             description: $raw['description'] ?? '',
             facilitator: $facilitator,

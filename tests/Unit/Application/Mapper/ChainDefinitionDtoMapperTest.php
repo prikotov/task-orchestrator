@@ -10,19 +10,21 @@ use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainStepDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainDefinitionDtoMapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
 
 #[CoversClass(ChainDefinitionDtoMapper::class)]
 final class ChainDefinitionDtoMapperTest extends TestCase
 {
     private ChainDefinitionDtoMapper $mapper;
+    private ChainDefinitionFactory $factory;
 
     #[Override]
     protected function setUp(): void
     {
         $this->mapper = new ChainDefinitionDtoMapper();
+        $this->factory = new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification());
     }
 
     #[Test]
@@ -76,7 +78,7 @@ final class ChainDefinitionDtoMapperTest extends TestCase
 
     private function createStaticChainVo(string $name = 'test-static'): ChainDefinitionInterface
     {
-        return StaticChainDefinitionVo::createFromSteps(
+        return $this->factory->createFromSteps(
             name: $name,
             description: 'Test static chain',
             steps: [
@@ -87,7 +89,7 @@ final class ChainDefinitionDtoMapperTest extends TestCase
 
     private function createDynamicChainVo(string $name = 'test-dynamic'): ChainDefinitionInterface
     {
-        return DynamicChainDefinitionVo::createFromDynamic(
+        return $this->factory->createFromDynamic(
             name: $name,
             description: 'Test dynamic chain',
             facilitator: 'analyst',

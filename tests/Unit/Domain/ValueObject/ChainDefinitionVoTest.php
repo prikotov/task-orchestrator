@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Helper\ChainFixIterationsValidatorHelper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
@@ -17,7 +16,6 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ChainDefinitionVo::class)]
-#[CoversClass(ChainFixIterationsValidatorHelper::class)]
 #[CoversClass(SharedChainDefinitionVo::class)]
 #[CoversClass(ChainStepVo::class)]
 #[CoversClass(ChainTypeEnum::class)]
