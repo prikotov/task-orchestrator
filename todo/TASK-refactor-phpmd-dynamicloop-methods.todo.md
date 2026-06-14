@@ -53,21 +53,28 @@ PHPMD baseline пуст, `make phpmd-full` = 0 violations.
 
 ## 3. Requirements (MoSCoW)
 ### 🔴 Must Have
-- [ ] `runParticipantTurn()` ≤79 LOC
-- [ ] `runFacilitatorStep()` ≤79 LOC
-- [ ] Все тесты проходят
-- [ ] Удалить 2 записи из `phpmd.baseline.xml`
+- [x] `runParticipantTurn()` ≤79 LOC
+- [x] `runFacilitatorStep()` ≤79 LOC
+- [x] Все тесты проходят
+- [x] Удалить 2 записи из `phpmd.baseline.xml`
 
 ### ⚫ Won't Have (Не будем делать)
 - Изменение dynamic loop контракта
 - Изменение порогов в phpmd.xml
 
 ## 4. Implementation Plan
-*Заполняется исполнителем.*
+
+Выполнено (Бэкендер Левша):
+
+1. **`runParticipantTurn`** (82 → 61 LOC): экстракция блока записи журналов/сессионных файлов в приватный метод `recordParticipantTurnJournals()`.
+2. **`runFacilitatorStep`** (81 → 70 LOC): экстракция вызова агент-фасилитатора в приватный метод `callFacilitatorAgent()`.
+3. Удалены 2 записи из `phpmd.baseline.xml`.
+4. Исправлена битая ссылка на Конвенции (была `../../`, стала `../`).
+5. Поведение не изменено — чистая экстракция без семантических изменений.
 
 ## 5. Definition of Done
-- [ ] `phpmd` не ругается на ExecuteDynamicTurnService
-- [ ] `make check` зелёный
+- [x] `phpmd` не ругается на ExecuteDynamicTurnService
+- [x] `make check` зелёный
 
 ## 6. Verification
 ```bash
@@ -89,7 +96,7 @@ make check
 ### Порядок действий
 1. Переключись в ветку `task/refactor-phpmd-dynamicloop-methods`: `git checkout task/refactor-phpmd-dynamicloop-methods`.
 2. Реализуй задачу согласно описанию выше: уменьшить `runParticipantTurn()` и `runFacilitatorStep()` до ≤79 LOC экстракцией приватных методов, **не меняя поведение**.
-3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта и AGENTS.md.
+3. Следуй [Конвенциям](../docs/conventions/index.md) проекта и AGENTS.md.
 4. Делай промежуточные коммиты после каждого логического этапа (Conventional Commits, scope `DynamicLoop`).
 5. После реализации запусти проверки: `make check`. Должен быть зелёным.
 6. Сделай `git push`.
@@ -100,3 +107,4 @@ make check
 | :--- | :--- | :--- |
 | 2026-05-21 | Тимлид (Алекс) | Создание задачи |
 | 2026-06-13 | Тимлид (Алекс) | Reverse Briefing: статус → in_progress, назначен исполнитель (Бэкендер Левша), создана подветка от эпик-ветки |
+| 2026-06-14 | Бэкендер (Левша) | Реализация: экстракция `recordParticipantTurnJournals` и `callFacilitatorAgent`, удаление 2 записей из phpmd.baseline.xml, `make check` зелёный |
