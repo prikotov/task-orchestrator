@@ -1,8 +1,5 @@
 <?xml version="1.0"?>
 <phpmd-baseline>
-  <violation rule="PHPMD\Rule\Design\LongClass" file="src/Module/ChainDefinition/Domain/ValueObject/ChainDefinitionVo.php"/>
-  <violation rule="PHPMD\Rule\Design\LongClass" file="src/Module/ChainDefinition/Infrastructure/Service/Chain/YamlChainLoaderService.php"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/ChainDefinition/Infrastructure/Service/Chain/YamlChainLoaderService.php" method="parseSteps"/>
   <!-- Formerly suppressed via @SuppressWarnings, moved to baseline for PHPStan compatibility -->
   <violation rule="PHPMD\Rule\CleanCode\ErrorControlOperator" file="src/Module/AgentRunner/Infrastructure/Service/Codex/Resources/bridge.php"/>
   <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="src/Module/DynamicLoop/Domain/Entity/DynamicLoopExecution.php"/>

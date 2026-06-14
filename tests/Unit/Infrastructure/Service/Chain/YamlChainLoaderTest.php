@@ -11,12 +11,14 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionE
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FallbackConfigVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\Helper\ChainStepParserHelper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(YamlChainLoaderService::class)]
+#[CoversClass(ChainStepParserHelper::class)]
 #[CoversClass(BudgetVo::class)]
 #[CoversClass(RoleConfigVo::class)]
 #[CoversClass(FallbackConfigVo::class)]

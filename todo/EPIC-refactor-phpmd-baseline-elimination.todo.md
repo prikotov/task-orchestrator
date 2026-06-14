@@ -55,7 +55,7 @@ status: in_progress
 
 ## 4. Implementation Plan
 1. [x] [TASK-refactor-phpmd-retrying-runner-run](done/TASK-refactor-phpmd-retrying-runner-run.todo.md) — RetryingAgentRunnerService::run() 112 строк → ≤79 *(залита напрямую в main как PR #259 до ввода эпик-ветки)*
-2. [ ] [TASK-refactor-phpmd-chaindefinition-classes](TASK-refactor-phpmd-chaindefinition-classes.todo.md) — ChainDefinitionVo 528 строк, YamlChainLoaderService 553 строк + parseSteps() 92 строки
+2. [x] [TASK-refactor-phpmd-chaindefinition-classes](done/TASK-refactor-phpmd-chaindefinition-classes.todo.md) — ChainDefinitionVo 545→493, YamlChainLoaderService 563→449, parseSteps() вынесен в ChainStepParserHelper
 3. [ ] [TASK-refactor-phpmd-chainexecution-methods](TASK-refactor-phpmd-chainexecution-methods.todo.md) — ShellHookExecutorService::execute() 107 строк, ExecuteAgentStepService::run() PHPMD bug @todo
 4. [x] [TASK-refactor-phpmd-dynamicloop-methods](done/TASK-refactor-phpmd-dynamicloop-methods.todo.md) — ExecuteDynamicTurnService::runParticipantTurn() 82→61, runFacilitatorStep() 81→70
 5. [x] [TASK-fix-phpmd-errorclassificationvo](done/TASK-fix-phpmd-errorclassificationvo.todo.md) — ErrorClassificationVo::createFromClassException() unused parameter $throwable
@@ -114,3 +114,4 @@ make check
 | 2026-05-21 | Тимлид (Алекс) | Создание эпика |
 | 2026-06-06 | Бэкендер (Левша) | TASK-fix-phpmd-errorclassificationvo выполнена, baseline обновлён |
 | 2026-06-13 | Тимлид (Алекс) | PR #259 (задача 1) влит в main; создана эпик-ветка `refactor/phpmd-baseline-elimination`, статус → in_progress; разведка выявила 5 непокрытых baseline-записей — добавлена задача 6 (audit-логгеры), по bridge.php и DynamicLoopExecution запрошено решение пользователя |
+| 2026-06-14 | Бэкендер (Левша) | TASK-refactor-phpmd-chaindefinition-classes выполнена (ChainDefinitionVo 545→493, YamlChainLoaderService 563→449, parseSteps→ChainStepParserHelper), 3 записи убраны из baseline, FQCN ChainFixIterationsValidatorHelper добавлен в StaticAccess exceptions |

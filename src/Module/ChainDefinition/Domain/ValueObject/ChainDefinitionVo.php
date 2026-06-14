@@ -7,6 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject;
 use InvalidArgumentException;
 use LogicException;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Helper\ChainFixIterationsValidatorHelper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 
@@ -90,70 +91,16 @@ final readonly class ChainDefinitionVo
         ?BudgetVo $budget = null,
         ?int $timeout = null,
     ): self {
-        if (count($steps) === 0) {
-            throw new InvalidArgumentException(
-                sprintf('Chain "%s" must have at least one step.', $name),
-            );
-        }
-
-        if ($fixIterations !== []) {
-            $nameMap = [];
-            foreach ($steps as $index => $step) {
-                $stepName = $step->getName();
-                if ($stepName !== null) {
-                    $nameMap[$stepName] = $index;
-                }
-            }
-            $allGroupStepNames = [];
-            foreach ($fixIterations as $group) {
-                foreach ($group->getStepNames() as $stepName) {
-                    if (!isset($nameMap[$stepName])) {
-                        throw new InvalidArgumentException(
-                            sprintf(
-                                'Chain "%s": fix iteration group "%s" references unknown step name "%s".',
-                                $name,
-                                $group->getGroup(),
-                                $stepName,
-                            ),
-                        );
-                    }
-                    if (isset($allGroupStepNames[$stepName])) {
-                        throw new InvalidArgumentException(
-                            sprintf(
-                                'Chain "%s": step name "%s" belongs to multiple fix iteration groups ("%s" and "%s").',
-                                $name,
-                                $stepName,
-                                $allGroupStepNames[$stepName],
-                                $group->getGroup(),
-                            ),
-                        );
-                    }
-                    $allGroupStepNames[$stepName] = $group->getGroup();
-                }
-            }
-        }
-
-        return new self(
+        return self::createLinearChain(
             name: $name,
             description: $description,
-            type: ChainTypeEnum::staticType,
             steps: $steps,
             fixIterations: $fixIterations,
-            facilitator: null,
-            participants: [],
-            maxRounds: 10,
-            brainstormSystemPrompt: null,
-            facilitatorAppendPrompt: null,
-            facilitatorStartPrompt: null,
-            facilitatorContinuePrompt: null,
-            facilitatorFinalizePrompt: null,
-            participantAppendPrompt: null,
-            participantUserPrompt: null,
             roles: $roles,
             defaultRetryPolicy: $defaultRetryPolicy,
             budget: $budget,
             timeout: $timeout,
-            maxTime: null,
+            type: ChainTypeEnum::staticType,
         );
     }
 
@@ -178,6 +125,41 @@ final readonly class ChainDefinitionVo
         ?BudgetVo $budget = null,
         ?int $timeout = null,
     ): self {
+        return self::createLinearChain(
+            name: $name,
+            description: $description,
+            steps: $steps,
+            fixIterations: $fixIterations,
+            roles: $roles,
+            defaultRetryPolicy: $defaultRetryPolicy,
+            budget: $budget,
+            timeout: $timeout,
+            type: ChainTypeEnum::conditionalType,
+        );
+    }
+
+    /**
+     * Общая реализация создания static/conditional-цепочки с линейными шагами.
+     *
+     * Валидирует шаги и fix-итерации, затем создаёт VO с заданным типом цепочки.
+     * Используется как {@see createFromSteps()}, так и {@see createFromConditionalSteps()} —
+     * различие между ними только в типе цепочки.
+     *
+     * @param list<ChainStepVo> $steps
+     * @param list<FixIterationGroupVo> $fixIterations
+     * @param array<string, RoleConfigVo> $roles per-role конфигурация
+     */
+    private static function createLinearChain(
+        string $name,
+        string $description,
+        array $steps,
+        array $fixIterations,
+        array $roles,
+        ?ChainRetryPolicyVo $defaultRetryPolicy,
+        ?BudgetVo $budget,
+        ?int $timeout,
+        ChainTypeEnum $type,
+    ): self {
         if (count($steps) === 0) {
             throw new InvalidArgumentException(
                 sprintf('Chain "%s" must have at least one step.', $name),
@@ -185,46 +167,13 @@ final readonly class ChainDefinitionVo
         }
 
         if ($fixIterations !== []) {
-            $nameMap = [];
-            foreach ($steps as $index => $step) {
-                $stepName = $step->getName();
-                if ($stepName !== null) {
-                    $nameMap[$stepName] = $index;
-                }
-            }
-            $allGroupStepNames = [];
-            foreach ($fixIterations as $group) {
-                foreach ($group->getStepNames() as $stepName) {
-                    if (!isset($nameMap[$stepName])) {
-                        throw new InvalidArgumentException(
-                            sprintf(
-                                'Chain "%s": fix iteration group "%s" references unknown step name "%s".',
-                                $name,
-                                $group->getGroup(),
-                                $stepName,
-                            ),
-                        );
-                    }
-                    if (isset($allGroupStepNames[$stepName])) {
-                        throw new InvalidArgumentException(
-                            sprintf(
-                                'Chain "%s": step name "%s" belongs to multiple fix iteration groups ("%s" and "%s").',
-                                $name,
-                                $stepName,
-                                $allGroupStepNames[$stepName],
-                                $group->getGroup(),
-                            ),
-                        );
-                    }
-                    $allGroupStepNames[$stepName] = $group->getGroup();
-                }
-            }
+            ChainFixIterationsValidatorHelper::assertValidReferences($name, $steps, $fixIterations);
         }
 
         return new self(
             name: $name,
             description: $description,
-            type: ChainTypeEnum::conditionalType,
+            type: $type,
             steps: $steps,
             fixIterations: $fixIterations,
             facilitator: null,
