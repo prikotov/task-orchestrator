@@ -84,7 +84,7 @@ make check
 ## Инструкции для сабагента
 
 **Ветка:** `task/refactor-phpmd-dynamicloop-methods` (уже создана от `refactor/phpmd-baseline-elimination` и активна)
-**PR:** уже создан (draft) из `task/refactor-phpmd-dynamicloop-methods` в `refactor/phpmd-baseline-elimination` — [PR #<PR_NUMBER>](<PR_LINK>)
+**PR:** уже создан (draft) из `task/refactor-phpmd-dynamicloop-methods` в `refactor/phpmd-baseline-elimination` — [PR #260](https://github.com/prikotov/task-orchestrator/pull/260)
 
 ### Порядок действий
 1. Переключись в ветку `task/refactor-phpmd-dynamicloop-methods`: `git checkout task/refactor-phpmd-dynamicloop-methods`.
@@ -93,7 +93,7 @@ make check
 4. Делай промежуточные коммиты после каждого логического этапа (Conventional Commits, scope `DynamicLoop`).
 5. После реализации запусти проверки: `make check`. Должен быть зелёным.
 6. Сделай `git push`.
-7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
+7. Переведи PR из draft в ready: `gh pr ready 260`.
 
 ## Change History
 | Дата | Автор (роль) | Изменение |
