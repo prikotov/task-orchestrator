@@ -22,8 +22,6 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContext
 
 /**
  * Доменная логика выполнения static-цепочки: линейное выполнение шагов с итерациями и budget.
- *
- * @todo 2026-05-21: PHPMD bug: multi-file analysis counts 82 LOC for processStep(), single-file = 74. Recheck after PHPMD upgrade.
  */
 final readonly class RunStaticChainService implements RunStaticChainServiceInterface
 {

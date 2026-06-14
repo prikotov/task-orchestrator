@@ -70,10 +70,17 @@ PHPMD baseline пуст, `@todo` убраны, `make phpmd-full` = 0 violations.
 ## 4. Implementation Plan
 *Заполняется исполнителем.*
 
+Выполнено (Левша, 2026-06-14):
+1. `ShellHookExecutorService::execute()` (107 LOC) разбит на: `execute()` (52 LOC) + 4 приватных метода (`logProcessOutput`, `buildNonZeroExitResult`, `handleTimeout`, `handleException`). Семантика proc_open flow сохранена полностью: порядок stdout/stderr-логирования, exit-code/timeout/generic-exception обработки, вычисление duration.
+2. Параметры извлечённых методов `$e` → `$exception` (правило `ShortVariable`, minimum 3; catch-переменные exempt, но параметры методов — нет).
+3. Убран `@todo 2026-05-21` (PHPMD bug) из `ExecuteAgentStepService.php` и `RunStaticChainService.php`.
+4. Удалены из `phpmd.baseline.xml`: `ExecuteAgentStepService::run` (ложная, реально 61 LOC) и `ShellHookExecutorService::execute` (после рефакторинга).
+5. Подтверждено: `rm -rf ~/.cache/pdepend` → PHPMD без baseline = 0 нарушений для целевых файлов.
+
 ## 5. Definition of Done
-- [ ] `phpmd` не ругается на ShellHookExecutorService
-- [ ] `@todo` в ExecuteAgentStepService и RunStaticChainService обработан (убран или обновлён)
-- [ ] `make check` зелёный
+- [x] `phpmd` не ругается на ShellHookExecutorService
+- [x] `@todo` в ExecuteAgentStepService и RunStaticChainService обработан (убран)
+- [x] `make check` зелёный
 
 ## 6. Verification
 ```bash

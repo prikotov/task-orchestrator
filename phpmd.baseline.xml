@@ -3,10 +3,8 @@
   <violation rule="PHPMD\Rule\Design\LongClass" file="src/Module/ChainDefinition/Domain/ValueObject/ChainDefinitionVo.php"/>
   <violation rule="PHPMD\Rule\Design\LongClass" file="src/Module/ChainDefinition/Infrastructure/Service/Chain/YamlChainLoaderService.php"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/ChainDefinition/Infrastructure/Service/Chain/YamlChainLoaderService.php" method="parseSteps"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/ChainExecution/Infrastructure/Service/Chain/Hook/ShellHookExecutorService.php" method="execute"/>
   <!-- Formerly suppressed via @SuppressWarnings, moved to baseline for PHPStan compatibility -->
   <violation rule="PHPMD\Rule\CleanCode\ErrorControlOperator" file="src/Module/AgentRunner/Infrastructure/Service/Codex/Resources/bridge.php"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/ChainExecution/Domain/Service/Static/ExecuteAgentStepService.php" method="run"/>
   <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="src/Module/DynamicLoop/Domain/Entity/DynamicLoopExecution.php"/>
   <violation rule="PHPMD\Rule\Design\TooManyFields" file="src/Module/DynamicLoop/Domain/Entity/DynamicLoopExecution.php"/>
 </phpmd-baseline>
