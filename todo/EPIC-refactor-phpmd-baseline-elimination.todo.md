@@ -57,7 +57,7 @@ status: in_progress
 1. [x] [TASK-refactor-phpmd-retrying-runner-run](done/TASK-refactor-phpmd-retrying-runner-run.todo.md) — RetryingAgentRunnerService::run() 112 строк → ≤79 *(залита напрямую в main как PR #259 до ввода эпик-ветки)*
 2. [ ] [TASK-refactor-phpmd-chaindefinition-classes](TASK-refactor-phpmd-chaindefinition-classes.todo.md) — ChainDefinitionVo 528 строк, YamlChainLoaderService 553 строк + parseSteps() 92 строки
 3. [ ] [TASK-refactor-phpmd-chainexecution-methods](TASK-refactor-phpmd-chainexecution-methods.todo.md) — ShellHookExecutorService::execute() 107 строк, ExecuteAgentStepService::run() PHPMD bug @todo
-4. [ ] [TASK-refactor-phpmd-dynamicloop-methods](TASK-refactor-phpmd-dynamicloop-methods.todo.md) — ExecuteDynamicTurnService::runParticipantTurn() 82 строки, runFacilitatorStep() 81 строка
+4. [x] [TASK-refactor-phpmd-dynamicloop-methods](done/TASK-refactor-phpmd-dynamicloop-methods.todo.md) — ExecuteDynamicTurnService::runParticipantTurn() 82→61, runFacilitatorStep() 81→70
 5. [x] [TASK-fix-phpmd-errorclassificationvo](done/TASK-fix-phpmd-errorclassificationvo.todo.md) — ErrorClassificationVo::createFromClassException() unused parameter $throwable
 6. [ ] [TASK-fix-phpmd-auditloggers](TASK-fix-phpmd-auditloggers.todo.md) — ErrorControlOperator (@mkdir) в JsonlAuditLoggerService и JsonlAuditLogger
 

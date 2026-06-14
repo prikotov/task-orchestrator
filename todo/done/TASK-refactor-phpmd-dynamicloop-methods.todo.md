@@ -9,8 +9,8 @@ epic: EPIC-refactor-phpmd-baseline-elimination
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/refactor-phpmd-dynamicloop-methods
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/260
+status: done
 ---
 
 # TASK-refactor-phpmd-dynamicloop-methods: Устранить LongMethod в ExecuteDynamicTurnService
@@ -108,3 +108,5 @@ make check
 | 2026-05-21 | Тимлид (Алекс) | Создание задачи |
 | 2026-06-13 | Тимлид (Алекс) | Reverse Briefing: статус → in_progress, назначен исполнитель (Бэкендер Левша), создана подветка от эпик-ветки |
 | 2026-06-14 | Бэкендер (Левша) | Реализация: экстракция `recordParticipantTurnJournals` и `callFacilitatorAgent`, удаление 2 записей из phpmd.baseline.xml, `make check` зелёный |
+| 2026-06-14 | Ревьювер (Пуаро) | Code review: APPROVE — эквивалентность поведения подтверждена построчно (13 аргументов runFacilitator, порядок side-effects), типизация/архитектура/Deptrac ок |
+| 2026-06-14 | Тимлид (Алекс) | Задача → done, файл перенесён в done/, эпик-план обновлён; ждёт подтверждения merge PR #260 |
