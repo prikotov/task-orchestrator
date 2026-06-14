@@ -126,3 +126,5 @@ make check
 | 2026-05-21 | Тимлид (Алекс) | Создание задачи |
 | 2026-06-14 | Тимлид (Алекс) | Reverse Briefing: статус → in_progress, реальные замеры (545/563/93), предупреждение о флакучести phpmd, работа в эпик-ветке |
 | 2026-06-14 | Бэкендер (Левша) | Выполнено: ChainDefinitionVo 545→493, YamlChainLoaderService 563→449, parseSteps() вынесен в ChainStepParserHelper; 3 записи убраны из baseline; status → done |
+| 2026-06-14 | Ревьювер (Пуаро) | Code review: APPROVE — эквивалентность подтверждена (createLinearChain 20 именованных аргументов, ChainStepParserHelper построчно, DSL-формат и контракт ChainLoaderInterface неизменны); StaticAccess exception обоснован конвенцией |
+| 2026-06-14 | Тимлид (Алекс) | Независимая верификация: make check зелёный, make phpmd зелёный 3×; bordercase ~493 NLOC зафиксирован в эпике |

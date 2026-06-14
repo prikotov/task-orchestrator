@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: refactor/phpmd-baseline-elimination
 pr: (единый эпик-PR в конце)
-status: in_progress
+status: done
 ---
 
 # TASK-fix-phpmd-auditloggers: Убрать ErrorControlOperator (@mkdir) в двух JsonlAuditLogger
@@ -97,3 +97,6 @@ make check
 | :--- | :--- | :--- |
 | 2026-06-13 | Тимлид (Алекс) | Создание задачи (разведка эпика выявила 5 непокрытых baseline-записей; эта задача покрывает 2 из них — `@mkdir` в audit-логгерах) |
 | 2026-06-14 | Тимлид (Алекс) | Reverse Briefing: статус → in_progress, исполнитель Левша, работа напрямую в эпик-ветке |
+| 2026-06-14 | Бэкендер (Левша) | Реализация: `@mkdir` → guard без `@` (fail-fast) в обоих логгерах, 2 записи убраны из baseline |
+| 2026-06-14 | Ревьювер (Пуаро) | Code review: APPROVE — эквивалентность подтверждена; уточнил: RuntimeException уже существовал в оригинале, поведение не изменилось вообще |
+| 2026-06-14 | Тимлид (Алекс) | Задача → done, перенос в done/ |

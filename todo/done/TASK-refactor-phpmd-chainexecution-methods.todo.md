@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: refactor/phpmd-baseline-elimination
 pr: (единый эпик-PR в конце)
-status: in_progress
+status: done
 ---
 
 # TASK-refactor-phpmd-chainexecution-methods: Устранить LongMethod в ChainExecution + убрать @todo PHPMD bug
@@ -118,3 +118,6 @@ make check
 | :--- | :--- | :--- |
 | 2026-05-21 | Тимлид (Алекс) | Создание задачи |
 | 2026-06-14 | Тимлид (Алекс) | Reverse Briefing: статус → in_progress, исполнитель Левша, работа в эпик-ветке; @todo-вопрос разрешён (корень = кэш PDepend) |
+| 2026-06-14 | Бэкендер (Левша) | Реализация: ShellHookExecutor::execute 107→52 LOC (4 приватных метода), @todo убраны, 2 записи baseline удалены |
+| 2026-06-14 | Ревьювер (Пуаро) | Code review: APPROVE — эквивалентность proc_open flow подтверждена построчно, catch-порядок сохранён |
+| 2026-06-14 | Тимлид (Алекс) | Задача → done, перенос в done/ |
