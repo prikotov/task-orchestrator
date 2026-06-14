@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic: EPIC-refactor-phpmd-baseline-elimination
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер (Левша)
+branch: refactor/phpmd-baseline-elimination
+pr: (единый эпик-PR в конце)
+status: in_progress
 ---
 
 # TASK-fix-phpmd-auditloggers: Убрать ErrorControlOperator (@mkdir) в двух JsonlAuditLogger
@@ -76,7 +76,19 @@ make check
 - `src/Module/DynamicLoop/Infrastructure/Service/JsonlAuditLogger.php`
 - `phpmd.baseline.xml` (записи `ErrorControlOperator` для этих файлов)
 
+## Инструкции для сабагента
+
+**Режим работы:** задача выполняется напрямую в эпик-ветке `refactor/phpmd-baseline-elimination` (без отдельной подветки/PR) — единый эпик-PR в конце.
+
+**Порядок:**
+1. Убедись, что активна ветка `refactor/phpmd-baseline-elimination`.
+2. Реализуй: замени `@mkdir($dir, 0777, true)` в обоих логгерах на guard без оператора `@` — `is_dir()` + `mkdir()` с проверкой возвращаемого значения и fail-fast (исключение при отказе). Без скрытого подавления ошибок.
+3. Удали 2 записи `ErrorControlOperator` из `phpmd.baseline.xml`.
+4. `make check` зелёный. Коммить (Conventional Commits, scope `Audit`).
+5. `git push` (remote уже SSH).
+
 ## Change History
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-06-13 | Тимлид (Алекс) | Создание задачи (разведка эпика выявила 5 непокрытых baseline-записей; эта задача покрывает 2 из них — `@mkdir` в audit-логгерах) |
+| 2026-06-14 | Тимлид (Алекс) | Reverse Briefing: статус → in_progress, исполнитель Левша, работа напрямую в эпик-ветке |
