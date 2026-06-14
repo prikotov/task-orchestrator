@@ -9,7 +9,7 @@ epic: EPIC-refactor-phpmd-baseline-elimination
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/refactor-phpmd-retrying-runner-run
-pr: "259"
+pr: https://github.com/prikotov/task-orchestrator/pull/259
 status: review
 ---
 
