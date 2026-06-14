@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic:
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Тимлид (Алекс)
+branch: refactor/phpmd-baseline-elimination
 pr:
-status: todo
+status: in_progress
 ---
 
 # EPIC-refactor-phpmd-baseline-elimination: Устранить все PHPMD baseline suppression
@@ -54,11 +54,16 @@ status: todo
 - Рефакторинг, не связанный с PHPMD violation
 
 ## 4. Implementation Plan
-1. [x] [TASK-refactor-phpmd-retrying-runner-run](done/TASK-refactor-phpmd-retrying-runner-run.todo.md) — RetryingAgentRunnerService::run() 112 строк → ≤79
+1. [x] [TASK-refactor-phpmd-retrying-runner-run](done/TASK-refactor-phpmd-retrying-runner-run.todo.md) — RetryingAgentRunnerService::run() 112 строк → ≤79 *(залита напрямую в main как PR #259 до ввода эпик-ветки)*
 2. [ ] [TASK-refactor-phpmd-chaindefinition-classes](TASK-refactor-phpmd-chaindefinition-classes.todo.md) — ChainDefinitionVo 528 строк, YamlChainLoaderService 553 строк + parseSteps() 92 строки
 3. [ ] [TASK-refactor-phpmd-chainexecution-methods](TASK-refactor-phpmd-chainexecution-methods.todo.md) — ShellHookExecutorService::execute() 107 строк, ExecuteAgentStepService::run() PHPMD bug @todo
 4. [ ] [TASK-refactor-phpmd-dynamicloop-methods](TASK-refactor-phpmd-dynamicloop-methods.todo.md) — ExecuteDynamicTurnService::runParticipantTurn() 82 строки, runFacilitatorStep() 81 строка
 5. [x] [TASK-fix-phpmd-errorclassificationvo](done/TASK-fix-phpmd-errorclassificationvo.todo.md) — ErrorClassificationVo::createFromClassException() unused parameter $throwable
+6. [ ] [TASK-fix-phpmd-auditloggers](TASK-fix-phpmd-auditloggers.todo.md) — ErrorControlOperator (@mkdir) в JsonlAuditLoggerService и JsonlAuditLogger
+
+### Открытые пункты (жду решения пользователя)
+- **bridge.php** (`ErrorControlOperator`, vendored Codex-скрипт, suppression намеренное) — рекомендую оставить suppression.
+- **DynamicLoopExecution** (`TooManyPublicMethods` 35/10 + `TooManyFields` 53/12) — богатый domain-aggregate, требует архитектурного редизайна; рекомендую отдельную задачу на дизайн Архитектора вне этого эпика, либо вынос за scope.
 
 ## 5. Definition of Done
 - [ ] `phpmd.baseline.xml` пуст или удалён
@@ -108,3 +113,4 @@ make check
 | :--- | :--- | :--- |
 | 2026-05-21 | Тимлид (Алекс) | Создание эпика |
 | 2026-06-06 | Бэкендер (Левша) | TASK-fix-phpmd-errorclassificationvo выполнена, baseline обновлён |
+| 2026-06-13 | Тимлид (Алекс) | PR #259 (задача 1) влит в main; создана эпик-ветка `refactor/phpmd-baseline-elimination`, статус → in_progress; разведка выявила 5 непокрытых baseline-записей — добавлена задача 6 (audit-логгеры), по bridge.php и DynamicLoopExecution запрошено решение пользователя |
