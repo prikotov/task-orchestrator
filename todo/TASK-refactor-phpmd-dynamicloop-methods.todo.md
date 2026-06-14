@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic: EPIC-refactor-phpmd-baseline-elimination
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Бэкендер (Левша)
+branch: task/refactor-phpmd-dynamicloop-methods
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-phpmd-dynamicloop-methods: Устранить LongMethod в ExecuteDynamicTurnService
@@ -81,7 +81,22 @@ make check
 ## 8. Sources
 - `src/Module/DynamicLoop/Domain/Service/Dynamic/ExecuteDynamicTurnService.php`
 
+## Инструкции для сабагента
+
+**Ветка:** `task/refactor-phpmd-dynamicloop-methods` (уже создана от `refactor/phpmd-baseline-elimination` и активна)
+**PR:** уже создан (draft) из `task/refactor-phpmd-dynamicloop-methods` в `refactor/phpmd-baseline-elimination` — [PR #<PR_NUMBER>](<PR_LINK>)
+
+### Порядок действий
+1. Переключись в ветку `task/refactor-phpmd-dynamicloop-methods`: `git checkout task/refactor-phpmd-dynamicloop-methods`.
+2. Реализуй задачу согласно описанию выше: уменьшить `runParticipantTurn()` и `runFacilitatorStep()` до ≤79 LOC экстракцией приватных методов, **не меняя поведение**.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта и AGENTS.md.
+4. Делай промежуточные коммиты после каждого логического этапа (Conventional Commits, scope `DynamicLoop`).
+5. После реализации запусти проверки: `make check`. Должен быть зелёным.
+6. Сделай `git push`.
+7. Переведи PR из draft в ready: `gh pr ready <PR_NUMBER>`.
+
 ## Change History
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-05-21 | Тимлид (Алекс) | Создание задачи |
+| 2026-06-13 | Тимлид (Алекс) | Reverse Briefing: статус → in_progress, назначен исполнитель (Бэкендер Левша), создана подветка от эпик-ветки |
