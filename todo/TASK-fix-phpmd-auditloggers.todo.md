@@ -57,10 +57,15 @@ status: in_progress
 ## 4. Implementation Plan
 *Заполняется исполнителем.*
 
+Выполнено (Левша, 2026-06-14):
+1. В обоих логгерах заменил блок `@mkdir(...)` + вложенную `is_dir`-проверку на единый `@`-free guard: `if (!is_dir($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) { throw new RuntimeException(...); }`. Третий терм (`&& !is_dir`) защищает от race-condition, когда каталог успел создаться другим процессом.
+2. Удалил 2 записи `ErrorControlOperator` из `phpmd.baseline.xml`.
+3. Тест failure-path (`throwsRuntimeExceptionWhenDirectoryNotWritable`) теперь подавляет ожидаемое benign-предупреждение `mkdir` через scoped `set_error_handler` (без `@` в проде; `failOnWarning=true` в PHPUnit иначе валит сборку).
+
 ## 5. Definition of Done
-- [ ] `phpmd` не ругается на `ErrorControlOperator` в обоих логгерах
-- [ ] `make check` зелёный
-- [ ] 2 записи убраны из baseline
+- [x] `phpmd` не ругается на `ErrorControlOperator` в обоих логгерах
+- [x] `make check` зелёный
+- [x] 2 записи убраны из baseline
 
 ## 6. Verification
 ```bash
