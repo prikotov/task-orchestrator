@@ -7,7 +7,10 @@ namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainStepFactory;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlChainStepMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRetryPolicyMapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -31,6 +34,18 @@ final class YamlChainLoaderToolStepTest extends TestCase
     private static function createFactory(): ChainDefinitionFactory
     {
         return new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification());
+    }
+
+    private static function createLoader(string $yamlPath): YamlChainLoaderService
+    {
+        $retryPolicyMapper = new YamlRetryPolicyMapper();
+
+        return new YamlChainLoaderService(
+            $yamlPath,
+            self::createFactory(),
+            new YamlChainStepMapper(new ChainStepFactory(), $retryPolicyMapper),
+            $retryPolicyMapper,
+        );
     }
 
     protected function tearDown(): void
@@ -62,7 +77,7 @@ chains:
         role: backend_developer
 YAML;
         file_put_contents($this->fixturePath, $yaml);
-        $loader = new YamlChainLoaderService($this->fixturePath, self::createFactory());
+        $loader = self::createLoader($this->fixturePath);
 
         $chain = $loader->load('with_tool');
 
@@ -99,7 +114,7 @@ chains:
         label: "Echo"
 YAML;
         file_put_contents($this->fixturePath, $yaml);
-        $loader = new YamlChainLoaderService($this->fixturePath, self::createFactory());
+        $loader = self::createLoader($this->fixturePath);
 
         $chain = $loader->load('tool_no_key');
         $toolStep = $chain->getSteps()[0];
@@ -124,7 +139,7 @@ chains:
         output_key: git_status
 YAML;
         file_put_contents($this->fixturePath, $yaml);
-        $loader = new YamlChainLoaderService($this->fixturePath, self::createFactory());
+        $loader = self::createLoader($this->fixturePath);
 
         $chain = $loader->load('tool_named');
         $toolStep = $chain->getSteps()[0];
@@ -145,7 +160,7 @@ chains:
         label: "Missing command"
 YAML;
         file_put_contents($this->fixturePath, $yaml);
-        $loader = new YamlChainLoaderService($this->fixturePath, self::createFactory());
+        $loader = self::createLoader($this->fixturePath);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Tool step must have "command"');
@@ -165,7 +180,7 @@ chains:
         command: "echo hi"
 YAML;
         file_put_contents($this->fixturePath, $yaml);
-        $loader = new YamlChainLoaderService($this->fixturePath, self::createFactory());
+        $loader = self::createLoader($this->fixturePath);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Tool step must have "label"');
@@ -198,7 +213,7 @@ chains:
         name: implement
 YAML;
         file_put_contents($this->fixturePath, $yaml);
-        $loader = new YamlChainLoaderService($this->fixturePath, self::createFactory());
+        $loader = self::createLoader($this->fixturePath);
 
         $chain = $loader->load('mixed');
         $steps = $chain->getSteps();

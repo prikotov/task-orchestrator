@@ -18,7 +18,8 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepV
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FallbackConfigVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\Helper\ChainStepParserHelper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlChainStepMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRetryPolicyMapper;
 
 /**
  * Реализация ChainLoaderInterface — загрузка цепочек из YAML-файла.
@@ -41,6 +42,8 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     public function __construct(
         string $yamlPath,
         private readonly ChainDefinitionFactory $chainDefinitionFactory,
+        private readonly YamlChainStepMapper $yamlChainStepMapper,
+        private readonly YamlRetryPolicyMapper $yamlRetryPolicyMapper,
     ) {
         $this->yamlPath = $yamlPath;
     }
@@ -130,11 +133,11 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     private function parseStaticChain(string $name, array $raw, array $roles): ChainDefinitionInterface
     {
         $stepsData = $raw['steps'] ?? [];
-        $chainRetryPolicy = ChainStepParserHelper::parseRetryPolicy($raw['retry_policy'] ?? null);
+        $chainRetryPolicy = $this->yamlRetryPolicyMapper->mapToChainRetryPolicy($raw['retry_policy'] ?? null);
         $budget = $this->parseBudget($raw['budget'] ?? null);
         $chainNoContextFiles = (bool) ($raw['no_context_files'] ?? false);
 
-        $steps = ChainStepParserHelper::parseSteps($name, $stepsData, $chainRetryPolicy, $chainNoContextFiles);
+        $steps = $this->yamlChainStepMapper->mapToChainSteps($name, $stepsData, $chainRetryPolicy, $chainNoContextFiles);
         $fixIterations = $this->parseFixIterations($raw['fix_iterations'] ?? []);
 
         // Auto-detect conditional: если хотя бы один шаг имеет when-выражение
@@ -184,11 +187,11 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     private function parseConditionalChain(string $name, array $raw, array $roles): ChainDefinitionInterface
     {
         $stepsData = $raw['steps'] ?? [];
-        $chainRetryPolicy = ChainStepParserHelper::parseRetryPolicy($raw['retry_policy'] ?? null);
+        $chainRetryPolicy = $this->yamlRetryPolicyMapper->mapToChainRetryPolicy($raw['retry_policy'] ?? null);
         $budget = $this->parseBudget($raw['budget'] ?? null);
         $chainNoContextFiles = (bool) ($raw['no_context_files'] ?? false);
 
-        $steps = ChainStepParserHelper::parseSteps($name, $stepsData, $chainRetryPolicy, $chainNoContextFiles);
+        $steps = $this->yamlChainStepMapper->mapToChainSteps($name, $stepsData, $chainRetryPolicy, $chainNoContextFiles);
         $fixIterations = $this->parseFixIterations($raw['fix_iterations'] ?? []);
 
         $this->validateWhenReferences($name, $steps);
