@@ -111,6 +111,47 @@ make check
 4. После реализации запусти проверки: `make check`. Должен быть зелёным.
 5. НЕ делай коммит и НЕ пуш — Тимлид контролирует git.
 
+## Reverse Briefing (Левша → Тимлид)
+
+**Подтверждаю понимание задачи.** Восстановить fail-fast guard ссылочной целостности
+`fix_iterations` в приватном конструкторе deprecated `ChainDefinitionVo` (единая точка
+для всех статических фабрик `createFromSteps` / `createFromConditionalSteps` /
+`createFromDynamic`). Guard — inline-проверка **без** зависимости от
+`FixIterationsReferenceIntegritySpecification` (правило Deptrac `DomainVo` ↛
+`DomainSpecification`).
+
+**План реализации:**
+1. Добавить приватный instance-метод-предикат `areFixIterationsReferencesValid($steps,
+   $fixIterations): bool`, алгоритмически эквивалентный `FixIterationsReferenceIntegritySpecification`
+   (empty → true; `nameMap` из non-null `getName()`; для каждой группы — unknown-step
+   или шаг в нескольких группах → false). Предикат выбран вместо `assert*(): void`, т.к.
+   sniff `ValueObjectStructureSniff` запрещает void return type для non-static методов VO.
+2. В приватном `__construct()` вызвать предикат и при `false` бросить
+   `InvalidArgumentException` с generic-сообщением (единая точка для всех фабрик;
+   для dynamic `fixIterations === []` → no-op).
+3. Обновить объясняющий комментарий в `createLinearChain()` (~169–174): теперь отражает,
+   что generic guard inline восстановлен в конструкторе, а detailed-валидация осталась
+   в `ChainDefinitionFactory`.
+4. Unit-тесты в `ChainDefinitionVoTest`: valid references → OK (в т.ч. несколько
+   непересекающихся групп); unknown-step → throw; duplicate-across-groups → throw;
+   unnamed-step (`getName() === null`) → throw (не резолвит ссылку). Проверка generic-сообщения.
+5. `make check` зелёный.
+
+**Уточнённые детали / допущения:**
+- Guard восстанавливает поведение, существовавшее до PR #261: `InvalidArgumentException`
+  вместо молчаливого принятия невалидных ссылок.
+- Generic-сообщение дословно по Must Have:
+  `Chain "%s" has invalid fix-iterations references (unknown step or step in multiple groups).`
+  (отличается от сообщения `ChainDefinitionFactory` — это намеренно, deprecated-путь).
+- Empty-steps guard (`count($steps) === 0`) остаётся в `createLinearChain()`, НЕ в
+  конструкторе — dynamic-цепочки валидно имеют `steps: []`.
+- Не трогаю: `ChainDefinitionFactory`, `FixIterationsReferenceIntegritySpecification`,
+  `ChainDefinitionValidatorService`.
+- **NLOC-бюджет (проверено эмпирически):** PHPMD `ExcessiveClassLength` считает NLOC
+  по PHPDepend (non-comment lines). Реальный NLOC класса = **375** после правок (было 345;
+  non-blank 483+ включает комментарии). Порог 500, запас ≈125 код-строк — guard вписывается
+  с большим запасом. Should Have (вынесенный метод-предикат) выполнен.
+
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
