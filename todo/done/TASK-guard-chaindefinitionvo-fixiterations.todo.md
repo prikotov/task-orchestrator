@@ -9,8 +9,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/guard-chaindefinitionvo-fixiterations
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/263
+status: done
 ---
 
 # TASK-guard-chaindefinitionvo-fixiterations: Восстановить fail-fast guard fix-итераций в deprecated ChainDefinitionVo
@@ -156,3 +156,6 @@ make check
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-06-15 | Тимлид (Алекс) | Создание задачи. Постановка на основе слепой зоны №1 из ревью PR #261 (fallback №2 из дизайна, раздел 4.3). |
+| 2026-06-15 | Бэкендер (Левша) | Reverse Briefing + реализация: guard в `__construct()` через pure-предикат `areFixIterationsReferencesValid(): bool`, 6 unit-тестов, `make check` зелёный (NLOC 375 < 500). |
+| 2026-06-15 | Ревьювер (Пуаро) | Code review: APPROVE — эквивалентность спецификации, Deptrac-чистота (`DomainVo` ↛ `DomainSpecification`), sniff-совместимость, регрессий нет. PHPUnit 1042/1042, Psalm 0 errors, Deptrac 0 violations. |
+| 2026-06-15 | Тимлид (Алекс) | Задача → done, файл перенесён в done/; PR #263 открыт. Ждёт подтверждения merge. |
