@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Domain\Service\Chain;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidatorService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainConfigViolationVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainDefinitionVo;
@@ -177,6 +179,133 @@ final class ChainDefinitionValidatorTest extends TestCase
         $violations = $this->validator->validate($chain);
 
         self::assertSame([], $violations);
+    }
+
+    // ─── Fix iterations: step belongs to multiple groups → violation ──
+
+    #[Test]
+    public function fixIterationStepInMultipleGroupsReturnsDuplicateViolation(): void
+    {
+        $steps = [
+            ChainStepVo::createAgent(role: 'dev', name: 'shared'),
+            ChainStepVo::createAgent(role: 'qa', name: 'qa'),
+            ChainStepVo::createAgent(role: 'ops', name: 'other'),
+        ];
+
+        // Шаг 'shared' входит в две группы fix-итераций одновременно;
+        // остальные шаги не пересекаются между группами.
+        $groupA = new FixIterationGroupVo('groupA', ['shared', 'qa'], 3);
+        $groupB = new FixIterationGroupVo('groupB', ['shared', 'other'], 3);
+
+        $chain = $this->createStaticChainWithStepsAndFixIterations('dup-test', $steps, [$groupA, $groupB]);
+
+        $violations = $this->validator->validate($chain);
+
+        self::assertCount(1, $violations);
+        self::assertSame('fix_iterations', $violations[0]->getField());
+        // Текст дословно по дизайну §3.2: шаг, первая группа, вторая группа
+        self::assertSame(
+            'fix_iteration step "shared" belongs to multiple groups ("groupA" and "groupB").',
+            $violations[0]->getMessage(),
+        );
+    }
+
+    // ─── Fix iterations: unknown step reported before duplicate for the same step ──
+
+    #[Test]
+    public function fixIterationUnknownStepDoesNotEscalateToDuplicateViolation(): void
+    {
+        $steps = [
+            ChainStepVo::createAgent(role: 'dev', name: 'known'),
+        ];
+
+        // Неизвестный шаг 'ghost' встречается в двух группах:
+        // спецификация short-circuit'ит на unknown, валидатор не должен эскалировать в duplicate.
+        $groupA = new FixIterationGroupVo('groupA', ['known', 'ghost'], 3);
+        $groupB = new FixIterationGroupVo('groupB', ['known', 'ghost'], 3);
+
+        $chain = $this->createStaticChainWithStepsAndFixIterations('order-test', $steps, [$groupA, $groupB]);
+
+        $violations = $this->validator->validate($chain);
+
+        // 'ghost' неизвестен → 2 unknown-нарушения (по одному на группу).
+        // 'known' известен и в двух группах → 1 duplicate-нарушение.
+        $unknownGhost = array_filter(
+            $violations,
+            static fn (ChainConfigViolationVo $v): bool => str_contains($v->getMessage(), 'references unknown step')
+                && str_contains($v->getMessage(), 'ghost'),
+        );
+        $duplicateKnown = array_filter(
+            $violations,
+            static fn (ChainConfigViolationVo $v): bool => str_contains($v->getMessage(), 'belongs to multiple groups')
+                && str_contains($v->getMessage(), 'known'),
+        );
+        // Ни одно сообщение об unknown-шаге 'ghost' не должно превратиться в duplicate-сообщение.
+        $ghostDuplicate = array_filter(
+            $violations,
+            static fn (ChainConfigViolationVo $v): bool => str_contains($v->getMessage(), 'belongs to multiple groups')
+                && str_contains($v->getMessage(), 'ghost'),
+        );
+
+        self::assertCount(2, $unknownGhost);
+        self::assertCount(1, $duplicateKnown);
+        self::assertCount(0, $ghostDuplicate);
+    }
+
+    // ─── Anti-divergence: spec → false ⇒ validator фиксирует нарушения ──
+
+    /**
+     * Гарантирует, что любой вход, на котором спецификация возвращает false,
+     * сопровождается непустым списком violations у валидатора по полю fix_iterations.
+     * Спецификация выступает oracle, валидатор — детальным репортёром.
+     *
+     * @param list<ChainStepVo> $steps
+     * @param list<FixIterationGroupVo> $fixIterations
+     */
+    #[Test]
+    #[DataProvider('invalidFixIterationsForSpecAndValidator')]
+    public function specificationFalseImpliesValidatorHasFixIterationsViolations(array $steps, array $fixIterations): void
+    {
+        $specification = new FixIterationsReferenceIntegritySpecification();
+
+        // Спецификация должна отклонить вход (oracle).
+        self::assertFalse($specification->isSatisfiedBy($steps, $fixIterations));
+
+        $chain = $this->createStaticChainWithStepsAndFixIterations('anti-divergence', $steps, $fixIterations);
+
+        $violations = $this->validator->validate($chain);
+
+        $fixIterationsViolations = array_filter(
+            $violations,
+            static fn (ChainConfigViolationVo $v): bool => $v->getField() === 'fix_iterations',
+        );
+
+        self::assertNotSame([], $fixIterationsViolations, 'Validator must report fix_iterations violations when specification is false.');
+    }
+
+    /**
+     * @return array<string, array{0: list<ChainStepVo>, 1: list<FixIterationGroupVo>}>
+     */
+    public static function invalidFixIterationsForSpecAndValidator(): array
+    {
+        $namedSteps = [
+            ChainStepVo::createAgent(role: 'dev', name: 'step1'),
+            ChainStepVo::createAgent(role: 'qa', name: 'step2'),
+        ];
+
+        return [
+            'unknown step' => [
+                $namedSteps,
+                [new FixIterationGroupVo('group1', ['step1', 'step_unknown'], 3)],
+            ],
+            'duplicate step across groups' => [
+                $namedSteps,
+                [
+                    new FixIterationGroupVo('groupA', ['step1', 'step2'], 3),
+                    new FixIterationGroupVo('groupB', ['step1', 'step2'], 3),
+                ],
+            ],
+        ];
     }
 
     // ─── Dynamic chain: valid → no violations ──

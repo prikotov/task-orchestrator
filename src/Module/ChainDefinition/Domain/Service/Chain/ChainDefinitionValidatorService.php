@@ -73,16 +73,30 @@ final readonly class ChainDefinitionValidatorService implements ChainDefinitionV
             $violations = [...$violations, ...$this->validateStep($name, $i, $step)];
         }
 
-        // fix_iterations: ссылки на существующие шаги
-        foreach ($chain->getFixIterations() as $group) {
-            $stepNameMap = [];
-            foreach ($steps as $step) {
-                $stepName = $step->getName();
-                if ($stepName !== null) {
-                    $stepNameMap[$stepName] = true;
-                }
-            }
+        $fixIterations = $chain->getFixIterations();
+        if ($fixIterations === []) {
+            return $violations;
+        }
 
+        // fix_iterations: ссылки на существующие шаги и отсутствие дублирования групп.
+        // Карта именованных шагов строится один раз до цикла по группам:
+        // она нужна и для unknown-проверки, и для duplicate-проверки.
+        $stepNameMap = [];
+        foreach ($steps as $step) {
+            $stepName = $step->getName();
+            if ($stepName !== null) {
+                $stepNameMap[$stepName] = true;
+            }
+        }
+
+        // Имя шага → имя первой группы fix-итерации, в которой он встретился.
+        // Используется для диагностики принадлежности шага нескольким группам.
+        // Синхронизировано с FixIterationsReferenceIntegritySpecification:
+        // для одного шага сначала диагностируется unknown step, затем duplicate-membership;
+        // unknown-шаг в аккумулятор не попадает (повторяет short-circuit спецификации).
+        $stepFirstGroup = [];
+
+        foreach ($fixIterations as $group) {
             foreach ($group->getStepNames() as $stepName) {
                 if (!isset($stepNameMap[$stepName])) {
                     $violations[] = new ChainConfigViolationVo(
@@ -94,7 +108,26 @@ final readonly class ChainDefinitionValidatorService implements ChainDefinitionV
                             $stepName,
                         ),
                     );
+
+                    continue;
                 }
+
+                if (isset($stepFirstGroup[$stepName])) {
+                    $violations[] = new ChainConfigViolationVo(
+                        chainName: $name,
+                        field: 'fix_iterations',
+                        message: sprintf(
+                            'fix_iteration step "%s" belongs to multiple groups ("%s" and "%s").',
+                            $stepName,
+                            $stepFirstGroup[$stepName],
+                            $group->getGroup(),
+                        ),
+                    );
+
+                    continue;
+                }
+
+                $stepFirstGroup[$stepName] = $group->getGroup();
             }
         }
 
