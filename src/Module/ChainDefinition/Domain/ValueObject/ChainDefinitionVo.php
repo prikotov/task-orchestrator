@@ -72,6 +72,57 @@ final readonly class ChainDefinitionVo
         private ?int $timeout = null,
         private ?int $maxTime = null,
     ) {
+        if (!$this->areFixIterationsReferencesValid($this->steps, $this->fixIterations)) {
+            throw new InvalidArgumentException(sprintf(
+                'Chain "%s" has invalid fix-iterations references (unknown step or step in multiple groups).',
+                $this->name,
+            ));
+        }
+    }
+
+    /**
+     * Проверяет ссылочную целостность групп fix-итераций (deprecated inline-проверка).
+     *
+     * Восстанавливает поведение, существовавшее до PR #261, в виде чистого предиката;
+     * выброс исключения с generic-сообщением выполняет приватный конструктор.
+     * Каждое имя шага из групп fix-итераций должно существовать среди именованных
+     * шагов (ChainStepVo с непустым name) и не принадлежать нескольким группам.
+     *
+     * Не зависит от FixIterationsReferenceIntegritySpecification: правило Deptrac
+     * DomainVo ↛ DomainSpecification запрещает VO обращаться к specification.
+     *
+     * @param list<ChainStepVo> $steps шаги цепочки
+     * @param list<FixIterationGroupVo> $fixIterations группы fix-итераций
+     *
+     * @return bool true — если fixIterations пуст, либо каждое имя шага из групп
+     *     существует среди именованных шагов и не принадлежит нескольким группам
+     */
+    private function areFixIterationsReferencesValid(array $steps, array $fixIterations): bool
+    {
+        if ($fixIterations === []) {
+            return true;
+        }
+
+        $nameMap = [];
+        foreach ($steps as $step) {
+            $stepName = $step->getName();
+            if ($stepName !== null) {
+                $nameMap[$stepName] = true;
+            }
+        }
+
+        $seenStepNames = [];
+        foreach ($fixIterations as $group) {
+            foreach ($group->getStepNames() as $stepName) {
+                if (!isset($nameMap[$stepName]) || isset($seenStepNames[$stepName])) {
+                    return false;
+                }
+
+                $seenStepNames[$stepName] = true;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -166,11 +217,11 @@ final readonly class ChainDefinitionVo
             );
         }
 
-        // Валидация ссылочной целостности fix-итераций не выполняется в deprecated VO:
-        // она перенесена в ChainDefinitionFactory (FixIterationsReferenceIntegritySpecification).
-        // Этот класс — compatibility shim до удаления; боевой код создаёт цепочки через фабрику.
-        // DomainVo не может зависеть от DomainSpecification (правило Deptrac), поэтому здесь
-        // нет ни алгоритма проверки, ни выброса исключения по инварианту fix-итераций.
+        // Generic fail-fast guard ссылочной целостности fix-итераций выполняется в
+        // приватном конструкторе (areFixIterationsReferencesValid): это единая точка
+        // для всех статических фабрик. DomainVo не может зависеть от DomainSpecification
+        // (правило Deptrac), поэтому guard реализован inline, а detailed-валидация
+        // (сообщения с именами группы/шага) остаётся в ChainDefinitionFactory.
 
         return new self(
             name: $name,

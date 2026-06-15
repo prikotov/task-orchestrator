@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Domain\ValueObject;
 
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\SharedChainDefinitionVo;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -82,6 +83,146 @@ final class ChainDefinitionVoTest extends TestCase
             name: 'empty',
             description: '',
             steps: [],
+        );
+    }
+
+    #[Test]
+    public function createFromStepsAcceptsValidFixIterations(): void
+    {
+        $steps = [
+            ChainStepVo::createAgent(role: 'dev', name: 'implement'),
+            ChainStepVo::createAgent(role: 'qa', name: 'review'),
+        ];
+        $fixIterations = [
+            new FixIterationGroupVo('dev-review', ['implement', 'review'], 3),
+        ];
+
+        $vo = ChainDefinitionVo::createFromSteps(
+            name: 'valid-fix',
+            description: '',
+            steps: $steps,
+            fixIterations: $fixIterations,
+        );
+
+        self::assertSame($fixIterations, $vo->getFixIterations());
+    }
+
+    #[Test]
+    public function createFromStepsAcceptsMultipleDistinctFixIterationGroups(): void
+    {
+        $steps = [
+            ChainStepVo::createAgent(role: 'a', name: 's1'),
+            ChainStepVo::createAgent(role: 'b', name: 's2'),
+            ChainStepVo::createAgent(role: 'c', name: 's3'),
+            ChainStepVo::createAgent(role: 'd', name: 's4'),
+        ];
+        $fixIterations = [
+            new FixIterationGroupVo('group-a', ['s1', 's2'], 2),
+            new FixIterationGroupVo('group-b', ['s3', 's4'], 2),
+        ];
+
+        $vo = ChainDefinitionVo::createFromSteps(
+            name: 'multi-group',
+            description: '',
+            steps: $steps,
+            fixIterations: $fixIterations,
+        );
+
+        self::assertCount(2, $vo->getFixIterations());
+    }
+
+    #[Test]
+    public function createFromConditionalStepsAcceptsValidFixIterations(): void
+    {
+        // Conditional-фабрика проходит через тот же приватный конструктор — guard единая точка.
+        $steps = [
+            ChainStepVo::createAgent(role: 'dev', name: 'implement'),
+            ChainStepVo::createAgent(role: 'qa', name: 'review'),
+        ];
+        $fixIterations = [
+            new FixIterationGroupVo('dev-review', ['implement', 'review'], 3),
+        ];
+
+        $vo = ChainDefinitionVo::createFromConditionalSteps(
+            name: 'conditional-valid-fix',
+            description: '',
+            steps: $steps,
+            fixIterations: $fixIterations,
+        );
+
+        self::assertSame($fixIterations, $vo->getFixIterations());
+    }
+
+    #[Test]
+    public function createFromStepsThrowsGenericOnUnknownFixIterationStep(): void
+    {
+        $steps = [
+            ChainStepVo::createAgent(role: 'dev', name: 'step1'),
+            ChainStepVo::createAgent(role: 'qa', name: 'step2'),
+        ];
+        $fixIterations = [
+            new FixIterationGroupVo('group1', ['step1', 'unknown_step'], 3),
+        ];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Chain "bad-fix" has invalid fix-iterations references (unknown step or step in multiple groups).',
+        );
+
+        ChainDefinitionVo::createFromSteps(
+            name: 'bad-fix',
+            description: '',
+            steps: $steps,
+            fixIterations: $fixIterations,
+        );
+    }
+
+    #[Test]
+    public function createFromStepsThrowsGenericOnDuplicateFixIterationStepAcrossGroups(): void
+    {
+        $steps = [
+            ChainStepVo::createAgent(role: 'a', name: 'shared'),
+            ChainStepVo::createAgent(role: 'b', name: 'only_a'),
+            ChainStepVo::createAgent(role: 'c', name: 'only_b'),
+        ];
+        $fixIterations = [
+            new FixIterationGroupVo('group-a', ['shared', 'only_a'], 2),
+            new FixIterationGroupVo('group-b', ['shared', 'only_b'], 2),
+        ];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Chain "dup-fix" has invalid fix-iterations references (unknown step or step in multiple groups).',
+        );
+
+        ChainDefinitionVo::createFromSteps(
+            name: 'dup-fix',
+            description: '',
+            steps: $steps,
+            fixIterations: $fixIterations,
+        );
+    }
+
+    #[Test]
+    public function createFromStepsThrowsWhenFixIterationReferencesUnnamedStep(): void
+    {
+        // Шаг без имени (getName() === null) не должен резолвить ссылку группы fix-итерации.
+        $steps = [
+            ChainStepVo::createAgent(role: 'dev'),
+            ChainStepVo::createAgent(role: 'qa'),
+        ];
+        $fixIterations = [
+            new FixIterationGroupVo('group1', ['step1', 'step2'], 3),
+        ];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('has invalid fix-iterations references');
+
+        ChainDefinitionVo::createFromSteps(
+            name: 'unnamed-ref',
+            description: '',
+            steps: $steps,
+            fixIterations: $fixIterations,
         );
     }
 
