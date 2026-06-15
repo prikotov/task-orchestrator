@@ -52,7 +52,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $auditLogger,
         );
 
-        $execution->appendDiscussionHistory(
+        $execution->getJournal()->appendDiscussionHistory(
             $this->journal->formatFacilitatorDiscussionEntry(
                 $context->facilitatorRole,
                 $facResponse->isDone(),
@@ -63,7 +63,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         );
 
         $stepCost = $turnResult->agentResult->getCost();
-        $execution->addRoleCost($context->facilitatorRole, $stepCost);
+        $execution->getMetrics()->addRoleCost($context->facilitatorRole, $stepCost);
 
         $budgetCheck = $this->budgetChecker->checkAndApply(
             $execution,
@@ -99,7 +99,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
                 true,
             )
         ) {
-            $execution->appendFacilitatorSummary(sprintf(
+            $execution->getJournal()->appendFacilitatorSummary(sprintf(
                 "Round %d: %s\n",
                 $execution->getRound(),
                 $nextRole,
@@ -149,7 +149,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         $this->recordParticipantTurnJournals($execution, $nextRole, $turnResult);
 
         $stepCost = $turnResult->agentResult->getCost();
-        $execution->addRoleCost($nextRole, $stepCost);
+        $execution->getMetrics()->addRoleCost($nextRole, $stepCost);
 
         $budgetCheck = $this->budgetChecker->checkAndApply(
             $execution,
@@ -232,7 +232,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $auditLogger,
         );
 
-        $execution->appendFacilitatorJournal(
+        $execution->getJournal()->appendFacilitatorJournal(
             $this->journal->formatFacilitatorEntry(
                 $execution->getStep(),
                 $execution->getRound(),
@@ -409,13 +409,13 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         string $nextRole,
         DynamicLoopTurnResultVo $turnResult,
     ): void {
-        $execution->appendDiscussionHistory(
+        $execution->getJournal()->appendDiscussionHistory(
             $this->journal->formatDiscussionEntry(
                 $nextRole,
                 $turnResult->agentResult->getOutputText(),
             ),
         );
-        $execution->appendFacilitatorJournal(
+        $execution->getJournal()->appendFacilitatorJournal(
             $this->journal->formatParticipantEntry(
                 $nextRole,
                 $turnResult->agentResult->getOutputText(),

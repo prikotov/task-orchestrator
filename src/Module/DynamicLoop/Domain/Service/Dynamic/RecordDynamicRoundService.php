@@ -36,7 +36,7 @@ final readonly class RecordDynamicRoundService implements RecordDynamicRoundServ
         ?string $synthesis = null,
         ?DynamicLoopAuditLoggerInterface $auditLogger = null,
     ): void {
-        $execution->recordRound($roundResult);
+        $execution->getMetrics()->recordRound($roundResult);
 
         $this->roundNotifier->notifyRoundCompleted(
             step: $step,

@@ -44,7 +44,7 @@ final readonly class CheckDynamicLoopBudgetService implements \TaskOrchestrator\
             $execution->markBudgetWarning80Logged();
         }
         if ($budgetCheck->warningMessage !== '') {
-            $execution->appendFacilitatorJournal($budgetCheck->warningMessage);
+            $execution->getJournal()->appendFacilitatorJournal($budgetCheck->warningMessage);
             $this->sessionLogger->writeContextFile(
                 'facilitator_journal.md',
                 $execution->getFacilitatorJournal(),

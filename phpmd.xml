@@ -7,6 +7,13 @@
     <exclude-pattern>*/var/*</exclude-pattern>
     <exclude-pattern>*/bin/*</exclude-pattern>
     <exclude-pattern>*/tests/*</exclude-pattern>
+    <!--
+        bridge.php — standalone PHP-процесс (запускается через proc_open([PHP_BINARY, $bridgeScript])),
+        а не require'ится в приложение. Функционально эквивалентен bin/-скриптам (уже исключены).
+        @-suppression на stream_socket_*/fread/fwrite/fclose — стандартный PHP-идиом для сетевого I/O
+        в concurrent (pcntl_fork) прокси-коде; PHPMD ErrorControlOperator здесь — false positive.
+    -->
+    <exclude-pattern>*/Codex/Resources/bridge.php</exclude-pattern>
 
     <rule ref="rulesets/codesize.xml">
         <exclude name="CyclomaticComplexity"/>
