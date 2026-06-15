@@ -55,7 +55,7 @@ status: in_progress
 
 ## 4. Implementation Plan
 1. [x] [TASK-refactor-phpmd-retrying-runner-run](done/TASK-refactor-phpmd-retrying-runner-run.todo.md) — RetryingAgentRunnerService::run() 112 строк → ≤79 *(залита напрямую в main как PR #259 до ввода эпик-ветки)*
-2. [x] [TASK-refactor-phpmd-chaindefinition-classes](done/TASK-refactor-phpmd-chaindefinition-classes.todo.md) — ChainDefinitionVo 545→493, YamlChainLoaderService 563→449, parseSteps() вынесен в ChainStepParserHelper
+2. [x] [TASK-refactor-phpmd-chaindefinition-classes](done/TASK-refactor-phpmd-chaindefinition-classes.todo.md) — ChainDefinitionVo 545→493, YamlChainLoaderService 563→449, parseSteps() вынесен из лоадера (далее редизайнен в Mapper+Factory, см. правки 2026-06-15)
 3. [x] [TASK-refactor-phpmd-chainexecution-methods](done/TASK-refactor-phpmd-chainexecution-methods.todo.md) — ShellHookExecutorService::execute() 107→52, `@todo` PHPMD bug убраны (корень = кэш PDepend)
 4. [x] [TASK-refactor-phpmd-dynamicloop-methods](done/TASK-refactor-phpmd-dynamicloop-methods.todo.md) — ExecuteDynamicTurnService::runParticipantTurn() 82→61, runFacilitatorStep() 81→70
 5. [x] [TASK-fix-phpmd-errorclassificationvo](done/TASK-fix-phpmd-errorclassificationvo.todo.md) — ErrorClassificationVo::createFromClassException() unused parameter $throwable
@@ -100,7 +100,7 @@ make check
 | 1 | LongMethod | RetryingAgentRunnerService.php | run() | 112 | 45 | #259 (main) |
 | 2 | LongClass | ChainDefinitionVo.php | — | 545 | 493 | задача 2 |
 | 3 | LongClass | YamlChainLoaderService.php | — | 563 | 449 | задача 2 |
-| 4 | LongMethod | YamlChainLoaderService.php | parseSteps() | 93 | → ChainStepParserHelper | задача 2 |
+| 4 | LongMethod | YamlChainLoaderService.php | parseSteps() | 93 | → Mapper+Factory (ChainStepParserHelper удалён) | задача 2 |
 | 5 | LongMethod | ShellHookExecutorService.php | execute() | 107 | 52 | задача 3 |
 | 6 | LongMethod | ExecuteDynamicTurnService.php | runParticipantTurn() | 82 | 61 | задача 4 |
 | 7 | LongMethod | ExecuteDynamicTurnService.php | runFacilitatorStep() | 81 | 70 | задача 4 |
@@ -132,4 +132,5 @@ make check
 | 2026-06-14 | Бэкендер (Левша) | TASK-refactor-phpmd-chaindefinition-classes выполнена (ChainDefinitionVo 545→493, YamlChainLoaderService 563→449, parseSteps→ChainStepParserHelper), 3 записи убраны из baseline, FQCN ChainFixIterationsValidatorHelper добавлен в StaticAccess exceptions |
 | 2026-06-14 | Бэкендер (Левша) | TASK-fix-phpmd-auditloggers + TASK-refactor-phpmd-chainexecution-methods выполнены (@mkdir→guard без @, ShellHookExecutor 107→52, @todo убраны), 4 записи убраны из baseline |
 | 2026-06-14 | Ревьювер (Пуаро) | Финальное ревью эпика: APPROVE — эквивалентность всех 6 частей подтверждена построчно |
+| 2026-06-15 | Архитектор (Локи) → Бэкендер (Левша) → Тимлид (Алекс) | **Редизайн двух helper'ов с бизнес-логикой из коммита c8f2789** по конвенциям (после аудита Пуаро): `ChainFixIterationsValidatorHelper` → `FixIterationsReferenceIntegritySpecification` (Domain) + `ChainDefinitionFactory` (Domain); `ChainStepParserHelper` → `ChainStepFactory` (Domain) + `YamlChainStepMapper` + `YamlRetryPolicyMapper` (Infrastructure). Поведение сохранено byte-to-byte, прямые unit-тесты добавлены (PHPUnit 981→1017). PR #261 доведён до конвенционной чистоты |
 | 2026-06-14 | Тимлид (Алекс) | РЕШЕНО: Q-A bridge.php — KEEP; Q-B DynamicLoopExecution — OUT OF SCOPE (follow-up TASK-refactor-phpmd-dynamicloop-aggregate). Baseline 12→3. Эпик готов к финальному PR |
