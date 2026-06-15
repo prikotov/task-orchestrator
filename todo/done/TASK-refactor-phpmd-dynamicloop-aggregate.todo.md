@@ -5,17 +5,17 @@ value: V2
 complexity: C3
 priority: P3
 depends_on:
-epic:
+epic: EPIC-refactor-phpmd-baseline-elimination
 author: Тимлид (Алекс)
-assignee:
-branch:
-pr:
-status: todo
+assignee: Бэкендер (Левша)
+branch: refactor/phpmd-baseline-elimination
+pr: "261"
+status: done
 ---
 
 # TASK-refactor-phpmd-dynamicloop-aggregate: Редизайн DynamicLoopExecution под пороги PHPMD
 
-> Follow-up эпика `EPIC-refactor-phpmd-baseline-elimination`. Вынесен за scope эпика, т.к. требует архитектурного редизайна domain-агрегата, а не механической экстракции.
+> Изначально — follow-up эпика `EPIC-refactor-phpmd-baseline-elimination` (вынесен за scope). **Возвращён в scope эпика и выполнен в PR #261** по решению пользователя (2026-06-15): «осталось часть ошибок в phpmd.baseline.xml» — устранить все оставшиеся записи.
 
 ## 0. Простое описание (Human Brief)
 Устранить 2 PHPMD violation на domain-агрегате `DynamicLoopExecution`.
@@ -46,22 +46,25 @@ status: todo
 
 ## 3. Requirements (MoSCoW)
 ### 🔴 Must Have
-- [ ] Архитектурный дизайн редизайна (Архитектор): какие VO/сервисы выделить.
-- [ ] `DynamicLoopExecution` ≤10 public methods и ≤12 fields.
-- [ ] Все тесты проходят.
-- [ ] Удалить 2 записи из `phpmd.baseline.xml`.
+- [x] Архитектурный дизайн редизайна (Архитектор Локи): мини-ADR с 6 развилками — выделить 2 владеемых мутабельных компонента `DynamicLoopMetrics` + `DynamicLoopJournal` (Domain\Entity, NOT ValueObject).
+- [x] `DynamicLoopExecution` 11 fields (≤12 ✓) и 9 counted public methods (≤10 ✓).
+- [x] Все тесты проходят (PHPUnit 1032/2888).
+- [x] Удалить 2 записи из `phpmd.baseline.xml` (baseline полностью пустой).
 
 ### ⚫ Won't Have (Не будем делать)
 - Изменение бизнес-поведения динамического цикла.
 - Изменение порогов в phpmd.xml.
 
 ## 4. Implementation Plan
-*Заполняется после архитектурного дизайна.*
+1. [x] Архитектор (Локи): мини-ADR `docs/agents/reports/system-architect/2026-06-15_18-00_dynamicloop-aggregate-redesign.md` — 6 развилок (owned mutable components в Domain\Entity, NOT Vo; группировка полей; контракт callers).
+2. [x] Бэкендер (Левша): реализация — `DynamicLoopMetrics` (6 fields, 3 counted) + `DynamicLoopJournal` (3 fields, 4 counted); `DynamicLoopExecution` rewrite (9 fields удалено→2 компонента, 5 write-методов удалено, read/set delegates сохранены); 5 callers переведены на `getMetrics()`/`getJournal()`; 2 unit-теста + обновлён `DynamicLoopExecutionMaxTimeTest`. Отчёт `docs/agents/reports/backend-developer/2026-06-15_18-14_dynamicloop-aggregate-implementation.md`.
+3. [x] Тимлид (Алекс): sanity-check (toLoopResultVo byte-to-byte, полей 11/≤12) + закрытие REMARK E.3 (контрактный unit-тест `DynamicLoopExecutionResultMappingTest` на cross-component поток metrics → toLoopResultVo).
+4. [x] Ревьювер (Пуаро): APPROVE, все секции A-F PASS, byte-to-byte сверка с оригиналом HEAD. Отчёт `docs/agents/reports/code-reviewer-backend/2026-06-15_18-25_dynamicloop-aggregate-review.md`.
 
 ## 5. Definition of Done
-- [ ] `phpmd` не ругается на `DynamicLoopExecution`
-- [ ] `make check` зелёный
-- [ ] 2 записи убраны из baseline
+- [x] `phpmd` не ругается на `DynamicLoopExecution` (и на `DynamicLoopMetrics`/`DynamicLoopJournal`)
+- [x] `make check` зелёный (PHPUnit 1032/2888, Psalm 0 errors, Deptrac 0 violations, PHPMD 0 violations)
+- [x] 2 записи убраны из baseline (baseline полностью пустой)
 
 ## 6. Verification
 ```bash
@@ -75,10 +78,13 @@ make check
 
 ## 8. Sources
 - `src/Module/DynamicLoop/Domain/Entity/DynamicLoopExecution.php`
-- `phpmd.baseline.xml` (2 записи для этого файла)
-- `todo/done/EPIC-refactor-phpmd-baseline-elimination.todo.md` (контекст эпика)
+- `src/Module/DynamicLoop/Domain/Entity/DynamicLoopMetrics.php` (новый)
+- `src/Module/DynamicLoop/Domain/Entity/DynamicLoopJournal.php` (новый)
+- `phpmd.baseline.xml` (теперь пустой)
+- `EPIC-refactor-phpmd-baseline-elimination.todo.md` (контекст эпика, та же папка `todo/done/`)
 
 ## Change History
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-06-14 | Тимлид (Алекс) | Создание follow-up задачи (Q-B эпика решён: вынос за scope) |
+| 2026-06-15 | Тимлид (Алекс) | Возвращена в scope эпика (решение пользователя «устранить все оставшиеся записи»). Status → done после полного конвейера Локи→Левша→Пуаро. PR #261. |

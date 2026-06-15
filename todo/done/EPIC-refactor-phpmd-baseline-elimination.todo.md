@@ -9,8 +9,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Тимлид (Алекс)
 branch: refactor/phpmd-baseline-elimination
-pr:
-status: in_progress
+pr: "261"
+status: done
 ---
 
 # EPIC-refactor-phpmd-baseline-elimination: Устранить все PHPMD baseline suppression
@@ -25,7 +25,7 @@ status: in_progress
 Декомпозиция длинных методов, сокращение классов, устранение unused параметров.
 
 ### Ожидаемый результат (Expected Result)
-`phpmd.baseline.xml` пуст или удалён, `make phpmd-full` = 0 violations, все `@todo` обработаны.
+`phpmd.baseline.xml` пуст, `make phpmd-full` = 0 violations, все `@todo` обработаны.
 
 ## 1. Concept and Goal (Концепция и Цель)
 ### Story (Job Story)
@@ -41,38 +41,39 @@ status: in_progress
 
 ## 3. Requirements (MoSCoW)
 ### 🔴 Must Have
-- [x] Устранить все **рефакторируемые** записи из `phpmd.baseline.xml` (9 из 12; 3 остаются как задокументированные исключения — см. «Открытые пункты»)
+- [x] Устранить **ВСЕ** записи из `phpmd.baseline.xml` (12/12): 9 — рефакторингом методов/классов, 1 (bridge.php) — exclude-pattern, 2 (DynamicLoopExecution) — архитектурным редизайном агрегата
 - [x] Убрать `@todo` о PHPMD bug из `ExecuteAgentStepService.php` и `RunStaticChainService.php`
-- [x] `make phpmd` (с оставшимся baseline) — 0 violations
+- [x] `make phpmd` (с пустым baseline) — 0 violations, 3× подряд зелёный
 - [x] `make check` — зелёный
 
 ### 🟡 Should Have
-- [ ] Удалить `phpmd.baseline.xml` если suppression больше не нужны
+- [x] `phpmd.baseline.xml` пустой (все suppression устранены)
 
 ### ⚫ Won't Have
 - Изменение порогов в `phpmd.xml`
 - Рефакторинг, не связанный с PHPMD violation
 
 ## 4. Implementation Plan
-1. [x] [TASK-refactor-phpmd-retrying-runner-run](done/TASK-refactor-phpmd-retrying-runner-run.todo.md) — RetryingAgentRunnerService::run() 112 строк → ≤79 *(залита напрямую в main как PR #259 до ввода эпик-ветки)*
-2. [x] [TASK-refactor-phpmd-chaindefinition-classes](done/TASK-refactor-phpmd-chaindefinition-classes.todo.md) — ChainDefinitionVo 545→493, YamlChainLoaderService 563→449, parseSteps() вынесен из лоадера (далее редизайнен в Mapper+Factory, см. правки 2026-06-15)
-3. [x] [TASK-refactor-phpmd-chainexecution-methods](done/TASK-refactor-phpmd-chainexecution-methods.todo.md) — ShellHookExecutorService::execute() 107→52, `@todo` PHPMD bug убраны (корень = кэш PDepend)
-4. [x] [TASK-refactor-phpmd-dynamicloop-methods](done/TASK-refactor-phpmd-dynamicloop-methods.todo.md) — ExecuteDynamicTurnService::runParticipantTurn() 82→61, runFacilitatorStep() 81→70
-5. [x] [TASK-fix-phpmd-errorclassificationvo](done/TASK-fix-phpmd-errorclassificationvo.todo.md) — ErrorClassificationVo::createFromClassException() unused parameter $throwable
-6. [x] [TASK-fix-phpmd-auditloggers](done/TASK-fix-phpmd-auditloggers.todo.md) — `@mkdir` → guard без `@` (fail-fast) в JsonlAuditLoggerService и JsonlAuditLogger
-7. [ ] [TASK-refactor-phpmd-dynamicloop-aggregate](TASK-refactor-phpmd-dynamicloop-aggregate.todo.md) — DynamicLoopExecution TooManyPublicMethods (14/10) + TooManyFields (18/12): архитектурный редизайн агрегата (follow-up, вне этого эпика)
+1. [x] [TASK-refactor-phpmd-retrying-runner-run](TASK-refactor-phpmd-retrying-runner-run.todo.md) — RetryingAgentRunnerService::run() 112 строк → ≤79 *(залита напрямую в main как PR #259 до ввода эпик-ветки)*
+2. [x] [TASK-refactor-phpmd-chaindefinition-classes](TASK-refactor-phpmd-chaindefinition-classes.todo.md) — ChainDefinitionVo 545→493, YamlChainLoaderService 563→449, parseSteps() вынесен из лоадера (далее редизайнен в Mapper+Factory, см. правки 2026-06-15)
+3. [x] [TASK-refactor-phpmd-chainexecution-methods](TASK-refactor-phpmd-chainexecution-methods.todo.md) — ShellHookExecutorService::execute() 107→52, `@todo` PHPMD bug убраны (корень = кэш PDepend)
+4. [x] [TASK-refactor-phpmd-dynamicloop-methods](TASK-refactor-phpmd-dynamicloop-methods.todo.md) — ExecuteDynamicTurnService::runParticipantTurn() 82→61, runFacilitatorStep() 81→70
+5. [x] [TASK-fix-phpmd-errorclassificationvo](TASK-fix-phpmd-errorclassificationvo.todo.md) — ErrorClassificationVo::createFromClassException() unused parameter $throwable
+6. [x] [TASK-fix-phpmd-auditloggers](TASK-fix-phpmd-auditloggers.todo.md) — `@mkdir` → guard без `@` (fail-fast) в JsonlAuditLoggerService и JsonlAuditLogger
+7. [x] [TASK-refactor-phpmd-dynamicloop-aggregate](TASK-refactor-phpmd-dynamicloop-aggregate.todo.md) — DynamicLoopExecution TooManyPublicMethods (14/10) + TooManyFields (18/12): архитектурный редизайн агрегата — выделение владеемых компонентов DynamicLoopMetrics + DynamicLoopJournal (возвращено в scope по решению пользователя 2026-06-15)
+8. [x] bridge.php — exclude-pattern в `phpmd.xml` (standalone proc_open-процесс, ≡ bin/-скриптам)
 
-### Открытые пункты — РЕШЕНО Тимлидом (2026-06-14)
-- **bridge.php** (`ErrorControlOperator`, vendored Codex-скрипт, suppression намеренное) — **РЕШЕНО: ОСТАВИТЬ** suppression. Запись в baseline остаётся как документированное исключение.
-- **DynamicLoopExecution** (`TooManyPublicMethods` **14**/10 + `TooManyFields` **18**/12 — реальные замеры, не 35/53) — **РЕШЕНО: ВЫНЕСТИ ЗА SCOPE**. Требует архитектурного редизайна агрегата; создана follow-up задача `TASK-refactor-phpmd-dynamicloop-aggregate` (см. план, п. 7). 2 записи в baseline остаются как документированное исключение до её выполнения.
+### Открытые пункты — РЕШЕНО (финал)
+- **bridge.php** (`ErrorControlOperator`, standalone Codex-процесс) — **ИТОГ: exclude-pattern в `phpmd.xml`** (ранее планировалось KEEP в baseline; пересмотрено по решению пользователя 2026-06-15 — устранить все записи). Запись убрана из baseline.
+- **DynamicLoopExecution** (`TooManyPublicMethods` 14/10 + `TooManyFields` 18/12) — **ИТОГ: архитектурный редизайн выполнен в этом же эпике** (ранее планировалось OUT OF SCOPE как follow-up; пересмотрено по решению пользователя 2026-06-15). 2 записи убраны из baseline.
 
 ### ⚠️ Технический нюанс: флакучесть PHPMD
 Единичный прогон `make phpmd` на этом репозитории **недосчитывает** нарушения (воспроизводимо: единичные прогоны показывают 0–3 вместо реальных 6). Очистка кэша PDepend НЕ помогает; флакучесть не от кэша. Поэтому все решения по baseline принимались по **стабильному набору** (3/3 идентичных прогона). Это предсуществующий риск CI (отдельная задача), не блокирующий эпик.
 
 ## 5. Definition of Done
-- [x] `phpmd.baseline.xml` сокращён с 12 до **3 задокументированных исключений** (bridge.php — intentional vendored; DynamicLoopExecution ×2 — вне scope, follow-up)
-- [x] `make phpmd` (с baseline) = 0 violations; `make phpmd` 3× подряд зелёный после удаления записей
-- [x] `make check` зелёный (963 теста, Psalm/PHPStan/Deptrac/PHPCS OK)
+- [x] `phpmd.baseline.xml` **полностью пустой** (12→0): bridge.php → exclude-pattern; DynamicLoopExecution ×2 → архитектурный редизайн агрегата
+- [x] `make phpmd` (с пустым baseline) = 0 violations; 3× подряд зелёный (283 файла)
+- [x] `make check` зелёный (1032 теста, Psalm 0 errors, Deptrac 0 violations)
 - [x] Все `@todo 2026-05-21: PHPMD bug` убраны
 
 ## 6. Verification
@@ -108,13 +109,9 @@ make check
 | 9 | ErrorControlOperator | JsonlAuditLogger.php | append | @mkdir | guard без @ | задача 6 |
 | — | LongMethod | ExecuteAgentStepService.php | run() | (stale) | — | задача 3 (ложная запись удалена) |
 
-### Оставшиеся baseline записи (3 — задокументированные исключения)
+### Оставшиеся baseline записи
 
-| # | Правило | Файл | Решение |
-|---|---------|------|--------|
-| 1 | ErrorControlOperator | bridge.php | KEEP — vendored Codex-скрипт, suppression намеренное |
-| 2 | TooManyPublicMethods | DynamicLoopExecution.php | OUT OF SCOPE — follow-up TASK-refactor-phpmd-dynamicloop-aggregate |
-| 3 | TooManyFields | DynamicLoopExecution.php | OUT OF SCOPE — follow-up TASK-refactor-phpmd-dynamicloop-aggregate |
+**Нет.** Baseline полностью пустой (12→0). bridge.php — exclude-pattern в `phpmd.xml`; DynamicLoopExecution ×2 — устранены архитектурным редизайном (выделение `DynamicLoopMetrics` + `DynamicLoopJournal`).
 
 ### Дополнительный техдолг (решён)
 
@@ -133,4 +130,6 @@ make check
 | 2026-06-14 | Бэкендер (Левша) | TASK-fix-phpmd-auditloggers + TASK-refactor-phpmd-chainexecution-methods выполнены (@mkdir→guard без @, ShellHookExecutor 107→52, @todo убраны), 4 записи убраны из baseline |
 | 2026-06-14 | Ревьювер (Пуаро) | Финальное ревью эпика: APPROVE — эквивалентность всех 6 частей подтверждена построчно |
 | 2026-06-15 | Архитектор (Локи) → Бэкендер (Левша) → Тимлид (Алекс) | **Редизайн двух helper'ов с бизнес-логикой из коммита c8f2789** по конвенциям (после аудита Пуаро): `ChainFixIterationsValidatorHelper` → `FixIterationsReferenceIntegritySpecification` (Domain) + `ChainDefinitionFactory` (Domain); `ChainStepParserHelper` → `ChainStepFactory` (Domain) + `YamlChainStepMapper` + `YamlRetryPolicyMapper` (Infrastructure). Поведение сохранено byte-to-byte, прямые unit-тесты добавлены (PHPUnit 981→1017). PR #261 доведён до конвенционной чистоты |
-| 2026-06-14 | Тимлид (Алекс) | РЕШЕНО: Q-A bridge.php — KEEP; Q-B DynamicLoopExecution — OUT OF SCOPE (follow-up TASK-refactor-phpmd-dynamicloop-aggregate). Baseline 12→3. Эпик готов к финальному PR |
+| 2026-06-14 | Тимлид (Алекс) | РЕШЕНО (предварительно): Q-A bridge.php — KEEP; Q-B DynamicLoopExecution — OUT OF SCOPE. Baseline 12→3 |
+| 2026-06-15 | Пользователь | Решение: «осталось часть ошибок в phpmd.baseline.xml» — устранить ВСЕ оставшиеся записи. bridge.php → exclude-pattern; DynamicLoopExecution → редизайн в этом же эпике |
+| 2026-06-15 | Архитектор (Локи) → Бэкендер (Левша) → Ревьювер (Пуаро) | Полный конвейер устранения оставшихся 3 записей: bridge.php exclude + DynamicLoopExecution редизайн (DynamicLoopMetrics + DynamicLoopJournal). **Baseline 12→0**. PHPUnit 1032/2888, Psalm 0, Deptrac 0, PHPMD 0 (baseline пустой). Эпик → done, PR #261 |
