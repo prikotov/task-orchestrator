@@ -29,6 +29,11 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Cha
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportResult;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainStepFactory;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlChainStepMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRetryPolicyMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\OrchestrateCommand;
 
@@ -232,7 +237,7 @@ chains:
 YAML);
 
         try {
-            $chainLoader = new YamlChainLoaderService('/nonexistent/default.yaml');
+            $chainLoader = new YamlChainLoaderService('/nonexistent/default.yaml', new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification()), new YamlChainStepMapper(new ChainStepFactory(), new YamlRetryPolicyMapper()), new YamlRetryPolicyMapper());
             $mapper = new \TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainDefinitionDtoMapper();
             $loadHandler = new LoadChainQueryHandler($chainLoader, $mapper);
 
@@ -284,7 +289,7 @@ chains:
 YAML);
 
         try {
-            $chainLoader = new YamlChainLoaderService('/nonexistent/default.yaml');
+            $chainLoader = new YamlChainLoaderService('/nonexistent/default.yaml', new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification()), new YamlChainStepMapper(new ChainStepFactory(), new YamlRetryPolicyMapper()), new YamlRetryPolicyMapper());
             $chainValidator = new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidatorService();
             $violationMapper = new \TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainConfigViolationDtoMapper();
             $validateHandler = new ValidateChainConfigQueryHandler($chainLoader, $chainValidator, $violationMapper);

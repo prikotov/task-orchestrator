@@ -45,7 +45,7 @@ final readonly class FinalizeDynamicLoopService implements FinalizeDynamicLoopSe
         );
 
         $dur = round($turnResult->duration, 1);
-        $execution->appendFacilitatorJournal(sprintf(
+        $execution->getJournal()->appendFacilitatorJournal(sprintf(
             "[%s %s] Step %d | Round %d | %s → synthesis (финализация)\n",
             date('Y-m-d'),
             date('H:i'),

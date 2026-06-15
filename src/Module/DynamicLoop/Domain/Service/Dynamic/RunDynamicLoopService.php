@@ -173,7 +173,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
             'elapsed' => round(microtime(true) - $startTime, 1),
             'finalizeReserve' => $reserve,
         ]);
-        $execution->appendFacilitatorJournal(sprintf(
+        $execution->getJournal()->appendFacilitatorJournal(sprintf(
             "[%s %s] Дискуссия остановлена: резервирование времени на синтез (reserve=%ds)\n",
             date('Y-m-d'),
             date('H:i'),

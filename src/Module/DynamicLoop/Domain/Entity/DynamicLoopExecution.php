@@ -11,38 +11,20 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundRe
 /**
  * In-memory сущность состояния dynamic-цикла.
  *
- * @todo Рассмотреть разделение на DynamicMetrics + DynamicJournal entity для снижения числа полей.
- *
  * Инкапсулирует мутабельное состояние выполнения dynamic-цепочки:
- * - накопление метрик (time, tokens, cost)
+ * - накопление метрик (time, tokens, cost) и round results — через DynamicLoopMetrics
+ * - journal entries (discussion history, facilitator journal) — через DynamicLoopJournal
  * - трекинг раундов и шагов
  * - бюджетный state (80% warning, exceeded)
- * - journal entries (discussion history, facilitator journal)
  *
  * Не персистентная — живёт только в рамках одного вызова runDynamicLoop().
  */
 final class DynamicLoopExecution
 {
-    // ─── Accumulators ──────────────────────────────────────────────────
+    // ─── Owned components ──────────────────────────────────────────────
 
-    private float $totalTime = 0.0;
-    private int $totalInputTokens = 0;
-    private int $totalOutputTokens = 0;
-    private float $totalCost = 0.0;
-
-    /** @var array<string, float> role → суммарная стоимость */
-    private array $roleCosts = [];
-
-    // ─── Round results ─────────────────────────────────────────────────
-
-    /** @var list<DynamicRoundResultVo> */
-    private array $roundResults = [];
-
-    // ─── Journal ───────────────────────────────────────────────────────
-
-    private string $discussionHistory;
-    private string $facilitatorJournal;
-    private string $facilitatorSummary = '';
+    private DynamicLoopMetrics $metrics;
+    private DynamicLoopJournal $journal;
 
     // ─── Counters ──────────────────────────────────────────────────────
 
@@ -67,8 +49,23 @@ final class DynamicLoopExecution
         $this->step = $startRound;
         $this->round = 0;
         $this->participantRounds = 0;
-        $this->discussionHistory = $initialDiscussionHistory;
-        $this->facilitatorJournal = $initialFacilitatorJournal;
+        $this->metrics = new DynamicLoopMetrics();
+        $this->journal = new DynamicLoopJournal(
+            $initialDiscussionHistory,
+            $initialFacilitatorJournal,
+        );
+    }
+
+    // ─── Owned component accessors ─────────────────────────────────────
+
+    public function getMetrics(): DynamicLoopMetrics
+    {
+        return $this->metrics;
+    }
+
+    public function getJournal(): DynamicLoopJournal
+    {
+        return $this->journal;
     }
 
     // ─── Getters ───────────────────────────────────────────────────────
@@ -90,17 +87,17 @@ final class DynamicLoopExecution
 
     public function getDiscussionHistory(): string
     {
-        return $this->discussionHistory;
+        return $this->journal->getDiscussionHistory();
     }
 
     public function getFacilitatorJournal(): string
     {
-        return $this->facilitatorJournal;
+        return $this->journal->getFacilitatorJournal();
     }
 
     public function getFacilitatorSummary(): string
     {
-        return $this->facilitatorSummary;
+        return $this->journal->getFacilitatorSummary();
     }
 
     public function getSynthesis(): ?string
@@ -138,7 +135,7 @@ final class DynamicLoopExecution
      */
     public function getRoundResults(): array
     {
-        return $this->roundResults;
+        return $this->metrics->getRoundResults();
     }
 
     /**
@@ -146,12 +143,7 @@ final class DynamicLoopExecution
      */
     public function getTotals(): array
     {
-        return [
-            'time' => $this->totalTime,
-            'in' => $this->totalInputTokens,
-            'out' => $this->totalOutputTokens,
-            'cost' => $this->totalCost,
-        ];
+        return $this->metrics->getTotals();
     }
 
     /**
@@ -159,12 +151,12 @@ final class DynamicLoopExecution
      */
     public function getRoleCosts(): array
     {
-        return $this->roleCosts;
+        return $this->metrics->getRoleCosts();
     }
 
     public function getTotalCost(): float
     {
-        return $this->totalCost;
+        return $this->metrics->getTotalCost();
     }
 
     // ─── Counter mutations ─────────────────────────────────────────────
@@ -184,50 +176,16 @@ final class DynamicLoopExecution
         $this->participantRounds++;
     }
 
-    // ─── Accumulators ──────────────────────────────────────────────────
-
-    /**
-     * Записывает результат выполненного раунда: добавляет в список и аккумулирует метрики.
-     */
-    public function recordRound(DynamicRoundResultVo $roundResult): void
-    {
-        $this->roundResults[] = $roundResult;
-        $this->totalTime += $roundResult->duration;
-        $this->totalInputTokens += $roundResult->inputTokens;
-        $this->totalOutputTokens += $roundResult->outputTokens;
-        $this->totalCost += $roundResult->cost;
-    }
-
-    public function addRoleCost(string $role, float $cost): void
-    {
-        $this->roleCosts[$role] = ($this->roleCosts[$role] ?? 0.0) + $cost;
-    }
-
-    // ─── Journal mutations ─────────────────────────────────────────────
-
-    public function appendFacilitatorJournal(string $entry): void
-    {
-        $this->facilitatorJournal .= $entry;
-    }
+    // ─── Journal setters (compatibility delegates) ─────────────────────
 
     public function setFacilitatorJournal(string $journal): void
     {
-        $this->facilitatorJournal = $journal;
-    }
-
-    public function appendDiscussionHistory(string $entry): void
-    {
-        $this->discussionHistory .= $entry;
+        $this->journal->setFacilitatorJournal($journal);
     }
 
     public function setDiscussionHistory(string $history): void
     {
-        $this->discussionHistory = $history;
-    }
-
-    public function appendFacilitatorSummary(string $entry): void
-    {
-        $this->facilitatorSummary .= $entry;
+        $this->journal->setDiscussionHistory($history);
     }
 
     // ─── Result mutations ──────────────────────────────────────────────
@@ -287,12 +245,14 @@ final class DynamicLoopExecution
      */
     public function toLoopResultVo(): DynamicLoopResultVo
     {
+        $totals = $this->metrics->getTotals();
+
         return new DynamicLoopResultVo(
-            roundResults: $this->roundResults,
-            totalTime: $this->totalTime,
-            totalInputTokens: $this->totalInputTokens,
-            totalOutputTokens: $this->totalOutputTokens,
-            totalCost: $this->totalCost,
+            roundResults: $this->metrics->getRoundResults(),
+            totalTime: $totals['time'],
+            totalInputTokens: $totals['in'],
+            totalOutputTokens: $totals['out'],
+            totalCost: $totals['cost'],
             synthesis: $this->synthesis,
             maxRoundsReached: $this->maxRoundsReached,
             interruptionReason: $this->interruptionReason,
