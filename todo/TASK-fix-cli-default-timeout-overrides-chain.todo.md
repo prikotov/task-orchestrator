@@ -7,10 +7,10 @@ priority: P2
 depends_on:
 epic:
 author: Тимлид (Алекс)
-assignee:
-branch:
+assignee: Бэкендер Левша
+branch: task/fix-cli-default-timeout-overrides-chain
 pr:
-status: backlog
+status: in_progress
 ---
 
 # TASK-fix-cli-default-timeout-overrides-chain: Не затирать chain timeout CLI default-значениями
