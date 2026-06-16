@@ -9,7 +9,7 @@ epic:
 author: Тимлид (Алекс)
 assignee: Бэкендер Левша
 branch: task/fix-cli-default-timeout-overrides-chain
-pr:
+pr: "267"
 status: done
 ---
 
