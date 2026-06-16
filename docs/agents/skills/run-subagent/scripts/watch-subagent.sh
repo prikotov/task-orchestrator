@@ -480,7 +480,9 @@ RUN_TS=$(date +%Y%m%d_%H%M%S)
 RUN_ROLE_SLUG=$(basename "$ROLE_FILE" | sed 's/\.[a-z][a-z]\.md$//' | tr -c '[:alnum:]' '-' | tr -s '-' | sed 's/^-//;s/-$//')
 RUN_ID="${RUN_TS}-${RUNNER}-${RUN_ROLE_SLUG}"
 RUN_LOG="$LOG_DIR/${RUN_ID}.log"
-_ARCHIVE_DIR="$LOG_DIR/${RUN_ID}"
+# PID в имени каталога архива исключает коллизию: два запуска в одну секунду
+# с тем же runner+role не перезапишут дамп друг друга.
+_ARCHIVE_DIR="$LOG_DIR/${RUN_ID}-$$"
 _EXIT_REASON="unknown"
 mkdir -p "$LOG_DIR"
 
