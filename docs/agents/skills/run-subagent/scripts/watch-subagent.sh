@@ -9,7 +9,11 @@
 #   PROMPT
 #
 # Параметры:
-#   -s, --soft-timeout   — базовый таймаут в секундах (обязателен).
+#   -s, --soft-timeout   — базовый таймаут в секундах (обязателен). ЦЕЛЕВОЕ время
+#                          задачи: по умолчанию превышение soft УБИВАЕТ запуск
+#                          (pi крутит turn'ы без лимита — soft это страховка от
+#                          сжигания токенов). Env WATCH_SOFT_WARN_ONLY=1 → только
+#                          предупреждать, не убивать (для экспериментов).
 #   -m, --hard-timeout   — абсолютный максимум в секундах (default: 1800).
 #   -t, --stall-timeout  — секунд без событий до признания зависания (default: 180).
 #   -o, --output         — формат вывода через запятую: raw, text, tools, files (default: raw).
@@ -19,6 +23,29 @@
 #   --model <string>     — модель (priority: CLI > env MODEL > role profile).
 #   --reasoning <string> — reasoning/thinking effort (priority: CLI > env REASONING > role profile).
 #   [prompt text]        — промпт. Если не указан — читается из stdin.
+#
+# Переменные окружения (наблюдаемость):
+#   WATCH_LOG_DIR          — каталог run-логов (default: var/log/watch-subagent).
+#   WATCH_KEEP_TMP=1       — сохранять TMPDIR (events.ndjson, gaps.tsv, stderr)
+#                            ВСЕГДА, даже при успехе (по умолчанию — только при сбое).
+#   WATCH_SOFT_WARN_ONLY=1 — soft-timeout только предупреждает, НЕ убивает
+#                            (по умолчанию soft-timeout УБИВАЕТ, т.к. pi крутит
+#                            turn'ы без лимита и soft — основная защита от сжигания
+#                            токенов). Использовать только для экспериментов.
+#
+# Переменные окружения (наследование от внешней обёртки):
+#   RUNNER/PROVIDER/MODEL/REASONING — см. приоритеты выше.
+#
+# Наблюдаемость: каждый запуск пишет run-log в WATCH_LOG_DIR/<ts>-<runner>-<role>.log
+# (RUN START с runner-cmd/timeouts, RUN SUMMARY с reason/duration/event-counts/
+# max-gap). При ненормальном завершении (timeout/stall/missing_agent_end/внешний
+# сигнал) TMPDIR архивируется в WATCH_LOG_DIR/<run-id>/events/ для постмортема.
+#
+# ⚠️ ВАЖНО про внешние обёртки (bash `timeout` и т.п.): НЕ оборачивайте запуск в
+# внешний timeout МЕНЬШЕ hard-timeout скрипта — скрипт сам корректно завершится
+# через свой stall/hard-timeout с правильным reason и архивом. Внешний kill
+# раньше времени ловится (reason=external_signal), но теряет детальную причину.
+# Если обёртка нужна — ставьте её timeout ≥ hard-timeout + 60с buffer.
 #
 # Выход:
 #   stdout — отфильтрованный вывод (зависит от -o).
@@ -443,10 +470,41 @@ filter_files() {
 # Подготовка и запуск
 # ============================================================================
 
+# --- Наблюдаемость (observability) -----------------------------------------
+# Run-log и архив TMPDIR помогают постмортем-анализу зависаний: pi иногда не
+# доходит до agent_end на длинных задачах (network stall провайдера, обрыв
+# стрима), и без логов невозможно понять, что именно произошло.
+# Логи пишутся в var/ (gitignored), контракт CLI не меняется.
+LOG_DIR="${WATCH_LOG_DIR:-$PROJECT_ROOT/var/log/watch-subagent}"
+RUN_TS=$(date +%Y%m%d_%H%M%S)
+RUN_ROLE_SLUG=$(basename "$ROLE_FILE" | sed 's/\.[a-z][a-z]\.md$//' | tr -c '[:alnum:]' '-' | tr -s '-' | sed 's/^-//;s/-$//')
+RUN_ID="${RUN_TS}-${RUNNER}-${RUN_ROLE_SLUG}-$$"
+# Один запуск = один каталог: run.log и (при сбое) events/ лежат вместе.
+# PID в RUN_ID исключает коллизию: два запуска в одну секунду с тем же
+# runner+role не перемешают логи/дампы друг друга.
+RUN_DIR="$LOG_DIR/${RUN_ID}"
+RUN_LOG="$RUN_DIR/run.log"
+_EXIT_REASON="unknown"
+mkdir -p "$RUN_DIR"
+
+log_run() {
+    # Best-effort запись в run-log (не падать, если файл недоступен).
+    printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> "$RUN_LOG" 2>/dev/null || true
+}
+
+log_run "=== RUN START ==="
+log_run "runner=$RUNNER role=$ROLE_FILE role_slug=$RUN_ROLE_SLUG"
+log_run "provider=${PROVIDER:-<none>} model=${MODEL:-<none>} reasoning=${REASONING:-<none>}"
+log_run "soft_timeout=${SOFT_TIMEOUT}s hard_timeout=${HARD_TIMEOUT}s stall_timeout=${STALL_TIMEOUT}s output=${OUTPUT}"
+log_run "effective_hard=${EFFECTIVE_HARD:-<computed-later>}s"
+log_run "run_log=$RUN_LOG"
+log_run "watch_keep_tmp=${WATCH_KEEP_TMP:-0}"
+
 TMPDIR=$(mktemp -d)
 PIPE="$TMPDIR/events.pipe"
 OUTFILE="$TMPDIR/events.ndjson"
 ERRFILE="$TMPDIR/runner.stderr"
+GAPS_FILE="$TMPDIR/gaps.tsv"   # ts<TAB>gap_since_prev_event_s<TAB>event_type — для анализа пауз
 mkfifo "$PIPE"
 
 AGENT_PID=""
@@ -567,10 +625,57 @@ print_filtered_output() {
 }
 
 cleanup() {
+    local exit_code=$?
+    # Сохраняем reason до того, как kill_agent_tree затрёт $?.
+    local reason="${_EXIT_REASON:-unknown}"
+    local now_epoch end_ts duration
+    now_epoch=$(date +%s)
+    end_ts=$(date '+%Y-%m-%d %H:%M:%S')
+    duration=$((now_epoch - ${START_TIME:-0}))
+
+    # Сначала освобождаем ресурсы агента.
     kill_agent_tree
+
+    # --- Run summary (best-effort, не падать при ошибках записи) ---
+    log_run "=== RUN SUMMARY ==="
+    log_run "ended=$end_ts duration=${duration}s exit_code=$exit_code reason=$reason"
+    log_run "agent_pid_at_exit=${AGENT_PID:-none}"
+    if [[ -f "${OUTFILE:-}" ]]; then
+        local total agent_end_count last_type
+        total=$(wc -l < "$OUTFILE" 2>/dev/null || echo 0)
+        agent_end_count=$(grep -c '"agent_end"' "$OUTFILE" 2>/dev/null || echo 0)
+        last_type=$(tail -1 "$OUTFILE" 2>/dev/null | jq -r '.type // "?"' 2>/dev/null || echo "?")
+        log_run "events_total=$total agent_end_count=$agent_end_count last_event_type=$last_type"
+        log_run "events_by_type: $(jq -r '.type' "$OUTFILE" 2>/dev/null | sort | uniq -c | sort -rn | head -8 | tr '\n' '|' | sed 's/|$//')"
+    fi
+    if [[ -f "${GAPS_FILE:-}" ]]; then
+        local max_gap gaps_count avg_gap
+        gaps_count=$(wc -l < "$GAPS_FILE" 2>/dev/null || echo 0)
+        max_gap=$(awk -F'\t' '{print $2}' "$GAPS_FILE" 2>/dev/null | sort -rn | head -1)
+        avg_gap=$(awk -F'\t' '{s+=$2; n++} END {if(n>0) printf "%d", s/n; else print 0}' "$GAPS_FILE" 2>/dev/null)
+        log_run "gaps_recorded=$gaps_count max_gap=${max_gap:-0}s avg_gap=${avg_gap:-0}s"
+    fi
+    log_run "=== END SUMMARY ==="
+
+    # --- Archive TMPDIR on failure (or if WATCH_KEEP_TMP=1) ---
+    # Сохраняем улики (events.ndjson, gaps.tsv, runner.stderr) для постмортема,
+    # если агент не завершился нормально. Успешные запуски не архивируем
+    # (кроме WATCH_KEEP_TMP=1), чтобы не копить гигабайты. run.log уже в RUN_DIR.
+    if [[ "$reason" != success_* ]] || [[ "${WATCH_KEEP_TMP:-0}" == "1" ]]; then
+        if cp -r "$TMPDIR" "$RUN_DIR/events" 2>/dev/null; then
+            log_run "events_archived_to=$RUN_DIR/events"
+            echo "[watch-subagent] run archived (reason=$reason): $RUN_DIR/events" >&2
+        fi
+    fi
+
     rm -rf "$TMPDIR"
 }
 trap cleanup EXIT
+
+# Внешний kill (bash timeout, Ctrl-C, OOM-killer) — фиксируем reason,
+# иначе cleanup увидит unknown и нельзя отличить «скрипт сам упал» от «убили снаружи».
+trap '_EXIT_REASON="external_signal"; exit 143' TERM
+trap '_EXIT_REASON="external_signal"; exit 130' INT
 
 # Формируем команду раннера
 build_runner_command
@@ -579,6 +684,8 @@ apply_proxy_env_defaults
 # Запускаем
 "${RUNNER_CMD[@]}" <<< "$PROMPT" > "$PIPE" 2> "$ERRFILE" &
 AGENT_PID=$!
+log_run "agent_started pid=$AGENT_PID prompt_bytes=$(printf '%s' "$PROMPT" | wc -c)"
+log_run "runner_cmd: ${RUNNER_CMD[*]}"
 
 # Вычисляем таймауты: soft — основной, hard — абсолютный потолок
 # SOFT_TIMEOUT обязателен, hard не может быть < soft
@@ -599,8 +706,14 @@ has_format raw && STREAM_RAW=true
 while IFS= read -r -t "$STALL_TIMEOUT" line; do
     echo "$line" >> "$OUTFILE"
 
-    last_event_time=$(date +%s)
-    now=$last_event_time
+    now=$(date +%s)
+    event_gap=$((now - last_event_time))
+    event_type=$(jq -r '.type // "?"' <<< "$line" 2>/dev/null || echo "?")
+    # Записываем паузу между событиями для анализа stall'ов (best-effort).
+    if [[ -n "${GAPS_FILE:-}" ]]; then
+        printf '%s\t%s\t%s\n' "$now" "$event_gap" "$event_type" >> "$GAPS_FILE"
+    fi
+    last_event_time=$now
     elapsed=$((now - START_TIME))
 
     # raw — стримим на stdout сразу
@@ -616,9 +729,11 @@ while IFS= read -r -t "$STALL_TIMEOUT" line; do
             else
                 print_runner_error "runner_failed_after_success_event" "$runner_exit_code"
             fi
+            _EXIT_REASON="runner_failed_after_agent_end"
             exit 1
         fi
 
+        _EXIT_REASON="success_agent_end"
         print_filtered_output
         exit 0
     fi
@@ -627,24 +742,36 @@ while IFS= read -r -t "$STALL_TIMEOUT" line; do
         runner_exit_code=0
         wait_agent || runner_exit_code=$?
         print_runner_error "runner_failed_event" "$runner_exit_code"
+        _EXIT_REASON="runner_failure_event_instream"
         exit 1
     fi
 
-    # Проверяем soft timeout — предупреждаем, но НЕ убиваем
+    # Проверяем soft timeout — целевое время задачи.
+    # ПО УМОЛЧАНИЮ УБИВАЕТ: превышение soft = задача застряла/модель зациклилась
+    # (pi крутит turn'ы без лимита, см. retro 2026-06-15). Убийство на soft-timeout
+    # экономит токены vs ожидание hard-timeout (раньше soft только предупреждал,
+    # и pi сжигал токены ещё soft→hard минут).
+    # Env WATCH_SOFT_WARN_ONLY=1 возвращает старое поведение (только warning) для
+    # экспериментов/длинных задач, где soft — мягкий ориентир.
     if [[ -n "$SOFT_TIMEOUT" ]] && [[ $elapsed -ge $SOFT_TIMEOUT ]]; then
-        # Пишем предупреждение один раз (флаг)
-        if [[ -z "${_SOFT_WARNED:-}" ]]; then
-            _SOFT_WARNED=1
+        if [[ "${WATCH_SOFT_WARN_ONLY:-0}" == "1" ]]; then
+            if [[ -z "${_SOFT_WARNED:-}" ]]; then
+                _SOFT_WARNED=1
+                echo '{"type":"_watch_timeout","reason":"soft","elapsed":'${elapsed}',"limit":'${SOFT_TIMEOUT}'}' >&2
+            fi
+        else
             echo '{"type":"_watch_timeout","reason":"soft","elapsed":'${elapsed}',"limit":'${SOFT_TIMEOUT}'}' >&2
+            _EXIT_REASON="soft_timeout"
+            exit 1
         fi
     fi
 
     # Проверяем жёсткий таймаут — УБИВАЕМ
     if [[ $elapsed -ge $EFFECTIVE_HARD ]]; then
         echo '{"type":"_watch_timeout","reason":"hard","elapsed":'${elapsed}',"limit":'${EFFECTIVE_HARD}'}' >&2
+        _EXIT_REASON="hard_timeout"
         exit 1
     fi
-
 done < "$PIPE"
 
 # read вернул ошибку — либо stall, либо pipe закрылся
@@ -652,7 +779,8 @@ now=$(date +%s)
 elapsed=$((now - last_event_time))
 
 if [[ $elapsed -ge $STALL_TIMEOUT ]]; then
-    echo '{"type":"_watch_timeout","reason":"stall","stalled":'${elapsed}'}' >&2
+    echo '{"type":"_watch_timeout","reason":"stall","stalled":'${elapsed}',"limit":'${STALL_TIMEOUT}'}' >&2
+    _EXIT_REASON="stall"
     exit 1
 fi
 
@@ -661,16 +789,19 @@ runner_exit_code=0
 wait_agent || runner_exit_code=$?
 if [[ $runner_exit_code -ne 0 ]]; then
     print_runner_error "runner_failed" "$runner_exit_code"
+    _EXIT_REASON="runner_failed_pipe_closed"
     exit 1
 fi
 
 if outfile_has_success_event; then
+    _EXIT_REASON="success_outfile"
     print_filtered_output
     exit 0
 fi
 
 if outfile_has_failure_event; then
     print_runner_error "runner_failed_event" "$runner_exit_code"
+    _EXIT_REASON="runner_failure_event_outfile"
     exit 1
 fi
 
@@ -679,4 +810,5 @@ if [[ "$RUNNER" == "pi" ]]; then
 else
     print_runner_error "missing_success_event" "$runner_exit_code"
 fi
+_EXIT_REASON="missing_agent_end"
 exit 1
