@@ -97,18 +97,17 @@ PROMPT
 
 ### Логи и отладка
 
-Каждый запуск пишет run-лог в `var/log/watch-subagent/`. Имя файла:
-`<YYYYMMDD_HHMMSS>-<runner>-<role-slug>-<pid>.log`, например
-`20260616_120323-pi-backend-developer-levsha-12345.log` (`runner` = `pi`|`codex`,
+Каждый запуск создаёт свой каталог в `var/log/watch-subagent/`:
+`<YYYYMMDD_HHMMSS>-<runner>-<role-slug>-<pid>/` (`runner` = `pi`|`codex`,
 `role-slug` — имя файла роли без локали и `.md`, `<pid>` — PID процесса;
 PID исключает коллизию при параллельных/повторных запусках в одну секунду).
 
-При ненормальном завершении полный дамп событий архивируется в каталог с тем же
-именем (минус `.log`): `<...>-<pid>/`. Внутри: `events/events.ndjson` (полный
-поток событий), `events/runner.stderr`, `run.log` (копия лога). Например:
-`var/log/watch-subagent/20260616_120323-pi-backend-developer-levsha-12345/events/`.
+Внутри: `run.log` (статус запуска — start, summary, reason) всегда; при
+ненормальном завершении добавляется `events/` (полный дамп: `events.ndjson`,
+`gaps.tsv`, `runner.stderr`) для разбора причин. Пример:
+`var/log/watch-subagent/20260616_120323-pi-backend-developer-levsha-12345/run.log`.
 
-Env `WATCH_KEEP_TMP=1` — архивировать и успешные запуски.
+Env `WATCH_KEEP_TMP=1` — сохранять `events/` и для успешных запусков.
 
 Если оборачиваете запуск во внешний `timeout` (CI и т.п.) — ставьте его
 ≥ `--hard-timeout` + 60с, иначе скрипт не успеет завершиться сам и потеряет

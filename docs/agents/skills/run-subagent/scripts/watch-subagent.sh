@@ -479,13 +479,13 @@ LOG_DIR="${WATCH_LOG_DIR:-$PROJECT_ROOT/var/log/watch-subagent}"
 RUN_TS=$(date +%Y%m%d_%H%M%S)
 RUN_ROLE_SLUG=$(basename "$ROLE_FILE" | sed 's/\.[a-z][a-z]\.md$//' | tr -c '[:alnum:]' '-' | tr -s '-' | sed 's/^-//;s/-$//')
 RUN_ID="${RUN_TS}-${RUNNER}-${RUN_ROLE_SLUG}-$$"
-RUN_LOG="$LOG_DIR/${RUN_ID}.log"
-# PID в RUN_ID (используется и для .log, и для каталога архива) исключает
-# коллизию: два запуска в одну секунду с тем же runner+role не перезапишут
-# и не перемешают логи/дампы друг друга.
-_ARCHIVE_DIR="$LOG_DIR/${RUN_ID}"
+# Один запуск = один каталог: run.log и (при сбое) events/ лежат вместе.
+# PID в RUN_ID исключает коллизию: два запуска в одну секунду с тем же
+# runner+role не перемешают логи/дампы друг друга.
+RUN_DIR="$LOG_DIR/${RUN_ID}"
+RUN_LOG="$RUN_DIR/run.log"
 _EXIT_REASON="unknown"
-mkdir -p "$LOG_DIR"
+mkdir -p "$RUN_DIR"
 
 log_run() {
     # Best-effort запись в run-log (не падать, если файл недоступен).
@@ -660,13 +660,11 @@ cleanup() {
     # --- Archive TMPDIR on failure (or if WATCH_KEEP_TMP=1) ---
     # Сохраняем улики (events.ndjson, gaps.tsv, runner.stderr) для постмортема,
     # если агент не завершился нормально. Успешные запуски не архивируем
-    # (кроме WATCH_KEEP_TMP=1), чтобы не копить гигабайты.
+    # (кроме WATCH_KEEP_TMP=1), чтобы не копить гигабайты. run.log уже в RUN_DIR.
     if [[ "$reason" != success_* ]] || [[ "${WATCH_KEEP_TMP:-0}" == "1" ]]; then
-        if mkdir -p "$_ARCHIVE_DIR" 2>/dev/null; then
-            cp -r "$TMPDIR" "$_ARCHIVE_DIR/events" 2>/dev/null || true
-            cp "$RUN_LOG" "$_ARCHIVE_DIR/run.log" 2>/dev/null || true
-            log_run "archived_to=$_ARCHIVE_DIR"
-            echo "[watch-subagent] run archived (reason=$reason): $_ARCHIVE_DIR" >&2
+        if cp -r "$TMPDIR" "$RUN_DIR/events" 2>/dev/null; then
+            log_run "events_archived_to=$RUN_DIR/events"
+            echo "[watch-subagent] run archived (reason=$reason): $RUN_DIR/events" >&2
         fi
     fi
 
