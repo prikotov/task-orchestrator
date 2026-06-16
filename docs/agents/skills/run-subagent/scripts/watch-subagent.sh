@@ -9,7 +9,11 @@
 #   PROMPT
 #
 # Параметры:
-#   -s, --soft-timeout   — базовый таймаут в секундах (обязателен).
+#   -s, --soft-timeout   — базовый таймаут в секундах (обязателен). ЦЕЛЕВОЕ время
+#                          задачи: по умолчанию превышение soft УБИВАЕТ запуск
+#                          (pi крутит turn'ы без лимита — soft это страховка от
+#                          сжигания токенов). Env WATCH_SOFT_WARN_ONLY=1 → только
+#                          предупреждать, не убивать (для экспериментов).
 #   -m, --hard-timeout   — абсолютный максимум в секундах (default: 1800).
 #   -t, --stall-timeout  — секунд без событий до признания зависания (default: 180).
 #   -o, --output         — формат вывода через запятую: raw, text, tools, files (default: raw).
@@ -24,6 +28,10 @@
 #   WATCH_LOG_DIR          — каталог run-логов (default: var/log/watch-subagent).
 #   WATCH_KEEP_TMP=1       — сохранять TMPDIR (events.ndjson, gaps.tsv, stderr)
 #                            ВСЕГДА, даже при успехе (по умолчанию — только при сбое).
+#   WATCH_SOFT_WARN_ONLY=1 — soft-timeout только предупреждает, НЕ убивает
+#                            (по умолчанию soft-timeout УБИВАЕТ, т.к. pi крутит
+#                            turn'ы без лимита и soft — основная защита от сжигания
+#                            токенов). Использовать только для экспериментов.
 #
 # Переменные окружения (наследование от внешней обёртки):
 #   RUNNER/PROVIDER/MODEL/REASONING — см. приоритеты выше.
@@ -737,10 +745,24 @@ while IFS= read -r -t "$STALL_TIMEOUT" line; do
         exit 1
     fi
 
-    # Проверяем soft timeout — предупреждаем, но НЕ убиваем
-    if [[ -n "$SOFT_TIMEOUT" ]] && [[ $elapsed -ge $SOFT_TIMEOUT ]] && [[ -z "${_SOFT_WARNED:-}" ]]; then
-        _SOFT_WARNED=1
-        echo '{"type":"_watch_timeout","reason":"soft","elapsed":'${elapsed}',"limit":'${SOFT_TIMEOUT}'}' >&2
+    # Проверяем soft timeout — целевое время задачи.
+    # ПО УМОЛЧАНИЮ УБИВАЕТ: превышение soft = задача застряла/модель зациклилась
+    # (pi крутит turn'ы без лимита, см. retro 2026-06-15). Убийство на soft-timeout
+    # экономит токены vs ожидание hard-timeout (раньше soft только предупреждал,
+    # и pi сжигал токены ещё soft→hard минут).
+    # Env WATCH_SOFT_WARN_ONLY=1 возвращает старое поведение (только warning) для
+    # экспериментов/длинных задач, где soft — мягкий ориентир.
+    if [[ -n "$SOFT_TIMEOUT" ]] && [[ $elapsed -ge $SOFT_TIMEOUT ]]; then
+        if [[ "${WATCH_SOFT_WARN_ONLY:-0}" == "1" ]]; then
+            if [[ -z "${_SOFT_WARNED:-}" ]]; then
+                _SOFT_WARNED=1
+                echo '{"type":"_watch_timeout","reason":"soft","elapsed":'${elapsed}',"limit":'${SOFT_TIMEOUT}'}' >&2
+            fi
+        else
+            echo '{"type":"_watch_timeout","reason":"soft","elapsed":'${elapsed}',"limit":'${SOFT_TIMEOUT}'}' >&2
+            _EXIT_REASON="soft_timeout"
+            exit 1
+        fi
     fi
 
     # Проверяем жёсткий таймаут — УБИВАЕМ
