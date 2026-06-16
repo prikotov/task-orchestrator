@@ -32,6 +32,8 @@ final readonly class DynamicChainDefinitionVo implements ChainDefinitionInterfac
      * @param int $maxRounds лимит раундов
      * @param PromptConfigurationVo $promptConfiguration конфигурация промптов
      * @param ChainRetryPolicyVo|null $defaultRetryPolicy политика retry по умолчанию
+     *
+     * @internal Используйте {@see \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory::createFromDynamic()}.
      */
     // phpcs:ignore
     public function __construct(
@@ -49,6 +51,8 @@ final readonly class DynamicChainDefinitionVo implements ChainDefinitionInterfac
      *
      * @param list<string> $participants
      * @param array<string, RoleConfigVo> $roles per-role конфигурация
+     *
+     * @deprecated Используйте {@see \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory::createFromDynamic()}.
      */
     public static function createFromDynamic(
         string $name,

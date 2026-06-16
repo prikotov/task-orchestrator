@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject;
 
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Enum\ErrorClassificationEnum;
-use Throwable;
 
 /**
  * Value Object — результат классификации ошибки агента.
@@ -54,12 +53,12 @@ final readonly class ErrorClassificationVo
     }
 
     /**
-     * Классифицирует исключение, выброшенное при выполнении агента.
+     * Создаёт классификацию для исключения, выброшенного при выполнении агента.
      *
      * Исключения из runner'а классифицируются как TRANSIENT —
      * причина обычно во внешних факторах (сеть, процесс упал и т.д.).
      */
-    public static function createFromClassException(Throwable $throwable): self
+    public static function createFromClassException(): self
     {
         return new self(ErrorClassificationEnum::transient);
     }

@@ -99,7 +99,15 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1e: Дополнительные исследования (2026-05-20)
 
-- [x] [TASK-research-zeroclaw](done/TASK-research-zeroclaw.todo.md) — Zeroclaw (zeroclaw-labs, AI-agent orchestration)
+- [x] [TASK-research-zeroclaw](TASK-research-zeroclaw.todo.md) — Zeroclaw (zeroclaw-labs, AI-agent orchestration)
+
+### Этап 1f: Дополнительные исследования (2026-06-12)
+
+- [x] [TASK-research-odysseus-ai-workspace](TASK-research-odysseus-ai-workspace.todo.md) — Odysseus (PewDiePie archdaemon, self-hosted AI workspace)
+
+### Этап 1g: Дополнительные исследования (2026-06-13)
+
+- [x] [TASK-research-agent-skills](TASK-research-agent-skills.todo.md) — Agent Skills (Addy Osmani, production-grade engineering skills for AI coding agents) *(PR #258)*
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
@@ -134,3 +142,6 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-04-21 | Тимлид (Алекс) | Создание эпика |
 | 2026-04-22 | Технический писатель (Гермиона) | Все 11 задач выполнены. Эпик завершён. |
 | 2026-04-22 | Тимлид (Алекс) + Пуаро + Локи | Постфактум ревью всех 11 отчётов через сабагентов. 5 критических и 15+ значимых исправлений. PR #52. |
+| 2026-06-13 | Тимлид (Алекс) | Добавлена research-задача по addyosmani/agent-skills. |
+| 2026-06-13 | Аналитик (Шерлок) | Stage 1g: исследование Agent Skills подготовлено, задача ожидает review и финализацию оркестратором. |
+| 2026-06-13 | Тимлид (Алекс) | Stage 1g: TASK-research-agent-skills принята, переведена в done и подготовлена к merge PR #258. |

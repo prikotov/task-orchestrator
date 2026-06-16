@@ -15,9 +15,11 @@ final class WatchSubagentScriptTest extends TestCase
     private string $tempDir;
     private string $fakeBinDir;
     private string $roleFile;
+    private string $piRoleFile;
     private string $chainsConfig;
     private string $runnerCaptureFile;
     private string $argsCaptureFile;
+    private string $stdinCaptureFile;
 
     protected function setUp(): void
     {
@@ -27,12 +29,15 @@ final class WatchSubagentScriptTest extends TestCase
         $this->tempDir = $tempDir;
         $this->fakeBinDir = $tempDir . '/bin';
         $this->roleFile = $tempDir . '/backend_developer_levsha.ru.md';
+        $this->piRoleFile = $tempDir . '/team_lead_alex.ru.md';
         $this->chainsConfig = $tempDir . '/chains.yaml';
         $this->runnerCaptureFile = $tempDir . '/runner.txt';
         $this->argsCaptureFile = $tempDir . '/args.txt';
+        $this->stdinCaptureFile = $tempDir . '/stdin.txt';
 
         mkdir($this->fakeBinDir, 0777, true);
         file_put_contents($this->roleFile, "# Test role\n");
+        file_put_contents($this->piRoleFile, "# Test pi role\n");
         file_put_contents($this->chainsConfig, <<<'YAML'
 roles:
   backend_developer_levsha:
@@ -44,6 +49,19 @@ roles:
       - role-model
       - -c
       - 'model_reasoning_effort="xhigh"'
+  team_lead_alex:
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --no-session
+      - --provider
+      - zai
+      - --model
+      - pi-role-model
+      - --thinking
+      - high
 YAML);
 
         $this->writeFakeRunner('pi');
@@ -98,6 +116,7 @@ YAML);
     {
         $this->runScript(env: [
             'RUNNER' => 'pi',
+            'PROVIDER' => 'env-provider',
             'MODEL' => 'env-model',
             'REASONING' => 'low',
         ]);
@@ -105,6 +124,7 @@ YAML);
         self::assertSame('pi', trim((string) file_get_contents($this->runnerCaptureFile)));
 
         $args = (string) file_get_contents($this->argsCaptureFile);
+        self::assertStringContainsString('--provider env-provider', $args);
         self::assertStringContainsString('--model env-model', $args);
         self::assertStringContainsString('--thinking low', $args);
         self::assertStringNotContainsString('role-model', $args);
@@ -117,6 +137,7 @@ YAML);
             arguments: ['--runner', 'codex', '--model', 'cli-model', '--reasoning', 'medium'],
             env: [
                 'RUNNER' => 'pi',
+                'PROVIDER' => 'env-provider',
                 'MODEL' => 'env-model',
                 'REASONING' => 'low',
             ],
@@ -127,16 +148,137 @@ YAML);
         $args = (string) file_get_contents($this->argsCaptureFile);
         self::assertStringContainsString('--model cli-model', $args);
         self::assertStringContainsString('model_reasoning_effort=medium', $args);
+        self::assertStringNotContainsString('env-provider', $args);
         self::assertStringNotContainsString('env-model', $args);
         self::assertStringNotContainsString('role-model', $args);
+    }
+
+    #[Test]
+    public function passesPromptToRunnerStdin(): void
+    {
+        $this->runScript(prompt: 'Prompt sentinel 123');
+
+        self::assertSame('Prompt sentinel 123', trim((string) file_get_contents($this->stdinCaptureFile)));
+    }
+
+    #[Test]
+    public function usesPiProviderModelAndReasoningFromRoleCommandProfile(): void
+    {
+        $this->runScript(roleFile: $this->piRoleFile);
+
+        self::assertSame('pi', trim((string) file_get_contents($this->runnerCaptureFile)));
+
+        $args = (string) file_get_contents($this->argsCaptureFile);
+        self::assertStringContainsString('-p', $args);
+        self::assertStringContainsString('--provider zai', $args);
+        self::assertStringContainsString('--model pi-role-model', $args);
+        self::assertStringContainsString('--thinking high', $args);
+    }
+
+    #[Test]
+    public function explicitRunnerDifferentFromPiRoleCommandProfileDoesNotUsePiProfileDefaults(): void
+    {
+        $this->runScript(arguments: ['--runner', 'codex'], roleFile: $this->piRoleFile);
+
+        self::assertSame('codex', trim((string) file_get_contents($this->runnerCaptureFile)));
+
+        $args = (string) file_get_contents($this->argsCaptureFile);
+        self::assertStringNotContainsString('--provider zai', $args);
+        self::assertStringNotContainsString('pi-role-model', $args);
+        self::assertStringNotContainsString('model_reasoning_effort=high', $args);
+    }
+
+    #[Test]
+    public function failsWhenRunnerClosesPipeWithoutAgentEnd(): void
+    {
+        $process = $this->runScript(
+            env: [
+                'FAKE_RUNNER_AGENT_END' => '0',
+            ],
+            roleFile: $this->piRoleFile,
+            expectSuccess: false,
+        );
+
+        self::assertFalse($process->isSuccessful());
+        self::assertStringContainsString('"reason":"missing_agent_end"', $process->getErrorOutput());
+    }
+
+    #[Test]
+    public function failsWhenRunnerExitsWithNonZeroStatusAndShowsStderr(): void
+    {
+        $process = $this->runScript(
+            env: [
+                'FAKE_RUNNER_AGENT_END' => '0',
+                'FAKE_RUNNER_EXIT_CODE' => '42',
+                'FAKE_RUNNER_STDERR' => 'No API key found for opencode.',
+            ],
+            expectSuccess: false,
+        );
+
+        self::assertFalse($process->isSuccessful());
+        self::assertStringContainsString('"reason":"runner_failed"', $process->getErrorOutput());
+        self::assertStringContainsString('"exit_code":42', $process->getErrorOutput());
+        self::assertStringContainsString('No API key found for opencode.', $process->getErrorOutput());
+    }
+
+    #[Test]
+    public function codexRunnerCompletesOnTurnCompletedAndExtractsItemText(): void
+    {
+        $process = $this->runScript(
+            arguments: ['--runner', 'codex', '-o', 'text'],
+            env: [
+                'FAKE_RUNNER_EVENTS' => implode("\n", [
+                    '{"type":"item.completed","item":{"type":"agent_message","text":"Codex OK"}}',
+                    '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}',
+                ]) . "\n",
+            ],
+        );
+
+        self::assertSame("Codex OK\n", $process->getOutput());
+    }
+
+    #[Test]
+    public function codexRunnerPrefersTurnCompletedItemsOverItemCompletedFallback(): void
+    {
+        $process = $this->runScript(
+            arguments: ['--runner', 'codex', '-o', 'text'],
+            env: [
+                'FAKE_RUNNER_EVENTS' => implode("\n", [
+                    '{"type":"item.completed","item":{"type":"agent_message","content":[{"type":"text","text":"Fallback text"}]}}',
+                    '{"type":"turn.completed","turn":{"items":[{"type":"command_execution","command":"ls","result":"files"},{"type":"agent_message","content":[{"type":"text","text":"Turn text"}]}]}}',
+                ]) . "\n",
+            ],
+        );
+
+        self::assertSame("Turn text\n", $process->getOutput());
+    }
+
+    #[Test]
+    public function codexRunnerFailsOnTurnFailed(): void
+    {
+        $process = $this->runScript(
+            arguments: ['--runner', 'codex'],
+            env: [
+                'FAKE_RUNNER_EVENTS' => '{"type":"turn.failed","error":{"message":"boom"}}' . "\n",
+            ],
+            expectSuccess: false,
+        );
+
+        self::assertFalse($process->isSuccessful());
+        self::assertStringContainsString('"reason":"runner_failed_event"', $process->getErrorOutput());
     }
 
     /**
      * @param list<string> $arguments
      * @param array<string, string> $env
      */
-    private function runScript(array $arguments = [], array $env = []): void
-    {
+    private function runScript(
+        array $arguments = [],
+        array $env = [],
+        ?string $roleFile = null,
+        string $prompt = 'Test prompt',
+        bool $expectSuccess = true,
+    ): Process {
         $projectRoot = dirname(__DIR__, 6);
         $script = $projectRoot . '/docs/agents/skills/run-subagent/scripts/watch-subagent.sh';
         $path = $this->fakeBinDir . PATH_SEPARATOR . (getenv('PATH') ?: '');
@@ -152,10 +294,10 @@ YAML);
                     '-m',
                     '4',
                     '-r',
-                    $this->roleFile,
+                    $roleFile ?? $this->roleFile,
                 ],
                 $arguments,
-                ['Test prompt'],
+                [$prompt],
             ),
             $projectRoot,
             array_merge(
@@ -164,6 +306,7 @@ YAML);
                     'CHAINS_CONFIG' => $this->chainsConfig,
                     'RUNNER_CAPTURE_FILE' => $this->runnerCaptureFile,
                     'ARGS_CAPTURE_FILE' => $this->argsCaptureFile,
+                    'STDIN_CAPTURE_FILE' => $this->stdinCaptureFile,
                 ],
                 $env,
             ),
@@ -171,11 +314,15 @@ YAML);
         $process->setTimeout(10);
         $process->run();
 
-        self::assertTrue(
-            $process->isSuccessful(),
-            $process->getErrorOutput() . $process->getOutput(),
-        );
-        self::assertStringContainsString('"agent_end"', $process->getOutput());
+        if ($expectSuccess) {
+            self::assertTrue(
+                $process->isSuccessful(),
+                $process->getErrorOutput() . $process->getOutput(),
+            );
+            self::assertNotSame('', trim($process->getOutput()));
+        }
+
+        return $process;
     }
 
     private function writeFakeRunner(string $name): void
@@ -186,8 +333,26 @@ YAML);
 set -euo pipefail
 printf '%s\n' "$(basename "$0")" > "$RUNNER_CAPTURE_FILE"
 printf '%s\n' "$*" > "$ARGS_CAPTURE_FILE"
-printf '{"type":"agent_end"}\n'
+cat > "$STDIN_CAPTURE_FILE"
+if [[ -n "${FAKE_RUNNER_STDERR:-}" ]]; then
+    printf '%s\n' "$FAKE_RUNNER_STDERR" >&2
+fi
+if [[ -n "${FAKE_RUNNER_EVENTS:-}" ]]; then
+    printf '%s' "$FAKE_RUNNER_EVENTS"
+elif [[ "$(basename "$0")" == "codex" ]]; then
+    if [[ "${FAKE_RUNNER_AGENT_END:-1}" == "1" ]]; then
+        printf '{"type":"item.completed","item":{"type":"agent_message","text":"codex fake output"}}\n'
+        printf '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}\n'
+    else
+        printf '{"type":"session"}\n'
+    fi
+elif [[ "${FAKE_RUNNER_AGENT_END:-1}" == "1" ]]; then
+    printf '{"type":"agent_end"}\n'
+else
+    printf '{"type":"session"}\n'
+fi
 sleep 0.2
+exit "${FAKE_RUNNER_EXIT_CODE:-0}"
 BASH);
         chmod($path, 0755);
     }

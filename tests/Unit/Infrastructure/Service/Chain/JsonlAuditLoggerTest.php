@@ -137,6 +137,15 @@ final class JsonlAuditLoggerTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unable to create audit log directory');
 
-        $logger->logChainStart('test', 'Task');
+        // Without the @ operator (forbidden by PHPMD), mkdir() emits a benign
+        // E_WARNING on the unwritable path before the fail-fast RuntimeException
+        // is thrown; suppress it for the duration of this assertion.
+        set_error_handler(static fn (): bool => true);
+
+        try {
+            $logger->logChainStart('test', 'Task');
+        } finally {
+            restore_error_handler();
+        }
     }
 }

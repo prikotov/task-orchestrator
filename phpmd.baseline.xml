@@ -1,18 +1,3 @@
 <?xml version="1.0"?>
 <phpmd-baseline>
-  <violation rule="PHPMD\Rule\UnusedFormalParameter" file="src/Module/AgentRunner/Domain/ValueObject/ErrorClassificationVo.php"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunnerService.php" method="run"/>
-  <violation rule="PHPMD\Rule\Design\LongClass" file="src/Module/ChainDefinition/Domain/ValueObject/ChainDefinitionVo.php"/>
-  <violation rule="PHPMD\Rule\Design\LongClass" file="src/Module/ChainDefinition/Infrastructure/Service/Chain/YamlChainLoaderService.php"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/ChainDefinition/Infrastructure/Service/Chain/YamlChainLoaderService.php" method="parseSteps"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/ChainExecution/Infrastructure/Service/Chain/Hook/ShellHookExecutorService.php" method="execute"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/DynamicLoop/Domain/Service/Dynamic/ExecuteDynamicTurnService.php" method="runParticipantTurn"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/DynamicLoop/Domain/Service/Dynamic/ExecuteDynamicTurnService.php" method="runFacilitatorStep"/>
-  <!-- Formerly suppressed via @SuppressWarnings, moved to baseline for PHPStan compatibility -->
-  <violation rule="PHPMD\Rule\CleanCode\ErrorControlOperator" file="src/Module/AgentRunner/Infrastructure/Service/Codex/Resources/bridge.php"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Module/ChainExecution/Domain/Service/Static/ExecuteAgentStepService.php" method="run"/>
-  <violation rule="PHPMD\Rule\CleanCode\ErrorControlOperator" file="src/Module/ChainExecution/Infrastructure/Service/Audit/JsonlAuditLoggerService.php" method="append"/>
-  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="src/Module/DynamicLoop/Domain/Entity/DynamicLoopExecution.php"/>
-  <violation rule="PHPMD\Rule\Design\TooManyFields" file="src/Module/DynamicLoop/Domain/Entity/DynamicLoopExecution.php"/>
-  <violation rule="PHPMD\Rule\CleanCode\ErrorControlOperator" file="src/Module/DynamicLoop/Infrastructure/Service/JsonlAuditLogger.php" method="append"/>
 </phpmd-baseline>

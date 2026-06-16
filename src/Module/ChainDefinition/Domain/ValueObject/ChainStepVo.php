@@ -20,6 +20,16 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionE
  */
 final readonly class ChainStepVo
 {
+    /**
+     * Дефолтный runner для agent-шага, когда runner не задан явно в YAML.
+     */
+    public const string DEFAULT_RUNNER = 'pi';
+
+    /**
+     * Дефолтный таймаут выполнения в секундах для quality_gate/tool-шагов.
+     */
+    public const int DEFAULT_TIMEOUT_SECONDS = 120;
+
     private readonly bool $runnerExplicit;
 
     /**
@@ -42,21 +52,21 @@ final readonly class ChainStepVo
     public function __construct(
         private ChainStepTypeEnum $type,
         private ?string $role = null,
-        private string $runner = 'pi',
+        private string $runner = self::DEFAULT_RUNNER,
         private ?string $tools = null,
         private ?string $model = null,
         private ?ChainRetryPolicyVo $retryPolicy = null,
         private ?string $name = null,
         private string $command = '',
         private string $label = '',
-        private int $timeoutSeconds = 120,
+        private int $timeoutSeconds = self::DEFAULT_TIMEOUT_SECONDS,
         private bool $noContextFiles = false,
         private ?ConditionExpressionVo $when = null,
         private ?string $postStep = null,
         private ?string $outputKey = null,
         ?bool $runnerExplicit = null,
     ) {
-        $this->runnerExplicit = $runnerExplicit ?? $runner !== 'pi';
+        $this->runnerExplicit = $runnerExplicit ?? $runner !== self::DEFAULT_RUNNER;
 
         if ($type === ChainStepTypeEnum::agent && ($role === null || $role === '')) {
             throw new InvalidArgumentException('Agent step must have a role.');
@@ -101,7 +111,7 @@ final readonly class ChainStepVo
         return new self(
             type: ChainStepTypeEnum::agent,
             role: $role,
-            runner: $runner ?? 'pi',
+            runner: $runner ?? self::DEFAULT_RUNNER,
             tools: $tools,
             model: $model,
             retryPolicy: $retryPolicy,
@@ -119,7 +129,7 @@ final readonly class ChainStepVo
     public static function createQualityGate(
         string $command,
         string $label,
-        int $timeoutSeconds = 120,
+        int $timeoutSeconds = self::DEFAULT_TIMEOUT_SECONDS,
         ?string $name = null,
         ?ConditionExpressionVo $when = null,
         ?string $postStep = null,
@@ -144,7 +154,7 @@ final readonly class ChainStepVo
     public static function createTool(
         string $command,
         string $label,
-        int $timeoutSeconds = 120,
+        int $timeoutSeconds = self::DEFAULT_TIMEOUT_SECONDS,
         ?string $outputKey = null,
         ?string $name = null,
         ?ConditionExpressionVo $when = null,

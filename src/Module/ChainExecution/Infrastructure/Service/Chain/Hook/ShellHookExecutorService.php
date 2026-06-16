@@ -52,38 +52,15 @@ final readonly class ShellHookExecutorService implements ShellHookExecutorServic
             $stderr = $process->getErrorOutput();
             $exitCode = $process->getExitCode() ?? -1;
 
-            // Логируем stdout/stderr
-            if ($stdout !== '') {
-                $this->logger?->info('Hook stdout', [
-                    'script' => $scriptPath,
-                    'stdout' => $stdout,
-                ]);
-            }
-
-            if ($stderr !== '') {
-                $this->logger?->warning('Hook stderr', [
-                    'script' => $scriptPath,
-                    'stderr' => $stderr,
-                ]);
-            }
+            $this->logProcessOutput($scriptPath, $stdout, $stderr);
 
             if ($exitCode !== 0) {
-                $this->logger?->warning('Hook failed with non-zero exit code', [
-                    'script' => $scriptPath,
-                    'exitCode' => $exitCode,
-                    'stdout' => $stdout,
-                    'stderr' => $stderr,
-                    'duration' => $duration,
-                ]);
-
-                return HookResultVo::createWarning(
-                    command: $scriptPath,
-                    exitCode: $exitCode,
-                    stdout: $stdout,
-                    stderr: $stderr,
-                    duration: $duration,
-                    timedOut: false,
-                    reason: sprintf('Hook exited with code %d.', $exitCode),
+                return $this->buildNonZeroExitResult(
+                    $scriptPath,
+                    $exitCode,
+                    $stdout,
+                    $stderr,
+                    $duration,
                 );
             }
 
@@ -99,42 +76,110 @@ final readonly class ShellHookExecutorService implements ShellHookExecutorServic
                 duration: $duration,
             );
         } catch (ProcessTimedOutException $e) {
-            $duration = microtime(true) - $startTime;
-
-            $this->logger?->warning('Hook timed out', [
-                'script' => $scriptPath,
-                'timeout' => self::HOOK_TIMEOUT,
-                'duration' => $duration,
-            ]);
-
-            return HookResultVo::createWarning(
-                command: $scriptPath,
-                exitCode: -1,
-                stdout: '',
-                stderr: $e->getMessage(),
-                duration: $duration,
-                timedOut: true,
-                reason: sprintf('Hook timed out after %d seconds.', self::HOOK_TIMEOUT),
-            );
+            return $this->handleTimeout($scriptPath, $e, $startTime);
         } catch (\Throwable $e) {
-            $duration = microtime(true) - $startTime;
-
-            $this->logger?->warning('Hook execution failed with exception', [
-                'script' => $scriptPath,
-                'exception' => $e->getMessage(),
-                'duration' => $duration,
-            ]);
-
-            return HookResultVo::createWarning(
-                command: $scriptPath,
-                exitCode: -1,
-                stdout: '',
-                stderr: $e->getMessage(),
-                duration: $duration,
-                timedOut: false,
-                reason: sprintf('Hook execution failed: %s', $e->getMessage()),
-            );
+            return $this->handleException($scriptPath, $e, $startTime);
         }
+    }
+
+    /**
+     * Логирует stdout (info) и stderr (warning) hook-процесса, если они непусты.
+     */
+    private function logProcessOutput(string $scriptPath, string $stdout, string $stderr): void
+    {
+        if ($stdout !== '') {
+            $this->logger?->info('Hook stdout', [
+                'script' => $scriptPath,
+                'stdout' => $stdout,
+            ]);
+        }
+
+        if ($stderr !== '') {
+            $this->logger?->warning('Hook stderr', [
+                'script' => $scriptPath,
+                'stderr' => $stderr,
+            ]);
+        }
+    }
+
+    /**
+     * Строит warning-результат для hook, завершившегося с ненулевым exit code.
+     */
+    private function buildNonZeroExitResult(
+        string $scriptPath,
+        int $exitCode,
+        string $stdout,
+        string $stderr,
+        float $duration,
+    ): HookResultVo {
+        $this->logger?->warning('Hook failed with non-zero exit code', [
+            'script' => $scriptPath,
+            'exitCode' => $exitCode,
+            'stdout' => $stdout,
+            'stderr' => $stderr,
+            'duration' => $duration,
+        ]);
+
+        return HookResultVo::createWarning(
+            command: $scriptPath,
+            exitCode: $exitCode,
+            stdout: $stdout,
+            stderr: $stderr,
+            duration: $duration,
+            timedOut: false,
+            reason: sprintf('Hook exited with code %d.', $exitCode),
+        );
+    }
+
+    /**
+     * Обрабатывает превышение таймаута hook-процесса (возвращает warning).
+     */
+    private function handleTimeout(
+        string $scriptPath,
+        ProcessTimedOutException $exception,
+        float $startTime,
+    ): HookResultVo {
+        $duration = microtime(true) - $startTime;
+
+        $this->logger?->warning('Hook timed out', [
+            'script' => $scriptPath,
+            'timeout' => self::HOOK_TIMEOUT,
+            'duration' => $duration,
+        ]);
+
+        return HookResultVo::createWarning(
+            command: $scriptPath,
+            exitCode: -1,
+            stdout: '',
+            stderr: $exception->getMessage(),
+            duration: $duration,
+            timedOut: true,
+            reason: sprintf('Hook timed out after %d seconds.', self::HOOK_TIMEOUT),
+        );
+    }
+
+    /**
+     * Обрабатывает произвольное исключение во время hook-выполнения (возвращает warning).
+     */
+    private function handleException(string $scriptPath, \Throwable $exception, float $startTime): HookResultVo
+    {
+        $duration = microtime(true) - $startTime;
+
+        $this->logger?->warning('Hook execution failed with exception', [
+            'script' => $scriptPath,
+            'exception' => $exception->getMessage(),
+            'duration' => $duration,
+        ]);
+
+        return HookResultVo::createWarning(
+            command: $scriptPath,
+            exitCode: -1,
+            stdout: '',
+            stderr: $exception->getMessage(),
+            duration: $duration,
+            timedOut: false,
+            reason: sprintf('Hook execution failed: %s', $exception->getMessage()),
+        );
     }
 
     /**

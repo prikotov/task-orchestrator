@@ -109,7 +109,16 @@ Agent timed out after 1800 seconds.
 
 **Решение:**
 
-1. Увеличьте таймаут (в секундах, по умолчанию = 600 с / 10 мин). Значение передаётся в `Symfony Process::setTimeout()`.
+1. Увеличьте таймаут (в секундах). Действует precedence (от высшего к низшему):
+
+   **явный CLI `--timeout`** → **`chain.timeout`** (YAML) → **hard default**.
+
+   Hard default — **600 с** (10 мин) для static, dynamic и conditional; для dynamic также
+   `max_time=3600` с (1 ч). Значение передаётся в `Symfony Process::setTimeout()`.
+
+   > CLI-опция `--timeout` учитывается **только при явном указании** — значение по умолчанию
+   > из `--help` не затирает `chain.timeout`. Поэтому static-цепочка без `chain.timeout`
+   > использует таймаут 600 с (как и dynamic). Подробности: [chains.md → Chain-level timeout](chains.md#chain-level-timeout-и-maxtime).
 
 2. Если проблема в сети — проверьте доступность API-эндпоинта LLM-провайдера.
 

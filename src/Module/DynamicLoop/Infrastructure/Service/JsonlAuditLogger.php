@@ -118,13 +118,10 @@ final readonly class JsonlAuditLogger implements DynamicLoopAuditLoggerInterface
     private function append(array $data): void
     {
         $dir = dirname($this->logFilePath);
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0777, true);
-            if (!is_dir($dir)) {
-                throw new RuntimeException(
-                    sprintf('Unable to create audit log directory: %s', $dir),
-                );
-            }
+        if (!is_dir($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new RuntimeException(
+                sprintf('Unable to create audit log directory: %s', $dir),
+            );
         }
 
         /** @var non-empty-string $json */

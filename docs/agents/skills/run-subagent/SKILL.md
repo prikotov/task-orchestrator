@@ -27,40 +27,42 @@ PROMPT
 
 | Параметр          | Сокращение | Описание                                                     | По умолчанию |
 |-------------------|------------|--------------------------------------------------------------|--------------|
-| `--soft-timeout`  | `-s`       | Базовый таймаут в секундах (обязателен)                      | —            |
+| `--soft-timeout`  | `-s`       | Базовый таймаут в секундах (обязателен). Целевое время задачи; превышение soft **убивает** запуск по умолчанию (страховка от сжигания токенов: pi крутит turn'ы без лимита) | —            |
 | `--hard-timeout`  | `-m`       | Абсолютный максимум в секундах                               | 1800         |
 | `--stall-timeout` | `-t`       | Нет событий N секунд → агент завис → завершить принудительно | 180          |
 | `--output`        | `-o`       | Формат вывода через запятую (см. ниже)                       | `raw`        |
 | `--role-file`     | `-r`       | Путь к файлу описания роли (обязателен)                      | —            |
 | `--runner`        | —          | Раннер: `pi` или `codex` (env `RUNNER`)                      | `roles.<role>.command[0]`, иначе `pi` |
+| `--provider`      | —          | Provider (провайдер) для `pi` (env `PROVIDER`)               | `roles.<role>.command --provider`, иначе — |
 | `--model`         | —          | Модель (env `MODEL`)                                         | `roles.<role>.command --model`, иначе — |
 | `--reasoning`     | —          | Reasoning/thinking effort (pi: `--thinking`, codex: `-c model_reasoning_effort=...`) | `roles.<role>.command`, иначе — |
 | `[prompt text]`   | —          | Промпт. Если не указан — читается из stdin                   | —            |
 
 ### Профиль делегирования роли
 
-Если `--runner`/`RUNNER`, `--model`/`MODEL`, `--reasoning`/`REASONING` не заданы явно,
+Если `--runner`/`RUNNER`, `--provider`/`PROVIDER`, `--model`/`MODEL`, `--reasoning`/`REASONING` не заданы явно,
 скрипт берёт значения из `config/chains.yaml` секции `roles.<role>.command`.
 Имя роли вычисляется по `--role-file`: например,
 `docs/agents/roles/team/backend_developer_levsha.ru.md` → `backend_developer_levsha`.
 
 Приоритеты резолва (resolution priority):
 
-1. CLI option (опция CLI): `--runner`, `--model`, `--reasoning`.
-2. Env (переменная окружения): `RUNNER`, `MODEL`, `REASONING`.
+1. CLI option (опция CLI): `--runner`, `--provider`, `--model`, `--reasoning`.
+2. Env (переменная окружения): `RUNNER`, `PROVIDER`, `MODEL`, `REASONING`.
 3. Role delegation profile (профиль делегирования роли): `roles.<role>.command`.
 4. Default (значение по умолчанию): `pi` только для runner.
 
 Из `command` извлекаются:
 - runner — первый элемент команды, например `codex` в `command: [codex, exec, ...]`;
+- provider — значение после `--provider` (применяется только для `pi`);
 - model — значение после `--model`;
 - reasoning — значение после `--thinking`/`--reasoning` или `model_reasoning_effort=...`.
 
 Явные значения не затираются профилем роли.
-`model`/`reasoning` из профиля роли применяются как связанная пара с profile runner (раннером профиля):
-- если `runner` не задан явно и берётся из профиля роли — profile `model`/`reasoning` применяются;
-- если `runner` задан явно через CLI/env и совпадает с profile runner — profile `model`/`reasoning` можно применять как defaults (значения по умолчанию);
-- если `runner` задан явно через CLI/env и отличается от profile runner — profile `model`/`reasoning` не применяются; они остаются пустыми, пока не заданы явно через CLI/env.
+`provider`/`model`/`reasoning` из профиля роли применяются как связанная группа с profile runner (раннером профиля):
+- если `runner` не задан явно и берётся из профиля роли — profile `provider`/`model`/`reasoning` применяются;
+- если `runner` задан явно через CLI/env и совпадает с profile runner — profile `provider`/`model`/`reasoning` можно применять как defaults (значения по умолчанию);
+- если `runner` задан явно через CLI/env и отличается от profile runner — profile `provider`/`model`/`reasoning` не применяются; они остаются пустыми, пока не заданы явно через CLI/env.
 
 ### Раннеры
 
@@ -72,7 +74,7 @@ scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer_lev
 PROMPT
 ```
 
-Команда: `pi --mode json --no-session --system-prompt <file> --append-system-prompt "Возьми на себя роль из файла: <role>"`
+Команда: `pi --mode json -p --no-session --system-prompt <file> [--provider <provider>] --append-system-prompt "Возьми на себя роль из файла: <role>"`
 
 #### codex
 
@@ -88,9 +90,28 @@ PROMPT
 
 ### Контроль
 
-1. Нет событий дольше `--stall-timeout` — агент завис → завершить
-2. `--hard-timeout` достигнут — завершить в любом случае
-3. Агент стримит события → ждать (каждая новая строка продлевает ожидание)
+1. `--soft-timeout` достигнут — завершить запуск (целевое время превышено). Env `WATCH_SOFT_WARN_ONLY=1` — только предупреждать, не убивать.
+2. Нет событий дольше `--stall-timeout` — агент завис → завершить.
+3. `--hard-timeout` достигнут — завершить в любом случае (абсолютный потолок).
+4. Агент стримит события → ждать (каждая новая строка продлевает ожидание).
+
+### Логи и отладка
+
+Каждый запуск создаёт свой каталог в `var/log/watch-subagent/`:
+`<YYYYMMDD_HHMMSS>-<runner>-<role-slug>-<pid>/` (`runner` = `pi`|`codex`,
+`role-slug` — имя файла роли без локали и `.md`, `<pid>` — PID процесса;
+PID исключает коллизию при параллельных/повторных запусках в одну секунду).
+
+Внутри: `run.log` (статус запуска — start, summary, reason) всегда; при
+ненормальном завершении добавляется `events/` (полный дамп: `events.ndjson`,
+`gaps.tsv`, `runner.stderr`) для разбора причин. Пример:
+`var/log/watch-subagent/20260616_120323-pi-backend-developer-levsha-12345/run.log`.
+
+Env `WATCH_KEEP_TMP=1` — сохранять `events/` и для успешных запусков.
+
+Если оборачиваете запуск во внешний `timeout` (CI и т.п.) — ставьте его
+≥ `--hard-timeout` + 60с, иначе скрипт не успеет завершиться сам и потеряет
+детальную причину.
 
 ### Формат вывода (`--output`)
 

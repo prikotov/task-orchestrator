@@ -52,7 +52,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $auditLogger,
         );
 
-        $execution->appendDiscussionHistory(
+        $execution->getJournal()->appendDiscussionHistory(
             $this->journal->formatFacilitatorDiscussionEntry(
                 $context->facilitatorRole,
                 $facResponse->isDone(),
@@ -63,7 +63,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         );
 
         $stepCost = $turnResult->agentResult->getCost();
-        $execution->addRoleCost($context->facilitatorRole, $stepCost);
+        $execution->getMetrics()->addRoleCost($context->facilitatorRole, $stepCost);
 
         $budgetCheck = $this->budgetChecker->checkAndApply(
             $execution,
@@ -99,7 +99,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
                 true,
             )
         ) {
-            $execution->appendFacilitatorSummary(sprintf(
+            $execution->getJournal()->appendFacilitatorSummary(sprintf(
                 "Round %d: %s\n",
                 $execution->getRound(),
                 $nextRole,
@@ -146,31 +146,10 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $challenge,
         );
 
-        $execution->appendDiscussionHistory(
-            $this->journal->formatDiscussionEntry(
-                $nextRole,
-                $turnResult->agentResult->getOutputText(),
-            ),
-        );
-        $execution->appendFacilitatorJournal(
-            $this->journal->formatParticipantEntry(
-                $nextRole,
-                $turnResult->agentResult->getOutputText(),
-                $execution->getStep(),
-                $execution->getRound(),
-            ),
-        );
-        $this->sessionLogger->writeContextFile(
-            'discussion_history.md',
-            $execution->getDiscussionHistory(),
-        );
-        $this->sessionLogger->writeContextFile(
-            'facilitator_journal.md',
-            $execution->getFacilitatorJournal(),
-        );
+        $this->recordParticipantTurnJournals($execution, $nextRole, $turnResult);
 
         $stepCost = $turnResult->agentResult->getCost();
-        $execution->addRoleCost($nextRole, $stepCost);
+        $execution->getMetrics()->addRoleCost($nextRole, $stepCost);
 
         $budgetCheck = $this->budgetChecker->checkAndApply(
             $execution,
@@ -216,23 +195,12 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $facRunner,
         );
 
-        /** @var array{DynamicLoopTurnResultVo, FacilitatorResponseVo} $facRun */
-        $facRun = $this->agentRunner->runFacilitator(
-            $execution->getStep(),
-            $execution->getRound(),
-            $context->facilitatorRole,
-            $context->topic,
-            $context->promptConfiguration->getBrainstormSystemPrompt(),
-            $context->promptConfiguration->getFacilitatorAppendPrompt(),
-            $context->promptConfiguration->getFacilitatorStartPrompt(),
-            $context->promptConfiguration->getFacilitatorContinuePrompt(),
-            $context->workingDir,
-            $execution->getFacilitatorSummary(),
+        [$turnResult, $facResponse] = $this->callFacilitatorAgent(
+            $context,
+            $execution,
             $facResponseFilesList,
-            $facRoleConfig?->getTimeout() ?? $context->timeout,
-            $facRoleConfig?->getCommand() ?? [],
+            $facRoleConfig,
         );
-        [$turnResult, $facResponse] = $facRun;
 
         $roundVo = self::toRoundResultVo(
             $turnResult,
@@ -264,7 +232,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $auditLogger,
         );
 
-        $execution->appendFacilitatorJournal(
+        $execution->getJournal()->appendFacilitatorJournal(
             $this->journal->formatFacilitatorEntry(
                 $execution->getStep(),
                 $execution->getRound(),
@@ -430,6 +398,66 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             systemPrompt: $turn->systemPrompt,
             userPrompt: $turn->userPrompt,
             timedOut: $agent->isTimedOut(),
+        );
+    }
+
+    /**
+     * Записывает вывод участника в дискуссионную историю, журнал фасилитатора и сессионные файлы.
+     */
+    private function recordParticipantTurnJournals(
+        DynamicLoopExecution $execution,
+        string $nextRole,
+        DynamicLoopTurnResultVo $turnResult,
+    ): void {
+        $execution->getJournal()->appendDiscussionHistory(
+            $this->journal->formatDiscussionEntry(
+                $nextRole,
+                $turnResult->agentResult->getOutputText(),
+            ),
+        );
+        $execution->getJournal()->appendFacilitatorJournal(
+            $this->journal->formatParticipantEntry(
+                $nextRole,
+                $turnResult->agentResult->getOutputText(),
+                $execution->getStep(),
+                $execution->getRound(),
+            ),
+        );
+        $this->sessionLogger->writeContextFile(
+            'discussion_history.md',
+            $execution->getDiscussionHistory(),
+        );
+        $this->sessionLogger->writeContextFile(
+            'facilitator_journal.md',
+            $execution->getFacilitatorJournal(),
+        );
+    }
+
+    /**
+     * Вызывает агент-фасилитатор и возвращает результат turn + разобранный ответ.
+     *
+     * @return array{DynamicLoopTurnResultVo, FacilitatorResponseVo}
+     */
+    private function callFacilitatorAgent(
+        DynamicLoopContextVo $context,
+        DynamicLoopExecution $execution,
+        string $facResponseFilesList,
+        ?DynamicLoopRoleConfigVo $facRoleConfig,
+    ): array {
+        return $this->agentRunner->runFacilitator(
+            $execution->getStep(),
+            $execution->getRound(),
+            $context->facilitatorRole,
+            $context->topic,
+            $context->promptConfiguration->getBrainstormSystemPrompt(),
+            $context->promptConfiguration->getFacilitatorAppendPrompt(),
+            $context->promptConfiguration->getFacilitatorStartPrompt(),
+            $context->promptConfiguration->getFacilitatorContinuePrompt(),
+            $context->workingDir,
+            $execution->getFacilitatorSummary(),
+            $facResponseFilesList,
+            $facRoleConfig?->getTimeout() ?? $context->timeout,
+            $facRoleConfig?->getCommand() ?? [],
         );
     }
 

@@ -6,11 +6,16 @@ namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\ChainNotFoundException;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainStepFactory;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FallbackConfigVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlChainStepMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRetryPolicyMapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -90,7 +95,24 @@ chains:
 YAML;
 
         file_put_contents($this->fixturePath, $yaml);
-        $this->loader = new YamlChainLoaderService($this->fixturePath);
+        $this->loader = self::createLoader($this->fixturePath);
+    }
+
+    private static function createFactory(): ChainDefinitionFactory
+    {
+        return new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification());
+    }
+
+    private static function createLoader(string $yamlPath): YamlChainLoaderService
+    {
+        $retryPolicyMapper = new YamlRetryPolicyMapper();
+
+        return new YamlChainLoaderService(
+            $yamlPath,
+            self::createFactory(),
+            new YamlChainStepMapper(new ChainStepFactory(), $retryPolicyMapper),
+            $retryPolicyMapper,
+        );
     }
 
     protected function tearDown(): void
@@ -195,7 +217,7 @@ YAML;
     #[Test]
     public function loadHandlesMissingFile(): void
     {
-        $loader = new YamlChainLoaderService('/nonexistent/path.yaml');
+        $loader = self::createLoader('/nonexistent/path.yaml');
 
         $chains = $loader->list();
 
@@ -211,7 +233,7 @@ YAML;
         file_put_contents($fixturePath, "chains:\n  bad:\n    steps: []\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('Chain "bad" must have at least one step');
             $loader->load('bad');
@@ -230,7 +252,7 @@ YAML;
         file_put_contents($fixturePath, "chains:\n  bad:\n    steps:\n      - { role: r1 }\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('Step "type" is required');
             $loader->load('bad');
@@ -249,7 +271,7 @@ YAML;
         file_put_contents($fixturePath, "chains:\n  bad:\n    steps:\n      - { type: unknown, role: r1 }\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('Step "type" is required');
             $loader->load('bad');
@@ -268,7 +290,7 @@ YAML;
         file_put_contents($fixturePath, "chains:\n  bad:\n    steps:\n      - { type: agent, runner: pi }\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('Agent step "role" is required');
             $loader->load('bad');
@@ -287,7 +309,7 @@ YAML;
         file_put_contents($fixturePath, "chains:\n  bad:\n    steps:\n      - { type: quality_gate, label: Test }\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('quality_gate step must have "command"');
             $loader->load('bad');
@@ -306,7 +328,7 @@ YAML;
         file_put_contents($fixturePath, "chains:\n  bad:\n    steps:\n      - { type: quality_gate, command: 'make lint' }\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('quality_gate step must have "label"');
             $loader->load('bad');
@@ -325,7 +347,7 @@ YAML;
         file_put_contents($fixturePath, "chains:\n  bad:\n    type: dynamic\n    facilitator: analyst\n    participants: []\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('at least one participant');
             $loader->load('bad');
@@ -344,7 +366,7 @@ YAML;
         file_put_contents($fixturePath, "chains:\n  bad:\n    type: dynamic\n    participants: [a, b]\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('must specify a facilitator');
             $loader->load('bad');
@@ -363,7 +385,7 @@ YAML;
         file_put_contents($fixturePath, "chains:\n  dyn:\n    type: dynamic\n    facilitator: x\n    participants: [a]\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('must specify prompts.brainstorm_system');
             $loader->load('dyn');
@@ -396,7 +418,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('dyn');
             $prompts = $chain->getPromptConfiguration();
             self::assertSame('not_a_file.txt', $prompts->getBrainstormSystemPrompt());
@@ -430,7 +452,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('dyn');
             self::assertSame(10, $chain->getMaxRounds());
         } finally {
@@ -460,7 +482,7 @@ YAML);
         file_put_contents($fixturePath, "chains:\n  s:\n    type: static\n    steps:\n      - { type: agent, role: r1 }\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('s');
             self::assertSame(ChainTypeEnum::staticType, $chain->getType());
             self::assertFalse($chain->isDynamic());
@@ -511,7 +533,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('dyn');
 
             $analyst = $chain->getRoleConfig('analyst');
@@ -563,7 +585,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
 
             $staticChain = $loader->load('static_chain');
             self::assertSame(['--model', 'gpt-4o'], $staticChain->getRoleConfig('r1')->getCommand());
@@ -595,7 +617,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('s');
 
             $config = $chain->getRoleConfig('custom_role');
@@ -630,7 +652,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('retry_chain');
 
             $retryPolicy = $chain->getDefaultRetryPolicy();
@@ -674,7 +696,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('mixed_retry');
 
             // Цепочная политика
@@ -714,7 +736,7 @@ YAML);
         file_put_contents($fixturePath, "chains:\n  plain:\n    steps:\n      - { type: agent, role: r1 }\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('plain');
 
             self::assertNull($chain->getDefaultRetryPolicy());
@@ -743,7 +765,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('step_retry');
 
             // Нет цепочной политики
@@ -791,7 +813,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('s');
 
             // analyst: fallback задан с полной command
@@ -828,7 +850,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('s');
 
             $r1Config = $chain->getRoleConfig('r1');
@@ -857,7 +879,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('s');
 
             $r1Config = $chain->getRoleConfig('r1');
@@ -895,7 +917,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('fb_retry');
 
             // analyst: fallback через role config + retry на шаге
@@ -940,7 +962,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('budgeted');
 
             $budget = $chain->getBudget();
@@ -979,7 +1001,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('dyn_budget');
 
             $budget = $chain->getBudget();
@@ -1001,7 +1023,7 @@ YAML);
         file_put_contents($fixturePath, "chains:\n  plain:\n    steps:\n      - { type: agent, role: r1 }\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('plain');
 
             self::assertNull($chain->getBudget());
@@ -1026,7 +1048,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('empty_budget');
 
             self::assertNull($chain->getBudget());
@@ -1052,7 +1074,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('per_step');
 
             $budget = $chain->getBudget();
@@ -1089,7 +1111,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('per_role_budget');
 
             $budget = $chain->getBudget();
@@ -1139,7 +1161,7 @@ YAML;
         file_put_contents($fixturePath, $yaml);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('implement');
 
             $steps = $chain->getSteps();
@@ -1181,7 +1203,7 @@ YAML;
         file_put_contents($fixturePath, $yaml);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('simple');
 
             foreach ($chain->getSteps() as $step) {
@@ -1231,7 +1253,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('with_gates');
 
             $steps = $chain->getSteps();
@@ -1279,7 +1301,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('default_timeout');
 
             $step = $chain->getSteps()[0];
@@ -1308,7 +1330,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('named_gate');
 
             $step = $chain->getSteps()[0];
@@ -1341,7 +1363,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('mixed');
 
             $steps = $chain->getSteps();
@@ -1375,7 +1397,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('nc_step');
 
             // r1: no_context_files = true
@@ -1404,7 +1426,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('nc_chain');
 
             // Оба шага наследуют no_context_files от цепочки
@@ -1432,7 +1454,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('nc_override');
 
             // r1: наследует true от цепочки
@@ -1454,7 +1476,7 @@ YAML);
         file_put_contents($fixturePath, "chains:\n  plain:\n    steps:\n      - { type: agent, role: r1 }\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('plain');
 
             self::assertFalse($chain->getSteps()[0]->hasNoContextFiles());
@@ -1490,7 +1512,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('dyn_t');
 
             self::assertSame(600, $chain->getTimeout());
@@ -1523,7 +1545,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('dyn_nt');
 
             self::assertNull($chain->getTimeout());
@@ -1548,7 +1570,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('static_t');
 
             self::assertSame(1200, $chain->getTimeout());
@@ -1567,7 +1589,7 @@ YAML);
         file_put_contents($fixturePath, "chains:\n  plain:\n    steps:\n      - { type: agent, role: r1 }\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('plain');
 
             self::assertNull($chain->getTimeout());
@@ -1603,7 +1625,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('dyn_mt');
 
             self::assertSame(1800, $chain->getMaxTime());
@@ -1636,7 +1658,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('dyn_nmt');
 
             self::assertNull($chain->getMaxTime());
@@ -1742,7 +1764,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('cond');
 
             // Auto-detected as conditional
@@ -1785,7 +1807,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('cond_qg');
 
             self::assertSame(ChainTypeEnum::conditionalType, $chain->getType());
@@ -1820,7 +1842,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('explicit');
 
             self::assertSame(ChainTypeEnum::conditionalType, $chain->getType());
@@ -1840,7 +1862,7 @@ YAML);
         file_put_contents($fixturePath, "chains:\n  plain:\n    steps:\n      - { type: agent, role: r1 }\n");
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('plain');
 
             self::assertSame(ChainTypeEnum::staticType, $chain->getType());
@@ -1883,7 +1905,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('when-condition references unknown step name "nonexistent"');
             $loader->load('bad_ref');
@@ -1911,7 +1933,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('not yet executed');
             $loader->load('fwd_ref');
@@ -1938,7 +1960,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('not yet executed');
             $loader->load('self_ref');
@@ -1965,7 +1987,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('ne_cond');
 
             $when = $chain->getSteps()[1]->getWhen();
@@ -1994,7 +2016,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('result_cond');
 
             self::assertSame(ChainTypeEnum::conditionalType, $chain->getType());
@@ -2025,7 +2047,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessage('Invalid condition expression');
             $loader->load('bad_expr');
@@ -2056,7 +2078,7 @@ chains:
 YAML);
 
         try {
-            $loader = new YamlChainLoaderService($fixturePath);
+            $loader = self::createLoader($fixturePath);
             $chain = $loader->load('multi_cond');
 
             self::assertSame(ChainTypeEnum::conditionalType, $chain->getType());

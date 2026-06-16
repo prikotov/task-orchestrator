@@ -29,6 +29,11 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Cha
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportResult;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainStepFactory;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlChainStepMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRetryPolicyMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\OrchestrateCommand;
 
@@ -119,6 +124,261 @@ final class OrchestrateCommandTest extends TestCase
         $tester->execute(['task' => 'test', '--timeout' => '600', '--report-format' => 'none']);
 
         self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+    }
+
+    // ─── CLI option mapping (precedence: CLI explicit > chain config > hard default) ──
+
+    #[Test]
+    public function executeWithoutTimeoutOptionPassesNullToHandler(): void
+    {
+        // Arrange: static-цепочка, --timeout НЕ передан явно.
+        $chain = $this->createStaticChainDefinition();
+        $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+            });
+
+        // Act
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--report-format' => 'none']);
+
+        // Assert: timeout null → execution-strategy возьмёт chain config / hard default.
+        self::assertNotNull($capturedCommand);
+        self::assertNull($capturedCommand->timeout);
+    }
+
+    #[Test]
+    public function executeWithExplicitTimeoutOptionPassesValueToHandler(): void
+    {
+        // Arrange
+        $chain = $this->createStaticChainDefinition();
+        $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+            });
+
+        // Act: явный --timeout=120 должен иметь приоритет над chain config.
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--timeout' => '120', '--report-format' => 'none']);
+
+        // Assert
+        self::assertNotNull($capturedCommand);
+        self::assertSame(120, $capturedCommand->timeout);
+    }
+
+    #[Test]
+    public function executeWithExplicitZeroTimeoutPassesZeroNotNullToHandler(): void
+    {
+        // Edge case: --timeout=0 — явное значение, а не «не передано».
+        // 0 должен дойти до стратегии как валидный override, а не превратиться в null
+        // (что привело бы к применению chain.timeout/hard default).
+        $chain = $this->createStaticChainDefinition();
+        $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+            });
+
+        // Act: явный --timeout=0.
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--timeout' => '0', '--report-format' => 'none']);
+
+        // Assert: 0 сохранён как явный override; resolveOptionalIntOption не схлопнул его в null.
+        self::assertNotNull($capturedCommand);
+        self::assertSame(0, $capturedCommand->timeout);
+    }
+
+    #[Test]
+    public function executeWithEmptyTimeoutStringPassesNullToHandler(): void
+    {
+        // Edge case: --timeout= (явная пустая строка) — не валидное число.
+        // resolveOptionalIntOption проходит через ветку $value !== '' → null, чтобы
+        // execution-strategy применила chain.timeout/hard default, а не (int)'' = 0.
+        $chain = $this->createStaticChainDefinition();
+        $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+            });
+
+        // Act: --timeout='' (явная пустая строка).
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--timeout' => '', '--report-format' => 'none']);
+
+        // Assert: пустая строка → null (не 0).
+        self::assertNotNull($capturedCommand);
+        self::assertNull($capturedCommand->timeout);
+    }
+
+    #[Test]
+    public function executeWithoutMaxTimeOptionPassesNullToHandler(): void
+    {
+        // Arrange
+        $chain = $this->createStaticChainDefinition();
+        $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+            });
+
+        // Act: --max-time НЕ передан.
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--report-format' => 'none']);
+
+        // Assert: maxTime null → chain.max_time / hard default не затёрт.
+        self::assertNotNull($capturedCommand);
+        self::assertNull($capturedCommand->maxTime);
+    }
+
+    #[Test]
+    public function executeWithExplicitMaxTimeOptionPassesValueToHandler(): void
+    {
+        // Arrange
+        $chain = $this->createStaticChainDefinition();
+        $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+            });
+
+        // Act: явный --max-time=999.
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--max-time' => '999', '--report-format' => 'none']);
+
+        // Assert
+        self::assertNotNull($capturedCommand);
+        self::assertSame(999, $capturedCommand->maxTime);
+    }
+
+    #[Test]
+    public function executeWithExplicitZeroMaxTimePassesZeroNotNullToHandler(): void
+    {
+        // Edge case (симметрично executeWithExplicitZeroTimeoutPassesZeroNotNullToHandler):
+        // --max-time=0 — явное значение, а не «не передано». 0 должен дойти до стратегии
+        // как валидный override, а не превратиться в null.
+        $chain = $this->createStaticChainDefinition();
+        $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+            });
+
+        // Act: явный --max-time=0.
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--max-time' => '0', '--report-format' => 'none']);
+
+        // Assert: 0 сохранён как явный override; resolveOptionalIntOption не схлопнул его в null.
+        self::assertNotNull($capturedCommand);
+        self::assertSame(0, $capturedCommand->maxTime);
+    }
+
+    #[Test]
+    public function resumeWithoutTimeoutOptionPassesNullToHandler(): void
+    {
+        // Arrange: resume-ветка не обращается к loadChainHandler.
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(
+                    roundResults: [],
+                    totalTime: 0.0,
+                    totalInputTokens: 0,
+                    totalOutputTokens: 0,
+                    totalCost: 0.0,
+                    synthesis: 'resumed',
+                    maxRoundsReached: false,
+                    sessionDir: '/tmp/resume',
+                    budgetExceeded: false,
+                    budgetLimit: 0.0,
+                    budgetExceededRole: null,
+                    timedOut: false,
+                );
+            });
+
+        // Act: resume без явного --timeout.
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--resume' => '/tmp/resume-dir']);
+
+        // Assert: precedence для resume такой же, как для initial run.
+        self::assertNotNull($capturedCommand);
+        self::assertNull($capturedCommand->timeout);
+        self::assertNull($capturedCommand->maxTime);
+    }
+
+    #[Test]
+    public function resumeWithExplicitTimeoutOptionPassesValueToHandler(): void
+    {
+        // Arrange
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(
+                    roundResults: [],
+                    totalTime: 0.0,
+                    totalInputTokens: 0,
+                    totalOutputTokens: 0,
+                    totalCost: 0.0,
+                    synthesis: 'resumed',
+                    maxRoundsReached: false,
+                    sessionDir: '/tmp/resume',
+                    budgetExceeded: false,
+                    budgetLimit: 0.0,
+                    budgetExceededRole: null,
+                    timedOut: false,
+                );
+            });
+
+        // Act: resume с явным --timeout=240.
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--resume' => '/tmp/resume-dir', '--timeout' => '240', '--max-time' => '7200']);
+
+        // Assert
+        self::assertNotNull($capturedCommand);
+        self::assertSame(240, $capturedCommand->timeout);
+        self::assertSame(7200, $capturedCommand->maxTime);
     }
 
     // ─── Dry-run ───────────────────────────────────────────────────────────────
@@ -232,7 +492,7 @@ chains:
 YAML);
 
         try {
-            $chainLoader = new YamlChainLoaderService('/nonexistent/default.yaml');
+            $chainLoader = new YamlChainLoaderService('/nonexistent/default.yaml', new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification()), new YamlChainStepMapper(new ChainStepFactory(), new YamlRetryPolicyMapper()), new YamlRetryPolicyMapper());
             $mapper = new \TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainDefinitionDtoMapper();
             $loadHandler = new LoadChainQueryHandler($chainLoader, $mapper);
 
@@ -284,7 +544,7 @@ chains:
 YAML);
 
         try {
-            $chainLoader = new YamlChainLoaderService('/nonexistent/default.yaml');
+            $chainLoader = new YamlChainLoaderService('/nonexistent/default.yaml', new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification()), new YamlChainStepMapper(new ChainStepFactory(), new YamlRetryPolicyMapper()), new YamlRetryPolicyMapper());
             $chainValidator = new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidatorService();
             $violationMapper = new \TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainConfigViolationDtoMapper();
             $validateHandler = new ValidateChainConfigQueryHandler($chainLoader, $chainValidator, $violationMapper);

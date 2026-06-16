@@ -9,20 +9,17 @@ use Override;
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\ChainNotFoundException;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\YamlChainLoaderServiceInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionExpressionVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FallbackConfigVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlChainStepMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRetryPolicyMapper;
 
 /**
  * Реализация ChainLoaderInterface — загрузка цепочек из YAML-файла.
@@ -42,8 +39,12 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     /** @var array<string, ChainDefinitionInterface>|null */
     private ?array $chains = null;
 
-    public function __construct(string $yamlPath)
-    {
+    public function __construct(
+        string $yamlPath,
+        private readonly ChainDefinitionFactory $chainDefinitionFactory,
+        private readonly YamlChainStepMapper $yamlChainStepMapper,
+        private readonly YamlRetryPolicyMapper $yamlRetryPolicyMapper,
+    ) {
         $this->yamlPath = $yamlPath;
     }
 
@@ -132,11 +133,11 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     private function parseStaticChain(string $name, array $raw, array $roles): ChainDefinitionInterface
     {
         $stepsData = $raw['steps'] ?? [];
-        $chainRetryPolicy = $this->parseRetryPolicy($raw['retry_policy'] ?? null);
+        $chainRetryPolicy = $this->yamlRetryPolicyMapper->mapToChainRetryPolicy($raw['retry_policy'] ?? null);
         $budget = $this->parseBudget($raw['budget'] ?? null);
         $chainNoContextFiles = (bool) ($raw['no_context_files'] ?? false);
 
-        $steps = $this->parseSteps($name, $stepsData, $chainRetryPolicy, $chainNoContextFiles);
+        $steps = $this->yamlChainStepMapper->mapToChainSteps($name, $stepsData, $chainRetryPolicy, $chainNoContextFiles);
         $fixIterations = $this->parseFixIterations($raw['fix_iterations'] ?? []);
 
         // Auto-detect conditional: если хотя бы один шаг имеет when-выражение
@@ -151,7 +152,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
         if ($hasConditions) {
             $this->validateWhenReferences($name, $steps);
 
-            return ConditionalChainDefinitionVo::createFromConditionalSteps(
+            return $this->chainDefinitionFactory->createFromConditionalSteps(
                 name: $name,
                 description: $raw['description'] ?? '',
                 steps: $steps,
@@ -163,7 +164,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
             );
         }
 
-        return StaticChainDefinitionVo::createFromSteps(
+        return $this->chainDefinitionFactory->createFromSteps(
             name: $name,
             description: $raw['description'] ?? '',
             steps: $steps,
@@ -186,16 +187,16 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     private function parseConditionalChain(string $name, array $raw, array $roles): ChainDefinitionInterface
     {
         $stepsData = $raw['steps'] ?? [];
-        $chainRetryPolicy = $this->parseRetryPolicy($raw['retry_policy'] ?? null);
+        $chainRetryPolicy = $this->yamlRetryPolicyMapper->mapToChainRetryPolicy($raw['retry_policy'] ?? null);
         $budget = $this->parseBudget($raw['budget'] ?? null);
         $chainNoContextFiles = (bool) ($raw['no_context_files'] ?? false);
 
-        $steps = $this->parseSteps($name, $stepsData, $chainRetryPolicy, $chainNoContextFiles);
+        $steps = $this->yamlChainStepMapper->mapToChainSteps($name, $stepsData, $chainRetryPolicy, $chainNoContextFiles);
         $fixIterations = $this->parseFixIterations($raw['fix_iterations'] ?? []);
 
         $this->validateWhenReferences($name, $steps);
 
-        return ConditionalChainDefinitionVo::createFromConditionalSteps(
+        return $this->chainDefinitionFactory->createFromConditionalSteps(
             name: $name,
             description: $raw['description'] ?? '',
             steps: $steps,
@@ -204,106 +205,6 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
             defaultRetryPolicy: $chainRetryPolicy,
             budget: $budget,
             timeout: $raw['timeout'] ?? null,
-        );
-    }
-
-    /**
-     * Парсит список шагов цепочки (agent и quality_gate).
-     *
-     * @param list<array<string, mixed>> $stepsData
-     * @return list<ChainStepVo>
-     */
-    private function parseSteps(string $name, array $stepsData, ?ChainRetryPolicyVo $chainRetryPolicy, bool $chainNoContextFiles): array
-    {
-        return array_map(
-            function (array $step) use ($name, $chainRetryPolicy, $chainNoContextFiles): ChainStepVo {
-                $stepType = ChainStepTypeEnum::tryFrom($step['type'] ?? '') ?? throw new InvalidArgumentException(
-                    sprintf('Step "type" is required in chain "%s" (expected: agent, quality_gate or tool).', $name),
-                );
-
-                // Парсим when-выражение (опционально)
-                $when = isset($step['when']) && is_string($step['when']) && $step['when'] !== ''
-                    ? ConditionExpressionVo::createFromExpression($step['when'])
-                    : null;
-
-                // Парсим post_step hook (опционально)
-                $postStep = isset($step['post_step']) && is_string($step['post_step']) && $step['post_step'] !== ''
-                    ? $step['post_step']
-                    : null;
-
-                if ($stepType === ChainStepTypeEnum::tool) {
-                    $command = $step['command'] ?? null;
-                    $label = $step['label'] ?? null;
-
-                    if ($command === null || $command === '') {
-                        throw new InvalidArgumentException(
-                            sprintf('Tool step must have "command" in chain "%s".', $name),
-                        );
-                    }
-
-                    if ($label === null || $label === '') {
-                        throw new InvalidArgumentException(
-                            sprintf('Tool step must have "label" in chain "%s".', $name),
-                        );
-                    }
-
-                    return ChainStepVo::createTool(
-                        command: $command,
-                        label: $label,
-                        timeoutSeconds: $step['timeout_seconds'] ?? 120,
-                        outputKey: $step['output_key'] ?? null,
-                        name: $step['name'] ?? null,
-                        when: $when,
-                        postStep: $postStep,
-                    );
-                }
-
-                if ($stepType === ChainStepTypeEnum::qualityGate) {
-                    $command = $step['command'] ?? null;
-                    $label = $step['label'] ?? null;
-
-                    if ($command === null || $command === '') {
-                        throw new InvalidArgumentException(
-                            sprintf('quality_gate step must have "command" in chain "%s".', $name),
-                        );
-                    }
-
-                    if ($label === null || $label === '') {
-                        throw new InvalidArgumentException(
-                            sprintf('quality_gate step must have "label" in chain "%s".', $name),
-                        );
-                    }
-
-                    return ChainStepVo::createQualityGate(
-                        command: $command,
-                        label: $label,
-                        timeoutSeconds: $step['timeout_seconds'] ?? 120,
-                        name: $step['name'] ?? null,
-                        when: $when,
-                        postStep: $postStep,
-                    );
-                }
-
-                // Agent step
-                $stepRetryPolicy = $this->parseRetryPolicy($step['retry_policy'] ?? null);
-                $stepNoContextFiles = (bool) ($step['no_context_files'] ?? $chainNoContextFiles);
-
-                return ChainStepVo::createAgent(
-                    role: $step['role'] ?? throw new InvalidArgumentException(
-                        sprintf('Agent step "role" is required in chain "%s".', $name),
-                    ),
-                    runner: $step['runner'] ?? 'pi',
-                    tools: $step['tools'] ?? null,
-                    model: $step['model'] ?? null,
-                    retryPolicy: $stepRetryPolicy ?? $chainRetryPolicy,
-                    name: $step['name'] ?? null,
-                    noContextFiles: $stepNoContextFiles,
-                    when: $when,
-                    postStep: $postStep,
-                    runnerExplicit: array_key_exists('runner', $step),
-                );
-            },
-            $stepsData,
         );
     }
 
@@ -394,7 +295,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
         $prompts = $this->resolvePrompts($name, $raw);
         $budget = $this->parseBudget($raw['budget'] ?? null);
 
-        return DynamicChainDefinitionVo::createFromDynamic(
+        return $this->chainDefinitionFactory->createFromDynamic(
             name: $name,
             description: $raw['description'] ?? '',
             facilitator: $facilitator,
@@ -412,20 +313,6 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
             timeout: $raw['timeout'] ?? null,
             maxTime: $raw['max_time'] ?? null,
         );
-    }
-
-    /**
-     * Парсит retry_policy из YAML-конфигурации.
-     *
-     * @param array{max_retries?: int, initial_delay_ms?: int, max_delay_ms?: int, multiplier?: float}|null $raw
-     */
-    private function parseRetryPolicy(?array $raw): ?ChainRetryPolicyVo
-    {
-        if ($raw === null || $raw === []) {
-            return null;
-        }
-
-        return ChainRetryPolicyVo::createFromArray($raw);
     }
 
     /**

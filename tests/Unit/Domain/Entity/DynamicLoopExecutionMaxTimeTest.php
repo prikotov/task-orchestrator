@@ -76,7 +76,7 @@ final class DynamicLoopExecutionMaxTimeTest extends TestCase
             initialFacilitatorJournal: 'Initial journal\n',
         );
         $execution->markMaxTimeExceeded();
-        $execution->appendFacilitatorJournal(
+        $execution->getJournal()->appendFacilitatorJournal(
             '[2026-04-27 12:00] Дискуссия остановлена: резервирование времени на синтез (reserve=360s)\n',
         );
 

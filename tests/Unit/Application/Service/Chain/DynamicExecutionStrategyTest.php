@@ -452,6 +452,139 @@ final class DynamicExecutionStrategyTest extends TestCase
         self::assertSame(600, $capturedTimeout);
     }
 
+    #[Test]
+    public function executeUsesChainMaxTimeWhenNoCliOverride(): void
+    {
+        // Arrange: chain.max_time=1800, CLI maxTime не передан (null).
+        $this->setUpDynamicConfig('maxtimed_chain', maxTime: 1800);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 0.0,
+            totalInputTokens: 0,
+            totalOutputTokens: 0,
+            totalCost: 0.0,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        );
+
+        $capturedMaxTime = -1;
+        $this->dynamicLoopRunner->method('execute')->willReturnCallback(
+            function (
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $context,
+            ) use (
+                &$capturedMaxTime,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedMaxTime = $context->maxTime;
+
+                return $loopResult;
+            },
+        );
+
+        // Act
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('maxtimed_chain', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'maxtimed_chain',
+                task: 'Test',
+            ),
+        );
+
+        // Assert: chain.max_time применяется, CLI default его не затирает.
+        self::assertSame(1800, $capturedMaxTime);
+    }
+
+    #[Test]
+    public function executeCliMaxTimeOverridesChain(): void
+    {
+        // Arrange: chain.max_time=1800, но CLI явно задаёт 900.
+        $this->setUpDynamicConfig('maxtimed_chain', maxTime: 1800);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 0.0,
+            totalInputTokens: 0,
+            totalOutputTokens: 0,
+            totalCost: 0.0,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        );
+
+        $capturedMaxTime = -1;
+        $this->dynamicLoopRunner->method('execute')->willReturnCallback(
+            function (
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $context,
+            ) use (
+                &$capturedMaxTime,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedMaxTime = $context->maxTime;
+
+                return $loopResult;
+            },
+        );
+
+        // Act
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('maxtimed_chain', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'maxtimed_chain',
+                task: 'Test',
+                maxTime: 900,
+            ),
+        );
+
+        // Assert: явный CLI maxTime побеждает chain config.
+        self::assertSame(900, $capturedMaxTime);
+    }
+
+    #[Test]
+    public function executeDefaultsTo3600WhenNoMaxTimeAnywhere(): void
+    {
+        // Arrange: ни в chain, ни в CLI нет max_time.
+        $this->setUpDynamicConfig('no_maxtime');
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 0.0,
+            totalInputTokens: 0,
+            totalOutputTokens: 0,
+            totalCost: 0.0,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        );
+
+        $capturedMaxTime = -1;
+        $this->dynamicLoopRunner->method('execute')->willReturnCallback(
+            function (
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $context,
+            ) use (
+                &$capturedMaxTime,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedMaxTime = $context->maxTime;
+
+                return $loopResult;
+            },
+        );
+
+        // Act
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('no_maxtime', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'no_maxtime',
+                task: 'Test',
+            ),
+        );
+
+        // Assert: hard default 3600.
+        self::assertSame(3600, $capturedMaxTime);
+    }
+
     // --- Audit logger tests ---
 
     #[Test]
@@ -807,6 +940,190 @@ final class DynamicExecutionStrategyTest extends TestCase
     }
 
     #[Test]
+    public function resumeUsesChainMaxTimeWhenNoCliOverride(): void
+    {
+        // Arrange: chain.max_time=1800, resume без явного CLI maxTime.
+        $this->setUpDynamicConfig('maxtimed_chain', maxTime: 1800);
+
+        $state = new DynamicLoopSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed with chain max_time',
+            maxRoundsReached: false,
+        );
+
+        $capturedMaxTime = -1;
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?DynamicLoopAuditLoggerInterface $auditLogger = null,
+            ) use (
+                &$capturedMaxTime,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedMaxTime = $ctx->maxTime;
+
+                return $loopResult;
+            });
+
+        // Act
+        $this->strategy->resume(
+            new ExecutionChainInfoVo('maxtimed_chain', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'maxtimed_chain',
+                task: 'Test',
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
+
+        // Assert: precedence для resume идентичен initial run.
+        self::assertSame(1800, $capturedMaxTime);
+    }
+
+    #[Test]
+    public function resumeCliMaxTimeOverridesChain(): void
+    {
+        // Arrange: chain.max_time=1800, но CLI явно задаёт 900.
+        $this->setUpDynamicConfig('maxtimed_chain', maxTime: 1800);
+
+        $state = new DynamicLoopSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed with CLI max_time',
+            maxRoundsReached: false,
+        );
+
+        $capturedMaxTime = -1;
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?DynamicLoopAuditLoggerInterface $auditLogger = null,
+            ) use (
+                &$capturedMaxTime,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedMaxTime = $ctx->maxTime;
+
+                return $loopResult;
+            });
+
+        // Act
+        $this->strategy->resume(
+            new ExecutionChainInfoVo('maxtimed_chain', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'maxtimed_chain',
+                task: 'Test',
+                maxTime: 900,
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
+
+        // Assert
+        self::assertSame(900, $capturedMaxTime);
+    }
+
+    #[Test]
+    public function resumeFallsBackTo3600WhenNoMaxTimeAnywhere(): void
+    {
+        // Arrange: ни в chain, ни в CLI нет max_time.
+        $this->setUpDynamicConfig('no_maxtime');
+
+        $state = new DynamicLoopSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed with default max_time',
+            maxRoundsReached: false,
+        );
+
+        $capturedMaxTime = -1;
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
+                int $startRound = 0,
+                string $history = '',
+                string $journal = '',
+                ?DynamicLoopAuditLoggerInterface $auditLogger = null,
+            ) use (
+                &$capturedMaxTime,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedMaxTime = $ctx->maxTime;
+
+                return $loopResult;
+            });
+
+        // Act
+        $this->strategy->resume(
+            new ExecutionChainInfoVo('no_maxtime', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'no_maxtime',
+                task: 'Test',
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
+
+        // Assert: hard default 3600.
+        self::assertSame(3600, $capturedMaxTime);
+    }
+
+    #[Test]
     public function resumeCreatesAuditLoggerFromResumeDir(): void
     {
         $this->setUpDynamicConfig('brainstorm', 5);
@@ -874,13 +1191,14 @@ final class DynamicExecutionStrategyTest extends TestCase
         string $name,
         int $maxRounds = 10,
         ?int $timeout = null,
+        ?int $maxTime = null,
     ): void {
         $config = new DynamicLoopConfigVo(
             name: $name,
             description: '',
             budget: null,
             timeout: $timeout,
-            maxTime: null,
+            maxTime: $maxTime,
             roleConfigs: [],
             facilitator: 'system_analyst',
             participants: ['architect'],

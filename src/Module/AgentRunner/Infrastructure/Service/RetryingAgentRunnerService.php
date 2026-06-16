@@ -50,50 +50,30 @@ final readonly class RetryingAgentRunnerService implements RetryingAgentRunnerSe
     #[Override]
     public function run(AgentRunRequestVo $request): AgentResultVo
     {
-        $attempt = 0;
-        $lastThrowable = null;
-        /** @var AgentResultVo|null $lastResult */
-        $lastResult = null;
         $runnerName = $this->innerRunner->getName();
         $startTime = microtime(true);
 
+        /** @var AgentResultVo|null $lastResult */
+        $lastResult = null;
+        $lastThrowable = null;
+        $attempt = 0;
+
         while ($attempt <= $this->retryPolicy->getMaxRetries()) {
-            $this->metrics?->recordCounter('runner.attempt', 1, [
-                'runner' => $runnerName,
-                'attempt' => (string) ($attempt + 1),
-            ]);
+            $this->recordAttemptMetric($runnerName, $attempt);
 
             try {
                 $result = $this->innerRunner->run($request);
                 $lastResult = $result;
 
                 if (!$result->isError()) {
-                    $this->recordDuration($startTime, $runnerName, 'success');
-
-                    if ($attempt > 0) {
-                        $this->logger->info(
-                            sprintf(
-                                '[RetryingAgentRunner] Runner "%s" succeeded on attempt %d.',
-                                $runnerName,
-                                $attempt + 1,
-                            ),
-                        );
-                    }
-
-                    return $result;
+                    return $this->finalizeSuccess($result, $startTime, $runnerName, $attempt);
                 }
 
                 // Результат с ошибкой — классифицируем
                 $classification = ErrorClassificationVo::createFromClassification($result);
 
                 if (!$classification->shouldRetry()) {
-                    $this->logger->warning(
-                        sprintf(
-                            '[RetryingAgentRunner] Runner "%s" fatal error (exitCode=%d), skipping retry.',
-                            $this->innerRunner->getName(),
-                            $result->getExitCode(),
-                        ),
-                    );
+                    $this->logFatalError($runnerName, $result);
 
                     return $result;
                 }
@@ -101,41 +81,114 @@ final readonly class RetryingAgentRunnerService implements RetryingAgentRunnerSe
                 $lastThrowable = new RuntimeException(
                     $result->getErrorMessage() ?? 'Unknown agent error',
                 );
-
-                $this->metrics?->recordCounter('runner.error', 1, [
-                    'runner' => $runnerName,
-                    'attempt' => (string) ($attempt + 1),
-                ]);
-
-                $this->logRetryAttempt($attempt, $lastThrowable);
+                $this->recordErrorAndLog($runnerName, $attempt, $lastThrowable);
             } catch (Throwable $throwable) {
                 $lastThrowable = $throwable;
-
-                $this->metrics?->recordCounter('runner.error', 1, [
-                    'runner' => $runnerName,
-                    'attempt' => (string) ($attempt + 1),
-                ]);
-
-                $this->logRetryAttempt($attempt, $throwable);
+                $this->recordErrorAndLog($runnerName, $attempt, $throwable);
             }
 
+            $this->waitBeforeNextAttempt($runnerName, $attempt);
             $attempt++;
-
-            if ($attempt <= $this->retryPolicy->getMaxRetries()) {
-                $delayMs = $this->retryPolicy->getDelayForAttempt($attempt - 1);
-                $this->logger->debug(
-                    sprintf(
-                        '[RetryingAgentRunner] Runner "%s" waiting %dms before attempt %d/%d.',
-                        $this->innerRunner->getName(),
-                        $delayMs,
-                        $attempt + 1,
-                        $this->retryPolicy->getMaxRetries() + 1,
-                    ),
-                );
-                usleep($delayMs * 1000);
-            }
         }
 
+        return $this->finalizeExhausted($startTime, $runnerName, $lastResult, $lastThrowable);
+    }
+
+    /**
+     * Фиксирует счётчик попытки вызова runner'а.
+     */
+    private function recordAttemptMetric(string $runnerName, int $attempt): void
+    {
+        $this->metrics?->recordCounter('runner.attempt', 1, [
+            'runner' => $runnerName,
+            'attempt' => (string) ($attempt + 1),
+        ]);
+    }
+
+    /**
+     * Фиксирует счётчик ошибки и логирует неудачную попытку.
+     * Используется в двух ветках: выброс исключения и transient error-result.
+     */
+    private function recordErrorAndLog(string $runnerName, int $attempt, Throwable $throwable): void
+    {
+        $this->metrics?->recordCounter('runner.error', 1, [
+            'runner' => $runnerName,
+            'attempt' => (string) ($attempt + 1),
+        ]);
+        $this->logRetryAttempt($attempt, $throwable);
+    }
+
+    /**
+     * Логирует fatal-ошибку runner'а и пропускает retry.
+     */
+    private function logFatalError(string $runnerName, AgentResultVo $result): void
+    {
+        $this->logger->warning(
+            sprintf(
+                '[RetryingAgentRunner] Runner "%s" fatal error (exitCode=%d), skipping retry.',
+                $runnerName,
+                $result->getExitCode(),
+            ),
+        );
+    }
+
+    /**
+     * При наличии следующей попытки — выдерживает паузу exponential backoff.
+     */
+    private function waitBeforeNextAttempt(string $runnerName, int $attempt): void
+    {
+        if ($attempt >= $this->retryPolicy->getMaxRetries()) {
+            return;
+        }
+
+        $delayMs = $this->retryPolicy->getDelayForAttempt($attempt);
+        $this->logger->debug(
+            sprintf(
+                '[RetryingAgentRunner] Runner "%s" waiting %dms before attempt %d/%d.',
+                $runnerName,
+                $delayMs,
+                $attempt + 2,
+                $this->retryPolicy->getMaxRetries() + 1,
+            ),
+        );
+        usleep($delayMs * 1000);
+    }
+
+    /**
+     * Завершает выполнение успешным результатом: метрика duration=success и
+     * info-лог, если успех достигнут не с первой попытки.
+     */
+    private function finalizeSuccess(
+        AgentResultVo $result,
+        float $startTime,
+        string $runnerName,
+        int $attempt,
+    ): AgentResultVo {
+        $this->recordDuration($startTime, $runnerName, 'success');
+
+        if ($attempt > 0) {
+            $this->logger->info(
+                sprintf(
+                    '[RetryingAgentRunner] Runner "%s" succeeded on attempt %d.',
+                    $runnerName,
+                    $attempt + 1,
+                ),
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Завершает выполнение после исчерпания всех попыток: метрика duration=exhausted,
+     * warning и AgentResultVo с пробросом флага timeout последнего результата.
+     */
+    private function finalizeExhausted(
+        float $startTime,
+        string $runnerName,
+        ?AgentResultVo $lastResult,
+        ?Throwable $lastThrowable,
+    ): AgentResultVo {
         $this->recordDuration($startTime, $runnerName, 'exhausted');
 
         $this->logger->warning(
@@ -147,17 +200,14 @@ final readonly class RetryingAgentRunnerService implements RetryingAgentRunnerSe
             ),
         );
 
-        // Если последний результат был timeout — пробрасываем флаг
-        $timedOut = $lastResult?->isTimedOut() ?? false;
-
         return AgentResultVo::createError(
             errorMessage: sprintf(
                 'All %d attempts exhausted for runner "%s". Last error: %s',
                 $this->retryPolicy->getMaxRetries() + 1,
-                $this->innerRunner->getName(),
+                $runnerName,
                 $lastThrowable?->getMessage() ?? 'unknown',
             ),
-            timedOut: $timedOut,
+            timedOut: $lastResult?->isTimedOut() ?? false,
         );
     }
 
