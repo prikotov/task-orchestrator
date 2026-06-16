@@ -98,14 +98,14 @@ PROMPT
 ### Логи и отладка
 
 Каждый запуск пишет run-лог в `var/log/watch-subagent/`. Имя файла:
-`<YYYYMMDD_HHMMSS>-<runner>-<role-slug>.log`, например
-`20260616_120323-pi-backend-developer-levsha.log` (`runner` = `pi`|`codex`,
-`role-slug` — имя файла роли без локали и `.md`).
+`<YYYYMMDD_HHMMSS>-<runner>-<role-slug>-<pid>.log`, например
+`20260616_120323-pi-backend-developer-levsha-12345.log` (`runner` = `pi`|`codex`,
+`role-slug` — имя файла роли без локали и `.md`, `<pid>` — PID процесса;
+PID исключает коллизию при параллельных/повторных запусках в одну секунду).
 
-При ненормальном завершении дамп событий архивируется в каталог с тем же именем
-плюс PID процесса — `<...>.log` → `<...>-<pid>/` (`-<pid>` исключает коллизию
-при параллельных/повторных запусках в одну секунду). Внутри: `events/events.ndjson`
-(полный поток событий), `events/runner.stderr`, `run.log`. Например:
+При ненормальном завершении полный дамп событий архивируется в каталог с тем же
+именем (минус `.log`): `<...>-<pid>/`. Внутри: `events/events.ndjson` (полный
+поток событий), `events/runner.stderr`, `run.log` (копия лога). Например:
 `var/log/watch-subagent/20260616_120323-pi-backend-developer-levsha-12345/events/`.
 
 Env `WATCH_KEEP_TMP=1` — архивировать и успешные запуски.

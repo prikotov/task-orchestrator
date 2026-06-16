@@ -478,11 +478,12 @@ filter_files() {
 LOG_DIR="${WATCH_LOG_DIR:-$PROJECT_ROOT/var/log/watch-subagent}"
 RUN_TS=$(date +%Y%m%d_%H%M%S)
 RUN_ROLE_SLUG=$(basename "$ROLE_FILE" | sed 's/\.[a-z][a-z]\.md$//' | tr -c '[:alnum:]' '-' | tr -s '-' | sed 's/^-//;s/-$//')
-RUN_ID="${RUN_TS}-${RUNNER}-${RUN_ROLE_SLUG}"
+RUN_ID="${RUN_TS}-${RUNNER}-${RUN_ROLE_SLUG}-$$"
 RUN_LOG="$LOG_DIR/${RUN_ID}.log"
-# PID в имени каталога архива исключает коллизию: два запуска в одну секунду
-# с тем же runner+role не перезапишут дамп друг друга.
-_ARCHIVE_DIR="$LOG_DIR/${RUN_ID}-$$"
+# PID в RUN_ID (используется и для .log, и для каталога архива) исключает
+# коллизию: два запуска в одну секунду с тем же runner+role не перезапишут
+# и не перемешают логи/дампы друг друга.
+_ARCHIVE_DIR="$LOG_DIR/${RUN_ID}"
 _EXIT_REASON="unknown"
 mkdir -p "$LOG_DIR"
 
