@@ -97,10 +97,12 @@ PROMPT
 
 ### Логи и отладка
 
-Каждый запуск пишет run-лог в `var/log/watch-subagent/<ts>-<runner>-<role>.log`
-(`var/` в `.gitignore`). При ненормальном завершении рядом архивируется
-полный дамп событий (`events.ndjson`, `runner.stderr`) для разбора причин.
-Env `WATCH_KEEP_TMP=1` — архивировать и успешные запуски.
+Каждый запуск пишет run-лог в `var/log/watch-subagent/`. Имя файла:
+`<YYYYMMDD_HHMMSS>-<runner>-<role-slug>.log`, например
+`20260616_120323-pi-backend-developer-levsha.log` (`runner` = `pi`|`codex`,
+`role-slug` — имя файла роли без локали и `.md`). При ненормальном завершении
+рядом архивируется полный дамп событий (`events.ndjson`, `runner.stderr`)
+для разбора причин. Env `WATCH_KEEP_TMP=1` — архивировать и успешные запуски.
 
 Если оборачиваете запуск во внешний `timeout` (CI и т.п.) — ставьте его
 ≥ `--hard-timeout` + 60с, иначе скрипт не успеет завершиться сам и потеряет
