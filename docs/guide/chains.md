@@ -468,23 +468,31 @@ ROUND N: Facilitator → {done: true, synthesis: "..."}
 | `participants` | да | Список ролей-участников (min 1) |
 | `max_rounds` | нет | Лимит раундов (default: 10) |
 | `timeout` | нет | Таймаут цепочки в секундах |
+| `max_time` | нет | Макс. суммарное время сессии в секундах (default: 3600) |
 | `description` | нет | Описание |
 | `prompts` | нет | Маппинг именных промптов (файлы .txt). Если указан — все 7 ключей обязательны |
 
-### Chain-level timeout
+### Chain-level timeout и max_time
 
-Параметр `timeout` задаёт максимальное время выполнения цепочки (в секундах).
-Доступен на уровне цепочки в YAML-конфигурации.
+Параметры `timeout` (таймаут шага/цепочки) и `max_time` (макс. суммарное время
+сессии, dynamic) задаются на уровне цепочки в YAML-конфигурации.
 
-**Приоритет fallback (от высшего к низшему):**
+**Приоритет (от высшего к низшему):**
 
 ```
-CLI --timeout → chain.timeout → 600 (default)
+explicit CLI  →  chain.* (YAML)  →  hard default
 ```
 
-1. **CLI `--timeout`** — если передан из командной строки, переопределяет всё.
-2. **`chain.timeout`** — значение из YAML-конфигурации цепочки.
-3. **`600`** — дефолт, если нигде не указано.
+1. **Явный CLI `--timeout` / `--max-time`** — применяется только если опция передана
+   в командной строке явно. Значение по умолчанию из `--help` НЕ затирает YAML.
+2. **`chain.timeout` / `chain.max_time`** — значение из YAML-конфигурации цепочки.
+3. **Hard default** — `timeout=600` (static и dynamic); для dynamic также
+   `max_time=3600`.
+
+> ⚠️ Важно: CLI-опция `--timeout`/`--max-time` учитывается **только при явном указании**.
+> Если опция не передана, её значение `null` пробрасывается в стратегию выполнения, и
+> применяется `chain.*` из YAML, а при его отсутствии — hard default. Это устраняет
+> давний баг, когда неявный default `--timeout=600` молча затирал `chain.timeout`.
 
 **Пример:**
 
@@ -492,13 +500,14 @@ CLI --timeout → chain.timeout → 600 (default)
 chains:
   brainstorm:
     type: dynamic
-    timeout: 600              # ← 10 минут на всю цепочку
+    timeout: 1800             # ← 30 минут, применяется без явного --timeout
+    max_time: 7200            # ← 2 часа сессии, применяется без явного --max-time
     facilitator: team_lead
     participants: [architect, marketer]
     max_rounds: 20
 ```
 
-Без `timeout` в YAML:
+Без `timeout` и `max_time` в YAML:
 ```yaml
 chains:
   brainstorm:
@@ -507,9 +516,11 @@ chains:
     participants: [architect, marketer]
 ```
 
-В этом случае таймаут берётся из CLI `--timeout`, а если и он не задан — используется **600 секунд** (10 минут).
+В этом случае действуют hard defaults: `timeout=600` (static и dynamic), для dynamic также
+`max_time=3600`. Переопределить их можно только явным `--timeout`/`--max-time`.
 
-Таймаут действует одинаково для начального запуска и для **resume** (возобновления прерванной сессии).
+Приоритет действует одинаково для начального запуска и для **resume** (возобновления
+прерванной сессии).
 
 ## Кастомная static-цепочка
 

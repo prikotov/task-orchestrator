@@ -84,7 +84,7 @@ final class OrchestrateCommand extends Command
             ->addOption(self::OPT_CHAIN, 'c', InputOption::VALUE_OPTIONAL, 'Имя цепочки', 'implement')
             ->addOption(self::OPT_WORKING_DIR, 'd', InputOption::VALUE_OPTIONAL, 'Рабочая директория')
             ->addOption(self::OPT_DRY_RUN, null, InputOption::VALUE_NONE, 'Показать план без запуска')
-            ->addOption(self::OPT_TIMEOUT, 't', InputOption::VALUE_OPTIONAL, 'Таймаут на шаг (секунды)', '600')
+            ->addOption(self::OPT_TIMEOUT, 't', InputOption::VALUE_OPTIONAL, 'Таймаут на шаг (секунды). Если не задан — из chain.timeout, иначе default 600 (static/dynamic)')
             ->addOption(self::OPT_TOPIC, null, InputOption::VALUE_OPTIONAL, 'Тема для dynamic-цепочки (по умолчанию = task)')
             ->addOption(self::OPT_MAX_ROUNDS, null, InputOption::VALUE_OPTIONAL, 'Макс. раундов (dynamic)')
             ->addOption(self::OPT_FACILITATOR, null, InputOption::VALUE_OPTIONAL, 'Роль фасилитатора (dynamic)')
@@ -96,7 +96,7 @@ final class OrchestrateCommand extends Command
             ->addOption(self::OPT_NO_CONTEXT_FILES, null, InputOption::VALUE_NONE, 'Отключить автоматическую загрузку контекстных файлов (AGENTS.md, CLAUDE.md)')
             ->addOption(self::OPT_VALIDATE_CONFIG, null, InputOption::VALUE_NONE, 'Проверить конфигурацию цепочки без запуска оркестрации')
             ->addOption(self::OPT_CONFIG, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу chains.yaml (переопределяет путь по умолчанию)')
-            ->addOption(self::OPT_MAX_TIME, null, InputOption::VALUE_OPTIONAL, 'Макс. время сессии в секундах (dynamic, переопределяет chains.yaml)', '3600');
+            ->addOption(self::OPT_MAX_TIME, null, InputOption::VALUE_OPTIONAL, 'Макс. время сессии в секундах (dynamic). Если не задан — из chain.max_time, иначе default 3600');
     }
 
     #[Override]
@@ -132,7 +132,10 @@ final class OrchestrateCommand extends Command
             $chainName = $input->getOption(self::OPT_CHAIN);
             /** @var bool $dryRun */
             $dryRun = $input->getOption(self::OPT_DRY_RUN);
-            $timeout = (int) $input->getOption(self::OPT_TIMEOUT);
+            // ВАЖНО: --timeout / --max-time НЕ имеют default в addOption(), поэтому при отсутствии
+            // явного значения здесь null. Это позволяет execution-strategy применить precedence
+            // (CLI explicit > chain config > hard default), не затирая chain-level timeout/max_time.
+            $timeout = $this->resolveOptionalIntOption($input, self::OPT_TIMEOUT);
 
             /** @var string|null $workingDir */
             $workingDir = $input->getOption(self::OPT_WORKING_DIR);
@@ -140,9 +143,7 @@ final class OrchestrateCommand extends Command
             // Dynamic-опции
             /** @var string|null $topic */
             $topic = $input->getOption(self::OPT_TOPIC);
-            /** @var string|null $maxRoundsStr */
-            $maxRoundsStr = $input->getOption(self::OPT_MAX_ROUNDS);
-            $maxRounds = $maxRoundsStr !== null ? (int) $maxRoundsStr : null;
+            $maxRounds = $this->resolveOptionalIntOption($input, self::OPT_MAX_ROUNDS);
             /** @var string|null $facilitator */
             $facilitator = $input->getOption(self::OPT_FACILITATOR);
             /** @var string|null $participantsStr */
@@ -153,8 +154,7 @@ final class OrchestrateCommand extends Command
             /** @var bool $noAuditLog */
             $noAuditLog = $input->getOption(self::OPT_NO_AUDIT_LOG);
             $noContextFiles = (bool) $input->getOption(self::OPT_NO_CONTEXT_FILES);
-            $maxTimeStr = $input->getOption(self::OPT_MAX_TIME);
-            $maxTime = $maxTimeStr !== null ? (int) $maxTimeStr : null;
+            $maxTime = $this->resolveOptionalIntOption($input, self::OPT_MAX_TIME);
 
             if ($resumeDir !== null && $resumeDir !== '') {
                 $io->section(sprintf('🔄 Resuming session: %s', $resumeDir));
@@ -238,6 +238,23 @@ final class OrchestrateCommand extends Command
         } finally {
             $lock->release();
         }
+    }
+
+    /**
+     * Резолвит необязательную числовую CLI-опцию в int|null.
+     *
+     * Опции --timeout / --max-time намеренно объявлены БЕЗ default в configure(),
+     * поэтому Symfony Console возвращает null, когда опция не передана явно.
+     * Возвращая null дальше в OrchestrateChainCommand, мы позволяем execution-strategy
+     * применить корректный precedence: CLI explicit > chain config > hard default.
+     * Раннее добавление default ('600'/'3600') затирало chain-level timeout/max_time.
+     */
+    private function resolveOptionalIntOption(InputInterface $input, string $name): ?int
+    {
+        /** @var string|null $value */
+        $value = $input->getOption($name);
+
+        return $value !== null && $value !== '' ? (int) $value : null;
     }
 
     private function executeValidateConfig(InputInterface $input, SymfonyStyle $io, ?string $configPath): int
