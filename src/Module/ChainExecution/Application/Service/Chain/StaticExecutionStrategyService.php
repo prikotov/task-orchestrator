@@ -26,7 +26,14 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepR
  */
 final readonly class StaticExecutionStrategyService implements StaticExecutionStrategyServiceInterface
 {
-    private const int DEFAULT_STATIC_TIMEOUT = 300;
+    /**
+     * @techdebt 2026-06-16 (CR-1, code review Пуаро): 300 — intended default для static,
+     *   вынесен в TASK-fix-static-timeout-default-300 как осознанный behavior change.
+     *   Здесь оставлено 600 ради back-compat-нейтральности: из-за давнего CLI-бага
+     *   (default --timeout=600) static-цепочки фактически всегда получали 600, поэтому
+     *   возврат к 300 в этом fix-PR был бы тихим regression. Меняется на 300 отдельно.
+     */
+    private const int DEFAULT_STATIC_TIMEOUT = 600;
 
     public function __construct(
         private ExecuteStaticChainServiceInterface $staticChainExecutor,
@@ -43,7 +50,7 @@ final readonly class StaticExecutionStrategyService implements StaticExecutionSt
             $config,
             $command->task,
             $command->workingDir,
-            $command->timeout ?? self::DEFAULT_STATIC_TIMEOUT,
+            $command->timeout ?? $config->timeout ?? self::DEFAULT_STATIC_TIMEOUT,
             null,
             $command->noContextFiles,
         );

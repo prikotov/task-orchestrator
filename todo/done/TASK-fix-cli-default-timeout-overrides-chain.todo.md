@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер Левша
 branch: task/fix-cli-default-timeout-overrides-chain
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-fix-cli-default-timeout-overrides-chain: Не затирать chain timeout CLI default-значениями

@@ -88,6 +88,112 @@ final class StaticExecutionStrategyTest extends TestCase
         self::assertSame('result', $result->stepResults[0]->outputText);
     }
 
+    #[Test]
+    public function executeUsesChainTimeoutWhenNoCliOverride(): void
+    {
+        // Arrange: chain.timeout=200, CLI timeout не передан (null).
+        $chainInfo = new ExecutionChainInfoVo('static-test', ChainExecutionTypeEnum::staticType);
+        $config = $this->createStaticConfigWithTimeout(200);
+        $this->chainProvider->method('loadStaticChainConfig')
+            ->with('static-test')
+            ->willReturn($config);
+
+        $capturedTimeout = -1;
+        $this->staticChainExecutor->method('execute')
+            ->willReturnCallback(
+                function (
+                    ExecutionStaticChainConfigVo $chain,
+                    string $task,
+                    ?string $workingDir,
+                    int $timeout,
+                ) use (&$capturedTimeout): StaticChainResultVo {
+                    $capturedTimeout = $timeout;
+
+                    return $this->createStaticChainResult([]);
+                },
+            );
+
+        // Act
+        $this->strategy->execute($chainInfo, new OrchestrateChainCommand(
+            chainName: 'static-test',
+            task: 'Do work',
+        ));
+
+        // Assert: chain.timeout применяется, а не затирается hard default 300.
+        self::assertSame(200, $capturedTimeout);
+    }
+
+    #[Test]
+    public function executeCliTimeoutOverridesChainTimeout(): void
+    {
+        // Arrange: chain.timeout=200, но CLI явно задаёт 100.
+        $chainInfo = new ExecutionChainInfoVo('static-test', ChainExecutionTypeEnum::staticType);
+        $config = $this->createStaticConfigWithTimeout(200);
+        $this->chainProvider->method('loadStaticChainConfig')
+            ->with('static-test')
+            ->willReturn($config);
+
+        $capturedTimeout = -1;
+        $this->staticChainExecutor->method('execute')
+            ->willReturnCallback(
+                function (
+                    ExecutionStaticChainConfigVo $chain,
+                    string $task,
+                    ?string $workingDir,
+                    int $timeout,
+                ) use (&$capturedTimeout): StaticChainResultVo {
+                    $capturedTimeout = $timeout;
+
+                    return $this->createStaticChainResult([]);
+                },
+            );
+
+        // Act
+        $this->strategy->execute($chainInfo, new OrchestrateChainCommand(
+            chainName: 'static-test',
+            task: 'Do work',
+            timeout: 100,
+        ));
+
+        // Assert: явный CLI timeout побеждает chain config.
+        self::assertSame(100, $capturedTimeout);
+    }
+
+    #[Test]
+    public function executeFallsBackTo600WhenNoTimeoutAnywhere(): void
+    {
+        // Arrange: ни в chain, ни в CLI нет timeout.
+        $chainInfo = new ExecutionChainInfoVo('static-test', ChainExecutionTypeEnum::staticType);
+        $config = $this->createStaticConfig();
+        $this->chainProvider->method('loadStaticChainConfig')
+            ->with('static-test')
+            ->willReturn($config);
+
+        $capturedTimeout = -1;
+        $this->staticChainExecutor->method('execute')
+            ->willReturnCallback(
+                function (
+                    ExecutionStaticChainConfigVo $chain,
+                    string $task,
+                    ?string $workingDir,
+                    int $timeout,
+                ) use (&$capturedTimeout): StaticChainResultVo {
+                    $capturedTimeout = $timeout;
+
+                    return $this->createStaticChainResult([]);
+                },
+            );
+
+        // Act
+        $this->strategy->execute($chainInfo, new OrchestrateChainCommand(
+            chainName: 'static-test',
+            task: 'Do work',
+        ));
+
+        // Assert: hard default static-стратегии = 600 (back-compat; intended 300 → follow-up).
+        self::assertSame(600, $capturedTimeout);
+    }
+
     // --- resume() ---
 
     #[Test]
@@ -108,12 +214,17 @@ final class StaticExecutionStrategyTest extends TestCase
 
     private function createStaticConfig(): ExecutionStaticChainConfigVo
     {
+        return $this->createStaticConfigWithTimeout(null);
+    }
+
+    private function createStaticConfigWithTimeout(?int $timeout): ExecutionStaticChainConfigVo
+    {
         return new ExecutionStaticChainConfigVo(
             name: 'static-test',
             steps: [],
             fixIterations: [],
             budget: null,
-            timeout: null,
+            timeout: $timeout,
             roles: [],
             defaultRetryPolicy: null,
         );
