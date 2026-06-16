@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.24] - 2026-06-16
+
+### Fixed
+
+- Stop `--timeout`/`--max-time` CLI defaults from silently overriding `chain.timeout`/`chain.max_time`: the options no longer carry a default in `addOption()`, so an unset option resolves to `null` and the execution strategy applies precedence `explicit CLI → chain.* → hard default` (#267).
+- Stop token burn on runaway subagents: `watch-subagent.sh` `soft-timeout` now kills the run by default instead of only warning; `run-subagent` skill gains per-run logging and post-mortem event archives (#266).
+- Restore fail-fast guard for `fix_iterations` in the deprecated `ChainDefinitionVo` and sync the validator with the specification (#262, #263).
+
+### Changed
+
+- Eliminate PHPMD baseline suppressions (12 → 0) through specification + factory + mapper + owned-component redesign of `ChainDefinition` and `DynamicLoopExecution` (#261).
+- Move domain `ChainDefinition` contracts out of the Integration path (#249).
+
 ## [0.1.23] - 2026-06-06
 
 ### Changed
