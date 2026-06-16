@@ -94,6 +94,39 @@ PROMPT
 2. `--hard-timeout` достигнут — завершить в любом случае
 3. Агент стримит события → ждать (каждая новая строка продлевает ожидание)
 
+### Наблюдаемость и постмортем
+
+Каждый запуск пишет run-log в `var/log/watch-subagent/<ts>-<runner>-<role>.log`
+(каталог в `.gitignore`, runtime-данные):
+
+- **RUN START**: runner-команда, provider/model, все timeout'ы, pid, размер промпта.
+- **RUN SUMMARY**: `reason` (success_agent_end / stall / hard_timeout / missing_agent_end / external_signal / …), длительность, `events_total`, `agent_end_count`, `last_event_type`, распределение событий по типам, `max_gap`/`avg_gap` между событиями.
+
+При ненормальном завершении (любой не-success reason, или env `WATCH_KEEP_TMP=1`)
+TMPDIR архивируется в `var/log/watch-subagent/<run-id>/events/` — там лежат
+полные `events.ndjson`, `gaps.tsv` (ts / gap-от-предыдущего-события / тип),
+`runner.stderr`. Это позволяет постмортем-анализу понять, что именно делал агент
+перед зависанием.
+
+> ⚠️ **Известное ограничение (post-roadmap retro 2026-06-15):** pi на задачах с
+> tool-call'ами (особенно `read`) может зависать после `tool_execution_end` —
+> отправляет tool-result в LLM-провайдера и ждёт ответа, который не приходит
+> (обрыв прокси / timeout провайдера). `stall-timeout` (180с) ловит это, но
+> это ~3 минуты мёртвого ожидания; «logical-stall» (по отсутствию значимых
+> событий, а не любых) требует преодоления блокировки `read -t` на pipe с
+> pi-процессом — заведён как backlog-задача.
+
+### Внешние обёртки (bash `timeout`, CI)
+
+🛑 **НЕ оборачивайте** запуск `watch-subagent.sh` во внешний `timeout` МЕНЬШЕ
+`--hard-timeout` скрипта. Скрипт сам корректно завершается через свой
+stall/hard-timeout с правильным `reason` и архивом улик. Внешний преждевременный
+kill ловится (`reason=external_signal`, архив сохраняется), но **теряется детальная
+причина** зависания.
+
+Если внешняя обёртка обязательна (CI, ограничения сессии) — ставьте её timeout
+**≥ hard-timeout + 60с buffer**, чтобы дать скрипту завершиться самому.
+
 ### Формат вывода (`--output`)
 
 Через запятую можно комбинировать: `-o text,files`, `-o text,tools`.
