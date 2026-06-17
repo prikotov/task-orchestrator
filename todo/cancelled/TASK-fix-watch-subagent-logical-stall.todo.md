@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee:
 branch:
 pr:
-status: backlog
+status: cancelled
 ---
 
 # TASK-fix-watch-subagent-logical-stall: Logical-stall детектор для паттерна зависания "молчание pi"
@@ -136,3 +136,15 @@ grep reason= var/log/watch-subagent/*.log | tail -1   # → reason=logical_stall
 | :--- | :--- | :--- |
 | 2026-06-16 | Тимлид (Алекс) | Создание задачи как follow-up к PR наблюдаемости watch-subagent |
 | 2026-06-16 | Тимлид (Алекс) | Уточнение: разделение на паттерн A (эта задача) и паттерн B (уже закрыт soft-timeout в PR #266) |
+| 2026-06-17 | Тимлид (Алекс) | ❌ **Отменена.** Посыл задачи («`read -t` блокируется на pipe с pi») опровергнута 4 эмпирическими тестами (одиночный read, цикл while-read, прямой запуск pi с командой watch-subagent, FIFO+фоновый reader — все отработали корректно). Симптом (dangling tool-call `start` без `end`) был багом pi 0.79.4/0.79.5, исправленным в 0.79.6 (CHANGELOG: «Fixed inherited OpenAI Responses streaming to tolerate null message content from OpenAI-compatible servers before tool calls» #5819 + «Fixed HTTP dispatcher configuration»). Зависание не воспроизводится на 0.79.6. Существующие `stall-timeout` (180с) и `soft-timeout` kill (v0.1.24, PR #266) остаются как страховка. Урок для триажа: симптомы на внешнем инструменте → первым делом проверять `pi --version` + дату выпуска vs дату симптомов + changelog, до гипотез о нашем коде. |
+
+## Причина отмены (2026-06-17, Тимлид Алекс)
+
+Посыл задачи неверна: `read -t` **не** блокируется на pipe с pi (доказано 4 тестами). Симптом «dangling tool-call» был не нашей проблемой, а багом pi 0.79.4/0.79.5 в обработке стриминга OpenAI-compatible серверов (zai/glm) перед tool-call'ами — pi обрывал стрим, не возвращая `tool_execution_end`. Исправлено в 0.79.6 (#5819 + HTTP dispatcher fix).
+
+Решение `coproc`/фоновый reader чинило бы несуществующую проблему. Действий по коду watch-subagent не требуется: `stall-timeout` (180с) корректно ловит тишину, `soft-timeout` kill (PR #266) ловит бесконечную активность. Если зависания вернутся на новых версиях pi — новая задача с обязательным первым шагом: триаж версии pi.
+
+Три ошибки диагностики за сессию (для самопроверки):
+1. «провайдер обрывает после tool-result» — неверно.
+2. «parallel tool race в pi» — неверно (это симптом, не причина).
+3. «баг pi, out of scope» — неверно как формулировка; правильно как направление, но проверку версии pi надо было делать первым делом, а не после трёх попыток спихнуть на внешнее.
