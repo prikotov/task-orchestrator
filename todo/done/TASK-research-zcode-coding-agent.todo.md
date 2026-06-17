@@ -11,7 +11,7 @@ author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-zcode-coding-agent
 pr: "https://github.com/prikotov/task-orchestrator/pull/269"
-status: review
+status: done
 ---
 
 # TASK-research-zcode-coding-agent: ZCode (Z.AI / Zhipu)

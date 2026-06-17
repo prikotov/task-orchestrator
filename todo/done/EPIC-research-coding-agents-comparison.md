@@ -121,7 +121,7 @@ flowchart LR
 
 ### Этап 1h: Дополнительные исследования (2026-06-17)
 
-- [x] [TASK-research-zcode-coding-agent](../TASK-research-zcode-coding-agent.todo.md) — ZCode (Z.AI / Zhipu, desktop GUI-агент, GLM-5.2) *(исследование выполнено, ожидает review/PR/merge)*
+- [x] [TASK-research-zcode-coding-agent](TASK-research-zcode-coding-agent.todo.md) — ZCode (Z.AI / Zhipu, desktop GUI-агент, GLM-5.2) *(PR #269, merge подтверждён пользователем)*
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все 14 индивидуальных research-задач выполнены
