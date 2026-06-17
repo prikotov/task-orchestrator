@@ -3,7 +3,7 @@
 **Роль:** Архитектор Локи
 **Дата:** 2026-06-17
 **Объект:** `src/Module/ChainDefinition` — взаимодействие `ChainDefinitionFactory` / `ChainDefinitionValidatorService` / `YamlChainLoaderService` / `ValidateChainConfigQueryHandler`.
-**Задача:** [`todo/TASK-fix-fixiterations-config-error-dx.todo.md`](../../../todo/TASK-fix-fixiterations-config-error-dx.todo.md) (слепая зона №2 из ревью PR #261).
+**Задача:** [`todo/done/TASK-fix-fixiterations-config-error-dx.todo.md`](../../../todo/done/TASK-fix-fixiterations-config-error-dx.todo.md) (слепая зона №2 из ревью PR #261).
 
 ---
 
