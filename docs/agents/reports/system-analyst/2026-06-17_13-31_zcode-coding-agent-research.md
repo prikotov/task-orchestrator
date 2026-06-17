@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-06-17
 **Объект:** ZCode v3.1.1 (Z.AI / Zhipu AI) — desktop GUI-агент; разделы документации `agents`, `subagents`, `skill`, `mcp-services`, `usage-stats`, `remote-control`, `configuration`, `goal`, `commands`, `install`, Terms of Use
-**Задача:** [TASK-research-zcode-coding-agent](../../../../todo/TASK-research-zcode-coding-agent.todo.md), эпик [EPIC-research-coding-agents-comparison](../../../../todo/done/EPIC-research-coding-agents-comparison.md)
+**Задача:** [TASK-research-zcode-coding-agent](../../../../todo/done/TASK-research-zcode-coding-agent.todo.md), эпик [EPIC-research-coding-agents-comparison](../../../../todo/done/EPIC-research-coding-agents-comparison.md)
 
 ---
 
@@ -56,7 +56,7 @@
 
 ## Артефакты (всё в ветке `task/research-zcode-coding-agent`, незакоммичено)
 
-1. `todo/TASK-research-zcode-coding-agent.todo.md` — задача (status: in_progress).
+1. `todo/done/TASK-research-zcode-coding-agent.todo.md` — задача (status: in_progress).
 2. `docs/research/coding-agents/zcode-coding-agent-comparison.md` — основной отчёт (10 критериев + вердикт + Mermaid).
 3. `docs/research/coding-agents-summary.md` — добавлены: строка рейтинга (#16), детальная строка в разделе 2.2 (проприетарные → 4), пункт тренда 5.3 (Goal Mode), строка #17 в «Детальные отчёты», строка в приложении «Проприетарные» (→ 4).
 4. `todo/done/EPIC-research-coding-agents-comparison.md` — Stage 1h + Change History.
