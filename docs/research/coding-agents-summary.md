@@ -1,7 +1,7 @@
 # Coding Agents — Сводная таблица сравнения (финальная версия)
 
 **Дата создания:** 2026-05-09
-**Дата обновления:** 2026-05-20 (16 исследований)
+**Дата обновления:** 2026-06-17 (17 исследований)
 **Эпик:** [EPIC-research-coding-agents-comparison](../../todo/done/EPIC-research-coding-agents-comparison.md)
 **Автор:** Аналитик (Шерлок)
 
@@ -38,6 +38,7 @@
 | 13 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
 | 14 | **OpenClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ✅ | ✅ | **21** | ❌ Не подходит (4/10) |
 | 15 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
+| 16 | **ZCode (Z.AI)** | Пропр. | ❌ | ❌ | ⚠️ | ✅ | ❌ | ❌ | ⚠️ | ⚠️ | ✅ | ❌ | **17** | ❌ Не подходит (4/10) |
 
 > **Примечание:** Вердикт включает качественную оценку (числовой score не всегда совпадает с суммой баллов — учитывается вес критериев для конкретного сценария сабагентной интеграции).
 
@@ -219,13 +220,14 @@
 | **Warp Oz** | AGPL-3.0 + MIT | ✅ (клиент) | ✅ | ⚠️ Сервер проприетарный |
 | **Zeroclaw** | MIT OR Apache-2.0 (dual) | ✅ | ✅ | ❌ Нет (только trademark на бренд) |
 
-### 2.2. Проприетарные агенты (3)
+### 2.2. Проприетарные агенты (4)
 
 | Агент | К1 Промпт | К2 Роль | К3 Скиллы | К4 AGENTS.md | К5 .agents/skills/ | К6 JSON-режим | К7 Токены | К8 Free tier | К9 Провайдеры | К10 Лицензия | Вердикт |
 |-------|-----------|---------|-----------|-------------|--------------------|--------------|-----------|-------------|--------------|-------------|---------|
 | **Claude Code** | ✅ `--system-prompt` + `--append-system-prompt` | ✅ `--append-system-prompt` | ⚠️ Нет CLI | ⚠️ Только CLAUDE.md | ❌ `.claude/skills/` | ✅ `--print --output-format json` | ✅ Полная + $ | ❌ $20+/мес | ⚠️ Только Anthropic | ❌ Проприетарная | 7/10 |
 | **Factory Droid** | ⚠️ Только конфиг | ⚠️ Custom Droids | ⚠️ Нет CLI | ✅ Авто | ⚠️ С настройкой | ✅ JSON-RPC | ⚠️ Токены без $ | ❌ $20+/мес | ⚠️ 10 BYOK | ❌ Проприетарная | 6/10 |
 | **GitHub Copilot CLI** | ⚠️ copilot-instructions.md | ⚠️ User prompt only | ❌ Нет | ❌ Только copilot-instructions.md | ❌ Нет | ❌ Plain text | ❌ Нет | ⚠️ Copilot Free (ограничен) | ❌ Только GitHub | ❌ Проприетарная | 3/10 |
+| **ZCode (Z.AI)** | ❌ Нет механизма | ❌ Нет ролей | ⚠️ SKILL.md + импорт (GUI only) | ✅ AGENTS.md(High) + CLAUDE.md(Low) | ❌ Только `~/.zcode/skills/` | ❌ Нет headless/JSON | ⚠️ Богато, но только GUI | ⚠️ Free trial quota + Coding Plans | ✅ Z.ai + named BYOK + any compatible | ❌ Проприетарная (юрисдикция КНР) | 4/10 |
 
 ---
 
@@ -400,6 +402,7 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 4. **Harness-делегирование** — Warp Oz может делегировать другим CLI-агентам (Claude, OpenCode, Gemini, Codex). Потенциальный паттерн для мультиагентной оркестрации.
 5. **ACP (Agent Client Protocol)** — поддерживается Goose, Kilo Code, Hermes, OpenClaw. Потенциальный стандарт для межагентной коммуникации.
 6. **SDK-first мультиагентность** — Codebuff использует SDK для программного управления агентами (handleSteps generators, AgentDefinition). Паттерн "mix of AI generation with programmatic control" уникален среди исследованных агентов.
+7. **Self-verifying Goal Mode (ZCode)** — встроенный итеративный цикл с авто-верификацией достижения цели (`/goal`): агент сам проверяет «достигнута ли цель» в конце каждой итерации и циклится, пока верификация не пройдёт. Прямой аналог нашего `dynamic-loop` + `quality-gate`. Тренд: loop-логика мигрирует внутрь самого агента (вместо внешнего оркестратора).
 
 ### 5.4. Рекомендации по дальнейшему развитию
 
@@ -435,6 +438,7 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 | 14 | OpenClaw | [openclaw-agent-comparison.md](coding-agents/openclaw-agent-comparison.md) | ❌ Не подходит (4/10) |
 | 15 | **Codebuff** | [codebuff-comparison.md](coding-agents/codebuff-comparison.md) | ⚠️ Частично (6/10) |
 | 16 | GitHub Copilot CLI | [copilot-cli-comparison.md](coding-agents/copilot-cli-comparison.md) | ❌ Не подходит (3/10) |
+| 17 | ZCode (Z.AI) | [zcode-coding-agent-comparison.md](coding-agents/zcode-coding-agent-comparison.md) | ❌ Не подходит (4/10) |
 
 ---
 
@@ -458,10 +462,11 @@ watch-claude.sh -r $ROLE_FILE <<< "$PROMPT"
 | Codebuff | TypeScript/Bun | Apache-2.0 | 5+ (OpenRouter 100+) | 6/10 |
 | OpenClaw | TypeScript/Node.js | MIT | 40+ | 4/10 |
 
-### Проприетарные (3 агента)
+### Проприетарные (4 агента)
 
 | Агент | Язык | Провайдеры | Цена | Score |
 |-------|------|-----------|------|-------|
 | Claude Code | TypeScript/Node.js | Anthropic only | $20+/мес | 7/10 |
 | Factory Droid | Go (бинарник) | 10 BYOK | $20+/мес | 6/10 |
 | GitHub Copilot CLI | Go (бинарник) | GitHub only | Free (ограничен) / $19+/мес | 3/10 |
+| ZCode (Z.AI) | Desktop (закрытый) | Z.ai + named BYOK + any compatible | Free trial quota / Coding Plans (USD) | 4/10 |
