@@ -119,6 +119,10 @@ flowchart LR
 
 - [x] ~~TASK-research-oh-my-openagent~~ → перенесён в EPIC-research-agent-frameworks-comparison (OmO — система оркестрации, не кодинг-агент)
 
+### Этап 1h: Дополнительные исследования (2026-06-17)
+
+- [x] [TASK-research-zcode-coding-agent](../TASK-research-zcode-coding-agent.todo.md) — ZCode (Z.AI / Zhipu, desktop GUI-агент, GLM-5.2) *(исследование выполнено, ожидает review/PR/merge)*
+
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все 14 индивидуальных research-задач выполнены
 - [x] Каждый comparison-документ создан в `docs/research/coding-agents/`
@@ -148,3 +152,4 @@ flowchart LR
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-05-09 | Тимлид (Алекс) | Создание эпика |
+| 2026-06-17 | Аналитик (Шерлок) | Stage 1h: исследование ZCode (Z.AI) добавлено. Вердикт ❌ Не подходит (4/10) — desktop GUI без headless/JSON-режима (К6 — блокер). Возникший вопрос о необходимости research во втором эпике (`agent-frameworks`) закрыт: субагенты ZCode (read-only Explore + roadmap кастомных) — feature продукта, а не система оркестрации; отдельного исследования в `EPIC-research-agent-frameworks-comparison` не требуется. |
