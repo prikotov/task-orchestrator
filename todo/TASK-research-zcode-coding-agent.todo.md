@@ -10,7 +10,7 @@ epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-zcode-coding-agent
-pr:
+pr: "https://github.com/prikotov/task-orchestrator/pull/269"
 status: review
 ---
 
