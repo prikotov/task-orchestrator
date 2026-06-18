@@ -9,7 +9,7 @@ author: Тимлид (Алекс)
 assignee:
 branch: task/research-agent-frameworks-comparison
 status: done
-reopened: 2026-04-28
+reopened: 2026-06-18
 pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация)"
 ---
 
@@ -109,6 +109,10 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 - [x] [TASK-research-agent-skills](TASK-research-agent-skills.todo.md) — Agent Skills (Addy Osmani, production-grade engineering skills for AI coding agents) *(PR #258)*
 
+### Этап 1h: Дополнительные исследования (2026-06-18)
+
+- [x] [TASK-research-swarm-forge](TASK-research-swarm-forge.todo.md) — SwarmForge (unclebob / Robert C. Martin, tmux-based swarm orchestration: git worktrees per role, layered constitution, handoff-протокол, config-driven topology) *(PR #272)*
+
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
 - [x] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
@@ -145,3 +149,5 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-06-13 | Тимлид (Алекс) | Добавлена research-задача по addyosmani/agent-skills. |
 | 2026-06-13 | Аналитик (Шерлок) | Stage 1g: исследование Agent Skills подготовлено, задача ожидает review и финализацию оркестратором. |
 | 2026-06-13 | Тимлид (Алекс) | Stage 1g: TASK-research-agent-skills принята, переведена в done и подготовлена к merge PR #258. |
+| 2026-06-18 | Тимлид (Алекс) | Эпик reopened: добавлена стадия 1h — TASK-research-swarm-forge (unclebob/swarm-forge, tmux-based swarm orchestration от R.C. Martin). SwarmForge концептуально ближе всего к нашей системе ролей/AGENTS.md/conventions; предварительный verdict: заимствовать паттерны, не dependency. |
+| 2026-06-18 | Тимлид (Алекс) | Stage 1h: TASK-research-swarm-forge принята (PR #272, verdict 🟡 паттерны / 🔴 не dependency, 29/29). Эпик возвращён в `done`. |
