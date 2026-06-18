@@ -6,6 +6,7 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory;
 
 use InvalidArgumentException;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\InvalidFixIterationsException;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
@@ -25,10 +26,13 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChai
  * ConditionalChainDefinitionVo, DynamicChainDefinitionVo): централизует guard-проверки
  * инвариантов и через DI получает доменную спецификацию fix-итераций.
  *
- * Фабрика кидает generic fail-fast исключение при нарушении инварианта ссылочной
- * целостности fix-итераций. Детальная диагностика (имя группы, имя шага) остаётся
- * ответственностью {@see \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidatorService} —
- * фабрика намеренно не дублирует её, чтобы не плодить второй источник подробных сообщений.
+ * Фабрика кидает fail-fast domain-исключение {@see InvalidFixIterationsException} при
+ * нарушении инварианта ссылочной целостности fix-итераций. Сообщение остаётся generic
+ * (без имени группы/шага), но исключение несёт raw-входные данные, чтобы validate-путь
+ * мог получить детальную диагностику (имя группы, имя шага) через единый источник —
+ * коллектор {@see \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\CollectFixIterationsViolationsServiceInterface}.
+ * Фабрика намеренно не дублирует форматирование detailed-сообщений, чтобы не плодить
+ * второй источник. Run-путь остаётся fail-fast и визуально неизменным.
  *
  * Не выполняет I/O, не зависит от внешних слоёв.
  *
@@ -48,7 +52,8 @@ final readonly class ChainDefinitionFactory
      * @param list<FixIterationGroupVo> $fixIterations
      * @param array<string, RoleConfigVo> $roles per-role конфигурация
      *
-     * @throws InvalidArgumentException если шагов нет либо нарушен инвариант fix-итераций
+     * @throws InvalidFixIterationsException если нарушен инвариант ссылочной целостности fix-итераций
+     * @throws InvalidArgumentException если шагов нет (chain без шагов)
      */
     public function createFromSteps(
         string $name,
@@ -83,7 +88,8 @@ final readonly class ChainDefinitionFactory
      * @param list<FixIterationGroupVo> $fixIterations
      * @param array<string, RoleConfigVo> $roles per-role конфигурация
      *
-     * @throws InvalidArgumentException если шагов нет либо нарушен инвариант fix-итераций
+     * @throws InvalidFixIterationsException если нарушен инвариант ссылочной целостности fix-итераций
+     * @throws InvalidArgumentException если шагов нет (chain без шагов)
      */
     public function createFromConditionalSteps(
         string $name,
@@ -171,7 +177,9 @@ final readonly class ChainDefinitionFactory
     }
 
     /**
-     * Проверяет инвариант ссылочной целостности fix-итераций и кидает generic исключение.
+     * Проверяет инвариант ссылочной целостности fix-итераций и кидает carrier-исключение
+     * {@see InvalidFixIterationsException} (сообщение generic; исключение несёт raw-входы
+     * для detailed-диагностики в validate-пути).
      *
      * Сообщение намеренно общее: не собирает имя группы/шага, чтобы не дублировать
      * детальную диагностику ChainDefinitionValidatorService.
@@ -179,7 +187,7 @@ final readonly class ChainDefinitionFactory
      * @param list<ChainStepVo> $steps
      * @param list<FixIterationGroupVo> $fixIterations
      *
-     * @throws InvalidArgumentException если спецификация не выполнена
+     * @throws InvalidFixIterationsException если спецификация не выполнена
      */
     private function assertStepBasedInvariant(string $name, array $steps, array $fixIterations): void
     {
@@ -187,10 +195,10 @@ final readonly class ChainDefinitionFactory
             return;
         }
 
-        throw new InvalidArgumentException(sprintf(
-            'Chain "%s": fix_iterations must reference existing named steps and each step name must belong to at most one fix_iteration group.',
-            $name,
-        ));
+        // Carrier-исключение несёт raw-входные данные для detailed-диагностики
+        // в validate-пути; getMessage() сохраняет прежний generic-текст (run-путь
+        // визуально неизменен). Зависимости фабрики не меняются (только Specification).
+        throw new InvalidFixIterationsException($name, $steps, $fixIterations);
     }
 
     /**

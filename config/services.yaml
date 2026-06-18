@@ -97,6 +97,10 @@ services:
 
   # ─── ChainDefinition module ─────────────────────────────────────────
 
+  # Domain Service alias (Interface → Implementation)
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\CollectFixIterationsViolationsServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\CollectFixIterationsViolationsService
+
   # Integration Service alias (Interface → Implementation)
   TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainLoaderInterface:
     alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService

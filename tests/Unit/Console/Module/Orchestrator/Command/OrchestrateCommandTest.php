@@ -545,9 +545,10 @@ YAML);
 
         try {
             $chainLoader = new YamlChainLoaderService('/nonexistent/default.yaml', new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification()), new YamlChainStepMapper(new ChainStepFactory(), new YamlRetryPolicyMapper()), new YamlRetryPolicyMapper());
-            $chainValidator = new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidatorService();
+            $collector = new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\CollectFixIterationsViolationsService();
+            $chainValidator = new \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidatorService($collector);
             $violationMapper = new \TaskOrchestrator\Common\Module\ChainDefinition\Application\Mapper\ChainConfigViolationDtoMapper();
-            $validateHandler = new ValidateChainConfigQueryHandler($chainLoader, $chainValidator, $violationMapper);
+            $validateHandler = new ValidateChainConfigQueryHandler($chainLoader, $chainValidator, $violationMapper, $collector);
 
             $command = new OrchestrateCommand(
                 $this->orchestrateHandler,

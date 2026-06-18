@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainDefinitionValidatorService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\CollectFixIterationsViolationsService;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainConfigViolationVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ChainDefinitionInterface;
@@ -30,7 +31,9 @@ final class ChainDefinitionValidatorTest extends TestCase
     #[Override]
     protected function setUp(): void
     {
-        $this->validator = new ChainDefinitionValidatorService();
+        // Валидатор делегирует inline-цикл fix-итераций коллектору (единый источник
+        // detailed-логики). Точные строки сообщений сохраняются — проверка дословного переноса.
+        $this->validator = new ChainDefinitionValidatorService(new CollectFixIterationsViolationsService());
     }
 
     // ─── Static chain: valid → no violations ──

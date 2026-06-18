@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Exception\InvalidFixIterationsException;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
@@ -234,6 +235,42 @@ final class ChainDefinitionFactoryTest extends TestCase
             steps: $steps,
             fixIterations: $fixIterations,
         );
+    }
+
+    /**
+     * Carrier-исключение InvalidFixIterationsException:
+     * - наследует \InvalidArgumentException (backward-compat существующих обработчиков);
+     * - сохраняет прежний generic-текст (run-путь визуально неизменен);
+     * - несёт raw-входные данные (chainName, steps, fixIterations) для detailed-диагностики
+     *   в validate-пути через единый источник — коллектор.
+     */
+    #[Test]
+    public function createFromStepsThrowsInvalidFixIterationsExceptionCarryingRawInputs(): void
+    {
+        $steps = [
+            ChainStepVo::createAgent(role: 'dev', name: 'step1'),
+            ChainStepVo::createAgent(role: 'qa', name: 'step2'),
+        ];
+        $fixIterations = [new FixIterationGroupVo('group1', ['step1', 'ghost'], 3)];
+
+        try {
+            $this->factory->createFromSteps(
+                name: 'broken',
+                description: '',
+                steps: $steps,
+                fixIterations: $fixIterations,
+            );
+            self::fail('Expected InvalidFixIterationsException to be thrown.');
+        } catch (InvalidFixIterationsException $e) {
+            self::assertInstanceOf(\InvalidArgumentException::class, $e);
+            self::assertStringContainsString(
+                'fix_iterations must reference existing named steps and each step name must belong to at most one fix_iteration group',
+                $e->getMessage(),
+            );
+            self::assertSame('broken', $e->getChainName());
+            self::assertSame($steps, $e->getSteps());
+            self::assertSame($fixIterations, $e->getFixIterations());
+        }
     }
 
     // ─── Передача опциональных полей (budget, retry, timeout) ──
