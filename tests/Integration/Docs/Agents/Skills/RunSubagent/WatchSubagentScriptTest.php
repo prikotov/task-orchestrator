@@ -268,6 +268,41 @@ YAML);
         self::assertStringContainsString('"reason":"runner_failed_event"', $process->getErrorOutput());
     }
 
+    #[Test]
+    public function watcherTerminatesStuckRunLoopWithSummaryAndArchive(): void
+    {
+        // Симуляция бага: pi эмитит agent_start и засыпает. При большом stall-timeout
+        // (-t 999) read блокируется, и in-loop проверки soft/hard/stall не исполняются.
+        // Фоновый watcher должен сам терминировать запуск по soft-timeout, написать
+        // RUN SUMMARY (source=watcher) и заархивировать events/.
+        $logDir = $this->tempDir . '/logs';
+
+        $process = $this->runScript(
+            arguments: ['-t', '999', '-m', '60', '--runner', 'pi'],
+            env: [
+                'FAKE_RUNNER_HANG' => '1',
+                'WATCH_WATCHER_INTERVAL' => '1',
+                'WATCH_LOG_DIR' => $logDir,
+            ],
+            expectSuccess: false,
+        );
+
+        self::assertFalse($process->isSuccessful());
+
+        $runLog = $this->findLatestRunLog($logDir);
+        self::assertNotNull($runLog, 'run.log not found in ' . $logDir);
+        $log = (string) file_get_contents($runLog);
+
+        self::assertStringContainsString('watcher_started', $log, 'watcher must be started');
+        self::assertStringContainsString('watcher_fired reason=soft_timeout', $log);
+        self::assertStringContainsString('=== RUN SUMMARY ===', $log);
+        self::assertStringContainsString('reason=soft_timeout', $log);
+        self::assertStringContainsString('source=watcher', $log);
+
+        $eventsDir = dirname($runLog) . '/events';
+        self::assertFileExists($eventsDir . '/events.ndjson', 'events/ must be archived on failure');
+    }
+
     /**
      * @param list<string> $arguments
      * @param array<string, string> $env
@@ -334,6 +369,13 @@ set -euo pipefail
 printf '%s\n' "$(basename "$0")" > "$RUNNER_CAPTURE_FILE"
 printf '%s\n' "$*" > "$ARGS_CAPTURE_FILE"
 cat > "$STDIN_CAPTURE_FILE"
+if [[ "${FAKE_RUNNER_HANG:-0}" == "1" ]]; then
+    # Симуляция зависания: одно событие, затем тишина. При большом stall-timeout
+    # read блокируется, in-loop проверки soft/hard не исполняются.
+    printf '{"type":"agent_start"}\n'
+    sleep 60
+    exit 0
+fi
 if [[ -n "${FAKE_RUNNER_STDERR:-}" ]]; then
     printf '%s\n' "$FAKE_RUNNER_STDERR" >&2
 fi
@@ -355,6 +397,25 @@ sleep 0.2
 exit "${FAKE_RUNNER_EXIT_CODE:-0}"
 BASH);
         chmod($path, 0755);
+    }
+
+    private function findLatestRunLog(string $logDir): ?string
+    {
+        if (!is_dir($logDir)) {
+            return null;
+        }
+
+        $latest = null;
+        $latestMtime = 0;
+        foreach ((array) glob($logDir . '/*', GLOB_ONLYDIR) as $entry) {
+            $runLog = $entry . '/run.log';
+            if (is_file($runLog) && filemtime($runLog) > $latestMtime) {
+                $latestMtime = filemtime($runLog);
+                $latest = $runLog;
+            }
+        }
+
+        return $latest;
     }
 
     private function removeDirectory(string $path): void

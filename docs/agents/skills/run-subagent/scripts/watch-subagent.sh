@@ -32,6 +32,17 @@
 #                            (по умолчанию soft-timeout УБИВАЕТ, т.к. pi крутит
 #                            turn'ы без лимита и soft — основная защита от сжигания
 #                            токенов). Использовать только для экспериментов.
+#   WATCH_WATCHER_INTERVAL — интервал опроса фонового watcher в секундах (default: 5).
+#                            Watcher = страховка по wall-clock: проверки soft/hard/
+#                            stall живут внутри read-цикла и исполняются только
+#                            когда read вернул строку. Если read завис (real-pi
+#                            edge case, см. зависания 2026-06-18 на pi 0.79.6),
+#                            in-loop проверки не исполняются. Watcher не блокирован
+#                            в read и терминирует запуск по часам, САМ пишет
+#                            RUN SUMMARY + архив events/ (bash trap не сработает,
+#                            пока read блокирован) и каждые WATCH_WATCHER_INTERVAL
+#                            секунд пишет heartbeat в run-log — диагностическая
+#                            улика «основной цикл завис» (растущий stall_gap).
 #
 # Переменные окружения (наследование от внешней обёртки):
 #   RUNNER/PROVIDER/MODEL/REASONING — см. приоритеты выше.
@@ -57,6 +68,7 @@ set -euo pipefail
 HARD_TIMEOUT=1800
 STALL_TIMEOUT=180
 SOFT_TIMEOUT=""
+WATCHER_INTERVAL="${WATCH_WATCHER_INTERVAL:-5}"
 OUTPUT="raw"
 ROLE_FILE=""
 RUNNER="${RUNNER:-}"
@@ -505,9 +517,16 @@ PIPE="$TMPDIR/events.pipe"
 OUTFILE="$TMPDIR/events.ndjson"
 ERRFILE="$TMPDIR/runner.stderr"
 GAPS_FILE="$TMPDIR/gaps.tsv"   # ts<TAB>gap_since_prev_event_s<TAB>event_type — для анализа пауз
+# Состояние/маркеры для фонового watcher: watcher читает LAST_EVENT_FILE,
+# чтобы считать stall по wall-clock; маркеры гарантируют единственность
+# RUN SUMMARY и архива (race между in-loop cleanup и watcher).
+LAST_EVENT_FILE="$TMPDIR/last_event"
+SUMMARY_MARKER="$TMPDIR/.summary_written"
+ARCHIVE_MARKER="$TMPDIR/.archive_done"
 mkfifo "$PIPE"
 
 AGENT_PID=""
+WATCHER_PID=""
 
 # Рекурсивно собрать все PID-потомки процесса
 _get_descendants() {
@@ -624,21 +643,30 @@ print_filtered_output() {
     if has_format files; then filter_files "$OUTFILE"; fi
 }
 
-cleanup() {
-    local exit_code=$?
-    # Сохраняем reason до того, как kill_agent_tree затрёт $?.
-    local reason="${_EXIT_REASON:-unknown}"
+# ----------------------------------------------------------------------------
+# Helpers для RUN SUMMARY и архива events/. Вынесены из cleanup(), чтобы их же
+# мог вызвать фоновый watcher, когда основной цикл завис в read и trap EXIT
+# основного процесса не сработает (bash исполняет traps между builtin'ами, а
+# блокированный read их откладывает). Маркеры гарантируют единственность записи
+# на запуск (race между cleanup и watcher).
+# ----------------------------------------------------------------------------
+
+emit_run_summary() {
+    local reason="$1"
+    local exit_code="$2"
+    local source="${3:-main}"
     local now_epoch end_ts duration
+
+    # Идемпотентность: только одна RUN SUMMARY на запуск.
+    [[ -f "$SUMMARY_MARKER" ]] && return 0
+    { mkdir -p "$(dirname "$SUMMARY_MARKER")" 2>/dev/null; : > "$SUMMARY_MARKER"; } 2>/dev/null || true
+
     now_epoch=$(date +%s)
     end_ts=$(date '+%Y-%m-%d %H:%M:%S')
     duration=$((now_epoch - ${START_TIME:-0}))
 
-    # Сначала освобождаем ресурсы агента.
-    kill_agent_tree
-
-    # --- Run summary (best-effort, не падать при ошибках записи) ---
     log_run "=== RUN SUMMARY ==="
-    log_run "ended=$end_ts duration=${duration}s exit_code=$exit_code reason=$reason"
+    log_run "ended=$end_ts duration=${duration}s exit_code=$exit_code reason=$reason source=$source"
     log_run "agent_pid_at_exit=${AGENT_PID:-none}"
     if [[ -f "${OUTFILE:-}" ]]; then
         local total agent_end_count last_type
@@ -656,17 +684,113 @@ cleanup() {
         log_run "gaps_recorded=$gaps_count max_gap=${max_gap:-0}s avg_gap=${avg_gap:-0}s"
     fi
     log_run "=== END SUMMARY ==="
+}
 
-    # --- Archive TMPDIR on failure (or if WATCH_KEEP_TMP=1) ---
-    # Сохраняем улики (events.ndjson, gaps.tsv, runner.stderr) для постмортема,
-    # если агент не завершился нормально. Успешные запуски не архивируем
-    # (кроме WATCH_KEEP_TMP=1), чтобы не копить гигабайты. run.log уже в RUN_DIR.
+archive_events() {
+    local reason="$1"
+
+    [[ -f "$ARCHIVE_MARKER" ]] && return 0
+    { : > "$ARCHIVE_MARKER"; } 2>/dev/null || true
+
+    # Успешные запуски не архивируем (кроме WATCH_KEEP_TMP=1), чтобы не копить
+    # гигабайты. run.log уже лежит в RUN_DIR.
     if [[ "$reason" != success_* ]] || [[ "${WATCH_KEEP_TMP:-0}" == "1" ]]; then
         if cp -r "$TMPDIR" "$RUN_DIR/events" 2>/dev/null; then
             log_run "events_archived_to=$RUN_DIR/events"
             echo "[watch-subagent] run archived (reason=$reason): $RUN_DIR/events" >&2
         fi
     fi
+}
+
+# Фоновый watcher терминирует зависший запуск по wall-clock. Вызывается
+# watcher'ом, когда основной цикл не отдаёт управление (read завис) и его
+# trap EXIT не сможет отработать. Watcher сам пишет summary + архив, затем
+# убивает дерево агента и основной процесс (SIGTERM → grace → SIGKILL).
+watcher_force_exit() {
+    local reason="$1"
+
+    emit_run_summary "$reason" 124 watcher
+    archive_events "$reason"
+    kill_agent_tree
+
+    # Будим основной процесс: SIGTERM может не пробить блокированный read
+    # (trap отложен), поэтому после grace даём SIGKILL.
+    kill -TERM "$$" 2>/dev/null || true
+    local waited=0
+    while [[ $waited -lt 2 ]] && kill -0 "$$" 2>/dev/null; do
+        sleep 1
+        waited=$((waited + 1))
+    done
+    kill -9 "$$" 2>/dev/null || true
+}
+
+# Фоновый watcher: enforce soft/hard/stall по wall-clock + heartbeat-диагностика.
+# Запускается отдельным подпроцессом (не блокирован в read) как страховка поверх
+# in-loop проверок. Heartbeat в run-log — главная улика «цикл завис»: stall_gap
+# растёт, новых событий нет, agent жив.
+start_watcher() {
+    (
+        local w_start="$START_TIME"
+        local w_last="$START_TIME"
+        local w_now w_elapsed w_stall w_read
+        local w_agent_alive
+
+        while true; do
+            sleep "$WATCHER_INTERVAL" 2>/dev/null || sleep 5
+            w_now=$(date +%s)
+            w_read=$(cat "$LAST_EVENT_FILE" 2>/dev/null || echo "$w_start")
+            [[ "$w_read" =~ ^[0-9]+$ ]] || w_read="$w_start"
+            w_last="$w_read"
+            w_elapsed=$((w_now - w_start))
+            w_stall=$((w_now - w_last))
+            if kill -0 "${AGENT_PID:-}" 2>/dev/null; then w_agent_alive=yes; else w_agent_alive=no; fi
+
+            log_run "watcher_heartbeat elapsed=${w_elapsed}s stall_gap=${w_stall}s agent_alive=$w_agent_alive"
+
+            # hard — абсолютный потолок по wall clock
+            if [[ $w_elapsed -ge $EFFECTIVE_HARD ]]; then
+                log_run "watcher_fired reason=hard_timeout elapsed=${w_elapsed}s limit=${EFFECTIVE_HARD}s"
+                watcher_force_exit "hard_timeout"
+                exit 0
+            fi
+            # soft — целевое время (если не warn-only)
+            if [[ -n "${SOFT_TIMEOUT:-}" ]] \
+               && [[ "${WATCH_SOFT_WARN_ONLY:-0}" != "1" ]] \
+               && [[ $w_elapsed -ge $SOFT_TIMEOUT ]]; then
+                log_run "watcher_fired reason=soft_timeout elapsed=${w_elapsed}s limit=${SOFT_TIMEOUT}s"
+                watcher_force_exit "soft_timeout"
+                exit 0
+            fi
+            # stall — нет событий дольше STALL_TIMEOUT
+            if [[ $w_stall -ge $STALL_TIMEOUT ]]; then
+                log_run "watcher_fired reason=stall stall_gap=${w_stall}s limit=${STALL_TIMEOUT}s"
+                watcher_force_exit "stall"
+                exit 0
+            fi
+        done
+    ) &
+    WATCHER_PID=$!
+    log_run "watcher_started pid=$WATCHER_PID interval=${WATCHER_INTERVAL}s"
+}
+
+cleanup() {
+    local exit_code=$?
+    # Сохраняем reason до того, как что-либо затрёт $?.
+    local reason="${_EXIT_REASON:-unknown}"
+
+    # Останавливаем watcher, чтобы не сделал двойной работы после нашего exit.
+    if [[ -n "${WATCHER_PID:-}" ]]; then
+        kill "${WATCHER_PID}" 2>/dev/null || true
+        wait "${WATCHER_PID}" 2>/dev/null || true
+        WATCHER_PID=""
+    fi
+
+    # Сначала освобождаем ресурсы агента.
+    kill_agent_tree
+
+    # --- Run summary + архив (best-effort, идемпотентно через маркеры) ---
+    emit_run_summary "$reason" "$exit_code" main
+    archive_events "$reason"
 
     rm -rf "$TMPDIR"
 }
@@ -700,8 +824,13 @@ fi
 
 START_TIME=$(date +%s)
 last_event_time=$START_TIME
+echo "$START_TIME" > "$LAST_EVENT_FILE"
 STREAM_RAW=false
 has_format raw && STREAM_RAW=true
+
+# Фоновый watcher — страховка по wall-clock поверх in-loop проверок.
+# Запускаем после того, как известны START_TIME/EFFECTIVE_HARD/AGENT_PID.
+start_watcher
 
 while IFS= read -r -t "$STALL_TIMEOUT" line; do
     echo "$line" >> "$OUTFILE"
@@ -714,6 +843,7 @@ while IFS= read -r -t "$STALL_TIMEOUT" line; do
         printf '%s\t%s\t%s\n' "$now" "$event_gap" "$event_type" >> "$GAPS_FILE"
     fi
     last_event_time=$now
+    echo "$now" > "$LAST_EVENT_FILE"
     elapsed=$((now - START_TIME))
 
     # raw — стримим на stdout сразу
