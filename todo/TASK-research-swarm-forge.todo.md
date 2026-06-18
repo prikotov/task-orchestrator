@@ -9,8 +9,8 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-swarm-forge
-pr:
-status: in_progress
+pr: "#272"
+status: review
 ---
 
 # TASK-research-swarm-forge: Исследовать unclebob/swarm-forge для сравнения с task-orchestrator
