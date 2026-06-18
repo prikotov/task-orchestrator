@@ -9,8 +9,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Тимлид Алекс (pi, прямой режим — bash-инфраструктура)
 branch: fix/watch-subagent-timeout
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/273
+status: review
 ---
 
 # TASK-fix-watch-subagent-timeout: Починить само-терминирование watch-subagent.sh по таймаутам
