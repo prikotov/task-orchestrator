@@ -8,7 +8,7 @@ priority: P2
 author: Тимлид (Алекс)
 assignee:
 branch: task/research-agent-frameworks-comparison
-status: in_progress
+status: done
 reopened: 2026-06-18
 pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация)"
 ---
@@ -111,7 +111,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1h: Дополнительные исследования (2026-06-18)
 
-- [ ] [TASK-research-swarm-forge](TASK-research-swarm-forge.todo.md) — SwarmForge (unclebob / Robert C. Martin, tmux-based swarm orchestration: git worktrees per role, layered constitution, handoff-протокол, config-driven topology)
+- [x] [TASK-research-swarm-forge](TASK-research-swarm-forge.todo.md) — SwarmForge (unclebob / Robert C. Martin, tmux-based swarm orchestration: git worktrees per role, layered constitution, handoff-протокол, config-driven topology) *(PR #272)*
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
@@ -150,3 +150,4 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-06-13 | Аналитик (Шерлок) | Stage 1g: исследование Agent Skills подготовлено, задача ожидает review и финализацию оркестратором. |
 | 2026-06-13 | Тимлид (Алекс) | Stage 1g: TASK-research-agent-skills принята, переведена в done и подготовлена к merge PR #258. |
 | 2026-06-18 | Тимлид (Алекс) | Эпик reopened: добавлена стадия 1h — TASK-research-swarm-forge (unclebob/swarm-forge, tmux-based swarm orchestration от R.C. Martin). SwarmForge концептуально ближе всего к нашей системе ролей/AGENTS.md/conventions; предварительный verdict: заимствовать паттерны, не dependency. |
+| 2026-06-18 | Тимлид (Алекс) | Stage 1h: TASK-research-swarm-forge принята (PR #272, verdict 🟡 паттерны / 🔴 не dependency, 29/29). Эпик возвращён в `done`. |

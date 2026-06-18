@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-swarm-forge
 pr: "#272"
-status: review
+status: done
 ---
 
 # TASK-research-swarm-forge: Исследовать unclebob/swarm-forge для сравнения с task-orchestrator
@@ -119,7 +119,21 @@ make validate-todo
 
 Концептуально SwarmForge ближе всего к нашей собственной системе ролей/AGENTS.md/conventions — многие решения повторяют наши почти 1:1, но реализованы иначе (peer-to-peer daemon messaging vs наша subprocess-делегирование; desktop tmux vs CLI/PHP). Это делает его особо ценным для сравнения: виден альтернативный путь реализации тех же идей. Предварительный verdict: **🟡 заимствовать отдельные паттерны, 🔴 не dependency** (стек bash/Clojure/tmux не переносим в PHP; нет retry/CB/quality gates/budget).
 
+## 10. Result (Результат выполнения)
+- Создан comparison report: `docs/research/framework-comparisons/swarm-forge-comparison.md` (379 строк).
+- Обновлена сводная таблица: строка `SwarmForge` (#29), счётчик `29 / 29`, рекомендации по governance/swarm паттернам (structured handoff schema, team topology presets, layered constitution override semantics).
+- Сохранён self-contained отчёт аналитика: `docs/agents/reports/system-analyst/2026-06-18_09-20_swarm-forge-research.md`.
+- Итоговый verdict: 🟡 заимствовать отдельные swarm-governance паттерны, 🔴 не dependency.
+- ⚠️ Мандатное external review через сабагента не выполнено из-за блокировки обёртки `watch-subagent.sh` (см. следствие — `TASK-fix-watch-subagent-timeout`). Компенсировано личным self-review Тимлида.
+- Создана задача-следствие: `todo/TASK-fix-watch-subagent-timeout.todo.md` (починка само-терминирования watch-subagent.sh).
+- Эпик reopened (стадия `1h`), после приёмки возвращается в `done`.
+- Создан PR: https://github.com/prikotov/task-orchestrator/pull/272. CI зелёный (`test`, `phar-smoke`). Проверки `make md-links` и `make validate-todo` — зелёные; `phpunit`/`psalm` пропущены обоснованно (docs-only).
+- Задача переведена в `done` перед merge (acceptance пользователем подтверждён).
+
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-06-18 | Тимлид (Алекс) | Создание задачи и постановка исследования. Эпик `EPIC-research-agent-frameworks-comparison` reopened (статус `in_progress`, стадия `1h`). |
+| 2026-06-18 | Аналитик (Шерлок) | Выполнено исследование SwarmForge, создан comparison report, обновлена сводная таблица, сохранён agent-report. |
+| 2026-06-18 | Тимлид (Алекс) | Создан PR #272, задача переведена в `review`; заведена задача-следствие `TASK-fix-watch-subagent-timeout`. |
+| 2026-06-18 | Тимлид (Алекс) | После acceptance (merge подтверждён пользователем) задача переведена в `done` перед merge и перенесена в `todo/done/`. |
