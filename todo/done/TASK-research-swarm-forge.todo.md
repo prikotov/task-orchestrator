@@ -124,8 +124,8 @@ make validate-todo
 - Обновлена сводная таблица: строка `SwarmForge` (#29), счётчик `29 / 29`, рекомендации по governance/swarm паттернам (structured handoff schema, team topology presets, layered constitution override semantics).
 - Сохранён self-contained отчёт аналитика: `docs/agents/reports/system-analyst/2026-06-18_09-20_swarm-forge-research.md`.
 - Итоговый verdict: 🟡 заимствовать отдельные swarm-governance паттерны, 🔴 не dependency.
-- ⚠️ Мандатное external review через сабагента не выполнено из-за блокировки обёртки `watch-subagent.sh` (см. следствие — `TASK-fix-watch-subagent-timeout`). Компенсировано личным self-review Тимлида.
-- Создана задача-следствие: `todo/TASK-fix-watch-subagent-timeout.todo.md` (починка само-терминирования watch-subagent.sh).
+- ⚠️ Мандатное external review через сабагента не выполнено из-за блокировки обёртки `watch-subagent.sh` (см. следствие — `TASK-fix-watch-subagent-timeout`, выполнено в PR #273). Компенсировано личным self-review Тимлида.
+- Создана задача-следствие: `todo/done/TASK-fix-watch-subagent-timeout.todo.md` (починка само-терминирования watch-subagent.sh — выполнена).
 - Эпик reopened (стадия `1h`), после приёмки возвращается в `done`.
 - Создан PR: https://github.com/prikotov/task-orchestrator/pull/272. CI зелёный (`test`, `phar-smoke`). Проверки `make md-links` и `make validate-todo` — зелёные; `phpunit`/`psalm` пропущены обоснованно (docs-only).
 - Задача переведена в `done` перед merge (acceptance пользователем подтверждён).
@@ -136,4 +136,5 @@ make validate-todo
 | 2026-06-18 | Тимлид (Алекс) | Создание задачи и постановка исследования. Эпик `EPIC-research-agent-frameworks-comparison` reopened (статус `in_progress`, стадия `1h`). |
 | 2026-06-18 | Аналитик (Шерлок) | Выполнено исследование SwarmForge, создан comparison report, обновлена сводная таблица, сохранён agent-report. |
 | 2026-06-18 | Тимлид (Алекс) | Создан PR #272, задача переведена в `review`; заведена задача-следствие `TASK-fix-watch-subagent-timeout`. |
+| 2026-06-18 | Тимлид Алекс (pi) | Задача-следствие `TASK-fix-watch-subagent-timeout` выполнена в PR #273: фоновый watcher по wall-clock для enforcement таймаутов. Ссылка обновлена на `done/`. |
 | 2026-06-18 | Тимлид (Алекс) | После acceptance (merge подтверждён пользователем) задача переведена в `done` перед merge и перенесена в `todo/done/`. |
