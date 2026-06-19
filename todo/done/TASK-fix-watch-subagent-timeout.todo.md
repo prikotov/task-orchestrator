@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Тимлид Алекс (pi, прямой режим — bash-инфраструктура)
 branch: fix/watch-subagent-timeout
 pr: https://github.com/prikotov/task-orchestrator/pull/273
-status: review
+status: done
 ---
 
 # TASK-fix-watch-subagent-timeout: Починить само-терминирование watch-subagent.sh по таймаутам
@@ -173,3 +173,4 @@ Helpers `emit_run_summary` / `archive_events` вынесены из `cleanup()` 
 | :--- | :--- | :--- |
 | 2026-06-18 | Тимлид (Алекс) | Создание задачи по итогам расследования блокировки сабагент-конвейера ревью (сессия над PR #272). Зафиксированы факты двух воспроизведений, гипотеза, investigation-first план. |
 | 2026-06-18 | Тимлид Алекс (pi, прямой режим — bash-инфраструктура) | Investigation + фикс: исключена версия pi (0.79.6 установлен до зависаний), опровергнута гипотеза «поток без `\n`», подтверждён структурный дефект (enforcement внутри `while read`). Введён фоновый watcher по wall-clock + heartbeat-диагностика + идемпотентные `emit_run_summary`/`archive_events`. Регрессионный PHP-тест добавлен. Проверки green. |
+| 2026-06-18 | Тимлид Алекс (pi) | PR #273 смержён в `main`. Операторская документация вынесена в `README.md` (параметры/env/диагностика), SKILL.md оставлен простым контрактом для агента. |
