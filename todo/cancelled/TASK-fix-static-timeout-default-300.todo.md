@@ -10,10 +10,22 @@ author: Тимлид (Алекс)
 assignee:
 branch:
 pr:
-status: backlog
+status: cancelled
 ---
 
 # TASK-fix-static-timeout-default-300: Вернуть intended default 300s для static-цепочек (осознанное behavior change)
+
+## Причина отмены
+
+Решение пользователя (2026-06-19, вариант A): задачу отменить, оставить `DEFAULT_STATIC_TIMEOUT = 600` как нейтральный default. Обоснование:
+
+1. **Предпосылка «300 — intended default для static» устарела.** В мире reasoning-моделей (глубокий think, длинный рефакторинг/анализ) static-шаг legitimately занимает 7–12 минут. Снижение 600→300 сделало бы потолок *более* жёстким — прямо во вред длинным шагам.
+2. **Таймаут — это hard kill процесса.** `DEFAULT_STATIC_TIMEOUT` попадает в `AgentRunRequestVo::timeout` → Symfony `Process::setTimeout()` → при превышении процесс убивается (`ProcessTimedOutException`, шаг помечается `timedOut: true`). При срабатывании теряются и результат шага, и уже потраченные токены — двойной убыток.
+3. **Escape-hatch уже есть.** После `TASK-fix-cli-default-timeout-overrides-chain` precedence корректен: `CLI explicit > chain.timeout > hard default`. 600 — лишь fallback для тех, кто ничего не настроил; длинные шаги покрываются `chain.timeout` в `chains.yaml`.
+
+Итог: тратить отдельный PR на *снижение* потолка вредно для reasoning-шагов. Hard default 600 — разумный компромисс; при необходимости его поднимают через конфиг.
+
+Связанный долг: stale-`@techdebt`-комментарий в `StaticExecutionStrategyService::DEFAULT_STATIC_TIMEOUT` (указывает на эту отменённую задачу) — убрать отдельной правкой.
 
 ## 0. Простое описание (Human Brief)
 
@@ -52,3 +64,4 @@ status: backlog
 | Дата | Автор | Изменение |
 | :--- | :--- | :--- |
 | 2026-06-16 | Тимлид (Алекс) | Создание follow-up к CR-1 (вариант a: 600 в fix-задаче, 300 здесь) |
+| 2026-06-19 | Тимлид (Алекс) | Отмена — вариант A: предпосылка «300 intended» устарела для reasoning-моделей; 600 оставлен как нейтральный default, escape-hatch через `chain.timeout` |
