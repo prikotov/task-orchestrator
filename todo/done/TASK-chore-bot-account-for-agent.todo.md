@@ -2,6 +2,7 @@
 type: chore
 created: 2026-06-19
 updated: 2026-06-19
+status_updated: 2026-06-19
 value: V2
 complexity: C2
 priority: P2
@@ -10,8 +11,8 @@ epic:
 author: prikotov
 assignee: team_lead_alex
 branch: task/chore-bot-account-for-agent
-pr:
-status: in_progress
+pr: '#275'
+status: done
 ---
 
 # TASK-chore-bot-account-for-agent: Разделение идентичности AI-агента и владельца репо (GitHub App `prikotov-agent`)
@@ -69,22 +70,23 @@ branch protection (требуется 1 review), и единственный о�
 
 ### 🔴 Must Have (Обязательно)
 
-- [ ] Гайд `docs/git-workflow/agent-identity.md`: концепция (идентичность≠токен≠доступ),
+- [x] Гайд `docs/guide/agent-identity.md`: концепция (идентичность≠токен≠доступ),
       пошаговое создание GitHub App `prikotov-agent`, список permissions, установка на репо,
       выпуск PEM, использование скрипта, `gh auth login`/`switch`, мульти-проект, чек-лист, troubleshooting.
-- [ ] Скрипт `bin/agent-token` (PHP): PEM → JWT RS256 (через `ext-openssl`, без сторонних зависимостей)
+- [x] Скрипт `bin/agent-token` (PHP): PEM → JWT RS256 (через `ext-openssl`, без сторонних зависимостей)
       → installation token. Вход: `<owner>/<repo>`. Кеш токена (TTL по `expires_at`).
       Вывод: `export GH_TOKEN=...` для `eval` + режим `--raw` для `gh auth login --with-token`.
       PEM — из env `AGENT_PRIVATE_KEY_PATH` или `~/.config/prikotov-agent/` (chmod 600),
       **никогда** не в репо/args/логах.
-- [ ] Актуализация ссылок: `docs/git-workflow/index.md`, `docs/index.md`, упоминание в `pull-request.md`.
-- [ ] Документировано: как переключать авторизацию (человек ↔ бот), как ротатить PEM (~раз в год),
+- [x] Актуализация ссылок: `docs/guide/index.md`, `docs/agents/skills/task-via-subagents/SKILL.md`
+  (примечание: гайд в `docs/guide/`, не `docs/git-workflow/` — последний сгенерирован init-скриптом и в `docs/.gitignore`).
+- [x] Документировано: как переключать авторизацию (человек ↔ бот), как ротатить PEM (~раз в год),
       как добавить новый репо.
 
 ### 🟡 Should Have (Желательно)
 
-- [ ] Короткоживущие installation tokens вместо long-lived PAT — **закрыто архитектурно** (TTL ~1 ч).
-- [ ] Кеш токена между вызовами (не дёргать API на каждый запуск агента).
+- [x] Короткоживущие installation tokens вместо long-lived PAT — **закрыто архитектурно** (TTL ~1 ч).
+- [x] Кеш токена между вызовами (не дёргать API на каждый запуск агента) — кеш `installation_id` + токен.
 
 ### ⚫ Won't Have (Не будем делать)
 
@@ -97,7 +99,9 @@ branch protection (требуется 1 review), и единственный о�
 
 ### Часть A — делает агент (этот PR)
 
-1. [ ] Гайд `docs/git-workflow/agent-identity.md` — **Тех. писатель Гермиона**.
+1. [ ] Гайд `docs/guide/agent-identity.md` — **Тех. писатель Гермиона**.
+   Примечание: рукописный гайд кладётся в `docs/guide/` (отслеживается), а НЕ в `docs/git-workflow/`
+   (сгенерированный init-скриптом, в `docs/.gitignore`). Ссылки на правила PR/веток — `../git-workflow/...`.
 2. [ ] Скрипт `bin/agent-token` (PHP, `ext-openssl`, без зависимостей) + unit-тесты — **Бэкендер Тони**.
 3. [ ] Self-review (Гермиона) + Code review с упором на безопасность — **Ревьювер Бэка Пуаро**.
 4. [ ] Актуализация ссылок в `docs/git-workflow/index.md`, `docs/index.md`, `docs/git-workflow/pull-request.md`.
@@ -114,10 +118,10 @@ branch protection (требуется 1 review), и единственный о�
 ## 5. Definition of Done (Критерии приёмки)
 
 **Техническая часть (агент):**
-- [ ] Гайд `docs/git-workflow/agent-identity.md` написан и актуализированы ссылки.
-- [ ] Скрипт `bin/agent-token` работает: `eval "$(bin/agent-token prikotov/task-orchestrator)"`
-      выставляет валидный `GH_TOKEN`; есть unit-тесты.
-- [ ] Секреты (PEM) не попадают в репо/args/логи; права минимальны.
+- [x] Гайд `docs/guide/agent-identity.md` написан и актуализированы ссылки.
+- [x] Скрипт `bin/agent-token` работает: `eval "$(bin/agent-token prikotov/task-orchestrator)"`
+      выставляет валидный `GH_TOKEN`; есть unit + integration тесты (1125 тестов, Psalm чист).
+- [x] Секреты (PEM) не попадают в репо/args/логи; права минимальны (подтверждено code review Пуаро).
 
 **Эксплуатационная часть (пользователь):**
 - [ ] GitHub App `prikotov-agent` создан и установлен на `task-orchestrator`.
@@ -178,3 +182,4 @@ gh pr view --json author --jq .author.login   # →  prikotov-agent[bot]
 | :--- | :--- | :--- |
 | 2026-04-19 | Тимлид | Создание задачи (исходная постановка, варианты A/B). |
 | 2026-06-19 | Тимлид Алекс | Рефрейминг: бот не «на агента», а единая идентичность на всех агентов. Учтён мульти-агентный (pi/codex/opencode) и мульти-проектный (~36 репо) контекст. Выбран GitHub App `prikotov-agent`. Перенос `backlog → todo`, начало реализации. |
+| 2026-06-19 | Тимлид Алекс | Техническая часть реализована (Бэкендер Тони — скрипт `bin/agent-token` + тесты; Тех. писатель Гермиона — гайд `docs/guide/agent-identity.md`; Ревьювер Бэка Пуаро — APPROVAL). Проверки: 1125 тестов OK, Psalm чист, gitleaks чист. PR #275. Техническая часть DoD закрыта; эксплуатационная часть (создание App, установка, проверка тестовым PR) — за владельцем. |
