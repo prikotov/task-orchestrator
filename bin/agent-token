@@ -1,0 +1,122 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * bin/agent-token — обёртка для получения короткоживущего installation token
+ * от GitHub App prikotov-agent.
+ *
+ * Вызов:
+ *   bin/agent-token <owner>/<repo>    — печатает export GH_TOKEN='...'
+ *   bin/agent-token <owner>/<repo> --raw   — голый токен (для pipe)
+ *   bin/agent-token <owner>/<repo> --json  — JSON {token, expires_at, installation_id}
+ *   bin/agent-token --help              — справка
+ *
+ * Конфигурация:
+ *   PEM private key: env AGENT_PRIVATE_KEY_PATH, иначе ~/.config/prikotov-agent/private-key.pem
+ *   App ID:          env AGENT_APP_ID,         иначе ~/.config/prikotov-agent/app-id
+ *
+ * DEV-инструмент, не является частью бизнес-логики.
+ * @see docs/guide/agent-identity.md
+ */
+
+require_once __DIR__ . '/lib/agent-token.php';
+
+// ─── Справка ────────────────────────────────────────────────────────────────
+
+$help = <<<'HELP'
+agent-token — получить GitHub installation access token от App prikotov-agent.
+
+Использование:
+  bin/agent-token <owner>/<repo>       Печатает export GH_TOKEN='...' (для eval)
+  bin/agent-token <owner>/<repo> --raw Печатает только голый токен
+  bin/agent-token <owner>/<repo> --json Печатает JSON {token, expires_at, installation_id}
+  bin/agent-token --help                Эта справка
+
+Конфигурация:
+  PEM private key: env AGENT_PRIVATE_KEY_PATH
+                   иначе ~/.config/prikotov-agent/private-key.pem (chmod 0600)
+  App ID:          env AGENT_APP_ID
+                   иначе ~/.config/prikotov-agent/app-id
+
+Примеры:
+  eval "$(bin/agent-token prikotov/task-orchestrator)"
+  bin/agent-token prikotov/task-orchestrator --raw | gh auth login --with-token
+HELP;
+
+// ─── Парсинг аргументов CLI ────────────────────────────────────────────────
+
+$argv = array_slice($_SERVER['argv'] ?? [], 1);
+$mode = 'export'; // export | raw | json
+
+foreach ($argv as $i => $arg) {
+    if ($arg === '--help' || $arg === '-h') {
+        fwrite(STDOUT, $help . "\n");
+        exit(0);
+    }
+    if ($arg === '--raw') {
+        $mode = 'raw';
+        unset($argv[$i]);
+        continue;
+    }
+    if ($arg === '--json') {
+        $mode = 'json';
+        unset($argv[$i]);
+        continue;
+    }
+}
+
+$argv = array_values($argv);
+
+if (count($argv) !== 1) {
+    fwrite(STDERR, "Error: expected exactly one argument: <owner>/<repo>\n\n");
+    fwrite(STDERR, $help . "\n");
+    exit(1);
+}
+
+// ─── Парсинг и валидация <owner>/<repo> ─────────────────────────────────────
+
+try {
+    $repo = agent_token_parse_repo_argument($argv[0]);
+} catch (\InvalidArgumentException $e) {
+    fwrite(STDERR, "Error: {$e->getMessage()}\n");
+    exit(1);
+}
+
+// ─── Получение токена ───────────────────────────────────────────────────────
+
+try {
+    $result = agent_token_obtain($repo['owner'], $repo['repo']);
+} catch (\RuntimeException $e) {
+    // НИКОГДА не печатаем JWT/PEM/token в stderr
+    fwrite(STDERR, "Error: {$e->getMessage()}\n");
+    exit(1);
+}
+
+// ─── Вывод ──────────────────────────────────────────────────────────────────
+
+// Защита от гипотетического спецсимвола в токене (сломает eval/shell)
+if (!preg_match('/^[A-Za-z0-9_]+$/', $result['token'])) {
+    fwrite(STDERR, "Error: token contains unexpected characters — aborting for safety.\n");
+    exit(1);
+}
+
+match ($mode) {
+    'export' => fwrite(STDOUT, "export GH_TOKEN='{$result['token']}'\n"),
+    'raw' => fwrite(STDOUT, $result['token'] . "\n"),
+    'json' => fwrite(
+        STDOUT,
+        json_encode(
+            [
+                'token' => $result['token'],
+                'expires_at' => $result['expires_at'],
+                'installation_id' => $result['installation_id'],
+            ],
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
+        ) . "\n",
+    ),
+    default => fwrite(STDERR, "Error: unknown mode.\n"),
+};
+
+exit(0);

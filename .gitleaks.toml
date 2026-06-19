@@ -13,6 +13,9 @@ useDefault = true
 paths = [
     '''tests/fixtures/.*''',
     '''\.example$''',
+    # Throwaway test RSA keys and synthetic PEM fragments — not production secrets
+    '''tests/Unit/AgentToken/.*\.(pem|key)''',
+    '''tests/.*/fixtures/.*''',
 ]
 
 # ── Custom rules ────────────────────────────────────────────────────────────
