@@ -9,7 +9,6 @@
 >
     <projectFiles>
         <directory name="src"/>
-        <directory name="bin/lib"/>
     </projectFiles>
     <issueHandlers>
         <PropertyNotSetInConstructor errorLevel="suppress" files="*Model.php" />

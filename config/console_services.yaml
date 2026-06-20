@@ -23,6 +23,11 @@ services:
     public: true
     tags: ['console.command']
 
+  TaskOrchestrator\Console\Module\GitIdentity\Command\:
+    resource: '%task_orchestrator.package_dir%/apps/console/src/Module/GitIdentity/Command/*'
+    public: true
+    tags: ['console.command']
+
   # --- Event Subscribers ---
   TaskOrchestrator\Console\Module\Orchestrator\EventSubscriber\:
     resource: '%task_orchestrator.package_dir%/apps/console/src/Module/Orchestrator/EventSubscriber/*'

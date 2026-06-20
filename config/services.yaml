@@ -249,3 +249,39 @@ services:
   TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler:
     arguments:
       $strategies: !tagged_iterator orchestrator.execution_strategy
+
+  # ─── GitIdentity module ───────────────────────────────────────────────
+
+  # Domain Service aliases (Interface → Implementation)
+  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\LoadGitIdentityConfigServiceInterface:
+    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\LoadGitIdentityConfigService
+  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\TokenCacheInterface:
+    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\FilesystemTokenCacheService
+  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\SignJwtTokenServiceInterface:
+    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\OpenSslSignJwtTokenService
+  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\ResolveInstallationIdServiceInterface:
+    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\GitHubResolveInstallationIdService
+  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\RequestInstallationTokenServiceInterface:
+    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\GitHubRequestInstallationTokenService
+  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\ClockServiceInterface:
+    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\SystemClockService
+
+  # Infrastructure Service parameters
+  TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\LoadGitIdentityConfigService:
+    arguments:
+      $appId: '%task_orchestrator.git_identity.app_id%'
+      $privateKeyPath: '%task_orchestrator.git_identity.private_key_path%'
+      $privateKey: '%task_orchestrator.git_identity.private_key%'
+      $apiBaseUri: '%task_orchestrator.git_identity.api_base_uri%'
+      $githubApiVersion: '%task_orchestrator.git_identity.github_api_version%'
+      $userAgent: '%task_orchestrator.git_identity.user_agent%'
+      $jwtTtlSeconds: '%task_orchestrator.git_identity.jwt_ttl_seconds%'
+      $jwtClockSkewSeconds: '%task_orchestrator.git_identity.jwt_clock_skew_seconds%'
+      $tokenExpirySafetyMarginSeconds: '%task_orchestrator.git_identity.token_expiry_safety_margin_seconds%'
+      $installationIdCacheTtlSeconds: '%task_orchestrator.git_identity.installation_id_cache_ttl_seconds%'
+      $scopeToRepository: '%task_orchestrator.git_identity.scope_to_repository%'
+      $requestTimeoutSeconds: '%task_orchestrator.git_identity.request_timeout_seconds%'
+
+  TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\FilesystemTokenCacheService:
+    arguments:
+      $cacheDir: '%task_orchestrator.git_identity.cache_dir%'
