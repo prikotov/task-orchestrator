@@ -156,7 +156,7 @@ main
 ### **Шаг 7:** Merge и финализация
 
 1. После подтверждения пользователя — мержи PR: `gh pr merge <N> --squash --delete-branch`.
-   - Корректный путь — PR от App `prikotov-agent`, Approve от владельца, merge без `--admin`. См. [Идентичность агента](../../../../docs/guide/agent-identity.md).
+   - Корректный путь — PR от GitHub App агента, Approve от владельца, merge без `--admin`. См. [Идентичность агента](../../../../docs/guide/agent-identity.md).
 2. Переключись на `main`: `git checkout main && git pull origin main`.
 3. Проверь: `git status` — working tree должен быть чистым.
 4. Удали рабочую ветку (если не удалена автоматически).

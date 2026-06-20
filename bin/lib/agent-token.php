@@ -188,31 +188,123 @@ function agent_token_cleanup_openssl_error(): string
 }
 
 /**
+ * Загружает .env.local из указанного каталога (по умолчанию — project-root).
+ *
+ * Простой парсер KEY=VALUE: построчно, игнорирует пустые строки и # (комментарии).
+ * Поддерживает одинарные и двойные кавычки вокруг значения.
+ * env-переменная, уже заданная в окружении, НЕ перезаписывается (Symfony-конвенция).
+ * Если .env.local не существует — молча пропускает.
+ *
+ * Ограничения:
+ *   - Не поддерживает inline-комментарии после значения;
+ *     комментарии только на отдельной строке, начинающейся с #.
+ *   - Поддерживает кавычки '...' и "..." (обрезаются).
+ *
+ * Загружается ОДИН раз (на старте скрипта) перед вызовом load_configuration.
+ *
+ * @param string|null $projectRoot Корень проекта (если null — определяется от __DIR__)
+ */
+function agent_token_load_env_local(?string $projectRoot = null): void
+{
+    $root = $projectRoot ?? dirname(__DIR__, 2);
+    $envFile = $root . '/.env.local';
+
+    if (!file_exists($envFile) || !is_readable($envFile)) {
+        return;
+    }
+
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        return;
+    }
+
+    foreach ($lines as $line) {
+        $line = trim($line);
+
+        // Пропуск комментариев и пустых строк
+        if ($line === '' || str_starts_with($line, '#')) {
+            continue;
+        }
+
+        // Минимальный валидный формат: KEY=VALUE (пробелы вокруг = допускаются)
+        if (!str_contains($line, '=')) {
+            continue;
+        }
+
+        [$key, $value] = explode('=', $line, 2) + ['', ''];
+        $key = trim($key);
+        $value = trim($value);
+
+        // Убираем кавычки вокруг значения
+        if (
+            (str_starts_with($value, "'") && str_ends_with($value, "'"))
+            || (str_starts_with($value, '"') && str_ends_with($value, '"'))
+        ) {
+            $value = substr($value, 1, -1);
+        }
+
+        // Реальное окружение имеет приоритет — не перезаписывать
+        if (getenv($key) !== false) {
+            continue;
+        }
+
+        putenv("{$key}={$value}");
+    }
+}
+
+/**
+ * Возвращает project-root (2 уровня вверх от bin/ скрипта).
+ *
+ * @param string|null $binDir Путь к каталогу bin/ (для параметризации в тестах);
+ *                        по умолчанию — каталог текущего файла (__DIR__)
+ */
+function agent_token_project_root(?string $binDir = null): string
+{
+    return ($binDir ?? __DIR__) . '/../..';
+}
+
+/**
  * Загружает конфигурацию: PEM-путь, App ID.
  *
  * Источники (в порядке приоритета):
- * - PEM: env AGENT_PRIVATE_KEY_PATH, иначе ~/.config/prikotov-agent/private-key.pem
- * - App ID: env AGENT_APP_ID, иначе ~/.config/prikotov-agent/app-id
+ *
+ *  a) AGENT_APP_ID:
+ *      env (окружение или .env.local) → иначе <root>/secrets/agent-identity/app-id
+ *  b) AGENT_PRIVATE_KEY_PATH:
+ *      env → иначе <root>/secrets/agent-identity/private-key.pem
+ *  c) AGENT_CONFIG_DIR:
+ *      если задан (env) — каталог-override целиком:
+ *      PEM в <AGENT_CONFIG_DIR>/private-key.pem, app-id в <AGENT_CONFIG_DIR>/app-id.
+ *      (Точечные AGENT_PRIVATE_KEY_PATH / AGENT_APP_ID имеют приоритет над AGENT_CONFIG_DIR.)
+ *  d) Проверка chmod 0600 на PEM (fail-fast).
+ *
+ * @param string|null $binDir Путь к каталогу bin/ (для параметризации в тестах);
+ *                     передаётся в project_root(), который возвращает binDir/../..
  *
  * @return array{pemPath: string, pemContent: string, appId: int}
  *
  * @throws \RuntimeException если конфиг не найден или PEM недоступен
  */
-function agent_token_load_configuration(): array
+function agent_token_load_configuration(?string $binDir = null): array
 {
+    $root = agent_token_project_root($binDir);
+    $secretsDir = $root . '/secrets/agent-identity';
+
+    // ── PEM path ──
     $pemPath = getenv('AGENT_PRIVATE_KEY_PATH');
     if ($pemPath === false || $pemPath === '') {
-        $pemPath = getenv('HOME');
-        if ($pemPath === false) {
-            throw new \RuntimeException('HOME environment variable is not set');
+        $configDir = getenv('AGENT_CONFIG_DIR');
+        if ($configDir !== false && $configDir !== '') {
+            $pemPath = rtrim($configDir, '/') . '/private-key.pem';
+        } else {
+            $pemPath = $secretsDir . '/private-key.pem';
         }
-        $pemPath = $pemPath . '/.config/prikotov-agent/private-key.pem';
     }
 
     if (!file_exists($pemPath)) {
         throw new \RuntimeException(
             'PEM private key not found. Set AGENT_PRIVATE_KEY_PATH or '
-            . 'place key at ~/.config/prikotov-agent/private-key.pem'
+            . 'place key at secrets/agent-identity/private-key.pem'
         );
     }
 
@@ -229,19 +321,22 @@ function agent_token_load_configuration(): array
         throw new \RuntimeException('Failed to read PEM file.');
     }
 
+    // ── App ID ──
     $appIdStr = getenv('AGENT_APP_ID');
     if ($appIdStr !== false && $appIdStr !== '') {
         $appId = (int) $appIdStr;
     } else {
-        $home = getenv('HOME');
-        if ($home === false) {
-            throw new \RuntimeException('HOME environment variable is not set');
+        $configDir = getenv('AGENT_CONFIG_DIR');
+        if ($configDir !== false && $configDir !== '') {
+            $appIdFile = rtrim($configDir, '/') . '/app-id';
+        } else {
+            $appIdFile = $secretsDir . '/app-id';
         }
-        $appIdFile = $home . '/.config/prikotov-agent/app-id';
+
         if (!file_exists($appIdFile)) {
             throw new \RuntimeException(
                 'App ID not found. Set AGENT_APP_ID or '
-                . 'create ~/.config/prikotov-agent/app-id'
+                . 'create secrets/agent-identity/app-id'
             );
         }
         $appIdStr = trim((string) file_get_contents($appIdFile));
@@ -276,7 +371,7 @@ function agent_token_github_api_request(
     $headers = [
         'Accept: application/vnd.github+json',
         'X-GitHub-Api-Version: 2022-11-28',
-        'User-Agent: prikotov-agent-token/1.0',
+        'User-Agent: task-orchestrator/agent-token',
     ];
 
     // JWT передаётся в заголовке, но в diagnostic-сообщениях не фигурирует

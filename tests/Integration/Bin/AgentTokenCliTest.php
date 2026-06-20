@@ -22,6 +22,8 @@ final class AgentTokenCliTest extends TestCase
     private string $fixtureDir;
     private string $tmpHome;
     private string $configDir;
+    private string $envPemPath;
+    private string $envAppId;
 
     #[Override]
     protected function setUp(): void
@@ -32,7 +34,7 @@ final class AgentTokenCliTest extends TestCase
         $this->tmpHome = sys_get_temp_dir() . '/agent-token-cli-test-' . bin2hex(random_bytes(6));
         mkdir($this->tmpHome, 0777, true);
 
-        $this->configDir = $this->tmpHome . '/.config/prikotov-agent';
+        $this->configDir = $this->tmpHome . '/secrets/agent-identity';
         mkdir($this->configDir, 0700, true);
 
         // Копируем фикстурный PEM с chmod 0600
@@ -43,6 +45,10 @@ final class AgentTokenCliTest extends TestCase
 
         // Пишем app-id
         file_put_contents($this->configDir . '/app-id', "12345\n");
+
+        // Кешируем пути для env-передачи
+        $this->envPemPath = $pemDst;
+        $this->envAppId = '12345';
     }
 
     #[Override]
@@ -84,10 +90,11 @@ final class AgentTokenCliTest extends TestCase
     #[Test]
     public function missingPemReturnsNotFoundError(): void
     {
-        // HOME pointing to tmp dir without any config
+        // HOME больше не используется — запускаем без AGENT_PRIVATE_KEY_PATH
         $process = $this->runAgentToken(
-            ['prikotov/repo'],
-            sys_get_temp_dir() . '/agent-token-empty-' . bin2hex(random_bytes(4)),
+            ['octocat/Hello-World'],
+            home: null,
+            extraEnv: ['AGENT_PRIVATE_KEY_PATH' => '', 'AGENT_APP_ID' => ''],
         );
 
         self::assertSame(1, $process->getExitCode());
@@ -108,15 +115,21 @@ final class AgentTokenCliTest extends TestCase
 
     /**
      * @param list<string> $arguments
+     * @param array<string, string> $extraEnv Дополнительные env-переменные
      */
-    private function runAgentToken(array $arguments, ?string $home = null): Process
+    private function runAgentToken(array $arguments, ?string $home = null, array $extraEnv = []): Process
     {
         $home ??= $this->tmpHome;
+
+        $env = array_merge(
+            ['HOME' => $home, 'AGENT_PRIVATE_KEY_PATH' => $this->envPemPath, 'AGENT_APP_ID' => $this->envAppId],
+            $extraEnv,
+        );
 
         $process = new Process(
             [PHP_BINARY, $this->projectRoot . '/bin/agent-token', ...$arguments],
             $this->projectRoot,
-            ['HOME' => $home],
+            $env,
         );
         $process->setTimeout(10);
         $process->run();

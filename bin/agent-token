@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 /**
  * bin/agent-token — обёртка для получения короткоживущего installation token
- * от GitHub App prikotov-agent.
+ * от GitHub App.
  *
  * Вызов:
  *   bin/agent-token <owner>/<repo>    — печатает export GH_TOKEN='...'
@@ -14,8 +14,8 @@ declare(strict_types=1);
  *   bin/agent-token --help              — справка
  *
  * Конфигурация:
- *   PEM private key: env AGENT_PRIVATE_KEY_PATH, иначе ~/.config/prikotov-agent/private-key.pem
- *   App ID:          env AGENT_APP_ID,         иначе ~/.config/prikotov-agent/app-id
+ *   PEM private key: env AGENT_PRIVATE_KEY_PATH, иначе secrets/agent-identity/private-key.pem
+ *   App ID:          env AGENT_APP_ID,         иначе secrets/agent-identity/app-id
  *
  * DEV-инструмент, не является частью бизнес-логики.
  * @see docs/guide/agent-identity.md
@@ -23,10 +23,13 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/lib/agent-token.php';
 
+// Загружаем .env.local один раз, до чего-либо
+agent_token_load_env_local();
+
 // ─── Справка ────────────────────────────────────────────────────────────────
 
 $help = <<<'HELP'
-agent-token — получить GitHub installation access token от App prikotov-agent.
+agent-token — получить GitHub installation access token.
 
 Использование:
   bin/agent-token <owner>/<repo>       Печатает export GH_TOKEN='...' (для eval)
@@ -36,13 +39,22 @@ agent-token — получить GitHub installation access token от App priko
 
 Конфигурация:
   PEM private key: env AGENT_PRIVATE_KEY_PATH
-                   иначе ~/.config/prikotov-agent/private-key.pem (chmod 0600)
+                   иначе secrets/agent-identity/private-key.pem (chmod 0600)
   App ID:          env AGENT_APP_ID
-                   иначе ~/.config/prikotov-agent/app-id
+                   иначе secrets/agent-identity/app-id
+
+  override-каталогом: env AGENT_CONFIG_DIR=<dir> → <dir>/private-key.pem, <dir>/app-id
+
+  Значения можно задать через .env.local (см. .env.local в корне проекта).
 
 Примеры:
-  eval "$(bin/agent-token prikotov/task-orchestrator)"
-  bin/agent-token prikotov/task-orchestrator --raw | gh auth login --with-token
+  eval "$(bin/agent-token owner/repo)"
+  bin/agent-token owner/repo --raw | gh auth login --with-token
+HELP;
+
+$help .= <<<'HELP'
+
+Приоритет: окружение > .env.local > AGENT_PRIVATE_KEY_PATH/AGENT_APP_ID > AGENT_CONFIG_DIR > дефолт secrets/agent-identity/
 HELP;
 
 // ─── Парсинг аргументов CLI ────────────────────────────────────────────────

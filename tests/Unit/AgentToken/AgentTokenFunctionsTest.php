@@ -168,10 +168,10 @@ class AgentTokenFunctionsTest extends TestCase
 
     public function testParseRepoArgumentValid(): void
     {
-        $result = agent_token_parse_repo_argument('prikotov/task-orchestrator');
+        $result = agent_token_parse_repo_argument('octocat/Hello-World');
 
-        $this->assertSame('prikotov', $result['owner']);
-        $this->assertSame('task-orchestrator', $result['repo']);
+        $this->assertSame('octocat', $result['owner']);
+        $this->assertSame('Hello-World', $result['repo']);
     }
 
     public function testParseRepoArgumentWithDots(): void
@@ -394,9 +394,9 @@ class AgentTokenFunctionsTest extends TestCase
 
     public function testInstallationIdCachePathContainsOwnerRepo(): void
     {
-        $path = agent_token_installation_id_cache_path('prikotov', 'task-orchestrator');
+        $path = agent_token_installation_id_cache_path('octocat', 'Hello-World');
 
-        $this->assertStringContainsString('prikotov_task-orchestrator.installation', $path);
+        $this->assertStringContainsString('octocat_Hello-World.installation', $path);
     }
 
     public function testInstallationIdCachePathWithCustomCacheDir(): void
@@ -503,8 +503,8 @@ class AgentTokenFunctionsTest extends TestCase
             $this->assertSame($expiresAt, $result['expires_at']);
             $this->assertSame(99999, $result['installation_id']);
         } finally {
-            putenv('AGENT_PRIVATE_KEY_PATH=');
-            putenv('AGENT_APP_ID=');
+            putenv('AGENT_PRIVATE_KEY_PATH');
+            putenv('AGENT_APP_ID');
             array_map('unlink', glob($tmpDir . '/*'));
             @rmdir($tmpDir);
         }
@@ -514,24 +514,28 @@ class AgentTokenFunctionsTest extends TestCase
 
     public function testLoadConfigurationFailsWithoutEnvOrFiles(): void
     {
-        // Убираем env-переменные, чтобы проверить fallback
-        putenv('AGENT_PRIVATE_KEY_PATH=');
-        putenv('AGENT_APP_ID=');
+        // Убираем env-переменные, чтобы проверить fallback на secrets/agent-identity/
+        putenv('AGENT_PRIVATE_KEY_PATH');
+        putenv('AGENT_APP_ID');
+        putenv('AGENT_CONFIG_DIR');
 
-        // С household HOME=tmpdir, где нет ~/.config/prikotov-agent/
-        $tmpHome = sys_get_temp_dir() . '/agent-token-home-' . uniqid();
-        mkdir($tmpHome, 0700, recursive: true);
-        putenv("HOME={$tmpHome}");
+        // Используем пустой tmp-каталог как project-root (нет secrets/agent-identity/)
+        $tmpRoot = sys_get_temp_dir() . '/agent-token-root-' . uniqid();
+        mkdir($tmpRoot, 0700, recursive: true);
+
+        // project_root() ожидает, что его параметр указывает на bin/-каталог (parent = root)
+        // agent_token_project_root($dir) возвращает $dir . '/../..'
+        // Чтобы root = $tmpRoot, нужно передать $tmpRoot . '/x/y' как $scriptDir
+        $fakeBinDir = $tmpRoot . '/x/y';
+        mkdir($fakeBinDir, 0700, recursive: true);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('PEM private key not found');
 
         try {
-            agent_token_load_configuration();
+            agent_token_load_configuration($fakeBinDir);
         } finally {
-            // Восстанавливаем
-            array_map('unlink', glob($tmpHome . '/*'));
-            @rmdir($tmpHome);
+            $this->removeDirectory($tmpRoot);
         }
     }
 
@@ -555,10 +559,69 @@ class AgentTokenFunctionsTest extends TestCase
         $this->assertNotEmpty($config['pemContent']);
 
         // Убираемся
-        putenv('AGENT_PRIVATE_KEY_PATH=');
-        putenv('AGENT_APP_ID=');
+        putenv('AGENT_PRIVATE_KEY_PATH');
+        putenv('AGENT_APP_ID');
         array_map('unlink', glob($tmpDir . '/*'));
         @rmdir($tmpDir);
+    }
+
+    public function testLoadConfigurationWithAgentConfigDir(): void
+    {
+        // AGENT_CONFIG_DIR override: PEM и app-id берутся из указанного каталога
+        $tmpDir = sys_get_temp_dir() . '/agent-token-cfgdir-' . uniqid();
+        mkdir($tmpDir, 0700, recursive: true);
+
+        $pemFile = $tmpDir . '/private-key.pem';
+        copy(self::FIXTURE_DIR . '/test-private-key.pem', $pemFile);
+        chmod($pemFile, 0600);
+
+        file_put_contents($tmpDir . '/app-id', "99\n");
+
+        putenv("AGENT_CONFIG_DIR={$tmpDir}");
+        putenv('AGENT_PRIVATE_KEY_PATH');
+        putenv('AGENT_APP_ID');
+
+        $config = agent_token_load_configuration();
+
+        $this->assertSame(99, $config['appId']);
+        $this->assertStringContainsString('private-key.pem', $config['pemPath']);
+        $this->assertStringContainsString($tmpDir, $config['pemPath']);
+
+        // Убираемся
+        putenv('AGENT_CONFIG_DIR');
+        array_map('unlink', glob($tmpDir . '/*'));
+        @rmdir($tmpDir);
+    }
+
+    public function testLoadConfigurationDefaultsToSecretsAgentIdentity(): void
+    {
+        // Без env — fallback на <root>/secrets/agent-identity/
+        $tmpRoot = sys_get_temp_dir() . '/agent-token-root-' . uniqid();
+        mkdir($tmpRoot, 0700, recursive: true);
+        $fakeBinDir = $tmpRoot . '/x/y';
+        mkdir($fakeBinDir, 0700, recursive: true);
+
+        $secretsDir = $tmpRoot . '/secrets/agent-identity';
+        mkdir($secretsDir, 0700, recursive: true);
+
+        $pemFile = $secretsDir . '/private-key.pem';
+        copy(self::FIXTURE_DIR . '/test-private-key.pem', $pemFile);
+        chmod($pemFile, 0600);
+
+        file_put_contents($secretsDir . '/app-id', "77\n");
+
+        putenv('AGENT_PRIVATE_KEY_PATH');
+        putenv('AGENT_APP_ID');
+        putenv('AGENT_CONFIG_DIR');
+
+        $config = agent_token_load_configuration($fakeBinDir);
+
+        $this->assertSame(77, $config['appId']);
+        $this->assertStringContainsString('secrets/agent-identity/private-key.pem', $config['pemPath']);
+        $this->assertNotEmpty($config['pemContent']);
+
+        // Убираемся
+        $this->removeDirectory($tmpRoot);
     }
 
     public function testLoadConfigurationRejectsInsecurePermissions(): void
@@ -588,8 +651,8 @@ class AgentTokenFunctionsTest extends TestCase
         try {
             agent_token_load_configuration();
         } finally {
-            putenv('AGENT_PRIVATE_KEY_PATH=');
-            putenv('AGENT_APP_ID=');
+            putenv('AGENT_PRIVATE_KEY_PATH');
+            putenv('AGENT_APP_ID');
             array_map('unlink', glob($tmpDir . '/*'));
             @rmdir($tmpDir);
         }
@@ -629,5 +692,173 @@ class AgentTokenFunctionsTest extends TestCase
         );
 
         $this->assertSame(1, $verified);
+    }
+
+    // ─── .env.local parser ──────────────────────────────────────────────────
+
+    public function testEnvLocalLoadsValues(): void
+    {
+        $tmpRoot = sys_get_temp_dir() . '/agent-token-env-' . uniqid();
+        mkdir($tmpRoot, 0700, recursive: true);
+
+        file_put_contents($tmpRoot . '/.env.local', "AGENT_APP_ID=555\nAGENT_PRIVATE_KEY_PATH=/tmp/key.pem\n");
+
+        putenv('AGENT_APP_ID');
+        putenv('AGENT_PRIVATE_KEY_PATH');
+
+        agent_token_load_env_local($tmpRoot);
+
+        $this->assertSame('555', getenv('AGENT_APP_ID'));
+        $this->assertSame('/tmp/key.pem', getenv('AGENT_PRIVATE_KEY_PATH'));
+
+        // Убираемся
+        putenv('AGENT_APP_ID');
+        putenv('AGENT_PRIVATE_KEY_PATH');
+        $this->removeDirectory($tmpRoot);
+    }
+
+    public function testEnvLocalRespectsExistingEnv(): void
+    {
+        // Реальное окружение имеет приоритет — не перезаписывать
+        $tmpRoot = sys_get_temp_dir() . '/agent-token-env-' . uniqid();
+        mkdir($tmpRoot, 0700, recursive: true);
+
+        file_put_contents($tmpRoot . '/.env.local', "AGENT_APP_ID=999\n");
+
+        putenv('AGENT_APP_ID=42');
+
+        agent_token_load_env_local($tmpRoot);
+
+        // Не перезаписалось
+        $this->assertSame('42', getenv('AGENT_APP_ID'));
+
+        putenv('AGENT_APP_ID');
+        $this->removeDirectory($tmpRoot);
+    }
+
+    public function testEnvLocalMissingFileSilentlySkipped(): void
+    {
+        $tmpRoot = sys_get_temp_dir() . '/agent-token-env-' . uniqid();
+        mkdir($tmpRoot, 0700, recursive: true);
+
+        putenv('AGENT_APP_ID');
+
+        // Файла .env.local нет — не должно быть ошибок
+        agent_token_load_env_local($tmpRoot);
+
+        $this->assertFalse(getenv('AGENT_APP_ID'));
+
+        $this->removeDirectory($tmpRoot);
+    }
+
+    public function testEnvLocalIgnoresCommentsAndEmptyLines(): void
+    {
+        $tmpRoot = sys_get_temp_dir() . '/agent-token-env-' . uniqid();
+        mkdir($tmpRoot, 0700, recursive: true);
+
+        file_put_contents(
+            $tmpRoot . '/.env.local',
+            "# This is a comment\n\nAGENT_APP_ID=111\n  \n# Another comment\n",
+        );
+
+        putenv('AGENT_APP_ID');
+
+        agent_token_load_env_local($tmpRoot);
+
+        $this->assertSame('111', getenv('AGENT_APP_ID'));
+
+        putenv('AGENT_APP_ID');
+        $this->removeDirectory($tmpRoot);
+    }
+
+    public function testEnvLocalStripsQuotes(): void
+    {
+        $tmpRoot = sys_get_temp_dir() . '/agent-token-env-' . uniqid();
+        mkdir($tmpRoot, 0700, recursive: true);
+
+        file_put_contents(
+            $tmpRoot . '/.env.local',
+            "AGENT_APP_ID=\"333\"\nAGENT_PRIVATE_KEY_PATH='/my/path/key.pem'\n",
+        );
+
+        putenv('AGENT_APP_ID');
+        putenv('AGENT_PRIVATE_KEY_PATH');
+
+        agent_token_load_env_local($tmpRoot);
+
+        $this->assertSame('333', getenv('AGENT_APP_ID'));
+        $this->assertSame('/my/path/key.pem', getenv('AGENT_PRIVATE_KEY_PATH'));
+
+        putenv('AGENT_APP_ID');
+        putenv('AGENT_PRIVATE_KEY_PATH');
+        $this->removeDirectory($tmpRoot);
+    }
+
+    public function testEnvLocalIntegrationWithLoadConfiguration(): void
+    {
+        // .env.local задаёт AGENT_APP_ID → load_configuration подхватывает
+        $tmpRoot = sys_get_temp_dir() . '/agent-token-env-int-' . uniqid();
+        mkdir($tmpRoot, 0700, recursive: true);
+
+        $secretsDir = $tmpRoot . '/secrets/agent-identity';
+        mkdir($secretsDir, 0700, recursive: true);
+
+        $pemFile = $secretsDir . '/private-key.pem';
+        copy(self::FIXTURE_DIR . '/test-private-key.pem', $pemFile);
+        chmod($pemFile, 0600);
+
+        // app-id берём из .env.local, PEM — из secrets/
+        file_put_contents($tmpRoot . '/.env.local', "AGENT_APP_ID=88\n");
+
+        putenv('AGENT_APP_ID');
+        putenv('AGENT_PRIVATE_KEY_PATH');
+        putenv('AGENT_CONFIG_DIR');
+
+        // Загружаем .env.local (projectRoot = $tmpRoot)
+        agent_token_load_env_local($tmpRoot);
+
+        // bin/ Dir для project_root = $tmpRoot . '/x/y' → root = $tmpRoot
+        $fakeBinDir = $tmpRoot . '/x/y';
+        mkdir($fakeBinDir, 0700, recursive: true);
+
+        $config = agent_token_load_configuration($fakeBinDir);
+
+        $this->assertSame(88, $config['appId']);
+        $this->assertStringContainsString('secrets/agent-identity/private-key.pem', $config['pemPath']);
+
+        // Убираемся
+        putenv('AGENT_APP_ID');
+        putenv('AGENT_PRIVATE_KEY_PATH');
+        $this->removeDirectory($tmpRoot);
+    }
+
+    // ─── helpers ──────────────────────────────────────────────────────────
+
+    private function removeDirectory(string $path): void
+    {
+        if (!is_dir($path)) {
+            return;
+        }
+
+        $items = scandir($path);
+        if ($items === false) {
+            return;
+        }
+
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            $itemPath = $path . '/' . $item;
+            if (is_dir($itemPath)) {
+                $this->removeDirectory($itemPath);
+                continue;
+            }
+
+            unlink($itemPath);
+        }
+
+        rmdir($path);
     }
 }
