@@ -2,12 +2,12 @@
 
 **Идентичность агента (Agent Identity)** — отдельная учётная сущность GitHub, от имени которой AI-агент создаёт PR и выполняет операции с репозиторием, отделённая от учётной записи владельца репозитория.
 
-В этом проекте роль такой сущности выполняет **GitHub App** (далее — App), имя которого **выбирает сам пользователь**, а получение токенов автоматизировано скриптом `bin/agent-token`. task-orchestrator — публичный продукт, поэтому в гайде **нет захардкоженного имени App**: везде, где в примерах встречается `prikotov-agent` или владелец `prikotov`, — это **только иллюстрация**. Автор гайда использует `prikotov-agent`; выберите собственное имя (см. [Выбор имени App](#a-создание-github-app)).
+В этом проекте роль такой сущности выполняет **GitHub App** (далее — App), имя которого **выбирает сам пользователь**, а получение токенов автоматизировано командой `bin/console agent:token` (DDD-модуль `GitIdentity`). task-orchestrator — публичный продукт: имя App выбирает пользователь и в гайде представлено placeholder'ом `<your-app>`. Везде, где в примерах встречается `prikotov-agent` или владелец `prikotov`, — это иллюстрация автора гайда (см. [Выбор имени App](#a-создание-github-app)).
 
 ## Границы ответственности
 
 - Документ объясняет концепцию разделения идентичностей и описывает настройку/использование GitHub App (имя выбирает пользователь).
-- Скрипт `bin/agent-token` — точный интерфейс см. в разделе [Использование скрипта](#4-использование-скрипта-binagent-token) и в справке `bin/agent-token --help`.
+- Команда `bin/console agent:token` — точный интерфейс см. в разделе [Использование команды](#4-использование-команды-binconsole-agenttoken) и в справке `bin/console agent:token --help`.
 - Правила создания PR см. в [Pull Request (PR)](../git-workflow/pull-request.md), правила веток — в [Ветки (Branches)](../git-workflow/branches.md).
 
 ## 1. Контекст и проблема
@@ -32,7 +32,7 @@ AI-агенты (`pi`, Codex, OpenCode) создают PR через CLI `gh`. �
 | Слой | Что это | Сколько | Срок жизни |
 |---|---|---|---|
 | **Идентичность (Identity)** | Сам App как участник GitHub (`<your-app>[bot]`) | **Один** на все проекты и всех агентов | Постоянно |
-| **Токен (Token)** | Installation access token, который агент подставляет в `GH_TOKEN` | По одному на установку в моменте | Короткоживущий, TTL ~1 ч |
+| **Токен (Token)** | Installation access token, который агент подставляет в `GITHUB_TOKEN` | По одному на установку в моменте | Короткоживущий, TTL ~1 ч |
 | **Доступ (Access)** | Список репозиториев, к которым у установки App есть права | Управляется галочками в настройках установки | До явного отзыва |
 
 Ключевой вывод: **одна идентичность — много короткоживущих токенов — гранулярный доступ по репо**. Утечка токена компрометирует максимум один репо на один час, а не все проекты навсегда.
@@ -49,11 +49,11 @@ GitHub App — официальный механизм GitHub для автом�
 
 ### Почему один App на всех агентов
 
-`pi`, Codex CLI и OpenCode — разные инструменты, но **все они читают токен из переменной окружения `GH_TOKEN`** (или `GITHUB_TOKEN`). Поэтому:
+`pi`, Codex CLI и OpenCode — разные инструменты, но **все они работают через CLI `gh`**, который читает токен из переменных окружения `GH_TOKEN`/`GITHUB_TOKEN`. Поэтому:
 
-- Один App → один скрипт `bin/agent-token` → одна переменная `GH_TOKEN`.
-- Любой агент, запущенный после `eval "$(bin/agent-token <owner>/<repo>)"`, автоматически работает от имени App.
-- Не нужны отдельные App'ы, токены или аккаунты на каждый агент.
+- Один App → одна команда `bin/console agent:token` → одна переменная `GITHUB_TOKEN`.
+- Любой агент, запущенный после `eval "$(bin/console agent:token <owner>/<repo> --format=env)"`, автоматически работает от имени App.
+- Отдельные App'ы, токены или аккаунты на каждый агент избыточны.
 
 ### Имя App выбирает пользователь
 
@@ -106,21 +106,25 @@ mv ~/Downloads/<your-app>.private-key.*.pem secrets/agent-identity/private-key.p
 chmod 0600 secrets/agent-identity/private-key.pem
 ```
 
-> `chmod 0600` обязателен: скрипт `bin/agent-token` откажется читать ключ с открытыми для группы/остальных правами (fail-fast по безопасности).
+> `chmod 0600` обязателен: модуль `GitIdentity` откажется читать ключ с открытыми для группы/остальных правами (fail-fast по безопасности).
 
 ### e. Сохранить App ID
 
-App ID можно сохранить **файлом** в каталог секретов:
-
-```bash
-echo 1234567 > secrets/agent-identity/app-id
-```
-
-Либо задать через `.env.local` (см. [раздел 5](#5-конфигурация-и-хранение-секретов)):
+App ID задаётся параметром `app_id` секции `git_identity` (см. [раздел 5](#5-конфигурация-и-хранение-секретов)). Проще всего — через `.env.local`, который `bin/console` загружает через Symfony Dotenv при старте:
 
 ```bash
 # .env.local (в корне проекта)
-AGENT_APP_ID=1234567
+GIT_IDENTITY_APP_ID=1234567
+```
+
+и сослаться на него в конфигурации модуля:
+
+```yaml
+# config/services.yaml (секция task_orchestrator.git_identity)
+task_orchestrator:
+    git_identity:
+        app_id: '%env(GIT_IDENTITY_APP_ID)%'
+        private_key_path: '%task_orchestrator.base_path%/secrets/agent-identity/private-key.pem'
 ```
 
 Подставьте вместо `1234567` реальный **App ID** со страницы App.
@@ -132,9 +136,9 @@ AGENT_APP_ID=1234567
 3. **Repository access** → **Only select repositories** → отметить галочками нужные репо.
 4. Для пилота — отметить целевой репо (например, `task-orchestrator` — подставьте свой).
 
-После установки App получает `installation_id` (внутренний идентификатор установки) — он нужен скрипту для запроса токена. Скрипт находит его автоматически по `<owner>/<repo>`.
+После установки App получает `installation_id` (внутренний идентификатор установки) — он нужен команде для запроса токена. Команда находит его автоматически по `<owner>/<repo>`.
 
-> Идентичность `<your-app>[bot]` после установки автоматически становится участником выбранных репо. Добавлять отдельного collaborator'а вручную не нужно.
+> Идентичность `<your-app>[bot]` после установки автоматически становится участником выбранных репо. Добавлять отдельного collaborator'а вручную избыточно.
 
 ### g. Убедиться, что `secrets/` в `.gitignore`
 
@@ -145,27 +149,40 @@ AGENT_APP_ID=1234567
 /secrets/
 ```
 
-> .env.local уже игнорируется в этом проекте (как, например, `CODEX_HTTP_PROXY`). Каталог `secrets/` должен быть закрыт так же надёжно. См. подробнее [семантику каталогов в разделе 5](#5-конфигурация-и-хранение-секретов).
+> `.env.local` уже игнорируется в этом проекте (как, например, `CODEX_HTTP_PROXY`). Каталог `secrets/` должен быть закрыт так же надёжно. См. подробнее [семантику каталогов в разделе 5](#5-конфигурация-и-хранение-секретов).
 
-## 4. Использование скрипта `bin/agent-token`
+## 4. Использование команды `bin/console agent:token`
 
-Скрипт `bin/agent-token` инкапсулирует весь цикл получения токена: чтение PEM → сборка JWT (RS256, через `ext-openssl`, без сторонних зависимостей) → поиск `installation_id` по `<owner>/<repo>` → запрос installation access token → кеширование.
+Команда `bin/console agent:token` инкапсулирует весь цикл получения токена: чтение PEM → сборка JWT (RS256, через `ext-openssl`, без сторонних зависимостей) → поиск `installation_id` по `<owner>/<repo>` → запрос installation access token → кеширование.
+
+> **Архитектура.** Функционал идентичности агента — полноценная часть продукта, а не dev-утилита. Реализован как DDD-модуль `src/Module/GitIdentity` со слоями Domain/Application/Infrastructure; команда `agent:token` — точка входа в Presentation-слое CLI (`apps/console/src/Module/GitIdentity/Command/AgentTokenCommand.php`), делегирующая в use case `ObtainTokenCommandHandler`.
 
 ### Справка
 
 ```bash
-bin/agent-token --help
+bin/console agent:token --help
 ```
 
-### Основной сценарий — выставить `GH_TOKEN` через `eval`
+### Сигнатура
+
+```
+bin/console agent:token <owner>/<repo> [--format=plain|json|env]
+```
+
+- Аргумент `repo` (обязательный): repository slug в формате `<owner>/<repo>`.
+- Опция `--format` (по умолчанию `plain`): `plain`, `json` или `env`.
+
+### Основной сценарий — выставить токен через `eval`
 
 ```bash
-eval "$(bin/agent-token <owner>/<repo>)"
+eval "$(bin/console agent:token <owner>/<repo> --format=env)"
 # Пример (подставьте свой owner/repo):
-# eval "$(bin/agent-token prikotov/task-orchestrator)"
+# eval "$(bin/console agent:token prikotov/task-orchestrator --format=env)"
 ```
 
-По умолчанию скрипт печатает строку вида `export GH_TOKEN='ghs_...'`, которую `eval` выполняет в текущей оболочке. После этого `gh` (и любой агент) использует этот токен.
+Формат `env` печатает строку `export GITHUB_TOKEN='<token>'`, которую `eval` выполняет в текущей оболочке. После этого `gh` (и любой агент, работающий через `gh`) использует этот токен.
+
+> `gh` CLI читает обе переменные окружения — `GH_TOKEN` и `GITHUB_TOKEN`. Команда экспортирует `GITHUB_TOKEN`; этого достаточно для `gh` и работающих через него агентов (`pi`, Codex CLI, OpenCode).
 
 ### Проверка, что авторизация сменилась на App
 
@@ -178,28 +195,29 @@ gh api user --jq .login     # → <your-app>[bot]
 
 | Вызов | Вывод | Назначение |
 |---|---|---|
-| `bin/agent-token <owner>/<repo>` | `export GH_TOKEN='...'` | для `eval` (по умолчанию) |
-| `bin/agent-token <owner>/<repo> --raw` | голый токен | для `gh auth login --with-token` / pipe |
-| `bin/agent-token <owner>/<repo> --json` | JSON `{token, expires_at, installation_id}` | для инспекции/скриптов |
-| `bin/agent-token --help` / `-h` | справка | — |
+| `bin/console agent:token <owner>/<repo>` | голый токен (по умолчанию `plain`) | для `gh auth login --with-token` / pipe |
+| `bin/console agent:token <owner>/<repo> --format=plain` | голый токен | то же (явно) |
+| `bin/console agent:token <owner>/<repo> --format=json` | JSON `{token, expires_at, installation_id}` | для инспекции/скриптов |
+| `bin/console agent:token <owner>/<repo> --format=env` | `export GITHUB_TOKEN='...'` | для `eval` |
+| `bin/console agent:token --help` / `-h` | справка | — |
 
-Режим `--raw` удобно использовать для постоянной авторизации `gh` под App:
+Постоянная авторизация `gh` под App (токен пишется в конфигурацию `gh`):
 
 ```bash
-bin/agent-token <owner>/<repo> --raw | gh auth login --with-token
+bin/console agent:token <owner>/<repo> --format=plain | gh auth login --with-token
 ```
 
 ### Как агенты подхватывают токен
 
-`pi`, Codex CLI и OpenCode читают `GH_TOKEN` из окружения. Любой процесс, запущенный в той же оболочке после `eval "$(bin/agent-token ...)"`, автоматически работает от имени `<your-app>[bot]` — отдельной конфигурации на агент не требуется.
+`pi`, Codex CLI и OpenCode работают через CLI `gh`, который читает `GITHUB_TOKEN`/`GH_TOKEN` из окружения. Любой процесс, запущенный в той же оболочке после `eval "$(bin/console agent:token ... --format=env)"`, автоматически работает от имени `<your-app>[bot]` — отдельной конфигурации на агент не требуется.
 
 ### Механика и кеш
 
-- JWT собирается скриптом самостоятельно: `header.payload.signature`, подпись RS256 через `ext-openssl`, payload `{iat, exp = iat + 9 мин, iss = App ID}`.
-- `installation_id` запрашивается через `GET /repos/{owner}/{repo}/installation`.
-- Access token запрашивается через `POST /app/installations/{id}/access/tokens`.
-- Токен **кешируется** в `var/cache/agent-token/<installation_id>.json`. TTL = `expires_at` минус 60 секунд запаса. Пока кеш валиден, запросов к API нет.
-- При HTTP-ошибке (сеть/4xx/5xx) скрипт завершается с кодом `1` и сообщением без чувствительных данных — **JWT, PEM и сам токен никогда не попадают в вывод/stderr**.
+- JWT собирается модулем самостоятельно: `header.payload.signature`, подпись RS256 через `ext-openssl`; payload `{iat = now − clock_skew, exp = iat + jwt_ttl, iss = App ID}` (параметры `jwt_ttl_seconds`/`jwt_clock_skew_seconds`, см. [раздел 5](#5-конфигурация-и-хранение-секретов)).
+- `installation_id` запрашивается через `GET /repos/{owner}/{repo}/installation` (коротко кешируется по `owner/repo`).
+- Access token запрашивается через `POST /app/installations/{id}/access_tokens`; при `scope_to_repository=true` ограничивается репозиторием (`repository_names`).
+- Токен **кешируется** в каталоге `var/cache/task-orchestrator/git-identity/`: файл `<installation_id>.token.json` с правами `0600` (каталог `0700`, атомарная запись под `flock`). TTL = `expires_at` минус `token_expiry_safety_margin_seconds`. Пока кеш валиден, запросов к API нет.
+- При ошибке (сеть/4xx/5xx/конфигурация) команда завершается с ненулевым кодом и сообщением без чувствительных данных — **JWT, PEM и сам токен никогда не попадают в вывод/stderr**, кроме целенаправленной печати токена в выбранном формате.
 
 ## 5. Конфигурация и хранение секретов
 
@@ -209,63 +227,76 @@ bin/agent-token <owner>/<repo> --raw | gh auth login --with-token
 
 | Каталог | Семантика | Что внутри | Восстановление |
 |---|---|---|---|
-| **`secrets/`** | **Постоянные секреты** — долговременные ключи доступа | PEM App, App ID, иные ключи | **Только вручную** (перевыпуск через GitHub UI) |
-| **`var/`** | **Временные данные** — кеш, протухающие артефакты | Кеш токена в `var/cache/agent-token/` | Чистится без последствий; протухает/пересоздаётся автоматически |
+| **`secrets/`** | **Постоянные секреты** — долговременные ключи доступа | PEM App | **Только вручную** (перевыпуск через GitHub UI) |
+| **`var/`** | **Временные данные** — кеш, протухающие артефакты | Кеш токена в `var/cache/task-orchestrator/git-identity/` | Чистится без последствий; протухает/пересоздаётся автоматически |
 
 **Почему PEM в `secrets/`, а кеш в `var/`:** PEM — долговременное средство подписи JWT, перевыпускается только вручную через GitHub UI (см. [Ротация PEM](#8-ротация-pem-private-key)). Кеш токена — короткоживущий артефакт, пересоздаётся автоматически и чистится без последствий. Поэтому постоянные секреты живут в `secrets/`, а кеш — в `var/`.
 
-### Способы задания конфигурации
+### Конфигурация: секция `task_orchestrator.git_identity`
 
-Скрипт `bin/agent-token` разрешает PEM и App ID по цепочке приоритетов. Ниже — от высшего приоритета к низшему:
+Настройка модуля — Symfony-нативная. Схема параметров определена в `src/DependencyInjection/Configuration.php` (секция `task_orchestrator.git_identity`). Отдельного самописного парсера `.env.local` у модуля нет: `.env.local` загружает сам `bin/console` через Symfony Dotenv при старте (как уже загружается, например, `CODEX_HTTP_PROXY`), а модуль читает уже разрешённые значения из конфигурации контейнера.
 
-1. **Реальное окружение** (экспортировано в shell): `AGENT_PRIVATE_KEY_PATH`, `AGENT_APP_ID` — высший приоритет.
-2. **`.env.local`** (в корне проекта): те же ключи. Скрипт **сам читает `.env.local`** при старте — вручную подключать его не нужно. Значения применяются, только если ключ не задан в реальном окружении (Symfony-конвенция: `.env.local` не перекрывает реальное окружение).
-3. **`AGENT_CONFIG_DIR`** — каталог-override **целиком** (PEM в `<AGENT_CONFIG_DIR>/private-key.pem`, App ID в `<AGENT_CONFIG_DIR>/app-id`). Используется, только если не заданы точечные `AGENT_PRIVATE_KEY_PATH`/`AGENT_APP_ID`. Редкий сценарий — например, глобальный конфиг в `~/.config/task-orchestrator/`.
-4. **Дефолт:** локальный каталог проекта `secrets/agent-identity/`.
+Параметры секции (`task_orchestrator.git_identity.*`):
 
-> Итого: **точечные переменные (реальное окружение > `.env.local`) > `AGENT_CONFIG_DIR` > дефолт `secrets/agent-identity/`**.
+| Параметр | Тип | По умолчанию | Назначение |
+|---|---|---|---|
+| `app_id` | строка\|null | `null` | GitHub App ID. **Обязателен** при использовании команды |
+| `private_key_path` | строка\|null | `null` | Путь к PEM-файлу (обязательно `chmod 0600`). Предпочтительный источник ключа |
+| `private_key` | строка\|null | `null` | Inline-содержимое PEM (через env). Альтернатива файлу |
+| `api_base_uri` | строка | `https://api.github.com` | Базовый URI GitHub API (переопределяется для GitHub Enterprise) |
+| `github_api_version` | строка | `2026-03-10` | Значение заголовка `X-GitHub-Api-Version` |
+| `user_agent` | строка | `task-orchestrator-git-identity` | HTTP `User-Agent` (требование GitHub) |
+| `cache_dir` | строка | `%base_path%/var/cache/task-orchestrator/git-identity` | Каталог кеша (создаётся с правами `0700`) |
+| `jwt_ttl_seconds` | int | `540` | TTL JWT, диапазон `1..600` (лимит GitHub — 600) |
+| `jwt_clock_skew_seconds` | int | `60` | Сдвиг `iat` назад (толерантность к drift NTP) |
+| `token_expiry_safety_margin_seconds` | int | `60` | Запас, вычитаемый из expiry для TTL кеша токена |
+| `installation_id_cache_ttl_seconds` | int | `86400` | TTL кеша installation id |
+| `scope_to_repository` | bool | `true` | Ограничивать installation token запрошенным репозиторием |
+| `request_timeout_seconds` | int | `30` | Таймаут HTTP-запросов к GitHub |
 
-### Дефолт: локально в проекте
+> **Источник ключа:** `private_key` (inline) имеет приоритет над `private_key_path` (файл). Если задан inline-ключ, файл не требуется и проверка `chmod` не выполняется. App ID принимается как строка или число и приводится к положительному целому.
 
-Самый частый путь — всё лежит в проекте:
+### Пример конфигурации
 
+**Вариант A — PEM-файл в `secrets/`, App ID через `.env.local` (локальная разработка):**
+
+```yaml
+# config/services.yaml (секция task_orchestrator, параметры модуля GitIdentity)
+task_orchestrator:
+    git_identity:
+        app_id: '%env(GIT_IDENTITY_APP_ID)%'
+        private_key_path: '%task_orchestrator.base_path%/secrets/agent-identity/private-key.pem'
+        # остальные параметры — по умолчанию из Configuration.php
 ```
-secrets/agent-identity/private-key.pem   # PEM, chmod 0600
-secrets/agent-identity/app-id            # App ID
-```
-
-Никаких env-переменных задавать не нужно — скрипт найдёт файлы по дефолтным путям.
-
-### Точечные переопределения через `.env.local`
-
-Файл `.env.local` в корне проекта уже игнорируется git'ом (в этом проекте через него задан, например, `CODEX_HTTP_PROXY`). Те же переменные подходят для точечной переопределения конфигурации App, не трогая файлы в `secrets/`:
 
 ```bash
-# .env.local (в корне проекта, gitignored)
-AGENT_APP_ID=1234567
-AGENT_PRIVATE_KEY_PATH=secrets/agent-identity/private-key.pem
+# .env.local (в корне проекта, gitignored) — загружается bin/console через Symfony Dotenv
+GIT_IDENTITY_APP_ID=1234567
 ```
 
-### Глобальный конфиг: `AGENT_CONFIG_DIR` (редко)
+**Вариант B — inline PEM через env (CI / сервер, без файла на диске):**
 
-Если App используется сразу для нескольких проектов и неудобно дублировать PEM в каждый `secrets/`, можно держать конфиг в одном месте (например, `~/.config/task-orchestrator/`) и указать каталог целиком:
+```yaml
+task_orchestrator:
+    git_identity:
+        app_id: '%env(GIT_IDENTITY_APP_ID)%'
+        private_key: '%env(GIT_IDENTITY_PRIVATE_KEY)%'
+```
 
 ```bash
-export AGENT_CONFIG_DIR=~/.config/task-orchestrator
-# ожидается:
-#   ~/.config/task-orchestrator/private-key.pem
-#   ~/.config/task-orchestrator/app-id
+# .env.local или переменные окружения CI:
+GIT_IDENTITY_APP_ID=1234567
+GIT_IDENTITY_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
 ```
 
-`AGENT_CONFIG_DIR` перекрывает **дефолт** `secrets/agent-identity/`, но **уступает** точечным `AGENT_PRIVATE_KEY_PATH`/`AGENT_APP_ID` (если они заданы — они важнее).
+> `.env.local` уже игнорируется git'ом в этом проекте. Каталог `secrets/` должен быть закрыт так же надёжно (см. шаг [3g](#g-убедиться-что-secrets-в-gitignore)).
 
-### Сводная таблица параметров
+### Сводная таблица источников секрета
 
-| Параметр | env (приоритет) | Файл/дефолт |
+| Секрет | Источник | Примечание |
 |---|---|---|
-| PEM private key | `AGENT_PRIVATE_KEY_PATH` | `secrets/agent-identity/private-key.pem` (обязательно `chmod 0600`) |
-| App ID | `AGENT_APP_ID` | `secrets/agent-identity/app-id` |
-| Override каталог целиком | `AGENT_CONFIG_DIR` | `<dir>/private-key.pem`, `<dir>/app-id` |
+| App ID | параметр `app_id` (через env `GIT_IDENTITY_APP_ID` или напрямую) | Обязателен; положительное целое |
+| PEM private key | `private_key_path` (файл, `0600`) **либо** `private_key` (inline env) | Inline приоритетнее; файл требует `chmod 0600` |
 
 ## 6. Переключение авторизации: человек ↔ App
 
@@ -273,7 +304,7 @@ export AGENT_CONFIG_DIR=~/.config/task-orchestrator
 
 ### Режим 1: агент всегда под App, человек — в браузере
 
-- В CLI `gh` всегда выставлен `GH_TOKEN` App (через `eval` перед запуском агента или `gh auth login --with-token`).
+- В CLI `gh` всегда выставлен токен App (через `eval ... --format=env` перед запуском агента или `gh auth login --with-token` из `--format=plain`).
 - Человек одобряет PR и выполняет merge вручную через GitHub UI в браузере от своего аккаунта.
 
 ### Режим 2: обе учётки в `gh` с переключением
@@ -297,12 +328,12 @@ gh auth status                             # посмотреть активну
 3. Получить токен под новый репо:
 
 ```bash
-eval "$(bin/agent-token <owner>/<new-repo>)"
+eval "$(bin/console agent:token <owner>/<new-repo> --format=env)"
 ```
 
-Поскольку PEM, App ID и скрипт одни на все проекты, новый репо начинает работать сразу после выставления галочки.
+Поскольку PEM, App ID и команда одни на все проекты, новый репо начинает работать сразу после выставления галочки.
 
-> **Конфигурация для разных проектов.** Либо **локальная**: `secrets/` (с PEM и App ID) живёт в каждом проекте отдельно. Либо **глобальная**: один каталог задаётся через `AGENT_CONFIG_DIR` (например, `~/.config/task-orchestrator/`) и используется всеми проектами. Дублировать PEM во все репозитории не обязательно — см. [раздел 5](#5-конфигурация-и-хранение-секретов).
+> **Конфигурация для разных проектов.** Либо **локальная**: секция `git_identity` + `secrets/` (с PEM) настраивается в каждом проекте отдельно. Либо **общая**: один inline-PEM задаётся через env (`GIT_IDENTITY_PRIVATE_KEY`) и переиспользуется всеми проектами — дублировать PEM-файл в каждый репозиторий необязательно. См. [раздел 5](#5-конфигурация-и-хранение-секретов).
 
 ## 8. Ротация PEM (private key)
 
@@ -310,25 +341,26 @@ eval "$(bin/agent-token <owner>/<new-repo>)"
 
 1. На странице App → **Generate a private key** (новый).
 2. Заменить файл `secrets/agent-identity/private-key.pem` новым содержимым, выставить `chmod 0600`.
-   - При использовании `AGENT_CONFIG_DIR` — замените PEM в этом каталоге.
+   - При использовании inline-ключа (`private_key` через env) — обновите значение `GIT_IDENTITY_PRIVATE_KEY`.
 3. В UI нажать **Delete** рядом со старым ключом (старый PEM при этом перестаёт действовать).
 4. Проверить:
 
 ```bash
-eval "$(bin/agent-token <owner>/<repo>)" && gh api user --jq .login
+eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --jq .login
 # → <your-app>[bot]
 ```
 
-> Installation tokens при ротации трогать **не нужно** — они короткоживущие (TTL ~1 ч) и перевыпускаются сами. Ротируется только PEM (средство подписи JWT).
+> Installation tokens при ротации трогать избыточно — они короткоживущие (TTL ~1 ч) и перевыпускаются сами. Ротируется только PEM (средство подписи JWT).
 
 ## 9. Чек-лист DoD (эксплуатационная часть)
 
-Задача считается закрытой, когда проверены **все** пункты. Имя App здесь не зафиксировано — подставьте выбранное вами имя.
+Задача считается закрытой, когда проверены **все** пункты. Имя App здесь представлено placeholder'ом — подставьте выбранное вами имя.
 
 - [ ] GitHub App (с выбранным вами именем) создан и установлен на целевой репо.
-- [ ] PEM лежит в `secrets/agent-identity/private-key.pem` с правами `0600`; App ID задан (`secrets/agent-identity/app-id` или `AGENT_APP_ID` в `.env.local`).
+- [ ] PEM лежит в `secrets/agent-identity/private-key.pem` с правами `0600` (либо задан через `GIT_IDENTITY_PRIVATE_KEY`).
+- [ ] App ID задан параметром `app_id` (через `GIT_IDENTITY_APP_ID` в `.env.local` или напрямую).
 - [ ] Каталог `secrets/` присутствует в `.gitignore` проекта.
-- [ ] `eval "$(bin/agent-token <owner>/<repo>)"` выполняется без ошибок.
+- [ ] `eval "$(bin/console agent:token <owner>/<repo> --format=env)"` выполняется без ошибок.
 - [ ] `gh api user --jq .login` → `<your-app>[bot]`.
 - [ ] Тестовый PR создан от имени `<your-app>[bot]` (`gh pr view --json author --jq .author.login`).
 - [ ] Владелец (человек) видит и может нажать **Approve** в UI.
@@ -338,15 +370,17 @@ eval "$(bin/agent-token <owner>/<repo>)" && gh api user --jq .login
 
 | Симптом | Причина | Действие |
 |---|---|---|
-| `Error: PEM file has insecure permissions. Expected 0600` | Файл ключа читается группой/остальными | `chmod 0600 secrets/agent-identity/private-key.pem` |
-| `Error: PEM private key not found...` | Не задан путь к ключу | Задать `AGENT_PRIVATE_KEY_PATH` или положить ключ в `secrets/agent-identity/private-key.pem` |
-| `Error: App ID not found...` | Не задан App ID | Задать `AGENT_APP_ID` или создать `secrets/agent-identity/app-id` |
-| `Error: Invalid App ID: must be a positive integer` | В `app-id` не число | Записать числовой App ID со страницы App |
-| `GitHub API error: HTTP 404` на шаге поиска installation | App **не установлен** на репо | Установить App (раздел 3, шаг `f`), проверить `owner/repo` на опечатки |
-| `GitHub API error: HTTP 403/404` при операциях в репо | Недостаточные permissions App | Проверить repository permissions (раздел 3, шаг `b`) |
-| `gh auth status` показывает старую учётку после `eval` | `gh` кеширует авторизацию поверх `GH_TOKEN` | `gh auth login --with-token` из `--raw`, либо `gh auth switch -u <your-app>[bot]` |
-| Команды `gh` внезапно падают с `401` спустя ~1 ч | Installation token протух (TTL ~1 ч) | Перевыпустить: повторный `eval "$(bin/agent-token ...)"` (кеш обновится автоматически) |
-| `Error: Failed to load private key` / `Failed to sign JWT` | Повреждён или некорректен PEM | Перевыпустить private key в UI и заменить файл (раздел 8) |
+| `GitHub App ID is not configured (parameter task_orchestrator.git_identity.app_id).` | Не задан App ID | Задать `app_id` (через `GIT_IDENTITY_APP_ID` или напрямую) — [раздел 5](#5-конфигурация-и-хранение-секретов) |
+| `GitHub App ID must be a positive integer.` | В `app_id` не число | Указать числовой App ID со страницы App |
+| `GitHub App private key is not configured: set private_key or private_key_path.` | Не задан ключ | Задать `private_key_path` или `private_key` в секции `git_identity` |
+| `GitHub App private key file not found: <path>` | Путь к PEM-файлу неверный или файла нет | Проверить путь в `private_key_path`, положить ключ в `secrets/agent-identity/private-key.pem` |
+| `Private key file has insecure permissions (expected 0600): <path>` | Файл ключа читается группой/остальными | `chmod 0600 secrets/agent-identity/private-key.pem` |
+| `Failed to read private key file: <path>` | Файл существует, но нечитается/повреждён | Проверить содержимое PEM; при подозрении — перевыпустить (раздел [8](#8-ротация-pem-private-key)) |
+| `GitHub API error: HTTP 404 ... /repos/.../installation` | App **не установлен** на репо | Установить App (раздел [3, шаг f](#f-install-app-установка-на-репозиторий)), проверить `owner/repo` на опечатки |
+| `GitHub API error: HTTP 403/404` при операциях в репо | Недостаточные permissions App | Проверить repository permissions (раздел [3, шаг b](#b-permissions-разрешения)) |
+| `GitHub API request failed: network error ...` | Нет сети / прокси / DNS | Проверить подключение (как `CODEX_HTTP_PROXY`); при GHES — параметр `api_base_uri` |
+| `gh auth status` показывает старую учётку после `eval` | `gh` кеширует авторизацию поверх `GITHUB_TOKEN` | `bin/console agent:token <owner>/<repo> --format=plain \| gh auth login --with-token`, либо `gh auth switch -u <your-app>[bot]` |
+| Команды `gh` внезапно падают с `401` спустя ~1 ч | Installation token протух (TTL ~1 ч) | Перевыпустить: повторный `eval "$(bin/console agent:token ... --format=env)"` (кеш обновится автоматически) |
 
 ## Источники
 
