@@ -31,7 +31,7 @@ final class StubGitIdentityConfigLoader implements LoadGitIdentityConfigServiceI
             appId: new AppIdVo($this->appId),
             privateKey: new PrivateKeyVo($this->privateKeyPem),
             apiBaseUri: 'https://api.github.com',
-            githubApiVersion: '2026-03-10',
+            githubApiVersion: '2022-11-28',
             userAgent: 'task-orchestrator-git-identity-test',
             jwtTtlSeconds: 540,
             jwtClockSkewSeconds: 60,

@@ -22,7 +22,7 @@ final class GitIdentityConfigVoTest extends TestCase
     {
         return $this->build(
             apiBaseUri: 'https://api.github.com',
-            githubApiVersion: '2026-03-10',
+            githubApiVersion: '2022-11-28',
             userAgent: 'task-orchestrator-git-identity',
             jwtTtlSeconds: 540,
             jwtClockSkewSeconds: 60,
@@ -53,7 +53,7 @@ final class GitIdentityConfigVoTest extends TestCase
             appId: new AppIdVo(123456),
             privateKey: new PrivateKeyVo(self::PEM),
             apiBaseUri: $apiBaseUri ?? 'https://api.github.com',
-            githubApiVersion: $githubApiVersion ?? '2026-03-10',
+            githubApiVersion: $githubApiVersion ?? '2022-11-28',
             userAgent: $userAgent ?? 'task-orchestrator-git-identity',
             jwtTtlSeconds: $jwtTtlSeconds ?? 540,
             jwtClockSkewSeconds: $jwtClockSkewSeconds ?? 60,
@@ -72,7 +72,7 @@ final class GitIdentityConfigVoTest extends TestCase
         self::assertSame(123456, $config->getAppId()->getValue());
         self::assertSame(self::PEM, $config->getPrivateKey()->getContent());
         self::assertSame('https://api.github.com', $config->getApiBaseUri());
-        self::assertSame('2026-03-10', $config->getGitHubApiVersion());
+        self::assertSame('2022-11-28', $config->getGitHubApiVersion());
         self::assertSame('task-orchestrator-git-identity', $config->getUserAgent());
         self::assertSame(540, $config->getJwtTtlSeconds());
         self::assertSame(60, $config->getJwtClockSkewSeconds());
@@ -90,7 +90,7 @@ final class GitIdentityConfigVoTest extends TestCase
             appId: new AppIdVo(123456),
             privateKey: new PrivateKeyVo(self::PEM),
             apiBaseUri: 'https://api.github.com',
-            githubApiVersion: '2026-03-10',
+            githubApiVersion: '2022-11-28',
             userAgent: 'task-orchestrator-git-identity',
             jwtTtlSeconds: 540,
             jwtClockSkewSeconds: 60,

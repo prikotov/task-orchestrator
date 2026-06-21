@@ -46,7 +46,7 @@ final class OpenSslSignJwtTokenServiceTest extends TestCase
             appId: $appId ?? new AppIdVo(self::APP_ID),
             privateKey: $privateKey ?? new PrivateKeyVo($this->privateKeyPem),
             apiBaseUri: 'https://api.github.com',
-            githubApiVersion: '2026-03-10',
+            githubApiVersion: '2022-11-28',
             userAgent: 'task-orchestrator-git-identity-test',
             jwtTtlSeconds: self::JWT_TTL,
             jwtClockSkewSeconds: self::CLOCK_SKEW,

@@ -110,22 +110,23 @@ chmod 0600 secrets/agent-identity/private-key.pem
 
 ### e. Сохранить App ID
 
-App ID задаётся параметром `app_id` секции `git_identity` (см. [раздел 5](#5-конфигурация-и-хранение-секретов)). Проще всего — через `.env.local`, который `bin/console` загружает через Symfony Dotenv при старте:
+App ID — это обязательная env-переменная `AGENT_APP_ID`, которую модуль GitIdentity читает напрямую при старте команды (см. [раздел 5](#5-конфигурация-и-хранение-секретов)). Проще всего — через `.env.local`, который `bin/console` загружает через Symfony Dotenv при старте:
 
 ```bash
 # .env.local (в корне проекта)
-GIT_IDENTITY_APP_ID=1234567
+AGENT_APP_ID=1234567
 ```
 
-и сослаться на него в конфигурации модуля:
+Путь к PEM-ключу задаётся рядом (тот же `.env.local`):
 
-```yaml
-# config/services.yaml (секция task_orchestrator.git_identity)
-task_orchestrator:
-    git_identity:
-        app_id: '%env(GIT_IDENTITY_APP_ID)%'
-        private_key_path: '%task_orchestrator.base_path%/secrets/agent-identity/private-key.pem'
+```bash
+# .env.local (продолжение)
+AGENT_PRIVATE_KEY_PATH=/absolute/path/to/secrets/agent-identity/private-key.pem
+# либо inline-PEM в одной строке (альтернатива файлу):
+# AGENT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 ```
+
+> Никакой секции `git_identity` в `config/services.yaml` настраивать не нужно: модуль читает конфиг целиком из env с дефолтами-константами внутри себя.
 
 Подставьте вместо `1234567` реальный **App ID** со страницы App.
 
@@ -213,10 +214,10 @@ bin/console agent:token <owner>/<repo> --format=plain | gh auth login --with-tok
 
 ### Механика и кеш
 
-- JWT собирается модулем самостоятельно: `header.payload.signature`, подпись RS256 через `ext-openssl`; payload `{iat = now − clock_skew, exp = iat + jwt_ttl, iss = App ID}` (параметры `jwt_ttl_seconds`/`jwt_clock_skew_seconds`, см. [раздел 5](#5-конфигурация-и-хранение-секретов)).
+- JWT собирается модулем самостоятельно: `header.payload.signature`, подпись RS256 через `ext-openssl`; payload `{iat = now − clock_skew, exp = iat + jwt_ttl, iss = App ID}` (env `AGENT_JWT_TTL_SECONDS`/`AGENT_JWT_CLOCK_SKEW_SECONDS`, см. [раздел 5](#5-конфигурация-и-хранение-секретов)).
 - `installation_id` запрашивается через `GET /repos/{owner}/{repo}/installation` (коротко кешируется по `owner/repo`).
-- Access token запрашивается через `POST /app/installations/{id}/access_tokens`; при `scope_to_repository=true` ограничивается репозиторием (`repository_names`).
-- Токен **кешируется** в каталоге `var/cache/task-orchestrator/git-identity/`: файл `<installation_id>.token.json` с правами `0600` (каталог `0700`, атомарная запись под `flock`). TTL = `expires_at` минус `token_expiry_safety_margin_seconds`. Пока кеш валиден, запросов к API нет.
+- Access token запрашивается через `POST /app/installations/{id}/access_tokens`; при `AGENT_SCOPE_TO_REPOSITORY=true` ограничивается репозиторием (`repository_names`).
+- Токен **кешируется** в каталоге `var/cache/task-orchestrator/git-identity/`: файл `<installation_id>.token.json` с правами `0600` (каталог `0700`, атомарная запись под `flock`). TTL = `expires_at` минус `AGENT_TOKEN_EXPIRY_SAFETY_MARGIN_SECONDS`. Пока кеш валиден, запросов к API нет. Каталог кеша = `<base_path>/var/cache/task-orchestrator/git-identity` (пробрасывается в `FilesystemTokenCacheService` из параметра `base_path`).
 - При ошибке (сеть/4xx/5xx/конфигурация) команда завершается с ненулевым кодом и сообщением без чувствительных данных — **JWT, PEM и сам токен никогда не попадают в вывод/stderr**, кроме целенаправленной печати токена в выбранном формате.
 
 ## 5. Конфигурация и хранение секретов
@@ -232,61 +233,50 @@ bin/console agent:token <owner>/<repo> --format=plain | gh auth login --with-tok
 
 **Почему PEM в `secrets/`, а кеш в `var/`:** PEM — долговременное средство подписи JWT, перевыпускается только вручную через GitHub UI (см. [Ротация PEM](#8-ротация-pem-private-key)). Кеш токена — короткоживущий артефакт, пересоздаётся автоматически и чистится без последствий. Поэтому постоянные секреты живут в `secrets/`, а кеш — в `var/`.
 
-### Конфигурация: секция `task_orchestrator.git_identity`
+### Конфигурация: env-переменные модуля GitIdentity
 
-Настройка модуля — Symfony-нативная. Схема параметров определена в `src/DependencyInjection/Configuration.php` (секция `task_orchestrator.git_identity`). Отдельного самописного парсера `.env.local` у модуля нет: `.env.local` загружает сам `bin/console` через Symfony Dotenv при старте (как уже загружается, например, `CODEX_HTTP_PROXY`), а модуль читает уже разрешённые значения из конфигурации контейнера.
+Настройка модуля принадлежит **самому модулю** и читается из env-переменных напрямую — реализация в `src/Module/GitIdentity/Infrastructure/Service/LoadGitIdentityConfigService.php`. Дефолты — это знание модуля о протоколе GitHub App auth, поэтому они хранятся как private-константы внутри сервиса, а не в конфигурации бандла. Никакой секции `git_identity` в `config/services.yaml` настраивать не нужно.
 
-Параметры секции (`task_orchestrator.git_identity.*`):
+`.env.local` загружает сам `bin/console` через Symfony Dotenv при старте (как уже загружается, например, `CODEX_HTTP_PROXY`), а модуль читает уже выставленные env-переменные через `getenv()`.
 
-| Параметр | Тип | По умолчанию | Назначение |
+Env-переменные модуля (`AGENT_*`):
+
+| Env | Тип | По умолчанию | Назначение |
 |---|---|---|---|
-| `app_id` | строка\|null | `null` | GitHub App ID. **Обязателен** при использовании команды |
-| `private_key_path` | строка\|null | `null` | Путь к PEM-файлу (обязательно `chmod 0600`). Предпочтительный источник ключа |
-| `private_key` | строка\|null | `null` | Inline-содержимое PEM (через env). Альтернатива файлу |
-| `api_base_uri` | строка | `https://api.github.com` | Базовый URI GitHub API (переопределяется для GitHub Enterprise) |
-| `github_api_version` | строка | `2026-03-10` | Значение заголовка `X-GitHub-Api-Version` |
-| `user_agent` | строка | `task-orchestrator-git-identity` | HTTP `User-Agent` (требование GitHub) |
-| `cache_dir` | строка | `%base_path%/var/cache/task-orchestrator/git-identity` | Каталог кеша (создаётся с правами `0700`) |
-| `jwt_ttl_seconds` | int | `540` | TTL JWT, диапазон `1..600` (лимит GitHub — 600) |
-| `jwt_clock_skew_seconds` | int | `60` | Сдвиг `iat` назад (толерантность к drift NTP) |
-| `token_expiry_safety_margin_seconds` | int | `60` | Запас, вычитаемый из expiry для TTL кеша токена |
-| `installation_id_cache_ttl_seconds` | int | `86400` | TTL кеша installation id |
-| `scope_to_repository` | bool | `true` | Ограничивать installation token запрошенным репозиторием |
-| `request_timeout_seconds` | int | `30` | Таймаут HTTP-запросов к GitHub |
+| `AGENT_APP_ID` | число > 0 | — (обязателен) | GitHub App ID. **Обязателен** при использовании команды |
+| `AGENT_PRIVATE_KEY_PATH` | путь \| null | null | Путь к PEM-файлу (обязательно `chmod 0600`). Предпочтительный источник ключа |
+| `AGENT_PRIVATE_KEY` | строка \| null | null | Inline-содержимое PEM. Альтернатива файлу |
+| `AGENT_API_BASE_URI` | строка | `https://api.github.com` | Базовый URI GitHub API (переопределяется для GitHub Enterprise) |
+| `AGENT_GITHUB_API_VERSION` | строка | `2022-11-28` | Значение заголовка `X-GitHub-Api-Version` |
+| `AGENT_USER_AGENT` | строка | `task-orchestrator-git-identity` | HTTP `User-Agent` (требование GitHub) |
+| `AGENT_JWT_TTL_SECONDS` | int | `540` | TTL JWT, диапазон `1..600` (лимит GitHub — 600) |
+| `AGENT_JWT_CLOCK_SKEW_SECONDS` | int | `60` | Сдвиг `iat` назад (толерантность к drift NTP) |
+| `AGENT_TOKEN_EXPIRY_SAFETY_MARGIN_SECONDS` | int | `60` | Запас, вычитаемый из expiry для TTL кеша токена |
+| `AGENT_INSTALLATION_ID_CACHE_TTL_SECONDS` | int \| `null` | `86400` | TTL кеша installation id; значение `null` = без expiry |
+| `AGENT_SCOPE_TO_REPOSITORY` | bool | `true` | Ограничивать installation token запрошенным репозиторием |
+| `AGENT_REQUEST_TIMEOUT_SECONDS` | int | `30` | Таймаут HTTP-запросов к GitHub |
 
-> **Источник ключа:** `private_key` (inline) имеет приоритет над `private_key_path` (файл). Если задан inline-ключ, файл не требуется и проверка `chmod` не выполняется. App ID принимается как строка или число и приводится к положительному целому.
+> Каталог кеша токенов не задаётся через env: он всегда `<base_path>/var/cache/task-orchestrator/git-identity` (пробрасывается в `FilesystemTokenCacheService` из параметра `base_path`).
+
+> **Источник ключа:** `AGENT_PRIVATE_KEY` (inline) имеет приоритет над `AGENT_PRIVATE_KEY_PATH` (файл). Если задан inline-ключ, файл не требуется и проверка `chmod` не выполняется. App ID принимается как строка/число и приводится к положительному целому. Булевы параметры принимают `true|false|1|0|yes|no|on|off` (без учёта регистра). Числа с нецифровым значением вызывают fail-fast ошибку; диапазоны (`jwt_ttl_seconds`, `request_timeout_seconds` и т.д.) дополнительно валидируются в `GitIdentityConfigVo`.
 
 ### Пример конфигурации
 
 **Вариант A — PEM-файл в `secrets/`, App ID через `.env.local` (локальная разработка):**
 
-```yaml
-# config/services.yaml (секция task_orchestrator, параметры модуля GitIdentity)
-task_orchestrator:
-    git_identity:
-        app_id: '%env(GIT_IDENTITY_APP_ID)%'
-        private_key_path: '%task_orchestrator.base_path%/secrets/agent-identity/private-key.pem'
-        # остальные параметры — по умолчанию из Configuration.php
-```
-
 ```bash
 # .env.local (в корне проекта, gitignored) — загружается bin/console через Symfony Dotenv
-GIT_IDENTITY_APP_ID=1234567
+AGENT_APP_ID=1234567
+AGENT_PRIVATE_KEY_PATH=/absolute/path/to/secrets/agent-identity/private-key.pem
+# остальные AGENT_* — по умолчанию из LoadGitIdentityConfigService
 ```
 
 **Вариант B — inline PEM через env (CI / сервер, без файла на диске):**
 
-```yaml
-task_orchestrator:
-    git_identity:
-        app_id: '%env(GIT_IDENTITY_APP_ID)%'
-        private_key: '%env(GIT_IDENTITY_PRIVATE_KEY)%'
-```
-
 ```bash
 # .env.local или переменные окружения CI:
-GIT_IDENTITY_APP_ID=1234567
-GIT_IDENTITY_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
+AGENT_APP_ID=1234567
+AGENT_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----\n"
 ```
 
 > `.env.local` уже игнорируется git'ом в этом проекте. Каталог `secrets/` должен быть закрыт так же надёжно (см. шаг [3g](#g-убедиться-что-secrets-в-gitignore)).
@@ -295,8 +285,8 @@ GIT_IDENTITY_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRI
 
 | Секрет | Источник | Примечание |
 |---|---|---|
-| App ID | параметр `app_id` (через env `GIT_IDENTITY_APP_ID` или напрямую) | Обязателен; положительное целое |
-| PEM private key | `private_key_path` (файл, `0600`) **либо** `private_key` (inline env) | Inline приоритетнее; файл требует `chmod 0600` |
+| App ID | env `AGENT_APP_ID` (или переменная окружения процесса) | Обязателен; положительное целое |
+| PEM private key | `AGENT_PRIVATE_KEY_PATH` (файл, `0600`) **либо** `AGENT_PRIVATE_KEY` (inline env) | Inline приоритетнее; файл требует `chmod 0600` |
 
 ## 6. Переключение авторизации: человек ↔ App
 
@@ -333,7 +323,7 @@ eval "$(bin/console agent:token <owner>/<new-repo> --format=env)"
 
 Поскольку PEM, App ID и команда одни на все проекты, новый репо начинает работать сразу после выставления галочки.
 
-> **Конфигурация для разных проектов.** Либо **локальная**: секция `git_identity` + `secrets/` (с PEM) настраивается в каждом проекте отдельно. Либо **общая**: один inline-PEM задаётся через env (`GIT_IDENTITY_PRIVATE_KEY`) и переиспользуется всеми проектами — дублировать PEM-файл в каждый репозиторий необязательно. См. [раздел 5](#5-конфигурация-и-хранение-секретов).
+> **Конфигурация для разных проектов.** Либо **локальная**: PEM в `secrets/` + env `AGENT_APP_ID`/`AGENT_PRIVATE_KEY_PATH` настраиваются в каждом проекте отдельно. Либо **общая**: один inline-PEM задаётся через env `AGENT_PRIVATE_KEY` и переиспользуется всеми проектами — дублировать PEM-файл в каждый репозиторий необязательно. См. [раздел 5](#5-конфигурация-и-хранение-секретов).
 
 ## 8. Ротация PEM (private key)
 
@@ -341,7 +331,7 @@ eval "$(bin/console agent:token <owner>/<new-repo> --format=env)"
 
 1. На странице App → **Generate a private key** (новый).
 2. Заменить файл `secrets/agent-identity/private-key.pem` новым содержимым, выставить `chmod 0600`.
-   - При использовании inline-ключа (`private_key` через env) — обновите значение `GIT_IDENTITY_PRIVATE_KEY`.
+   - При использовании inline-ключа (env `AGENT_PRIVATE_KEY`) — обновите его значение.
 3. В UI нажать **Delete** рядом со старым ключом (старый PEM при этом перестаёт действовать).
 4. Проверить:
 
@@ -357,8 +347,8 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --j
 Задача считается закрытой, когда проверены **все** пункты. Имя App здесь представлено placeholder'ом — подставьте выбранное вами имя.
 
 - [ ] GitHub App (с выбранным вами именем) создан и установлен на целевой репо.
-- [ ] PEM лежит в `secrets/agent-identity/private-key.pem` с правами `0600` (либо задан через `GIT_IDENTITY_PRIVATE_KEY`).
-- [ ] App ID задан параметром `app_id` (через `GIT_IDENTITY_APP_ID` в `.env.local` или напрямую).
+- [ ] PEM лежит в `secrets/agent-identity/private-key.pem` с правами `0600` (либо задан через env `AGENT_PRIVATE_KEY`).
+- [ ] App ID задан через env `AGENT_APP_ID` (в `.env.local` или как переменная окружения).
 - [ ] Каталог `secrets/` присутствует в `.gitignore` проекта.
 - [ ] `eval "$(bin/console agent:token <owner>/<repo> --format=env)"` выполняется без ошибок.
 - [ ] `gh api user --jq .login` → `<your-app>[bot]`.
@@ -370,15 +360,15 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --j
 
 | Симптом | Причина | Действие |
 |---|---|---|
-| `GitHub App ID is not configured (parameter task_orchestrator.git_identity.app_id).` | Не задан App ID | Задать `app_id` (через `GIT_IDENTITY_APP_ID` или напрямую) — [раздел 5](#5-конфигурация-и-хранение-секретов) |
-| `GitHub App ID must be a positive integer.` | В `app_id` не число | Указать числовой App ID со страницы App |
-| `GitHub App private key is not configured: set private_key or private_key_path.` | Не задан ключ | Задать `private_key_path` или `private_key` в секции `git_identity` |
-| `GitHub App private key file not found: <path>` | Путь к PEM-файлу неверный или файла нет | Проверить путь в `private_key_path`, положить ключ в `secrets/agent-identity/private-key.pem` |
+| `GitHub App ID is not configured (env AGENT_APP_ID).` | Не задан App ID | Задать env `AGENT_APP_ID` в `.env.local` или в окружении — [раздел 5](#5-конфигурация-и-хранение-секретов) |
+| `GitHub App ID must be a positive integer, got "...".` | В `AGENT_APP_ID` не число | Указать числовой App ID со страницы App |
+| `GitHub App private key is not configured: set AGENT_PRIVATE_KEY or AGENT_PRIVATE_KEY_PATH.` | Не задан ключ | Задать env `AGENT_PRIVATE_KEY_PATH` или `AGENT_PRIVATE_KEY` |
+| `GitHub App private key file not found: <path>` | Путь к PEM-файлу неверный или файла нет | Проверить путь в `AGENT_PRIVATE_KEY_PATH`, положить ключ в `secrets/agent-identity/private-key.pem` |
 | `Private key file has insecure permissions (expected 0600): <path>` | Файл ключа читается группой/остальными | `chmod 0600 secrets/agent-identity/private-key.pem` |
 | `Failed to read private key file: <path>` | Файл существует, но нечитается/повреждён | Проверить содержимое PEM; при подозрении — перевыпустить (раздел [8](#8-ротация-pem-private-key)) |
 | `GitHub API error: HTTP 404 ... /repos/.../installation` | App **не установлен** на репо | Установить App (раздел [3, шаг f](#f-install-app-установка-на-репозиторий)), проверить `owner/repo` на опечатки |
 | `GitHub API error: HTTP 403/404` при операциях в репо | Недостаточные permissions App | Проверить repository permissions (раздел [3, шаг b](#b-permissions-разрешения)) |
-| `GitHub API request failed: network error ...` | Нет сети / прокси / DNS | Проверить подключение (как `CODEX_HTTP_PROXY`); при GHES — параметр `api_base_uri` |
+| `GitHub API request failed: network error ...` | Нет сети / прокси / DNS | Проверить подключение (как `CODEX_HTTP_PROXY`); при GHES — env `AGENT_API_BASE_URI` |
 | `gh auth status` показывает старую учётку после `eval` | `gh` кеширует авторизацию поверх `GITHUB_TOKEN` | `bin/console agent:token <owner>/<repo> --format=plain \| gh auth login --with-token`, либо `gh auth switch -u <your-app>[bot]` |
 | Команды `gh` внезапно падают с `401` спустя ~1 ч | Installation token протух (TTL ~1 ч) | Перевыпустить: повторный `eval "$(bin/console agent:token ... --format=env)"` (кеш обновится автоматически) |
 

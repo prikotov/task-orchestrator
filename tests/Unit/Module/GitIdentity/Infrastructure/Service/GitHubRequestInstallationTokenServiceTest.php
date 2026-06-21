@@ -132,7 +132,7 @@ final class GitHubRequestInstallationTokenServiceTest extends TestCase
             appId: new AppIdVo(123456),
             privateKey: new PrivateKeyVo((string) file_get_contents(self::FIXTURE_PEM)),
             apiBaseUri: $apiBaseUri,
-            githubApiVersion: '2026-03-10',
+            githubApiVersion: '2022-11-28',
             userAgent: 'task-orchestrator-git-identity-test',
             jwtTtlSeconds: 540,
             jwtClockSkewSeconds: 60,
