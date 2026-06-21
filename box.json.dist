@@ -3,14 +3,16 @@
     "files": [
         "config/services.yaml",
         "config/console_services.yaml",
-        "config/chains.yaml"
+        "config/chains.yaml",
+        "config/modules.php"
     ],
     "directories": [
         "src",
         "apps/console/src",
         "vendor",
         "config/prompts",
-        "docs/agents/roles"
+        "docs/agents/roles",
+        "src/Module/GitIdentity/Resource/config"
     ],
     "compression": "GZ"
 }
