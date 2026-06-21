@@ -249,26 +249,3 @@ services:
   TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler:
     arguments:
       $strategies: !tagged_iterator orchestrator.execution_strategy
-
-  # ─── GitIdentity module ───────────────────────────────────────────────
-
-  # Domain Service aliases (Interface → Implementation)
-  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\LoadGitIdentityConfigServiceInterface:
-    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\LoadGitIdentityConfigService
-  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\TokenCacheInterface:
-    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\FilesystemTokenCacheService
-  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\SignJwtTokenServiceInterface:
-    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\OpenSslSignJwtTokenService
-  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\ResolveInstallationIdServiceInterface:
-    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\GitHubResolveInstallationIdService
-  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\RequestInstallationTokenServiceInterface:
-    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\GitHubRequestInstallationTokenService
-  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\ClockServiceInterface:
-    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\SystemClockService
-
-  # Infrastructure Service parameters
-  # LoadGitIdentityConfigService: без аргументов — читает конфиг из env
-  # (AGENT_APP_ID, AGENT_PRIVATE_KEY[_PATH] и т.д.) с дефолтами-константами.
-  TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\FilesystemTokenCacheService:
-    arguments:
-      $cacheDir: '%task_orchestrator.base_path%/var/cache/task-orchestrator/git-identity'

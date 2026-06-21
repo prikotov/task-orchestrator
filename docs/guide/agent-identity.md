@@ -217,7 +217,7 @@ bin/console agent:token <owner>/<repo> --format=plain | gh auth login --with-tok
 - JWT собирается модулем самостоятельно: `header.payload.signature`, подпись RS256 через `ext-openssl`; payload `{iat = now − clock_skew, exp = iat + jwt_ttl, iss = App ID}` (env `AGENT_JWT_TTL_SECONDS`/`AGENT_JWT_CLOCK_SKEW_SECONDS`, см. [раздел 5](#5-конфигурация-и-хранение-секретов)).
 - `installation_id` запрашивается через `GET /repos/{owner}/{repo}/installation` (коротко кешируется по `owner/repo`).
 - Access token запрашивается через `POST /app/installations/{id}/access_tokens`; при `AGENT_SCOPE_TO_REPOSITORY=true` ограничивается репозиторием (`repository_names`).
-- Токен **кешируется** в каталоге `var/cache/task-orchestrator/git-identity/`: файл `<installation_id>.token.json` с правами `0600` (каталог `0700`, атомарная запись под `flock`). TTL = `expires_at` минус `AGENT_TOKEN_EXPIRY_SAFETY_MARGIN_SECONDS`. Пока кеш валиден, запросов к API нет. Каталог кеша = `<base_path>/var/cache/task-orchestrator/git-identity` (пробрасывается в `FilesystemTokenCacheService` из параметра `base_path`).
+- Токен **кешируется** в каталоге `var/cache/git-identity/`: файл `<installation_id>.token.json` с правами `0600` (каталог `0700`, атомарная запись под `flock`). TTL = `expires_at` минус `AGENT_TOKEN_EXPIRY_SAFETY_MARGIN_SECONDS`. Пока кеш валиден, запросов к API нет. Каталог кеша = `<base_path>/var/cache/git-identity` (пробрасывается в `FilesystemTokenCacheService` из параметра модуля `module.git_identity.cache_dir`, по умолчанию `<base_path>/var/cache/git-identity`).
 - При ошибке (сеть/4xx/5xx/конфигурация) команда завершается с ненулевым кодом и сообщением без чувствительных данных — **JWT, PEM и сам токен никогда не попадают в вывод/stderr**, кроме целенаправленной печати токена в выбранном формате.
 
 ## 5. Конфигурация и хранение секретов
@@ -229,7 +229,7 @@ bin/console agent:token <owner>/<repo> --format=plain | gh auth login --with-tok
 | Каталог | Семантика | Что внутри | Восстановление |
 |---|---|---|---|
 | **`secrets/`** | **Постоянные секреты** — долговременные ключи доступа | PEM App | **Только вручную** (перевыпуск через GitHub UI) |
-| **`var/`** | **Временные данные** — кеш, протухающие артефакты | Кеш токена в `var/cache/task-orchestrator/git-identity/` | Чистится без последствий; протухает/пересоздаётся автоматически |
+| **`var/`** | **Временные данные** — кеш, протухающие артефакты | Кеш токена в `var/cache/git-identity/` | Чистится без последствий; протухает/пересоздаётся автоматически |
 
 **Почему PEM в `secrets/`, а кеш в `var/`:** PEM — долговременное средство подписи JWT, перевыпускается только вручную через GitHub UI (см. [Ротация PEM](#8-ротация-pem-private-key)). Кеш токена — короткоживущий артефакт, пересоздаётся автоматически и чистится без последствий. Поэтому постоянные секреты живут в `secrets/`, а кеш — в `var/`.
 
@@ -256,7 +256,7 @@ Env-переменные модуля (`AGENT_*`):
 | `AGENT_SCOPE_TO_REPOSITORY` | bool | `true` | Ограничивать installation token запрошенным репозиторием |
 | `AGENT_REQUEST_TIMEOUT_SECONDS` | int | `30` | Таймаут HTTP-запросов к GitHub |
 
-> Каталог кеша токенов не задаётся через env: он всегда `<base_path>/var/cache/task-orchestrator/git-identity` (пробрасывается в `FilesystemTokenCacheService` из параметра `base_path`).
+> Каталог кеша токенов не задаётся через env: он всегда `<base_path>/var/cache/git-identity` (пробрасывается в `FilesystemTokenCacheService` из параметра модуля `module.git_identity.cache_dir`, по умолчанию `<base_path>/var/cache/git-identity`).
 
 > **Источник ключа:** `AGENT_PRIVATE_KEY` (inline) имеет приоритет над `AGENT_PRIVATE_KEY_PATH` (файл). Если задан inline-ключ, файл не требуется и проверка `chmod` не выполняется. App ID принимается как строка/число и приводится к положительному целому. Булевы параметры принимают `true|false|1|0|yes|no|on|off` (без учёта регистра). Числа с нецифровым значением вызывают fail-fast ошибку; диапазоны (`jwt_ttl_seconds`, `request_timeout_seconds` и т.д.) дополнительно валидируются в `GitIdentityConfigVo`.
 

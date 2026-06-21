@@ -41,5 +41,14 @@ class TaskOrchestratorExtension extends Extension
 
         $loader = new YamlFileLoader($container, new FileLocator($packageDir . '/config'));
         $loader->load('services.yaml');
+
+        // Module-local service configurations (конвенция modules/configuration.md).
+        // GitIdentity: parameters module.git_identity.* + interface aliases +
+        // скалярный аргумент $cacheDir (auto-discovery классов — в основном services.yaml).
+        $gitIdentityLoader = new YamlFileLoader(
+            $container,
+            new FileLocator($packageDir . '/src/Module/GitIdentity/Resource/config'),
+        );
+        $gitIdentityLoader->load('services.yaml');
     }
 }
