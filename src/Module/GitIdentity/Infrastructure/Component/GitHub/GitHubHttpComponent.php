@@ -41,10 +41,17 @@ final readonly class GitHubHttpComponent implements GitHubHttpComponentInterface
         ]);
 
         try {
-            $response = $this->httpClient->request($method, $url, [
+            $requestOptions = [
                 'headers' => $this->buildHeaders($bearer, $body),
-                'body' => $body,
-            ]);
+            ];
+            // body передаётся только для POST: на GET-запрос body=null порождает
+            // заголовок Content-Length: 0, что часть серверов (включая GitHub при
+            // определённых условиях) обрабатывает некорректно.
+            if ($body !== null) {
+                $requestOptions['body'] = $body;
+            }
+
+            $response = $this->httpClient->request($method, $url, $requestOptions);
 
             $status = $response->getStatusCode();
 
