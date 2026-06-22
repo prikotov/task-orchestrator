@@ -10,8 +10,8 @@ epic:
 author: prikotov
 assignee: Тимлид Алекс
 branch: fix/httpclient-runtime-github-api
-pr:
-status: in_progress
+pr: '#277'
+status: done
 ---
 
 # TASK-fix-httpclient-runtime-github-api: env-processor синтаксис ломал timeout в scoped http_client
