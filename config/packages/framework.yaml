@@ -1,0 +1,7 @@
+# Базовая конфигурация Symfony Framework (console-only).
+#
+# TaskOrchestrator — CLI-приложение без HTTP-интерфейса: session, router
+# (помимо служебного service-router MicroKernelTrait) и csrf здесь не нужны.
+# Secret берётся из APP_SECRET (с безопасным fallback для CLI).
+framework:
+    secret: '%env(default:task-orchestrator-cli-secret:APP_SECRET)%'
