@@ -3,11 +3,19 @@
 
 declare(strict_types=1);
 
+/**
+ * Task Orchestrator — CLI entry point (standalone, development).
+ *
+ * Собирает контейнер через {@see \TaskOrchestrator\Common\Kernel} (MicroKernelTrait +
+ * bundles/packages + ModuleKernelTrait). Presentation-слой apps/console (команды,
+ * Application, EventSubscriber) подключается импортом в config/services.yaml.
+ *
+ * Без symfony/runtime и flex .env-файлы не подхватываются автоматически, поэтому
+ * .env.local (CODEX_HTTP_PROXY и будущие AGENT_*) загружается вручную ПЕРЕД ядром.
+ */
+
 use Symfony\Component\Console\Application;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use TaskOrchestrator\Common\DependencyInjection\TaskOrchestratorExtension;
+use TaskOrchestrator\Common\Kernel;
 
 if (!is_file(dirname(__DIR__) . '/vendor/autoload.php')) {
     throw new LogicException('Dependencies are missing. Try running "composer install".');
@@ -17,47 +25,29 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 
 $projectDir = dirname(__DIR__);
 
-// Load .env.local if exists (e.g. CODEX_HTTP_PROXY)
+// Load .env.local if exists (e.g. CODEX_HTTP_PROXY). Without symfony/runtime/flex,
+// Dotenv is not invoked automatically — load manually before Kernel.
 if (is_file($projectDir . '/.env.local')) {
     (new Symfony\Component\Dotenv\Dotenv())->usePutenv(true)->load($projectDir . '/.env.local');
 }
 
-$container = new ContainerBuilder();
-$container->setParameter('kernel.project_dir', $projectDir);
+$env = $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'prod';
+$debug = (bool) ($_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? false);
 
-$version = class_exists(\Composer\InstalledVersions::class)
-    ? \Composer\InstalledVersions::getRootPackage()['version']
-    : '0.1.0';
-$container->setParameter('app.version', ltrim($version, 'v'));
+$kernel = new Kernel($env, $debug);
+$kernel->boot();
 
-// Load bundle services (Domain, Application, Infrastructure)
-$extension = new TaskOrchestratorExtension();
-$extension->load([
-    [
-        'roles_dir' => $projectDir . '/docs/agents/roles/team',
-        'base_path' => $projectDir,
-        'chains_yaml' => $projectDir . '/config/chains.yaml',
-        'chains_session_dir' => $projectDir . '/var/sessions',
-    ],
-], $container);
-
-// Load console presentation services
-$loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../config'));
-$loader->load('console_services.yaml');
-
-$container->compile();
+$container = $kernel->getContainer();
 
 /** @var Application $application */
 $application = $container->get('console.application');
 
-// Register tagged console commands
-$commands = [];
-foreach ($container->findTaggedServiceIds('console.command') as $id => $tags) {
-    $service = $container->get($id);
-    if ($service instanceof \Symfony\Component\Console\Command\Command) {
-        $commands[] = $service;
-    }
+// Lazy-загрузчик команд построен AddConsoleCommandPass (services с тегом
+// console.command и #[AsCommand]). Подключаем его к Application.
+if ($container->has('console.command_loader')) {
+    /** @var \Symfony\Component\Console\CommandLoader\CommandLoaderInterface $loader */
+    $loader = $container->get('console.command_loader');
+    $application->setCommandLoader($loader);
 }
-$application->addCommands($commands);
 
 $application->run();

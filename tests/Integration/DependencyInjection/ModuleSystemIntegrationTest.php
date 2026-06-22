@@ -7,60 +7,47 @@ namespace TaskOrchestrator\Tests\Integration\DependencyInjection;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use TaskOrchestrator\Common\Component\ModuleSystem\DependencyInjection\ModuleCompilerPass;
-use TaskOrchestrator\Common\DependencyInjection\TaskOrchestratorExtension;
-use TaskOrchestrator\Common\Module\GitIdentity\Application\UseCase\Command\ObtainToken\ObtainTokenCommandHandler;
+use TaskOrchestrator\Common\Kernel;
 use TaskOrchestrator\Common\Module\GitIdentity\GitIdentityModule;
 
 /**
- * Интеграционная проверка универсального механизма ModuleSystem:
- * Extension::load() + compile() контейнера должны поднять сервисы модуля
- * GitIdentity через ModuleCompilerPass, зарегистрированный из реестра
- * config/modules.php.
+ * Интеграционная проверка универсального механизма ModuleSystem под Symfony Kernel:
+ * Kernel::build() (через {@see ModuleKernelTrait}) + {@see ModuleCompilerPass} должны
+ * поднять сервисы модуля GitIdentity из реестра config/modules.php.
  *
- * Ключевое свойство: если ModuleCompilerPass НЕ отработал, то Domain Service
- * aliases из Resource/config/services.yaml модуля GitIdentity отсутствуют и
- * compile() падает с ServiceNotFoundException (Cannot autowire service
- * TokenCacheInterface для ObtainTokenCommandHandler). Таким образом, успешная
- * компиляция сама по себе доказывает, что ModuleCompilerPass загрузил
- * конфигурацию модуля.
+ * В отличие от прежней версии (тестировавшей TaskOrchestratorExtension напрямую),
+ * здесь используется реальное ядро: boot() компилирует контейнер со всеми бандлами,
+ * пакетами и модулями. Успешная загрузка сама по себе доказывает, что ModuleCompilerPass
+ * отработал — иначе Domain Service aliases модуля GitIdentity отсутствовали бы и
+ * компиляция упала с ServiceNotFoundException (Cannot autowire TokenCacheInterface).
  */
-#[CoversClass(TaskOrchestratorExtension::class)]
 #[CoversClass(ModuleCompilerPass::class)]
 final class ModuleSystemIntegrationTest extends TestCase
 {
-    private ContainerBuilder $container;
+    private Kernel $kernel;
 
     #[\Override]
     protected function setUp(): void
     {
-        $projectRoot = dirname(__DIR__, 3);
+        $this->kernel = new Kernel('test', false);
+        $this->kernel->boot();
+    }
 
-        $this->container = new ContainerBuilder();
-        $this->container->setParameter('kernel.project_dir', $projectRoot);
-
-        (new TaskOrchestratorExtension())->load([
-            [
-                'roles_dir' => $projectRoot . '/docs/agents/roles/team',
-                'base_path' => $projectRoot,
-                'chains_yaml' => $projectRoot . '/config/chains.yaml',
-                'chains_session_dir' => $projectRoot . '/var/sessions',
-            ],
-        ], $this->container);
-
-        // Реальная компиляция: на этом шаге отрабатывает ModuleCompilerPass,
-        // зарегистрированный Extension-ом для GitIdentityModule.
-        $this->container->compile();
+    #[\Override]
+    protected function tearDown(): void
+    {
+        $this->kernel->shutdown();
     }
 
     #[Test]
-    public function compilationSucceedsWithModuleSystem(): void
+    public function kernelBootsWithModuleSystem(): void
     {
-        // setUp() уже вызвал compile() без исключений — это означает, что
-        // ModuleCompilerPass отработал и подключил Domain Service aliases
-        // модуля GitIdentity, иначе autowire упал бы с ServiceNotFoundException.
-        self::assertTrue($this->container->isCompiled());
+        // boot() в setUp() отработал без исключений — значит ModuleCompilerPass
+        // подключил Resource/config/services.yaml модуля GitIdentity и весь граф
+        // зависимостей (включая agent:token-команду) успешно скомпилирован.
+        self::assertTrue($this->kernel->getContainer()->isCompiled());
     }
 
     #[Test]
@@ -68,52 +55,38 @@ final class ModuleSystemIntegrationTest extends TestCase
     {
         // Параметры module.git_identity.* объявлены в Resource/config/services.yaml
         // модуля и появляются в контейнере только если ModuleCompilerPass отработал.
-        $packageDir = $this->container->getParameter('task_orchestrator.package_dir');
-        $moduleDir = $this->container->getParameter('module.git_identity.module_dir');
-        $cacheDir = $this->container->getParameter('module.git_identity.cache_dir');
+        $container = $this->kernel->getContainer();
+
+        $packageDir = $container->getParameter('task_orchestrator.package_dir');
+        $moduleDir = $container->getParameter('module.git_identity.module_dir');
+        $cacheDir = $container->getParameter('module.git_identity.cache_dir');
 
         self::assertSame($packageDir . '/src/Module/GitIdentity', $moduleDir);
-        self::assertSame($this->container->getParameter('task_orchestrator.base_path') . '/var/cache/git-identity', $cacheDir);
+        self::assertSame($packageDir . '/var/cache/git-identity', $cacheDir);
     }
 
     #[Test]
-    public function gitIdentityCommandHandlerIsReachableAfterCompilation(): void
+    public function gitIdentityCommandIsRegistered(): void
     {
-        // ObtainTokenCommandHandler помечаем публичным ПЕРЕД compile() — тогда он
-        // не вычищается как приватный неиспользуемый сервис и остаётся доступным
-        // через get(). Это доказывает, что handler зарегистрирован (auto-discovery
-        // в общем services.yaml) И что его зависимости резолвятся (aliases из
-        // Resource/config/services.yaml модуля подгружены ModuleCompilerPass-ом).
-        $projectRoot = dirname(__DIR__, 3);
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.project_dir', $projectRoot);
+        // Команда agent:token зависит от ObtainTokenCommandHandler, который, в свою
+        // очередь, требует aliases из Resource/config/services.yaml модуля. Наличие
+        // команды в command_loader доказывает, что весь граф модуля зарезолвился
+        // на этапе компиляции (иначе compile() упал бы).
+        $container = $this->kernel->getContainer();
+        self::assertTrue($container->has('console.command_loader'));
 
-        (new TaskOrchestratorExtension())->load([
-            [
-                'roles_dir' => $projectRoot . '/docs/agents/roles/team',
-                'base_path' => $projectRoot,
-                'chains_yaml' => $projectRoot . '/config/chains.yaml',
-                'chains_session_dir' => $projectRoot . '/var/sessions',
-            ],
-        ], $container);
-
-        $handlerId = ObtainTokenCommandHandler::class;
-        self::assertTrue($container->hasDefinition($handlerId));
-        $container->getDefinition($handlerId)->setPublic(true);
-
-        $container->compile();
-
-        self::assertTrue($container->has($handlerId));
-        self::assertInstanceOf(ObtainTokenCommandHandler::class, $container->get($handlerId));
+        /** @var CommandLoaderInterface $loader */
+        $loader = $container->get('console.command_loader');
+        self::assertTrue($loader->has('agent:token'));
     }
 
     #[Test]
     public function gitIdentityModuleReturnsExpectedConfigPath(): void
     {
         $module = new GitIdentityModule();
-        $projectRoot = dirname(__DIR__, 3);
+        $packageDir = $this->kernel->getProjectDir();
 
-        self::assertSame($projectRoot . '/src/Module/GitIdentity', $module->getModuleDir());
+        self::assertSame($packageDir . '/src/Module/GitIdentity', $module->getModuleDir());
         self::assertSame($module->getModuleDir() . '/Resource/config', $module->getModuleConfigPath());
     }
 }

@@ -10,9 +10,9 @@ use TaskOrchestrator\Common\Component\ModuleSystem\ModuleInterface;
 /**
  * Модуль GitIdentity.
  *
- * Регистрируется в config/modules.php; TaskOrchestratorExtension через
- * ModuleCompilerPass подгружает Resource/config/services.yaml с параметрами
- * module.git_identity.* и привязками интерфейсов к реализациям.
+ * Регистрируется в config/modules.php; Kernel (через ModuleKernelTrait)
+ * регистрирует ModuleCompilerPass, который подгружает Resource/config/services.yaml
+ * с параметрами module.git_identity.* и привязками интерфейсов к реализациям.
  */
 final class GitIdentityModule implements ModuleInterface
 {

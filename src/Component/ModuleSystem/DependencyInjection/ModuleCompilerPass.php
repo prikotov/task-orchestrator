@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  *
  * Дополнительно подключает services.php и services_<environment>.php, если
  * они присутствуют в каталоге конфигурации модуля. Один pass регистрируется
- * на каждый модуль из реестра config/modules.php в TaskOrchestratorExtension.
+ * на каждый модуль из реестра config/modules.php в Kernel (через ModuleKernelTrait).
  */
 final readonly class ModuleCompilerPass implements CompilerPassInterface
 {

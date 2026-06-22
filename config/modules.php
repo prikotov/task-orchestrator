@@ -8,12 +8,9 @@ declare(strict_types=1);
  * Формат записи соответствует конвенции docs/conventions/symfony-folder-structure.md
  * и docs/conventions/modules/configuration.md: класс модуля => массив окружений, в которых модуль активен.
  *
- * Ключ 'all' => true означает «модуль включён во всех окружениях». Проект
- * task-orchestrator — CLI-бандл без Symfony Kernel, поэтому реестр содержит
- * единое окружение; другие env-ключи зарезервированы для будущей совместимости
- * с конвенцией.
+ * Ключ 'all' => true означает «модуль включён во всех окружениях».
  *
- * TaskOrchestratorExtension::load() перебирает этот реестр и для каждого
+ * Kernel (через ModuleKernelTrait) перебирает этот реестр и для каждого
  * модуля, реализующего ModuleInterface, регистрирует ModuleCompilerPass,
  * подгружающий Resource/config/services.yaml модуля.
  *

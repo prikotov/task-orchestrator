@@ -9,7 +9,7 @@ namespace TaskOrchestrator\Common\Component\ModuleSystem;
  *
  * Каждый доменный модуль (src/Module/<Name>/) реализует этот интерфейс и
  * объявляет пути к своим ресурсам. Реестр модулей config/modules.php
- * перебирает классы, реализующие интерфейс, а TaskOrchestratorExtension
+ * перебирает классы, реализующие интерфейс, а Kernel (через ModuleKernelTrait)
  * регистрирует для каждого модуля ModuleCompilerPass, который подгружает
  * Resource/config/services.yaml модуля.
  *

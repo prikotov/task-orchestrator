@@ -14,6 +14,25 @@
         <PropertyNotSetInConstructor errorLevel="suppress" files="*Model.php" />
         <MissingConstructor errorLevel="suppress" files="*Model.php" />
         <ClassMustBeFinal errorLevel="suppress" files="*Model.php" />
+
+        <!-- Symfony MicroKernelTrait (vendor) — known Psalm false-positives on Symfony's own trait.
+             Our Kernel.php uses MicroKernelTrait; Psalm follows into vendor and flags traits's internals.
+             These are Symfony's code, not ours; suppress per-file. -->
+        <RiskyTruthyFalsyComparison>
+            <errorLevel type="suppress">
+                <file name="vendor/symfony/framework-bundle/Kernel/MicroKernelTrait.php"/>
+            </errorLevel>
+        </RiskyTruthyFalsyComparison>
+        <LessSpecificImplementedReturnType>
+            <errorLevel type="suppress">
+                <file name="vendor/symfony/framework-bundle/Kernel/MicroKernelTrait.php"/>
+            </errorLevel>
+        </LessSpecificImplementedReturnType>
+        <ParentNotFound>
+            <errorLevel type="suppress">
+                <file name="vendor/symfony/framework-bundle/Kernel/MicroKernelTrait.php"/>
+            </errorLevel>
+        </ParentNotFound>
     </issueHandlers>
     <plugins>
         <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin"/>

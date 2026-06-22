@@ -1,3 +1,10 @@
+# Конфигурация сервисов приложения (Domain/Application/Infrastructure) загружается
+# MicroKernelTrait::configureContainer(). Presentation-слой (apps/console — команды,
+# Application, EventSubscriber, Lock) вынесен в отдельный файл и подключается здесь,
+# чтобы ядро из Kernel.php не зависело от презентационного пакета напрямую.
+imports:
+    - { resource: console_services.yaml }
+
 services:
   _defaults:
     autowire: true
