@@ -126,7 +126,7 @@ class TaskOrchestratorExtension extends Extension
     }
 
     /**
-     * Совпадает с логикой ModuleKernelTrait из TasK-референса:
+     * Реализует правило конвенции docs/conventions/modules/configuration.md:
      * модуль активен, если явно указано текущее окружение, либо ключ 'all'.
      *
      * @param array<string, bool> $envs конфигурация окружений модуля
