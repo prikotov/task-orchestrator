@@ -16,7 +16,7 @@ use TaskOrchestrator\Common\Module\GitIdentity\Domain\Exception\GitHubApiExcepti
  *
  * Чистый детерминированный VO: конструктор не читает системные часы. Пригодность
  * к использованию определяет Application через {@see isUsableAt()} (с safety
- * margin) — время передаётся вызывающей стороной (ClockServiceInterface), что
+ * margin) — время передаётся вызывающей стороной (Psr\Clock\ClockInterface), что
  * делает VO предсказуемым и тестируемым с фиксированным временем.
  *
  * Хелперы TTL/usable выносят логику safety margin из Application, оставаясь

@@ -33,8 +33,6 @@ services:
     alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\GitHubResolveInstallationIdService
   TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\RequestInstallationTokenServiceInterface:
     alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\GitHubRequestInstallationTokenService
-  TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\ClockServiceInterface:
-    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\SystemClockService
 
   # Infrastructure Service parameters.
   # LoadGitIdentityConfigService — без аргументов: читает конфиг из env

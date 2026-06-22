@@ -16,7 +16,7 @@ use TaskOrchestrator\Common\Module\GitIdentity\Domain\Exception\InvalidConfigura
  *
  * Чистый детерминированный VO: конструктор не читает системные часы. Проверка
  * истечения срока — pure-метод {@see isExpiredAt()} (время передаётся
- * вызывающей стороной, обычно Application через ClockServiceInterface), что
+ * вызывающей стороной, обычно Application через Psr\Clock\ClockInterface), что
  * делает VO предсказуемым и тестируемым с фиксированным временем.
  */
 final readonly class JwtTokenVo

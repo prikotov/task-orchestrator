@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\GitIdentity\Application\UseCase\Command
 use TaskOrchestrator\Common\Module\GitIdentity\Application\Exception\ObtainTokenFailedException;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Exception\GitHubApiException;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Exception\GitIdentityException;
-use TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\ClockServiceInterface;
+use Psr\Clock\ClockInterface;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\LoadGitIdentityConfigServiceInterface;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\RequestInstallationTokenServiceInterface;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\ResolveInstallationIdServiceInterface;
@@ -56,7 +56,7 @@ final readonly class ObtainTokenCommandHandler
         private SignJwtTokenServiceInterface $jwtSigner,
         private ResolveInstallationIdServiceInterface $installationResolver,
         private RequestInstallationTokenServiceInterface $tokenRequester,
-        private ClockServiceInterface $clock,
+        private ClockInterface $clock,
     ) {
     }
 

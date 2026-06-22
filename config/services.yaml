@@ -36,6 +36,10 @@ services:
       - '%task_orchestrator.package_dir%/src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunnerService.php'
       - '%task_orchestrator.package_dir%/src/**/Resources/'
 
+  # --- PSR-20 Clock (источник времени; реализация в общем Component) ---
+  Psr\Clock\ClockInterface:
+    alias: TaskOrchestrator\Common\Component\Clock\SystemClock
+
   # ─── DynamicLoop module ─────────────────────────────────────────────
 
   # Domain Service aliases

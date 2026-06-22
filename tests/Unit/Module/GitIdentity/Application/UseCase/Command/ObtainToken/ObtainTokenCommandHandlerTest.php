@@ -15,7 +15,7 @@ use TaskOrchestrator\Common\Module\GitIdentity\Application\UseCase\Command\Obtai
 use TaskOrchestrator\Common\Module\GitIdentity\Application\UseCase\Command\ObtainToken\ObtainTokenResultDto;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Exception\GitHubApiException;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Exception\InvalidConfigurationException;
-use TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\ClockServiceInterface;
+use Psr\Clock\ClockInterface;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\LoadGitIdentityConfigServiceInterface;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\RequestInstallationTokenServiceInterface;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\ResolveInstallationIdServiceInterface;
@@ -55,7 +55,7 @@ final class ObtainTokenCommandHandlerTest extends TestCase
 
     private RequestInstallationTokenServiceInterface&MockObject $requester;
 
-    private ClockServiceInterface&MockObject $clock;
+    private ClockInterface&MockObject $clock;
 
     private ObtainTokenCommandHandler $handler;
 
@@ -91,7 +91,7 @@ final class ObtainTokenCommandHandlerTest extends TestCase
         $this->jwtSigner = $this->createMock(SignJwtTokenServiceInterface::class);
         $this->resolver = $this->createMock(ResolveInstallationIdServiceInterface::class);
         $this->requester = $this->createMock(RequestInstallationTokenServiceInterface::class);
-        $this->clock = $this->createMock(ClockServiceInterface::class);
+        $this->clock = $this->createMock(ClockInterface::class);
 
         $this->clock->method('now')->willReturn($this->now);
         $this->configLoader->method('load')->willReturn($this->config);

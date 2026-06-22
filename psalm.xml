@@ -33,6 +33,33 @@
                 <file name="vendor/symfony/framework-bundle/Kernel/MicroKernelTrait.php"/>
             </errorLevel>
         </ParentNotFound>
+        <!-- Symfony MicroKernelTrait: closures/refs (registerContainerConfigurations).
+             Known Psalm false-positives on Symfony's own trait internals (Symfony 8.x). -->
+        <UnsupportedReferenceUsage>
+            <errorLevel type="suppress">
+                <file name="vendor/symfony/framework-bundle/Kernel/MicroKernelTrait.php"/>
+            </errorLevel>
+        </UnsupportedReferenceUsage>
+        <PossiblyNullFunctionCall>
+            <errorLevel type="suppress">
+                <file name="vendor/symfony/framework-bundle/Kernel/MicroKernelTrait.php"/>
+            </errorLevel>
+        </PossiblyNullFunctionCall>
+        <MissingClosureReturnType>
+            <errorLevel type="suppress">
+                <file name="vendor/symfony/framework-bundle/Kernel/MicroKernelTrait.php"/>
+            </errorLevel>
+        </MissingClosureReturnType>
+        <UndefinedThisPropertyFetch>
+            <errorLevel type="suppress">
+                <file name="vendor/symfony/framework-bundle/Kernel/MicroKernelTrait.php"/>
+            </errorLevel>
+        </UndefinedThisPropertyFetch>
+        <MissingClosureParamType>
+            <errorLevel type="suppress">
+                <file name="vendor/symfony/framework-bundle/Kernel/MicroKernelTrait.php"/>
+            </errorLevel>
+        </MissingClosureParamType>
     </issueHandlers>
     <plugins>
         <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin"/>
