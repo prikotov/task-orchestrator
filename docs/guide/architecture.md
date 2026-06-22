@@ -469,12 +469,23 @@ src/Module/DynamicLoop/
 
 ```
 src/
-├── DependencyInjection/
-│   ├── TaskOrchestratorExtension.php                    # Extension для параметров конфигурации
-│   └── Configuration.php                               # TreeBuilder-валидация
+├── Kernel.php                                       # Symfony Kernel: BaseKernel + MicroKernelTrait + ModuleKernelTrait
+├── Component/
+│   ├── ModuleSystem/                                # ModuleInterface, ModuleCompilerPass, ModuleKernelTrait
+│   └── Clock/                                        # SystemClock (PSR-20 Psr\Clock\ClockInterface)
 config/
-└── services.yaml                                       # DI-конфигурация
+├── bundles.php                                      # Реестр bundles (FrameworkBundle, TwigBundle, MonologBundle)
+├── modules.php                                      # Реестр доменных модулей (ModuleInterface)
+├── packages/                                        # Конфигурация bundles (framework, twig, translation, monolog)
+├── services.yaml                                    # DI-конфигурация приложения + alias Psr\Clock\ClockInterface
+└── console_services.yaml                             # Presentation-слой apps/console (команды, EventDispatcher, Lock)
 ```
+
+Контейнер собирается Kernel через MicroKernelTrait (config/packages/* + config/services.yaml) и
+ModuleKernelTrait (перебирает config/modules.php, для каждого модуля подгружает его
+Resource/config/services.yaml). Параметры task_orchestrator.* задаются в Kernel::getKernelParameters()
+на самом раннем этапе. Параметр base_path/roles_dir/chains_yaml — с dual-context resolution
+(standalone vs vendor-binary: host-пути для ролей/цепочек, package-пути для config пакета).
 
 ### Presentation-слой (в приложении-хосте)
 

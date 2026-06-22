@@ -48,7 +48,7 @@ status: todo
   | ChainDefinition | ❌ | ❌ | 0 |
   | ChainExecution | ❌ | ❌ | 0 |
   | DynamicLoop | ❌ | ❌ | 0 |
-  | GitIdentity | ❌ | ❌ | 0 |
+  | GitIdentity | ✅ | ✅ | есть |
 
   **Все 5 модулей** зарегистрированы централизованно в `config/services.yaml` блоками `# ─── <Module> module`, без `ModuleInterface` и без `Resource/config/`.
 * **Границы (Out of Scope):**

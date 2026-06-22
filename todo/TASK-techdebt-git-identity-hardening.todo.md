@@ -92,9 +92,19 @@ status: todo
       **Фикс:** заменить на типизированное исключение модуля. Проверить, что это не нарушает deptrac
       (Presentation → Application исключение допустимо; Presentation → Domain — нет).
 
-- [ ] **INFO — привести `RepoSlugVo::fromString()` к конвекции `createFromString()`.**
+- [ ] **INFO — привести `RepoSlugVo::fromString()` к конвенции `createFromString()`.**
       Конвенция Value Object предписывает фабричные методы с префиксом `createFrom*()` (а не `from*()`).
       `RepoSlugVo::fromString()` — формальное нарушение. Обновить все вызовы + тесты.
+
+- [ ] **CR-2 (из review PR #275) — VO бросают не тот тип исключения.**
+      Конвенция `core-patterns/value-object.md`: «При нарушении инвариантов выбрасывайте `InvalidArgumentException`.»
+      Реальность: все VO модуля GitIdentity (`AppIdVo`, `PrivateKeyVo`, `RepoSlugVo`, `InstallationIdVo`,
+      `JwtTokenVo`, `GitIdentityConfigVo`) бросают `InvalidConfigurationException extends GitIdentityException
+      extends \RuntimeException` — НЕ `InvalidArgumentException`. Остальные VO проекта корректно используют
+      `InvalidArgumentException`. Причина отклонения — осознанная унификация доменных исключений под
+      `GitIdentityException` (чтобы Application-хендлер ловил один базовый класс). Решить: либо VO →
+      `InvalidArgumentException` (+ `GitIdentityException implements DomainExceptionInterface`), либо
+      обновить конвенцию под доменные exception-деревья. Файлы: `src/Module/GitIdentity/Domain/ValueObject/*.php`.
 
 ### ⟫ Won't Have (Не будем делать)
 
@@ -134,7 +144,7 @@ vendor/bin/psalm
 make deptrac
 
 # Проверка: после L1 права кеш-файла всегда 0600
-ls -la var/cache/agent-token/*.json
+ls -la var/cache/git-identity/*.json
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)
