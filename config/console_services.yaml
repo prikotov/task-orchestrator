@@ -3,14 +3,6 @@ services:
     autowire: true
     autoconfigure: true
 
-  # --- Console Application ---
-  console.application:
-    class: Symfony\Component\Console\Application
-    arguments:
-      $name: 'Task Orchestrator'
-      $version: '%app.version%'
-    public: true
-
   # --- PSR Event Dispatcher ---
   Psr\EventDispatcher\EventDispatcherInterface:
     alias: Symfony\Component\EventDispatcher\EventDispatcher

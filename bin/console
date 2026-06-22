@@ -39,8 +39,13 @@ $kernel->boot();
 
 $container = $kernel->getContainer();
 
-/** @var Application $application */
-$application = $container->get('console.application');
+// Version: из параметра app.version, задаваемого Kernel'ом.
+/** @var string $version */
+$version = $container->getParameter('app.version');
+
+// Application создаётся напрямую (presentation glue), а не как контейнерный сервис —
+// это убирает хрупкую зависимость от 'console.application' (особенно в Phar).
+$application = new Application('Task Orchestrator', $version);
 
 // Lazy-загрузчик команд построен AddConsoleCommandPass (services с тегом
 // console.command и #[AsCommand]). Подключаем его к Application.
