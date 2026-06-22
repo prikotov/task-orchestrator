@@ -17,10 +17,37 @@ parameters:
   # task-orchestrator/ в пути не нужно (раньше было var/cache/task-orchestrator/git-identity).
   module.git_identity.cache_dir: '%task_orchestrator.base_path%/var/cache/git-identity'
 
+  # Транспортные настройки HTTP-клиента для GitHub API (конвенция External Service:
+  # таймауты обязательны). Те же env-переменные читает LoadGitIdentityConfigService
+  # для доменной конфигурации (GitIdentityConfigVo) — значения остаются согласованными.
+  module.git_identity.request_timeout_seconds: '%env(int:default::30:AGENT_REQUEST_TIMEOUT_SECONDS)%'
+  module.git_identity.request_max_duration_seconds: '%env(int:default::60:AGENT_REQUEST_MAX_DURATION_SECONDS)%'
+  module.git_identity.api_version: '%env(default::2022-11-28:AGENT_GITHUB_API_VERSION)%'
+  module.git_identity.user_agent: '%env(default::task-orchestrator-git-identity:AGENT_USER_AGENT)%'
+
 services:
   _defaults:
     autowire: true
     autoconfigure: true
+
+  # Scoped HTTP-клиент для GitHub API (конвенция External Service):
+  # таймауты и статические заголовки задаются один раз, per-request компонент
+  # добавляет только динамический Authorization (bearer).
+  http_client.git_identity:
+    class: Symfony\Contracts\HttpClient\HttpClientInterface
+    factory: ['@http_client', 'withOptions']
+    arguments:
+      - timeout: '%module.git_identity.request_timeout_seconds%'
+        max_duration: '%module.git_identity.request_max_duration_seconds%'
+        headers:
+          Accept: 'application/vnd.github+json'
+          'X-GitHub-Api-Version': '%module.git_identity.api_version%'
+          'User-Agent': '%module.git_identity.user_agent%'
+
+  # GitHub HTTP-компонент получает scoped-клиент вместо дефолтного http_client.
+  TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Component\GitHub\GitHubHttpComponent:
+    arguments:
+      $httpClient: '@http_client.git_identity'
 
   # Domain Service aliases (Interface → Implementation)
   TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\LoadGitIdentityConfigServiceInterface:
@@ -33,6 +60,12 @@ services:
     alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\GitHubResolveInstallationIdService
   TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\RequestInstallationTokenServiceInterface:
     alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\GitHubRequestInstallationTokenService
+
+  # Инфраструктурный интерфейс HTTP-компонента GitHub → единственная реализация
+  # (авто-резолвится через GitHubHttpComponent, но alias объявлен явно для
+  # детерминированности DI и независимости от порядка auto-discovery).
+  TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Component\GitHub\GitHubHttpComponentInterface:
+    alias: TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Component\GitHub\GitHubHttpComponent
 
   # Infrastructure Service parameters.
   # LoadGitIdentityConfigService — без аргументов: читает конфиг из env

@@ -13,17 +13,24 @@ use TaskOrchestrator\Common\Module\GitIdentity\Domain\ValueObject\InstallationId
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\ValueObject\InstallationTokenVo;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\ValueObject\JwtTokenVo;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\ValueObject\RepoSlugVo;
+use TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Component\GitHub\Exception\GitHubHttpException;
+use TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Component\GitHub\GitHubHttpComponentInterface;
 
 /**
  * Запрос installation access token у GitHub.
  *
  * Внешний вызов: `POST {apiBaseUri}/app/installations/{installation_id}/access_tokens`.
+ * Транспортную логику делегирует {@see GitHubHttpComponentInterface} по конвенции
+ * External Service; здесь остаются формирование URL, тела запроса и разбор ответа.
+ *
  * При {@see GitIdentityConfigVo::shouldScopeToRepository()}=true запрос ограничивается
  * репозиторием через `repository_names` (контракт, допущение 5).
  */
 final class GitHubRequestInstallationTokenService implements RequestInstallationTokenServiceInterface
 {
-    use GitHubHttpTransportTrait;
+    public function __construct(
+        private readonly GitHubHttpComponentInterface $http,
+    ) {}
 
     #[Override]
     public function request(
@@ -36,8 +43,12 @@ final class GitHubRequestInstallationTokenService implements RequestInstallation
             . '/app/installations/' . $installationId->getValue() . '/access_tokens';
 
         $body = $config->shouldScopeToRepository() ? $this->buildScopedBody($repoSlug) : null;
-        $response = $this->githubRequest('POST', $url, $jwtToken->getValue(), $config, $body);
-        $data = $this->githubDecodeJson($response);
+
+        try {
+            $data = $this->http->request('POST', $url, $jwtToken->getValue(), $body);
+        } catch (GitHubHttpException $e) {
+            throw $this->toDomainException($e);
+        }
 
         $token = $data['token'] ?? null;
         $expiresAtRaw = $data['expires_at'] ?? null;
@@ -69,5 +80,19 @@ final class GitHubRequestInstallationTokenService implements RequestInstallation
         } catch (\Throwable $e) {
             throw new GitHubApiException('GitHub API: invalid expires_at value in response.', 0, $e);
         }
+    }
+
+    /**
+     * Переводит Infrastructure-исключение транспортного слоя в доменное,
+     * сохраняя HTTP-статус (для детерминированной классификации 404) и trace
+     * через {@see $previous} — граница исключений по конвенции exception.md.
+     */
+    private function toDomainException(GitHubHttpException $e): GitHubApiException
+    {
+        $status = $e->getHttpStatus();
+
+        return $status !== null
+            ? GitHubApiException::forHttpStatus($status, $e->getMessage(), $e)
+            : new GitHubApiException($e->getMessage(), 0, $e);
     }
 }
