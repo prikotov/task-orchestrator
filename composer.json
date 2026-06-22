@@ -13,6 +13,7 @@
         "symfony/dependency-injection": "^8.0",
         "symfony/event-dispatcher": "^8.0",
         "symfony/framework-bundle": "^8.0",
+        "symfony/http-client": "^8.0",
         "symfony/http-kernel": "^8.0",
         "symfony/lock": "^8.0",
         "symfony/monolog-bundle": "^4.0",
