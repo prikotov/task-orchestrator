@@ -9,6 +9,9 @@
 >
     <projectFiles>
         <directory name="src"/>
+        <ignoreFiles allowMissingFiles="true">
+            <directory name="vendor"/>
+        </ignoreFiles>
     </projectFiles>
     <issueHandlers>
         <PropertyNotSetInConstructor errorLevel="suppress" files="*Model.php" />

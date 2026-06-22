@@ -1,16 +1,22 @@
 {
     "output": "task-orchestrator.phar",
+    "check-requirements": false,
     "files": [
         "config/services.yaml",
         "config/console_services.yaml",
-        "config/chains.yaml"
+        "config/chains.yaml",
+        "config/modules.php",
+        "config/bundles.php"
     ],
     "directories": [
         "src",
         "apps/console/src",
         "vendor",
         "config/prompts",
-        "docs/agents/roles"
+        "config/packages",
+        "docs/agents/roles",
+        "src/Module/GitIdentity/Resource/config",
+        "templates"
     ],
     "compression": "GZ"
 }

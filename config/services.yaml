@@ -1,3 +1,10 @@
+# Конфигурация сервисов приложения (Domain/Application/Infrastructure) загружается
+# MicroKernelTrait::configureContainer(). Presentation-слой (apps/console — команды,
+# Application, EventSubscriber, Lock) вынесен в отдельный файл и подключается здесь,
+# чтобы ядро из Kernel.php не зависело от презентационного пакета напрямую.
+imports:
+    - { resource: console_services.yaml }
+
 services:
   _defaults:
     autowire: true
@@ -28,6 +35,10 @@ services:
       - '%task_orchestrator.package_dir%/src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunnerService.php'
       - '%task_orchestrator.package_dir%/src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunnerService.php'
       - '%task_orchestrator.package_dir%/src/**/Resources/'
+
+  # --- PSR-20 Clock (источник времени; реализация в общем Component) ---
+  Psr\Clock\ClockInterface:
+    alias: TaskOrchestrator\Common\Component\Clock\SystemClock
 
   # ─── DynamicLoop module ─────────────────────────────────────────────
 

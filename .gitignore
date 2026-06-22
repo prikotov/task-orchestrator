@@ -13,3 +13,6 @@
 
 *.phar
 .env.local
+
+# Local secrets (e.g. GitHub App PEM for agent:token command)
+/secrets/

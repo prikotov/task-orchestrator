@@ -1,0 +1,8 @@
+# Конфигурация переводов (минимальная).
+#
+# Модули, реализующие TranslationInterface, добавляют свои каталоги переводов
+# через ModuleKernelTrait (prepend-extension-config translator.paths).
+framework:
+    default_locale: '%env(default:en:APP_LOCALE)%'
+    translator:
+        fallbacks: ['en']

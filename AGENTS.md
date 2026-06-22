@@ -10,6 +10,13 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 **`Конвенции`** — формализованные соглашения и правила, регулирующие именование, структуру кода, паттерны проектирования, стиль документирования, взаимодействие между слоями: [`docs/conventions/index.md`](docs/conventions/index.md).
 
+🔴 **Конвенции первичны.** Это источник истины для любых архитектурных и кодовых решений. Им нужно следовать как обязательным правилам, а **НЕ** примерам из существующего кода. Соседний код может содержать долг, ошибки или устаревшие паттерны — повторять их «как у соседей» запрещено. Порядок авторитета при конфликте:
+
+1. **`Конвенции`** (`docs/conventions/`) — высший приоритет для кода/архитектуры/стиля.
+2. AGENTS.md и документы из раздела «Источники» ниже.
+3. Постановка задачи (`todo/*.todo.md`).
+4. Примеры из существующего кода — **самый низший приоритет**, не эталон. Если код расходится с Конвенцией — правильный код (по Конвенции), а расхождение фиксируется отдельной задачей техдолга (см. «Работа с кодом»).
+
 ---
 
 # Роль
@@ -84,20 +91,25 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 ```
 /
-├── src/                              # Исходный код приложения (TaskOrchestrator\Common\)
-│   ├── Module/
-│   │   ├── AgentRunner/               # Модуль движка AI-агента
-│   │   └── Orchestrator/              # Модуль оркестрации цепочек
-│   ├── DependencyInjection/           # Symfony Extension + Configuration (TreeBuilder)
-│   └── Infrastructure/Symfony/        # TaskOrchestratorBundle
-├── apps/console/                      # Presentation-слой: CLI-приложение (TaskOrchestrator\Console\)
-├── config/                            # Конфигурация services.yaml
-├── tests/                             # Тесты
+├── src/                              # Исходный код библиотеки (TaskOrchestrator\Common\)
+│   ├── Kernel.php                    # Symfony Kernel: BaseKernel + MicroKernelTrait + ModuleKernelTrait
+│   ├── Component/                    # Сквозные компоненты
+│   │   ├── ModuleSystem/             # Модульная система (ModuleInterface, ModuleKernelTrait, compiler passes)
+│   │   └── Clock/                    # Реализация PSR-20 ClockInterface
+│   └── Module/                       # Доменные модули (DDD-слои внутри каждого)
+│       ├── AgentRunner/              # Движок AI-агента (запуск runner'ов, JSONL-парсинг)
+│       ├── ChainDefinition/          # Определение цепочек (YAML-загрузка, роли, runners)
+│       ├── ChainExecution/           # Исполнение цепочек (оркестрация шагов)
+│       ├── DynamicLoop/              # Динамические циклы (итеративные раунды)
+│       └── GitIdentity/              # Git-identity бота (committer identity для коммитов агента)
+├── apps/console/                     # Presentation-слой: CLI-приложение (TaskOrchestrator\Console\)
+├── config/                           # Конфигурация контейнера: bundles.php, modules.php, packages/, services.yaml, console_services.yaml, chains.yaml
+├── tests/                            # Тесты
 │   ├── Unit/
 │   └── Integration/
 ├── docs/                              # Документация приложения
 │   ├── releases/                      # Release plans (планы релизов)
-└── bin/                               # Скрипты
+└── bin/                               # CLI entry points (console, task-orchestrator)
 ```
 
 ## Слои

@@ -89,11 +89,7 @@ Agent role "verifier" not found.
    Описание роли...
    ```
 
-4. Проверьте параметр `task_orchestrator.roles_dir` в конфигурации:
-   ```yaml
-   task_orchestrator:
-       roles_dir: '<package_root>/docs/agents/roles/team'
-   ```
+4. Параметр `task_orchestrator.roles_dir` задаётся ядром `TaskOrchestrator\Common\Kernel` в `getKernelParameters()` (значение по умолчанию — `<project_root>/docs/agents/roles/team` с fallback на package root). Независимой YAML-настройки этого параметра нет — путь определяется каталогами ядра.
 
 ---
 
@@ -284,30 +280,28 @@ Quality gate "PHP CodeSniffer" failed (exit code 1)
 The service "TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Prompt\RolePromptBuilder" has a dependency on a non-existent parameter "task_orchestrator.roles_dir".
 ```
 
-**Причина:** Параметры конфигурации не были переданы в `TaskOrchestratorExtension` при загрузке DI-контейнера.
+**Причина:** Параметры `task_orchestrator.*` задаются ядром `TaskOrchestrator\Common\Kernel` на этапе `getKernelParameters()` — это самый ранний шаг сборки контейнера (раньше любого импорта конфигурации). Если параметр отсутствует, значит ядро не собралось либо собралось в неверном контексте путей.
 
 **Решение:**
 
-1. Убедитесь, что в CLI entry point (`bin/task-orchestrator`) вызывается `TaskOrchestratorExtension::load()` с корректными путями:
-   ```php
-   $extension = new TaskOrchestratorExtension();
-   $extension->load([
-       [
-           'roles_dir' => $packageRoot . '/docs/agents/roles/team',
-           'base_path' => $packageRoot,
-           'chains_yaml' => $packageRoot . '/config/chains.yaml',
-           'chains_session_dir' => $packageRoot . '/var/sessions',
-       ],
-   ], $container);
+1. Проверьте, что контейнер собирается ядром. Entry points (`bin/console`, `bin/task-orchestrator`) создают `new Kernel($env, $debug, $projectRoot)`, затем `boot()` и `getContainer()`. Если ядро падает на этапе compile — запустите любую команду, и Symfony покажет причину:
+   ```bash
+   bin/console agent:token --help
    ```
+   Ошибка `Kernel`/compile укажет на отсутствующий bundle, модуль или битый `config/services.yaml`.
 
-2. Проверьте, что YAML-файл цепочек существует по указанному пути.
+2. Параметры вычисляются в `Kernel::getKernelParameters()` из двух каталогов: **package root** (`getProjectDir()`, источник `config/`) и **host-проект** (`getProjectRoot()`, источник ролей, цепочек и `base_path`). Проверьте, что файлы существуют и разрешаются корректно:
+   - роли: `<project_root>/docs/agents/roles/team` (fallback на package root);
+   - цепочки: `<project_root>/config/chains.yaml` (fallback на package root);
+   - конфигурация контейнера: `config/bundles.php`, `config/modules.php`, `config/packages/`, `config/services.yaml`, `config/console_services.yaml`.
+
+3. Если параметр нужен доменному модулю — убедитесь, что модуль зарегистрирован в `config/modules.php` и содержит `Resource/config/services.yaml` (его подгружает `ModuleCompilerPass` через `ModuleKernelTrait`).
 
 ---
 
 ## Отладочные команды
 
-> **Примечание:** Команды ниже относятся к TasK Console — Presentation-слою проекта TasK. Если вы используете библиотеку в другом приложении, замените `bin/console` на CLI вашего приложения, а имена команд — на свои.
+> **Примечание:** Команды ниже относятся к Presentation-слою приложения `apps/console`. В библиотечном режиме (vendor binary) путь `bin/console` заменяется на `vendor/bin/task-orchestrator`, а имена команд остаются прежними.
 
 ### Проверить доступные движки
 

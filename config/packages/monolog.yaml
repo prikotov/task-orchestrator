@@ -1,0 +1,11 @@
+# Конфигурация Monolog: потоковый handler в var/log/<env>.log.
+#
+# Путь лога разрешается от kernel.logs_dir (см. Kernel::getLogDir): host-проект
+# в обычном режиме, системный временный каталог — при работе из Phar.
+monolog:
+    handlers:
+        main:
+            type: stream
+            path: '%kernel.logs_dir%/%kernel.environment%.log'
+            level: debug
+            channels: ['!event']

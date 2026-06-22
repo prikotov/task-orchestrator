@@ -1,0 +1,7 @@
+# Переопределения Framework для окружения test.
+#
+# framework.test=true включает test-режим Symfony (отключает часть кеширования,
+# переключает на test-реализации там, где это применимо). Используется при
+# загрузке ядра из тестов: new Kernel('test', false).
+framework:
+    test: true

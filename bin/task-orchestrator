@@ -4,23 +4,24 @@
 declare(strict_types=1);
 
 /**
- * Task Orchestrator — CLI entry point.
+ * Task Orchestrator — CLI entry point (packaged binary).
  *
  * Works in two contexts:
  * 1. Standalone: running from the package root (bin/task-orchestrator)
- *    — paths resolve relative to the package root
+ *    — paths resolve relative to the package root.
  * 2. Vendor binary: installed via composer require (vendor/bin/task-orchestrator)
- *    — paths resolve relative to the host project (CWD)
+ *    — host-project resources (roles, chains, base_path, .env.local) resolve
+ *    relative to the host project (CWD); package resources (config/, bundles,
+ *    modules) stay pinned to the package root.
  *
- * In vendor context, the tool searches for config and roles in the host project.
- * If a file is not found in the host project, it falls back to the package defaults.
+ * Разделение путей реализовано в {@see \TaskOrchestrator\Common\Kernel}: getProjectDir()
+ * (package root) используется для config/ — bundles.php, modules.php, packages/*,
+ * services.yaml; getProjectRoot() (host-проект) — для ролей, цепочек и base_path.
+ * Здесь лишь определяем контекст и передаём projectRoot в конструктор ядра.
  */
 
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use TaskOrchestrator\Common\DependencyInjection\TaskOrchestratorExtension;
+use TaskOrchestrator\Common\Kernel;
 
 // Find Composer autoloader and detect execution context
 // vendor:    __DIR__ = <project>/vendor/prikotov/task-orchestrator/bin
@@ -38,68 +39,48 @@ if (file_exists($vendorAutoload)) {
     throw new LogicException('Dependencies are missing. Try running "composer install".');
 }
 
-// Package root: always the directory containing this package's composer.json
+// Package root: directory containing this package's composer.json (config/, src/).
 $packageRoot = dirname(__DIR__);
 
-// Project root: directory of the host project
-// — In vendor context: CWD (the caller's project directory)
-// — In standalone context: package root (running from the repository)
+// Project root: host project in vendor context (CWD), package root standalone.
 $projectRoot = $isVendor ? getcwd() : $packageRoot;
 
-$container = new ContainerBuilder();
-$container->setParameter('kernel.project_dir', $projectRoot);
-$container->setParameter('task_orchestrator.package_dir', $packageRoot);
+// .env.local: host first (CODEX_HTTP_PROXY, AGENT_*), then package fallback.
+// Загружается ПЕРЕД ядром, чтобы APP_ENV/APP_DEBUG и proxy-переменные были видны.
+$dotenv = new Symfony\Component\Dotenv\Dotenv();
+$dotenv->usePutenv(true);
 
-// Resolve version: prefer installed package version, fall back to root package, then default
-$version = '0.1.0';
-if (class_exists(\Composer\InstalledVersions::class)) {
-    $version = \Composer\InstalledVersions::getVersion('prikotov/task-orchestrator')
-        ?? \Composer\InstalledVersions::getRootPackage()['version']
-        ?? $version;
-}
-$container->setParameter('app.version', ltrim($version, 'v'));
-
-// Resolve paths: search in project root first, fall back to package defaults
-$rolesDir = $projectRoot . '/docs/agents/roles/team';
-if (!is_dir($rolesDir)) {
-    $rolesDir = $packageRoot . '/docs/agents/roles/team';
+if (is_file($projectRoot . '/.env.local')) {
+    $dotenv->load($projectRoot . '/.env.local');
 }
 
-$chainsYaml = $projectRoot . '/config/chains.yaml';
-if (!file_exists($chainsYaml)) {
-    $chainsYaml = $packageRoot . '/config/chains.yaml';
+if ($projectRoot !== $packageRoot && is_file($packageRoot . '/.env.local')) {
+    $dotenv->load($packageRoot . '/.env.local');
 }
 
-$chainsSessionDir = $projectRoot . '/var/sessions';
+$env = $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'prod';
+$debug = (bool) ($_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? false);
 
-// Load services (Domain, Application, Infrastructure)
-$extension = new TaskOrchestratorExtension();
-$extension->load([
-    [
-        'roles_dir' => $rolesDir,
-        'base_path' => $projectRoot,
-        'chains_yaml' => $chainsYaml,
-        'chains_session_dir' => $chainsSessionDir,
-    ],
-], $container);
+// Kernel: config/ — из packageRoot (getProjectDir); roles/chains/base_path — из
+// projectRoot (getProjectRoot). Отдельный процесс со своим ядром (как PHPUnit).
+$kernel = new Kernel($env, $debug, $projectRoot);
+$kernel->boot();
 
-// Load console presentation services
-$loader = new YamlFileLoader($container, new FileLocator($packageRoot . '/config'));
-$loader->load('console_services.yaml');
+$container = $kernel->getContainer();
 
-$container->compile();
+// Version: из параметра app.version, задаваемого Kernel'ом.
+/** @var string $version */
+$version = $container->getParameter('app.version');
 
-/** @var Application $application */
-$application = $container->get('console.application');
+// Application создаётся напрямую (presentation glue), а не как контейнерный сервис —
+// это убирает хрупкую зависимость от 'console.application' (особенно в Phar).
+$application = new Application('Task Orchestrator', $version);
 
-// Register tagged console commands
-$commands = [];
-foreach ($container->findTaggedServiceIds('console.command') as $id => $tags) {
-    $service = $container->get($id);
-    if ($service instanceof \Symfony\Component\Console\Command\Command) {
-        $commands[] = $service;
-    }
+// Lazy-загрузчик команд (AddConsoleCommandPass). Подключаем к Application.
+if ($container->has('console.command_loader')) {
+    /** @var \Symfony\Component\Console\CommandLoader\CommandLoaderInterface $loader */
+    $loader = $container->get('console.command_loader');
+    $application->setCommandLoader($loader);
 }
-$application->addCommands($commands);
 
 $application->run();
