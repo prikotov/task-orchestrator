@@ -241,23 +241,10 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 # Работа с секретами
 
-**Секрет** — PEM-ключ, токен (PAT, installation token `ghs_*`, JWT, API-key), пароль, значение `.env.local`. Секрет утёк, если оказался доступен за пределами предназначенного места (env/secret-store/`.env.local`).
-
-## Поверхности, где секреты появляются (защищаем ВСЕ)
-
-| Поверхность | Чем защищена |
-|---|---|
-| Код / коммиты / staged-файлы | **gitleaks** (pre-commit hook, `gitleaks protect --staged`) + **GitHub Push Protection** (на push) |
-| **PR body / PR comment / issue / commit message** | **CI `secret-scan-pr-content`** + **GitHub Secret Scanning** (alert) — gitleaks pre-commit их НЕ видит, эта поверхность живёт в GitHub API |
-| Логи CI / stdout / скриншоты / демо | только `redacted`/`<REDACTED>` вручную — автоматической защиты нет |
-
-## Правила
-
-* **Live-секреты — только в env/`.env.local`/secret-store.** Нигде больше: ни в коде, ни в тестах, ни в PR-body, ни в commit-message, ни в ретро, ни в логах демо.
-* В PR-body / демо / отчётах / ретро / скриншотах — **только placeholder**: `ghs_<redacted>`, `<REDACTED-token>`, `***`. Даже «доказательство работы команды» — через placeholder, не через live-значение.
-* Если секрет всё же вставлен в PR-body (через `gh pr edit`/API) — gitleaks pre-commit этого **не видит** (он сканирует только git-контент). Спасает CI `secret-scan-pr-content` + GitHub Secret Scanning alert.
-* При инциденте (утечка): (1) проверить валидность токена (TTL); (2) закрыть alert `resolution=revoked`; (3) почистить PR-body (placeholder + security-note); (4) при реальной утече — отозвать токен/ротировать PEM; (5) зафиксировать в ретро.
-* Файлы секретов в `secrets/` (gitignored, chmod 0600), `.env.local` (gitignored) — в репо не попадают. Throwaway тестовые ключи — в `tests/fixtures/` (allowlisted в `.gitleaks.toml`).
+* **Секрет** (PEM, токен `ghs_*`/PAT/JWT/API-key, пароль, значение `.env.local`) — live-значение живёт **только** в env/`.env.local`/`secrets/` (chmod 0600, gitignored). Нигде больше: ни в коде, ни в тестах, ни в коммит-сообщениях, ни в логах.
+* **В PR-body, комментариях, демо, отчётах, ретро, скриншотах — только placeholder** (`<REDACTED>`, `ghs_<redacted>`, `***`). Даже «доказательство работы» — через placeholder, не через live-значение.
+* **Защита многоуровневая:** gitleaks (pre-commit) + GitHub Push Protection — на git-контент; CI `secret-scan-pr-content` + GitHub Secret Scanning — на PR-body/комментарии (git-hooks их не видят). Ни один слой не покрывает всё — полагаться на все.
+* Throwaway тестовые ключи — в `tests/fixtures/` (allowlisted в `.gitleaks.toml`).
 
 ---
 
