@@ -243,7 +243,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 * **Секрет** (PEM, токен `ghs_*`/PAT/JWT/API-key, пароль, значение `.env.local`) — настоящее значение хранится **только** в `.env.local`/`secrets/`. Нигде больше: ни в коде, ни в тестах, ни в коммит-сообщениях, ни в логах.
 * **В PR-body, комментариях, демо, отчётах, ретро, скриншотах — только заменитель** (`<REDACTED>`, `ghs_<redacted>`, `***`).
-* **Защита многоуровневая:** gitleaks (pre-commit) + GitHub Push Protection — на git-контент; CI `secret-scan-pr-content` + GitHub Secret Scanning — на PR-body/комментарии (git-hooks их не видят). Ни один слой не покрывает всё — полагаться на все.
+* **Защита многоуровневая:** gitleaks (pre-commit) + GitHub Push Protection — на git-контент; CI `secret-scan-pr-content` + GitHub Secret Scanning — на PR-body/комментарии (git-hooks их не видят). Слои дополняют друг друга — нужны все.
 * Одноразовые тестовые ключи — в `tests/fixtures/` (allowlisted в `.gitleaks.toml`).
 
 ---
