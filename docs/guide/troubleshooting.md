@@ -35,10 +35,10 @@ Agent runner "codex" not found.
    final class CodexAgentRunner implements AgentRunnerInterface { ... }
    ```
 
-2. Проверьте, что класс не исключён из auto-discovery в `config/services.yaml`. Тег `agent.runner` автоматически назначается через `_instanceof`:
+2. Проверьте, что класс не исключён из auto-discovery (автообнаружение сервисов) в `src/Module/AgentRunner/Resource/config/services.yaml`. Тег `agent.runner` автоматически назначается через `_instanceof`:
    ```yaml
    _instanceof:
-     TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\AgentRunner\AgentRunnerInterface:
+     TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
        tags: ['agent.runner']
    ```
 

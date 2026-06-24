@@ -42,7 +42,7 @@ final readonly class RepoSlugVo
      *
      * @throws InvalidConfigurationException если формат некорректен.
      */
-    public static function fromString(string $slug): self
+    public static function createFromString(string $slug): self
     {
         $slug = trim($slug);
         $parts = explode('/', $slug, 2);

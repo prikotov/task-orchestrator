@@ -1,0 +1,56 @@
+# Конфигурация сервисов модуля ChainDefinition.
+
+parameters:
+  module.chain_definition.module_dir: '%task_orchestrator.package_dir%/src/Module/ChainDefinition'
+  module.chain_definition.chains_yaml: '%task_orchestrator.chains_yaml%'
+  module.chain_definition.base_path: '%task_orchestrator.base_path%'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  TaskOrchestrator\Common\Module\ChainDefinition\:
+    resource: '%module.chain_definition.module_dir%/'
+    exclude:
+      - '%module.chain_definition.module_dir%/Domain/Dto/'
+      - '%module.chain_definition.module_dir%/Domain/Entity/'
+      - '%module.chain_definition.module_dir%/Domain/Enum/'
+      - '%module.chain_definition.module_dir%/Domain/Exception/'
+      - '%module.chain_definition.module_dir%/Domain/ValueObject/'
+      - '%module.chain_definition.module_dir%/Application/Dto/'
+      - '%module.chain_definition.module_dir%/Application/Enum/'
+      - '%module.chain_definition.module_dir%/Resource/'
+      - '%module.chain_definition.module_dir%/ChainDefinitionModule.php'
+
+  # Domain Service aliases (Interface → Implementation)
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\CollectFixIterationsViolationsServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\CollectFixIterationsViolationsService
+
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ChainLoaderInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService
+
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\YamlChainLoaderServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService
+
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityRoleTargetProviderInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\YamlConnectivityRoleTargetProviderService
+
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityCommandResolverInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\ProductionLikeConnectivityCommandResolverService
+
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityProcessRunnerInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\SymfonyConnectivityProcessRunnerService
+
+  # Infrastructure Service parameters
+  TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService:
+    arguments:
+      $yamlPath: '%module.chain_definition.chains_yaml%'
+
+  TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\YamlConnectivityRoleTargetProviderService:
+    arguments:
+      $yamlPath: '%module.chain_definition.chains_yaml%'
+
+  TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\SymfonyConnectivityProcessRunnerService:
+    arguments:
+      $basePath: '%module.chain_definition.base_path%'

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\GitIdentity\Application\UseCase\Command\ObtainToken;
 
+use Psr\Clock\ClockInterface;
 use TaskOrchestrator\Common\Module\GitIdentity\Application\Exception\ObtainTokenFailedException;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Exception\GitHubApiException;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Exception\GitIdentityException;
-use Psr\Clock\ClockInterface;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\LoadGitIdentityConfigServiceInterface;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\RequestInstallationTokenServiceInterface;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\Service\ResolveInstallationIdServiceInterface;
@@ -77,7 +77,7 @@ final readonly class ObtainTokenCommandHandler
     private function handle(ObtainTokenCommand $command): ObtainTokenResultDto
     {
         $config = $this->configLoader->load();
-        $repoSlug = RepoSlugVo::fromString($command->repoSlug);
+        $repoSlug = RepoSlugVo::createFromString($command->repoSlug);
         $safetyMargin = $config->getTokenExpirySafetyMarginSeconds();
         $installationIdCacheTtl = $config->getInstallationIdCacheTtlSeconds();
 

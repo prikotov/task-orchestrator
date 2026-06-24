@@ -18,4 +18,8 @@ declare(strict_types=1);
  */
 return [
     TaskOrchestrator\Common\Module\GitIdentity\GitIdentityModule::class => ['all' => true],
+    TaskOrchestrator\Common\Module\AgentRunner\AgentRunnerModule::class => ['all' => true],
+    TaskOrchestrator\Common\Module\ChainDefinition\ChainDefinitionModule::class => ['all' => true],
+    TaskOrchestrator\Common\Module\ChainExecution\ChainExecutionModule::class => ['all' => true],
+    TaskOrchestrator\Common\Module\DynamicLoop\DynamicLoopModule::class => ['all' => true],
 ];

@@ -147,17 +147,30 @@ src/Module/
 
 **DI-конфигурация:**
 
+`ExecutionStrategyInterface` принадлежит модулю ChainExecution, поэтому базовое тегирование стратегий ChainExecution и tagged iterator (итератор по тегам) для `OrchestrateChainCommandHandler` описаны в модульной конфигурации ChainExecution:
+
 ```yaml
-# config/services.yaml
+# src/Module/ChainExecution/Resource/config/services.yaml
 services:
     _instanceof:
-        ExecutionStrategyInterface:
+        TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface:
             tags: ['orchestrator.execution_strategy']
 
-    OrchestrateChainCommandHandler:
+    TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler:
         arguments:
             $strategies: !tagged_iterator orchestrator.execution_strategy
 ```
+
+`DynamicExecutionStrategy` реализован в модуле DynamicLoop, поэтому он получает явный tag (тег) в конфигурации модуля-владельца:
+
+```yaml
+# src/Module/DynamicLoop/Resource/config/services.yaml
+services:
+    TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\DynamicExecutionStrategy:
+        tags: ['orchestrator.execution_strategy']
+```
+
+Это обязательно, потому что `_instanceof` действует только в пределах своего файла конфигурации: cross-module implementation (реализация в другом модуле) не тегируется автоматически правилами ChainExecution.
 
 **Почему Strategy, а не if/switch:** Handler не знает о типах цепочек. Новая стратегия — новый класс + тег, handler не меняется.
 
@@ -475,17 +488,31 @@ src/
 │   └── Clock/                                        # SystemClock (PSR-20 Psr\Clock\ClockInterface)
 config/
 ├── bundles.php                                      # Реестр bundles (FrameworkBundle, TwigBundle, MonologBundle)
-├── modules.php                                      # Реестр доменных модулей (ModuleInterface)
+├── modules.php                                      # Реестр доменных модулей: GitIdentity, AgentRunner, ChainDefinition, ChainExecution, DynamicLoop
 ├── packages/                                        # Конфигурация bundles (framework, twig, translation, monolog)
-├── services.yaml                                    # DI-конфигурация приложения + alias Psr\Clock\ClockInterface
+├── services.yaml                                    # Общие компоненты + alias Psr\Clock\ClockInterface + импорт console_services.yaml
 └── console_services.yaml                             # Presentation-слой apps/console (команды, EventDispatcher, Lock)
+
+src/Module/<Name>/
+├── <Name>Module.php                                 # ModuleInterface: пути модуля и Resource/config
+└── Resource/config/services.yaml                     # DI-конфигурация конкретного модуля
 ```
 
-Контейнер собирается Kernel через MicroKernelTrait (config/packages/* + config/services.yaml) и
-ModuleKernelTrait (перебирает config/modules.php, для каждого модуля подгружает его
-Resource/config/services.yaml). Параметры task_orchestrator.* задаются в Kernel::getKernelParameters()
-на самом раннем этапе. Параметр base_path/roles_dir/chains_yaml — с dual-context resolution
-(standalone vs vendor-binary: host-пути для ролей/цепочек, package-пути для config пакета).
+Контейнер собирается `Kernel` через `MicroKernelTrait` (`config/packages/*` + `config/services.yaml`) и
+`ModuleKernelTrait`. `config/modules.php` содержит 5 модулей: `GitIdentity`, `AgentRunner`,
+`ChainDefinition`, `ChainExecution`, `DynamicLoop`. Для каждого модуля `ModuleKernelTrait`
+регистрирует `ModuleCompilerPass`, который подгружает `Resource/config/services.yaml` модуля.
+
+Общий `config/services.yaml` остаётся тонким: импортирует `console_services.yaml`, включает
+auto-discovery (автообнаружение сервисов) только для `src/Component/*` и объявляет общий alias
+`Psr\Clock\ClockInterface` → `SystemClock`. Алиасы интерфейсов, scalar arguments (скалярные
+аргументы), tagged iterators (итераторы по тегам) и `_instanceof`-тегирование конкретных модулей
+живут в модульных `src/Module/<Name>/Resource/config/services.yaml`.
+
+Параметры `task_orchestrator.*` задаются в `Kernel::getKernelParameters()` на самом раннем этапе.
+Модульные файлы используют собственные параметры `module.<name>.*`, при необходимости ссылаясь на
+`task_orchestrator.*` как на источник. Параметр `base_path`/`roles_dir`/`chains_yaml` — с
+dual-context resolution (разрешение путей для двух контекстов: standalone и vendor-binary).
 
 ### Presentation-слой (в приложении-хосте)
 
@@ -535,7 +562,11 @@ task_orchestrator:
 - `RetryingAgentRunner` — обёртка с retry-policy (экспоненциальная задержка)
 - `CircuitBreakerAgentRunner` — обёртка Circuit Breaker (closed → open → half_open)
 - `RetryableRunnerFactory` — фабрика для создания retrying-обёртки
-- Новый движок: создать класс, реализующий `AgentRunnerInterface`, зарегистрировать в `config/services.yaml` с тегом `agent.runner`
+- Новый движок: создать класс в модуле `AgentRunner`, реализующий `AgentRunnerInterface`. Тег
+  `agent.runner` ставится автоматически через `_instanceof` в
+  `src/Module/AgentRunner/Resource/config/services.yaml`; общий `config/services.yaml` для этого не
+  изменяется. Если реализация находится вне модуля `AgentRunner`, добавьте явный tag (тег) в
+  `Resource/config/services.yaml` модуля-владельца.
 
 Подробнее о retry и circuit breaker — в [Надёжность](reliability.md).
 

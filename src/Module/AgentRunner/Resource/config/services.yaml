@@ -1,0 +1,48 @@
+# Конфигурация сервисов модуля AgentRunner.
+
+parameters:
+  module.agent_runner.module_dir: '%task_orchestrator.package_dir%/src/Module/AgentRunner'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  _instanceof:
+    TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
+      tags: ['agent.runner']
+
+  TaskOrchestrator\Common\Module\AgentRunner\:
+    resource: '%module.agent_runner.module_dir%/'
+    exclude:
+      - '%module.agent_runner.module_dir%/Domain/Dto/'
+      - '%module.agent_runner.module_dir%/Domain/Entity/'
+      - '%module.agent_runner.module_dir%/Domain/Enum/'
+      - '%module.agent_runner.module_dir%/Domain/Exception/'
+      - '%module.agent_runner.module_dir%/Domain/ValueObject/'
+      - '%module.agent_runner.module_dir%/Application/Dto/'
+      - '%module.agent_runner.module_dir%/Application/Enum/'
+      - '%module.agent_runner.module_dir%/Resource/'
+      - '%module.agent_runner.module_dir%/**/Resources/'
+      - '%module.agent_runner.module_dir%/AgentRunnerModule.php'
+      - '%module.agent_runner.module_dir%/Infrastructure/Service/RetryingAgentRunnerService.php'
+      - '%module.agent_runner.module_dir%/Infrastructure/Service/CircuitBreakerAgentRunnerService.php'
+
+  TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunnerService
+
+  TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\PiAgentRunnerServiceInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunnerService
+
+  TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService
+
+  TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\MetricsCollectorInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Metrics\InMemoryMetricsCollectorService
+
+  TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\RetryableRunnerFactory
+
+  TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService:
+    arguments:
+      $runners: !tagged_iterator agent.runner

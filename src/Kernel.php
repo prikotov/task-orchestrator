@@ -94,7 +94,7 @@ class Kernel extends BaseKernel
      * конфигурации), поэтому task_orchestrator.* доступны services.yaml и
      * модульным Resource/config/services.yaml без отдельной настройки.
      *
-     * @return array<string, array|bool|string|int|float|\UnitEnum|null>
+     * @return array<string, mixed>
      */
     #[Override]
     protected function getKernelParameters(): array
@@ -152,9 +152,10 @@ class Kernel extends BaseKernel
     private function resolveVersion(): string
     {
         if (class_exists(\Composer\InstalledVersions::class)) {
-            $version = \Composer\InstalledVersions::getVersion('prikotov/task-orchestrator')
-                ?? \Composer\InstalledVersions::getRootPackage()['version']
-                ?? '0.1.0';
+            $version = \Composer\InstalledVersions::getVersion('prikotov/task-orchestrator');
+            if ($version === null) {
+                $version = \Composer\InstalledVersions::getRootPackage()['version'];
+            }
 
             return ltrim($version, 'v');
         }

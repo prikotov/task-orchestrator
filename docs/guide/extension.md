@@ -27,11 +27,11 @@ Orchestrator спроектирован для расширения без из�
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\AgentRunner\Codex;
+namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\AgentRunner\Codex;
 
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\AgentRunner\AgentRunnerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\AgentResultVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use Override;
 use Symfony\Component\Process\Process;
 
@@ -110,16 +110,24 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
 
 ### Шаг 2. Зарегистрировать в контейнере
 
-Движок регистрируется **автоматически** через `_instanceof` в `config/services.yaml`:
+Движок внутри модуля AgentRunner регистрируется **автоматически** через `_instanceof` в `src/Module/AgentRunner/Resource/config/services.yaml`:
 
 ```yaml
 services:
   _instanceof:
-    TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\AgentRunner\AgentRunnerInterface:
+    TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
       tags: ['agent.runner']
 ```
 
 Все классы, реализующие `AgentRunnerInterface`, попадают в `AgentRunnerRegistryService` через `!tagged_iterator agent.runner`.
+
+Если реализация runner'а находится вне модуля AgentRunner, `_instanceof` чужого модуля её не тегирует автоматически. В таком случае добавьте явный tag (тег) в `Resource/config/services.yaml` модуля-владельца:
+
+```yaml
+services:
+  TaskOrchestrator\Common\Module\CustomModule\Infrastructure\Service\CodexAgentRunner:
+    tags: ['agent.runner']
+```
 
 > **Важно:** декораторы (`RetryingAgentRunner`, `CircuitBreakerAgentRunner`) исключены из auto-discovery — не добавляйте их в реестр.
 

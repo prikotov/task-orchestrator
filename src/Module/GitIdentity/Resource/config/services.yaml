@@ -3,13 +3,8 @@
 # Следует конвенции docs/conventions/modules/configuration.md: конфигурация
 # сервисов модуля лежит в Resource/config/services.yaml, параметры имеют
 # префикс module.git_identity.* (а не в общем config/services.yaml).
-#
-# ВАЖНО: auto-discovery классов модуля выполняется общим config/services.yaml
-# (resource: '%task_orchestrator.package_dir%/src/*' с exclude по Domain/*).
-# Поэтому здесь resource/exclude НЕ объявляются — это избегает двойной
-# регистрации. Этот файл отвечает только за module-specific параметры и
-# привязки интерфейсов к реализациям (Domain Service aliases) + скалярные
-# аргументы конструкторов, которые autowire разрешить не может.
+# Этот файл является единственным владельцем auto-discovery namespace
+# TaskOrchestrator\Common\Module\GitIdentity\.
 
 parameters:
   module.git_identity.module_dir: '%task_orchestrator.package_dir%/src/Module/GitIdentity'
@@ -29,6 +24,21 @@ services:
   _defaults:
     autowire: true
     autoconfigure: true
+
+  TaskOrchestrator\Common\Module\GitIdentity\:
+    resource: '%module.git_identity.module_dir%/'
+    exclude:
+      - '%module.git_identity.module_dir%/Domain/Dto/'
+      - '%module.git_identity.module_dir%/Domain/Entity/'
+      - '%module.git_identity.module_dir%/Domain/Enum/'
+      - '%module.git_identity.module_dir%/Domain/Exception/'
+      - '%module.git_identity.module_dir%/Domain/ValueObject/'
+      - '%module.git_identity.module_dir%/Application/Dto/'
+      - '%module.git_identity.module_dir%/Application/Enum/'
+      - '%module.git_identity.module_dir%/Application/Event/'
+      - '%module.git_identity.module_dir%/Application/Exception/'
+      - '%module.git_identity.module_dir%/Resource/'
+      - '%module.git_identity.module_dir%/GitIdentityModule.php'
 
   # Scoped HTTP-клиент для GitHub API (конвенция External Service):
   # таймауты и статические заголовки задаются один раз, per-request компонент

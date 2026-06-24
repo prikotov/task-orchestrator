@@ -65,7 +65,7 @@ final class GitHubResolveInstallationIdServiceTest extends TestCase
             ->willReturn(['id' => 424242]);
 
         $service = new GitHubResolveInstallationIdService($this->http);
-        $installationId = $service->resolve(RepoSlugVo::fromString('octocat/Hello-World'), $this->jwt, $this->config);
+        $installationId = $service->resolve(RepoSlugVo::createFromString('octocat/Hello-World'), $this->jwt, $this->config);
 
         self::assertSame(424242, $installationId->getValue());
     }
@@ -78,7 +78,7 @@ final class GitHubResolveInstallationIdServiceTest extends TestCase
         $this->expectException(GitHubApiException::class);
 
         (new GitHubResolveInstallationIdService($this->http))->resolve(
-            RepoSlugVo::fromString('octocat/Hello-World'),
+            RepoSlugVo::createFromString('octocat/Hello-World'),
             $this->jwt,
             $this->config,
         );
@@ -97,7 +97,7 @@ final class GitHubResolveInstallationIdServiceTest extends TestCase
         $service = new GitHubResolveInstallationIdService($this->http);
 
         try {
-            $service->resolve(RepoSlugVo::fromString('octocat/Hello-World'), $this->jwt, $this->config);
+            $service->resolve(RepoSlugVo::createFromString('octocat/Hello-World'), $this->jwt, $this->config);
             self::fail('Ожидалось GitHubApiException (404).');
         } catch (GitHubApiException $e) {
             self::assertTrue($e->isNotFound());

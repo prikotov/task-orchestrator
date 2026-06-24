@@ -29,7 +29,7 @@ use TaskOrchestrator\Common\Component\ModuleSystem\Extension\TwigInterface;
  *
  * @see \TaskOrchestrator\Common\Kernel
  *
- * @method bool isEnvironmentIncluded(array $envs)
+ * @method bool isEnvironmentIncluded(array<string, bool> $envs)
  */
 trait ModuleKernelTrait
 {

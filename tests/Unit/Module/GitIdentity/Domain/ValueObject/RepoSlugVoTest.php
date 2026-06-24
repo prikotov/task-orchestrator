@@ -17,7 +17,7 @@ final class RepoSlugVoTest extends TestCase
     #[Test]
     public function fromStringParsesOwnerAndRepo(): void
     {
-        $vo = RepoSlugVo::fromString('octocat/Hello-World');
+        $vo = RepoSlugVo::createFromString('octocat/Hello-World');
 
         self::assertSame('octocat', $vo->getOwner());
         self::assertSame('Hello-World', $vo->getRepo());
@@ -27,7 +27,7 @@ final class RepoSlugVoTest extends TestCase
     #[Test]
     public function fromStringAllowsDotsDashesAndUnderscores(): void
     {
-        $vo = RepoSlugVo::fromString('my_org/my.repo_v2');
+        $vo = RepoSlugVo::createFromString('my_org/my.repo_v2');
 
         self::assertSame('my_org', $vo->getOwner());
         self::assertSame('my.repo_v2', $vo->getRepo());
@@ -36,7 +36,7 @@ final class RepoSlugVoTest extends TestCase
     #[Test]
     public function fromStringTrimsSurroundingWhitespace(): void
     {
-        $vo = RepoSlugVo::fromString('  octocat/Hello-World  ');
+        $vo = RepoSlugVo::createFromString('  octocat/Hello-World  ');
 
         self::assertSame('octocat', $vo->getOwner());
         self::assertSame('Hello-World', $vo->getRepo());
@@ -45,7 +45,7 @@ final class RepoSlugVoTest extends TestCase
     #[Test]
     public function cacheKeyReplacesSlashWithUnderscore(): void
     {
-        $vo = RepoSlugVo::fromString('octocat/Hello-World');
+        $vo = RepoSlugVo::createFromString('octocat/Hello-World');
 
         self::assertSame('octocat_Hello-World', $vo->cacheKey());
         self::assertStringNotContainsString('/', $vo->cacheKey());
@@ -60,7 +60,7 @@ final class RepoSlugVoTest extends TestCase
     {
         $this->expectException(InvalidConfigurationException::class);
 
-        RepoSlugVo::fromString($slug);
+        RepoSlugVo::createFromString($slug);
     }
 
     /**

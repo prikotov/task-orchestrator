@@ -34,7 +34,7 @@ final class FilesystemTokenCacheServiceTest extends TestCase
         $this->cacheDir = sys_get_temp_dir() . '/git-identity-cache-' . bin2hex(random_bytes(6));
         $this->cache = new FilesystemTokenCacheService($this->cacheDir);
         $this->installationId = new InstallationIdVo(424242);
-        $this->repoSlug = RepoSlugVo::fromString('octocat/Hello-World');
+        $this->repoSlug = RepoSlugVo::createFromString('octocat/Hello-World');
         $this->tokenPath = $this->cacheDir . '/424242.token.json';
         $this->installationPath = $this->cacheDir . '/octocat_Hello-World.installation.json';
     }
