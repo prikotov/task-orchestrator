@@ -9,7 +9,7 @@ epic:
 author: Тимлид Алекс
 assignee: Тимлид Алекс
 branch: task/modules-configuration-convention
-pr:
+pr: '#282'
 status: done
 ---
 
