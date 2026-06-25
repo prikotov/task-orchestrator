@@ -15,6 +15,7 @@
 - [Quality Gate упал](#quality-gate-упал)
 - [Ошибки конфигурации](#ошибки-конфигурации)
 - [Отладочные команды](#отладочные-команды)
+- [PHAR собирается, но команды модулей недоступны (hollow-контейнер)](#phar-собирается-но-команды-модулей-недоступны-hollow-контейнер)
 - [Таблица исключений](#таблица-исключений)
 
 ---
@@ -35,12 +36,12 @@ Agent runner "codex" not found.
    final class CodexAgentRunner implements AgentRunnerInterface { ... }
    ```
 
-2. Проверьте, что класс не исключён из auto-discovery (автообнаружение сервисов) в `src/Module/AgentRunner/Resource/config/services.yaml`. Тег `agent.runner` автоматически назначается через `_instanceof`:
-   ```yaml
-   _instanceof:
-     TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
-       tags: ['agent.runner']
-   ```
+2. Проверьте, что класс не исключён из auto-discovery (автообнаружение сервисов).
+   Auto-discovery выполняет `ModuleServiceRegistrar` (PHAR-safe регистратор), а исключения
+   объявляются в контракте модуля — `ModuleInterface::getServiceExcludePaths()` (а не в `services.yaml`).
+   Тег `agent.runner` назначается автоматически через container-wide autoconfiguration
+   (`Kernel::build()` → `registerForAutoconfiguration()`), единообразно для классов модуля
+   `AgentRunner` и реализаций в других модулях. Module-local `_instanceof` больше не используется.
 
 3. При использовании `--runner=<name>` убедитесь, что `getName()` возвращает то же имя.
 
@@ -290,7 +291,7 @@ The service "TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Servi
    ```
    Ошибка `Kernel`/compile укажет на отсутствующий bundle, модуль или битый `config/services.yaml`.
 
-2. Параметры вычисляются в `Kernel::getKernelParameters()` из двух каталогов: **package root** (`getProjectDir()`, источник `config/`) и **host-проект** (`getProjectRoot()`, источник ролей, цепочек и `base_path`). Проверьте, что файлы существуют и разрешаются корректно:
+2. Параметры вычисляются в `Kernel::getKernelParameters()` из двух каталогов: **package root** (`getPackageDir()` = `dirname(__DIR__)` от `src/Kernel.php` — CWD-независимо, источник `config/`, `task_orchestrator.package_dir`) и **host-проект** (`getProjectRoot()`, источник ролей, цепочек и `base_path`). Проверьте, что файлы существуют и разрешаются корректно:
    - роли: `<project_root>/docs/agents/roles/team` (fallback на package root);
    - цепочки: `<project_root>/config/chains.yaml` (fallback на package root);
    - конфигурация контейнера: `config/bundles.php`, `config/modules.php`, `config/packages/`, `config/services.yaml`, `config/console_services.yaml`.
@@ -343,6 +344,26 @@ cat var/log/agent_audit.jsonl | python3 -m json.tool
 ```
 
 Каждая строка — JSON с метриками шага: токены, стоимость, длительность.
+
+---
+
+## PHAR собирается, но команды модулей недоступны (hollow-контейнер)
+
+**Симптом:** собранный `task-orchestrator.phar` запускается (`--version` работает), но `list` не показывает команд модулей (`agent:run`, `validate:connectivity` и др.), либо команда падает на этапе autowire (автосвязывания) с `ServiceNotFoundException`.
+
+**Причина:** контейнер собран «пустым» по модулям (hollow — полым). Обычно это CWD-зависимая сборка в PHAR:
+
+- сломан package-root: наследуемый `getProjectDir()` в PHAR даёт неверный `phar://.../src` (`composer.json` не упакован в PHAR) → `getModules()` возвращает `[]` → ни один модуль не грузится. Фикс — `Kernel::getPackageDir() = dirname(__DIR__)`;
+- сломан PHAR-safe регистратор (`ModuleServiceRegistrar`): если вместо него остался оператор `resource:` — `GlobResource` возвращает 0 файлов по `phar://`.
+
+**Диагностика:**
+
+```bash
+# Команды модулей должны быть видны из произвольного CWD (не только из checkout):
+ cd /tmp && php /path/to/task-orchestrator.phar list | grep -E 'agent:run|validate'
+```
+
+Если пусто — контейнер hollow. Проверьте, что `bin/phar-smoke` (усиленный) зелёный из distributable CWD: он специально ловит этот случай (`--version` ложнозелёный и проходит даже при hollow). См. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-auto-discovery-вариант-4).
 
 ---
 

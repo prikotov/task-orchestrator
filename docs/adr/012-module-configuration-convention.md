@@ -1,10 +1,10 @@
 # ADR-012: Конвенция конфигурации модулей
 
-| Поле        | Значение                                             |
-|-------------|------------------------------------------------------|
-| Статус      | Принято                                              |
-| Дата        | 2026-06-24                                           |
-| Автор       | Архитектор (Гэндальф)                                |
+| Поле        | Значение                                                                  |
+|-------------|---------------------------------------------------------------------------|
+| Статус      | Принято (дополнено 2026-06-25: PHAR-переносимость, Вариант 4)             |
+| Дата        | 2026-06-24 (дополнено 2026-06-25)                                         |
+| Автор       | Архитектор (Гэндальф)                                                     |
 
 ## Контекст
 
@@ -58,7 +58,7 @@ parameters:
   module.<name>.module_dir: '%task_orchestrator.package_dir%/src/Module/<Name>'
 ```
 
-8. Модульный `services.yaml` объявляет auto-discovery (автообнаружение сервисов) только своего namespace (пространства имён):
+8. Модульный `services.yaml` объявляет auto-discovery (автообнаружение сервисов) только своего namespace (пространства имён). В исходном Path A это делалось оператором `resource:`/`exclude:`:
 
 ```yaml
 services:
@@ -77,7 +77,9 @@ services:
       - '%module.<name>.module_dir%/<Name>Module.php'
 ```
 
-Обязательный минимум `exclude` защищает контейнер от регистрации несервисных типов: Entity (сущность), Enum (перечисление), ValueObject (объект-значение), DTO (data transfer object — объект передачи данных), ресурсов модуля и класса модуля. Если в модуле есть дополнительные несервисные каталоги (`Application/Enum`, `Application/Event`, `Domain/Exception` и т.п.), они также добавляются в `exclude` модульного файла.
+Обязательный минимум `exclude` защищает контейнер от регистрации несервисных типов: Entity (сущность), Enum (перечисление), ValueObject (объект-значение), DTO (data transfer object — объект передачи данных), ресурсов модуля и класса модуля. Если в модуле есть дополнительные несервисные каталоги (`Application/Enum`, `Application/Event`, `Domain/Exception` и т.п.), они также добавляются в `exclude`.
+
+> **Дополнение (Вариант 4, 2026-06-25):** операторы `resource:`/`exclude:` основаны на Symfony `GlobResource`, который не работает по путям `phar://` и ломал сборку PHAR (см. [PHAR-переносимость](#phar-переносимость-эволюция-auto-discovery-вариант-4)). Auto-discovery перенесён в программный PHAR-safe регистратор `ModuleServiceRegistrar`; namespace и `exclude`-пути теперь объявляются не в YAML, а в контракте модуля — `ModuleInterface::getServiceNamespace()` и `getServiceExcludePaths()` (базовый набор — константа `DEFAULT_SERVICE_EXCLUDE_PATHS`). Сами YAML-операторы `resource:`/`exclude:` из модульных `services.yaml` убраны.
 
 ### Что переносится из `config/services.yaml` в модульные файлы
 
@@ -183,6 +185,96 @@ parameters:
 5. Запустить `vendor/bin/phpunit`, `vendor/bin/psalm`, `make deptrac`.
 6. Выполнить smoke-тест CLI (например, `bin/console --help` и `bin/task-orchestrator --help`, если entry point доступен в окружении).
 
+## PHAR-переносимость: эволюция auto-discovery (Вариант 4)
+
+### Контекст
+
+Path A (см. «Решение») задумывался на стандартном Symfony-механизме `resource:`/`exclude:` auto-discovery. На практике он оказался непереносимым в собранный PHAR (PHP-архив, package-формат), и это было обнаружено только на CI `phar-smoke`.
+
+### Проблема
+
+Symfony-операторы `resource:`/`exclude:` реализованы поверх `Symfony\Component\Config\Resource\GlobResource` — glob-сканирования каталогов. PHP stream-wrapper для `phar://` **не поддерживает glob-операции**: `GlobResource` возвращает **0 файлов** по любому пути внутри `phar://`. Это фундаментальное ограничение stream-wrapper, а не баг Symfony. В результате в собранном PHAR auto-discovery модулей тихо становился пустым: ни один сервисный класс не регистрировался.
+
+### Симптом
+
+CI `phar-smoke` падал с `FileLocatorFileNotFoundException`: команды, запускаемые из собранного `task-orchestrator.phar`, не находили сервисы модулей на этапе autowire (автосвязывания). В dev-режиме (обычная файловая система) `GlobResource` работал корректно, поэтому регрессия проявлялась только в PHAR.
+
+### Рассмотренные альтернативы
+
+- **В1 «Откатить `resource:` в корневой `config/services.yaml`.»** Отклонена. Это даёт «ложнозелёный» dev/CI на обычной ФС, но PHAR остаётся пустым по той же причине (`GlobResource` не работает по `phar://`). Усугубляет проблему, маскируя её.
+- **В2 «Self-extracting PHAR (самораспаковывающийся архив).»** Отклонена. Распаковка на старте добавляет runtime-latency (задержку запуска), плодит временные файлы и создаёт расхождение между dev и prod-средой (в dev файлы одни, в prod — распакованные копии).
+- **В3 «Явная регистрация классов (перечисление FQCN каждого сервиса).»** Отклонена как основной путь. Это рабочее решение, но отступает от принципа auto-discovery: каждый новый сервис требует ручной правки списка, что сводит на нет выигрыш модульной системы и провоцирует «забыл добавить класс».
+- **В4 (выбрана) «PHAR-safe регистратор + container-wide autoconfiguration.»** `dev = prod`, без runtime-распаковки, без правки composer/box-сборки.
+
+### Решение (Вариант 4)
+
+Две замены вместо операторов `resource:`/`exclude:` и module-local `_instanceof`.
+
+**1. Программный auto-discovery через `ModuleServiceRegistrar`**
+(`src/Component/ModuleSystem/DependencyInjection/ModuleServiceRegistrar.php`). Перечисление `*.php` через `RecursiveDirectoryIterator` (PHP SPL) — он **работает по `phar://`** (проверено эмпирически), в отличие от glob. Далее: FQCN-маппинг по PSR-4 namespace модуля, фильтрация несервисных типов (abstract/interface/trait/enum) и `exclude`-путей, регистрация каждого оставшегося класса как `autowired` + `autoconfigured` `Definition`.
+
+Конфигурация регистратора — из самого модуля (единый источник истины), а не из YAML:
+
+- `ModuleInterface::getServiceNamespace()` — PSR-4 префикс (для FQCN-маппинга);
+- `ModuleInterface::getServiceExcludePaths()` — относительные пути для исключения;
+- `ModuleInterface::DEFAULT_SERVICE_EXCLUDE_PATHS` — стандартный набор несервисных каталогов DDD-слоёв, который модули композируют со своими module-specific исключениями.
+
+**2. Container-wide autoconfiguration вместо module-local `_instanceof`.**
+Теги интерфейсов регистрируются в `Kernel::build()` через `ContainerBuilder::registerForAutoconfiguration()`:
+
+- `AgentRunnerInterface` → `agent.runner`;
+- `ExecutionStrategyInterface` → `orchestrator.execution_strategy`;
+- `ExecuteStepServiceInterface` → `chain_execution.step_runner`.
+
+Container-wide autoconfiguration применяется единообразно ко **всем** `autoconfigured`-сервисам, независимо от того, зарегистрированы они через регистратор или явным определением (explicit def), и независимо от того, в каком модуле лежит реализация. Это снимает историческое ограничение `_instanceof`, который действовал только в пределах своего файла и не тегировал cross-module реализации (например, `DynamicExecutionStrategy` в модуле `DynamicLoop` при контракте из `ChainExecution`).
+
+### Package-root в PHAR: `getPackageDir()`
+
+После внедрения регистратора вскрылась вторая, более глубокая проблема CWD-зависимости (current working directory — текущий рабочий каталог). Наследуемый `Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait`/`BaseKernel::getProjectDir()` ищет `composer.json`, поднимаясь от `Kernel.php`. В PHAR `composer.json` **не упакован** (Box его не кладёт), поэтому fallback даёт неверный `dirname(Kernel.php)` = `phar://.../src` вместо root PHAR.
+
+Это ломало два места:
+
+- `getModules()`: искал `phar://.../src/config/modules.php` (файла там нет — он в `phar://.../config/modules.php`) → возвращал `[]` → **0 модулей** → регистратор не вызывался → контейнер собирался «пустым» (hollow — полым) по модулям.
+- параметр `task_orchestrator.package_dir` = `phar://.../src` → ломал все оставшиеся `resource:`-блоки (Component, apps/console).
+
+Фикс: в `Kernel` введён `private function getPackageDir(): string { return dirname(__DIR__); }`. Для `src/Kernel.php` это даёт package root (каталог пакета с `src/`, `apps/`, `config/`) CWD-независимо:
+
+- dev: `dirname('/path/src')` = `/path`;
+- PHAR: `dirname('phar://x.phar/src')` = `phar://x.phar`.
+
+`getPackageDir()` используется в `getModules()` и `getKernelParameters()` (для `task_orchestrator.package_dir`). Наследуемый `getProjectDir()` (нужен Symfony для `kernel.project_dir`, routing, cache) и `getProjectRoot()` (host-проект ролей/цепочек) не переопределяются. Доказано A/B-экспериментом: `getProjectDir()` → 0 модулей, `getPackageDir()` → 5 модулей.
+
+### Расширение PHAR-safe регистрации за пределы доменных модулей
+
+Помимо доменных модулей `src/Module/*`, операторы `resource:` использовались ещё в 4 местах — все ломались в PHAR по той же причине (`GlobResource` + `phar://`). После Варианта 4 они тоже переведены на PHAR-safe регистрацию:
+
+1. **`config/services.yaml`** — блок `TaskOrchestrator\Common\Component\:` (`src/Component/*`) заменён на **явное определение** `TaskOrchestrator\Common\Component\Clock\SystemClock: ~`. Это единственный concrete-сервис каталога; остальные классы `Component/ModuleSystem/` (compiler passes, сам `ModuleServiceRegistrar`, interfaces, trait) либо инстанцируются вручную через `new`/`addCompilerPass`, либо пропускаются регистратором как несервисные типы.
+2-4. **`config/console_services.yaml`** — три блока `apps/console/src/Module/{Orchestrator,GitIdentity}/.../{Command,EventSubscriber}/*` убраны. Регистрацию выполняет новый метод `Kernel::registerConsoleServices()`, который вызывает обобщённый `ModuleServiceRegistrar` для трёх каталогов с `public: true`.
+
+**Обобщение регистратора.** `ModuleServiceRegistrar` сделан generic (применим не только к модулям): параметр конструктора переименован `moduleDir` → `serviceDir`, добавлена опция `public: bool = false` (для команд apps/console — `true`, чтобы Console Application мог их доставать; для доменных модулей остаётся `false`).
+
+**Теги команд и подписчиков.** Symfony `FrameworkExtension` регистрирует container-wide autoconfiguration для `Symfony\Component\Console\Command\Command` (тег `console.command`) и `EventSubscriberInterface` (тег `kernel.event_subscriber`) — поэтому регистратору достаточно `setAutoconfigured(true)`, теги применяются автоматически единообразно в dev и PHAR.
+
+В результате ни в `config/services.yaml`, ни в `config/console_services.yaml` не осталось ни одного `resource:`-блока: только явные определения (aliases, скалярные аргументы, alias `Psr\Clock\ClockInterface` → `SystemClock`, `EventDispatcher`, `LockFactory`).
+
+### Усиление `phar-smoke`: ловля hollow-контейнера
+
+Прежний `bin/phar-smoke` проверял только `--version` — **ложнозелёный**: `--version` печатается даже при hollow-контейнере (ни один сервис для неё не нужен). Усиленный smoke дополнительно проверяет наличие команд модулей (`agent:run`, `validate:connectivity`) через `list | grep` из **двух CWD** — checkout (как в CI) и произвольный временный каталог (сценарий распространяемого PHAR) — со сбросом кэша контейнера PHAR. Если команды отсутствуют — smoke падает, сигнализируя о hollow-контейнере (сломан package-root или регистратор).
+
+### Порядок выполнения и explicit-wins
+
+`ModuleServiceRegistrar` запускается из `ModuleCompilerPass::process()` **после** загрузки модульного `services.yaml`. Поэтому правило **explicit-wins (явное определение побеждает)**: если `services.yaml` уже объявил для FQCN alias, аргументы или явный `Definition` — регистратор его не перетирает. Это позволяет держать в модульном `services.yaml` только то, что требует ручной настройки (interface aliases, scalar arguments, tagged iterators, service maps), а «массовую» регистрацию инстанциируемых классов поручить регистратору.
+
+### Параметр `module.<name>.module_dir`
+
+Параметр `module.<name>.module_dir` сохранён в модульных `services.yaml` как **декларативный контракт** (каноническое место хранения каталога модуля по конвенции), но **не является runtime-значением**: регистратор берёт каталог напрямую из `ModuleInterface::getModuleDir()` (= `__DIR__`), а не из параметра контейнера. Позиция: параметр оставлен осознанно — он документирует, где физически лежит модуль, и сохраняет совместимость с рецептом Path A, если в будущем потребуется вернуться к `resource:` в среде без PHAR.
+
+### Эмпирическое подтверждение
+
+- PHPUnit: 1245 тестов / 3355 assertions — зелёные.
+- Psalm: 0 ошибок.
+- `phar-smoke` (CI): зелёный как из каталога checkout, так и из произвольного временного CWD (current working directory — текущий рабочий каталог). Усиленный smoke дополнительно проверяет, что команды модулей (`agent:run`, `validate:connectivity` и др.) действительно зарегистрированы из обоих CWD — то есть контейнер PHAR не hollow, package-root и регистратор отработали. До усиления smoke `--version` проходил даже при пустом по модулям контейнере, маскируя регрессию.
+
 ## Последствия
 
 Положительные последствия:
@@ -192,12 +284,13 @@ parameters:
 - Новый модуль подключается механически по одному рецепту: `ModuleInterface` → `Resource/config/services.yaml` → `config/modules.php`.
 - Общий `config/services.yaml` перестаёт расти как монолитный DI-файл.
 - Модульные расширения `TwigInterface` и `TranslationInterface` остаются совместимыми с тем же механизмом, но не навязываются CLI-модулям.
+- PHAR-переносимость (Вариант 4): auto-discovery через `RecursiveDirectoryIterator` работает единообразно в обычной файловой системе и внутри `phar://`, поэтому dev-сборка и prod-PHAR-сборка собирают контейнер одинаково.
 
 Отрицательные последствия и риски:
 
 - Миграция затрагивает DI-контейнер, поэтому возможны регрессии autowire/autoconfigure (автосвязывания и автоконфигурации).
 - На время переноса возможны дубли определений сервисов, если root auto-discovery всё ещё покрывает `src/Module/*`. Поэтому финальная очистка root auto-discovery обязательна.
-- `_instanceof` работает в контексте файла конфигурации. Cross-module implementations (реализации в другом модуле), например `DynamicExecutionStrategy`, должны получать явный tag в своём модульном `services.yaml`.
+- Container-wide autoconfiguration тегирует реализации интерфейсов независимо от модуля, поэтому прежнее ограничение `_instanceof` (действие только в пределах своего файла) больше неактуально. Cross-module реализации (например, `DynamicExecutionStrategy` в `DynamicLoop` при контракте `ExecutionStrategyInterface` из `ChainExecution`) тегируются автоматически; явный `tags:` на таких классах — опциональная перестраховка (explicit-wins), а не необходимость.
 - `task_orchestrator.*` остаются параметрами ядра. Модульные `module.<name>.*` параметры не должны превращаться в копию всей глобальной конфигурации — только в явные зависимости модуля.
 
 ## Альтернативы

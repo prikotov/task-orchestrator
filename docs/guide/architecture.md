@@ -147,21 +147,17 @@ src/Module/
 
 **DI-конфигурация:**
 
-`ExecutionStrategyInterface` принадлежит модулю ChainExecution, поэтому базовое тегирование стратегий ChainExecution и tagged iterator (итератор по тегам) для `OrchestrateChainCommandHandler` описаны в модульной конфигурации ChainExecution:
+Тег `orchestrator.execution_strategy` регистрируется **container-wide** (на уровне всего контейнера) в `Kernel::build()` через `registerForAutoconfiguration()`, а не module-local `_instanceof` (последнее работало только в пределах своего файла и ломалось в PHAR — см. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-auto-discovery-вариант-4)). Поэтому любая реализация `ExecutionStrategyInterface` тегируется автоматически, в каком бы модуле она ни лежала. Tagged iterator (итератор по тегам) для `OrchestrateChainCommandHandler` остаётся явным определением в модульной конфигурации ChainExecution:
 
 ```yaml
 # src/Module/ChainExecution/Resource/config/services.yaml
 services:
-    _instanceof:
-        TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface:
-            tags: ['orchestrator.execution_strategy']
-
     TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler:
         arguments:
             $strategies: !tagged_iterator orchestrator.execution_strategy
 ```
 
-`DynamicExecutionStrategy` реализован в модуле DynamicLoop, поэтому он получает явный tag (тег) в конфигурации модуля-владельца:
+`DynamicExecutionStrategy` реализован в модуле DynamicLoop (контракт `ExecutionStrategyInterface` лежит в ChainExecution). С container-wide autoconfiguration он тегируется автоматически. В `DynamicLoop/services.yaml` на нём оставлен явный `tags: ['orchestrator.execution_strategy']` как опциональная перестраховка (explicit-wins):
 
 ```yaml
 # src/Module/DynamicLoop/Resource/config/services.yaml
@@ -170,7 +166,7 @@ services:
         tags: ['orchestrator.execution_strategy']
 ```
 
-Это обязательно, потому что `_instanceof` действует только в пределах своего файла конфигурации: cross-module implementation (реализация в другом модуле) не тегируется автоматически правилами ChainExecution.
+Ранее этот явный тег был **обязателен**, потому что `_instanceof` действовал только в пределах своего файла конфигурации и не тегировал cross-module implementation (реализацию в другом модуле). После перехода на container-wide autoconfiguration это ограничение снято.
 
 **Почему Strategy, а не if/switch:** Handler не знает о типах цепочек. Новая стратегия — новый класс + тег, handler не меняется.
 
@@ -484,7 +480,7 @@ src/Module/DynamicLoop/
 src/
 ├── Kernel.php                                       # Symfony Kernel: BaseKernel + MicroKernelTrait + ModuleKernelTrait
 ├── Component/
-│   ├── ModuleSystem/                                # ModuleInterface, ModuleCompilerPass, ModuleKernelTrait
+│   ├── ModuleSystem/                                # ModuleInterface, ModuleServiceRegistrar, ModuleCompilerPass, ModuleKernelTrait
 │   └── Clock/                                        # SystemClock (PSR-20 Psr\Clock\ClockInterface)
 config/
 ├── bundles.php                                      # Реестр bundles (FrameworkBundle, TwigBundle, MonologBundle)
@@ -501,13 +497,36 @@ src/Module/<Name>/
 Контейнер собирается `Kernel` через `MicroKernelTrait` (`config/packages/*` + `config/services.yaml`) и
 `ModuleKernelTrait`. `config/modules.php` содержит 5 модулей: `GitIdentity`, `AgentRunner`,
 `ChainDefinition`, `ChainExecution`, `DynamicLoop`. Для каждого модуля `ModuleKernelTrait`
-регистрирует `ModuleCompilerPass`, который подгружает `Resource/config/services.yaml` модуля.
+регистрирует `ModuleCompilerPass`, который подгружает `Resource/config/services.yaml` модуля, а
+затем запускает `ModuleServiceRegistrar` — PHAR-safe auto-discovery сервисов через
+`RecursiveDirectoryIterator` (подробности ниже).
 
-Общий `config/services.yaml` остаётся тонким: импортирует `console_services.yaml`, включает
-auto-discovery (автообнаружение сервисов) только для `src/Component/*` и объявляет общий alias
-`Psr\Clock\ClockInterface` → `SystemClock`. Алиасы интерфейсов, scalar arguments (скалярные
-аргументы), tagged iterators (итераторы по тегам) и `_instanceof`-тегирование конкретных модулей
-живут в модульных `src/Module/<Name>/Resource/config/services.yaml`.
+Общий `config/services.yaml` остаётся тонким: импортирует `console_services.yaml`, объявляет общий alias `Psr\Clock\ClockInterface` → `SystemClock` (сам `SystemClock` — единственный concrete-сервис `src/Component/` — задан явным определением). Алиасы интерфейсов, scalar arguments (скалярные аргументы), tagged iterators (итераторы по тегам) конкретных модулей живут в модульных `src/Module/<Name>/Resource/config/services.yaml`. Никаких операторов `resource:`/`exclude:` в корневых YAML не осталось — все они ломались в PHAR через `GlobResource` (см. ниже) и заменены на PHAR-safe регистрацию.
+
+Package root (каталог пакета с `src/`, `apps/`, `config/`) разрешается через `Kernel::getPackageDir() = dirname(__DIR__)` — CWD-независимо (наследуемый `getProjectDir()` в PHAR даёт неверный `phar://.../src`, т.к. `composer.json` не упакован в PHAR). `getPackageDir()` используется для `config/modules.php`, параметра `task_orchestrator.package_dir` и базовых путей PHAR-safe регистрации.
+
+### PHAR-safe регистрация сервисов модуля
+
+Auto-discovery классов модуля выполняется **не** оператором Symfony `resource:`/`exclude:`, а
+программно через `ModuleServiceRegistrar` (`src/Component/ModuleSystem/DependencyInjection/`).
+Причина: `GlobResource` (механизм `resource:`) возвращает 0 файлов по путям `phar://` и
+молча опустошал DI-контейнер собранного PHAR. Полное обоснование и рассмотренные альтернативы —
+в [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-auto-discovery-вариант-4).
+
+Как это работает:
+
+- **Конфигурация из модуля.** `ModuleServiceRegistrar` берёт namespace и exclude-пути из контракта
+  модуля — `ModuleInterface::getServiceNamespace()` и `getServiceExcludePaths()` (базовый набор —
+  константа `DEFAULT_SERVICE_EXCLUDE_PATHS`). Сами операторы `resource:`/`exclude:` в модульных
+  `services.yaml` отсутствуют.
+- **Явные определения побеждают (explicit-wins).** Регистратор запускается **после** загрузки
+  `services.yaml`, поэтому alias'ы, scalar-аргументы, tagged iterators и service maps из YAML
+  имеют приоритет: регистратор не перетирает уже заданный `Definition`/`Alias`.
+- **Container-wide autoconfiguration вместо `_instanceof`.** Теги интерфейсов (`agent.runner`,
+  `orchestrator.execution_strategy`, `chain_execution.step_runner`) регистрируются в `Kernel::build()`
+  через `registerForAutoconfiguration()` и применяются ко всем `autoconfigured`-сервисам независимо
+  от модуля и способа регистрации. Module-local `_instanceof` больше не используется.
+- **За пределами доменных модулей.** Тот же `ModuleServiceRegistrar` (generic: параметр `serviceDir`, опция `public`) применяется в `Kernel::registerConsoleServices()` для регистрации команд и подписчиков `apps/console/src/Module/*/Command|EventSubscriber/` (теги `console.command`/`kernel.event_subscriber` добавляются container-wide autoconfig Symfony).
 
 Параметры `task_orchestrator.*` задаются в `Kernel::getKernelParameters()` на самом раннем этапе.
 Модульные файлы используют собственные параметры `module.<name>.*`, при необходимости ссылаясь на
@@ -563,10 +582,10 @@ task_orchestrator:
 - `CircuitBreakerAgentRunner` — обёртка Circuit Breaker (closed → open → half_open)
 - `RetryableRunnerFactory` — фабрика для создания retrying-обёртки
 - Новый движок: создать класс в модуле `AgentRunner`, реализующий `AgentRunnerInterface`. Тег
-  `agent.runner` ставится автоматически через `_instanceof` в
-  `src/Module/AgentRunner/Resource/config/services.yaml`; общий `config/services.yaml` для этого не
-  изменяется. Если реализация находится вне модуля `AgentRunner`, добавьте явный tag (тег) в
-  `Resource/config/services.yaml` модуля-владельца.
+  `agent.runner` ставится автоматически через container-wide autoconfiguration (`Kernel::build()` →
+  `registerForAutoconfiguration()`) — единообразно для классов модуля `AgentRunner` и любых
+  реализаций в других модулях; общий `config/services.yaml` для этого не изменяется. Module-local
+  `_instanceof` больше не используется (см. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-auto-discovery-вариант-4)).
 
 Подробнее о retry и circuit breaker — в [Надёжность](reliability.md).
 
