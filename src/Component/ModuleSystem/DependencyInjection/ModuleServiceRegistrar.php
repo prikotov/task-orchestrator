@@ -147,6 +147,8 @@ final readonly class ModuleServiceRegistrar
      * Для PHP 8.4 enum проверяется явно через {@see ReflectionClass::isEnum()}
      * (ReflectionEnum), хотя isInstantiable() для enum и так возвращает false —
      * явная проверка делает намерение очевидным и устойчивым к версиям PHP.
+     *
+     * @param ReflectionClass<object> $reflection
      */
     private function isInstantiable(ReflectionClass $reflection): bool
     {
