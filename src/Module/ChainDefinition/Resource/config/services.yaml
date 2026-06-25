@@ -1,6 +1,10 @@
 # Конфигурация сервисов модуля ChainDefinition.
 
 parameters:
+  # Канонический module-dir параметр модуля по конвенции modules/configuration.md.
+  # PHAR-safe регистратор берёт каталог напрямую из ModuleInterface::getModuleDir()
+  # (= __DIR__), поэтому параметр здесь декларативный; сохранён для соответствия
+  # конвенции модульной конфигурации.
   module.chain_definition.module_dir: '%task_orchestrator.package_dir%/src/Module/ChainDefinition'
   module.chain_definition.chains_yaml: '%task_orchestrator.chains_yaml%'
   module.chain_definition.base_path: '%task_orchestrator.base_path%'
@@ -10,18 +14,10 @@ services:
     autowire: true
     autoconfigure: true
 
-  TaskOrchestrator\Common\Module\ChainDefinition\:
-    resource: '%module.chain_definition.module_dir%/'
-    exclude:
-      - '%module.chain_definition.module_dir%/Domain/Dto/'
-      - '%module.chain_definition.module_dir%/Domain/Entity/'
-      - '%module.chain_definition.module_dir%/Domain/Enum/'
-      - '%module.chain_definition.module_dir%/Domain/Exception/'
-      - '%module.chain_definition.module_dir%/Domain/ValueObject/'
-      - '%module.chain_definition.module_dir%/Application/Dto/'
-      - '%module.chain_definition.module_dir%/Application/Enum/'
-      - '%module.chain_definition.module_dir%/Resource/'
-      - '%module.chain_definition.module_dir%/ChainDefinitionModule.php'
+  # Auto-discovery сервисов модуля выполняется ModuleServiceRegistrar
+  # (PHAR-safe: RecursiveDirectoryIterator вместо Symfony resource:/GlobResource,
+  # который не работает по phar:// путям). Explicit defs (aliases, параметры,
+  # аргументы) ниже.
 
   # Domain Service aliases (Interface → Implementation)
   TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\CollectFixIterationsViolationsServiceInterface:

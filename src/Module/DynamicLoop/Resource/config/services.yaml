@@ -1,6 +1,10 @@
 # Конфигурация сервисов модуля DynamicLoop.
 
 parameters:
+  # Канонический module-dir параметр модуля по конвенции modules/configuration.md.
+  # PHAR-safe регистратор берёт каталог напрямую из ModuleInterface::getModuleDir()
+  # (= __DIR__), поэтому параметр здесь декларативный; сохранён для соответствия
+  # конвенции модульной конфигурации.
   module.dynamic_loop.module_dir: '%task_orchestrator.package_dir%/src/Module/DynamicLoop'
   module.dynamic_loop.chains_session_dir: '%task_orchestrator.chains_session_dir%'
   module.dynamic_loop.base_path: '%task_orchestrator.base_path%'
@@ -10,19 +14,10 @@ services:
     autowire: true
     autoconfigure: true
 
-  TaskOrchestrator\Common\Module\DynamicLoop\:
-    resource: '%module.dynamic_loop.module_dir%/'
-    exclude:
-      - '%module.dynamic_loop.module_dir%/Domain/Dto/'
-      - '%module.dynamic_loop.module_dir%/Domain/Entity/'
-      - '%module.dynamic_loop.module_dir%/Domain/Enum/'
-      - '%module.dynamic_loop.module_dir%/Domain/Exception/'
-      - '%module.dynamic_loop.module_dir%/Domain/ValueObject/'
-      - '%module.dynamic_loop.module_dir%/Application/Dto/'
-      - '%module.dynamic_loop.module_dir%/Application/Enum/'
-      - '%module.dynamic_loop.module_dir%/Application/Event/'
-      - '%module.dynamic_loop.module_dir%/Resource/'
-      - '%module.dynamic_loop.module_dir%/DynamicLoopModule.php'
+  # Auto-discovery сервисов модуля выполняется ModuleServiceRegistrar
+  # (PHAR-safe: RecursiveDirectoryIterator вместо Symfony resource:/GlobResource,
+  # который не работает по phar:// путям). Explicit defs (aliases, параметры,
+  # аргументы) ниже.
 
   # Domain Service aliases (Interface → Implementation)
   TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopServiceInterface:
@@ -48,6 +43,14 @@ services:
 
   TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RoundCompletedNotifierInterface:
     alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\DispatchRoundEventService
+
+  # Alias для SessionCompletedNotifierInterface отсутствовал (pre-existing latent-баг):
+  # DynamicExecutionStrategy autowire-ит этот интерфейс, но привязки в services.yaml
+  # не было. В dev-режиме баг маскировался тем, что тесты инстанцировали стратегию
+  # вручную с mock-объектом, поэтому prod-autowire никогда не проверялся.
+  # PHAR-сборка (без ручного инстанцирования) проявила его.
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\SessionCompletedNotifierInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\DispatchSessionCompletedEventService
 
   TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopAgentServiceInterface:
     alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\RunDynamicLoopAgentService

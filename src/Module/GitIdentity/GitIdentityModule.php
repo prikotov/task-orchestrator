@@ -27,4 +27,19 @@ final class GitIdentityModule implements ModuleInterface
     {
         return $this->getModuleDir() . '/Resource/config';
     }
+
+    #[Override]
+    public function getServiceNamespace(): string
+    {
+        return 'TaskOrchestrator\\Common\\Module\\GitIdentity';
+    }
+
+    /**
+     * @return list<string>
+     */
+    #[Override]
+    public function getServiceExcludePaths(): array
+    {
+        return [...self::DEFAULT_SERVICE_EXCLUDE_PATHS, 'GitIdentityModule.php'];
+    }
 }

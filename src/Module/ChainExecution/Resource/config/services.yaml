@@ -1,6 +1,10 @@
 # Конфигурация сервисов модуля ChainExecution.
 
 parameters:
+  # Канонический module-dir параметр модуля по конвенции modules/configuration.md.
+  # PHAR-safe регистратор берёт каталог напрямую из ModuleInterface::getModuleDir()
+  # (= __DIR__), поэтому параметр здесь декларативный; сохранён для соответствия
+  # конвенции модульной конфигурации.
   module.chain_execution.module_dir: '%task_orchestrator.package_dir%/src/Module/ChainExecution'
   module.chain_execution.roles_dir: '%task_orchestrator.roles_dir%'
   module.chain_execution.base_path: '%task_orchestrator.base_path%'
@@ -10,25 +14,14 @@ services:
     autowire: true
     autoconfigure: true
 
-  _instanceof:
-    TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface:
-      tags: ['orchestrator.execution_strategy']
-    TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStepServiceInterface:
-      tags: ['chain_execution.step_runner']
+  # Теги интерфейсов (orchestrator.execution_strategy, chain_execution.step_runner)
+  # регистрируются container-wide в Kernel::build через registerForAutoconfiguration
+  # (применяется ко всем autoconfigured сервисам), а не module-local _instanceof.
 
-  TaskOrchestrator\Common\Module\ChainExecution\:
-    resource: '%module.chain_execution.module_dir%/'
-    exclude:
-      - '%module.chain_execution.module_dir%/Domain/Dto/'
-      - '%module.chain_execution.module_dir%/Domain/Entity/'
-      - '%module.chain_execution.module_dir%/Domain/Enum/'
-      - '%module.chain_execution.module_dir%/Domain/Exception/'
-      - '%module.chain_execution.module_dir%/Domain/ValueObject/'
-      - '%module.chain_execution.module_dir%/Application/Dto/'
-      - '%module.chain_execution.module_dir%/Application/Enum/'
-      - '%module.chain_execution.module_dir%/Application/Event/'
-      - '%module.chain_execution.module_dir%/Resource/'
-      - '%module.chain_execution.module_dir%/ChainExecutionModule.php'
+  # Auto-discovery сервисов модуля выполняется ModuleServiceRegistrar
+  # (PHAR-safe: RecursiveDirectoryIterator вместо Symfony resource:/GlobResource,
+  # который не работает по phar:// путям). Explicit defs (aliases, параметры,
+  # аргументы) ниже.
 
   # Domain/Application Service aliases (Interface → Implementation)
   TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Agent\RunAgentServiceInterface:

@@ -1,6 +1,10 @@
 # Конфигурация сервисов модуля AgentRunner.
 
 parameters:
+  # Канонический module-dir параметр модуля по конвенции modules/configuration.md.
+  # PHAR-safe регистратор берёт каталог напрямую из ModuleInterface::getModuleDir()
+  # (= __DIR__), поэтому параметр здесь декларативный; сохранён для соответствия
+  # конвенции модульной конфигурации.
   module.agent_runner.module_dir: '%task_orchestrator.package_dir%/src/Module/AgentRunner'
 
 services:
@@ -8,25 +12,14 @@ services:
     autowire: true
     autoconfigure: true
 
-  _instanceof:
-    TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
-      tags: ['agent.runner']
+  # Тег agent.runner регистрируется container-wide в Kernel::build через
+  # registerForAutoconfiguration (применяется ко всем autoconfigured сервисам),
+  # а не module-local _instanceof.
 
-  TaskOrchestrator\Common\Module\AgentRunner\:
-    resource: '%module.agent_runner.module_dir%/'
-    exclude:
-      - '%module.agent_runner.module_dir%/Domain/Dto/'
-      - '%module.agent_runner.module_dir%/Domain/Entity/'
-      - '%module.agent_runner.module_dir%/Domain/Enum/'
-      - '%module.agent_runner.module_dir%/Domain/Exception/'
-      - '%module.agent_runner.module_dir%/Domain/ValueObject/'
-      - '%module.agent_runner.module_dir%/Application/Dto/'
-      - '%module.agent_runner.module_dir%/Application/Enum/'
-      - '%module.agent_runner.module_dir%/Resource/'
-      - '%module.agent_runner.module_dir%/**/Resources/'
-      - '%module.agent_runner.module_dir%/AgentRunnerModule.php'
-      - '%module.agent_runner.module_dir%/Infrastructure/Service/RetryingAgentRunnerService.php'
-      - '%module.agent_runner.module_dir%/Infrastructure/Service/CircuitBreakerAgentRunnerService.php'
+  # Auto-discovery сервисов модуля выполняется ModuleServiceRegistrar
+  # (PHAR-safe: RecursiveDirectoryIterator вместо Symfony resource:/GlobResource,
+  # который не работает по phar:// путям). Explicit defs (aliases, параметры,
+  # аргументы) ниже.
 
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunnerService

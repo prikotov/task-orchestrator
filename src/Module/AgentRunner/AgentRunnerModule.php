@@ -27,4 +27,30 @@ final class AgentRunnerModule implements ModuleInterface
     {
         return $this->getModuleDir() . '/Resource/config';
     }
+
+    #[Override]
+    public function getServiceNamespace(): string
+    {
+        return 'TaskOrchestrator\\Common\\Module\\AgentRunner';
+    }
+
+    /**
+     * @return list<string>
+     */
+    #[Override]
+    public function getServiceExcludePaths(): array
+    {
+        // Module-specific excludes помимо стандартного DDD-набора:
+        //  - Resources/ — каталог с runtime-ресурсами runner'ов;
+        //  - декораторы runner'ов (Retrying/CircuitBreaker) — это не
+        //    самостоятельные сервисы, а декораторы PiAgentRunnerService,
+        //    собираемые явно фабрикой RetryableRunnerFactory.
+        return [
+            ...self::DEFAULT_SERVICE_EXCLUDE_PATHS,
+            'AgentRunnerModule.php',
+            'Resources/',
+            'Infrastructure/Service/RetryingAgentRunnerService.php',
+            'Infrastructure/Service/CircuitBreakerAgentRunnerService.php',
+        ];
+    }
 }

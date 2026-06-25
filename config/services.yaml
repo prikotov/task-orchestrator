@@ -10,12 +10,15 @@ services:
     autowire: true
     autoconfigure: true
 
-  # --- Auto-discovery общих компонентов вне доменных модулей ---
-  # Модули из src/Module/* загружают собственные Resource/config/services.yaml
-  # через ModuleKernelTrait и являются единственными владельцами своего namespace.
-  TaskOrchestrator\Common\Component\:
-    resource: '%task_orchestrator.package_dir%/src/Component/*'
-
   # --- PSR-20 Clock (источник времени; реализация в общем Component) ---
+  # SystemClock — единственный concrete-сервис каталога src/Component/, который
+  # должен быть доступен контейнеру (через alias Psr\Clock\ClockInterface ниже).
+  # Остальное содержимое src/Component/ (ModuleSystem: compiler passes, сам
+  # регистратор, trait, интерфейсы) — не сервисы: инстанциируются вручную
+  # (new / addCompilerPass в Kernel) либо являются interface/trait.
+  # PHAR-safe: явное определение вместо прежнего `resource: .../src/Component/*`
+  # (Symfony GlobResource возвращает 0 файлов по phar://, ломая сборку PHAR).
+  TaskOrchestrator\Common\Component\Clock\SystemClock: ~
+
   Psr\Clock\ClockInterface:
     alias: TaskOrchestrator\Common\Component\Clock\SystemClock

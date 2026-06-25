@@ -11,7 +11,13 @@
 
 /var/
 
+# Symfony auto-generated reference artifact (debug/cache commands)
+/config/reference.php
+
 *.phar
+
+# Local dev tools (Box/Phar-building, not distributed)
+/.tools/
 .env.local
 
 # Local secrets (e.g. GitHub App PEM for agent:token command)

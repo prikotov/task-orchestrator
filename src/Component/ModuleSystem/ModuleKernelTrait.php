@@ -8,6 +8,7 @@ use RuntimeException;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use TaskOrchestrator\Common\Component\ModuleSystem\DependencyInjection\ModuleCompilerPass;
+use TaskOrchestrator\Common\Component\ModuleSystem\DependencyInjection\ModuleServiceRegistrar;
 use TaskOrchestrator\Common\Component\ModuleSystem\DependencyInjection\TwigCompilerPass;
 use TaskOrchestrator\Common\Component\ModuleSystem\Extension\TranslationInterface;
 use TaskOrchestrator\Common\Component\ModuleSystem\Extension\TwigInterface;
@@ -56,8 +57,18 @@ trait ModuleKernelTrait
                 );
             }
 
+            // PHAR-safe регистратор сервисов модуля: auto-discovery через
+            // RecursiveDirectoryIterator (вместо Symfony resource:/GlobResource,
+            // который не работает по phar:// путям). Конфигурация (namespace +
+            // excludes) берётся из самого модуля — единый источник истины.
+            $registrar = new ModuleServiceRegistrar(
+                serviceDir: $module->getModuleDir(),
+                serviceNamespace: $module->getServiceNamespace(),
+                excludeRelativePaths: $module->getServiceExcludePaths(),
+            );
+
             $container->addCompilerPass(
-                new ModuleCompilerPass($module->getModuleConfigPath(), $this->environment),
+                new ModuleCompilerPass($module->getModuleConfigPath(), $this->environment, $registrar),
                 PassConfig::TYPE_BEFORE_OPTIMIZATION,
                 10000,
             );

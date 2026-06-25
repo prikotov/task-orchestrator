@@ -7,6 +7,10 @@
 # TaskOrchestrator\Common\Module\GitIdentity\.
 
 parameters:
+  # Каталог модуля. Используется интеграционным тестом ModuleSystemIntegrationTest
+  # (проверяет, что параметры services.yaml загружены через ModuleCompilerPass)
+  # и является каноническим module-dir параметром по конвенции
+  # modules/configuration.md.
   module.git_identity.module_dir: '%task_orchestrator.package_dir%/src/Module/GitIdentity'
   # Каталог кеша токенов. base_path — корень проекта, поэтому дублировать
   # task-orchestrator/ в пути не нужно (раньше было var/cache/task-orchestrator/git-identity).
@@ -25,20 +29,10 @@ services:
     autowire: true
     autoconfigure: true
 
-  TaskOrchestrator\Common\Module\GitIdentity\:
-    resource: '%module.git_identity.module_dir%/'
-    exclude:
-      - '%module.git_identity.module_dir%/Domain/Dto/'
-      - '%module.git_identity.module_dir%/Domain/Entity/'
-      - '%module.git_identity.module_dir%/Domain/Enum/'
-      - '%module.git_identity.module_dir%/Domain/Exception/'
-      - '%module.git_identity.module_dir%/Domain/ValueObject/'
-      - '%module.git_identity.module_dir%/Application/Dto/'
-      - '%module.git_identity.module_dir%/Application/Enum/'
-      - '%module.git_identity.module_dir%/Application/Event/'
-      - '%module.git_identity.module_dir%/Application/Exception/'
-      - '%module.git_identity.module_dir%/Resource/'
-      - '%module.git_identity.module_dir%/GitIdentityModule.php'
+  # Auto-discovery сервисов модуля выполняется ModuleServiceRegistrar
+  # (PHAR-safe: RecursiveDirectoryIterator вместо Symfony resource:/GlobResource,
+  # который не работает по phar:// путям). Explicit defs (aliases, параметры,
+  # аргументы) ниже.
 
   # Scoped HTTP-клиент для GitHub API (конвенция External Service):
   # таймауты и статические заголовки задаются один раз, per-request компонент
