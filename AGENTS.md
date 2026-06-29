@@ -191,7 +191,6 @@ AGENTS.md — обязательные правила для AI-агента в 
   - Integration-тесты: `vendor/bin/phpunit tests/Integration/`.
   - Psalm: `vendor/bin/psalm`.
   - Deptrac: `vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress` или `make deptrac`.
-  - PHPCS sniff-тесты: `php vendor/prikotov/coding-standard/bin/run-sniff-tests.php`.
 
 ---
 

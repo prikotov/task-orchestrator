@@ -27,11 +27,11 @@ Orchestrator спроектирован для расширения без из�
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\AgentRunner\Codex;
+namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\AgentRunner\Codex;
 
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\AgentRunner\AgentRunnerInterface;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\AgentResultVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use Override;
 use Symfony\Component\Process\Process;
 
@@ -110,16 +110,39 @@ final readonly class CodexAgentRunner implements AgentRunnerInterface
 
 ### Шаг 2. Зарегистрировать в контейнере
 
-Движок регистрируется **автоматически** через `_instanceof` в `config/services.yaml`:
+Сервисы модуля обнаруживаются автоматически: auto-discovery (автообнаружение сервисов) выполняет
+`ModuleServiceRegistrar` — программный PHAR-safe регистратор на `RecursiveDirectoryIterator`
+(вместо Symfony `resource:`, который не работает внутри `phar://`). Конфигурация auto-discovery
+(namespace и exclude-пути) объявляется в контракте модуля (`ModuleInterface::getServiceNamespace()`
+и `getServiceExcludePaths()`), а не в `services.yaml`.
+
+Тег `agent.runner` ставится **container-wide** (на уровне всего контейнера) в `Kernel::build()`
+через `registerForAutoconfiguration()`, а не module-local `_instanceof`. Поэтому **любой** класс,
+реализующий `AgentRunnerInterface`, тегируется автоматически — независимо от того, в каком модуле
+он лежит:
 
 ```yaml
-services:
-  _instanceof:
-    TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\AgentRunner\AgentRunnerInterface:
-      tags: ['agent.runner']
+# Kernel::build() — эквивалентно registerForAutoconfiguration(
+#   AgentRunnerInterface::class)->addTag('agent.runner')
 ```
 
-Все классы, реализующие `AgentRunnerInterface`, попадают в `AgentRunnerRegistryService` через `!tagged_iterator agent.runner`.
+Все классы с тегом `agent.runner` попадают в `AgentRunnerRegistryService` через
+`!tagged_iterator agent.runner`.
+
+Если реализация runner'а находится вне модуля `AgentRunner` (например, в кастомном модуле),
+отдельная ручная регистрация **не требуется** — container-wide autoconfiguration тегирует её
+автоматически. При желании можно указать явный `tags: ['agent.runner']` как перестраховку
+(explicit-wins), но это опционально:
+
+```yaml
+# src/Module/CustomModule/Resource/config/services.yaml — опционально
+services:
+  TaskOrchestrator\Common\Module\CustomModule\Infrastructure\Service\CodexAgentRunner:
+    tags: ['agent.runner']
+```
+
+Подробнее о переходе с `_instanceof` на container-wide autoconfiguration — в
+[ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-auto-discovery-вариант-4).
 
 > **Важно:** декораторы (`RetryingAgentRunner`, `CircuitBreakerAgentRunner`) исключены из auto-discovery — не добавляйте их в реестр.
 

@@ -24,3 +24,37 @@ if [[ ! -f "${PHAR_PATH}" ]]; then
 fi
 
 php "${PHAR_PATH}" --version
+
+# Smoke: контейнер НЕ hollow — команды модулей apps/console зарегистрированы
+# PHAR-safe регистратором (ModuleServiceRegistrar). Раньше проверка была только
+# --version, что ложно-зелёное: --version печатается даже при пустом контейнере.
+# Проверяем из двух CWD: checkout (как CI) и временный каталог (сценарий
+# распространяемого PHAR). Symfony кэширует контейнер PHAR в системном
+# temp-каталоге (writableRoot); перед distributable-чеком чистим его, чтобы
+# тестировать актуальную сборку, а не застарелый кэш.
+SMOKE_COMMANDS=('agent:run' 'validate:connectivity')
+
+check_commands() {
+  local label="$1"
+  local cwd="$2"
+  local missing=0
+  echo "Phar smoke [${label}]: команды модулей из ${cwd}"
+  for cmd in "${SMOKE_COMMANDS[@]}"; do
+    if (cd "${cwd}" && php "${PHAR_PATH}" list) 2>/dev/null | grep -q -- "${cmd}"; then
+      echo "  ✓ ${cmd}"
+    else
+      echo "  ✗ команда '${cmd}' НЕ зарегистрирована (контейнер hollow?)" >&2
+      missing=1
+    fi
+  done
+  return "${missing}"
+}
+
+# 1) Из checkout CWD (контекст CI).
+check_commands 'checkout' "${ROOT_DIR}"
+
+# 2) Из временного каталога (распространяемый PHAR) + свежий кэш контейнера.
+TMP_CWD="$(mktemp -d)"
+trap 'rm -rf "${TMP_CWD}"' EXIT
+rm -rf "${TMPDIR:-/tmp}/task-orchestrator"
+check_commands 'distributable' "${TMP_CWD}"

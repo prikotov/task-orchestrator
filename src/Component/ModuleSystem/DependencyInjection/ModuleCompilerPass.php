@@ -25,6 +25,7 @@ final readonly class ModuleCompilerPass implements CompilerPassInterface
     public function __construct(
         private string $serviceConfigPath,
         private string $environment,
+        private ?ModuleServiceRegistrar $registrar = null,
     ) {
     }
 
@@ -36,6 +37,13 @@ final readonly class ModuleCompilerPass implements CompilerPassInterface
     {
         $loader = new YamlFileLoader($container, new FileLocator($this->serviceConfigPath), $this->environment);
         $loader->load('services.yaml');
+
+        // PHAR-safe auto-discovery сервисов модуля через RecursiveDirectoryIterator.
+        // Выполняется ПОСЛЕ загрузки services.yaml, чтобы явные определения
+        // (aliases/аргументы/теги) выигрывали (explicit-wins в ModuleServiceRegistrar).
+        if ($this->registrar instanceof ModuleServiceRegistrar) {
+            $this->registrar->register($container);
+        }
 
         $phpLoader = new PhpFileLoader($container, new FileLocator($this->serviceConfigPath), $this->environment);
         if (is_file($this->serviceConfigPath . '/services.php')) {

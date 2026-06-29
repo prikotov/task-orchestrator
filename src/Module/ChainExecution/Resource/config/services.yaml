@@ -1,0 +1,113 @@
+# Конфигурация сервисов модуля ChainExecution.
+
+parameters:
+  # Канонический module-dir параметр модуля по конвенции modules/configuration.md.
+  # PHAR-safe регистратор берёт каталог напрямую из ModuleInterface::getModuleDir()
+  # (= __DIR__), поэтому параметр здесь декларативный; сохранён для соответствия
+  # конвенции модульной конфигурации.
+  module.chain_execution.module_dir: '%task_orchestrator.package_dir%/src/Module/ChainExecution'
+  module.chain_execution.roles_dir: '%task_orchestrator.roles_dir%'
+  module.chain_execution.base_path: '%task_orchestrator.base_path%'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  # Теги интерфейсов (orchestrator.execution_strategy, chain_execution.step_runner)
+  # регистрируются container-wide в Kernel::build через registerForAutoconfiguration
+  # (применяется ко всем autoconfigured сервисам), а не module-local _instanceof.
+
+  # Auto-discovery сервисов модуля выполняется ModuleServiceRegistrar
+  # (PHAR-safe: RecursiveDirectoryIterator вместо Symfony resource:/GlobResource,
+  # который не работает по phar:// путям). Explicit defs (aliases, параметры,
+  # аргументы) ниже.
+
+  # Domain/Application Service aliases (Interface → Implementation)
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Agent\RunAgentServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\RunAgentService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\PromptProviderInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Prompt\RolePromptBuilderService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\RolePromptBuilderServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Prompt\RolePromptBuilderService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Audit\AuditLoggerInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Audit\JsonlAuditLoggerService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Audit\JsonlAuditLoggerServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Audit\JsonlAuditLoggerService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Shared\PromptFormatterInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\PromptFormatterService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ExecuteConditionalStepServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\ExecuteConditionalStepService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\Hook\ShellHookExecutorService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\ShellHookExecutorServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\Hook\ShellHookExecutorService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Condition\EvaluateConditionService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ChainDefinition\ChainDefinitionProviderInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapperService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ChainDefinition\ChainExecutionDefinitionMapperServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapperService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\Prompt\FormatPromptService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\StaticAuditServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\Audit\StaticAuditService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\QualityGate\QualityGateRunnerService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\QualityGateRunnerServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\QualityGate\QualityGateRunnerService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ToolStepRunnerInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\ToolStep\ToolStepRunnerService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ToolStepRunnerServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\ToolStep\ToolStepRunnerService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Agent\ResolveChainRunnerService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunStaticChainServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\RunStaticChainService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\CheckStaticBudgetService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerService
+
+  TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerService:
+    arguments:
+      $runners: !tagged_iterator chain_execution.step_runner
+
+  TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\ReportResultFactory:
+    arguments:
+      $mappers:
+        text: '@TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportTextMapper'
+        json: '@TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportJsonMapper'
+
+  TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Prompt\RolePromptBuilderService:
+    arguments:
+      $rolesDir: '%module.chain_execution.roles_dir%'
+      $basePath: '%module.chain_execution.base_path%'
+
+  TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler:
+    arguments:
+      $strategies: !tagged_iterator orchestrator.execution_strategy

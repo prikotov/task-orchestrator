@@ -3,15 +3,14 @@
 # Следует конвенции docs/conventions/modules/configuration.md: конфигурация
 # сервисов модуля лежит в Resource/config/services.yaml, параметры имеют
 # префикс module.git_identity.* (а не в общем config/services.yaml).
-#
-# ВАЖНО: auto-discovery классов модуля выполняется общим config/services.yaml
-# (resource: '%task_orchestrator.package_dir%/src/*' с exclude по Domain/*).
-# Поэтому здесь resource/exclude НЕ объявляются — это избегает двойной
-# регистрации. Этот файл отвечает только за module-specific параметры и
-# привязки интерфейсов к реализациям (Domain Service aliases) + скалярные
-# аргументы конструкторов, которые autowire разрешить не может.
+# Этот файл является единственным владельцем auto-discovery namespace
+# TaskOrchestrator\Common\Module\GitIdentity\.
 
 parameters:
+  # Каталог модуля. Используется интеграционным тестом ModuleSystemIntegrationTest
+  # (проверяет, что параметры services.yaml загружены через ModuleCompilerPass)
+  # и является каноническим module-dir параметром по конвенции
+  # modules/configuration.md.
   module.git_identity.module_dir: '%task_orchestrator.package_dir%/src/Module/GitIdentity'
   # Каталог кеша токенов. base_path — корень проекта, поэтому дублировать
   # task-orchestrator/ в пути не нужно (раньше было var/cache/task-orchestrator/git-identity).
@@ -29,6 +28,11 @@ services:
   _defaults:
     autowire: true
     autoconfigure: true
+
+  # Auto-discovery сервисов модуля выполняется ModuleServiceRegistrar
+  # (PHAR-safe: RecursiveDirectoryIterator вместо Symfony resource:/GlobResource,
+  # который не работает по phar:// путям). Explicit defs (aliases, параметры,
+  # аргументы) ниже.
 
   # Scoped HTTP-клиент для GitHub API (конвенция External Service):
   # таймауты и статические заголовки задаются один раз, per-request компонент

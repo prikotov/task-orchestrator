@@ -1,0 +1,92 @@
+# Конфигурация сервисов модуля DynamicLoop.
+
+parameters:
+  # Канонический module-dir параметр модуля по конвенции modules/configuration.md.
+  # PHAR-safe регистратор берёт каталог напрямую из ModuleInterface::getModuleDir()
+  # (= __DIR__), поэтому параметр здесь декларативный; сохранён для соответствия
+  # конвенции модульной конфигурации.
+  module.dynamic_loop.module_dir: '%task_orchestrator.package_dir%/src/Module/DynamicLoop'
+  module.dynamic_loop.chains_session_dir: '%task_orchestrator.chains_session_dir%'
+  module.dynamic_loop.base_path: '%task_orchestrator.base_path%'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  # Auto-discovery сервисов модуля выполняется ModuleServiceRegistrar
+  # (PHAR-safe: RecursiveDirectoryIterator вместо Symfony resource:/GlobResource,
+  # который не работает по phar:// путям). Explicit defs (aliases, параметры,
+  # аргументы) ниже.
+
+  # Domain Service aliases (Interface → Implementation)
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\ExecuteDynamicTurnServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\ExecuteDynamicTurnService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FinalizeDynamicLoopServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FinalizeDynamicLoopService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RecordDynamicRoundServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RecordDynamicRoundService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FormatDynamicJournalServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FormatDynamicJournalService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\BuildDynamicContextService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RoundCompletedNotifierInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\DispatchRoundEventService
+
+  # Alias для SessionCompletedNotifierInterface отсутствовал (pre-existing latent-баг):
+  # DynamicExecutionStrategy autowire-ит этот интерфейс, но привязки в services.yaml
+  # не было. В dev-режиме баг маскировался тем, что тесты инстанцировали стратегию
+  # вручную с mock-объектом, поэтому prod-autowire никогда не проверялся.
+  # PHAR-сборка (без ручного инстанцирования) проявила его.
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\SessionCompletedNotifierInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\DispatchSessionCompletedEventService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopAgentServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\RunDynamicLoopAgentService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FacilitatorResponseParserInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\FacilitatorResponseParserService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Budget\CheckDynamicLoopBudgetServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\CheckDynamicBudgetService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Shared\DynamicLoopPromptFormatterInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\PromptFormatterService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerFactoryInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\JsonlAuditLoggerFactory
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionWriterInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionReaderInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution\DynamicExecutionStrategy:
+    tags: ['orchestrator.execution_strategy']
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\ChainDefinition\ChainDefinitionProviderInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapperService
+
+  TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\ChainDefinition\DynamicLoopDefinitionMapperServiceInterface:
+    alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapperService
+
+  # Infrastructure Service parameters
+  TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger:
+    arguments:
+      $chainsSessionDir: '%module.dynamic_loop.chains_session_dir%'
+      $basePath: '%module.dynamic_loop.base_path%'

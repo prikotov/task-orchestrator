@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f44e256089f1ca2d209334475461973d",
+    "content-hash": "8c19b6327a9f096df60b26aed796e2d4",
     "packages": [
         {
             "name": "monolog/monolog",
@@ -6847,16 +6847,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.19.3",
+            "version": "v0.20.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/prikotov/coding-standard.git",
-                "reference": "f5af793dcc79775b1cc5532ceaac160e2f391766"
+                "url": "git@github.com:prikotov/coding-standard.git",
+                "reference": "9baad7cd56951f13b317d1ea732de069dd02491c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/f5af793dcc79775b1cc5532ceaac160e2f391766",
-                "reference": "f5af793dcc79775b1cc5532ceaac160e2f391766",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/9baad7cd56951f13b317d1ea732de069dd02491c",
+                "reference": "9baad7cd56951f13b317d1ea732de069dd02491c",
                 "shasum": ""
             },
             "require": {
@@ -6940,11 +6940,7 @@
                 "phpcs",
                 "sniffs"
             ],
-            "support": {
-                "source": "https://github.com/prikotov/coding-standard/tree/v0.19.3",
-                "issues": "https://github.com/prikotov/coding-standard/issues"
-            },
-            "time": "2026-06-04T04:57:24+00:00"
+            "time": "2026-06-25T00:54:51+00:00"
         },
         {
             "name": "prikotov/git-workflow",

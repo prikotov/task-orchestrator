@@ -50,7 +50,7 @@ final class GitHubRequestInstallationTokenServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->installationId = new InstallationIdVo(424242);
-        $this->repoSlug = RepoSlugVo::fromString('octocat/Hello-World');
+        $this->repoSlug = RepoSlugVo::createFromString('octocat/Hello-World');
         $this->jwt = new JwtTokenVo('header.payload.signature', new DateTimeImmutable('+1 minute'));
         $this->config = $this->buildConfig(true);
         $this->http = $this->createMock(GitHubHttpComponentInterface::class);
