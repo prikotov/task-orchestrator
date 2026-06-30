@@ -210,6 +210,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 # Pull Requests
 
 * Публикация изменений в ветку `main` и `release/*` — только через Pull Requests.
+* ❗ **Идентичность PR.** PR создаёт AI-агент от имени GitHub App `prikotov-agent[bot]`, а approve ставит человек (владелец). Перед любыми git/gh-операциями (commit, push, `gh pr create`) получи installation token и выставь его в окружение: `export GH_TOKEN=$(bin/console agent:token <owner>/<repo> --format=plain)`. **Запрещено** создавать PR от личного аккаунта владельца и запрещено агенту approve'ить свой собственный PR — это ломает branch protection и вынуждает обход через `--admin`. Подробности и режимы авторизации — в [`docs/guide/agent-identity.md`](docs/guide/agent-identity.md).
 * Merge выполняй только через `gh pr merge`.
 * ❗ **КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО** выполнять `gh pr merge` (любые флаги, включая `--admin`, `--auto`, `--squash`, `--merge`) **без явного подтверждения пользователя**. Даже если все проверки пройдены. Даже если PR готов. Даже если пользователь сказал «приступай» или «делай». Слово «merge» или «вливай» должно прозвучать от пользователя явно.
 * ❗ **ЗАПРЕЩЁННЫЕ КОМАНДЫ** (без подтверждения пользователя): `gh pr merge ... --admin`, `gh pr merge ... --auto`, `gh pr merge ...` (любые флаги).
