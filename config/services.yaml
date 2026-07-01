@@ -22,3 +22,11 @@ services:
 
   Psr\Clock\ClockInterface:
     alias: TaskOrchestrator\Common\Component\Clock\SystemClock
+
+  # --- agent:init: установка task-orchestrator в host-проекте ---
+  # Команде нужны корневые параметры package_dir/base_path (аутовайринг строковых
+  # аргументов требует явного binding). Filesystem резолвится через FrameworkBundle.
+  TaskOrchestrator\Console\Module\Orchestrator\Command\InitCommand:
+    arguments:
+      $packageDir: '%task_orchestrator.package_dir%'
+      $basePath: '%task_orchestrator.base_path%'

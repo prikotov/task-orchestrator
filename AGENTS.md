@@ -39,10 +39,15 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 Роль может ссылаться на скиллы (skills). Скилл — каталог с `SKILL.md` и вспомогательными файлами (скрипты, шаблоны). Скиллы лежат в [`docs/agents/skills/`](docs/agents/skills/).
 
-При загрузке роли:
-1. Прочитай файл роли — в нём указаны скиллы (YAML `skills:` и/или markdown-ссылки).
-2. Если роль ссылается на скилл — прочитай его `SKILL.md` по ссылке из файла роли.
-3. Скрипты и ресурсы скилла лежат **рядом с `SKILL.md`**. Путь к скрипту — относительный от каталога скилла. Пример: если `SKILL.md` прочитан из `docs/agents/skills/run-subagent/SKILL.md`, то скрипт `scripts/watch-subagent.sh` находится в `docs/agents/skills/run-subagent/scripts/watch-subagent.sh`.
+При загрузке роли используется единый механизм **adopt-role** — мета-скилл, который резолвит файл роли и объявляет её скиллы в контексте (универсален для pi и codex, не зависит от нативной автозагрузки скиллов):
+
+1. Определи имя роли (snake_case, по списку выше). Если роль не названа явно — выбери подходящую по описаниям выше и [матрице RACI](docs/agents/raci-matrix.md).
+2. Вызови `docs/agents/skills/adopt-role/scripts/adopt-role.sh <role>` (или `bin/console agent:role-skills <role> --format=block`). Скрипт выведет путь к файлу роли и XML-каталог её скиллов (с развёрнутыми зависимостями `depends_on`).
+3. Прочитай файл роли (путь из вывода) полностью через `read` — там personality, экспертиза, стиль работы.
+4. Каталог скиллов (`<available_skills>`) уже в контексте. Когда задача совпадает с описанием скилла — открой его `SKILL.md` по `<location>` через `read`.
+5. Скрипты и ресурсы скилла лежат **рядом с `SKILL.md`**. Путь к скрипту — относительный от каталога скилла. Пример: если `SKILL.md` прочитан из `docs/agents/skills/run-subagent/SKILL.md`, то скрипт `scripts/watch-subagent.sh` находится в `docs/agents/skills/run-subagent/scripts/watch-subagent.sh`.
+
+`adopt-role` — единственный общий скилл: он сам фильтрует скиллы по роли, поэтому role-специфичные скиллы не нужно размещать в автозагружаемых локациях (`.agents/skills/`, `.pi/skills/`, `.codex/skills/`), где их увидели бы все роли. Изоляция контекста по роли достигается промптом, а не автозагрузкой.
 
 ---
 
@@ -160,6 +165,22 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 * Помечай временный код `@todo` или `@techdebt` (укажи дату и причину).
 * Создавай задачу на устранение техдолга в `todo/`.
+
+---
+
+# Запуск codex (прокси)
+
+* **Codex CLI в этом проекте требует HTTPS-прокси.** Без него — `403 Forbidden` на `chatgpt.com` (Cloudflare IP-block по региону). Это НЕ баг codex, НЕ требует мостов/обходов — нужен только прокси в окружении.
+* Прокси лежит в `.env.local` проекта (переменная `CODEX_HTTP_PROXY`).
+* **Через `watch-subagent.sh` прокси подхватывается автоматически**: скрипт source-ит `.env.local` и выставляет `HTTPS_PROXY`/`HTTP_PROXY` из `CODEX_HTTP_PROXY` для codex-раннера. Ручных действий не требуется.
+* **Прямой запуск codex** (вне `watch-subagent.sh`):
+  ```bash
+  set -a; . ./.env.local; set +a
+  codex exec --json --skip-git-repo-check --ephemeral "..."
+  ```
+  или `export HTTPS_PROXY="$CODEX_HTTP_PROXY" HTTP_PROXY="$CODEX_HTTP_PROXY"` перед вызовом.
+* При `CODEX_HTTP_PROXY` со схемой `https://` codex пишет шум `Reconnecting... Proxy URL scheme not supported` и падает на WebSocket → **это нормально**, сразу следует fallback на HTTPS-transport, и запрос проходит. Не воспринимать как ошибку.
+* 🔴 **Запрещено** «изобретать» обходы (HttpsProxyBridge standalone, PHP-мосты, костыли) для запуска codex вне PHP-раннера. Прокси в env — единственное решение. HttpsProxyBridge используется только внутри `CodexAgentRunnerService` (PHP, через `bin/console`), для `watch-subagent.sh` он не нужен.
 
 ---
 

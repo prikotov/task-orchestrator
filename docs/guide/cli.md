@@ -176,3 +176,59 @@ php vendor/bin/task-orchestrator agent:runners
 ```
 
 Вывод — таблица с колонками `Runner` и `Status` (Available/Unavailable).
+
+---
+
+### `agent:init`
+
+Установка task-orchestrator в host-проекте: создаёт симлинк общего skill `adopt-role` в `<project>/.agents/skills/`, чтобы он был виден AI-инструментам (pi, codex и др.) как нативный skill через кросс-клиентскую конвенцию `.agents/skills/`. Сам skill живёт в пакете task-orchestrator.
+
+Идемпотентна: повторный запуск безопасен. Запускайте после `composer install` в host-проекте.
+
+```bash
+php vendor/bin/task-orchestrator agent:init [--force]
+```
+
+| Опция | Описание |
+|---|---|
+| `--force`, `-f` | Пересоздать симлинк, если он существует и некорректен |
+
+**Exit codes:** `0` — успех (или уже установлен); `1` — skill не найден в пакете либо конфликт без `--force`.
+
+---
+
+### `agent:role-skills`
+
+Резолвит skills (навыки) роли и выводит их каталог для включения в system prompt агента. Используется мета-скиллом `adopt-role` для динамического объявления skills роли в контексте (универсально для pi и codex).
+
+```bash
+php vendor/bin/task-orchestrator agent:role-skills <role> [--format=block|list|json]
+```
+
+| Аргумент/опция | Описание | По умолчанию |
+|---|---|---|
+| `role` (аргумент) | Имя роли (snake_case), как в `config/chains.yaml` `roles.<role>` и имя файла роли без локали | — (обязательный) |
+| `--format` | Формат вывода: `block` (XML-каталог `<available_skills>`), `list`, `json` | `block` |
+
+Каталог разворачивает транзитивные зависимости skills (`depends_on` в frontmatter `SKILL.md`): зависимости помещаются перед зависящими от них skills, дубликаты исключаются. Если роль не декларирует skills — выводится пустая строка (по стандарту Agent Skills пустой блок не выводится).
+
+**Примеры:**
+
+```bash
+# XML-каталог skills тимлида для system prompt
+php vendor/bin/task-orchestrator agent:role-skills team_lead_alex --format=block
+
+# Человекочитаемый список
+php vendor/bin/task-orchestrator agent:role-skills team_lead_alex --format=list
+
+# JSON (имя, описание, путь каждого skill + готовый catalog)
+php vendor/bin/task-orchestrator agent:role-skills team_lead_alex --format=json
+```
+
+**Exit codes:**
+
+| Code | Meaning |
+|------|---------|
+| `0` | Успех |
+| `1` | Роль или её skill не найдены, цикл `depends_on` (fail-fast) |
+| `2` | Неверное значение `--format` |
