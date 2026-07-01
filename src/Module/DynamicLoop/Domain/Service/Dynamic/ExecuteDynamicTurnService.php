@@ -13,6 +13,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBud
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRoleConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorResponseVo;
@@ -27,6 +28,9 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
 {
     /** @var string Причина прерывания цикла по таймауту */
     private const string INTERRUPTION_REASON_TIMEOUT = 'timeout';
+
+    /** @var string Ошибка пустого ответа агента */
+    private const string EMPTY_OUTPUT_ERROR_MESSAGE = 'Agent returned empty output.';
 
     public function __construct(
         private RunDynamicLoopAgentServiceInterface $agentRunner,
@@ -146,10 +150,19 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $challenge,
         );
 
-        $this->recordParticipantTurnJournals($execution, $nextRole, $turnResult);
-
         $stepCost = $turnResult->agentResult->getCost();
         $execution->getMetrics()->addRoleCost($nextRole, $stepCost);
+
+        if ($turnResult->agentResult->isError()) {
+            $reason = $turnResult->agentResult->isTimedOut()
+                ? self::INTERRUPTION_REASON_TIMEOUT
+                : 'agent_error';
+            $this->sessionLogger->interruptSession($reason);
+
+            return new TurnBreakVo(interruptionReason: $reason);
+        }
+
+        $this->recordParticipantTurnJournals($execution, $nextRole, $turnResult);
 
         $budgetCheck = $this->budgetChecker->checkAndApply(
             $execution,
@@ -162,14 +175,6 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
                 interruptionReason: 'budget_exceeded',
                 budgetResult: $budgetCheck,
             );
-        }
-        if ($turnResult->agentResult->isError()) {
-            $reason = $turnResult->agentResult->isTimedOut()
-                ? self::INTERRUPTION_REASON_TIMEOUT
-                : 'agent_error';
-            $this->sessionLogger->interruptSession($reason);
-
-            return new TurnBreakVo(interruptionReason: $reason);
         }
 
         return new TurnContinueVo();
@@ -285,6 +290,8 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $challenge,
             $partRoleConfig?->getPromptFile(),
         );
+        $turnResult = self::normalizeEmptySuccessfulOutput($turnResult);
+
         $roundVo = self::toRoundResultVo(
             $turnResult,
             $execution->getStep(),
@@ -398,6 +405,24 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             systemPrompt: $turn->systemPrompt,
             userPrompt: $turn->userPrompt,
             timedOut: $agent->isTimedOut(),
+        );
+    }
+
+    private static function normalizeEmptySuccessfulOutput(DynamicLoopTurnResultVo $turnResult): DynamicLoopTurnResultVo
+    {
+        if ($turnResult->agentResult->isError() || trim($turnResult->agentResult->getOutputText()) !== '') {
+            return $turnResult;
+        }
+
+        return new DynamicLoopTurnResultVo(
+            agentResult: DynamicLoopRunResultVo::createError(
+                errorMessage: self::EMPTY_OUTPUT_ERROR_MESSAGE,
+                exitCode: 0,
+            ),
+            duration: $turnResult->duration,
+            userPrompt: $turnResult->userPrompt,
+            systemPrompt: $turnResult->systemPrompt,
+            invocation: $turnResult->invocation,
         );
     }
 

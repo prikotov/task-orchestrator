@@ -29,8 +29,22 @@ class StubSessionLogger implements DynamicLoopSessionLoggerInterface
     }
 
     #[Override]
-    public function logRound(int $step, int $round, string $role, bool $isFacilitator, string $systemPrompt, string $userPrompt, string $response, float $duration, int $inputTokens, int $outputTokens, float $cost, ?string $invocation = null): void
-    {
+    public function logRound(
+        int $step,
+        int $round,
+        string $role,
+        bool $isFacilitator,
+        string $systemPrompt,
+        string $userPrompt,
+        string $response,
+        float $duration,
+        int $inputTokens,
+        int $outputTokens,
+        float $cost,
+        ?string $invocation = null,
+        bool $isError = false,
+        ?string $errorMessage = null,
+    ): void {
         // no-op
     }
 

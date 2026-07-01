@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Codex;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexAgentRunnerService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexJsonlParser;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CodexAgentRunnerService::class)]
 final class CodexAgentRunnerTest extends TestCase
@@ -20,8 +20,12 @@ final class CodexAgentRunnerTest extends TestCase
     /** @var HttpsProxyBridge|null Мост для очистки в tearDown */
     private ?HttpsProxyBridge $bridgeToCleanup = null;
 
+    /** @var list<string> */
+    private array $fixtureFiles = [];
+
     protected function setUp(): void
     {
+        putenv('CODEX_HTTP_PROXY');
         $this->runner = new CodexAgentRunnerService(new CodexJsonlParser());
     }
 
@@ -30,6 +34,12 @@ final class CodexAgentRunnerTest extends TestCase
         // Очистка моста если тест его создал
         $this->bridgeToCleanup?->stop();
         $this->bridgeToCleanup = null;
+
+        foreach ($this->fixtureFiles as $fixtureFile) {
+            @unlink($fixtureFile);
+        }
+
+        $this->fixtureFiles = [];
 
         // Очистка env-переменной
         putenv('CODEX_HTTP_PROXY');
@@ -492,5 +502,86 @@ final class CodexAgentRunnerTest extends TestCase
         $bridge = $this->runner->createBridgeIfNeeded();
 
         self::assertNull($bridge);
+    }
+
+    #[Test]
+    public function runStreamsChunkedJsonlAndFlushesLastLineWithoutNewline(): void
+    {
+        $command = $this->createExecutableFixture('codex_stream_', <<<'PHP'
+fwrite(STDOUT, "{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"Chunked ");
+fflush(STDOUT);
+usleep(10000);
+fwrite(STDOUT, "OK\"}}\r\n");
+fflush(STDOUT);
+usleep(10000);
+fwrite(STDOUT, "{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":13,\"cached_input_tokens\":5,\"output_tokens\":8,\"reasoning_output_tokens\":2,\"cost\":0.75}}");
+PHP);
+
+        $result = $this->runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+        ));
+
+        self::assertFalse($result->isError());
+        self::assertSame('Chunked OK', $result->getOutputText());
+        self::assertSame(13, $result->getInputTokens());
+        self::assertSame(8, $result->getOutputTokens());
+        self::assertSame(5, $result->getCacheReadTokens());
+        self::assertSame(0, $result->getCacheWriteTokens());
+        self::assertSame(0.75, $result->getCost());
+        self::assertSame(1, $result->getTurns());
+    }
+
+    #[Test]
+    public function runHandlesEmptyOutputWithoutCrash(): void
+    {
+        $command = $this->createExecutableFixture('codex_empty_', <<<'PHP'
+exit(0);
+PHP);
+
+        $result = $this->runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+        ));
+
+        self::assertFalse($result->isError());
+        self::assertSame('', $result->getOutputText());
+        self::assertSame(0, $result->getInputTokens());
+    }
+
+    #[Test]
+    public function runReturnsErrorWhenProcessExitsBeforeTurnCompleted(): void
+    {
+        $command = $this->createExecutableFixture('codex_broken_', <<<'PHP'
+fwrite(STDOUT, "{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"partial\"}}\n");
+fwrite(STDERR, "pipe closed");
+exit(9);
+PHP);
+
+        $result = $this->runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+        ));
+
+        self::assertTrue($result->isError());
+        self::assertSame(9, $result->getExitCode());
+        self::assertSame('pipe closed', $result->getErrorMessage());
+    }
+
+    private function createExecutableFixture(string $prefix, string $script): string
+    {
+        $fixtureFile = tempnam(sys_get_temp_dir(), $prefix);
+        if ($fixtureFile === false) {
+            self::fail('Unable to create temporary runner fixture.');
+        }
+
+        file_put_contents($fixtureFile, "#!/usr/bin/env php\n<?php\n" . $script);
+        chmod($fixtureFile, 0700);
+        $this->fixtureFiles[] = $fixtureFile;
+
+        return $fixtureFile;
     }
 }

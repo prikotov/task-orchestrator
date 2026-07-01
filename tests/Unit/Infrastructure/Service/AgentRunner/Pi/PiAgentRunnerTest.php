@@ -4,21 +4,33 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Pi;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunnerService;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiJsonlParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunnerService;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiJsonlParser;
 
 #[CoversClass(PiAgentRunnerService::class)]
 final class PiAgentRunnerTest extends TestCase
 {
     private PiAgentRunnerService $runner;
 
+    /** @var list<string> */
+    private array $fixtureFiles = [];
+
     protected function setUp(): void
     {
         $this->runner = new PiAgentRunnerService(new PiJsonlParser());
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->fixtureFiles as $fixtureFile) {
+            @unlink($fixtureFile);
+        }
+
+        $this->fixtureFiles = [];
     }
 
     // ──── getName / isAvailable ─────────────────────────────────────────
@@ -284,5 +296,87 @@ final class PiAgentRunnerTest extends TestCase
         );
 
         self::assertFalse($request->hasNoContextFiles());
+    }
+
+    #[Test]
+    public function runStreamsChunkedJsonlAndFlushesLastLineWithoutNewline(): void
+    {
+        $command = $this->createExecutableFixture('pi_stream_', <<<'PHP'
+fwrite(STDOUT, "{\"type\":\"message_end\",\"message\":{\"usage\":{\"input\":11,\"output\":7,\"turns\":1,\"cache\":{\"read\":3,\"write\":2},\"cost\":{\"total\":0.5}},\"model\":\"pi-test\"}}\r\n");
+fflush(STDOUT);
+usleep(10000);
+fwrite(STDOUT, "{\"type\":\"agent_end\",\"messages\":[{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"Chunked ");
+fflush(STDOUT);
+usleep(10000);
+fwrite(STDOUT, "OK\"}]}]}");
+PHP);
+
+        $result = $this->runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+        ));
+
+        self::assertFalse($result->isError());
+        self::assertSame('Chunked OK', $result->getOutputText());
+        self::assertSame(11, $result->getInputTokens());
+        self::assertSame(7, $result->getOutputTokens());
+        self::assertSame(3, $result->getCacheReadTokens());
+        self::assertSame(2, $result->getCacheWriteTokens());
+        self::assertSame(0.5, $result->getCost());
+        self::assertSame('pi-test', $result->getModel());
+        self::assertSame(1, $result->getTurns());
+    }
+
+    #[Test]
+    public function runHandlesEmptyOutputWithoutCrash(): void
+    {
+        $command = $this->createExecutableFixture('pi_empty_', <<<'PHP'
+exit(0);
+PHP);
+
+        $result = $this->runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+        ));
+
+        self::assertFalse($result->isError());
+        self::assertSame('', $result->getOutputText());
+        self::assertSame(0, $result->getInputTokens());
+    }
+
+    #[Test]
+    public function runReturnsErrorWhenProcessExitsBeforeAgentEnd(): void
+    {
+        $command = $this->createExecutableFixture('pi_broken_', <<<'PHP'
+fwrite(STDOUT, "{\"type\":\"message_update\",\"assistantMessageEvent\":{\"type\":\"text_delta\",\"delta\":\"partial\"}}\n");
+fwrite(STDERR, "pipe closed");
+exit(7);
+PHP);
+
+        $result = $this->runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+        ));
+
+        self::assertTrue($result->isError());
+        self::assertSame(7, $result->getExitCode());
+        self::assertSame('pipe closed', $result->getErrorMessage());
+    }
+
+    private function createExecutableFixture(string $prefix, string $script): string
+    {
+        $fixtureFile = tempnam(sys_get_temp_dir(), $prefix);
+        if ($fixtureFile === false) {
+            self::fail('Unable to create temporary runner fixture.');
+        }
+
+        file_put_contents($fixtureFile, "#!/usr/bin/env php\n<?php\n" . $script);
+        chmod($fixtureFile, 0700);
+        $this->fixtureFiles[] = $fixtureFile;
+
+        return $fixtureFile;
     }
 }

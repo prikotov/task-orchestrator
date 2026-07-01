@@ -24,7 +24,7 @@ final class ChainSessionWriter
     /** @var list<string> */
     private array $participants = [];
     private int $maxRounds = 0;
-    /** @var array<int, array{system: string, user: string, response: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, invocation?: string}> */
+    /** @var array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, response?: string, error?: string, error_message?: string, invocation?: string}> */
     private array $roundFiles = [];
     /** @var array<string, mixed> */
     private array $invocation = [];
@@ -59,8 +59,22 @@ final class ChainSessionWriter
         return $sessionDir;
     }
 
-    public function logRound(int $step, int $round, string $role, bool $isFacilitator, string $systemPrompt, string $userPrompt, string $response, float $duration, int $inputTokens, int $outputTokens, float $cost, ?string $invocation = null): void
-    {
+    public function logRound(
+        int $step,
+        int $round,
+        string $role,
+        bool $isFacilitator,
+        string $systemPrompt,
+        string $userPrompt,
+        string $response,
+        float $duration,
+        int $inputTokens,
+        int $outputTokens,
+        float $cost,
+        ?string $invocation = null,
+        bool $isError = false,
+        ?string $errorMessage = null,
+    ): void {
         $this->assertActiveSession();
         $dir = $this->currentSessionDir;
         $baseName = $this->storage->buildStepBaseName($step, $round, $role);
@@ -69,14 +83,25 @@ final class ChainSessionWriter
             $this->storage->writeFile($dir . '/' . $systemFile, $systemPrompt);
         }
         $this->storage->writeFile($dir . '/' . $baseName . '_3_user.md', $userPrompt);
-        $this->storage->writeFile($dir . '/' . $baseName . '_4_response.md', $response);
+
         $roundData = [
             'system' => $systemFile, 'user' => $baseName . '_3_user.md',
-            'response' => $baseName . '_4_response.md', 'role' => $role,
+            'role' => $role,
             'is_facilitator' => $isFacilitator, 'round' => $round,
             'duration' => round($duration, 1), 'input_tokens' => $inputTokens,
             'output_tokens' => $outputTokens, 'cost' => round($cost, 4),
         ];
+        $artifactName = $baseName . ($isError ? '_4_error.md' : '_4_response.md');
+        $artifactContent = $isError ? ($errorMessage ?? 'Agent returned an error.') : $response;
+        $this->storage->writeFile($dir . '/' . $artifactName, $artifactContent);
+
+        if ($isError) {
+            $roundData['error'] = $artifactName;
+            $roundData['error_message'] = $errorMessage ?? '';
+        }
+        if (!$isError) {
+            $roundData['response'] = $artifactName;
+        }
         if ($invocation !== null) {
             $roundData['invocation'] = $invocation;
         }
@@ -186,7 +211,7 @@ final class ChainSessionWriter
     public function getCurrentSessionDir(): ?string { return $this->currentSessionDir; }
 
     /**
-     * @return array<int, array{system: string, user: string, response: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, invocation?: string}>
+     * @return array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, response?: string, error?: string, error_message?: string, invocation?: string}>
      */
     public function getRoundFiles(): array { return $this->roundFiles; }
 
@@ -206,20 +231,30 @@ final class ChainSessionWriter
     /**
      * @param list<array<string, mixed>> $roundsData
      *
-     * @return array<int, array{system: string, user: string, response: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float}>
+     * @return array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, response?: string, error?: string, error_message?: string}>
      */
     private function parseRoundFiles(array $roundsData): array
     {
         $result = [];
         foreach ($roundsData as $rd) {
             $step = (int) ($rd['step'] ?? 0);
-            $result[$step] = [
+            $roundFile = [
                 'system' => $rd['system_prompt_file'] ?? '', 'user' => $rd['user_prompt_file'] ?? '',
-                'response' => $rd['response_file'] ?? '', 'role' => $rd['role'] ?? '',
+                'role' => $rd['role'] ?? '',
                 'is_facilitator' => $rd['is_facilitator'] ?? false, 'round' => (int) ($rd['round'] ?? 0),
                 'duration' => (float) ($rd['duration'] ?? 0), 'input_tokens' => (int) ($rd['input_tokens'] ?? 0),
                 'output_tokens' => (int) ($rd['output_tokens'] ?? 0), 'cost' => (float) ($rd['cost'] ?? 0),
             ];
+            if (($rd['response_file'] ?? '') !== '') {
+                $roundFile['response'] = $rd['response_file'];
+            }
+            if (($rd['error_file'] ?? '') !== '') {
+                $roundFile['error'] = $rd['error_file'];
+            }
+            if (($rd['error_message'] ?? '') !== '') {
+                $roundFile['error_message'] = $rd['error_message'];
+            }
+            $result[$step] = $roundFile;
         }
 
         return $result;
@@ -243,10 +278,19 @@ final class ChainSessionWriter
             $entry = [
                 'step' => $step, 'round' => $files['round'], 'role' => $files['role'],
                 'is_facilitator' => $files['is_facilitator'], 'system_prompt_file' => $files['system'],
-                'user_prompt_file' => $files['user'], 'response_file' => $files['response'],
+                'user_prompt_file' => $files['user'],
                 'duration' => $files['duration'], 'input_tokens' => $files['input_tokens'],
                 'output_tokens' => $files['output_tokens'], 'cost' => $files['cost'],
             ];
+            if (isset($files['response'])) {
+                $entry['response_file'] = $files['response'];
+            }
+            if (isset($files['error'])) {
+                $entry['error_file'] = $files['error'];
+            }
+            if (isset($files['error_message'])) {
+                $entry['error_message'] = $files['error_message'];
+            }
             if (isset($files['invocation'])) {
                 $entry['invocation'] = $files['invocation'];
             }

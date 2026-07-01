@@ -6,6 +6,8 @@ namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Code
 
 use InvalidArgumentException;
 use Override;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\CodexAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
@@ -37,6 +39,9 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunReques
  */
 final readonly class CodexAgentRunnerService implements CodexAgentRunnerServiceInterface
 {
+    /** @var int Максимальный stderr-tail для AgentResultVo ошибки процесса */
+    private const int ERROR_OUTPUT_TAIL_BYTES = 65536;
+
     public function __construct(
         private CodexJsonlParser $parser,
     ) {
@@ -144,14 +149,35 @@ final readonly class CodexAgentRunnerService implements CodexAgentRunnerServiceI
             $process->setEnv($processEnv);
         }
 
-        try {
-            $process->run();
-        } catch (\Symfony\Component\Process\Exception\ProcessTimedOutException) {
-            $bridge?->stop();
+        $this->parser->reset();
+        $stdoutBuffer = '';
+        $errorOutput = '';
 
+        $outputHandler = function (string $type, string $chunk) use ($process, &$stdoutBuffer, &$errorOutput): void {
+            if ($type === Process::OUT) {
+                $this->bufferStdoutChunk($chunk, $stdoutBuffer);
+                $process->clearOutput();
+
+                return;
+            }
+
+            $errorOutput = self::appendErrorOutputTail($errorOutput, $chunk);
+            $process->clearErrorOutput();
+        };
+
+        try {
+            $process->start($outputHandler);
+            $process->wait();
+            $this->flushStdoutBuffer($stdoutBuffer);
+        } catch (ProcessTimedOutException) {
             return AgentResultVo::createError(
                 errorMessage: sprintf('Agent timed out after %d seconds.', $request->getTimeout()),
                 timedOut: true,
+            );
+        } catch (ProcessSignaledException $e) {
+            return AgentResultVo::createError(
+                errorMessage: sprintf('codex process terminated by signal %d.', $e->getSignal()),
+                exitCode: 128 + $e->getSignal(),
             );
         } finally {
             $bridge?->stop();
@@ -159,12 +185,14 @@ final readonly class CodexAgentRunnerService implements CodexAgentRunnerServiceI
 
         if (!$process->isSuccessful()) {
             return AgentResultVo::createError(
-                $process->getErrorOutput() ?: sprintf('codex exited with code %d.', $process->getExitCode() ?? 1),
+                $errorOutput !== ''
+                    ? $errorOutput
+                    : sprintf('codex exited with code %d.', $process->getExitCode() ?? 1),
                 $process->getExitCode() ?? 1,
             );
         }
 
-        $parsed = $this->parser->parse($process->getOutput());
+        $parsed = $this->parser->result();
 
         return AgentResultVo::createSuccess(
             outputText: $parsed['outputText'],
@@ -391,5 +419,44 @@ final readonly class CodexAgentRunnerService implements CodexAgentRunnerServiceI
         }
 
         return $value;
+    }
+
+    /**
+     * Буферизует stdout-чанк до переводов строк и отдаёт полные JSONL-строки в parser.
+     */
+    private function bufferStdoutChunk(string $chunk, string &$stdoutBuffer): void
+    {
+        $stdoutBuffer .= $chunk;
+        $newlinePosition = strpos($stdoutBuffer, "\n");
+
+        while ($newlinePosition !== false) {
+            $line = substr($stdoutBuffer, 0, $newlinePosition);
+            $stdoutBuffer = substr($stdoutBuffer, $newlinePosition + 1);
+            $this->parser->feed($line);
+            $newlinePosition = strpos($stdoutBuffer, "\n");
+        }
+    }
+
+    /**
+     * Отдаёт parser последнюю строку без завершающего перевода строки.
+     */
+    private function flushStdoutBuffer(string &$stdoutBuffer): void
+    {
+        if ($stdoutBuffer === '') {
+            return;
+        }
+
+        $this->parser->feed($stdoutBuffer);
+        $stdoutBuffer = '';
+    }
+
+    private static function appendErrorOutputTail(string $currentOutput, string $chunk): string
+    {
+        $currentOutput .= $chunk;
+        if (strlen($currentOutput) <= self::ERROR_OUTPUT_TAIL_BYTES) {
+            return $currentOutput;
+        }
+
+        return substr($currentOutput, -self::ERROR_OUTPUT_TAIL_BYTES);
     }
 }
