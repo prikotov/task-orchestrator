@@ -38,6 +38,8 @@ interface DynamicLoopSessionWriterInterface
         int $outputTokens,
         float $cost,
         ?string $invocation = null,
+        bool $isError = false,
+        ?string $errorMessage = null,
     ): void;
 
     public function completeSession(

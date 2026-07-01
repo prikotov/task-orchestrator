@@ -5,213 +5,212 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex;
 
 /**
- * Парсер JSONL-потока вывода Codex CLI (`codex exec --json`).
+ * Stateful-парсер JSONL-потока вывода Codex CLI (`codex exec --json`).
  *
- * Извлекает текст ответа из item.completed (item.text или item.content[])
- * и usage-метрики (input_tokens, output_tokens, cached_input_tokens, reasoning_output_tokens).
- *
- * Поддерживаемые форматы:
- * - codex CLI >= v0.125.0: item.text — строка, usage — на верхнем уровне turn.completed
- * - Старый формат: item.content[] — массив блоков, usage — внутри turn.usage
+ * Принимает уже выделенные строки через feed() и хранит только итоговый текст/usage.
  */
-final readonly class CodexJsonlParser
+final class CodexJsonlParser
 {
+    private int $inputTokens = 0;
+    private int $outputTokens = 0;
+    private int $cacheReadTokens = 0;
+    private int $reasoningOutputTokens = 0;
+    private int $turns = 0;
+    private float $cost = 0.0;
+    private ?string $model = null;
+    private string $outputText = '';
+
     /**
-     * Парсит JSONL-поток вывода Codex CLI.
-     *
-     * Формат событий Codex exec --json:
-     * - thread.started, turn.started — служебные события
-     * - item.started, item.updated, item.completed — элементы ответа
-     * - turn.completed — завершение хода с usage и items
-     * - turn.failed — ошибка хода
-     * - error — промежуточная ошибка
-     *
-     * @param string $jsonlOutput сырой JSONL-вывод Codex
+     * Сбрасывает состояние перед новым потоком JSONL.
+     */
+    public function reset(): void
+    {
+        $this->inputTokens = 0;
+        $this->outputTokens = 0;
+        $this->cacheReadTokens = 0;
+        $this->reasoningOutputTokens = 0;
+        $this->turns = 0;
+        $this->cost = 0.0;
+        $this->model = null;
+        $this->outputText = '';
+    }
+
+    /**
+     * Обрабатывает одну JSONL-строку.
+     */
+    public function feed(string $line): void
+    {
+        $line = rtrim($line, "\r");
+        if (trim($line) === '') {
+            return;
+        }
+
+        $decoded = json_decode($line, true);
+        if (!is_array($decoded)) {
+            return;
+        }
+
+        $type = $decoded['type'] ?? '';
+        if ($type === 'turn.completed') {
+            $this->applyTurnCompleted($decoded);
+            return;
+        }
+
+        if ($type === 'item.completed') {
+            $this->applyItemCompleted($decoded);
+        }
+    }
+
+    /**
+     * Возвращает результат в прежнем shape массива.
      *
      * @return array{outputText: string, inputTokens: int, outputTokens: int, cacheReadTokens: int, cacheWriteTokens: int, cost: float, model: string|null, turns: int, reasoningOutputTokens: int}
      */
-    public function parse(string $jsonlOutput): array
+    public function result(): array
     {
-        $lines = array_filter(explode("\n", trim($jsonlOutput)));
-        $inputTokens = $outputTokens = $cacheReadTokens = $reasoningOutputTokens = $turns = 0;
-        $cost = 0.0;
-        $model = null;
-        $outputText = '';
-
-        foreach ($lines as $line) {
-            $decoded = json_decode($line, true);
-            if (!is_array($decoded)) {
-                continue;
-            }
-
-            $type = $decoded['type'] ?? '';
-
-            if ($type === 'turn.completed') {
-                $turnData = $this->extractTurnCompleted($decoded);
-                $inputTokens += $turnData['inputTokens'];
-                $outputTokens += $turnData['outputTokens'];
-                $cacheReadTokens += $turnData['cacheReadTokens'];
-                $reasoningOutputTokens += $turnData['reasoningOutputTokens'];
-                $cost += $turnData['cost'];
-                $model = $turnData['model'];
-                ++$turns;
-
-                if ($turnData['outputText'] !== '') {
-                    $outputText = $turnData['outputText'];
-                }
-            }
-
-            if ($type === 'item.completed') {
-                $itemText = $this->extractItemText($decoded);
-                if ($itemText !== '' && $outputText === '') {
-                    $outputText = $itemText;
-                }
-            }
-        }
-
         return [
-            'outputText' => $outputText,
-            'inputTokens' => $inputTokens,
-            'outputTokens' => $outputTokens,
-            'cacheReadTokens' => $cacheReadTokens,
+            'outputText' => $this->outputText,
+            'inputTokens' => $this->inputTokens,
+            'outputTokens' => $this->outputTokens,
+            'cacheReadTokens' => $this->cacheReadTokens,
             'cacheWriteTokens' => 0,
-            'cost' => $cost,
-            'model' => $model,
-            'turns' => $turns,
-            'reasoningOutputTokens' => $reasoningOutputTokens,
+            'cost' => $this->cost,
+            'model' => $this->model,
+            'turns' => $this->turns,
+            'reasoningOutputTokens' => $this->reasoningOutputTokens,
         ];
     }
 
     /**
-     * Извлекает данные из события turn.completed.
-     *
-     * Codex CLI >= v0.125.0 кладёт usage на верхний уровень:
-     * {
-     *   "type": "turn.completed",
-     *   "usage": {
-     *     "input_tokens": int,
-     *     "output_tokens": int,
-     *     "cached_input_tokens": int,
-     *     "reasoning_output_tokens": int
-     *   }
-     * }
-     *
-     * Старый формат — usage внутри turn:
-     * {
-     *   "type": "turn.completed",
-     *   "turn": {
-     *     "items": [...],
-     *     "usage": { ... }
-     *   }
-     * }
+     * Извлекает usage из turn.completed и текст из turn.items старого формата.
      *
      * @param array<string, mixed> $decoded
-     * @return array{outputText: string, inputTokens: int, outputTokens: int, cacheReadTokens: int, reasoningOutputTokens: int, cost: float, model: string|null}
      */
-    private function extractTurnCompleted(array $decoded): array
+    private function applyTurnCompleted(array $decoded): void
     {
         $turn = $decoded['turn'] ?? [];
+        if (!is_array($turn)) {
+            $turn = [];
+        }
 
-        // Codex v0.125.0+: usage на верхнем уровне; старый формат — внутри turn
         $usage = $decoded['usage'] ?? $turn['usage'] ?? [];
+        if (!is_array($usage)) {
+            $usage = [];
+        }
+
+        $this->inputTokens += (int) ($usage['input_tokens'] ?? 0);
+        $this->outputTokens += (int) ($usage['output_tokens'] ?? 0);
+        $this->cacheReadTokens += (int) ($usage['cached_input_tokens'] ?? 0);
+        $this->reasoningOutputTokens += (int) ($usage['reasoning_output_tokens'] ?? 0);
+        $this->cost += (float) ($usage['cost'] ?? 0.0);
+        ++$this->turns;
+
+        if (isset($turn['model']) && is_string($turn['model'])) {
+            $this->model = $turn['model'];
+        }
 
         $items = $turn['items'] ?? [];
-        $outputText = $this->extractLastAgentMessageText($items);
+        if (!is_array($items)) {
+            return;
+        }
 
-        return [
-            'outputText' => $outputText,
-            'inputTokens' => (int) ($usage['input_tokens'] ?? 0),
-            'outputTokens' => (int) ($usage['output_tokens'] ?? 0),
-            'cacheReadTokens' => (int) ($usage['cached_input_tokens'] ?? 0),
-            'reasoningOutputTokens' => (int) ($usage['reasoning_output_tokens'] ?? 0),
-            'cost' => (float) ($usage['cost'] ?? 0.0),
-            'model' => $turn['model'] ?? null,
-        ];
+        $turnOutputText = $this->extractLastAgentMessageText($items);
+        if ($turnOutputText !== '') {
+            $this->outputText = $turnOutputText;
+        }
+    }
+
+    /**
+     * Извлекает текст из item.completed.
+     *
+     * @param array<string, mixed> $decoded
+     */
+    private function applyItemCompleted(array $decoded): void
+    {
+        $itemText = $this->extractItemText($decoded);
+        if ($itemText === '') {
+            return;
+        }
+
+        $this->outputText = $itemText;
     }
 
     /**
      * Извлекает текст последнего agent_message из массива items.
      *
-     * Идёт с конца массива items и ищет последний элемент типа agent_message
-     * с текстовым content.
-     *
-     * @param list<array> $items массив items из turn.completed
+     * @param array<int, mixed> $items массив items из turn.completed
      */
     private function extractLastAgentMessageText(array $items): string
     {
-        $text = '';
-
-        for ($i = count($items) - 1; $i >= 0; $i--) {
+        for ($i = count($items) - 1; $i >= 0; --$i) {
             $item = $items[$i];
+            if (!is_array($item)) {
+                continue;
+            }
 
             if (($item['type'] ?? '') !== 'agent_message') {
                 continue;
             }
 
-            $content = $item['content'] ?? [];
-            if (is_array($content)) {
-                foreach ($content as $block) {
-                    if (is_array($block) && ($block['type'] ?? '') === 'text') {
-                        $text .= $block['text'] ?? '';
-                    }
-                }
-            } elseif (is_string($content)) {
-                $text .= $content;
-            }
-
+            $text = $this->extractTextFromItem($item);
             if ($text !== '') {
-                break;
+                return $text;
             }
         }
 
-        return $text;
+        return '';
     }
 
     /**
      * Извлекает текст из события item.completed.
      *
-     * Используется как fallback, если turn.completed не содержит items.
-     *
-     * Codex CLI >= v0.125.0 передаёт текст как item.text (строка):
-     * {
-     *   "type": "item.completed",
-     *   "item": {"type": "agent_message", "text": "PING_OK"}
-     * }
-     *
-     * Старый формат — массив блоков content[]:
-     * {
-     *   "type": "item.completed",
-     *   "item": {"type": "agent_message", "content": [{"type": "text", "text": "..."}]}
-     * }
-     *
      * @param array<string, mixed> $decoded
-     * @return string текст элемента или пустая строка
      */
     private function extractItemText(array $decoded): string
     {
         $item = $decoded['item'] ?? [];
+        if (!is_array($item)) {
+            return '';
+        }
 
         if (($item['type'] ?? '') !== 'agent_message') {
             return '';
         }
 
-        // Codex v0.125.0+: item.text — строка
+        return $this->extractTextFromItem($item);
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     */
+    private function extractTextFromItem(array $item): string
+    {
         if (isset($item['text']) && is_string($item['text']) && $item['text'] !== '') {
             return $item['text'];
         }
 
-        // Старый формат: item.content[] — массив блоков или строка
         $content = $item['content'] ?? [];
-        $text = '';
+        if (is_string($content)) {
+            return $content;
+        }
 
-        if (is_array($content)) {
-            foreach ($content as $block) {
-                if (is_array($block) && ($block['type'] ?? '') === 'text') {
-                    $text .= $block['text'] ?? '';
-                }
+        if (!is_array($content)) {
+            return '';
+        }
+
+        $text = '';
+        foreach ($content as $block) {
+            if (!is_array($block)) {
+                continue;
             }
-        } elseif (is_string($content)) {
-            $text .= $content;
+
+            if (($block['type'] ?? '') !== 'text') {
+                continue;
+            }
+
+            if (isset($block['text']) && is_string($block['text'])) {
+                $text .= $block['text'];
+            }
         }
 
         return $text;

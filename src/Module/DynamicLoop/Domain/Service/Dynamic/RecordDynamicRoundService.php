@@ -76,6 +76,8 @@ final readonly class RecordDynamicRoundService implements RecordDynamicRoundServ
             $roundResult->outputTokens,
             $roundResult->cost,
             $roundResult->invocation,
+            $roundResult->isError,
+            $roundResult->errorMessage,
         );
         $this->sessionWriter->updateSessionState($step);
     }

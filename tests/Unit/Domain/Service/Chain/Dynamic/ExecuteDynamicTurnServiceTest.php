@@ -4,28 +4,35 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Domain\Service\Chain\Dynamic;
 
+use FilesystemIterator;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\ExecuteDynamicTurnService;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FormatDynamicJournalServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RecordDynamicRoundService;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RecordDynamicRoundServiceInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RoundCompletedNotifierInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopAgentServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetCheckVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRoleConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPromptConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRoleConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorResponseVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnBreakVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnContinueVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger;
 
 #[CoversClass(ExecuteDynamicTurnService::class)]
 final class ExecuteDynamicTurnServiceTest extends TestCase
@@ -346,6 +353,98 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     }
 
     #[Test]
+    public function runParticipantTurnReturnsBreakOnEmptySuccessfulOutput(): void
+    {
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
+        $context = $this->createContext('facilitator', ['architect']);
+        $execution = new DynamicLoopExecution();
+
+        $turnResult = $this->createSuccessTurnResult(" \n\t ");
+
+        $this->agentRunner->method('runParticipant')->willReturn($turnResult);
+        $this->roundRecorder
+            ->expects(self::once())
+            ->method('record')
+            ->willReturnCallback(static function (mixed ...$arguments): void {
+                $roundResult = $arguments[7];
+
+                self::assertInstanceOf(DynamicRoundResultVo::class, $roundResult);
+                self::assertTrue($roundResult->isError);
+                self::assertSame('', $roundResult->outputText);
+                self::assertSame('Agent returned empty output.', $roundResult->errorMessage);
+            });
+        $this->journal->expects(self::never())->method('formatDiscussionEntry');
+        $this->journal->expects(self::never())->method('formatParticipantEntry');
+        $this->sessionLogger->method('getResponseFilePaths')->willReturn([]);
+        $this->budgetChecker->method('checkAndApply')->willReturn(null);
+        $this->sessionLogger->expects(self::once())->method('interruptSession')->with('agent_error');
+
+        $result = $this->service->runParticipantTurn(
+            $chain, $context, $execution, null, null, 'architect', 'challenge',
+        );
+
+        self::assertInstanceOf(TurnBreakVo::class, $result);
+        self::assertSame('agent_error', $result->interruptionReason);
+    }
+
+    #[Test]
+    public function runParticipantTurnDoesNotCreateResponseFileForEmptyOutputWithRealRecorder(): void
+    {
+        $tmpDir = sys_get_temp_dir() . '/dynamic_empty_response_test_' . str_replace('.', '', uniqid('', true));
+        $sessionLogger = new ChainSessionLogger($tmpDir . '/var/agent/chains', $tmpDir);
+        $sessionDir = $sessionLogger->startSession(
+            chainName: 'test',
+            topic: 'Test topic',
+            facilitator: 'facilitator',
+            participants: ['architect'],
+            maxRounds: 10,
+        );
+        $roundRecorder = new RecordDynamicRoundService(
+            $sessionLogger,
+            $this->createNoopRoundNotifier(),
+        );
+        $service = new ExecuteDynamicTurnService(
+            $this->agentRunner,
+            $roundRecorder,
+            $this->journal,
+            $sessionLogger,
+            $this->budgetChecker,
+        );
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
+        $context = $this->createContext('facilitator', ['architect']);
+        $execution = new DynamicLoopExecution();
+        $execution->advanceRound();
+
+        $this->agentRunner->method('runParticipant')->willReturn($this->createSuccessTurnResult(''));
+        $this->journal->expects(self::never())->method('formatDiscussionEntry');
+        $this->journal->expects(self::never())->method('formatParticipantEntry');
+        $this->budgetChecker->expects(self::never())->method('checkAndApply');
+
+        try {
+            $result = $service->runParticipantTurn(
+                $chain,
+                $context,
+                $execution,
+                null,
+                null,
+                'architect',
+                'challenge',
+            );
+
+            self::assertInstanceOf(TurnBreakVo::class, $result);
+            self::assertSame('agent_error', $result->interruptionReason);
+            self::assertSame([], $this->globFiles($sessionDir . '/*_4_response.md'));
+            self::assertSame([], $sessionLogger->getResponseFilePaths($execution->getStep()));
+
+            $errorFiles = $this->globFiles($sessionDir . '/*_4_error.md');
+            self::assertCount(1, $errorFiles);
+            self::assertSame('Agent returned empty output.', trim((string) file_get_contents($errorFiles[0])));
+        } finally {
+            $this->removeDirectory($tmpDir);
+        }
+    }
+
+    #[Test]
     public function runParticipantTurnReturnsContinueOnSuccess(): void
     {
         $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
@@ -434,6 +533,54 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
             agentResult: DynamicLoopRunResultVo::createError('Timed out', timedOut: true),
             duration: 60.0,
         );
+    }
+
+    private function createNoopRoundNotifier(): RoundCompletedNotifierInterface
+    {
+        return new class implements RoundCompletedNotifierInterface {
+            public function notifyRoundCompleted(
+                int $step,
+                int $round,
+                string $role,
+                bool $isFacilitator,
+                bool $isError,
+                ?string $errorMessage,
+                float $duration,
+                int $inputTokens,
+                int $outputTokens,
+                float $cost,
+                ?string $nextRole = null,
+                bool $done = false,
+                ?string $synthesis = null,
+            ): void {
+            }
+        };
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function globFiles(string $pattern): array
+    {
+        $files = glob($pattern);
+
+        return $files === false ? [] : array_values($files);
+    }
+
+    private function removeDirectory(string $directory): void
+    {
+        if (!is_dir($directory)) {
+            return;
+        }
+
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST,
+        );
+        foreach ($files as $file) {
+            $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
+        }
+        rmdir($directory);
     }
 
     /**

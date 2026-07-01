@@ -30,7 +30,7 @@ interface ModuleInterface
      *
      * @var list<string>
      */
-    public const DEFAULT_SERVICE_EXCLUDE_PATHS = [
+    public const array DEFAULT_SERVICE_EXCLUDE_PATHS = [
         'Domain/Dto/',
         'Domain/Entity/',
         'Domain/Enum/',

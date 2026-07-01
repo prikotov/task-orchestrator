@@ -18,7 +18,8 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSes
  *     session.json
  *     step_001_round_001_role_1_system.md
  *     step_001_round_001_role_3_user.md
- *     step_001_round_001_role_4_response.md
+ *     step_001_round_001_role_4_response.md # success
+ *     step_001_round_001_role_4_error.md    # error
  *     ...
  *     result.md
  *
@@ -74,6 +75,8 @@ final class ChainSessionLogger implements DynamicLoopSessionLoggerInterface
         int $outputTokens,
         float $cost,
         ?string $invocation = null,
+        bool $isError = false,
+        ?string $errorMessage = null,
     ): void {
         $this->writer->logRound(
             $step,
@@ -88,6 +91,8 @@ final class ChainSessionLogger implements DynamicLoopSessionLoggerInterface
             $outputTokens,
             $cost,
             $invocation,
+            $isError,
+            $errorMessage,
         );
     }
 
