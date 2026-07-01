@@ -188,8 +188,114 @@ final class PiJsonlParserTest extends TestCase
         self::assertSame(2, $result['turns']);
     }
 
+    // ──── error-контракт: stopReason:"error" + errorMessage ───────────────
+
+    #[Test]
+    public function parseErrorSignalCarriesExactErrorMessageFromIncidentFixture(): void
+    {
+        // Реальная фикстура инцидента var/sessions/brainstorm/2026-07-01_03-35-24/
+        // (step 010, роль system_analyst_sherlock, provider: openai-codex):
+        // pi завершается с exit 0, но сообщает об ошибке модели внутри JSONL во
+        // всех трёх событиях — message_end / turn_end / agent_end.
+        $jsonl = implode("\n", [
+            '{"type":"message_end","message":{"role":"assistant","content":[],"provider":"openai-codex","model":"gpt-5.5","usage":{"input":0,"output":0,"totalTokens":0,"cost":{"total":0}},"stopReason":"error","errorMessage":"No API key for provider: openai-codex"}}',
+            '{"type":"turn_end","message":{"stopReason":"error","errorMessage":"No API key for provider: openai-codex"},"toolResults":[]}',
+            '{"type":"agent_end","messages":[{"role":"assistant","content":[],"stopReason":"error","errorMessage":"No API key for provider: openai-codex"}],"willRetry":false}',
+        ]);
+
+        $result = $this->feedJsonl($jsonl);
+
+        self::assertTrue($result['isError']);
+        self::assertSame('No API key for provider: openai-codex', $result['errorMessage']);
+        // usage-метрики сохраняются и при ошибке модели.
+        self::assertSame('gpt-5.5', $result['model']);
+        self::assertSame(0, $result['inputTokens']);
+        self::assertSame(0, $result['outputTokens']);
+    }
+
+    #[Test]
+    public function parseErrorSignalWithoutErrorMessageUsesFallbackMessage(): void
+    {
+        // pi сообщил stopReason:"error", но без errorMessage — берём fallback-сообщение,
+        // чтобы上层-оркестратор всё равно видел структурный сигнал ошибки.
+        $jsonl = implode("\n", [
+            '{"type":"message_end","message":{"role":"assistant","content":[],"usage":{"input":0,"output":0,"cost":{"total":0}},"stopReason":"error"}}',
+            '{"type":"agent_end","messages":[{"role":"assistant","content":[],"stopReason":"error"}]}',
+        ]);
+
+        $result = $this->feedJsonl($jsonl);
+
+        self::assertTrue($result['isError']);
+        self::assertSame(
+            'Agent stopped due to model error (stopReason: error).',
+            $result['errorMessage'],
+        );
+    }
+
+    #[Test]
+    public function parseErrorSignalOnlyInAgentEndLastAssistantMessage(): void
+    {
+        // message_end/turn_end пришли без stopReason — ошибка фиксируется только
+        // в последнем assistant-сообщении agent_end.
+        $jsonl = implode("\n", [
+            '{"type":"message_end","message":{"role":"assistant","content":[{"type":"text","text":""}],"usage":{"input":0,"output":0,"cost":{"total":0}}}}',
+            '{"type":"agent_end","messages":[{"role":"user","content":[{"type":"text","text":"Hi"}]},{"role":"assistant","content":[],"stopReason":"error","errorMessage":"Upstream 503"}]}',
+        ]);
+
+        $result = $this->feedJsonl($jsonl);
+
+        self::assertTrue($result['isError']);
+        self::assertSame('Upstream 503', $result['errorMessage']);
+    }
+
+    #[Test]
+    public function parseErrorSignalWithSnakeCaseFields(): void
+    {
+        // Альтернативная запись полей: stop_reason / error_message (snake_case).
+        $jsonl = implode("\n", [
+            '{"type":"message_end","message":{"role":"assistant","content":[],"usage":{"input":0,"output":0,"cost":{"total":0}},"stop_reason":"error","error_message":"Provider rate limited"}}',
+            '{"type":"agent_end","messages":[{"role":"assistant","content":[],"stop_reason":"error","error_message":"Provider rate limited"}]}',
+        ]);
+
+        $result = $this->feedJsonl($jsonl);
+
+        self::assertTrue($result['isError']);
+        self::assertSame('Provider rate limited', $result['errorMessage']);
+    }
+
+    #[Test]
+    public function parseErrorSignalKeepsFirstExplicitErrorMessage(): void
+    {
+        // pi дублирует stopReason:"error" в нескольких событиях. Берём первое
+        // осмысленное errorMessage и далее его не перезаписываем.
+        $jsonl = implode("\n", [
+            '{"type":"message_end","message":{"role":"assistant","content":[],"usage":{"input":0,"output":0,"cost":{"total":0}},"stopReason":"error","errorMessage":"First error"}}',
+            '{"type":"agent_end","messages":[{"role":"assistant","content":[],"stopReason":"error","errorMessage":"Different second error"}]}',
+        ]);
+
+        $result = $this->feedJsonl($jsonl);
+
+        self::assertTrue($result['isError']);
+        self::assertSame('First error', $result['errorMessage']);
+    }
+
+    #[Test]
+    public function parseHappyPathDoesNotFlagError(): void
+    {
+        // Успешный поток без stopReason:"error" не должен флаговать ошибку.
+        $jsonl = implode("\n", [
+            '{"type":"message_end","message":{"role":"assistant","content":[{"type":"text","text":"OK"}],"usage":{"input":1,"output":1,"turns":1,"cost":{"total":0.0}}}}',
+            '{"type":"agent_end","messages":[{"role":"assistant","content":[{"type":"text","text":"OK"}]}]}',
+        ]);
+
+        $result = $this->feedJsonl($jsonl);
+
+        self::assertFalse($result['isError']);
+        self::assertSame('', $result['errorMessage']);
+    }
+
     /**
-     * @return array{outputText: string, inputTokens: int, outputTokens: int, cacheReadTokens: int, cacheWriteTokens: int, cost: float, model: string|null, turns: int}
+     * @return array{outputText: string, inputTokens: int, outputTokens: int, cacheReadTokens: int, cacheWriteTokens: int, cost: float, model: string|null, turns: int, isError: bool, errorMessage: string}
      */
     private function feedJsonl(string $jsonl): array
     {

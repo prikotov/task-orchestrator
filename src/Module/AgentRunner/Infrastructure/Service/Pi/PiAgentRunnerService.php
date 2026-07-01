@@ -166,6 +166,12 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
 
         $parsed = $this->parser->result();
 
+        if ($parsed['isError']) {
+            return AgentResultVo::createError(
+                errorMessage: $parsed['errorMessage'],
+            );
+        }
+
         return AgentResultVo::createSuccess(
             outputText: $parsed['outputText'],
             inputTokens: $parsed['inputTokens'],

@@ -5,11 +5,17 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi;
 
 use RuntimeException;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\ValueObject\PiErrorStateVo;
 
 /**
  * Stateful-парсер JSONL-потока вывода pi (JSON mode).
  *
  * Принимает уже выделенные строки через feed() и хранит только итоговый текст/usage.
+ *
+ * Распознаёт ошибки модели: pi при сбое провайдера (нет API-ключа, 5xx, лимиты) завершается
+ * с exit 0, но сообщает об ошибке внутри JSONL полями stopReason:"error" + errorMessage:"..."
+ * в событиях message_end / turn_end / agent_end. Эти поля сохраняются в result() как
+ * isError + errorMessage и прокидываются в AgentResultVo::createError().
  */
 final class PiJsonlParser
 {
@@ -25,8 +31,23 @@ final class PiJsonlParser
     private string $lastAssistantText = '';
     private bool $hasAgentEnd = false;
 
+    /**
+     * Состояние ошибки модели (stopReason:"error" + errorMessage): инкапсулировано
+     * в иммутабельном VO, что убирает три раздельных поля и держит счётчик полей
+     * класса под лимитом PHPMD TooManyFields. Инвариант (приоритет первого
+     * осмысленного сообщения + fallback) живёт внутри VO.
+     */
+    private PiErrorStateVo $errorState;
+
     /** @var resource|null */
     private mixed $textDeltaFallbackStream = null;
+
+    public function __construct()
+    {
+        // new в инициализаторе свойства не разрешён PHP, поэтому начальное
+        // состояние ошибки задаётся в конструкторе.
+        $this->errorState = new PiErrorStateVo();
+    }
 
     /**
      * Сбрасывает состояние перед новым потоком JSONL.
@@ -43,6 +64,7 @@ final class PiJsonlParser
         $this->model = null;
         $this->lastAssistantText = '';
         $this->hasAgentEnd = false;
+        $this->errorState = new PiErrorStateVo();
     }
 
     /**
@@ -63,12 +85,19 @@ final class PiJsonlParser
         $type = $decoded['type'] ?? '';
         if ($type === 'message_end') {
             $this->applyUsageMetrics($decoded);
+            $this->applyErrorSignal($decoded);
+            return;
+        }
+
+        if ($type === 'turn_end') {
+            $this->applyErrorSignal($decoded);
             return;
         }
 
         if ($type === 'agent_end') {
             $this->hasAgentEnd = true;
             $this->lastAssistantText = $this->extractLastAssistantText($decoded);
+            $this->applyErrorSignal($decoded);
             $this->closeTextDeltaFallbackStream();
             return;
         }
@@ -79,9 +108,11 @@ final class PiJsonlParser
     }
 
     /**
-     * Возвращает результат в прежнем shape массива.
+     * Возвращает итоговый результат парсинга потока.
      *
-     * @return array{outputText: string, inputTokens: int, outputTokens: int, cacheReadTokens: int, cacheWriteTokens: int, cost: float, model: string|null, turns: int}
+     * Ключи isError и errorMessage — additive: они не удаляют существующие ключи.
+     *
+     * @return array{outputText: string, inputTokens: int, outputTokens: int, cacheReadTokens: int, cacheWriteTokens: int, cost: float, model: string|null, turns: int, isError: bool, errorMessage: string}
      */
     public function result(): array
     {
@@ -99,7 +130,100 @@ final class PiJsonlParser
             'cost' => $this->cost,
             'model' => $this->model,
             'turns' => $this->turns,
+            'isError' => $this->errorState->isError(),
+            'errorMessage' => $this->errorState->errorMessage(),
         ];
+    }
+
+    /**
+     * Фиксирует сигнал ошибки модели из события message_end/turn_end/agent_end.
+     *
+     * pi дублирует stopReason:"error" + errorMessage сразу в нескольких событиях.
+     * Берём первое осмысленное (непустое) errorMessage и далее его не перезаписываем.
+     * Если stopReason:"error" пришёл без errorMessage — используем fallback-сообщение.
+     *
+     * @param array<string, mixed> $decoded
+     */
+    private function applyErrorSignal(array $decoded): void
+    {
+        // Инвариант (приоритет первого осмысленного сообщения + fallback) живёт в VO;
+        // парсер отвечает только за извлечение сигнала из pi-формата события.
+        $this->errorState = $this->errorState->applyErrorSignal($this->extractErrorMessage($decoded));
+    }
+
+    /**
+     * Извлекает errorMessage сигнала ошибки из события.
+     *
+     * Возвращает null, если stopReason не "error" (сигнала нет);
+     * пустую строку, если stopReason "error", но без текста;
+     * непустую строку с текстом ошибки модели.
+     *
+     * Для message_end/turn_end ошибка лежит во вложенном message, для agent_end —
+     * в последнем assistant-сообщении массива messages.
+     *
+     * @param array<string, mixed> $decoded
+     */
+    private function extractErrorMessage(array $decoded): ?string
+    {
+        $type = $decoded['type'] ?? '';
+
+        if ($type === 'agent_end') {
+            return $this->extractErrorMessageFromAgentEnd($decoded);
+        }
+
+        $message = $decoded['message'] ?? null;
+        if (is_array($message)) {
+            return $this->extractErrorMessageFromMessage($message);
+        }
+
+        return null;
+    }
+
+    /**
+     * Ищет errorMessage сигнала ошибки в последнем assistant-сообщении agent_end.
+     *
+     * @param array<string, mixed> $decoded
+     */
+    private function extractErrorMessageFromAgentEnd(array $decoded): ?string
+    {
+        $messages = $decoded['messages'] ?? [];
+        if (!is_array($messages)) {
+            return null;
+        }
+
+        for ($i = count($messages) - 1; $i >= 0; --$i) {
+            $message = $messages[$i];
+            if (!is_array($message) || ($message['role'] ?? '') !== 'assistant') {
+                continue;
+            }
+
+            $errorMessage = $this->extractErrorMessageFromMessage($message);
+            if ($errorMessage !== null) {
+                return $errorMessage;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Извлекает errorMessage сигнала ошибки из одного сообщения.
+     *
+     * Допускает camelCase (stopReason/errorMessage) и snake_case (stop_reason/error_message)
+     * варианты записи полей.
+     *
+     * @param array<string, mixed> $message
+     */
+    private function extractErrorMessageFromMessage(array $message): ?string
+    {
+        $stopReason = $message['stopReason'] ?? $message['stop_reason'] ?? null;
+        if ($stopReason !== 'error') {
+            return null;
+        }
+
+        $errorMessage = $message['errorMessage'] ?? $message['error_message'] ?? null;
+
+        return is_string($errorMessage) ? $errorMessage : '';
     }
 
     /**
