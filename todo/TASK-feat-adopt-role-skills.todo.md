@@ -9,8 +9,8 @@ epic:
 author: Бэкендер (Левша)
 assignee: Бэкендер (Левша)
 branch: task/skills-per-role-launcher
-pr:
-status: in_progress
+pr: '#289'
+status: review
 ---
 
 # TASK-feat-adopt-role-skills: Универсальный загрузчик skills роли (adopt-role) для pi и codex
