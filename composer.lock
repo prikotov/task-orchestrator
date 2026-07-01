@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8c19b6327a9f096df60b26aed796e2d4",
+    "content-hash": "7452b7dd86a21e3301a509f3a5300c51",
     "packages": [
         {
             "name": "monolog/monolog",
@@ -6944,16 +6944,16 @@
         },
         {
             "name": "prikotov/git-workflow",
-            "version": "v0.2.0",
+            "version": "v0.3.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/prikotov/git-workflow.git",
-                "reference": "f946d111123d9434372f210787fa069e84448c20"
+                "url": "git@github.com:prikotov/git-workflow.git",
+                "reference": "37acb8970a16a210015d74e8dcbe25f643152206"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/f946d111123d9434372f210787fa069e84448c20",
-                "reference": "f946d111123d9434372f210787fa069e84448c20",
+                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/37acb8970a16a210015d74e8dcbe25f643152206",
+                "reference": "37acb8970a16a210015d74e8dcbe25f643152206",
                 "shasum": ""
             },
             "require": {
@@ -6989,11 +6989,7 @@
                 "release",
                 "workflow"
             ],
-            "support": {
-                "source": "https://github.com/prikotov/git-workflow/tree/v0.2.0",
-                "issues": "https://github.com/prikotov/git-workflow/issues"
-            },
-            "time": "2026-06-04T10:02:32+00:00"
+            "time": "2026-07-01T14:32:29+00:00"
         },
         {
             "name": "prikotov/todo-md",
