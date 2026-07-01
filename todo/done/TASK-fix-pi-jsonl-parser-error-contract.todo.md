@@ -9,7 +9,7 @@ epic:
 author: Тимлид (Алекс)
 assignee: backend_developer_levsha
 branch: task/fix-pi-jsonl-parser-error-contract
-pr:
+pr: '#286'
 status: done
 ---
 
