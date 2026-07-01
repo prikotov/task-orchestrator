@@ -22,3 +22,6 @@
 
 # Local secrets (e.g. GitHub App PEM for agent:token command)
 /secrets/
+
+# Local AI-agent skill setup (created per-environment via `agent:init`)
+/.agents/
