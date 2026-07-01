@@ -10,7 +10,7 @@ epic:
 author: Тимлид (Алекс)
 assignee: Бэкендер Левша (backend_developer_levsha)
 branch: task/fix-pi-jsonl-parser-oom
-pr:
+pr: '#285'
 status: done
 ---
 
