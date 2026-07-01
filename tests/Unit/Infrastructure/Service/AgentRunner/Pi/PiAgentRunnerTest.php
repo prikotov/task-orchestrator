@@ -366,6 +366,31 @@ PHP);
         self::assertSame('pipe closed', $result->getErrorMessage());
     }
 
+    // ──── run: ошибка модели (exit 0 + stopReason:error в JSONL) ─────────
+
+    #[Test]
+    public function runReturnsErrorWhenModelReportsErrorInJsonl(): void
+    {
+        // Инцидент-сценарий: pi выходит с exit 0, но сообщает об ошибке модели
+        // внутри JSONL (stopReason:"error" + errorMessage) — реальная фиксстура
+        // из var/sessions/brainstorm/2026-07-01_03-35-24/ (step 010).
+        $command = $this->createExecutableFixture('pi_model_error_', <<<'PHP'
+fwrite(STDOUT, "{\"type\":\"message_end\",\"message\":{\"role\":\"assistant\",\"content\":[],\"usage\":{\"input\":0,\"output\":0,\"cost\":{\"total\":0}},\"stopReason\":\"error\",\"errorMessage\":\"No API key for provider: openai-codex\"}}\n");
+fwrite(STDOUT, "{\"type\":\"turn_end\",\"message\":{\"stopReason\":\"error\",\"errorMessage\":\"No API key for provider: openai-codex\"},\"toolResults\":[]}\n");
+fwrite(STDOUT, "{\"type\":\"agent_end\",\"messages\":[{\"role\":\"assistant\",\"content\":[],\"stopReason\":\"error\",\"errorMessage\":\"No API key for provider: openai-codex\"}],\"willRetry\":false}\n");
+exit(0);
+PHP);
+
+        $result = $this->runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+        ));
+
+        self::assertTrue($result->isError());
+        self::assertSame('No API key for provider: openai-codex', $result->getErrorMessage());
+    }
+
     private function createExecutableFixture(string $prefix, string $script): string
     {
         $fixtureFile = tempnam(sys_get_temp_dir(), $prefix);
