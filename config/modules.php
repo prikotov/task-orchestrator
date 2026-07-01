@@ -22,4 +22,5 @@ return [
     TaskOrchestrator\Common\Module\ChainDefinition\ChainDefinitionModule::class => ['all' => true],
     TaskOrchestrator\Common\Module\ChainExecution\ChainExecutionModule::class => ['all' => true],
     TaskOrchestrator\Common\Module\DynamicLoop\DynamicLoopModule::class => ['all' => true],
+    TaskOrchestrator\Common\Module\AgentRole\AgentRoleModule::class => ['all' => true],
 ];

@@ -162,6 +162,7 @@ class Kernel extends BaseKernel
         $parameters['task_orchestrator.base_path'] = $projectRoot;
         $parameters['task_orchestrator.chains_session_dir'] = $projectRoot . '/var/sessions';
         $parameters['task_orchestrator.roles_dir'] = $this->resolveRolesDir($projectRoot, $packageDir);
+        $parameters['task_orchestrator.skills_dir'] = $this->resolveSkillsDir($projectRoot, $packageDir);
         $parameters['task_orchestrator.chains_yaml'] = $this->resolveChainsYaml($projectRoot, $packageDir);
         $parameters['app.version'] = $this->resolveVersion();
 
@@ -252,6 +253,10 @@ class Kernel extends BaseKernel
                     'namespace' => 'TaskOrchestrator\Console\Module\GitIdentity\Command',
                 ],
                 [
+                    'dir' => $appsConsoleModule . '/AgentRole/Command',
+                    'namespace' => 'TaskOrchestrator\Console\Module\AgentRole\Command',
+                ],
+                [
                     'dir' => $appsConsoleModule . '/Orchestrator/EventSubscriber',
                     'namespace' => 'TaskOrchestrator\Console\Module\Orchestrator\EventSubscriber',
                 ],
@@ -274,6 +279,13 @@ class Kernel extends BaseKernel
         $candidate = $projectRoot . '/docs/agents/roles/team';
 
         return is_dir($candidate) ? $candidate : $packageDir . '/docs/agents/roles/team';
+    }
+
+    private function resolveSkillsDir(string $projectRoot, string $packageDir): string
+    {
+        $candidate = $projectRoot . '/docs/agents/skills';
+
+        return is_dir($candidate) ? $candidate : $packageDir . '/docs/agents/skills';
     }
 
     private function resolveChainsYaml(string $projectRoot, string $packageDir): string
