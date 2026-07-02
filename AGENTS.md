@@ -39,9 +39,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 В frontmatter роли может быть список skills (скиллов). Скилл — каталог с `SKILL.md` и вспомогательными файлами (скрипты, шаблоны). Скиллы лежат в [`docs/agents/skills/`](docs/agents/skills/).
 
-При работе от лица роли используй мета-скилл **[become-role](docs/agents/skills/become-role/SKILL.md)** — он выводит путь к файлу роли и объявляет её скиллы в контексте (работает и в pi, и в codex). Инструкция — в `SKILL.md`, детали механики — в `README.md` рядом со скиллом.
-
-🔴 После клонирования один раз выполни `bin/console agent:init` — создаёт симлинк `become-role` в `.agents/skills/` (каталог `.agents/` в `.gitignore`, per-environment). Без этого скилл невидим агентам.
+При работе от лица роли используй мета-скилл **[become-role](docs/agents/skills/become-role/SKILL.md)** — он выводит путь к файлу роли и объявляет её скиллы в контексте. Инструкция — в `SKILL.md`, детали механики — в `README.md` рядом со скиллом.
 
 ---
 
