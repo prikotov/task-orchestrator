@@ -31,7 +31,7 @@ fi
 ROLE_NAME="$1"
 
 # Пути вычисляются от расположения скрипта (как в watch-subagent.sh).
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
 ROLES_DIR="${PROJECT_ROOT}/docs/agents/roles/team"
 CONSOLE="${PROJECT_ROOT}/bin/console"
