@@ -10,7 +10,7 @@ author: Бэкендер (Левша)
 assignee: Бэкендер (Левша)
 branch: task/skills-per-role-launcher
 pr: 'https://github.com/prikotov/task-orchestrator/pull/289'
-status: review
+status: done
 ---
 
 # TASK-feat-become-role-skills: Универсальный загрузчик skills роли (become-role) для pi и codex
