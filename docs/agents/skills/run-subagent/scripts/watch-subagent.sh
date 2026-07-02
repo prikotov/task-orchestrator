@@ -358,7 +358,7 @@ build_runner_command() {
             [[ -n "$PROVIDER" ]] && RUNNER_CMD+=(--provider "$PROVIDER")
             [[ -n "$MODEL" ]] && RUNNER_CMD+=(--model "$MODEL")
             [[ -n "$REASONING" ]] && RUNNER_CMD+=(--thinking "$REASONING")
-            RUNNER_CMD+=(--append-system-prompt "Работай от лица роли: $ROLE_NAME. Войди в роль через skill adopt-role (он доступен как нативный skill и объявит твои skills вместе с файлом роли), затем выполняй задачу.")
+            RUNNER_CMD+=(--append-system-prompt "Работай от лица роли: $ROLE_NAME. Войди в роль через skill become-role (он доступен как нативный skill и объявит твои skills вместе с файлом роли), затем выполняй задачу.")
             ;;
         codex)
             RUNNER_CMD=(codex exec --json --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check --ephemeral)
@@ -366,7 +366,7 @@ build_runner_command() {
             [[ -n "$REASONING" ]] && RUNNER_CMD+=(-c "model_reasoning_effort=$REASONING")
             # codex использует системный промпт через instructions
             RUNNER_CMD+=(-c "model_instructions_file=$SYSTEM_PROMPT_FILE")
-            RUNNER_CMD+=(-c "additional_instructions=Работай от лица роли: $ROLE_NAME. Войди в роль через skill adopt-role (он доступен как нативный skill и объявит твои skills вместе с файлом роли), затем выполняй задачу.")
+            RUNNER_CMD+=(-c "additional_instructions=Работай от лица роли: $ROLE_NAME. Войди в роль через skill become-role (он доступен как нативный skill и объявит твои skills вместе с файлом роли), затем выполняй задачу.")
             ;;
     esac
 }

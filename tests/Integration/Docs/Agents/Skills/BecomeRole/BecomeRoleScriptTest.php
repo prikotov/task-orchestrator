@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Tests\Integration\Docs\Agents\Skills\AdoptRole;
+namespace TaskOrchestrator\Tests\Integration\Docs\Agents\Skills\BecomeRole;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
@@ -11,19 +11,19 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 /**
- * Integration-тест скрипта adopt-role.sh.
+ * Integration-тест скрипта become-role.sh.
  *
  * Запускает реальный скрипт на реальном проекте (включая bin/console) и
  * проверяет, что вывод содержит путь к файлу роли и XML-каталог её skills.
  */
 #[Group('integration')]
 #[CoversNothing]
-final class AdoptRoleScriptTest extends TestCase
+final class BecomeRoleScriptTest extends TestCase
 {
     private function runScript(string $role): Process
     {
         $projectRoot = dirname(__DIR__, 6);
-        $script = $projectRoot . '/docs/agents/skills/adopt-role/scripts/adopt-role.sh';
+        $script = $projectRoot . '/docs/agents/skills/become-role/scripts/become-role.sh';
 
         $process = new Process(['bash', $script, $role], cwd: $projectRoot);
         $process->run();

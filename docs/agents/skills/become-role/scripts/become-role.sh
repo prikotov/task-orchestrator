@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
-# adopt-role.sh — вход в роль агента: резолвит файл роли и объявляет её skills.
+# become-role.sh — вход в роль агента: резолвит файл роли и объявляет её skills.
 #
-# Универсальный механизм «adopt-role»: агент вызывает этот скрипт, чтобы
+# Универсальный механизм «become-role»: агент вызывает этот скрипт, чтобы
 # одновременно получить путь к файлу роли (для чтения через read) и каталог
 # skills роли (XML-блок `<available_skills>` для контекста). Работает и в pi,
 # и в codex, т.к. опирается только на чтение файлов и bin/console.
 #
 # Использование:
-#   scripts/adopt-role.sh <role>
+#   scripts/become-role.sh <role>
 #
 # Где <role> — имя роли (snake_case), как в config/chains.yaml `roles.<role>`
 # и имя файла роли без локали (например, team_lead_alex).

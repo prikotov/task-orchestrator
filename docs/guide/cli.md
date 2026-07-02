@@ -181,7 +181,7 @@ php vendor/bin/task-orchestrator agent:runners
 
 ### `agent:init`
 
-Установка task-orchestrator в host-проекте: создаёт симлинк общего skill `adopt-role` в `<project>/.agents/skills/`, чтобы он был виден AI-инструментам (pi, codex и др.) как нативный skill через кросс-клиентскую конвенцию `.agents/skills/`. Сам skill живёт в пакете task-orchestrator.
+Установка task-orchestrator в host-проекте: создаёт симлинк общего skill `become-role` в `<project>/.agents/skills/`, чтобы он был виден AI-инструментам (pi, codex и др.) как нативный skill через кросс-клиентскую конвенцию `.agents/skills/`. Сам skill живёт в пакете task-orchestrator.
 
 Идемпотентна: повторный запуск безопасен. Запускайте после `composer install` в host-проекте.
 
@@ -199,7 +199,7 @@ php vendor/bin/task-orchestrator agent:init [--force]
 
 ### `agent:role-skills`
 
-Резолвит skills (навыки) роли и выводит их каталог для включения в system prompt агента. Используется мета-скиллом `adopt-role` для динамического объявления skills роли в контексте (универсально для pi и codex).
+Резолвит skills (навыки) роли и выводит их каталог для включения в system prompt агента. Используется мета-скиллом `become-role` для динамического объявления skills роли в контексте (универсально для pi и codex).
 
 ```bash
 php vendor/bin/task-orchestrator agent:role-skills <role> [--format=block|list|json]

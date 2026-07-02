@@ -19,7 +19,7 @@ use function sys_get_temp_dir;
 /**
  * Integration-тест команды agent:init.
  *
- * Проверяет создание симлинка adopt-role в «host-проекте» (temp dir),
+ * Проверяет создание симлинка become-role в «host-проекте» (temp dir),
  * идемпотентность и поведение --force.
  */
 #[Group('integration')]
@@ -64,8 +64,8 @@ final class InitCommandTest extends TestCase
 
         // Assert
         self::assertSame(0, $exit);
-        $link = $this->basePath . '/.agents/skills/adopt-role';
-        self::assertTrue(is_link($link), 'adopt-role symlink must be created');
+        $link = $this->basePath . '/.agents/skills/become-role';
+        self::assertTrue(is_link($link), 'become-role symlink must be created');
         self::assertFileExists($link . '/SKILL.md', 'SKILL.md must be reachable through symlink');
     }
 
@@ -75,7 +75,7 @@ final class InitCommandTest extends TestCase
         // Arrange
         $first = new CommandTester($this->command);
         $first->execute([]);
-        $link = $this->basePath . '/.agents/skills/adopt-role';
+        $link = $this->basePath . '/.agents/skills/become-role';
         $firstLinkTarget = readlink($link);
 
         // Act — повторный запуск
@@ -93,7 +93,7 @@ final class InitCommandTest extends TestCase
     public function executeForceReplacesIncorrectSymlink(): void
     {
         // Arrange — некорректный существующий симлинк (на /dev/null или несуществующий путь)
-        $link = $this->basePath . '/.agents/skills/adopt-role';
+        $link = $this->basePath . '/.agents/skills/become-role';
         $this->filesystem->mkdir($this->basePath . '/.agents/skills');
         $this->filesystem->symlink('/nonexistent/destination', $link);
 

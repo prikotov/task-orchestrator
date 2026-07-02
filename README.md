@@ -107,7 +107,7 @@ php vendor/bin/task-orchestrator agent:orchestrate \
 
 | Скилл | Что делает |
 |---|---|
-| [`adopt-role`](docs/agents/skills/adopt-role/SKILL.md) | Вход в роль: прописывает skills роли в контекст агента (формат Agent Skills), универсально для pi и codex |
+| [`become-role`](docs/agents/skills/become-role/SKILL.md) | Вход в роль: прописывает skills роли в контекст агента (формат Agent Skills), универсально для pi и codex |
 | [`run-subagent`](docs/agents/skills/run-subagent/SKILL.md) | Запускает подчинённого агента: роль + поручение + контекст. Контроль таймаутов, stall-детекция, фильтрация вывода |
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | Проводит задачу от постановки до merge: реализация → self-review → code review → доработка → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | Проводит эпик из нескольких задач через сабагентов |
@@ -155,7 +155,7 @@ TasK-orchestrator — CLI-инструмент. Минимальные треб�
 composer require prikotov/task-orchestrator
 ```
 
-После установки один раз выполните `agent:init` — он создаёт симлинк общего skill `adopt-role` в `<проект>/.agents/skills/`, чтобы ваш AI-агент (pi/codex) видел его как нативный skill (через кросс-клиентскую конвенцию `.agents/skills/`):
+После установки один раз выполните `agent:init` — он создаёт симлинк общего skill `become-role` в `<проект>/.agents/skills/`, чтобы ваш AI-агент (pi/codex) видел его как нативный skill (через кросс-клиентскую конвенцию `.agents/skills/`):
 
 ```bash
 php vendor/bin/task-orchestrator agent:init

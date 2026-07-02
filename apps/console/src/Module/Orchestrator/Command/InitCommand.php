@@ -22,7 +22,7 @@ use Symfony\Component\Filesystem\Path;
 /**
  * Установка task-orchestrator в host-проекте.
  *
- * Создаёт симлинк общего skill `adopt-role` в `<project>/.agents/skills/`, чтобы
+ * Создаёт симлинк общего skill `become-role` в `<project>/.agents/skills/`, чтобы
  * он был виден AI-инструментам (pi, codex и др.) как нативный skill через
  * кросс-клиентскую конвенцию `.agents/skills/`. Сам skill живёт в пакете
  * task-orchestrator; симлинк делает его доступным без копирования.
@@ -32,15 +32,15 @@ use Symfony\Component\Filesystem\Path;
  */
 #[AsCommand(
     name: 'agent:init',
-    description: 'Установка task-orchestrator в host-проекте (общий skill adopt-role)',
+    description: 'Установка task-orchestrator в host-проекте (общий skill become-role)',
 )]
 final class InitCommand extends Command
 {
     private const string OPT_FORCE = 'force';
 
-    private const string SKILL_RELATIVE_PATH = 'docs/agents/skills/adopt-role';
+    private const string SKILL_RELATIVE_PATH = 'docs/agents/skills/become-role';
 
-    private const string TARGET_RELATIVE_PATH = '.agents/skills/adopt-role';
+    private const string TARGET_RELATIVE_PATH = '.agents/skills/become-role';
 
     public function __construct(
         private readonly string $packageDir,
@@ -72,20 +72,20 @@ final class InitCommand extends Command
         $target = Path::canonicalize($targetDir . '/' . basename(self::TARGET_RELATIVE_PATH));
 
         if (!is_dir($source) || !is_file($source . '/SKILL.md')) {
-            $io->error(sprintf('Skill adopt-role не найден в пакете: %s', $source));
+            $io->error(sprintf('Skill become-role не найден в пакете: %s', $source));
 
             return Command::FAILURE;
         }
 
         if ($this->isCorrectSymlink($target, $source)) {
-            $io->success(sprintf('adopt-role уже установлен: %s -> %s', $target, $source));
+            $io->success(sprintf('become-role уже установлен: %s -> %s', $target, $source));
 
             return Command::SUCCESS;
         }
 
         if ((is_link($target) || file_exists($target)) && !$force) {
             $io->warning(sprintf(
-                'Путь существует и не является корректным симлинком adopt-role: %s. Используйте --force для замены.',
+                'Путь существует и не является корректным симлинком become-role: %s. Используйте --force для замены.',
                 $target,
             ));
 
@@ -103,7 +103,7 @@ final class InitCommand extends Command
         $relativeSource = Path::makeRelative($source, $targetDir);
         $this->filesystem->symlink($relativeSource, $target);
 
-        $io->success(sprintf('adopt-role установлен: %s -> %s', $target, $source));
+        $io->success(sprintf('become-role установлен: %s -> %s', $target, $source));
 
         return Command::SUCCESS;
     }

@@ -31,7 +31,7 @@ use TaskOrchestrator\Common\Module\AgentRole\Application\UseCase\Query\ResolveRo
  *   - list: построчный список `name — description`;
  *   - json: {role, skills: [{name, description, location}], catalog}.
  *
- * Используется мета-скиллом adopt-role для динамического объявления skills роли
+ * Используется мета-скиллом become-role для динамического объявления skills роли
  * в контексте агента (как текущей сессии, так и сабагента).
  */
 #[AsCommand(
