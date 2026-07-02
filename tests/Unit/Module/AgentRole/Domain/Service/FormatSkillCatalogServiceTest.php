@@ -43,7 +43,7 @@ final class FormatSkillCatalogServiceTest extends TestCase
         self::assertStringContainsString('<name>run-subagent</name>', $result);
         self::assertStringContainsString('<description>Запуск сабагента</description>', $result);
         self::assertStringContainsString('<location>/abs/run-subagent/SKILL.md</location>', $result);
-        self::assertStringContainsString('Use the read tool to load', $result);
+        self::assertStringContainsString('загрузи его SKILL.md инструментом read', $result);
     }
 
     #[Test]

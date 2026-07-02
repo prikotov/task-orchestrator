@@ -21,9 +21,9 @@ use Override;
 final readonly class FormatSkillCatalogService implements FormatSkillCatalogServiceInterface
 {
     private const string HEADER = <<<'TEXT'
-        The following skills provide specialized instructions for specific tasks.
-        Use the read tool to load a skill's file when the task matches its description.
-        When a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.
+        Следующие skills предоставляют специализированные инструкции для конкретных задач.
+        Когда задача совпадает с описанием skill — загрузи его SKILL.md инструментом read.
+        Относительные пути внутри skill разрешай относительно его каталога (родителя SKILL.md) и используй абсолютные пути в командах.
         TEXT;
 
     #[Override]
