@@ -91,6 +91,18 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
 SYSTEM_PROMPT_FILE="$SCRIPT_DIR/subagent_system.txt"
 CHAINS_CONFIG="${CHAINS_CONFIG:-$PROJECT_ROOT/config/chains.yaml}"
 
+# Подгружаем .env.local проекта, если есть: codex требует HTTPS-прокси для обхода
+# Cloudflare IP-block на chatgpt.com (CODEX_HTTP_PROXY в .env.local). Без этого
+# codex падает с 403. Секреты из .env.local попадают только в окружение процесса
+# и не выводятся скриптом. См. чек-лист в AGENTS.md «Запуск codex».
+ENV_LOCAL="$PROJECT_ROOT/.env.local"
+if [[ -f "$ENV_LOCAL" ]]; then
+    set -a
+    # shellcheck disable=SC1090
+    . "$ENV_LOCAL"
+    set +a
+fi
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -s|--soft-timeout)  SOFT_TIMEOUT="$2"; shift 2 ;;
@@ -346,7 +358,7 @@ build_runner_command() {
             [[ -n "$PROVIDER" ]] && RUNNER_CMD+=(--provider "$PROVIDER")
             [[ -n "$MODEL" ]] && RUNNER_CMD+=(--model "$MODEL")
             [[ -n "$REASONING" ]] && RUNNER_CMD+=(--thinking "$REASONING")
-            RUNNER_CMD+=(--append-system-prompt "Возьми на себя роль из файла: $ROLE_FILE")
+            RUNNER_CMD+=(--append-system-prompt "Работай от лица роли: $ROLE_NAME. Войди в роль через skill become-role (он доступен как нативный skill и объявит твои skills вместе с файлом роли), затем выполняй задачу.")
             ;;
         codex)
             RUNNER_CMD=(codex exec --json --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check --ephemeral)
@@ -354,13 +366,15 @@ build_runner_command() {
             [[ -n "$REASONING" ]] && RUNNER_CMD+=(-c "model_reasoning_effort=$REASONING")
             # codex использует системный промпт через instructions
             RUNNER_CMD+=(-c "model_instructions_file=$SYSTEM_PROMPT_FILE")
-            RUNNER_CMD+=(-c "additional_instructions=Возьми на себя роль из файла: $ROLE_FILE")
+            RUNNER_CMD+=(-c "additional_instructions=Работай от лица роли: $ROLE_NAME. Войди в роль через skill become-role (он доступен как нативный skill и объявит твои skills вместе с файлом роли), затем выполняй задачу.")
             ;;
     esac
 }
 
 apply_proxy_env_defaults() {
-    local proxy="${ALL_PROXY:-${all_proxy:-}}"
+    # Приоритет прокси: CODEX_HTTP_PROXY (для codex, обход Cloudflare IP-block)
+    # выше ALL_PROXY/all_proxy. Значение загружается из .env.local выше (source).
+    local proxy="${CODEX_HTTP_PROXY:-${ALL_PROXY:-${all_proxy:-}}}"
 
     if [[ -z "$proxy" ]]; then
         return 0

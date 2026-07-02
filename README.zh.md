@@ -107,6 +107,7 @@ php vendor/bin/task-orchestrator agent:orchestrate \
 
 | 技能 | 功能 |
 |---|---|
+| [`become-role`](docs/agents/skills/become-role/SKILL.md) | 進入角色：將角色的 skills 揭露至代理上下文（Agent Skills 格式） |
 | [`run-subagent`](docs/agents/skills/run-subagent/SKILL.md) | 啟動從屬代理：角色 + 任務指派 + 上下文。超時控制、停滞偵測、輸出過濾 |
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | 從規劃到 merge 執行任務：實作 → self-review → code review → 返工 → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | 透過子代理執行包含多個任務的史詩任務（epic） |
@@ -152,6 +153,12 @@ TasK-orchestrator 是一個 CLI 工具。最低需求：PHP >= 8.4 和一個 CLI
 
 ```bash
 composer require prikotov/task-orchestrator
+```
+
+安裝後執行一次 `agent:init` — 它會在 `<專案>/.agents/skills/` 建立共用 skill `become-role` 的符號連結，讓您的 AI 代理（pi/codex）將其視為原生 skill（透過跨客戶端 `.agents/skills/` 慣例）：
+
+```bash
+php vendor/bin/task-orchestrator agent:init
 ```
 
 最小的 `config/chains.yaml` — 兩個角色和一個兩步驟鏈條：

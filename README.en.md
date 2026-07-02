@@ -107,6 +107,7 @@ Available skills:
 
 | Skill | Description |
 |---|---|
+| [`become-role`](docs/agents/skills/become-role/SKILL.md) | Enter a role and expose its skills to the agent context (Agent Skills format) |
 | [`run-subagent`](docs/agents/skills/run-subagent/SKILL.md) | Launches a subordinate agent: role + assignment + context. Timeout control, stall detection, output filtering |
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | Drives a task from setup to merge: implementation → self-review → code review → revision → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | Drives an epic of multiple tasks via subagents |
@@ -152,6 +153,12 @@ Installation:
 
 ```bash
 composer require prikotov/task-orchestrator
+```
+
+After installation, run `agent:init` once — it creates a symlink for the shared `become-role` skill in `<project>/.agents/skills/` so your AI agent (pi/codex) sees it as a native skill (via the cross-client `.agents/skills/` convention):
+
+```bash
+php vendor/bin/task-orchestrator agent:init
 ```
 
 Minimal `config/chains.yaml` — two roles and a two-step chain:

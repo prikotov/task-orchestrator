@@ -1,0 +1,46 @@
+# Конфигурация сервисов модуля AgentRole.
+#
+# Следует конвенции docs/conventions/modules/configuration.md: конфигурация
+# сервисов модуля лежит в Resource/config/services.yaml, параметры имеют
+# префикс module.agent_role.*. Auto-discovery сервисов модуля выполняется
+# ModuleServiceRegistrar (PHAR-safe); здесь — только explicit defs (aliases,
+# параметры, аргументы).
+
+parameters:
+  module.agent_role.module_dir: '%task_orchestrator.package_dir%/src/Module/AgentRole'
+  # Каталог ролей и skills берётся из глобальных параметров Kernel
+  # (task_orchestrator.roles_dir / skills_dir) — единый источник путей
+  # host-проекта с fallback на package_dir.
+  module.agent_role.roles_dir: '%task_orchestrator.roles_dir%'
+  module.agent_role.skills_dir: '%task_orchestrator.skills_dir%'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  # Domain Service aliases (Interface → Implementation)
+  TaskOrchestrator\Common\Module\AgentRole\Domain\Service\LocateRoleFileServiceInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemLocateRoleFileService
+  TaskOrchestrator\Common\Module\AgentRole\Domain\Service\LoadRoleFrontmatterServiceInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\YamlLoadRoleFrontmatterService
+  TaskOrchestrator\Common\Module\AgentRole\Domain\Service\LoadSkillFrontmatterServiceInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\YamlLoadSkillFrontmatterService
+  TaskOrchestrator\Common\Module\AgentRole\Domain\Service\ResolveRoleSkillsServiceInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRole\Domain\Service\ResolveRoleSkillsService
+  TaskOrchestrator\Common\Module\AgentRole\Domain\Service\FormatSkillCatalogServiceInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRole\Domain\Service\FormatSkillCatalogService
+
+  # Application: basePath для вычисления относительного пути к файлу роли.
+  TaskOrchestrator\Common\Module\AgentRole\Application\UseCase\Query\ResolveRoleSkills\ResolveRoleSkillsQueryHandler:
+    arguments:
+      $basePath: '%task_orchestrator.base_path%'
+
+  # Infrastructure Service parameters.
+  TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemLocateRoleFileService:
+    arguments:
+      $rolesDir: '%module.agent_role.roles_dir%'
+
+  TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\YamlLoadSkillFrontmatterService:
+    arguments:
+      $skillsDir: '%module.agent_role.skills_dir%'
