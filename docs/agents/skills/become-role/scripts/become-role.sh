@@ -1,80 +1,65 @@
 #!/usr/bin/env bash
 #
-# become-role.sh — вход в роль агента: резолвит файл роли и объявляет её skills.
+# become-role.sh <role|file> — войти в роль: путь к файлу роли и её skills.
 #
-# Универсальный механизм «become-role»: агент вызывает этот скрипт, чтобы
-# одновременно получить путь к файлу роли (для чтения через read) и каталог
-# skills роли (XML-блок `<available_skills>` для контекста). Работает и в pi,
-# и в codex, т.к. опирается только на чтение файлов и bin/console.
+# Аргумент — имя роли (snake_case, например team_lead_alex) ИЛИ путь к файлу
+# роли (например docs/agents/roles/team/team_lead_alex.ru.md). Скрипт сам
+# разбирает, что передано.
 #
-# Использование:
-#   scripts/become-role.sh <role>
+# Выводит на stdout относительный путь к файлу роли (от project root) и каталог
+# её skills (<available_skills>). Агент сам читает файл роли через read — скрипт
+# не выводит содержимое роли.
 #
-# Где <role> — имя роли (snake_case), как в config/chains.yaml `roles.<role>`
-# и имя файла роли без локали (например, team_lead_alex).
+# Поиск role-file делегирован в PHP (bin/task-orchestrator agent:role-skills):
+# это работает и в самом task-orchestrator, и в host-проекте — локатор корректно
+# резолвит host-роли через Kernel.
 #
-# Выход (stdout) — блок для контекста агента:
-#   - заголовок роли и абсолютный путь к её файлу (агент читает через read);
-#   - XML-каталог skills роли (с развёрнутыми depends_on).
-#
-# Exit:
-#   0 — успех; 1 — роль не найдена или ошибка резолвинга.
+# Exit: 0 — успех; 1 — роль не найдена или ошибка получения skills.
 
 set -euo pipefail
 
 if [[ $# -lt 1 || -z "${1:-}" ]]; then
-    echo "Использование: $0 <role>" >&2
-    echo "  <role> — имя роли (snake_case), например team_lead_alex" >&2
+    echo "Использование: $0 <role|file>" >&2
+    echo "  <role>  — имя роли (snake_case), например team_lead_alex" >&2
+    echo "  <file>  — путь к файлу роли, например docs/agents/roles/team/team_lead_alex.ru.md" >&2
     exit 1
 fi
 
-ROLE_NAME="$1"
+ARG="$1"
 
-# Пути вычисляются от расположения скрипта (как в watch-subagent.sh).
+# Каталог пакета (через симлинк .agents/ pwd -P даёт физический путь к пакету);
+# bin/task-orchestrator сам определяет контекст (standalone vs vendor/host).
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
-ROLES_DIR="${PROJECT_ROOT}/docs/agents/roles/team"
-CONSOLE="${PROJECT_ROOT}/bin/console"
+PACKAGE_ROOT="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
+TASK_ORCH_BIN="$PACKAGE_ROOT/bin/task-orchestrator"
 
-# Поиск файла роли: предпочтение .ru.md, затем .md, затем любой .<locale>.md.
-find_role_file() {
-    local role="$1"
-    local candidate
-
-    for candidate in \
-        "${ROLES_DIR}/${role}.ru.md" \
-        "${ROLES_DIR}/${role}.md"; do
-        if [[ -f "$candidate" ]]; then
-            realpath "$candidate"
-            return 0
-        fi
-    done
-
-    # Fallback: любой <role>.<locale>.md.
-    local found
-    found="$(find "$ROLES_DIR" -maxdepth 1 -type f -name "${role}.*.md" 2>/dev/null | head -1 || true)"
-    if [[ -n "$found" ]]; then
-        realpath "$found"
-        return 0
-    fi
-
-    return 1
+# Имя роли из basename файла роли: team_lead_alex.ru.md → team_lead_alex.
+role_name_from_file() {
+    local name
+    name="$(basename "$1")"          # team_lead_alex.ru.md
+    name="${name%.md}"               # team_lead_alex.ru
+    name="${name%.[a-z][a-z]}"       # team_lead_alex (убрать суффикс локали)
+    echo "$name"
 }
 
-ROLE_FILE="$(find_role_file "$ROLE_NAME")" || {
-    echo "Ошибка: файл роли \"${ROLE_NAME}\" не найден в ${ROLES_DIR}." >&2
-    exit 1
-}
+if [[ -f "$ARG" ]]; then
+    ROLE_NAME="$(role_name_from_file "$ARG")"
+else
+    ROLE_NAME="$ARG"
+fi
 
-echo "# Роль: ${ROLE_NAME}"
-echo ""
-echo "Файл роли (прочитай полностью через read перед началом работы):"
-echo "  ${ROLE_FILE}"
-echo ""
-
-# Каталог skills роли (XML-блок). bin/console делает fail-fast при ошибках
-# (несуществующий skill, цикл depends_on) — выводит ошибку в stderr и exit 1.
-if ! "$CONSOLE" agent:role-skills "$ROLE_NAME" --format=block; then
-    echo "Ошибка: не удалось развернуть skills роли \"${ROLE_NAME}\"." >&2
+# agent:role-skills через bin/task-orchestrator (host-aware). --format=json:
+# {role, role_file, skills, catalog}. bin/task-orchestrator делает fail-fast
+# при ошибках (роль/skill не найдены, цикл depends_on) — ненулевой exit.
+if ! OUTPUT="$("$TASK_ORCH_BIN" agent:role-skills "$ROLE_NAME" --format=json)"; then
+    echo "Ошибка: не удалось получить данные роли \"${ROLE_NAME}\"." >&2
     exit 1
 fi
+
+ROLE_FILE="$(jq -r '.role_file' <<< "$OUTPUT")"
+CATALOG="$(jq -r '.catalog' <<< "$OUTPUT")"
+
+echo "Роль: ${ROLE_NAME}"
+echo "Файл роли: ${ROLE_FILE}"
+echo ""
+echo "$CATALOG"

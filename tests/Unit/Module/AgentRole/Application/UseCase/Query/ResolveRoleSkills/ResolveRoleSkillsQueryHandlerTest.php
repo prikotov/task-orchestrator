@@ -41,6 +41,7 @@ final class ResolveRoleSkillsQueryHandlerTest extends TestCase
             $this->roleReader,
             $this->resolver,
             $this->formatter,
+            basePath: '/abs/project',
         );
     }
 
@@ -48,7 +49,7 @@ final class ResolveRoleSkillsQueryHandlerTest extends TestCase
     public function invokeResolvesRoleSkillsAndCatalogBlock(): void
     {
         // Arrange
-        $roleFile = '/abs/roles/team/team_lead_alex.ru.md';
+        $roleFile = '/abs/project/docs/agents/roles/team/team_lead_alex.ru.md';
         $roleMetadata = new RoleMetadataVo(
             name: RoleNameVo::createFromName('team_lead_alex'),
             filePath: $roleFile,
@@ -75,6 +76,7 @@ final class ResolveRoleSkillsQueryHandlerTest extends TestCase
         self::assertSame('run-subagent', $result->skills[0]->name);
         self::assertSame('Запуск сабагента', $result->skills[0]->description);
         self::assertSame('<available_skills>...</available_skills>', $result->catalogBlock);
+        self::assertSame('docs/agents/roles/team/team_lead_alex.ru.md', $result->roleFilePath);
     }
 
     #[Test]

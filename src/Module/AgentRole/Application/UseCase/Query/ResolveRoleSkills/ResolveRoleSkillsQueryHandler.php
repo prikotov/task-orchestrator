@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\AgentRole\Application\UseCase\Query\ResolveRoleSkills;
 
+use Symfony\Component\Filesystem\Path;
 use TaskOrchestrator\Common\Module\AgentRole\Application\Dto\SkillDto;
 use TaskOrchestrator\Common\Module\AgentRole\Application\Exception\ResolveRoleSkillsFailedException;
 use TaskOrchestrator\Common\Module\AgentRole\Domain\Exception\AgentRoleException;
@@ -35,6 +36,7 @@ final readonly class ResolveRoleSkillsQueryHandler
         private LoadRoleFrontmatterServiceInterface $roleFrontmatterReader,
         private ResolveRoleSkillsServiceInterface $roleSkillsResolver,
         private FormatSkillCatalogServiceInterface $skillCatalogFormatter,
+        private string $basePath,
     ) {
     }
 
@@ -61,7 +63,16 @@ final readonly class ResolveRoleSkillsQueryHandler
         return new ResolveRoleSkillsResultDto(
             skills: $this->toSkillDtos($skills),
             catalogBlock: $catalogBlock,
+            roleFilePath: $this->relativeRoleFilePath($roleFile),
         );
+    }
+
+    /**
+     * Относительный путь файла роли от base_path проекта.
+     */
+    private function relativeRoleFilePath(string $roleFile): string
+    {
+        return Path::makeRelative($roleFile, $this->basePath);
     }
 
     /**

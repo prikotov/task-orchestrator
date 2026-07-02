@@ -17,10 +17,12 @@ final readonly class ResolveRoleSkillsResultDto
     /**
      * @param list<SkillDto> $skills упорядоченный список skills роли
      * @param string $catalogBlock XML-блок `<available_skills>` (пустая строка, если skills нет)
+     * @param string $roleFilePath относительный путь к файлу роли (от project root)
      */
     public function __construct(
         public array $skills,
         public string $catalogBlock,
+        public string $roleFilePath,
     ) {
     }
 }

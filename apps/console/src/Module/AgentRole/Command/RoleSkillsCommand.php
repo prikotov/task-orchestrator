@@ -144,6 +144,7 @@ final class RoleSkillsCommand extends Command
             return json_encode(
                 [
                     'role' => $roleName,
+                    'role_file' => $result->roleFilePath,
                     'skills' => array_map(
                         static fn (SkillDto $skill): array => [
                             'name' => $skill->name,

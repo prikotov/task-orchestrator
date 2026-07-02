@@ -14,25 +14,25 @@ use Symfony\Component\Process\Process;
  * Integration-тест скрипта become-role.sh.
  *
  * Запускает реальный скрипт на реальном проекте (включая bin/console) и
- * проверяет, что вывод содержит путь к файлу роли и XML-каталог её skills.
+ * проверяет, что вывод содержит путь к файлу роли и XML-блок её skills.
  */
 #[Group('integration')]
 #[CoversNothing]
 final class BecomeRoleScriptTest extends TestCase
 {
-    private function runScript(string $role): Process
+    private function runScript(string $roleOrFile): Process
     {
         $projectRoot = dirname(__DIR__, 6);
         $script = $projectRoot . '/docs/agents/skills/become-role/scripts/become-role.sh';
 
-        $process = new Process(['bash', $script, $role], cwd: $projectRoot);
+        $process = new Process(['bash', $script, $roleOrFile], cwd: $projectRoot);
         $process->run();
 
         return $process;
     }
 
     #[Test]
-    public function adoptRoleOutputsRoleFileAndSkillsCatalogForKnownRole(): void
+    public function becomeRoleOutputsRolePathAndSkillsBlockForKnownRole(): void
     {
         // Act
         $process = $this->runScript('team_lead_alex');
@@ -41,8 +41,8 @@ final class BecomeRoleScriptTest extends TestCase
         self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
         $output = $process->getOutput();
 
-        self::assertStringContainsString('# Роль: team_lead_alex', $output);
-        self::assertStringContainsString('team_lead_alex.ru.md', $output);
+        self::assertStringContainsString('Роль: team_lead_alex', $output);
+        self::assertStringContainsString('Файл роли: docs/agents/roles/team/team_lead_alex.ru.md', $output);
         self::assertStringContainsString('<available_skills>', $output);
         // run-subagent — прямая декларация + транзитивная зависимость других skills Тимлида.
         self::assertStringContainsString('<name>run-subagent</name>', $output);
@@ -55,7 +55,22 @@ final class BecomeRoleScriptTest extends TestCase
     }
 
     #[Test]
-    public function adoptRoleFailsOnUnknownRole(): void
+    public function becomeRoleAcceptsRoleFilePath(): void
+    {
+        // Arrange — вызвать через путь к файлу роли, а не по имени.
+        // Act
+        $process = $this->runScript('docs/agents/roles/team/team_lead_alex.ru.md');
+
+        // Assert — имя роли выводится из basename файла; skills каталог присутствует.
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        $output = $process->getOutput();
+
+        self::assertStringContainsString('Роль: team_lead_alex', $output);
+        self::assertStringContainsString('<available_skills>', $output);
+    }
+
+    #[Test]
+    public function becomeRoleFailsOnUnknownRole(): void
     {
         // Act
         $process = $this->runScript('definitely_unknown_role_xyz');

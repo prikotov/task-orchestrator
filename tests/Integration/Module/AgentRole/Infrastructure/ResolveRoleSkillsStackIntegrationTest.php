@@ -49,6 +49,7 @@ final class ResolveRoleSkillsStackIntegrationTest extends TestCase
             roleFrontmatterReader: new YamlLoadRoleFrontmatterService($parser),
             roleSkillsResolver: new ResolveRoleSkillsService(new YamlLoadSkillFrontmatterService($this->skillsDir, $parser)),
             skillCatalogFormatter: new FormatSkillCatalogService(),
+            basePath: $fixturesDir,
         );
     }
 
