@@ -7,6 +7,7 @@ namespace TaskOrchestrator\Tests\Unit\Module\AgentRole\Application\UseCase\Query
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use TaskOrchestrator\Common\Module\AgentRole\Application\Exception\ResolveRoleSkillsFailedException;
 use TaskOrchestrator\Common\Module\AgentRole\Application\UseCase\Query\ResolveRoleSkills\ResolveRoleSkillsQuery;
 use TaskOrchestrator\Common\Module\AgentRole\Application\UseCase\Query\ResolveRoleSkills\ResolveRoleSkillsQueryHandler;
@@ -41,6 +42,7 @@ final class ResolveRoleSkillsQueryHandlerTest extends TestCase
             $this->roleReader,
             $this->resolver,
             $this->formatter,
+            new Filesystem(),
             basePath: '/abs/project',
         );
     }

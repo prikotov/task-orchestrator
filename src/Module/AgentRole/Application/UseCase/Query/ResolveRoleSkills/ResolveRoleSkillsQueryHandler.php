@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\AgentRole\Application\UseCase\Query\ResolveRoleSkills;
 
-use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Filesystem\Filesystem;
 use TaskOrchestrator\Common\Module\AgentRole\Application\Dto\SkillDto;
 use TaskOrchestrator\Common\Module\AgentRole\Application\Exception\ResolveRoleSkillsFailedException;
 use TaskOrchestrator\Common\Module\AgentRole\Domain\Exception\AgentRoleException;
@@ -36,6 +36,7 @@ final readonly class ResolveRoleSkillsQueryHandler
         private LoadRoleFrontmatterServiceInterface $roleFrontmatterReader,
         private ResolveRoleSkillsServiceInterface $roleSkillsResolver,
         private FormatSkillCatalogServiceInterface $skillCatalogFormatter,
+        private Filesystem $filesystem,
         private string $basePath,
     ) {
     }
@@ -72,7 +73,8 @@ final readonly class ResolveRoleSkillsQueryHandler
      */
     private function relativeRoleFilePath(string $roleFile): string
     {
-        return Path::makeRelative($roleFile, $this->basePath);
+        // makePathRelative добавляет trailing '/' (для директорий) — обрезаем для файла.
+        return rtrim($this->filesystem->makePathRelative($roleFile, $this->basePath), '/');
     }
 
     /**

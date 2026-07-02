@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use TaskOrchestrator\Common\Module\AgentRole\Application\UseCase\Query\ResolveRoleSkills\ResolveRoleSkillsQuery;
 use TaskOrchestrator\Common\Module\AgentRole\Application\UseCase\Query\ResolveRoleSkills\ResolveRoleSkillsQueryHandler;
 use TaskOrchestrator\Common\Module\AgentRole\Domain\Service\FormatSkillCatalogService;
@@ -49,6 +50,7 @@ final class ResolveRoleSkillsStackIntegrationTest extends TestCase
             roleFrontmatterReader: new YamlLoadRoleFrontmatterService($parser),
             roleSkillsResolver: new ResolveRoleSkillsService(new YamlLoadSkillFrontmatterService($this->skillsDir, $parser)),
             skillCatalogFormatter: new FormatSkillCatalogService(),
+            filesystem: new Filesystem(),
             basePath: $fixturesDir,
         );
     }
