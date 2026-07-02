@@ -37,19 +37,19 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 ## Скиллы ролей
 
-Роль может ссылаться на скиллы (skills). Скилл — каталог с `SKILL.md` и вспомогательными файлами (скрипты, шаблоны). Скиллы лежат в [`docs/agents/skills/`](docs/agents/skills/).
+В frontmatter роли может быть список skills (скиллов). Скилл — каталог с `SKILL.md` и вспомогательными файлами (скрипты, шаблоны). Скиллы лежат в [`docs/agents/skills/`](docs/agents/skills/).
 
-При загрузке роли используется единый механизм **adopt-role** — мета-скилл, который резолвит файл роли и объявляет её скиллы в контексте (универсален для pi и codex, не зависит от нативной автозагрузки скиллов):
+При загрузке роли используется единый механизм **adopt-role** — мета-скилл, который резолвит файл роли и объявляет её скиллы в контексте (сам `adopt-role` доступен агентам через `.agents/skills/`, а role-специфичные скиллы не требуют нативной автозагрузки; работает и в pi, и в codex):
 
 1. Определи имя роли (snake_case, по списку выше). Если роль не названа явно — выбери подходящую по описаниям выше и [матрице RACI](docs/agents/raci-matrix.md).
-2. Вызови `docs/agents/skills/adopt-role/scripts/adopt-role.sh <role>` (или `bin/console agent:role-skills <role> --format=block`). Скрипт выведет путь к файлу роли и XML-каталог её скиллов (с развёрнутыми зависимостями `depends_on`).
+2. Вызови `docs/agents/skills/adopt-role/scripts/adopt-role.sh <role>` (или `bin/console agent:role-skills <role> --format=block`). Скрипт выведет путь к файлу роли и, при наличии скиллов, XML-каталог `<available_skills>` с развёрнутыми `depends_on`.
 3. Прочитай файл роли (путь из вывода) полностью через `read` — там personality, экспертиза, стиль работы.
 4. Каталог скиллов (`<available_skills>`) уже в контексте. Когда задача совпадает с описанием скилла — открой его `SKILL.md` по `<location>` через `read`.
-5. Скрипты и ресурсы скилла лежат **рядом с `SKILL.md`**. Путь к скрипту — относительный от каталога скилла. Пример: если `SKILL.md` прочитан из `docs/agents/skills/run-subagent/SKILL.md`, то скрипт `scripts/watch-subagent.sh` находится в `docs/agents/skills/run-subagent/scripts/watch-subagent.sh`.
+5. Относительные пути внутри скилла резолвь от каталога его `SKILL.md` (например, `scripts/watch-subagent.sh` рядом с `docs/agents/skills/run-subagent/SKILL.md`).
 
-`adopt-role` — единственный общий скилл: он сам фильтрует скиллы по роли, поэтому role-специфичные скиллы не нужно размещать в автозагружаемых локациях (`.agents/skills/`, `.pi/skills/`, `.codex/skills/`), где их увидели бы все роли. Изоляция контекста по роли достигается промптом, а не автозагрузкой.
+`adopt-role` — единственный общий скилл: он резолвит скиллы из frontmatter роли (включая `depends_on`), поэтому role-специфичные скиллы не нужно размещать в автозагружаемых локациях (`.agents/skills/`, `.pi/skills/`, `.codex/skills/`), где их увидели бы все роли. Изоляция контекста по роли достигается промптом, а не автозагрузкой.
 
-🔴 **Локальный setup (обязательно после clone).** Каталог `.agents/` находится в `.gitignore` — он создаётся per-environment. Чтобы pi/codex увидели `adopt-role`, один раз выполни `bin/console agent:init` (симлинк `adopt-role` в `.agents/skills/`). Проверь: `ls .agents/skills/` должен показывать `adopt-role`. Без этого скилл невидим агентам.
+🔴 **Локальная настройка (обязательно после клонирования).** Каталог `.agents/` находится в `.gitignore` — он создаётся per-environment. Чтобы pi/codex увидели `adopt-role`, один раз выполни `bin/console agent:init` (симлинк `adopt-role` в `.agents/skills/`). Проверь: `ls .agents/skills/` должен показывать `adopt-role`. Без этого скилл невидим агентам.
 
 ---
 
