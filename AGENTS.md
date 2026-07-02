@@ -162,17 +162,7 @@ AGENTS.md — обязательные правила для AI-агента в 
 
 # Запуск codex (прокси)
 
-* **Codex CLI в этом проекте требует HTTPS-прокси.** Без него — `403 Forbidden` на `chatgpt.com` (Cloudflare IP-block по региону). Это НЕ баг codex, НЕ требует мостов/обходов — нужен только прокси в окружении.
-* Прокси лежит в `.env.local` проекта (переменная `CODEX_HTTP_PROXY`).
-* **Через `watch-subagent.sh` прокси подхватывается автоматически**: скрипт source-ит `.env.local` и выставляет `HTTPS_PROXY`/`HTTP_PROXY` из `CODEX_HTTP_PROXY` для codex-раннера. Ручных действий не требуется.
-* **Прямой запуск codex** (вне `watch-subagent.sh`):
-  ```bash
-  set -a; . ./.env.local; set +a
-  codex exec --json --skip-git-repo-check --ephemeral "..."
-  ```
-  или `export HTTPS_PROXY="$CODEX_HTTP_PROXY" HTTP_PROXY="$CODEX_HTTP_PROXY"` перед вызовом.
-* При `CODEX_HTTP_PROXY` со схемой `https://` codex пишет шум `Reconnecting... Proxy URL scheme not supported` и падает на WebSocket → **это нормально**, сразу следует fallback на HTTPS-transport, и запрос проходит. Не воспринимать как ошибку.
-* 🔴 **Запрещено** «изобретать» обходы (HttpsProxyBridge standalone, PHP-мосты, костыли) для запуска codex вне PHP-раннера. Прокси в env — единственное решение. HttpsProxyBridge используется только внутри `CodexAgentRunnerService` (PHP, через `bin/console`), для `watch-subagent.sh` он не нужен.
+* Codex CLI требует HTTPS-прокси (Cloudflare IP-block по региону; без него — `403 Forbidden`). Прокси в `.env.local` (`CODEX_HTTP_PROXY`); `watch-subagent.sh` подхватывает автоматически. Детали и прямой запуск — в [доке по запуску codex](docs/guide/codex.md).
 
 ---
 
