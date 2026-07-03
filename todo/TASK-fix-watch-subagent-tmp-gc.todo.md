@@ -9,8 +9,8 @@ epic:
 author: Тимлид Алекс
 assignee: Тимлид Алекс
 branch: task/fix-watch-subagent-tmp-gc
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/291
+status: review
 ---
 
 # TASK-fix-watch-subagent-tmp-gc: очистка осиротевших TMPDIR и сам-уборка watcher'а
