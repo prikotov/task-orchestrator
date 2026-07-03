@@ -9,8 +9,8 @@ epic:
 author: Тимлид Алекс
 assignee: Бэкендер Левша
 branch: task/fix-pi-runner-https-proxy
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/290
+status: review
 ---
 
 # TASK-fix-pi-runner-https-proxy: HTTPS-прокси для pi-runner
