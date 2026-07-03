@@ -43,6 +43,15 @@
 #                            пока read блокирован) и каждые WATCH_WATCHER_INTERVAL
 #                            секунд пишет heartbeat в run-log — диагностическая
 #                            улика «основной цикл завис» (растущий stall_gap).
+#   WATCH_TMP_GC=0         — отключить startup-очистку осиротевших TMPDIR прошлых
+#                            запусков (по умолчанию ВКЛ). При SIGKILL/OOM/закрытии
+#                            терминала trap cleanup НЕ отрабатывает (bash не
+#                            исполняет traps при жёстком убийстве), и /tmp копит
+#                            гигабайты мусора (events.ndjson до сотен МБ на запуск).
+#                            GC удаляет только осиротевшие каталоги старше
+#                            WATCH_TMP_GC_MIN_AGE_MIN минут, без живого держателя.
+#   WATCH_TMP_GC_MIN_AGE_MIN — минимальный возраст TMPDIR (минут) для удаления
+#                            startup-GC (default: 360 = 6 часов).
 #
 # Переменные окружения (наследование от внешней обёртки):
 #   RUNNER/PROVIDER/MODEL/REASONING — см. приоритеты выше.
@@ -518,6 +527,61 @@ log_run() {
     printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> "$RUN_LOG" 2>/dev/null || true
 }
 
+# Garbage collection осиротевших TMPDIR прошлых запусков. trap cleanup НЕ
+# срабатывает на SIGKILL/OOM/закрытие терминала (bash не исполняет traps при
+# жёстком убийстве), поэтому /tmp копит гигабайты мусора: каждый убитый прогон
+# оставляет events.ndjson (часто сотни МБ). GC запускается при старте и удаляет
+# только осиротевшие каталоги (маркер watch-subagent — events.pipe/events.ndjson),
+# пропуская свежие (моложе min-age) и занятые живым процессом.
+gc_tmpdir() {
+    [[ "${WATCH_TMP_GC:-1}" == "1" ]] || return 0
+    local min_age="${WATCH_TMP_GC_MIN_AGE_MIN:-360}"   # 6 часов по умолчанию
+    local now mt age d removed=0 skipped=0 prev_nullglob
+    now=$(date +%s)
+    # shopt -p БЕЗ -s/-u возвращает exit-статус query (0 если опция on, 1 если off),
+    # что под set -e убивает процесс. Сохраняем состояние через -q (тихий query).
+    if shopt -q nullglob; then
+        prev_nullglob="shopt -s nullglob"
+    else
+        prev_nullglob="shopt -u nullglob"
+    fi
+    shopt -s nullglob
+    for d in /tmp/tmp.*/; do
+        [[ -p "${d}events.pipe" || -f "${d}events.ndjson" ]] || continue
+        mt=$(stat -c %Y "$d" 2>/dev/null || echo 0)
+        [[ "$mt" =~ ^[0-9]+$ ]] || continue
+        age=$(( (now - mt) / 60 ))
+        if [[ $age -lt $min_age ]]; then skipped=$((skipped+1)); continue; fi
+        if _gc_tmpdir_has_holder "$d"; then skipped=$((skipped+1)); continue; fi
+        log_run "gc_tmpdir removing orphan: ${d} age=${age}min size=$(du -sh "$d" 2>/dev/null | cut -f1)"
+        rm -rf "$d"
+        removed=$((removed+1))
+    done
+    eval "$prev_nullglob"
+    if [[ $removed -gt 0 || $skipped -gt 0 ]]; then
+        log_run "gc_tmpdir done: removed=$removed skipped=$skipped"
+    fi
+}
+
+# 0 = есть живой держатель (не удалять); 1 = свободен (можно удалить).
+# fail-safe: если ни lsof, ни fuser недоступны — считаем «есть держатель»
+# (никогда не удаляем вслепую).
+_gc_tmpdir_has_holder() {
+    local d="$1" pids
+    if command -v lsof >/dev/null 2>&1; then
+        pids=$(lsof -t "$d" 2>/dev/null);                [[ -n "$pids" ]] && return 0
+        [[ -p "$d/events.pipe" ]] && { pids=$(lsof -t "$d/events.pipe" 2>/dev/null); [[ -n "$pids" ]] && return 0; }
+        [[ -f "$d/events.ndjson" ]] && { pids=$(lsof -t "$d/events.ndjson" 2>/dev/null); [[ -n "$pids" ]] && return 0; }
+        return 1
+    fi
+    if command -v fuser >/dev/null 2>&1; then
+        fuser "$d" >/dev/null 2>&1 && return 0
+        [[ -p "$d/events.pipe" ]] && fuser "$d/events.pipe" >/dev/null 2>&1 && return 0
+        return 1
+    fi
+    return 0
+}
+
 log_run "=== RUN START ==="
 log_run "runner=$RUNNER role=$ROLE_FILE role_slug=$RUN_ROLE_SLUG"
 log_run "provider=${PROVIDER:-<none>} model=${MODEL:-<none>} reasoning=${REASONING:-<none>}"
@@ -525,6 +589,11 @@ log_run "soft_timeout=${SOFT_TIMEOUT}s hard_timeout=${HARD_TIMEOUT}s stall_timeo
 log_run "effective_hard=${EFFECTIVE_HARD:-<computed-later>}s"
 log_run "run_log=$RUN_LOG"
 log_run "watch_keep_tmp=${WATCH_KEEP_TMP:-0}"
+
+# Убираем осиротевшие TMPDIR прошлых запусков (убитых SIGKILL/OOM/закрытием
+# терминала — их trap cleanup не отработал, /tmp копит гигабайты мусора).
+# Запускается ДО создания нашего TMPDIR: чистим старьё, затем создаём свежий.
+gc_tmpdir
 
 TMPDIR=$(mktemp -d)
 PIPE="$TMPDIR/events.pipe"
@@ -538,6 +607,7 @@ LAST_EVENT_FILE="$TMPDIR/last_event"
 SUMMARY_MARKER="$TMPDIR/.summary_written"
 ARCHIVE_MARKER="$TMPDIR/.archive_done"
 mkfifo "$PIPE"
+log_run "tmpdir=$TMPDIR"
 
 AGENT_PID=""
 WATCHER_PID=""
@@ -751,6 +821,20 @@ start_watcher() {
 
         while true; do
             sleep "$WATCHER_INTERVAL" 2>/dev/null || sleep 5
+
+            # Родитель (основной watch-subagent) убит (SIGKILL/OOM/закрытие
+            # терминала)? Мы — сирота: trap cleanup родителя не отработал, и
+            # без самостоятельной уборки TMPDIR утечёт (копится мусор в /tmp).
+            # Приберёмся сами: summary → архив → kill дерева агента → rm TMPDIR.
+            if ! kill -0 "$$" 2>/dev/null; then
+                log_run "watcher_orphaned: parent=$$ dead — self-cleanup of $TMPDIR"
+                emit_run_summary "watcher_orphaned" 124 watcher
+                archive_events "watcher_orphaned"
+                kill_agent_tree
+                rm -rf "$TMPDIR"
+                exit 0
+            fi
+
             w_now=$(date +%s)
             w_read=$(cat "$LAST_EVENT_FILE" 2>/dev/null || echo "$w_start")
             [[ "$w_read" =~ ^[0-9]+$ ]] || w_read="$w_start"

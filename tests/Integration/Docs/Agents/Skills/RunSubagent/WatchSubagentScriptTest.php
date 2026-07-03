@@ -21,6 +21,9 @@ final class WatchSubagentScriptTest extends TestCase
     private string $argsCaptureFile;
     private string $stdinCaptureFile;
 
+    /** @var list<string> созданные тестом watch-subagent tmpdir в /tmp — гарантированный cleanup в tearDown */
+    private array $gcTmpdirs = [];
+
     protected function setUp(): void
     {
         $tempDir = sys_get_temp_dir() . '/watch-subagent-test-' . bin2hex(random_bytes(6));
@@ -71,6 +74,12 @@ YAML);
     protected function tearDown(): void
     {
         $this->removeDirectory($this->tempDir);
+
+        foreach ($this->gcTmpdirs as $dir) {
+            if (is_dir($dir)) {
+                $this->removeDirectory($dir);
+            }
+        }
     }
 
     #[Test]
@@ -301,6 +310,43 @@ YAML);
 
         $eventsDir = dirname($runLog) . '/events';
         self::assertFileExists($eventsDir . '/events.ndjson', 'events/ must be archived on failure');
+    }
+
+    /**
+     * startup-GC (WATCH_TMP_GC) должен удалять осиротевшие TMPDIR прошлых
+     * запусков (убитых SIGKILL/OOM — trap cleanup не отрабатывает), но НЕ
+     * трогать свежие (моложе WATCH_TMP_GC_MIN_AGE_MIN). Регрессия: `shopt -p
+     * nullglob` под `set -e` возвращал exit 1 (nullglob off) и убивал процесс
+     * (фикс: `shopt -q`).
+     */
+    #[Test]
+    public function gcTmpdirRemovesOrphanedTmpdirsButKeepsFresh(): void
+    {
+        // Осиротевший (7ч назад, без держателя) — должен удалиться startup-GC.
+        $orphan = $this->createGcTmpdir('gc-orphan', '7 hours ago');
+        // Свежий (моложе min-age=360мин) — не должен трогаться.
+        $fresh = $this->createGcTmpdir('gc-fresh', null);
+
+        $this->runScript(expectSuccess: true);
+
+        // tearDown уберёт остатки (даже при failure) — ассерты не должны этому мешать.
+        self::assertFileDoesNotExist($orphan, 'startup-GC must remove orphaned watch-subagent tmpdir');
+        self::assertFileExists($fresh, 'startup-GC must keep fresh tmpdir (age < min)');
+    }
+
+    private function createGcTmpdir(string $suffix, ?string $age): string
+    {
+        $dir = sys_get_temp_dir() . '/tmp.' . $suffix . '.' . bin2hex(random_bytes(4));
+        self::assertTrue(mkdir($dir, 0o777, true), 'cannot create ' . $dir);
+        file_put_contents($dir . '/events.ndjson', "{\"x\":1}\n");
+
+        if ($age !== null) {
+            (new Process(['touch', '-d', $age, $dir, $dir . '/events.ndjson']))->mustRun();
+        }
+
+        $this->gcTmpdirs[] = $dir;   // регистрируем для гарантированного cleanup в tearDown
+
+        return $dir;
     }
 
     /**
