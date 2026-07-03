@@ -12,6 +12,7 @@ use Symfony\Component\Process\Process;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\PiAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
 
 /**
  * Реализация AgentRunnerInterface для pi CLI.
@@ -22,6 +23,12 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunReques
  * Пути к файлам промптов (--system-prompt, --append-system-prompt) передаются
  * как абсолютные пути — Pi читает файлы самостоятельно через existsSync-эвристику.
  * Значения с префиксом @ разрешаются как пути к файлам (содержимое подставляется inline).
+ *
+ * Поддержка HTTPS-прокси через HttpsProxyBridge (переиспользуется из Codex-раннера):
+ * если CODEX_HTTP_PROXY содержит https:// схему, автоматически запускается
+ * локальный HTTP-прокси-мост, пересылающий CONNECT-запросы через TLS.
+ * Симметрично CodexAgentRunnerService, чтобы любой pi-профиль, ходящий к OpenAI,
+ * работал через прокси без ручных действий.
  */
 final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterface
 {
@@ -125,6 +132,35 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
             $process->setWorkingDirectory($request->getWorkingDir());
         }
 
+        // HTTPS-прокси мост: если CODEX_HTTP_PROXY содержит https:// схему,
+        // запускаем локальный HTTP-прокси-мост для пересылки через TLS.
+        // Ошибки запуска моста не должны бросать исключение из run() —
+        // возвращаем AgentResultVo::createError() по контракту AgentRunnerInterface.
+        $bridge = null;
+        try {
+            $bridge = $this->createBridgeIfNeeded();
+        } catch (\Throwable $e) {
+            return AgentResultVo::createError(
+                errorMessage: sprintf('Failed to start HTTPS proxy bridge: %s', $e->getMessage()),
+            );
+        }
+
+        // Передача HTTP-прокси через env-переменные:
+        // CODEX_HTTP_PROXY (приоритет) подменяет HTTPS_PROXY для pi-процесса.
+        // Если CODEX_HTTP_PROXY не задан — Process наследует env родителя (HTTPS_PROXY, HTTP_PROXY).
+        $codexProxy = getenv('CODEX_HTTP_PROXY');
+        if ($codexProxy !== false && $codexProxy !== '') {
+            $processEnv = $this->buildProcessEnv(getenv());
+
+            // Если мост запущен — подменяем HTTPS_PROXY на локальный URL моста
+            if ($bridge !== null) {
+                $processEnv['HTTPS_PROXY'] = $bridge->getLocalProxyUrl();
+                $processEnv['HTTP_PROXY'] = $bridge->getLocalProxyUrl();
+            }
+
+            $process->setEnv($processEnv);
+        }
+
         $this->parser->reset();
         $stdoutBuffer = '';
         $errorOutput = '';
@@ -155,6 +191,10 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
                 errorMessage: sprintf('pi process terminated by signal %d.', $e->getSignal()),
                 exitCode: 128 + $e->getSignal(),
             );
+        } finally {
+            // Гарантированная остановка orphan-процесса моста при любом исходе
+            // (включая таймаут/сигнал/нормальное завершение).
+            $bridge?->stop();
         }
 
         if (!$process->isSuccessful()) {
@@ -182,6 +222,62 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
             model: $parsed['model'],
             turns: $parsed['turns'],
         );
+    }
+
+    /**
+     * Формирует env-переменные для Symfony Process с учётом HTTP-прокси.
+     *
+     * Приоритет HTTPS_PROXY для pi-процесса:
+     *   CODEX_HTTP_PROXY (если задан) → подменяет HTTPS_PROXY
+     *   HTTPS_PROXY из окружения      → унаследуется автоматически (если setEnv не вызван)
+     *   HTTP_PROXY из окружения       → унаследуется автоматически
+     *
+     * Для https://-схемы HTTPS_PROXY НЕ подменяется здесь — это сделает мост в run()
+     * (подставит свой локальный http:// URL).
+     *
+     * Метод принимает текущее окружение как параметр для тестируемости.
+     *
+     * @param array<string, string> $currentEnv текущее окружение (например, из getenv())
+     *
+     * @return array<string, string> окружение с подменённым HTTPS_PROXY
+     */
+    public function buildProcessEnv(array $currentEnv): array
+    {
+        $codexProxy = $currentEnv['CODEX_HTTP_PROXY'] ?? null;
+
+        if ($codexProxy !== null && $codexProxy !== '') {
+            // Для HTTPS-прокси НЕ подменяем HTTPS_PROXY здесь — мост это сделает в run()
+            if (!str_starts_with($codexProxy, 'https://')) {
+                $currentEnv['HTTPS_PROXY'] = $codexProxy;
+            }
+        }
+
+        return $currentEnv;
+    }
+
+    /**
+     * Создаёт HttpsProxyBridge если CODEX_HTTP_PROXY содержит https:// схему.
+     *
+     * Мост переиспользуется из Codex-раннера (общий механизм обхода Cloudflare
+     * IP-block для endpoint'ов OpenAI).
+     *
+     * @return HttpsProxyBridge|null мост или null если HTTPS-прокси не нужен
+     */
+    public function createBridgeIfNeeded(): ?HttpsProxyBridge
+    {
+        $codexProxy = getenv('CODEX_HTTP_PROXY');
+        if ($codexProxy === false || $codexProxy === '') {
+            return null;
+        }
+
+        if (!str_starts_with($codexProxy, 'https://')) {
+            return null;
+        }
+
+        $bridge = new HttpsProxyBridge($codexProxy);
+        $bridge->start();
+
+        return $bridge;
     }
 
     /**
