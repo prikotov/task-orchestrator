@@ -674,6 +674,53 @@ YAML);
     }
 
     #[Test]
+    public function loadParsesDynamicChainRetryPolicy(): void
+    {
+        // retry_policy на уровне dynamic-цепочки должна доходить до
+        // DynamicChainDefinitionVo::getDefaultRetryPolicy() — это основа transient-retry
+        // шагов dynamic-цикла (спасает зависшие шаги вроде glm synthesis в json-режиме).
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_retry_dyn_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+chains:
+  retry_dyn:
+    type: dynamic
+    facilitator: x
+    participants: [a]
+    prompts:
+      brainstorm_system: "BS"
+      facilitator_append: "FA %s"
+      facilitator_start: "St %s"
+      facilitator_continue: "C %s %s"
+      facilitator_finalize: "F %s %s"
+      participant_append: "PA %s"
+      participant_user: "PU %s %s"
+    retry_policy:
+      max_retries: 4
+      initial_delay_ms: 500
+      max_delay_ms: 20000
+      multiplier: 2.0
+YAML);
+
+        try {
+            $loader = self::createLoader($fixturePath);
+            $chain = $loader->load('retry_dyn');
+
+            self::assertSame(ChainTypeEnum::dynamicType, $chain->getType());
+            $retryPolicy = $chain->getDefaultRetryPolicy();
+            self::assertNotNull($retryPolicy, 'dynamic chain must inherit retry_policy');
+            self::assertSame(4, $retryPolicy->getMaxRetries());
+            self::assertSame(500, $retryPolicy->getInitialDelayMs());
+            self::assertSame(20000, $retryPolicy->getMaxDelayMs());
+            self::assertSame(2.0, $retryPolicy->getMultiplier());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
     public function loadParsesStepLevelRetryPolicyOverride(): void
     {
         $fixtureDir = sys_get_temp_dir() . '/agent_chains_retry_step_' . uniqid();

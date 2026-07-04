@@ -574,6 +574,15 @@ chains:
   brainstorm:
     type: dynamic
     description: "Фасилитируемый brainstorm с конструктивным конфликтом"
+    # transient-retry для шагов dynamic-цикла: transient-ошибки (timeout/rate-limit/
+    # terminated) ретраятся с exponential backoff на уровне AgentRunner — ниже
+    # state цикла, безопасно для journal/rounds. Спасает зависшие шаги (напр.
+    # glm synthesis-step, виснущий в json-режиме) от разрыва всей сессии.
+    retry_policy:
+      max_retries: 2
+      initial_delay_ms: 2000
+      max_delay_ms: 30000
+      multiplier: 2.0
     timeout: 600
     facilitator: team_lead_alex
     participants: [system_architect_gandalf, system_architect_loki, backend_developer_tony]

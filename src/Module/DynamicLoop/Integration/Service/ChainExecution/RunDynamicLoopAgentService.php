@@ -9,10 +9,12 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Agen
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Prompt\GetPromptFilePath\GetPromptFilePathQuery;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Prompt\GetPromptFilePath\GetPromptFilePathQueryHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FacilitatorResponseParserInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\RunDynamicLoopAgentServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionWriterInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Shared\DynamicLoopPromptFormatterInterface;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRetryPolicyVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunRequestVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
@@ -52,6 +54,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         string $responseFilesList,
         int $timeout,
         array $command = [],
+        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
     ): array {
         $ctx = $this->formatter->buildFacilitatorContext(
             $facilitatorStartPrompt,
@@ -87,6 +90,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             timeout: $timeout,
             command: $command,
             runnerArgs: ['--append-system-prompt', $appendPromptFile],
+            retryPolicy: $retryPolicy,
         );
 
         $start = microtime(true);
@@ -124,6 +128,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         bool $hasPreviousResponses = true,
         ?string $challenge = null,
         ?string $promptFile = null,
+        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
     ): DynamicLoopTurnResultVo {
         $roleFilePath = $promptFile ?? ($this->getPromptFilePathHandler)(new GetPromptFilePathQuery($role));
         $appendPromptContent = sprintf($participantAppendPrompt, $roleFilePath);
@@ -161,6 +166,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             timeout: $timeout,
             command: $command,
             runnerArgs: ['--append-system-prompt', $appendPromptFile],
+            retryPolicy: $retryPolicy,
         );
 
         $start = microtime(true);
@@ -192,6 +198,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         string $responseFilesList,
         int $timeout,
         array $command = [],
+        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
     ): DynamicLoopTurnResultVo {
         $ctx = $this->formatter->buildFinalizeContext(
             $facilitatorFinalizePrompt,
@@ -225,6 +232,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             timeout: $timeout,
             command: $command,
             runnerArgs: ['--append-system-prompt', $appendPromptFile],
+            retryPolicy: $retryPolicy,
         );
 
         $start = microtime(true);
@@ -245,6 +253,10 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
 
     /**
      * Маппит DynamicLoopRunRequestVo → ChainRunRequestVo и запускает через foreign Application.
+     *
+     * Retry-политика (если задана в config цепочки) пробрасывается в AgentRunner:
+     * transient-ошибки (timeout, rate limit, terminated) ретраятся с exponential backoff
+     * на уровне runner'а — ниже state dynamic-цикла, поэтому безопасна для journal/rounds.
      */
     private function runViaAgentRunner(DynamicLoopRunRequestVo $request): DynamicLoopRunResultVo
     {
@@ -264,7 +276,10 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             noContextFiles: $request->hasNoContextFiles(),
         );
 
-        $chainResult = $this->agentRunner->run($this->truncateRequestContext($chainRequest));
+        $chainResult = $this->agentRunner->run(
+            $this->truncateRequestContext($chainRequest),
+            $this->toExecutionRetryPolicy($request->getRetryPolicy()),
+        );
 
         if ($chainResult->isError()) {
             return DynamicLoopRunResultVo::createError(
@@ -283,6 +298,24 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             cost: $chainResult->getCost(),
             model: $chainResult->getModel(),
             turns: $chainResult->getTurns(),
+        );
+    }
+
+    /**
+     * Конвертирует политику retry dynamic-цикла в ExecutionRetryPolicyVo foreign-модуля.
+     * null → null (retry выключен, прежнее поведение).
+     */
+    private function toExecutionRetryPolicy(?DynamicLoopRetryPolicyVo $policy): ?ExecutionRetryPolicyVo
+    {
+        if ($policy === null || !$policy->isEnabled()) {
+            return null;
+        }
+
+        return new ExecutionRetryPolicyVo(
+            maxRetries: $policy->getMaxRetries(),
+            initialDelayMs: $policy->getInitialDelayMs(),
+            maxDelayMs: $policy->getMaxDelayMs(),
+            multiplier: $policy->getMultiplier(),
         );
     }
 

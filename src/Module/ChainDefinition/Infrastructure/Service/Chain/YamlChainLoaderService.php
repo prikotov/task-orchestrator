@@ -294,6 +294,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
 
         $prompts = $this->resolvePrompts($name, $raw);
         $budget = $this->parseBudget($raw['budget'] ?? null);
+        $chainRetryPolicy = $this->yamlRetryPolicyMapper->mapToChainRetryPolicy($raw['retry_policy'] ?? null);
 
         return $this->chainDefinitionFactory->createFromDynamic(
             name: $name,
@@ -309,6 +310,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
             participantAppendPrompt: $prompts['participant_append'],
             participantUserPrompt: $prompts['participant_user'],
             roles: $roles,
+            defaultRetryPolicy: $chainRetryPolicy,
             budget: $budget,
             timeout: $raw['timeout'] ?? null,
             maxTime: $raw['max_time'] ?? null,
