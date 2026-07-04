@@ -12,6 +12,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoo
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRetryPolicyVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRoleConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
@@ -205,6 +206,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $execution,
             $facResponseFilesList,
             $facRoleConfig,
+            $chain->getDefaultRetryPolicy(),
         );
 
         $roundVo = self::toRoundResultVo(
@@ -289,6 +291,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $prevResponsePaths !== [],
             $challenge,
             $partRoleConfig?->getPromptFile(),
+            $chain->getDefaultRetryPolicy(),
         );
         $turnResult = self::normalizeEmptySuccessfulOutput($turnResult);
 
@@ -345,6 +348,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             responseFilesList: $facResponseFilesList,
             timeout: $finRoleConfig?->getTimeout() ?? $context->timeout,
             command: $finRoleConfig?->getCommand() ?? [],
+            retryPolicy: $chain->getDefaultRetryPolicy(),
         );
 
         $roundVo = self::toRoundResultVo(
@@ -468,6 +472,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         DynamicLoopExecution $execution,
         string $facResponseFilesList,
         ?DynamicLoopRoleConfigVo $facRoleConfig,
+        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
     ): array {
         return $this->agentRunner->runFacilitator(
             $execution->getStep(),
@@ -483,6 +488,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $facResponseFilesList,
             $facRoleConfig?->getTimeout() ?? $context->timeout,
             $facRoleConfig?->getCommand() ?? [],
+            $retryPolicy,
         );
     }
 

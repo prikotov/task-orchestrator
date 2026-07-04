@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic;
 
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRetryPolicyVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorResponseVo;
 
@@ -31,6 +32,7 @@ interface RunDynamicLoopAgentServiceInterface
         string $responseFilesList,
         int $timeout,
         array $command = [],
+        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
     ): array;
 
     /**
@@ -51,6 +53,7 @@ interface RunDynamicLoopAgentServiceInterface
         bool $hasPreviousResponses = true,
         ?string $challenge = null,
         ?string $promptFile = null,
+        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
     ): DynamicLoopTurnResultVo;
 
     /**
@@ -68,5 +71,6 @@ interface RunDynamicLoopAgentServiceInterface
         string $responseFilesList,
         int $timeout,
         array $command = [],
+        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
     ): DynamicLoopTurnResultVo;
 }

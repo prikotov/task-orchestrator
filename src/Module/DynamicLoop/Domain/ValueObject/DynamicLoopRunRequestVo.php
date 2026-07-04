@@ -14,6 +14,8 @@ final readonly class DynamicLoopRunRequestVo
     /**
      * @param list<string> $command полная CLI-команда из role config
      * @param list<string> $runnerArgs доп. аргументы runner'а
+     * @param ?DynamicLoopRetryPolicyVo $retryPolicy политика transient-retry
+     *        для шага (пробрасывается в AgentRunner). null = retry выключен.
      */
     public function __construct(
         private string $role,
@@ -29,6 +31,7 @@ final readonly class DynamicLoopRunRequestVo
         private array $runnerArgs = [],
         private ?string $runnerName = null,
         private bool $noContextFiles = false,
+        private ?DynamicLoopRetryPolicyVo $retryPolicy = null,
     ) {
     }
 
@@ -103,5 +106,9 @@ final readonly class DynamicLoopRunRequestVo
         return $this->noContextFiles;
     }
 
+    public function getRetryPolicy(): ?DynamicLoopRetryPolicyVo
+    {
+        return $this->retryPolicy;
+    }
 
 }

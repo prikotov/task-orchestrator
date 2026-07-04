@@ -8,6 +8,7 @@ use Override;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQuery;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\ChainDefinition\DynamicLoopDefinitionMapperServiceInterface;
@@ -15,6 +16,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\DynamicLoopConfigM
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPromptConfigVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRetryPolicyVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRoleConfigVo;
 
 /**
@@ -68,7 +70,21 @@ final readonly class DynamicLoopDefinitionMapperService implements DynamicLoopCo
                 participantAppendPrompt: $promptConfig->getParticipantAppendPrompt(),
                 participantUserPrompt: $promptConfig->getParticipantUserPrompt(),
             ),
-            defaultRetryPolicy: null,
+            defaultRetryPolicy: $this->mapRetryPolicy($chain->getDefaultRetryPolicy()),
+        );
+    }
+
+    private function mapRetryPolicy(?ChainRetryPolicyVo $policy): ?DynamicLoopRetryPolicyVo
+    {
+        if ($policy === null) {
+            return null;
+        }
+
+        return new DynamicLoopRetryPolicyVo(
+            maxRetries: $policy->getMaxRetries(),
+            initialDelayMs: $policy->getInitialDelayMs(),
+            maxDelayMs: $policy->getMaxDelayMs(),
+            multiplier: $policy->getMultiplier(),
         );
     }
 
