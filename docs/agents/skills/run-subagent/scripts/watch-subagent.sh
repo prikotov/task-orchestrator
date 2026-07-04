@@ -43,6 +43,12 @@
 #                            пока read блокирован) и каждые WATCH_WATCHER_INTERVAL
 #                            секунд пишет heartbeat в run-log — диагностическая
 #                            улика «основной цикл завис» (растущий stall_gap).
+#   WATCH_STALL_RESPECT_LIVENESS=0 — отключить liveness-gate для stall-timeout.
+#                            По умолчанию (1) при тишине в потоке процесс НЕ
+#                            убивается, если он активен (грузит CPU/IO — например,
+#                            ретраит провайдера, ожидание длинного ответа):
+#                            watcher ждёт до hard-timeout. Убивает только реально
+#                            простаивающий (idle) процесс. Linux-only (/proc).
 #
 # Переменные окружения (наследование от внешней обёртки):
 #   RUNNER/PROVIDER/MODEL/REASONING — см. приоритеты выше.
@@ -738,6 +744,41 @@ watcher_force_exit() {
     kill -9 "$$" 2>/dev/null || true
 }
 
+# Liveness процесса-агента по CPU/IO. Возвращает 0 (active), если с прошлого
+# вызова процесс потребил CPU (ps times суммирует потоки) или сделал IO
+# (/proc/<pid>/io: rchar+wchar, включает сетевой IO). Иначе 1 (idle/замер).
+# Первый замер инициализирует базу и консервативно считает процесс активным
+# (чтобы не убить на старте). Состояние дельты — в глобалах; у watcher'а (subshell)
+# и у основного цикла — свои независимые базы.
+process_is_active() {
+    local pid="${1:-}"
+    [[ -n "$pid" ]] || return 0
+    kill -0 "$pid" 2>/dev/null || return 1
+
+    local cpu_now=0 io_now=0
+    local t
+    t=$(ps --no-headers -o times= -p "$pid" 2>/dev/null | tr -d '[:space:]') || true
+    if [[ "$t" =~ ^[0-9]+$ ]]; then cpu_now=$t; fi
+    if [[ -r "/proc/$pid/io" ]]; then
+        local io
+        io=$(awk '/^(rchar|wchar):/ { s += $2 } END { print s+0 }' "/proc/$pid/io" 2>/dev/null) || io=0
+        if [[ "$io" =~ ^[0-9]+$ ]]; then io_now=$io; fi
+    fi
+
+    local prev_cpu="${_LIVENESS_PREV_CPU:-}"
+    local prev_io="${_LIVENESS_PREV_IO:-}"
+    _LIVENESS_PREV_CPU=$cpu_now
+    _LIVENESS_PREV_IO=$io_now
+
+    # Первый замер — базы нет: консервативно active.
+    [[ -z "$prev_cpu" ]] && return 0
+
+    if (( cpu_now > prev_cpu )) || (( io_now > prev_io )); then
+        return 0
+    fi
+    return 1
+}
+
 # Фоновый watcher: enforce soft/hard/stall по wall-clock + heartbeat-диагностика.
 # Запускается отдельным подпроцессом (не блокирован в read) как страховка поверх
 # in-loop проверок. Heartbeat в run-log — главная улика «цикл завис»: stall_gap
@@ -759,7 +800,14 @@ start_watcher() {
             w_stall=$((w_now - w_last))
             if kill -0 "${AGENT_PID:-}" 2>/dev/null; then w_agent_alive=yes; else w_agent_alive=no; fi
 
-            log_run "watcher_heartbeat elapsed=${w_elapsed}s stall_gap=${w_stall}s agent_alive=$w_agent_alive"
+            # Liveness: грузит ли CPU/IO (дельта с прошлого heartbeat). Решает,
+            # убивать ли при тишине (idle=завис) или ждать до hard (active=работает).
+            w_live="n/a"
+            if [[ "$w_agent_alive" == "yes" ]]; then
+                if process_is_active "${AGENT_PID:-}"; then w_live=active; else w_live=idle; fi
+            fi
+
+            log_run "watcher_heartbeat elapsed=${w_elapsed}s stall_gap=${w_stall}s agent_alive=$w_agent_alive live=$w_live"
 
             # hard — абсолютный потолок по wall clock
             if [[ $w_elapsed -ge $EFFECTIVE_HARD ]]; then
@@ -775,11 +823,14 @@ start_watcher() {
                 watcher_force_exit "soft_timeout"
                 exit 0
             fi
-            # stall — нет событий дольше STALL_TIMEOUT
+            # stall — нет событий дольше STALL_TIMEOUT. НЕ убиваем, если процесс
+            # активен (работает, но молчит в потоке): ждём до hard-timeout.
             if [[ $w_stall -ge $STALL_TIMEOUT ]]; then
-                log_run "watcher_fired reason=stall stall_gap=${w_stall}s limit=${STALL_TIMEOUT}s"
-                watcher_force_exit "stall"
-                exit 0
+                if [[ "${WATCH_STALL_RESPECT_LIVENESS:-1}" != "1" ]] || [[ "$w_live" != "active" ]]; then
+                    log_run "watcher_fired reason=stall stall_gap=${w_stall}s limit=${STALL_TIMEOUT}s live=$w_live"
+                    watcher_force_exit "stall"
+                    exit 0
+                fi
             fi
         done
     ) &
@@ -846,6 +897,9 @@ has_format raw && STREAM_RAW=true
 # Запускаем после того, как известны START_TIME/EFFECTIVE_HARD/AGENT_PID.
 start_watcher
 
+# Внешний цикл переживает stall, если процесс активен: read -t выходит при
+# тишине, но если агент работает (CPU/IO), перезапускаем ожидание, а не убиваем.
+while true; do
 while IFS= read -r -t "$STALL_TIMEOUT" line; do
     echo "$line" >> "$OUTFILE"
 
@@ -917,6 +971,20 @@ while IFS= read -r -t "$STALL_TIMEOUT" line; do
         exit 1
     fi
 done < "$PIPE"
+
+    # read вышел по таймауту (тишина) или EOF. При тишине, если процесс активен —
+    # не убиваем: логируем и перезапускаем ожидание (ждём до hard-timeout).
+    now=$(date +%s)
+    elapsed=$((now - last_event_time))
+    if [[ $elapsed -ge $STALL_TIMEOUT ]] \
+       && [[ "${WATCH_STALL_RESPECT_LIVENESS:-1}" == "1" ]] \
+       && kill -0 "${AGENT_PID:-}" 2>/dev/null \
+       && process_is_active "$AGENT_PID"; then
+        echo '{"type":"_watch_stall_suppressed","reason":"process_active","gap":'${elapsed}',"limit":'${STALL_TIMEOUT}'}' >&2
+        continue
+    fi
+    break
+done
 
 # read вернул ошибку — либо stall, либо pipe закрылся
 now=$(date +%s)

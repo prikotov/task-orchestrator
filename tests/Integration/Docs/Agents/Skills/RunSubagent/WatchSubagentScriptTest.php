@@ -303,6 +303,87 @@ YAML);
         self::assertFileExists($eventsDir . '/events.ndjson', 'events/ must be archived on failure');
     }
 
+    #[Test]
+    public function stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout(): void
+    {
+        // Процесс молчит в потоке, но грузит CPU (busy-loop) → liveness=active →
+        // stall-timeout НЕ убивает; запуск доживает до soft-timeout (watcher).
+        $logDir = $this->tempDir . '/logs';
+
+        $process = $this->runScript(
+            arguments: ['-s', '4', '-t', '2', '-m', '30', '--runner', 'pi'],
+            env: [
+                'FAKE_RUNNER_HANG_ACTIVE' => '1',
+                'WATCH_WATCHER_INTERVAL' => '1',
+                'WATCH_LOG_DIR' => $logDir,
+            ],
+            expectSuccess: false,
+        );
+
+        self::assertFalse($process->isSuccessful());
+
+        $runLog = $this->findLatestRunLog($logDir);
+        self::assertNotNull($runLog, 'run.log not found in ' . $logDir);
+        $log = (string) file_get_contents($runLog);
+
+        self::assertStringContainsString('live=active', $log, 'watcher must see busy-loop process as active');
+        self::assertStringContainsString('reason=soft_timeout', $log, 'active process must wait until soft-timeout, not stall');
+        self::assertStringNotContainsString('reason=stall', $log, 'active process must NOT be killed by stall');
+    }
+
+    #[Test]
+    public function stallKillsIdleProcessEvenWithLivenessGate(): void
+    {
+        // Процесс заснул (sleep) → liveness=idle → stall-timeout убивает как обычно.
+        $logDir = $this->tempDir . '/logs';
+
+        $process = $this->runScript(
+            arguments: ['-s', '30', '-t', '2', '-m', '60', '--runner', 'pi'],
+            env: [
+                'FAKE_RUNNER_HANG' => '1',
+                'WATCH_WATCHER_INTERVAL' => '1',
+                'WATCH_LOG_DIR' => $logDir,
+            ],
+            expectSuccess: false,
+        );
+
+        self::assertFalse($process->isSuccessful());
+
+        $runLog = $this->findLatestRunLog($logDir);
+        self::assertNotNull($runLog, 'run.log not found in ' . $logDir);
+        $log = (string) file_get_contents($runLog);
+
+        self::assertStringContainsString('live=idle', $log, 'watcher must see sleeping process as idle');
+        self::assertStringContainsString('reason=stall', $log, 'idle process must be killed by stall even with liveness gate');
+    }
+
+    #[Test]
+    public function livenessGateCanBeDisabledAndKillsActiveProcessOnStall(): void
+    {
+        // WATCH_STALL_RESPECT_LIVENESS=0 отключает gate: активный (busy-loop)
+        // процесс убивается по stall-timeout — старое поведение.
+        $logDir = $this->tempDir . '/logs';
+
+        $process = $this->runScript(
+            arguments: ['-s', '30', '-t', '2', '-m', '60', '--runner', 'pi'],
+            env: [
+                'FAKE_RUNNER_HANG_ACTIVE' => '1',
+                'WATCH_STALL_RESPECT_LIVENESS' => '0',
+                'WATCH_WATCHER_INTERVAL' => '1',
+                'WATCH_LOG_DIR' => $logDir,
+            ],
+            expectSuccess: false,
+        );
+
+        self::assertFalse($process->isSuccessful());
+
+        $runLog = $this->findLatestRunLog($logDir);
+        self::assertNotNull($runLog, 'run.log not found in ' . $logDir);
+        $log = (string) file_get_contents($runLog);
+
+        self::assertStringContainsString('reason=stall', $log, 'with gate disabled, active process must be killed by stall');
+    }
+
     /**
      * @param list<string> $arguments
      * @param array<string, string> $env
@@ -374,6 +455,14 @@ if [[ "${FAKE_RUNNER_HANG:-0}" == "1" ]]; then
     # read блокируется, in-loop проверки soft/hard не исполняются.
     printf '{"type":"agent_start"}\n'
     sleep 60
+    exit 0
+fi
+if [[ "${FAKE_RUNNER_HANG_ACTIVE:-0}" == "1" ]]; then
+    # Симуляция «работает, но молчит»: одно событие, затем тишина в потоке, но
+    # процесс грузит CPU (busy-loop) — process_is_active должен видеть active.
+    printf '{"type":"agent_start"}\n'
+    end=$((SECONDS + 120))
+    while [ "$SECONDS" -lt "$end" ]; do :; done
     exit 0
 fi
 if [[ -n "${FAKE_RUNNER_STDERR:-}" ]]; then
