@@ -127,6 +127,12 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
 
         $process = new Process($command);
         $process->setTimeout($request->getTimeout());
+        // Закрываем stdin: prompt передаётся через args, не через stdin.
+        // Без этого Symfony Process оставляет stdin-pipe открытым, и pi в ряде
+        // случаев блокируется на read(stdin) (wchan=anon_pipe_read, 0 network,
+        // cpu 0) — симптомы неотличимы от «зависания». setInput('') пишет пустой
+        // ввод и закрывает pipe → pi получает EOF и не виснет.
+        $process->setInput('');
 
         if ($request->getWorkingDir() !== null) {
             $process->setWorkingDirectory($request->getWorkingDir());

@@ -115,6 +115,10 @@ final readonly class CodexAgentRunnerService implements CodexAgentRunnerServiceI
 
         $process = new Process($command);
         $process->setTimeout($request->getTimeout());
+        // Закрываем stdin (аналогично PiAgentRunnerService): без этого codex может
+        // блокироваться на read(stdin) — открытый pipe без EOF. Prompt идёт через
+        // args, stdin не нужен.
+        $process->setInput('');
 
         if ($request->getWorkingDir() !== null) {
             $process->setWorkingDirectory($request->getWorkingDir());
