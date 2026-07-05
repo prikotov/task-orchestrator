@@ -903,9 +903,17 @@ while true; do
 while IFS= read -r -t "$STALL_TIMEOUT" line; do
     echo "$line" >> "$OUTFILE"
 
-    now=$(date +%s)
+    # ⚠️ Без fork в горячем цикле: $(date) и $(jq) на каждой строке давали
+    # pipe-backpressure — FIFO переполнялся, pi блокировался на write в stdout
+    # и выглядел зависшим (тишина/stderr пуст/0 error-events). EPOCHSECONDS
+    # (bash 5+) и builtin-парсинг type — без fork.
+    now=${EPOCHSECONDS:-$(printf '%(%s)T' -1)}
     event_gap=$((now - last_event_time))
-    event_type=$(jq -r '.type // "?"' <<< "$line" 2>/dev/null || echo "?")
+    event_type="?"
+    if [[ "$line" == *'"type":"'* ]]; then
+        event_type="${line#*\"type\":\"}"
+        event_type="${event_type%%\"*}"
+    fi
     # Записываем паузу между событиями для анализа stall'ов (best-effort).
     if [[ -n "${GAPS_FILE:-}" ]]; then
         printf '%s\t%s\t%s\n' "$now" "$event_gap" "$event_type" >> "$GAPS_FILE"
