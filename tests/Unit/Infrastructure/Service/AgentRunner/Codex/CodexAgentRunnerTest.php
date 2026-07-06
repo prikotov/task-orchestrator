@@ -41,8 +41,9 @@ final class CodexAgentRunnerTest extends TestCase
 
         $this->fixtureFiles = [];
 
-        // Очистка env-переменной
+        // Очистка env-переменных
         putenv('CODEX_HTTP_PROXY');
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC');
     }
 
     // ──── getName / isAvailable ─────────────────────────────────────────
@@ -569,6 +570,59 @@ PHP);
         self::assertTrue($result->isError());
         self::assertSame(9, $result->getExitCode());
         self::assertSame('pipe closed', $result->getErrorMessage());
+    }
+
+    // ──── Liveness-adaptive timeout (#297 symmetry) ──────────────────
+
+    #[Test]
+    public function runKillsIdleProcessAsTransient(): void
+    {
+        // Процесс спит без CPU/IO — liveness должна убить его за idle-threshold
+        // (2с) и вернуть transient-error (timedOut=true) → retry подхватит.
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=2');
+        $command = $this->createExecutableFixture('codex_idle_', <<<'PHP'
+sleep(120);
+PHP);
+
+        $start = microtime(true);
+        $result = $this->runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+        ));
+        $elapsed = microtime(true) - $start;
+
+        self::assertTrue($result->isError(), 'idle process must be reported as error');
+        self::assertTrue($result->isTimedOut(), 'idle kill must be flagged transient (timedOut) for retry');
+        // Kill должен сработать заметно быстрее sleep(120) — в районе idle-threshold + grace.
+        self::assertLessThan(30.0, $elapsed, 'idle process must be killed fast, not waited full sleep');
+    }
+
+    #[Test]
+    public function runLetsActiveProcessSurvive(): void
+    {
+        // Процесс активно работает (CPU/IO растут) — liveness НЕ должна его убивать:
+        // он завершается сам и возвращает success. idle-threshold намеренно мал (2с),
+        // чтобы тест проверял именно «активный процесс дожил», а не «успел за отведённое».
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=2');
+        $command = $this->createExecutableFixture('codex_active_', <<<'PHP'
+for ($i = 0; $i < 40; $i++) {
+    fwrite(STDOUT, "tick $i\n");
+    fflush(STDOUT);
+    usleep(100000);
+}
+fwrite(STDOUT, "{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":1,\"output_tokens\":1,\"cost\":0.1}}");
+PHP);
+
+        $result = $this->runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+        ));
+
+        self::assertFalse($result->isError(), 'active process must NOT be killed: it finishes successfully');
+        self::assertFalse($result->isTimedOut());
+        self::assertSame(1, $result->getInputTokens());
     }
 
     private function createExecutableFixture(string $prefix, string $script): string
