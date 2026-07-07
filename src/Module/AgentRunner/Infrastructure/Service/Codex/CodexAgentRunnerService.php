@@ -114,7 +114,12 @@ final readonly class CodexAgentRunnerService implements CodexAgentRunnerServiceI
         $command = $this->buildCommand($request);
 
         $process = new Process($command);
-        $process->setTimeout($request->getTimeout());
+        // Liveness-adaptive timeout: Symfony setTimeout = абсолютный hard cap (fallback),
+        // poll-loop ниже убивает раньше при простое (idle). Активный процесс (модель
+        // рассуждает/стримит) дорабатывает до cap, не обрезаясь по жёсткому таймеру.
+        // Симметрично PiAgentRunnerService (#297).
+        $hardCap = max($request->getTimeout(), $this->envInt('AGENT_RUNNER_HARD_TIMEOUT_SEC', 1800));
+        $process->setTimeout($hardCap);
 
         if ($request->getWorkingDir() !== null) {
             $process->setWorkingDirectory($request->getWorkingDir());
@@ -167,11 +172,22 @@ final readonly class CodexAgentRunnerService implements CodexAgentRunnerServiceI
 
         try {
             $process->start($outputHandler);
-            $process->wait();
+            $completed = $this->waitForProcessWithLiveness($process);
             $this->flushStdoutBuffer($stdoutBuffer);
+            if (!$completed) {
+                // Процесс простаивал (idle) — нет прогресса CPU/IO дольше порога.
+                // Возвращаем transient-error (timedOut) → retry подхватит.
+                return AgentResultVo::createError(
+                    errorMessage: sprintf(
+                        'Agent idle: no CPU/IO progress for %d seconds.',
+                        $this->envInt('AGENT_RUNNER_IDLE_TIMEOUT_SEC', 60),
+                    ),
+                    timedOut: true,
+                );
+            }
         } catch (ProcessTimedOutException) {
             return AgentResultVo::createError(
-                errorMessage: sprintf('Agent timed out after %d seconds.', $request->getTimeout()),
+                errorMessage: sprintf('Agent timed out after %d seconds (hard cap).', $hardCap),
                 timedOut: true,
             );
         } catch (ProcessSignaledException $e) {
@@ -180,6 +196,8 @@ final readonly class CodexAgentRunnerService implements CodexAgentRunnerServiceI
                 exitCode: 128 + $e->getSignal(),
             );
         } finally {
+            // Гарантированная остановка orphan-процесса моста при любом исходе
+            // (включая таймаут/сигнал/нормальное завершение).
             $bridge?->stop();
         }
 
@@ -254,6 +272,110 @@ final readonly class CodexAgentRunnerService implements CodexAgentRunnerServiceI
         $bridge->start();
 
         return $bridge;
+    }
+
+    /**
+     * Poll-loop с liveness-проверкой вместо блокирующего wait(): пока процесс
+     * активен (грузит CPU/IO — модель рассуждает/стримит), даём ему доработать
+     * до абсолютного hard cap (Symfony setTimeout). При простое (idle) дольше
+     * AGENT_RUNNER_IDLE_TIMEOUT_SEC — останавливаем: это зависание, быстрее
+     * вернуть transient-error и дать retry, чем ждать hard cap.
+     *
+     * Симметрично PiAgentRunnerService::waitForProcessWithLiveness (#297).
+     *
+     * @return bool true — процесс завершился сам; false — остановлен по idle.
+     */
+    private function waitForProcessWithLiveness(Process $process): bool
+    {
+        $idleThreshold = (float) $this->envInt('AGENT_RUNNER_IDLE_TIMEOUT_SEC', 60);
+        $pollIntervalUs = 500_000; // 0.5с
+
+        $lastActivity = microtime(true);
+        $prevCpu = null;
+        $prevIo = null;
+
+        while ($process->isRunning()) {
+            // Symfony fallback: бросит ProcessTimedOutException при превышении hard cap.
+            $process->checkTimeout();
+
+            $pid = $process->getPid();
+            if ($pid !== null) {
+                $cpu = $this->readProcessCpuTime($pid);
+                $io = $this->readProcessIo($pid);
+                if ($prevCpu !== null && ($cpu > $prevCpu || $io > $prevIo)) {
+                    $lastActivity = microtime(true); // прогресс есть — работает
+                }
+                $prevCpu = $cpu;
+                $prevIo = $io;
+            }
+
+            if (microtime(true) - $lastActivity > $idleThreshold) {
+                // Зависание: grace SIGTERM, затем SIGKILL.
+                $process->stop(2);
+
+                return false;
+            }
+
+            usleep($pollIntervalUs);
+        }
+
+        return true;
+    }
+
+    /**
+     * CPU-time процесса в секундах (ps times суммирует потоки, важно для
+     * многопоточного node/bun).
+     */
+    private function readProcessCpuTime(int $pid): int
+    {
+        /** @psalm-suppress ForbiddenCode */
+        $out = @shell_exec(sprintf('ps -o times= -p %d 2>/dev/null', $pid));
+        if (!is_string($out) || $out === '') {
+            return 0;
+        }
+
+        $t = trim($out);
+
+        return is_numeric($t) ? (int) $t : 0;
+    }
+
+    /**
+     * Сумма rchar+wchar из /proc/<pid>/io (включает сетевой IO через libc,
+     * не только диск). Linux-only; отсутствие /proc — 0 (liveness по CPU).
+     */
+    private function readProcessIo(int $pid): int
+    {
+        $path = sprintf('/proc/%d/io', $pid);
+        if (!@is_readable($path)) {
+            return 0;
+        }
+
+        $content = @file_get_contents($path);
+        if ($content === false) {
+            return 0;
+        }
+
+        $sum = 0;
+        foreach (['rchar', 'wchar'] as $key) {
+            if (preg_match('/^' . $key . ':\s*(\d+)/m', $content, $m) === 1) {
+                $sum += (int) $m[1];
+            }
+        }
+
+        return $sum;
+    }
+
+    /**
+     * Читает int из env с дефолтом; не-числовые/пустые значения → default.
+     */
+    private function envInt(string $name, int $default): int
+    {
+        $v = getenv($name);
+        if ($v === false || $v === '' || !is_numeric($v)) {
+            return $default;
+        }
+
+        return (int) $v;
     }
 
     /**
