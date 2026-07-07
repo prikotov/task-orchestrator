@@ -294,4 +294,41 @@ final class ExecuteAgentStepServiceTest extends TestCase
 
         self::assertSame('pi', $result->runner);
     }
+
+    #[Test]
+    public function runPassesRolePromptFileAsSystemPrompt(): void
+    {
+        // Раньше static-chain primary-path передавал systemPrompt: null, и codex падал
+        // на literal "@system-prompt" (No such file). Фикс: prompt_file роли передаётся
+        // как systemPrompt → runner резолвит @system-prompt маркер в путь.
+        $agentRunner = $this->createMock(RunAgentServiceInterface::class);
+        $agentRunner->expects($this->once())->method('run')->with(
+            $this->callback(function (ChainRunRequestVo $request): bool {
+                return $request->getSystemPrompt() === 'docs/agents/roles/team/analyst.ru.md';
+            }),
+        )->willReturn(
+            ChainRunResultVo::createSuccess('Result', 50, 100, cost: 0.005),
+        );
+
+        $runner = new ExecuteAgentStepService(
+            $agentRunner,
+            $this->createMock(ResolveChainRunnerServiceInterface::class),
+            $this->createMock(FormatPromptServiceInterface::class),
+        );
+
+        $step = new ExecutionStepVo(
+            type: ChainStepTypeEnum::agent,
+            role: 'analyst',
+            runner: 'codex',
+        );
+
+        $context = new StepContextVo(
+            task: 'Test task',
+            roleConfig: new ExecutionRoleConfigVo(
+                promptFile: 'docs/agents/roles/team/analyst.ru.md',
+            ),
+        );
+
+        $runner->run($step, $context);
+    }
 }
