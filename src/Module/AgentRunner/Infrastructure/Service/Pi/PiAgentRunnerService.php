@@ -92,6 +92,12 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
         // Разрешение @file → содержимое файла
         $command = $this->resolveCommandFiles($command, $request->getWorkingDir());
 
+        // Разрешение маркеров @system-prompt / @append-system-prompt → путь к файлу
+        // (pi читает файл сам через --system-prompt/--append-system-prompt).
+        // Отдельно от resolveCommandFiles (который про @file → inline-содержимое):
+        // маркеры — это слоты prompt_file роли, резолвятся из request, не из FS.
+        $command = $this->resolvePromptMarkers($command, $request);
+
         // Model — только если не задан в command
         if ($request->getModel() !== null && !in_array('--model', $command, true)) {
             $command[] = '--model';
@@ -410,6 +416,78 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
         }
 
         return (int) $v;
+    }
+
+    /**
+     * Резолвит маркеры @system-prompt и @append-system-prompt в элементах command
+     * в пути к prompt-файлам роли (pi читает файлы сам, как codex model_instructions_file).
+     *
+     * Симметрично CodexAgentRunnerService::resolvePromptSlots. Источники путей:
+     * - @system-prompt → request.systemPrompt (если это путь к существующему файлу)
+     * - @append-system-prompt → runnerArgs[--append-system-prompt] (если значение — путь)
+     *
+     * @param list<string> $command
+     *
+     * @return list<string>
+     */
+    private function resolvePromptMarkers(array $command, AgentRunRequestVo $request): array
+    {
+        $systemPath = $this->resolveSystemPromptPath($request);
+        $appendPath = $this->extractAppendPromptPath($request->getRunnerArgs());
+
+        $resolved = [];
+        foreach ($command as $value) {
+            if ($systemPath !== null && $value === '@system-prompt') {
+                $resolved[] = $systemPath;
+                continue;
+            }
+            if ($appendPath !== null && $value === '@append-system-prompt') {
+                $resolved[] = $appendPath;
+                continue;
+            }
+            $resolved[] = $value;
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Путь к system-prompt-файлу из request.systemPrompt.
+     * Если systemPrompt — путь к существующему файлу, возвращается как есть;
+     * иначе null (маркер останется literal).
+     */
+    private function resolveSystemPromptPath(AgentRunRequestVo $request): ?string
+    {
+        $systemPrompt = $request->getSystemPrompt();
+        if ($systemPrompt === null) {
+            return null;
+        }
+
+        if (file_exists($systemPrompt) && is_file($systemPrompt)) {
+            return $systemPrompt;
+        }
+
+        return null;
+    }
+
+    /**
+     * Извлекает путь к append-system-prompt-файлу из runnerArgs.
+     *
+     * @param list<string> $runnerArgs
+     *
+     * @return string|null путь к существующему файлу или null
+     */
+    private function extractAppendPromptPath(array $runnerArgs): ?string
+    {
+        for ($i = 0, $count = count($runnerArgs); $i < $count - 1; $i++) {
+            if ($runnerArgs[$i] === '--append-system-prompt') {
+                $path = $runnerArgs[$i + 1];
+
+                return (file_exists($path) && is_file($path)) ? $path : null;
+            }
+        }
+
+        return null;
     }
 
     private function resolveCommandFiles(array $command, ?string $workingDir): array

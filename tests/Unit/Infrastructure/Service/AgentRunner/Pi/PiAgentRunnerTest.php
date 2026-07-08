@@ -164,6 +164,55 @@ final class PiAgentRunnerTest extends TestCase
         self::assertSame('You are a system analyst.', $command[$idx + 1]);
     }
 
+    #[Test]
+    public function buildCommandResolvesSystemPromptMarkerToPath(): void
+    {
+        // Маркер @system-prompt в command резолвится в путь из request.systemPrompt
+        // (если это существующий файл). Раньше маркер оставался literal → pi игнорировал
+        // role-prompt в static chains (TASK-fix-pi-static-chain-system-prompt).
+        $tmpFile = (string) tempnam(sys_get_temp_dir(), 'pi_sys_');
+        file_put_contents($tmpFile, 'role prompt');
+
+        try {
+            $command = $this->runner->buildCommand(new AgentRunRequestVo(
+                role: 'test',
+                task: 'task',
+                command: ['pi', '--system-prompt', '@system-prompt'],
+                systemPrompt: $tmpFile,
+            ));
+
+            self::assertContains('--system-prompt', $command);
+            $idx = array_search('--system-prompt', $command, true);
+            self::assertSame($tmpFile, $command[$idx + 1], '@system-prompt must be resolved to file path');
+            self::assertNotContains('@system-prompt', $command, 'literal marker must not remain');
+        } finally {
+            @unlink($tmpFile);
+        }
+    }
+
+    #[Test]
+    public function buildCommandResolvesAppendSystemPromptMarkerToPath(): void
+    {
+        $tmpFile = (string) tempnam(sys_get_temp_dir(), 'pi_append_');
+        file_put_contents($tmpFile, 'append prompt');
+
+        try {
+            $command = $this->runner->buildCommand(new AgentRunRequestVo(
+                role: 'test',
+                task: 'task',
+                command: ['pi', '--append-system-prompt', '@append-system-prompt'],
+                runnerArgs: ['--append-system-prompt', $tmpFile],
+            ));
+
+            self::assertContains('--append-system-prompt', $command);
+            $idx = array_search('--append-system-prompt', $command, true);
+            self::assertSame($tmpFile, $command[$idx + 1], '@append-system-prompt must be resolved to file path');
+            self::assertNotContains('@append-system-prompt', $command, 'literal marker must not remain');
+        } finally {
+            @unlink($tmpFile);
+        }
+    }
+
     // ──── buildCommand: noContextFiles ──────────────────────────────────
 
     #[Test]
