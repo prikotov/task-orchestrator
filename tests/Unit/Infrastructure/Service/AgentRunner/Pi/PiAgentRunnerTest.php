@@ -11,6 +11,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunReques
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunnerService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiJsonlParser;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLivenessWatcher;
 
 #[CoversClass(PiAgentRunnerService::class)]
 final class PiAgentRunnerTest extends TestCase
@@ -27,7 +28,7 @@ final class PiAgentRunnerTest extends TestCase
     {
         // Сбрасываем CODEX_HTTP_PROXY на каждый тест — изоляция от окружения
         putenv('CODEX_HTTP_PROXY');
-        $this->runner = new PiAgentRunnerService(new PiJsonlParser());
+        $this->runner = new PiAgentRunnerService(new PiJsonlParser(), new ProcessLivenessWatcher());
     }
 
     protected function tearDown(): void

@@ -10,7 +10,7 @@ author: Тимлид Алекс
 assignee:
 branch:
 pr:
-status: todo
+status: done
 ---
 
 # TASK-techdebt-extract-process-liveness-service: Вынести liveness-логику в общий service
@@ -38,11 +38,11 @@ Service — единственный законный по конвенциям 
 
 ## Критерии готовности (Definition of Done)
 
-- [ ] Создан `ProcessLivenessWatcher` (Infrastructure, AgentRunner) с методом `waitFor(Process $process): bool` и helper'ами чтения CPU/IO/env.
-- [ ] `PiAgentRunnerService` и `CodexAgentRunnerService` инжектируют service через constructor, делегируют liveness-ожидание ему.
-- [ ] DI-конфиг (`config/`) обновлён — service регистрируется и автосвязывается в оба раннера.
-- [ ] Дублирование методов удалено из обоих раннеров.
-- [ ] Unit-тесты: `ProcessLivenessWatcherTest` покрывает idle-kill + active-survive (+ edge: pid=null, /proc недоступен, ps недоступен).
-- [ ] Существующие runner-тесты адаптированы (мок service или integration через реальный process).
-- [ ] Psalm 0, PHPUnit green, Deptrac/PHPCS чисто.
-- [ ] Поведение env-рук (`AGENT_RUNNER_*`) сохранено, дефолты те же.
+- [x] Создан `ProcessLivenessWatcher` (Infrastructure, AgentRunner) с методом `waitFor(Process $process): bool` и helper'ами чтения CPU/IO/env.
+- [x] `PiAgentRunnerService` и `CodexAgentRunnerService` инжектируют service через constructor, делегируют liveness-ожидание ему.
+- [x] DI-конфиг (`config/`) обновлён — service регистрируется и автосвязывается в оба раннера.
+- [x] Дублирование методов удалено из обоих раннеров.
+- [x] Unit-тесты: `ProcessLivenessWatcherTest` покрывает idle-kill + active-survive (+ edge: pid=null, /proc недоступен, ps недоступен).
+- [x] Существующие runner-тесты адаптированы (мок service или integration через реальный process).
+- [x] Psalm 0, PHPUnit green, Deptrac/PHPCS чисто.
+- [x] Поведение env-рук (`AGENT_RUNNER_*`) сохранено, дефолты те же.
