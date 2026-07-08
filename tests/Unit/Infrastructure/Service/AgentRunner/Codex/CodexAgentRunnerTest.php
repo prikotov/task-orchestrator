@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexAgentRunnerService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexJsonlParser;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLivenessWatcher;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
 
 #[CoversClass(CodexAgentRunnerService::class)]
@@ -26,7 +27,7 @@ final class CodexAgentRunnerTest extends TestCase
     protected function setUp(): void
     {
         putenv('CODEX_HTTP_PROXY');
-        $this->runner = new CodexAgentRunnerService(new CodexJsonlParser());
+        $this->runner = new CodexAgentRunnerService(new CodexJsonlParser(), new ProcessLivenessWatcher());
     }
 
     protected function tearDown(): void
