@@ -54,10 +54,14 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
         $roleCommand = $roleConfig?->getCommand() ?? [];
         $runnerName = $this->resolveRunnerName($step, $roleCommand);
         $command = $this->resolveCommand($step, $roleCommand, $runnerName);
+        // systemPrompt = путь к prompt_file роли: runner'ы резолвят @system-prompt
+        // маркер в command (codex -c model_instructions_file, pi --system-prompt)
+        // в этот путь. Раньше передавался только в fallback-path; primary-path
+        // получал null → codex падал на literal "@system-prompt" (No such file).
         $request = new ChainRunRequestVo(
             role: $role,
             task: $context->task,
-            systemPrompt: null,
+            systemPrompt: $roleConfig?->getPromptFile(),
             previousContext: $formattedContext,
             model: $step->getModel(),
             tools: $step->getTools(),
