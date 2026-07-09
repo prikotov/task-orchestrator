@@ -92,10 +92,24 @@ final class ProcessLivenessWatcher
     }
 
     /**
-     * CPU-time процесса в секундах (ps times суммирует потоки, важно для
-     * многопоточного node/bun).
+     * CPU-time процесса и его direct children в секундах.
+     *
+     * ВАЖНО: codex/node-раннеры при tool calls spawn'ят детей (find/grep/sed),
+     * пока сами ждут в ep_poll — direct PID выглядит idle. Суммируем CPU
+     * direct PID + direct children, иначе liveness ложно kill'ит активный
+     * процесс с tool calls (brainstorm: «читай файлы — проверяй»).
      */
     private function readProcessCpuTime(int $pid): int
+    {
+        $sum = $this->readSingleCpuTime($pid);
+        foreach ($this->childPids($pid) as $childPid) {
+            $sum += $this->readSingleCpuTime($childPid);
+        }
+
+        return $sum;
+    }
+
+    private function readSingleCpuTime(int $pid): int
     {
         /** @psalm-suppress ForbiddenCode */
         $out = @shell_exec(sprintf('ps -o times= -p %d 2>/dev/null', $pid));
@@ -109,10 +123,22 @@ final class ProcessLivenessWatcher
     }
 
     /**
-     * Сумма rchar+wchar из /proc/<pid>/io (включает сетевой IO через libc,
-     * не только диск). Linux-only; отсутствие /proc — 0 (liveness по CPU).
+     * Сумма rchar+wchar из /proc/<pid>/io для процесса и его direct children.
+     * Включает сетевой IO через libc, не только диск. Linux-only;
+     * отсутствие /proc — 0 (liveness по CPU). Children важны для tool calls
+     * (см. readProcessCpuTime).
      */
     private function readProcessIo(int $pid): int
+    {
+        $sum = $this->readSingleIo($pid);
+        foreach ($this->childPids($pid) as $childPid) {
+            $sum += $this->readSingleIo($childPid);
+        }
+
+        return $sum;
+    }
+
+    private function readSingleIo(int $pid): int
     {
         $path = sprintf('/proc/%d/io', $pid);
         if (!@is_readable($path)) {
@@ -132,6 +158,30 @@ final class ProcessLivenessWatcher
         }
 
         return $sum;
+    }
+
+    /**
+     * Direct children PIDs (один уровень — достаточно для codex tool calls:
+     * find/grep/sed сами детей не spawn'ят).
+     *
+     * @return list<int>
+     */
+    private function childPids(int $pid): array
+    {
+        /** @psalm-suppress ForbiddenCode */
+        $out = @shell_exec(sprintf('pgrep -P %d 2>/dev/null', $pid));
+        if (!is_string($out) || $out === '') {
+            return [];
+        }
+
+        $pids = [];
+        foreach (preg_split('/\s+/', trim($out)) as $p) {
+            if (is_numeric($p)) {
+                $pids[] = (int) $p;
+            }
+        }
+
+        return $pids;
     }
 
     /**

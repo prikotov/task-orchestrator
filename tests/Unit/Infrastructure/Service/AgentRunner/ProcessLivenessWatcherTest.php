@@ -83,6 +83,38 @@ PHP
     }
 
     #[Test]
+    public function waitForLetsProcessSurviveWhenChildIsActive(): void
+    {
+        // Codex/agent pattern: сам процесс idle (ep_poll / pcntl_wait), но spawn'ит
+        // active children (tool calls: find/grep/sed). До фикса liveness видела только
+        // direct PID → ложно kill'ила активный процесс с tool calls. С фиксом children
+        // CPU/IO учитываются → процесс дорабатывает.
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=2');
+        $watcher = new ProcessLivenessWatcher();
+
+        $process = new Process([$this->createExecutableFixture('liveness_child_', <<<'PHP'
+$child = pcntl_fork();
+if ($child === 0) {
+    for ($i = 0; $i < 40; $i++) {
+        fwrite(STDOUT, "tick $i\n");
+        fflush(STDOUT);
+        usleep(100000);
+    }
+    exit(0);
+}
+pcntl_wait($status);
+PHP
+        )]);
+        $process->setTimeout(1800);
+
+        $process->start();
+        $completed = $watcher->waitFor($process);
+
+        self::assertTrue($completed, 'process with active child must NOT be killed (children CPU/IO counts)');
+        self::assertTrue($process->isSuccessful());
+    }
+
+    #[Test]
     public function resolveHardCapReturnsRequestTimeoutWhenHigherThanEnv(): void
     {
         putenv('AGENT_RUNNER_HARD_TIMEOUT_SEC=100');
