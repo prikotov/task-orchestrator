@@ -25,3 +25,6 @@
 
 # Local AI-agent skill setup (created per-environment via `agent:init`)
 /.agents/
+
+# Local scratch (PR bodies, temporary artifacts)
+/tmp/
