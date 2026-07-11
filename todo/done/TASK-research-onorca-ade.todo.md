@@ -9,7 +9,7 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-onorca-ade
-pr:
+pr: "#303"
 status: done
 ---
 
@@ -166,4 +166,5 @@ Orca — **не coding agent** и **не фреймворк** (CrewAI/LangGraph)
 | 2026-07-10 | Аналитик (Шерлок) | Создание задачи и постановка исследования Orca ADE. Эпик `EPIC-research-agent-frameworks-comparison` reopened (статус `in_progress`, стадия `1i`). |
 | 2026-07-10 | Тимлид (Алекс) | Задача переведена в `in_progress`, делегирована сабагенту в роли Аналитик (Шерлок) на реализацию исследования (конвейер `task-via-subagents`). |
 | 2026-07-10 | Тимлид (Алекс) | Code review (Архитектор Локи, сабагент): Changes Requested (5 CR) → доработка исполнителем → повторное ревью: **Approval** (все CR устранены). `make md-links`/`make validate-todo` — зелёные. Ожидает коммита/PR по запросу пользователя. |
+| 2026-07-10 | Тимлид (Алекс) | Коммит, push, PR #303 создан от имени `prikotov-agent[bot]` (label `pi`). Задача переведена в `done`, перенесена в `todo/done/`, ссылка в эпике (стадия `1i`) актуализирована. Ожидает merge по явному подтверждению пользователя. |
 | 2026-07-10 | Аналитик (Шерлок) | Выполнено исследование Orca ADE: создан comparison-отчёт, обновлена сводная таблица до `30 / 30`, сохранён agent-report; задача оставлена в `in_progress` без изменения front matter. |
