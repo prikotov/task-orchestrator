@@ -308,17 +308,6 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
     }
 
     /**
-     * Разрешает @file в элементах command.
-     *
-     * Формат: `@path/to/file.txt` → содержимое файла.
-     * Если файл не найден — значение остаётся как есть.
-     *
-     * @param list<string> $command
-     * @param string|null $workingDir базовая директория для относительных путей
-     *
-     * @return list<string>
-     */
-    /**
      * Резолвит маркеры @system-prompt и @append-system-prompt в элементах command
      * в пути к prompt-файлам роли (pi читает файлы сам, как codex model_instructions_file).
      *
@@ -390,6 +379,17 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
         return null;
     }
 
+    /**
+     * Разрешает @file в элементах command.
+     *
+     * Формат: `@path/to/file.txt` → содержимое файла.
+     * Если файл не найден — значение остаётся как есть.
+     *
+     * @param list<string> $command
+     * @param string|null $workingDir базовая директория для относительных путей
+     *
+     * @return list<string>
+     */
     private function resolveCommandFiles(array $command, ?string $workingDir): array
     {
         $resolved = [];
