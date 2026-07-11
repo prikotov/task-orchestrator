@@ -8,8 +8,8 @@ priority: P2
 author: Тимлид (Алекс)
 assignee:
 branch: task/research-agent-frameworks-comparison
-status: done
-reopened: 2026-06-18
+status: in_progress
+reopened: 2026-07-10
 pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация)"
 ---
 
@@ -113,6 +113,10 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 - [x] [TASK-research-swarm-forge](TASK-research-swarm-forge.todo.md) — SwarmForge (unclebob / Robert C. Martin, tmux-based swarm orchestration: git worktrees per role, layered constitution, handoff-протокол, config-driven topology) *(PR #272)*
 
+### Этап 1i: Дополнительные исследования (2026-07-10)
+
+- [x] [TASK-research-onorca-ade](TASK-research-onorca-ade.todo.md) — Orca ADE (stablyai/orca, MIT, TypeScript/Electron + mobile; «AI Orchestrator» — параллельная ручная оркестрация coding-агентов в изолированных git worktrees: fan-out prompt → N agents → merge winner; BYO subscription; Ghostty-class terminal IDE; mobile companion; Orca Tasks/Automations; `orca.yaml`) *(verdict 🟡 паттерны / 🔴 не dependency; code review Approval)*
+
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
 - [x] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
@@ -151,3 +155,5 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-06-13 | Тимлид (Алекс) | Stage 1g: TASK-research-agent-skills принята, переведена в done и подготовлена к merge PR #258. |
 | 2026-06-18 | Тимлид (Алекс) | Эпик reopened: добавлена стадия 1h — TASK-research-swarm-forge (unclebob/swarm-forge, tmux-based swarm orchestration от R.C. Martin). SwarmForge концептуально ближе всего к нашей системе ролей/AGENTS.md/conventions; предварительный verdict: заимствовать паттерны, не dependency. |
 | 2026-06-18 | Тимлид (Алекс) | Stage 1h: TASK-research-swarm-forge принята (PR #272, verdict 🟡 паттерны / 🔴 не dependency, 29/29). Эпик возвращён в `done`. |
+| 2026-07-10 | Аналитик (Шерлок) | Эпик reopened (статус `in_progress`, стадия `1i`): добавлена постановка TASK-research-onorca-ade — Orca ADE (stablyai/orca, MIT, TypeScript/Electron, ≈15.3k★, YC-backed). Orca — система ручной оркестрации (ADE/harness поверх coding-агентов в worktrees), не coding-агент → отнесён в этот эпик по прецеденту oh-my-openagent (#23). Ближайшие аналоги: SwarmForge (#29), AgentCraft (#16), Sandcastle (#20). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. |
+| 2026-07-10 | Тимлид (Алекс) | Stage 1i: TASK-research-onorca-ade выполнена — comparison-отчёт `orca-ade-comparison.md`, строка `Orca ADE` (#30) в summary (`30 / 30`). Verdict 🟡 заимствовать паттерны (parallel fan-out comparison, structured worker_done/dispatch-id, BYO runner ergonomics, worktree isolation, live monitoring) / 🔴 не dependency. Code review Архитектор Локи → Approval (5 CR устранены, сверено с `skills/orchestration/SKILL.md` и `src/main/runtime/orchestration/db.ts`). Задача перенесена в `done/`. |

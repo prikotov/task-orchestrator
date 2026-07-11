@@ -5,9 +5,16 @@
 
 ---
 
+
+## Терминологическая пометка
+
+В сводке англоязычные термины используются в следующих значениях: **fan-out** — веерная раздача задачи нескольким агентам; **BYO (bring your own)** — «принеси свой» агент/подписку; **control surface** — управляющая поверхность; **human-in-the-loop** — человек в контуре принятия решения; **workflow** — рабочий процесс; **workbench** — рабочее место/панель управления; **live monitoring** — наблюдение за живым запуском; **runner-/chain-level retry/backoff/CB** — повтор, задержка и circuit breaker (предохранитель отказов) на уровне запуска агента или цепочки; **dispatch-level retry/circuit-break** — повтор и размыкание на уровне dispatch-задачи Orca с порогом 3 failures.
+
+---
+
 ## Сравнительная таблица
 
-> **Статус заполнения:** 29 / 29 исследований
+> **Статус заполнения:** 30 / 30 исследований
 
 | # | Фреймворк | Язык | Категория | Модель оркестрации | State mgmt | Error handling | Extensibility | Вердикт | Отчёт |
 |:---:|---|---|---|---|---|---|---|---|---|
@@ -40,12 +47,13 @@
 | 27 | Odysseus (PewDiePie archdaemon) | Python (FastAPI) | `self-hosted AI workspace` | `agent-loop (ReAct) + Deep Research (multi-step runs) + Skills (SKILL.md) + Memory (ChromaDB)` | `session persistence (SQLite) + ChromaDB (memory/skills) + vector + keyword retrieval` | `retry max 3 + host health (cooldown 20s after 2 consecutive failures) + tool timeout (60s)` | `Tools (bash/python/web_search/etc.) + MCP servers + Skills (SKILL.md) + custom endpoints + Deep Research workflow` | 🔴 не dependency, 🟡 feature candidates for independent implementation | [odysseus-comparison.md](framework-comparisons/odysseus-comparison.md) ✅ |
 | 28 | Agent Skills (Addy Osmani) | Markdown + Bash + JavaScript | `skill-pack` | `host-driven skill activation + lifecycle commands (/spec→/plan→/build→/test→/review→/ship) + /ship fan-out review` | `N/A / host-dependent` (delegated to host agent/IDE) | `N/A / delegated to host agent` (prompt-level verification, no retry/CB/fallback) | `24 SKILL.md + 8 commands + 4 personas + hooks + plugin manifests + skill validator` | 🔴 не dependency, 🟡 заимствовать authoring/governance patterns | [agent-skills-comparison.md](framework-comparisons/agent-skills-comparison.md) ✅ |
 | 29 | SwarmForge (Uncle Bob) | Babashka/Clojure + zsh | `swarm-orchestration` | `peer-to-peer handoff pipeline` (tmux sessions + daemon-delivered inbox/outbox files + git worktrees per role) | `file-based` (`.swarmforge/` handoffs + `roles.tsv` + git worktrees) | `validation/fail-fast` (strict handoff schema, failed queue, ambiguous-state errors; no retry/CB/gates/budget) | `swarmforge.conf topology + roles/*.prompt + layered constitution + backends codex/claude/copilot/grok + pack presets` | 🔴 не dependency, 🟡 заимствовать swarm-governance patterns | [swarm-forge-comparison.md](framework-comparisons/swarm-forge-comparison.md) ✅ |
+| 30 | Orca ADE | TypeScript + Electron + React Native | `ADE / manual-orchestrator` | `parallel worktree fan-out` (1 prompt → N CLI agents in isolated git worktrees → compare → merge winner) + experimental messages/tasks/dispatches/gates | `git worktrees + app/runtime state` (branches/files/terminals/tasks/dispatches; mobile pairing) | `manual recovery/rerun + validation/precheck` (нет universal runner-/chain-level retry/backoff/CB/gates/budget на уровне agent steps; есть experimental dispatch-level retry/circuit-break после 3 failures) | `any CLI agent + BYO subscription + Orca Skills (SKILL.md) + MCP endpoints + CLI + SSH/mobile/emulator/computer-use` | 🔴 не dependency, 🟡 заимствовать fan-out/worktree-monitoring patterns | [orca-ade-comparison.md](framework-comparisons/orca-ade-comparison.md) ✅ |
 
 ### Легенда колонок
 
 | Колонка | Описание | Значения |
 |---|---|---|
-| **Категория** | Тип фреймворка | `single-agent`, `multi-agent`, `meta-orchestration`, `cloud/SaaS`, `CLI-agent` |
+| **Категория** | Тип фреймворка | `single-agent`, `multi-agent`, `meta-orchestration`, `cloud/SaaS`, `CLI-agent`, `ADE / manual-orchestrator` |
 | **Модель оркестрации** | Как оркестируются шаги/агенты | `sequential`, `graph/DAG`, `event-driven`, `SOP`, `agent-loop` и т.д. |
 | **State mgmt** | Как хранится и передаётся состояние | `in-memory`, `shared-context`, `message-passing`, `persistent` и т.д. |
 | **Error handling** | Retry, circuit breaker, fallback | `retry+backoff`, `circuit-breaker`, `fallback-model`, `manual` и т.д. |
@@ -56,15 +64,13 @@
 
 ## Резюме для принятия решений (Executive Summary)
 
-По результатам исследования 29 AI-agent фреймворков, инструментов, оркестраторов и skill packs можно сделать **три главных вывода**:
+По результатам исследования 30 AI-agent фреймворков, инструментов, оркестраторов, ADE и skill packs можно сделать **три главных вывода**:
 
-1. **task-orchestrator обладает уникальной комбинацией возможностей**, которой нет ни у одного из исследованных проектов: YAML-цепочки + retry с backoff + circuit breaker + quality gates (shell) + бюджетный контроль + fix_iterations + fallback routing + JSONL audit trail. Ни один фреймворк — ни open-source, ни проприетарный — не предлагает все эти механизмы вместе. **Paperclip AI** — ближайший аналог по уровню (мета-оркестратор), но работает на уровне компании/агентов, а не chain steps. **Zeroclaw** (#26, Rust, 31.5k ★) — наиболее развитый single-agent runtime из исследованных (SOP engine, loop detection, 6-layer security, WASM plugins, hardware), но не имеет circuit breaker, quality gates, бюджетного контроля или chain-level retry. **Duet** (Aomni, $4.4M seed) подтверждает тренд: даже well-funded SaaS-платформы и локальные swarm-оркестраторы для автономных AI-агентов не имеют retry с backoff, circuit breaker, quality gates или бюджетного контроля.
+1. **task-orchestrator обладает уникальной комбинацией возможностей**, которой нет ни у одного из исследованных проектов: YAML-цепочки + retry с backoff + circuit breaker + quality gates (shell-проверки качества) + бюджетный контроль + fix_iterations + fallback routing + JSONL audit trail. Ни один фреймворк — ни open-source, ни проприетарный — не предлагает все эти механизмы вместе. **Paperclip AI** — ближайший аналог по уровню (мета-оркестратор), но работает на уровне компании/агентов, а не chain steps. **Zeroclaw** (#26, Rust, 31.5k ★) — наиболее развитый single-agent runtime из исследованных, но не имеет circuit breaker, quality gates, бюджетного контроля или chain-level retry. **Duet** (Aomni, $4.4M seed) подтверждает тренд: даже well-funded SaaS-платформы и локальные swarm-оркестраторы для автономных AI-агентов не имеют полного набора этих механизмов.
 
-2. **Наибольший потенциал для заимствования** — в трёх кластерах: (а) интеллектуальная обработка ошибок (error classification, stuck detection, model failover), (б) безопасность автономного выполнения (sandboxing, exec policy, permission system), (в) расширенные модели оркестрации (conditional branching, parallel execution, sub-agents). **Duet** (#24) добавляет четвёртый кластер: (г) cron-triggered recurring execution и prompt engineering паттерны (gotchas, idempotency guidance, multi-phase workflows).
-2. **Наибольший потенциал для заимствования** — в трёх кластерах: (а) интеллектуальная обработка ошибок (error classification, stuck detection, model failover), (б) безопасность автономного выполнения (sandboxing, exec policy, permission system), (в) расширенные модели оркестрации (conditional branching, parallel execution, sub-agents). **Duet** добавляет кластер: (г) skill-based специализация и use-case curation (SKILL.md формат, persona-based routing, prompt-level guardrails).
+2. **Наибольший потенциал для заимствования** — в четырёх кластерах: (а) интеллектуальная обработка ошибок (error classification, stuck detection, model failover), (б) безопасность автономного выполнения (sandboxing, exec policy, permission system), (в) расширенные модели оркестрации (conditional branching, parallel execution, sub-agents), (г) skill-based специализация и recurring execution (cron-triggered recurring execution, gotchas, idempotency guidance, multi-phase workflows). **Duet** (#24) усиливает кластер (г) через SKILL.md-формат, use-case curation и prompt-level guardrails.
 
-3. **Ближайшие аналоги** по уровню абстракции — Archon (TypeScript/Bun, chain-level оркестрация через subprocess SDK) и Paperclip AI (TypeScript/Node.js, company-level мета-оркестратор). Archon не имеет circuit breaker, quality gates или бюджетного контроля. Paperclip AI имеет развитый budget enforcement, run recovery и plugin system, но не поддерживает chains, circuit breaker или quality gates. Наши ключевые отличия сохраняются. **Duet** — не аналог, а complement: skill-based SaaS-агент для continuous business automation, не chain orchestrator.
-**SwarmForge** (#29) — новый близкий аналог по модели ролевой координации: `roles/*.prompt` + layered constitution + `swarmforge.conf` + handoff daemon. Это не coding agent и не dependency, а локальный desktop-first swarm orchestrator; особенно ценны patterns для governance, handoff и team topology.
+3. **Ближайшие аналоги** по уровню абстракции — Archon (TypeScript/Bun, chain-level оркестрация через subprocess SDK), Paperclip AI (TypeScript/Node.js, company-level мета-оркестратор), SwarmForge (#29) и Orca ADE (#30). Archon не имеет circuit breaker, quality gates или бюджетного контроля. Paperclip AI имеет развитый budget enforcement, run recovery и plugin system, но не поддерживает chains, circuit breaker или quality gates. **SwarmForge** близок по ролевой координации (`roles/*.prompt` + layered constitution + `swarmforge.conf` + handoff daemon). **Orca ADE** близок по worktree-first ручной оркестрации: desktop/mobile ADE, parallel worktree fan-out, BYO CLI agents, Orca Skills and Automations. SwarmForge и Orca — не dependency; SwarmForge ценен для governance/handoff/team topology, Orca — для fan-out comparison и live worktree monitoring. При этом у Orca есть experimental dispatch-level retry/circuit-break после 3 failures, но нет universal runner-/chain-level retry/backoff/CB, сопоставимого с task-orchestrator.
 
 ---
 
@@ -390,17 +396,26 @@
 * **SwarmForge: batch receive mode** (группировать equal-priority handoffs перед review/merge decision) — P3
 * **SwarmForge: git worktree per role** (изоляция параллельных сабагентов в epic-level fan-out) — P3
 
+#### Orca ADE
+
+* **Orca ADE: parallel fan-out candidate comparison** (1 prompt → N agents/worktrees → compare → merge winner — модель для будущих `task-via-subagents` fan-out workflows) — P2
+* **Orca ADE: structured `worker_done` + dispatch-id completion authority** (taskId/dispatchId/files/report-path — защита от stale completion и модель для отчётов сабагентов) — P2
+* **Orca ADE: BYO runner/subscription ergonomics** (явно документировать runner как внешний CLI + аккаунт пользователя, usage/rate-limit assumptions) — P2
+* **Orca ADE: worktree isolation for parallel subagents** (отдельные worktrees для independent research/review/candidate implementation) — P3
+* **Orca ADE: workspace setup/preflight recipe** (`orca.yaml` setup/environmentRecipes как аналог project-owned preflight metadata рядом с chains) — P3
+* **Orca ADE: live run monitoring / notifications** (идея dashboard/уведомлений для long-running chains; не переносить mobile native UI) — P3
+
 </details>
 
 ---
 
 ## Общие тренды
 
-> Анализ выполнен на основе всех 29 исследований. Тренды сгруппированы по значимости для архитектуры task-orchestrator.
+> Анализ выполнен на основе всех 30 исследований. Тренды сгруппированы по значимости для архитектуры task-orchestrator.
 
 ### 1. Уникальная позиция task-orchestrator
 
-**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 29 проектов.
+**Ни один из исследованных проектов — ни open-source, ни коммерческий — не имеет полного набора:** chains + retry с backoff + circuit breaker + quality gates + бюджетный контроль + fix_iterations + fallback routing. Это подлинная (genuine) комбинация, отличающая task-orchestrator от всех 30 проектов.
 
 **Ни один проприетарный продукт** (Claude Code, GitHub Copilot Cloud Agent, OpenAI Codex, Duet) не имеет retry с backoff, circuit breaker, quality gates, budget limits или декларативных chains — все наши ключевые отличия актуальны даже против крупнейших коммерческих AI-agent продуктов (включая Factory Missions — SaaS-продукт для multi-day autonomous software engineering, оценённый в $1.5B, и Duet — always-on business agent SaaS, $4.4M funding).
 
@@ -414,9 +429,9 @@
 
 ### 2. Agent Loop — доминирующая модель выполнения
 
-**19 из 29 фреймворков** используют базовую или first-class модель `LLM → tool call → observation → LLM → ...`. В numerator (числитель) входят: Crush (#1), pi_agent_rust (#2), CrewAI (#3), LangGraph (#4; agent loop может быть выражен как graph cycle/superstep), AutoGen (#5), OpenHands SDK (#6), MetaGPT (#8), OpenClaw (#9), Mastra AI (#10), Claude Code (#11), Copilot Cloud Agent (#12), Docker Agent + Codex (#13), Agno (#14), Hermes Agent (#18), Kilo Code (#21), OpenCode (#22), OmO (#23), Zeroclaw (#26), **Odysseus (#27)**. Denominator (знаменатель) теперь `29`, потому что добавлен **SwarmForge (#29)**, но SwarmForge **не увеличивает numerator**: это swarm-orchestration layer (слой оркестрации роя), а не execution layer. Увеличение numerator с прежнего `18` связано с ранее добавленным **Odysseus (#27)**, который явно использует `agent-loop (ReAct) + Deep Research`, а не с Agent Skills или SwarmForge.
+**19 из 30 фреймворков** используют базовую или first-class модель `LLM → tool call → observation → LLM → ...`. В numerator (числитель) входят: Crush (#1), pi_agent_rust (#2), CrewAI (#3), LangGraph (#4; agent loop может быть выражен как graph cycle/superstep), AutoGen (#5), OpenHands SDK (#6), MetaGPT (#8), OpenClaw (#9), Mastra AI (#10), Claude Code (#11), Copilot Cloud Agent (#12), Docker Agent + Codex (#13), Agno (#14), Hermes Agent (#18), Kilo Code (#21), OpenCode (#22), OmO (#23), Zeroclaw (#26), **Odysseus (#27)**. Denominator (знаменатель) теперь `30`, потому что добавлен **Orca ADE (#30)**, но Orca **не увеличивает numerator**: это ADE/manual orchestration layer (ручной слой оркестрации), а не execution layer. Ранее добавленный **SwarmForge (#29)** также не увеличивал numerator: это swarm-orchestration layer (слой оркестрации роя), а не execution layer. Увеличение numerator с прежнего `18` связано с ранее добавленным **Odysseus (#27)**, который явно использует `agent-loop (ReAct) + Deep Research`, а не с Agent Skills, SwarmForge или Orca.
 
-Не входят в agent-loop numerator: Archon (#7; DAG + subprocess SDK), Paperclip AI (#15; heartbeat-based мета-оркестрация), AgentCraft (#16; GUI wrapper), Factory Missions (#17; orchestrator-worker delegation), Oz (#19; cloud-managed runs), Sandcastle (#20; agent invocation loop в песочнице), Duet (#24; skill-driven orchestration), Multica (#25; daemon-based task dispatch), Agent Skills (#28; skill pack / prompt workflow library), SwarmForge (#29; tmux-based swarm orchestration platform). **Duet** (#24) использует skill-driven orchestration: intent → skill selection → multi-phase autonomous execution. **Multica** (#25) использует daemon-based task dispatch (не agent loop, а task queue).
+Не входят в agent-loop numerator: Archon (#7; DAG + subprocess SDK), Paperclip AI (#15; heartbeat-based мета-оркестрация), AgentCraft (#16; GUI wrapper), Factory Missions (#17; orchestrator-worker delegation), Oz (#19; cloud-managed runs), Sandcastle (#20; agent invocation loop в песочнице), Duet (#24; skill-driven orchestration), Multica (#25; daemon-based task dispatch), Agent Skills (#28; skill pack / prompt workflow library), SwarmForge (#29; tmux-based swarm orchestration platform), Orca ADE (#30; desktop/mobile manual parallel-agent harness). **Duet** (#24) использует skill-driven orchestration: intent → skill selection → multi-phase autonomous execution. **Multica** (#25) использует daemon-based task dispatch (не agent loop, а task queue).
 
 **AgentCraft не учитывается в этом подсчёте:** он не имеет собственной модели выполнения, а выступает как GUI wrapper, делегируя выполнение подключённым внешним агентам (Claude Code, OpenCode, Cursor, OpenClaw). Эти агенты сами используют agent loop — AgentCraft лишь управляет их запуском и визуализирует прогресс. Таким образом, AgentCraft не является ни «agent loop», ни «другой моделью выполнения» — это управляющий слой поверх существующих сред.
 
@@ -432,9 +447,9 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 **Вывод:** Наша модель (YAML chain → runner call → payload) — это оркестрация поверх agent loop. Это правильный уровень: мы не дублируем LLM interaction, а управляем им. Oz (Warp) подтверждает тренд: облачные платформы (SaaS) управляют *запуском* агентов (когда, где, с каким окружением), а task-orchestrator управляет *процессом* (шаги, retry, quality gates).
 
-### 3. Разделение на одиннадцать уровней абстракции
+### 3. Разделение на двенадцать уровней абстракции
 
-**Все 29 проектов** чётко делятся на одиннадцать уровней:
+**Все 30 проектов** чётко делятся на двенадцать уровней:
 
 | Уровень | Проекты | Что делают | Аналог в task-orchestrator |
 |---|---|---|---|
@@ -442,6 +457,7 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 | **Оркестратор / Workflow engine** | CrewAI, LangGraph, AutoGen, Archon, MetaGPT, Copilot Workspace | Управляют потоком выполнения между агентами/шагами | Chain executor |
 | **Sandbox orchestration** | Sandcastle | Управляет жизненным циклом песочниц (Docker/Podman/Vercel), git worktrees, branch strategies для внешних AI-агентов | — (нет аналога) |
 | **Swarm orchestration** | SwarmForge | Запускает локальный рой внешних AI-агентов в `tmux`, распределяет роли по `git worktree`, доставляет peer-to-peer handoffs через daemon | `docs/agents/roles/team/*` + `task-via-subagents` (частичный аналог, но централизованный) |
+| **ADE / Manual parallel-agent harness** | Orca ADE | Desktop/mobile workbench для параллельного запуска внешних CLI-агентов в изолированных `git worktree`: fan-out prompt → compare → merge winner | `task-via-subagents` + потенциальный fan-out comparison workflow (частичный аналог без GUI/mobile) |
 | **GUI Manager / Launcher** | AgentCraft | Визуальный интерфейс для запуска и мониторинга внешних агентов, без собственной логики выполнения | — (нет аналога) |
 | **Multi-agent SaaS / Product** | Factory Missions | Автономная multi-day software development: orchestrator → workers → validators, file-based shared state | — (нет аналога, closest — chain executor + dynamic loops) |
 | **Business Agent SaaS** | Duet (Aomni) | Always-on автономный бизнес-агент: skill-driven execution, shared workspace, scheduled pipelines, multi-channel delivery | — (нет аналога) |
@@ -454,25 +470,25 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 **Agent Skills** добавляет отдельный уровень **Skill Pack / Prompt Workflow Library**: это не runtime и не orchestrator, а переносимый слой инженерных workflows, personas, commands и validation вокруг host agents.
 
-**SwarmForge** добавляет уровень **Swarm orchestration**: это не LLM runtime и не coding agent, а локальный control layer (контур управления) для нескольких внешних CLI-агентов с peer-to-peer handoff protocol.
+**SwarmForge** добавляет уровень **Swarm orchestration**: это не LLM runtime и не coding agent, а локальный control layer (контур управления) для нескольких внешних CLI-агентов с peer-to-peer handoff protocol. **Orca ADE** добавляет уровень **ADE / Manual parallel-agent harness**: desktop/mobile control surface для параллельных external CLI agents в git worktrees, с human-in-the-loop comparison and merge.
 
 **Paperclip AI** подтверждает тренд на многоуровневую абстракцию: SDK/runtime → оркестратор → GUI manager → мета-оркестратор. Paperclip — наиболее продвинутый мета-оркестратор из исследованных: org charts, budgets, governance, goal alignment, company portability.
 
 ### 4. SKILL.md / AGENTS.md — де-факто стандарт
 
-**20 из 29 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
-- Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex, Agno, Factory Missions (.factory/skills/), Hermes Agent, Oz (Warp) (oz-skills), Kilo Code, **OpenCode** (.opencode/skills/ + remote URLs + .claude/skills/ + .agents/skills/), **OmO** (Skill-Embedded MCPs: SKILL.md + собственные MCP-серверы), **Duet** (SKILL.md в duet-skills реестр: frontmatter id/model/tools + markdown body = system prompt), **Multica** (workspace-level skills, SKILL.md + files, import from URL/runtime/ClawHub/Skills.sh/GitHub), **Zeroclaw** (SkillForge: SKILL.md discovery + validation + WASM skill packaging), **Odysseus** (SKILL.md в memory/skills), **Agent Skills** (24 переносимых SKILL.md + validator + plugin manifests)
+**21 из 30 проектов** используют SKILL.md или аналогичный формат для формализации agent capabilities:
+- Crush, pi_agent_rust, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Codex, Agno, Factory Missions (.factory/skills/), Hermes Agent, Oz (Warp) (oz-skills), Kilo Code, **OpenCode** (.opencode/skills/ + remote URLs + .claude/skills/ + .agents/skills/), **OmO** (Skill-Embedded MCPs: SKILL.md + собственные MCP-серверы), **Duet** (SKILL.md в duet-skills реестр: frontmatter id/model/tools + markdown body = system prompt), **Multica** (workspace-level skills, SKILL.md + files, import from URL/runtime/ClawHub/Skills.sh/GitHub), **Zeroclaw** (SkillForge: SKILL.md discovery + validation + WASM skill packaging), **Odysseus** (SKILL.md в memory/skills), **Agent Skills** (24 переносимых SKILL.md + validator + plugin manifests), **Orca ADE** (installable Orca Skills: `orca-cli`, `orchestration`, `computer-use`, `orca-linear`, emulator/per-workspace env skills)
 - Формат: YAML frontmatter + markdown body, discovery из нескольких мест, валидация
 - Стандарт [agentskills.io](https://agentskills.io) получает широкое распространение
 - Paperclip AI добавляет Company Skills: managed skill registry с import/export, trust levels, compatibility checks
 - **Multica** реализует workspace-level Skills (SKILL.md) с import из ClawHub/skills.sh/GitHub и per-agent assignment с provider-native injection (`.claude/skills/`, `CODEX_HOME/skills/`, `.opencode/skills/` и т.д.)
 
-**AGENTS.md** используется как минимум в 9 проектах (Crush, pi_agent_rust, OpenHands SDK, Codex, Paperclip AI, Factory Missions (per-mission AGENTS.md с boundaries + guidance), Hermes Agent (`.hermes.md` / `HERMES.md`), Agent Skills, task-orchestrator) — де-факто стандарт для AI-agent контекста.
+**AGENTS.md** используется как минимум в 10 проектах (Crush, pi_agent_rust, OpenHands SDK, Codex, Paperclip AI, Factory Missions (per-mission AGENTS.md с boundaries + guidance), Hermes Agent (`.hermes.md` / `HERMES.md`), Agent Skills, Orca ADE, task-orchestrator) — де-факто стандарт для AI-agent контекста.
 
 ### 5. MCP (Model Context Protocol) — повсеместный протокол расширения
 
-**17 из 29 проектов** поддерживают MCP:
-- Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Paperclip AI, Hermes Agent, Oz (Warp), Kilo Code, **OpenCode** (full MCP client: tools + resources + OAuth), **OmO** (Skill-Embedded MCPs: MCP-серверы внутри скиллов, per-session изоляция), **Zeroclaw** (MCP client: подключение внешних MCP-серверов как инструментов)
+**18 из 30 проектов** поддерживают MCP:
+- Crush, CrewAI, OpenHands SDK, Archon, OpenClaw, Mastra AI, Claude Code, Copilot Cloud Agent, Codex, Agno, Paperclip AI, Hermes Agent, Oz (Warp), Kilo Code, **OpenCode** (full MCP client: tools + resources + OAuth), **OmO** (Skill-Embedded MCPs: MCP-серверы внутри скиллов, per-session изоляция), **Zeroclaw** (MCP client: подключение внешних MCP-серверов как инструментов), **Orca ADE** (MCP endpoints under Settings → Integrations → MCP; tools appear inside compatible agent CLIs)
 - **Multica** поддерживает MCP через per-agent config (JSONB в `agent` таблице), но не на уровне platform — делегирует agent CLI
 - MCP — стандарт де-факто для расширения возможностей AI-агентов через внешние tool-серверы
 - **Duet** (#24) использует **Composio** вместо MCP — проприетарный интеграционный слой (19+ connectors). Это не стандарт MCP, но решает ту же задачу: доступ к внешним API через стандартизированный interface
@@ -481,7 +497,7 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 6. Контекст-менеджмент — повсеместная проблема
 
-**12 из 29 проектов** реализуют auto-compaction / auto-summarization при context overflow:
+**12 из 30 проектов** реализуют auto-compaction / auto-summarization при context overflow:
 - Crush, pi_agent_rust, OpenHands SDK, Mastra AI, Claude Code, Codex, Agno, Hermes Agent, Kilo Code, **OpenCode** (7-секционный structured template + pruning + preserve recent turns + replay), **OmO** (proactive compaction: monitor + compact **до** ошибки + dynamic context pruning: dedup/supersede/purge), **Zeroclaw** (ContextCompressor: LLM-суммаризация + HistoryPruner: orphaned tool messages + collapsed pairs + protected indices + 1.2x token safety margin)
 - Все используют LLM-суммаризацию для сжатия истории
 - Hermes Agent — наиболее продвинутый подход: 14-секционный structured summary template, tool result pruning + deduplication, anti-thrashing protection, iterative summary updates, tool_call/result pair integrity, last-user-message anchoring (~1500 LOC)
@@ -514,8 +530,28 @@ Agno также поддерживает **step-based workflow** (Step/Steps/Loo
 
 ### 8. Sub-agents / Multi-agent — тренд к иерархической декомпозиции
 
-**17 из 29 runtime/platform-level проектов** поддерживают sub-agents или multi-agent на уровне runtime (рантайм) или platform-level (уровень платформы):
-- Crush (Coder → Task), Claude Code (Task tool), Codex (spawn/send_message/wait/close_agent с depth limit), OpenHands SDK (DelegateTool), OpenClaw (ACP spawn с limits), Mastra AI (agent network), Archon (inline sub-agents), CrewAI (Crew), AutoGen (group chat), Agno (Team с 4 режимами), Factory Missions (Task tool для subagents: investigation, review, research), Hermes Agent (delegate_task: parallel spawning, orchestrator/leaf roles, depth control до 3), Kilo Code (task tool: isolated session, permission inheritance, cost propagation, resume, parallel invocation), **OpenCode** (task tool: isolated session + permission inheritance + resume по task_id + no recursive delegation), **OmO** (Team Mode: Lead + до 8 параллельных members, shared mailbox + shared task list, 12 team_* инструментов), **Zeroclaw** (DelegateTool: sync/background/parallel delegation + SwarmTool: pipeline/parallel/router multi-agent patterns)
+**18 из 30 runtime/platform-level проектов** поддерживают sub-agents или multi-agent на уровне runtime (рантайм) или platform-level (уровень платформы). Orca ADE входит в числитель как manual parallel-agent orchestration (ручная параллельная оркестрация агентов), потому что один prompt можно раздать нескольким external CLI agents в отдельных `git worktree`, а experimental `orca orchestration` добавляет messages/tasks/dispatches/worker_done/decision gates.
+
+Воспроизводимый список 18 учтённых проектов:
+
+1. Crush — Coder → Task.
+2. Claude Code — Task tool.
+3. Codex — spawn/send_message/wait/close_agent с depth limit.
+4. OpenHands SDK — DelegateTool.
+5. OpenClaw — ACP spawn с limits.
+6. Mastra AI — agent network.
+7. Archon — inline sub-agents.
+8. CrewAI — Crew.
+9. AutoGen — group chat.
+10. Agno — Team с 4 режимами.
+11. Factory Missions — Task tool для subagents: investigation, review, research.
+12. Hermes Agent — delegate_task: parallel spawning, orchestrator/leaf roles, depth control до 3.
+13. Kilo Code — task tool: isolated session, permission inheritance, cost propagation, resume, parallel invocation.
+14. OpenCode — task tool: isolated session + permission inheritance + resume по task_id + no recursive delegation.
+15. OmO — Team Mode: Lead + до 8 параллельных members, shared mailbox + shared task list, 12 team_* инструментов.
+16. Zeroclaw — DelegateTool: sync/background/parallel delegation + SwarmTool: pipeline/parallel/router multi-agent patterns.
+17. SwarmForge — peer-to-peer swarm coordination через `handoffd.bb`, durable inbox/outbox files и `git worktree` per role.
+18. Orca ADE — manual parallel-agent orchestration через worktree fan-out и experimental messages/tasks/dispatches/worker_done/decision gates.
 
 Oz (Warp) не имеет sub-agents в традиционном понимании, но поддерживает **unlimited parallel cloud agents** — одновременный запуск множества независимых agent runs через API. Это горизонтальное масштабирование, не иерархическая декомпозиция.
 
@@ -523,14 +559,9 @@ Oz (Warp) не имеет sub-agents в традиционном пониман�
 
 **Duet** (#24) не поддерживает sub-agents — один агент per thread. Каждый skill описывает multi-phase workflow, выполняемый одним агентом (не несколькими). Это сознательное ограничение: простота и предсказуемость ценой параллелизма.
 
-Sandcastle поддерживает multi-agent orchestration через **templates**: parallel-planner запускает N агентов параллельно (Promise.allSettled), каждый на своей ветке; sequential-reviewer — implement + review в shared sandbox. Это parallel `run()` calls, не классический sub-agent (spawn/wait/close), но паттерн working — one failing agent doesn't cancel others.
+Sandcastle поддерживает multi-agent orchestration через **templates**: parallel-planner запускает N агентов параллельно (Promise.allSettled), каждый на своей ветке; sequential-reviewer — implement + review в shared sandbox. Это parallel `run()` calls, а не sub-agent primitive с собственной координацией, поэтому Sandcastle описан как adjacent pattern (смежный паттерн), но не включён в числитель 18.
 
-**Zeroclaw** предлагает два инструмента субагентной оркестрации: `DelegateTool` (sync/background/parallel delegation с изолированным контекстом) и `SwarmTool` (pipeline/parallel/router multi-agent patterns). SwarmTool уникален поддержкой встроенных стратегий координации (pipeline, parallel, router) на уровне tool.
-- Codex — наиболее продвинутая sub-agent система: mailbox pattern, fork modes, role system
-- Hermes Agent — наиболее продвинутая security model для sub-agents: DELEGATE_BLOCKED_TOOLS (no recursive delegation, no user interaction, no shared memory writes), auto-deny/approve для dangerous commands, child timeout
-- Paperclip AI не имеет sub-agents, но моделирует иерархию через org chart (агенты как «сотрудники» с reportsTo)
-- AgentCraft реализует Agent Teams — мультиагентные командные workflows через GUI wrapper (детали закрыты)
-- SwarmForge реализует peer-to-peer swarm coordination через `handoffd.bb`, durable inbox/outbox files и `git worktree` per role; это не hierarchical sub-agent, но runtime/platform-level multi-agent orchestration.
+AgentCraft реализует Agent Teams — мультиагентные командные workflows через GUI wrapper, но детали закрыты и не позволяют воспроизводимо подтвердить runtime/platform-level механизм; поэтому AgentCraft также вынесен из числителя.
 
 **Вывод:** Sub-agent pattern — готовый механизм для dynamic chains. Рекомендуется как P2: «chain внутри chain» с изолированным контекстом.
 
@@ -606,6 +637,7 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 * **Duet (Aomni) — единственный business-agent SaaS** в исследовании: always-on AI-агент для командной работы, автоматизирующий GTM, product и ops workflows. Позиционирование: «Build an autonomous business in 45 minutes». Уникальная модель оркестрации — skill-driven: intent → skill selection → multi-phase autonomous execution. Не DAG, не agent loop, не graph — декларативные SKILL.md описывают multi-phase workflows (2–7 фаз), которые LLM автономно выполняет. Error handling — полностью prompt-driven (gotchas в SKILL.md), без retry/CB/fallback. Расширяемость через SKILL.md (19 default + 12 industry skills), UseCase surface placements (strict TypeScript-enforced separation capability/presentation), Composio integrations (19+), chat SDK adapters (8 platforms). Cron tool для scheduled pipelines. Build-apps tool для генерации мини-приложений. Подтверждает тренд: SaaS-продукты на уровне целых бизнес-процессов — отдельная ниша, не пересекающаяся с chain orchestration.
 
 * **Multica — первый project management platform для human+agent teams** в исследовании: Linear/Jira-like board, где AI-агенты — first-class teammates с профилями, assignee picker и activity timeline. Уникальная комбинация: daemon-based task queue (poll + WS wakeup) + session resumption + poisoned session detection + autopilot (cron/webhook) + workspace-level skills с provider-native injection. Multica **не вызывает LLM API напрямую** — все AI-взаимодействия делегируются внешним agent CLI (11 providers). Это platform layer, а не execution engine — принципиально другой уровень, чем task-orchestrator. Подтверждает тренд separation of concerns: chain orchestrator (task-orchestrator) → project management platform (Multica) → meta-orchestrator (Paperclip AI).
+* **Orca ADE — первый полноценный open-source desktop/mobile ADE для параллельной ручной оркестрации coding-агентов** в исследовании: Electron/TypeScript desktop, React Native mobile companion, BYO subscriptions, any CLI agent, real `git worktree` per task/agent, fan-out prompt → compare → merge winner, Tasks/Automations, installable Orca Skills и MCP endpoints. Orca **не вызывает LLM API напрямую** и не заменяет coding agents; это control surface поверх Codex/Claude Code/OpenCode/Pi/etc. Вердикт: не dependency, но ценный источник patterns для fan-out comparison, worktree isolation, dispatch-id completion authority и live monitoring.
 
 ---
 
@@ -644,3 +676,4 @@ Agno предлагает **error-specific fallback routing** (on_error/on_rate_
 | 2026-05-20 | Аналитик (Шерлок) | Создан отчёт zeroclaw-comparison.md, заполнена строка Zeroclaw (#26). Пересчитаны тренды (25→26). Добавлены рекомендации Zeroclaw (P2 Quick win: loop detection 3 patterns, error classification, context limit auto-detection; P3: hint-based model routing, history pruning, SOP deterministic mode, cost-optimized routing; R&D: cryptographic tool receipts, 6-layer security). Добавлено наблюдение: Zeroclaw — тематически связан с OpenClaw (независимый проект, не fork), наиболее развитый single-agent runtime (SOP engine, loop detection, 6-layer security, WASM plugins, hardware). |
 | 2026-06-13 | Аналитик (Шерлок) | Создан отчёт agent-skills-comparison.md, заполнена строка Agent Skills (#28). Статус заполнения обновлён до 28/28. Добавлены рекомендации: skill anatomy validator, anti-rationalization tables, red flags, lifecycle mapping, persona composition guardrail. |
 | 2026-06-18 | Аналитик (Шерлок) | Создан отчёт swarm-forge-comparison.md, заполнена строка SwarmForge (#29). Статус заполнения обновлён до 29/29. Добавлены рекомендации: layered constitution override semantics, strict handoff draft schema, role ownership blocks, pack presets, batch receive mode, git worktree per role. |
+| 2026-07-10 | Аналитик (Шерлок) | Создан отчёт orca-ade-comparison.md, заполнена строка Orca ADE (#30). Статус заполнения обновлён до 30/30. Пересчитаны тренды (29→30): agent loop 19/30 (Orca не execution layer), SKILL.md 21/30, MCP 18/30, sub-agents/multi-agent 18/30 с воспроизводимым списком учтённых проектов, compression 12/30. Уточнено: у Orca нет universal runner-/chain-level retry/backoff/CB, но есть experimental dispatch-level retry/circuit-break после 3 failures. Добавлен двенадцатый уровень абстракции: ADE / manual parallel-agent harness. Добавлены рекомендации: parallel fan-out comparison, structured worker_done/dispatch-id reports, BYO runner ergonomics, worktree isolation, workspace setup/preflight recipe, live monitoring. |
