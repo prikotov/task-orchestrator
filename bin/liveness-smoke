@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "ERROR: Node.js is required for the worker_threads liveness regression." >&2
+  exit 1
+fi
+
+printf 'node=%s\n' "$(node --version)"
+php "${ROOT_DIR}/vendor/bin/phpunit" \
+  --do-not-cache-result \
+  --fail-on-skipped \
+  --fail-on-incomplete \
+  --fail-on-risky \
+  "${ROOT_DIR}/tests/Integration/Infrastructure/Service/AgentRunner/ProcessLivenessWatcherNodeWorkerIntegrationTest.php"
+
+docker run --rm \
+  --entrypoint sh \
+  --volume "${ROOT_DIR}:/app:ro" \
+  --workdir /app \
+  php:8.4.1-cli \
+  -lc '
+    set -eu
+    export APP_CACHE_DIR=/tmp/task-orchestrator-cache
+    export APP_LOG_DIR=/tmp/task-orchestrator-log
+
+    platform_family="$(php -r "echo PHP_OS_FAMILY;")"
+    printf "PHP_OS_FAMILY=%s\n" "${platform_family}"
+    test "${platform_family}" = Linux
+
+    if command -v ps >/dev/null 2>&1; then
+      echo "ERROR: ps must be absent from the exact liveness smoke image." >&2
+      exit 1
+    fi
+    echo "ps=MISSING"
+
+    if command -v pgrep >/dev/null 2>&1; then
+      echo "ERROR: pgrep must be absent from the exact liveness smoke image." >&2
+      exit 1
+    fi
+    echo "pgrep=MISSING"
+
+    if php -r "exit(function_exists(\"pcntl_fork\") ? 0 : 1);"; then
+      echo "ERROR: pcntl_fork must be absent from the exact liveness smoke image." >&2
+      exit 1
+    fi
+    echo "pcntl_fork=MISSING"
+
+    php vendor/bin/phpunit \
+      --do-not-cache-result \
+      --fail-on-skipped \
+      --fail-on-incomplete \
+      --fail-on-risky \
+      tests/Integration/Infrastructure/Service/AgentRunner/ProcessLivenessWatcherLinuxIntegrationTest.php
+  '

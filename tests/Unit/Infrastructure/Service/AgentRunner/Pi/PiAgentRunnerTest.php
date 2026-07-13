@@ -8,6 +8,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\{
+    ProcessLivenessClockComponent,
+    ProcessLivenessProbeUnavailableComponent,
+    ProcessLivenessSleeperComponent,
+};
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunnerService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiJsonlParser;
@@ -28,7 +33,7 @@ final class PiAgentRunnerTest extends TestCase
     {
         // Сбрасываем CODEX_HTTP_PROXY на каждый тест — изоляция от окружения
         putenv('CODEX_HTTP_PROXY');
-        $this->runner = new PiAgentRunnerService(new PiJsonlParser(), new ProcessLivenessWatcher());
+        $this->runner = new PiAgentRunnerService(new PiJsonlParser(), $this->createLivenessWatcher());
     }
 
     protected function tearDown(): void
@@ -601,5 +606,14 @@ PHP);
         $this->fixtureFiles[] = $fixtureFile;
 
         return $fixtureFile;
+    }
+
+    private function createLivenessWatcher(): ProcessLivenessWatcher
+    {
+        return new ProcessLivenessWatcher(
+            probe: new ProcessLivenessProbeUnavailableComponent(),
+            clock: new ProcessLivenessClockComponent(),
+            sleeper: new ProcessLivenessSleeperComponent(),
+        );
     }
 }

@@ -2,261 +2,543 @@
 
 declare(strict_types=1);
 
-namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service;
-
-use TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\ProcessLivenessWatcherShellExecInterceptor;
-
-function shell_exec(string $command): false|string|null
-{
-    return ProcessLivenessWatcherShellExecInterceptor::execute($command);
-}
-
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner;
 
+use Closure;
+use LogicException;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\{
+    Dto\ProcessLivenessActiveProbeResultDto,
+    Dto\ProcessLivenessInactiveProbeResultDto,
+    Dto\ProcessLivenessPidSnapshotDto,
+    Dto\ProcessLivenessSnapshotDto,
+    Dto\ProcessLivenessUnknownProbeResultDto,
+    ProcessLivenessClockComponentInterface,
+    ProcessLivenessProbeComponentInterface,
+    ProcessLivenessSleeperComponentInterface,
+};
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLivenessWatcher;
 
 /**
- * Unit-тесты для ProcessLivenessWatcher — вынесенной из раннеров
- * liveness-логики (раньше дублировалась в Pi/Codex runners).
+ * Детерминированные Unit-тесты policy-логики без процессов ОС и реального sleep.
  */
 #[CoversClass(ProcessLivenessWatcher::class)]
 final class ProcessLivenessWatcherTest extends TestCase
 {
-    /** @var list<string> */
-    private array $fixtureFiles = [];
-
     protected function tearDown(): void
     {
-        foreach ($this->fixtureFiles as $fixtureFile) {
-            @unlink($fixtureFile);
-        }
-        $this->fixtureFiles = [];
-
-        // Очистка env-переменных liveness
         putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC');
         putenv('AGENT_RUNNER_HARD_TIMEOUT_SEC');
     }
 
     #[Test]
-    public function waitForKillsIdleProcess(): void
+    public function waitForStopsOnlyAfterComparableInactiveSamplesExceedThreshold(): void
     {
-        // Процесс спит без CPU/IO — liveness должна убить за idle-threshold (2с)
-        // и вернуть false (остановлен по idle).
-        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=2');
-        $watcher = new ProcessLivenessWatcher();
+        // Arrange
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=1');
+        $snapshot = $this->snapshot([42 => [10, 20]]);
+        $probe = new ProcessLivenessProbeStub([
+            $this->activeResult($snapshot),
+            $this->inactiveResult($snapshot),
+            $this->inactiveResult($snapshot),
+        ]);
+        $clock = new ProcessLivenessClockFake();
+        $process = new ProcessLivenessProcessDouble();
+        $watcher = $this->watcher($probe, $clock);
 
-        $process = new Process([$this->createExecutableFixture('liveness_idle_', <<<'PHP'
-sleep(120);
-PHP
-        )]);
-        $process->setTimeout(1800); // hard cap — не должен сработать раньше idle
-
-        $start = microtime(true);
-        $process->start();
+        // Act
         $completed = $watcher->waitFor($process);
-        $elapsed = microtime(true) - $start;
 
-        self::assertFalse($completed, 'idle process must be reported as killed (false)');
-        self::assertFalse($process->isRunning(), 'process must be stopped');
-        // Kill должен сработать заметно быстрее sleep(120) — в районе idle-threshold + grace.
-        self::assertLessThan(30.0, $elapsed, 'idle process must be killed fast, not waited full sleep');
+        // Assert
+        self::assertFalse($completed);
+        self::assertSame(1, $process->stopCalls);
+        self::assertFalse($process->isRunning());
+        self::assertSame(3, $probe->calls);
+        self::assertSame(3, $process->checkTimeoutCalls);
+        self::assertNull($probe->previousSnapshots[0]);
+        self::assertSame($snapshot, $probe->previousSnapshots[1]);
     }
 
     #[Test]
-    public function waitForLetsActiveProcessSurvive(): void
+    public function waitForTreatsTopologyChangeAsActivityAndDoesNotStopProcess(): void
     {
-        // Активный процесс (CPU/IO растут) — liveness НЕ должна убивать: он завершается сам.
-        // idle-threshold намеренно мал (2с), чтобы тест проверял именно «активный дожил».
-        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=2');
-        $watcher = new ProcessLivenessWatcher();
+        // Arrange
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=1');
+        $parentSnapshot = $this->snapshot([42 => [10, 20]]);
+        $parentAndChildSnapshot = $this->snapshot([
+            42 => [10, 20],
+            84 => [1, 2],
+        ]);
+        $probe = new ProcessLivenessProbeStub([
+            $this->activeResult($parentSnapshot),
+            $this->activeResult($parentAndChildSnapshot),
+            $this->inactiveResult($parentAndChildSnapshot),
+        ]);
+        $clock = new ProcessLivenessClockFake();
+        $process = new ProcessLivenessProcessDouble();
+        $watcher = $this->watcher(
+            probe: $probe,
+            clock: $clock,
+            onSleep: static function (int $calls) use ($process): void {
+                if ($calls === 3) {
+                    $process->finish();
+                }
+            },
+        );
 
-        $process = new Process([$this->createExecutableFixture('liveness_active_', <<<'PHP'
-for ($i = 0; $i < 30; $i++) {
-    fwrite(STDOUT, "tick $i\n");
-    fflush(STDOUT);
-    usleep(100000);
-}
-PHP
-        )]);
-        $process->setTimeout(1800);
-
-        $process->start();
+        // Act
         $completed = $watcher->waitFor($process);
 
-        self::assertTrue($completed, 'active process must NOT be killed: it finishes by itself');
-        self::assertTrue($process->isSuccessful(), 'process must exit 0');
+        // Assert
+        self::assertTrue($completed);
+        self::assertSame(0, $process->stopCalls);
+        self::assertSame(3, $probe->calls);
     }
 
     #[Test]
-    public function waitForLetsProcessSurviveWhenChildIsActive(): void
+    public function waitForKeepsUnknownModePermanentForCurrentWait(): void
     {
-        // Codex/agent pattern: сам процесс idle (ep_poll / pcntl_wait), но spawn'ит
-        // active children (tool calls: find/grep/sed). До фикса liveness видела только
-        // direct PID → ложно kill'ила активный процесс с tool calls. С фиксом children
-        // CPU/IO учитываются → процесс дорабатывает.
-        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=2');
-        $watcher = new ProcessLivenessWatcher();
+        // Arrange
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=1');
+        $snapshot = $this->snapshot([42 => [10, 20]]);
+        $probe = new ProcessLivenessProbeStub([
+            $this->activeResult($snapshot),
+            $this->unknownResult(),
+            $this->inactiveResult($snapshot),
+        ]);
+        $clock = new ProcessLivenessClockFake();
+        $process = new ProcessLivenessProcessDouble();
+        $watcher = $this->watcher(
+            probe: $probe,
+            clock: $clock,
+            onSleep: static function (int $calls) use ($process): void {
+                if ($calls === 4) {
+                    $process->finish();
+                }
+            },
+        );
 
-        $process = new Process([$this->createExecutableFixture('liveness_child_', <<<'PHP'
-$child = pcntl_fork();
-if ($child === 0) {
-    for ($i = 0; $i < 40; $i++) {
-        fwrite(STDOUT, "tick $i\n");
-        fflush(STDOUT);
-        usleep(100000);
-    }
-    exit(0);
-}
-pcntl_wait($status);
-PHP
-        )]);
-        $process->setTimeout(1800);
-
-        $process->start();
+        // Act
         $completed = $watcher->waitFor($process);
 
-        self::assertTrue($completed, 'process with active child must NOT be killed (children CPU/IO counts)');
-        self::assertTrue($process->isSuccessful());
+        // Assert
+        self::assertTrue($completed);
+        self::assertSame(0, $process->stopCalls);
+        self::assertSame(2, $probe->calls, 'UNKNOWN must disable later probes for this waitFor().');
+        self::assertSame(4, $process->checkTimeoutCalls, 'Hard cap check must continue in UNKNOWN mode.');
+    }
+
+    #[Test]
+    public function waitForLiveProcessWithoutPidUsesHardCapOnly(): void
+    {
+        // Arrange
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=1');
+        $probe = new ProcessLivenessProbeStub([]);
+        $clock = new ProcessLivenessClockFake();
+        $process = new ProcessLivenessProcessDouble(processId: null);
+        $watcher = $this->watcher(
+            probe: $probe,
+            clock: $clock,
+            onSleep: static function (int $calls) use ($process): void {
+                if ($calls === 3) {
+                    $process->finish();
+                }
+            },
+        );
+
+        // Act
+        $completed = $watcher->waitFor($process);
+
+        // Assert
+        self::assertTrue($completed);
+        self::assertSame(0, $probe->calls);
+        self::assertSame(0, $process->stopCalls);
+        self::assertSame(3, $process->checkTimeoutCalls);
+    }
+
+    #[Test]
+    public function waitForExitBetweenRunningCheckAndPidReturnsNaturally(): void
+    {
+        // Arrange
+        $probe = new ProcessLivenessProbeStub([]);
+        $clock = new ProcessLivenessClockFake();
+        $process = new ProcessLivenessProcessDouble();
+        $process->onGetPid = static function () use ($process): ?int {
+            $process->finish();
+
+            return null;
+        };
+        $watcher = $this->watcher($probe, $clock);
+
+        // Act
+        $completed = $watcher->waitFor($process);
+
+        // Assert
+        self::assertTrue($completed);
+        self::assertSame(0, $probe->calls);
+        self::assertSame(0, $process->stopCalls);
+    }
+
+    #[Test]
+    public function waitForProcessDeathDuringProbeReturnsNaturally(): void
+    {
+        // Arrange
+        $clock = new ProcessLivenessClockFake();
+        $process = new ProcessLivenessProcessDouble();
+        $probe = new ProcessLivenessProbeStub([
+            static function () use ($process): ProcessLivenessUnknownProbeResultDto {
+                $process->finish();
+
+                return new ProcessLivenessUnknownProbeResultDto();
+            },
+        ]);
+        $watcher = $this->watcher($probe, $clock);
+
+        // Act
+        $completed = $watcher->waitFor($process);
+
+        // Assert
+        self::assertTrue($completed);
+        self::assertSame(0, $process->stopCalls);
+        self::assertSame(1, $probe->calls);
+    }
+
+    #[Test]
+    public function waitForNaturalExitImmediatelyBeforeIdleStopReturnsNaturally(): void
+    {
+        // Arrange
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=1');
+        $snapshot = $this->snapshot([42 => [10, 20]]);
+        $probe = new ProcessLivenessProbeStub([
+            $this->activeResult($snapshot),
+            $this->inactiveResult($snapshot),
+            $this->inactiveResult($snapshot),
+        ]);
+        $process = new ProcessLivenessProcessDouble();
+        $clock = new ProcessLivenessClockFake(static function (float $time) use ($process): void {
+            if ($time > 1.0) {
+                $process->finish();
+            }
+        });
+        $watcher = $this->watcher($probe, $clock);
+
+        // Act
+        $completed = $watcher->waitFor($process);
+
+        // Assert
+        self::assertTrue($completed);
+        self::assertSame(0, $process->stopCalls);
+        self::assertSame(3, $probe->calls);
+    }
+
+    #[Test]
+    public function waitForUnknownModeStillPropagatesHardCapException(): void
+    {
+        // Arrange
+        $probe = new ProcessLivenessProbeStub([$this->unknownResult()]);
+        $clock = new ProcessLivenessClockFake();
+        $process = new ProcessLivenessProcessDouble(timeoutOnCheckCall: 3);
+        $watcher = $this->watcher($probe, $clock);
+
+        // Act + Assert
+        try {
+            $watcher->waitFor($process);
+            self::fail('Hard-cap exception must be propagated.');
+        } catch (ProcessTimedOutException $exception) {
+            self::assertSame($process, $exception->getProcess());
+        }
+
+        self::assertSame(3, $process->checkTimeoutCalls);
+        self::assertSame(1, $probe->calls);
+        self::assertFalse($process->isRunning());
+    }
+
+    #[Test]
+    public function waitForPropagatesSameUnexpectedProbeThrowable(): void
+    {
+        // Arrange
+        $expected = new LogicException('probe programming error');
+        $probe = new ProcessLivenessProbeStub([$expected]);
+        $clock = new ProcessLivenessClockFake();
+        $process = new ProcessLivenessProcessDouble();
+        $watcher = $this->watcher($probe, $clock);
+
+        // Act + Assert
+        try {
+            $watcher->waitFor($process);
+            self::fail('Unexpected probe Throwable must be propagated.');
+        } catch (LogicException $actual) {
+            self::assertSame($expected, $actual);
+        } finally {
+            $process->finish();
+        }
     }
 
     #[Test]
     public function resolveHardCapReturnsRequestTimeoutWhenHigherThanEnv(): void
     {
+        // Arrange
         putenv('AGENT_RUNNER_HARD_TIMEOUT_SEC=100');
-        $watcher = new ProcessLivenessWatcher();
+        $watcher = $this->watcher(new ProcessLivenessProbeStub([]), new ProcessLivenessClockFake());
 
-        self::assertSame(200, $watcher->resolveHardCap(200), 'request-timeout wins when > env-cap');
+        // Act
+        $hardCap = $watcher->resolveHardCap(200);
+
+        // Assert
+        self::assertSame(200, $hardCap);
     }
 
     #[Test]
     public function resolveHardCapReturnsEnvCapWhenHigherThanRequest(): void
     {
+        // Arrange
         putenv('AGENT_RUNNER_HARD_TIMEOUT_SEC=1800');
-        $watcher = new ProcessLivenessWatcher();
+        $watcher = $this->watcher(new ProcessLivenessProbeStub([]), new ProcessLivenessClockFake());
 
-        self::assertSame(1800, $watcher->resolveHardCap(300), 'env-cap wins when > request-timeout');
+        // Act
+        $hardCap = $watcher->resolveHardCap(300);
+
+        // Assert
+        self::assertSame(1800, $hardCap);
     }
 
     #[Test]
-    public function resolveHardCapUsesDefaultWhenEnvNotSet(): void
+    public function resolveHardCapUsesDefaultAndIgnoresNonNumericEnv(): void
     {
-        // AGENT_RUNNER_HARD_TIMEOUT_SEC не задан (tearDown сбросил) → default 1800
-        $watcher = new ProcessLivenessWatcher();
+        // Arrange
+        $watcher = $this->watcher(new ProcessLivenessProbeStub([]), new ProcessLivenessClockFake());
 
-        self::assertSame(1800, $watcher->resolveHardCap(300), 'default cap is 1800');
-        self::assertSame(1800, $watcher->resolveHardCap(null), 'null request-timeout → default cap');
+        // Act + Assert
+        self::assertSame(1800, $watcher->resolveHardCap(null));
+
+        putenv('AGENT_RUNNER_HARD_TIMEOUT_SEC=not-a-number');
+        self::assertSame(1800, $watcher->resolveHardCap(null));
     }
 
     #[Test]
-    public function getIdleThresholdReadsEnvOverride(): void
+    public function getIdleThresholdReadsOverrideAndDefault(): void
     {
+        // Arrange
+        $watcher = $this->watcher(new ProcessLivenessProbeStub([]), new ProcessLivenessClockFake());
+
+        // Act + Assert
+        self::assertSame(60, $watcher->getIdleThreshold());
+
         putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=45');
-        $watcher = new ProcessLivenessWatcher();
-
         self::assertSame(45, $watcher->getIdleThreshold());
     }
 
-    #[Test]
-    public function getIdleThresholdUsesDefaultWhenEnvNotSet(): void
-    {
-        $watcher = new ProcessLivenessWatcher();
-
-        self::assertSame(60, $watcher->getIdleThreshold(), 'default idle threshold is 60');
+    private function watcher(
+        ProcessLivenessProbeComponentInterface $probe,
+        ProcessLivenessClockFake $clock,
+        ?Closure $onSleep = null,
+    ): ProcessLivenessWatcher {
+        return new ProcessLivenessWatcher(
+            probe: $probe,
+            clock: $clock,
+            sleeper: new ProcessLivenessSleeperFake($clock, $onSleep),
+        );
     }
 
-    #[Test]
-    public function waitForPropagatesUnexpectedThrowableFromLivenessProbeAndRestoresErrorHandler(): void
+    /**
+     * @param array<int, array{0: int, 1: int}> $countersByProcessId
+     */
+    private function snapshot(array $countersByProcessId): ProcessLivenessSnapshotDto
     {
-        $watcher = new ProcessLivenessWatcher();
-        $process = new Process([PHP_BINARY, '-r', 'sleep(5);']);
-        $process->setTimeout(1800);
-        $process->start();
-
-        $restoredHandlerWasCalled = false;
-        set_error_handler(static function () use (&$restoredHandlerWasCalled): bool {
-            $restoredHandlerWasCalled = true;
-
-            return true;
-        });
-
-        ProcessLivenessWatcherShellExecInterceptor::throwNext(new \Error('liveness probe failed'));
-
-        try {
-            try {
-                $watcher->waitFor($process);
-                self::fail('Unexpected Throwable from liveness probe must be propagated.');
-            } catch (\Error $error) {
-                self::assertSame('liveness probe failed', $error->getMessage());
-            }
-
-            trigger_error('Probe wrapper must restore previous error handler.', E_USER_WARNING);
-
-            self::assertTrue(
-                $restoredHandlerWasCalled,
-                'Previous error handler must be restored even when liveness probe throws.',
+        $processes = [];
+        foreach ($countersByProcessId as $processId => [$cpuTicks, $ioCharacters]) {
+            $processes[$processId] = new ProcessLivenessPidSnapshotDto(
+                processId: $processId,
+                startTimeTicks: $processId * 100,
+                cpuTicks: $cpuTicks,
+                ioCharacters: $ioCharacters,
             );
-        } finally {
-            restore_error_handler();
-            ProcessLivenessWatcherShellExecInterceptor::reset();
-
-            if ($process->isRunning()) {
-                $process->stop(0);
-            }
-        }
-    }
-
-    #[Test]
-    public function resolveHardCapIgnoresNonNumericEnv(): void
-    {
-        putenv('AGENT_RUNNER_HARD_TIMEOUT_SEC=not-a-number');
-        $watcher = new ProcessLivenessWatcher();
-
-        self::assertSame(1800, $watcher->resolveHardCap(null), 'non-numeric env → default 1800');
-    }
-
-    private function createExecutableFixture(string $prefix, string $script): string
-    {
-        $fixtureFile = tempnam(sys_get_temp_dir(), $prefix);
-        if ($fixtureFile === false) {
-            self::fail('Unable to create temporary liveness fixture.');
         }
 
-        file_put_contents($fixtureFile, "#!/usr/bin/env php\n<?php\n" . $script);
-        chmod($fixtureFile, 0700);
-        $this->fixtureFiles[] = $fixtureFile;
+        return new ProcessLivenessSnapshotDto($processes);
+    }
 
-        return $fixtureFile;
+    private function activeResult(
+        ProcessLivenessSnapshotDto $snapshot,
+    ): ProcessLivenessActiveProbeResultDto {
+        return new ProcessLivenessActiveProbeResultDto($snapshot);
+    }
+
+    private function inactiveResult(
+        ProcessLivenessSnapshotDto $snapshot,
+    ): ProcessLivenessInactiveProbeResultDto {
+        return new ProcessLivenessInactiveProbeResultDto($snapshot);
+    }
+
+    private function unknownResult(): ProcessLivenessUnknownProbeResultDto
+    {
+        return new ProcessLivenessUnknownProbeResultDto();
     }
 }
 
-final class ProcessLivenessWatcherShellExecInterceptor
+/**
+ * Детерминированный double Symfony Process для policy Unit-тестов.
+ */
+final class ProcessLivenessProcessDouble extends Process
 {
-    private static ?\Throwable $throwable = null;
+    public int $checkTimeoutCalls = 0;
+    public int $stopCalls = 0;
+    public ?Closure $onGetPid = null;
+    private bool $running = false;
 
-    public static function throwNext(\Throwable $throwable): void
-    {
-        self::$throwable = $throwable;
+    public function __construct(
+        private readonly ?int $processId = 42,
+        private readonly ?int $timeoutOnCheckCall = null,
+    ) {
+        parent::__construct(['process-double']);
+        $this->running = true;
     }
 
-    public static function reset(): void
+    #[Override]
+    public function isRunning(): bool
     {
-        self::$throwable = null;
+        return $this->running;
     }
 
-    public static function execute(string $command): false|string|null
+    #[Override]
+    public function getPid(): ?int
     {
-        if (self::$throwable !== null) {
-            $throwable = self::$throwable;
-            self::$throwable = null;
-
-            throw $throwable;
+        if ($this->onGetPid !== null) {
+            return ($this->onGetPid)();
         }
 
-        /** @psalm-suppress ForbiddenCode */
-        return shell_exec($command);
+        return $this->processId;
+    }
+
+    #[Override]
+    public function checkTimeout(): void
+    {
+        ++$this->checkTimeoutCalls;
+        if ($this->timeoutOnCheckCall === $this->checkTimeoutCalls) {
+            $this->running = false;
+
+            throw new ProcessTimedOutException($this, ProcessTimedOutException::TYPE_GENERAL);
+        }
+    }
+
+    #[Override]
+    public function stop(float $timeout = 10, ?int $signal = null): ?int
+    {
+        ++$this->stopCalls;
+        $this->running = false;
+
+        return 143;
+    }
+
+    public function finish(): void
+    {
+        $this->running = false;
+    }
+}
+
+/**
+ * Управляемые монотонные часы.
+ */
+final class ProcessLivenessClockFake implements ProcessLivenessClockComponentInterface
+{
+    private float $time = 0.0;
+
+    public function __construct(private readonly ?Closure $onNow = null)
+    {
+    }
+
+    #[Override]
+    public function now(): float
+    {
+        if ($this->onNow !== null) {
+            ($this->onNow)($this->time);
+        }
+
+        return $this->time;
+    }
+
+    public function advance(float $seconds): void
+    {
+        $this->time += $seconds;
+    }
+}
+
+/**
+ * Ожидание без реального sleep, продвигающее fake clock.
+ */
+final class ProcessLivenessSleeperFake implements ProcessLivenessSleeperComponentInterface
+{
+    private int $calls = 0;
+
+    public function __construct(
+        private readonly ProcessLivenessClockFake $clock,
+        private readonly ?Closure $onSleep,
+    ) {
+    }
+
+    #[Override]
+    public function sleep(int $microseconds): void
+    {
+        ++$this->calls;
+        $this->clock->advance(0.6);
+
+        if ($this->onSleep !== null) {
+            ($this->onSleep)($this->calls);
+        }
+    }
+}
+
+/**
+ * Очередь результатов/ошибок liveness-пробы.
+ */
+final class ProcessLivenessProbeStub implements ProcessLivenessProbeComponentInterface
+{
+    public int $calls = 0;
+
+    /** @var list<ProcessLivenessSnapshotDto|null> */
+    public array $previousSnapshots = [];
+
+    public function __construct(
+        /**
+         * @var list<ProcessLivenessActiveProbeResultDto|ProcessLivenessInactiveProbeResultDto
+         *     |ProcessLivenessUnknownProbeResultDto|Closure|\Throwable>
+         */
+        private array $outcomes,
+    ) {
+    }
+
+    #[Override]
+    public function probe(
+        int $processId,
+        ?ProcessLivenessSnapshotDto $previousSnapshot,
+    ): ProcessLivenessActiveProbeResultDto
+        | ProcessLivenessInactiveProbeResultDto
+        | ProcessLivenessUnknownProbeResultDto {
+        ++$this->calls;
+        $this->previousSnapshots[] = $previousSnapshot;
+        $outcome = array_shift($this->outcomes);
+
+        if ($outcome instanceof \Throwable) {
+            throw $outcome;
+        }
+
+        if ($outcome instanceof Closure) {
+            return $outcome();
+        }
+
+        if (
+            !$outcome instanceof ProcessLivenessActiveProbeResultDto
+            && !$outcome instanceof ProcessLivenessInactiveProbeResultDto
+            && !$outcome instanceof ProcessLivenessUnknownProbeResultDto
+        ) {
+            throw new LogicException('No liveness probe result configured.');
+        }
+
+        return $outcome;
     }
 }
