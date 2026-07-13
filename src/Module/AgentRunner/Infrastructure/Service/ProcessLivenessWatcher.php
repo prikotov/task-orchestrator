@@ -193,8 +193,6 @@ final class ProcessLivenessWatcher
         try {
             /** @psalm-suppress ForbiddenCode */
             $output = shell_exec($command);
-        } catch (\Throwable) {
-            return null;
         } finally {
             restore_error_handler();
         }
@@ -207,8 +205,6 @@ final class ProcessLivenessWatcher
         set_error_handler(static fn (): bool => true);
         try {
             return is_readable($path);
-        } catch (\Throwable) {
-            return false;
         } finally {
             restore_error_handler();
         }
@@ -219,8 +215,6 @@ final class ProcessLivenessWatcher
         set_error_handler(static fn (): bool => true);
         try {
             $content = file_get_contents($path);
-        } catch (\Throwable) {
-            return null;
         } finally {
             restore_error_handler();
         }
