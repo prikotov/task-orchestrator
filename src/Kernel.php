@@ -59,11 +59,13 @@ class Kernel extends BaseKernel
      * @param bool        $debug       режим отладки
      * @param string|null $projectRoot каталог host-проекта для ролей/цепочек/base_path;
      *                                 null = standalone (совпадает с package root)
+     * @param string      $platformFamily явно внедрённое семейство ОС для platform-specific компонентов
      */
     public function __construct(
         string $environment,
         bool $debug,
         private readonly ?string $projectRoot = null,
+        private readonly string $platformFamily = \PHP_OS_FAMILY,
     ) {
         parent::__construct($environment, $debug);
     }
@@ -164,6 +166,7 @@ class Kernel extends BaseKernel
         $parameters['task_orchestrator.roles_dir'] = $this->resolveRolesDir($projectRoot, $packageDir);
         $parameters['task_orchestrator.skills_dir'] = $this->resolveSkillsDir($projectRoot, $packageDir);
         $parameters['task_orchestrator.chains_yaml'] = $this->resolveChainsYaml($projectRoot, $packageDir);
+        $parameters['task_orchestrator.platform_family'] = $this->platformFamily;
         $parameters['app.version'] = $this->resolveVersion();
 
         return $parameters;

@@ -49,6 +49,7 @@ final class AgentRunnerModule implements ModuleInterface
             ...self::DEFAULT_SERVICE_EXCLUDE_PATHS,
             'AgentRunnerModule.php',
             'Resources/',
+            'Infrastructure/Component/ProcessLiveness/Dto/',
             'Infrastructure/Service/RetryingAgentRunnerService.php',
             'Infrastructure/Service/CircuitBreakerAgentRunnerService.php',
         ];
