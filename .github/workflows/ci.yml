@@ -33,3 +33,14 @@ jobs:
       - run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
       - run: make phar-smoke
+
+  composer-host-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+
+      - run: make composer-host-smoke

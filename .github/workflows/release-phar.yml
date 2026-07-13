@@ -5,9 +5,10 @@
 #
 # Как работает:
 #   1. composer install (без dev-зависимостей)
-#   2. make phar-smoke:
+#   2. PHAR_SMOKE_KEEP_ARTIFACT=1 make phar-smoke:
 #      - box compile --config=box.json.dist → task-orchestrator.phar
-#      - php task-orchestrator.phar --version
+#      - version/commands/agent:init smoke в изолированном временном state
+#      - успешно проверенный task-orchestrator.phar сохраняется для upload
 #   3. Загрузка task-orchestrator.phar в assets релиза
 #
 # Ошибка сборки или smoke-теста блокирует публикацию Phar asset.
@@ -41,7 +42,18 @@ jobs:
 
       - run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-      - run: make phar-smoke
+      - name: Smoke-test Composer host distribution
+        run: make composer-host-smoke
+
+      - name: Build and smoke-test release Phar
+        run: make phar-smoke
+        env:
+          # bin/phar-smoke удаляет локальный test artifact по умолчанию.
+          # Release workflow явно сохраняет только успешно проверенный PHAR.
+          PHAR_SMOKE_KEEP_ARTIFACT: '1'
+
+      - name: Verify release Phar asset
+        run: test -s task-orchestrator.phar
 
       - name: Upload Phar to GitHub Release
         uses: softprops/action-gh-release@v2

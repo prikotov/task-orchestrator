@@ -160,6 +160,7 @@ class Kernel extends BaseKernel
 
         $parameters['task_orchestrator.package_dir'] = $packageDir;
         $parameters['task_orchestrator.base_path'] = $projectRoot;
+        $parameters['task_orchestrator.is_phar'] = $this->isPhar();
         $parameters['task_orchestrator.chains_session_dir'] = $projectRoot . '/var/sessions';
         $parameters['task_orchestrator.roles_dir'] = $this->resolveRolesDir($projectRoot, $packageDir);
         $parameters['task_orchestrator.skills_dir'] = $this->resolveSkillsDir($projectRoot, $packageDir);

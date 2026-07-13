@@ -44,6 +44,7 @@ final class InitCommandTest extends TestCase
         $this->command = new InitCommand(
             packageDir: $this->packageDir,
             basePath: $this->basePath,
+            isPhar: false,
             filesystem: $this->filesystem,
         );
     }

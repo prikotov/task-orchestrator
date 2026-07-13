@@ -46,6 +46,7 @@ final class KernelIntegrationTest extends TestCase
 
             self::assertSame($this->packageRoot, $container->getParameter('task_orchestrator.package_dir'));
             self::assertSame($this->packageRoot, $container->getParameter('task_orchestrator.base_path'));
+            self::assertFalse($container->getParameter('task_orchestrator.is_phar'));
             self::assertSame($this->packageRoot, $container->getParameter('kernel.project_dir'));
             self::assertSame(
                 $this->packageRoot . '/docs/agents/roles/team',
