@@ -4,7 +4,7 @@
 
 ## Как это работает
 
-`become-role.sh <role|file>` — обёртка над CLI `bin/console agent:role-skills`. Аргумент — имя роли или путь к файлу роли (скрипт сам разбирает).
+`.agents/skills/become-role/scripts/become-role.sh <role|file>` — установленная обёртка над CLI-командой `agent:role-skills`. Аргумент — имя роли или путь к файлу роли (скрипт сам разбирает).
 
 `become-role.sh`:
 1. Находит файл роли (`docs/agents/roles/team/<role>.ru.md` → `<role>.md` → любой `<role>.<locale>.md`) и выводит его **относительный путь** (от project root).
@@ -14,20 +14,38 @@
 
 Роль без `skills:` в frontmatter → только путь к файлу роли (XML-блок skills пуст).
 
-## Настройка (после клонирования)
+## Установка и запуск
 
-Каталог `.agents/` находится в `.gitignore` — он создаётся per-environment. Чтобы pi/codex увидели `become-role` как нативный skill (через кросс-клиентскую конвенцию `.agents/skills/`), один раз выполни:
+Каталог `.agents/` находится в `.gitignore` — он создаётся отдельно для каждого окружения. Чтобы pi/codex увидели `become-role` как нативный skill через кросс-клиентскую конвенцию `.agents/skills/`, один раз выполни подходящую команду.
+
+В source checkout (локальной копии исходников):
 
 ```bash
 bin/console agent:init
 ```
 
-Команда создаёт симлинк `.agents/skills/become-role` → `docs/agents/skills/become-role` (идемпотентна, `--force` заменяет некорректный). Проверь: `ls .agents/skills/` должен показывать `become-role`. Для host-проектов — `php vendor/bin/task-orchestrator agent:init`.
+В host-проекте с Composer-установкой:
+
+```bash
+php vendor/bin/task-orchestrator agent:init
+```
+
+Команда создаёт относительный симлинк `.agents/skills/become-role` на skill внутри пакета. Она идемпотентна; `--force` заменяет некорректный симлинк. После установки запускай только путь из host-проекта:
+
+```bash
+.agents/skills/become-role/scripts/become-role.sh <role|file>
+```
+
+В `v0.2.0` установка поддерживается только для Source/Composer. PHAR — secondary/best-effort канал: `agent:init` зарегистрирован, но завершается с кодом `1` до записи файлов и рекомендует Composer; `--force` не меняет это поведение и не создаёт `.agents`. Подробная матрица возможностей приведена в [CLI guide](../../../guide/cli.md#agentinit).
 
 ## Альтернативный вызов (без скрипта)
 
 ```bash
+# Source checkout
 bin/console agent:role-skills <role> --format=block
+
+# Composer host
+php vendor/bin/task-orchestrator agent:role-skills <role> --format=block
 ```
 
 Форматы: `block` (XML `<available_skills>`), `list` (`name — description` + `location`), `json` (`{role, skills[], catalog}`).
