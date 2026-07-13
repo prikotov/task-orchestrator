@@ -4,11 +4,12 @@
 # и прикрепляет его к GitHub Release.
 #
 # Как работает:
-#   1. composer install (без dev-зависимостей)
-#   2. make phar-smoke:
+#   1. composer install + Node worker и exact php:8.4.1-cli liveness smoke без procps/pcntl
+#   2. composer install (без dev-зависимостей)
+#   3. make phar-smoke:
 #      - box compile --config=box.json.dist → task-orchestrator.phar
 #      - php task-orchestrator.phar --version
-#   3. Загрузка task-orchestrator.phar в assets релиза
+#   4. Загрузка task-orchestrator.phar в assets релиза
 #
 # Ошибка сборки или smoke-теста блокирует публикацию Phar asset.
 # Box установлен как standalone tool через setup-php (не через Composer,
@@ -38,6 +39,15 @@ jobs:
         with:
           php-version: '8.4'
           tools: box
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: composer install --no-interaction --prefer-dist
+
+      - name: Linux liveness smoke with Node worker and exact PHP 8.4.1
+        run: make liveness-smoke
 
       - run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 

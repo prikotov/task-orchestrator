@@ -93,6 +93,12 @@ phar-smoke: ## Собрать Phar через Box и проверить запу
 	@echo "Phar smoke:"
 	@bin/phar-smoke
 
+.PHONY: liveness-smoke
+liveness-smoke: ## Проверить Linux liveness с Node worker и в точном php:8.4.1-cli без procps/pcntl
+	@echo
+	@echo "Liveness smoke:"
+	@bin/liveness-smoke
+
 .PHONY: check
 check: ## Запустить все проверки (phpstan + deptrac + psalm + phpmd + phpcs + md-links + validate-todo + validate-roles + tests)
 	@${MAKE} --no-print-directory phpstan deptrac psalm phpmd phpcs md-links validate-todo validate-roles tests && \

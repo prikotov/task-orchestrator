@@ -16,7 +16,14 @@ jobs:
         with:
           php-version: '8.4'
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - run: composer install --no-interaction --prefer-dist
+
+      - name: Linux liveness smoke with Node worker and exact PHP 8.4.1
+        run: make liveness-smoke
 
       - run: vendor/bin/phpunit
 
