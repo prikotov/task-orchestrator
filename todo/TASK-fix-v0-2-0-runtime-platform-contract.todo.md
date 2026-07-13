@@ -10,8 +10,8 @@ epic:
 author: Аналитик Шерлок (system_analyst_sherlock)
 assignee: Бэкендер Левша (backend_developer_levsha)
 branch: task/fix-v0-2-0-runtime-platform-contract
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/306
+status: review
 ---
 
 # TASK-fix-v0-2-0-runtime-platform-contract: Зафиксировать единый runtime platform contract для v0.2.0
@@ -233,5 +233,6 @@ Production-like команды должны быть выполнены имен
 
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
+| 2026-07-14 | Аналитик Шерлок (system_analyst_sherlock) | PR #306 создан; задача передана в review. |
 | 2026-07-14 | Аналитик Шерлок (system_analyst_sherlock) | В обязательный runtime platform contract добавлен `ext-zlib` для GZ-сжатия PHAR и его проверка в Composer, CI, документации и smoke-наборе. |
 | 2026-07-13 | Аналитик Шерлок (system_analyst_sherlock) | Создание задачи; зафиксирован принятый runtime platform contract для `v0.2.0`. |
