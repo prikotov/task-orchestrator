@@ -42,8 +42,8 @@ final class ProcessLivenessWatcher
         $idleThreshold = (float) $this->envInt('AGENT_RUNNER_IDLE_TIMEOUT_SEC', 60);
 
         $lastActivity = microtime(true);
-        $prevCpu = null;
-        $prevIo = null;
+        $previousCpu = null;
+        $previousIo = null;
 
         while ($process->isRunning()) {
             // Symfony fallback: бросит ProcessTimedOutException при превышении hard cap.
@@ -52,12 +52,12 @@ final class ProcessLivenessWatcher
             $pid = $process->getPid();
             if ($pid !== null) {
                 $cpu = $this->readProcessCpuTime($pid);
-                $io = $this->readProcessIo($pid);
-                if ($prevCpu !== null && ($cpu > $prevCpu || $io > $prevIo)) {
+                $currentIo = $this->readProcessIo($pid);
+                if ($previousCpu !== null && $previousIo !== null && ($cpu > $previousCpu || $currentIo > $previousIo)) {
                     $lastActivity = microtime(true); // прогресс есть — работает
                 }
-                $prevCpu = $cpu;
-                $prevIo = $io;
+                $previousCpu = $cpu;
+                $previousIo = $currentIo;
             }
 
             if (microtime(true) - $lastActivity > $idleThreshold) {
@@ -111,15 +111,14 @@ final class ProcessLivenessWatcher
 
     private function readSingleCpuTime(int $pid): int
     {
-        /** @psalm-suppress ForbiddenCode */
-        $out = @shell_exec(sprintf('ps -o times= -p %d 2>/dev/null', $pid));
-        if (!is_string($out) || $out === '') {
+        $output = $this->executeShellCommandSilently(sprintf('ps -o times= -p %d 2>/dev/null', $pid));
+        if ($output === null || $output === '') {
             return 0;
         }
 
-        $t = trim($out);
+        $trimmedOutput = trim($output);
 
-        return is_numeric($t) ? (int) $t : 0;
+        return is_numeric($trimmedOutput) ? (int) $trimmedOutput : 0;
     }
 
     /**
@@ -141,19 +140,19 @@ final class ProcessLivenessWatcher
     private function readSingleIo(int $pid): int
     {
         $path = sprintf('/proc/%d/io', $pid);
-        if (!@is_readable($path)) {
+        if (!$this->isReadableSilently($path)) {
             return 0;
         }
 
-        $content = @file_get_contents($path);
-        if ($content === false) {
+        $content = $this->readFileContentsSilently($path);
+        if ($content === null) {
             return 0;
         }
 
         $sum = 0;
         foreach (['rchar', 'wchar'] as $key) {
-            if (preg_match('/^' . $key . ':\s*(\d+)/m', $content, $m) === 1) {
-                $sum += (int) $m[1];
+            if (preg_match('/^' . $key . ':\s*(\d+)/m', $content, $matches) === 1) {
+                $sum += (int) $matches[1];
             }
         }
 
@@ -168,20 +167,59 @@ final class ProcessLivenessWatcher
      */
     private function childPids(int $pid): array
     {
-        /** @psalm-suppress ForbiddenCode */
-        $out = @shell_exec(sprintf('pgrep -P %d 2>/dev/null', $pid));
-        if (!is_string($out) || $out === '') {
+        $output = $this->executeShellCommandSilently(sprintf('pgrep -P %d 2>/dev/null', $pid));
+        if ($output === null || $output === '') {
+            return [];
+        }
+
+        $parts = preg_split('/\s+/', trim($output));
+        if ($parts === false) {
             return [];
         }
 
         $pids = [];
-        foreach (preg_split('/\s+/', trim($out)) as $p) {
-            if (is_numeric($p)) {
-                $pids[] = (int) $p;
+        foreach ($parts as $part) {
+            if (is_numeric($part)) {
+                $pids[] = (int) $part;
             }
         }
 
         return $pids;
+    }
+
+    private function executeShellCommandSilently(string $command): ?string
+    {
+        set_error_handler(static fn (): bool => true);
+        try {
+            /** @psalm-suppress ForbiddenCode */
+            $output = shell_exec($command);
+        } finally {
+            restore_error_handler();
+        }
+
+        return is_string($output) ? $output : null;
+    }
+
+    private function isReadableSilently(string $path): bool
+    {
+        set_error_handler(static fn (): bool => true);
+        try {
+            return is_readable($path);
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    private function readFileContentsSilently(string $path): ?string
+    {
+        set_error_handler(static fn (): bool => true);
+        try {
+            $content = file_get_contents($path);
+        } finally {
+            restore_error_handler();
+        }
+
+        return is_string($content) ? $content : null;
     }
 
     /**
@@ -189,11 +227,11 @@ final class ProcessLivenessWatcher
      */
     private function envInt(string $name, int $default): int
     {
-        $v = getenv($name);
-        if ($v === false || $v === '' || !is_numeric($v)) {
+        $value = getenv($name);
+        if ($value === false || $value === '' || !is_numeric($value)) {
             return $default;
         }
 
-        return (int) $v;
+        return (int) $value;
     }
 }

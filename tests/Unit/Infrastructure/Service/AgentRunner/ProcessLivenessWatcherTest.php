@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service;
+
+use TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\ProcessLivenessWatcherShellExecInterceptor;
+
+function shell_exec(string $command): false|string|null
+{
+    return ProcessLivenessWatcherShellExecInterceptor::execute($command);
+}
+
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -160,6 +169,47 @@ PHP
     }
 
     #[Test]
+    public function waitForPropagatesUnexpectedThrowableFromLivenessProbeAndRestoresErrorHandler(): void
+    {
+        $watcher = new ProcessLivenessWatcher();
+        $process = new Process([PHP_BINARY, '-r', 'sleep(5);']);
+        $process->setTimeout(1800);
+        $process->start();
+
+        $restoredHandlerWasCalled = false;
+        set_error_handler(static function () use (&$restoredHandlerWasCalled): bool {
+            $restoredHandlerWasCalled = true;
+
+            return true;
+        });
+
+        ProcessLivenessWatcherShellExecInterceptor::throwNext(new \Error('liveness probe failed'));
+
+        try {
+            try {
+                $watcher->waitFor($process);
+                self::fail('Unexpected Throwable from liveness probe must be propagated.');
+            } catch (\Error $error) {
+                self::assertSame('liveness probe failed', $error->getMessage());
+            }
+
+            trigger_error('Probe wrapper must restore previous error handler.', E_USER_WARNING);
+
+            self::assertTrue(
+                $restoredHandlerWasCalled,
+                'Previous error handler must be restored even when liveness probe throws.',
+            );
+        } finally {
+            restore_error_handler();
+            ProcessLivenessWatcherShellExecInterceptor::reset();
+
+            if ($process->isRunning()) {
+                $process->stop(0);
+            }
+        }
+    }
+
+    #[Test]
     public function resolveHardCapIgnoresNonNumericEnv(): void
     {
         putenv('AGENT_RUNNER_HARD_TIMEOUT_SEC=not-a-number');
@@ -180,5 +230,33 @@ PHP
         $this->fixtureFiles[] = $fixtureFile;
 
         return $fixtureFile;
+    }
+}
+
+final class ProcessLivenessWatcherShellExecInterceptor
+{
+    private static ?\Throwable $throwable = null;
+
+    public static function throwNext(\Throwable $throwable): void
+    {
+        self::$throwable = $throwable;
+    }
+
+    public static function reset(): void
+    {
+        self::$throwable = null;
+    }
+
+    public static function execute(string $command): false|string|null
+    {
+        if (self::$throwable !== null) {
+            $throwable = self::$throwable;
+            self::$throwable = null;
+
+            throw $throwable;
+        }
+
+        /** @psalm-suppress ForbiddenCode */
+        return shell_exec($command);
     }
 }
