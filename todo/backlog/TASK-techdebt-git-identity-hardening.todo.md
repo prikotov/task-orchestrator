@@ -10,7 +10,7 @@ author: Тимлид Алекс
 assignee:
 branch:
 pr:
-status: todo
+status: backlog
 ---
 
 # TASK-techdebt-git-identity-hardening: Усиление безопасности и стиля модуля GitIdentity

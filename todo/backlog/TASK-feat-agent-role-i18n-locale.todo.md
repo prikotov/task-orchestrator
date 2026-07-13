@@ -10,7 +10,7 @@ author: Бэкендер (Левша)
 assignee:
 branch:
 pr:
-status: todo
+status: backlog
 ---
 
 # TASK-feat-agent-role-i18n-locale: Локаль-зависимое поведение become-role (i18n)
