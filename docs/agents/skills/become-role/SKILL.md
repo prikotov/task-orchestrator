@@ -20,12 +20,10 @@ description: "Войти в роль и объявить её skills в конт
 **Шаг 1.** Определи роль — по описаниям ролей в `AGENTS.md` (раздел «Роль») или
 RACI-матрице. При сомнении бери `team_lead_alex` (дефолт проекта).
 
-**Шаг 2.** Убедись, что `become-role` установлен командой `agent:init` из source-окружения или Composer-проекта. PHAR в `v0.2.0` не устанавливает этот skill.
-
-**Шаг 3.** Вызови установленный скрипт, передав имя роли или путь к файлу роли:
+**Шаг 2.** Вызови скрипт, передав имя роли или путь к файлу роли:
 
 ```bash
-.agents/skills/become-role/scripts/become-role.sh <role|file>
+docs/agents/skills/become-role/scripts/become-role.sh <role|file>
 ```
 
 Пример вывода (`become-role.sh team_lead_alex`):
@@ -48,7 +46,7 @@ RACI-матрице. При сомнении бери `team_lead_alex` (дефо
 </available_skills>
 ```
 
-**Шаг 4.** Действуй по выводу скрипта.
+**Шаг 3.** Действуй по выводу скрипта.
 
 ### Войти в роль
 
