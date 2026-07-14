@@ -170,6 +170,9 @@ php vendor/bin/task-orchestrator agent:init
 
 Composer — основной канал дистрибуции. PHAR остаётся secondary/best-effort каналом; `--force` не снимает ограничение `agent:init`.
 
+> Полный `agent:init`/`become-role` для PHAR находится в очереди:  
+> [TASK-feat-phar-full-become-role-install](todo/backlog/TASK-feat-phar-full-become-role-install.todo.md).
+
 Минимальный `config/chains.yaml` — две роли и цепочка из двух шагов:
 
 ```yaml
