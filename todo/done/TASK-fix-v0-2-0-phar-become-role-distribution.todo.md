@@ -10,7 +10,7 @@ author: system_analyst_sherlock (Шерлок)
 assignee: backend_developer_levsha
 branch: task/fix-v0-2-0-phar-become-role-distribution
 pr: https://github.com/prikotov/task-orchestrator/pull/307
-status: review
+status: done
 ---
 
 # TASK-fix-v0-2-0-phar-become-role-distribution: Зафиксировать контракт become-role для Composer и PHAR
