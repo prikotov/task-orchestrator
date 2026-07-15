@@ -35,7 +35,7 @@
 
 - [x] `make check` успешно выполнен: PHPUnit — 1411 tests / 3813 assertions; PHPStan, Psalm, Deptrac, PHPMD, PHPCS, MD links и validators — OK.
 - [x] `composer-host-smoke` подтверждает production-установку пакета в host-проект.
-- [ ] Окончательный PHAR gate должен пройти в CI для release PR/ветки: локально не запускался из-за отсутствия Box. На том же code SHA `f8b4b43` CI main run `29401437494` успешно выполнил exact PHP 8.4.1 PHAR smoke.
+- [x] PR #309 CI run `29430683170`: exact PHP 8.4.1 production install и PHAR smoke — OK.
 - [x] `liveness-smoke` подтверждает Linux procfs contract на host и в `php:8.4.1` без зависимости от `ps`, `pgrep` и procps.
 - [x] `composer check-platform-reqs --no-dev` подтверждает PHP >= 8.4.1, `ext-openssl` и `ext-zlib`.
 - [x] Tag `v0.2.0` отсутствует до завершения всех проверок.
