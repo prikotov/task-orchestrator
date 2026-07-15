@@ -147,7 +147,7 @@ Development roadmap — see [ROADMAP](docs/releases/ROADMAP-2026-Q2-Q3.md).
 
 ## Quick Start
 
-TasK-orchestrator is a CLI tool. Minimum requirements: PHP >= 8.4 and a CLI agent (e.g., [pi CLI](https://github.com/prikotov/pi) or [Codex CLI](https://github.com/openi/codex)).
+TasK-orchestrator is a CLI tool. Minimum requirements: PHP >= 8.4.1, the OpenSSL (`ext-openssl`) and Zlib (`ext-zlib`) PHP extensions, and a CLI agent (e.g., [pi CLI](https://github.com/prikotov/pi) or [Codex CLI](https://github.com/openi/codex)).
 
 Installation:
 

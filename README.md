@@ -147,7 +147,7 @@ php vendor/bin/task-orchestrator agent:orchestrate \
 
 ## Быстрый старт
 
-TasK-orchestrator — CLI-инструмент. Минимальные требования: PHP >= 8.4 и CLI-агент (например, [pi CLI](https://github.com/prikotov/pi) или [Codex CLI](https://github.com/openi/codex)).
+TasK-orchestrator — CLI-инструмент. Минимальные требования: PHP >= 8.4.1, расширения PHP OpenSSL (`ext-openssl`) и Zlib (`ext-zlib`), а также CLI-агент (например, [pi CLI](https://github.com/prikotov/pi) или [Codex CLI](https://github.com/openi/codex)).
 
 Установка:
 
