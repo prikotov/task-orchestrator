@@ -88,7 +88,7 @@ validate-roles: ## Валидация файлов ролей AI-агентов
 	@php bin/validate-roles
 
 .PHONY: phar-smoke
-phar-smoke: ## Собрать Phar через Box и проверить запуск --version
+phar-smoke: ## Собрать Phar и проверить команды и fail-fast agent:init
 	@echo
 	@echo "Phar smoke:"
 	@bin/phar-smoke
@@ -98,6 +98,12 @@ liveness-smoke: ## Проверить Linux liveness с Node worker и в точ
 	@echo
 	@echo "Liveness smoke:"
 	@bin/liveness-smoke
+
+.PHONY: composer-host-smoke
+composer-host-smoke: ## Проверить agent:init в физической Composer-копии host-проекта
+	@echo
+	@echo "Composer host smoke:"
+	@bin/composer-host-smoke
 
 .PHONY: check
 check: ## Запустить все проверки (phpstan + deptrac + psalm + phpmd + phpcs + md-links + validate-todo + validate-roles + tests)

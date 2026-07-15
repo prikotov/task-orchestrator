@@ -147,7 +147,7 @@ php vendor/bin/task-orchestrator agent:orchestrate \
 
 ## Быстрый старт
 
-TasK-orchestrator — CLI-инструмент. Минимальные требования: PHP >= 8.4 и CLI-агент (например, [pi CLI](https://github.com/prikotov/pi) или [Codex CLI](https://github.com/openi/codex)).
+TasK-orchestrator — CLI-инструмент. Минимальные требования: PHP >= 8.4.1, расширения PHP OpenSSL (`ext-openssl`) и Zlib (`ext-zlib`), а также CLI-агент (например, [pi CLI](https://github.com/prikotov/pi) или [Codex CLI](https://github.com/openi/codex)).
 
 Установка:
 
@@ -160,6 +160,18 @@ composer require prikotov/task-orchestrator
 ```bash
 php vendor/bin/task-orchestrator agent:init
 ```
+
+### Матрица возможностей дистрибутивов
+
+| Возможность | Source/Composer | PHAR |
+|---|---|---|
+| `agent:init` и установка `become-role` | Поддерживаются полностью | Не поддерживаются: команда завершается с кодом `1` до любых записей в файловую систему и рекомендует Composer |
+| Запуск установленного `become-role` | `.agents/skills/become-role/scripts/become-role.sh <role\|file>` | Недоступен, поскольку PHAR не устанавливает skill |
+
+Composer — основной канал дистрибуции. PHAR остаётся secondary/best-effort каналом; `--force` не снимает ограничение `agent:init`.
+
+> Полный `agent:init`/`become-role` для PHAR находится в очереди:  
+> [TASK-feat-phar-full-become-role-install](todo/backlog/TASK-feat-phar-full-become-role-install.todo.md).
 
 Минимальный `config/chains.yaml` — две роли и цепочка из двух шагов:
 

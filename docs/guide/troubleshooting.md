@@ -15,6 +15,7 @@
 - [Quality Gate упал](#quality-gate-упал)
 - [Ошибки конфигурации](#ошибки-конфигурации)
 - [Отладочные команды](#отладочные-команды)
+- [`agent:init` недоступен в PHAR](#agentinit-недоступен-в-phar)
 - [PHAR собирается, но команды модулей недоступны (hollow-контейнер)](#phar-собирается-но-команды-модулей-недоступны-hollow-контейнер)
 - [Таблица исключений](#таблица-исключений)
 
@@ -347,9 +348,29 @@ cat var/log/agent_audit.jsonl | python3 -m json.tool
 
 ---
 
+## `agent:init` недоступен в PHAR
+
+**Симптом:** `php task-orchestrator.phar agent:init` или вариант с `--force` завершается с кодом `1` и предлагает использовать Composer.
+
+**Причина:** в `v0.2.0` Composer/Packagist — основной канал с полной поддержкой, а PHAR — secondary/best-effort. Команда `agent:init` зарегистрирована в PHAR, но установка `become-role` из виртуальной файловой системы `phar://` не поддерживается.
+
+Это безопасный fail-fast: команда завершается до любых файловых записей, не создаёт `.agents` и не изменяет существующие файлы. `--force` не снимает ограничение.
+
+**Решение:** установите пакет через Composer в host-проект и повторите инициализацию:
+
+```bash
+composer require prikotov/task-orchestrator
+php vendor/bin/task-orchestrator agent:init
+.agents/skills/become-role/scripts/become-role.sh <role|file>
+```
+
+Для source checkout (локальной копии исходников) используйте `bin/console agent:init`. Полный контракт и матрица возможностей приведены в разделе [`agent:init`](cli.md#agentinit).
+
+---
+
 ## PHAR собирается, но команды модулей недоступны (hollow-контейнер)
 
-**Симптом:** собранный `task-orchestrator.phar` запускается (`--version` работает), но `list` не показывает команд модулей (`agent:run`, `validate:connectivity` и др.), либо команда падает на этапе autowire (автосвязывания) с `ServiceNotFoundException`.
+**Симптом:** собранный `task-orchestrator.phar` запускается (`--version` работает), но `list` не показывает команд модулей (`agent:init`, `agent:role-skills`, `agent:token`, `agent:run`, `validate:connectivity`), либо команда падает на этапе autowire (автосвязывания) с `ServiceNotFoundException`.
 
 **Причина:** контейнер собран «пустым» по модулям (hollow — полым). Обычно это CWD-зависимая сборка в PHAR:
 
@@ -360,7 +381,8 @@ cat var/log/agent_audit.jsonl | python3 -m json.tool
 
 ```bash
 # Команды модулей должны быть видны из произвольного CWD (не только из checkout):
- cd /tmp && php /path/to/task-orchestrator.phar list | grep -E 'agent:run|validate'
+cd /tmp && php /path/to/task-orchestrator.phar list \
+  | grep -E 'agent:init|agent:role-skills|agent:token|agent:run|validate:connectivity'
 ```
 
 Если пусто — контейнер hollow. Проверьте, что `bin/phar-smoke` (усиленный) зелёный из distributable CWD: он специально ловит этот случай (`--version` ложнозелёный и проходит даже при hollow). См. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-auto-discovery-вариант-4).

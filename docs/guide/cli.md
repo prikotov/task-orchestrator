@@ -181,19 +181,41 @@ php vendor/bin/task-orchestrator agent:runners
 
 ### `agent:init`
 
-Установка task-orchestrator в host-проекте: создаёт симлинк общего skill `become-role` в `<project>/.agents/skills/`, чтобы он был виден AI-инструментам (pi, codex и др.) как нативный skill через кросс-клиентскую конвенцию `.agents/skills/`. Сам skill живёт в пакете task-orchestrator.
+Устанавливает общий skill `become-role` в host-проект: создаёт симлинк в `<project>/.agents/skills/`, чтобы AI-инструменты (pi, codex и др.) видели его как нативный skill через кросс-клиентскую конвенцию `.agents/skills/`. Сам skill остаётся внутри пакета task-orchestrator.
 
-Идемпотентна: повторный запуск безопасен. Запускайте после `composer install` в host-проекте.
+Команда идемпотентна: повторный запуск безопасен. Для source checkout (локальной копии исходников) используйте:
+
+```bash
+bin/console agent:init [--force]
+```
+
+В Composer host-проекте запускайте после `composer install`:
 
 ```bash
 php vendor/bin/task-orchestrator agent:init [--force]
 ```
 
+После успешной установки вызывайте skill только по установленному пути:
+
+```bash
+.agents/skills/become-role/scripts/become-role.sh <role|file>
+```
+
+#### Матрица возможностей `v0.2.0`
+
+| Возможность | Source/Composer | PHAR |
+|---|---|---|
+| Регистрация команды `agent:init` | Да | Да |
+| Установка `become-role` | Поддерживается полностью | Не поддерживается: fail-fast с кодом `1` до любых файловых записей |
+| Запуск установленного `become-role` | `.agents/skills/become-role/scripts/become-role.sh <role\|file>` | Недоступен |
+
+PHAR остаётся secondary/best-effort каналом. В PHAR `agent:init` и `agent:init --force` не создают и не изменяют `.agents`, завершаются с кодом `1` и рекомендуют Composer с рабочей командой `php vendor/bin/task-orchestrator agent:init`.
+
 | Опция | Описание |
 |---|---|
 | `--force`, `-f` | Пересоздать симлинк, если он существует и некорректен |
 
-**Exit codes:** `0` — успех (или уже установлен); `1` — skill не найден в пакете либо конфликт без `--force`.
+**Exit codes:** `0` — успех (или уже установлен); `1` — PHAR не поддерживает установку, skill не найден в пакете либо обнаружен конфликт без `--force`.
 
 ---
 

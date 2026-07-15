@@ -30,3 +30,4 @@ services:
     arguments:
       $packageDir: '%task_orchestrator.package_dir%'
       $basePath: '%task_orchestrator.base_path%'
+      $isPhar: '%task_orchestrator.is_phar%'

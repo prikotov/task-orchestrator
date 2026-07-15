@@ -56,10 +56,28 @@ if ! OUTPUT="$("$TASK_ORCH_BIN" agent:role-skills "$ROLE_NAME" --format=json)"; 
     exit 1
 fi
 
-ROLE_FILE="$(jq -r '.role_file' <<< "$OUTPUT")"
-CATALOG="$(jq -r '.catalog' <<< "$OUTPUT")"
+if ! RENDERED="$(php -r '
+try {
+    $payload = json_decode(stream_get_contents(STDIN), true, 512, JSON_THROW_ON_ERROR);
+
+    if (
+        !is_array($payload)
+        || !isset($payload["role_file"], $payload["catalog"])
+        || !is_string($payload["role_file"])
+        || !is_string($payload["catalog"])
+    ) {
+        throw new UnexpectedValueException("Unexpected agent:role-skills payload.");
+    }
+
+    printf("Файл роли: %s\n\n%s", $payload["role_file"], $payload["catalog"]);
+} catch (Throwable) {
+    fwrite(STDERR, "Ошибка: некорректный JSON от agent:role-skills.\n");
+    exit(1);
+}
+' <<< "$OUTPUT")"; then
+    echo "Ошибка: не удалось обработать данные роли \"${ROLE_NAME}\"." >&2
+    exit 1
+fi
 
 echo "Роль: ${ROLE_NAME}"
-echo "Файл роли: ${ROLE_FILE}"
-echo ""
-echo "$CATALOG"
+printf '%s\n' "$RENDERED"
