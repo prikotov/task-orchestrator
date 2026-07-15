@@ -32,7 +32,7 @@ composer require prikotov/task-orchestrator
 vendor/bin/task-orchestrator --version                # project
 ```
 
-## Вариант B: Phar (альтернатива)
+## Вариант B: PHAR (альтернатива)
 
 Скачать из [GitHub Releases](https://github.com/prikotov/task-orchestrator/releases):
 
@@ -43,7 +43,28 @@ mv task-orchestrator.phar /usr/local/bin/task-orchestrator
 task-orchestrator --version
 ```
 
-> **Note:** Phar публикуется на best-effort основе. Для автообновления используйте Composer.
+> **Примечание:** PHAR публикуется на best-effort основе. Для полной поддержки, включая установку `become-role`, используйте Composer.
+
+## Матрица возможностей `v0.2.0`
+
+| Возможность | Source/Composer | PHAR |
+|---|---|---|
+| Основные CLI-команды | Полная поддержка | Secondary/best-effort |
+| `agent:init` и установка `become-role` | Поддерживаются полностью | Не поддерживаются: команда зарегистрирована, но завершается с кодом `1` до любых записей в файловую систему |
+| Запуск установленного `become-role` | `.agents/skills/become-role/scripts/become-role.sh <role\|file>` | Недоступен |
+
+`--force` не снимает ограничение PHAR. При попытке `agent:init` команда рекомендует Composer и не создаёт `.agents`.
+
+## Подключение `become-role`
+
+В Composer host-проекте после установки пакета выполните:
+
+```bash
+php vendor/bin/task-orchestrator agent:init
+.agents/skills/become-role/scripts/become-role.sh <role|file>
+```
+
+В source checkout (локальной копии исходников) используйте `bin/console agent:init`, затем тот же установленный путь `.agents/skills/become-role/scripts/become-role.sh`. PHAR не устанавливает этот skill в `v0.2.0`.
 
 ## Первый запуск
 
@@ -87,5 +108,5 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml 
 | Composer сообщает об отсутствии `ext-zlib` | Установить и включить расширение PHP Zlib |
 | `composer: command not found` | Установить Composer: [getcomposer.org](https://getcomposer.org) |
 | `task-orchestrator: command not found` | Добавить `~/.composer/vendor/bin` в `$PATH` или использовать полный путь |
-| `Could not find package` | Пакет не опубликован на Packagist — использовать Phar |
+| `Could not find package` | Проверьте имя и доступность пакета на Packagist; PHAR подходит только для best-effort возможностей из матрицы выше |
 | `Chain not found` | Проверить путь к `chains.yaml` в конфигурации |

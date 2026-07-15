@@ -4,6 +4,29 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PHAR_PATH="${ROOT_DIR}/task-orchestrator.phar"
 BOX_CONFIG="${ROOT_DIR}/box.json.dist"
+TMP_CWD=""
+CLEANUP_PHAR=false
+KEEP_PHAR_ARTIFACT="${PHAR_SMOKE_KEEP_ARTIFACT:-0}"
+SMOKE_SUCCEEDED=false
+
+cleanup() {
+  if [[ -n "${TMP_CWD}" ]]; then
+    rm -rf "${TMP_CWD}"
+  fi
+
+  if [[ "${CLEANUP_PHAR}" == true ]]; then
+    if [[ "${KEEP_PHAR_ARTIFACT}" != '1' || "${SMOKE_SUCCEEDED}" != true ]]; then
+      rm -f "${PHAR_PATH}"
+    fi
+  fi
+}
+
+trap cleanup EXIT
+
+if [[ "${KEEP_PHAR_ARTIFACT}" != '0' && "${KEEP_PHAR_ARTIFACT}" != '1' ]]; then
+  echo 'ERROR: PHAR_SMOKE_KEEP_ARTIFACT must be 0 or 1.' >&2
+  exit 2
+fi
 
 if ! command -v box >/dev/null 2>&1; then
   cat >&2 <<'MESSAGE'
@@ -14,6 +37,7 @@ MESSAGE
 fi
 
 cd "${ROOT_DIR}"
+CLEANUP_PHAR=true
 rm -f "${PHAR_PATH}"
 
 box compile --config="${BOX_CONFIG}"
@@ -23,24 +47,51 @@ if [[ ! -f "${PHAR_PATH}" ]]; then
   exit 1
 fi
 
-php "${PHAR_PATH}" --version
+# Cache/log изолируются уже для первого запуска PHAR. Это исключает влияние
+# застарелого prod-контейнера и общий writable state параллельных smoke.
+TMP_CWD="$(mktemp -d)"
+(
+  cd "${ROOT_DIR}" || exit 125
+  APP_CACHE_DIR="${TMP_CWD}/cache/version" \
+    APP_LOG_DIR="${TMP_CWD}/log/version" \
+    php "${PHAR_PATH}" --version
+)
 
 # Smoke: контейнер НЕ hollow — команды модулей apps/console зарегистрированы
 # PHAR-safe регистратором (ModuleServiceRegistrar). Раньше проверка была только
 # --version, что ложно-зелёное: --version печатается даже при пустом контейнере.
 # Проверяем из двух CWD: checkout (как CI) и временный каталог (сценарий
-# распространяемого PHAR). Symfony кэширует контейнер PHAR в системном
-# temp-каталоге (writableRoot); перед distributable-чеком чистим его, чтобы
-# тестировать актуальную сборку, а не застарелый кэш.
-SMOKE_COMMANDS=('agent:run' 'validate:connectivity')
+# распространяемого PHAR). Cache/log каждого сценария направляются в отдельный
+# временный каталог ниже, чтобы всегда тестировать актуальную сборку.
+SMOKE_COMMANDS=(
+  'agent:init'
+  'agent:role-skills'
+  'agent:run'
+  'agent:token'
+  'validate:connectivity'
+)
 
 check_commands() {
   local label="$1"
   local cwd="$2"
   local missing=0
+  local command_list
   echo "Phar smoke [${label}]: команды модулей из ${cwd}"
+
+  if ! command_list="$(
+    cd "${cwd}" || exit 125
+    APP_CACHE_DIR="${TMP_CWD}/cache/${label}" \
+      APP_LOG_DIR="${TMP_CWD}/log/${label}" \
+      php "${PHAR_PATH}" list --raw 2>&1
+  )"; then
+    echo "ERROR: не удалось получить список команд PHAR из ${cwd}" >&2
+    echo "${command_list}" >&2
+    return 1
+  fi
+
   for cmd in "${SMOKE_COMMANDS[@]}"; do
-    if (cd "${cwd}" && php "${PHAR_PATH}" list) 2>/dev/null | grep -q -- "${cmd}"; then
+    if awk -v expected="${cmd}" '$1 == expected { found = 1 } END { exit(found ? 0 : 1) }' \
+      <<< "${command_list}"; then
       echo "  ✓ ${cmd}"
     else
       echo "  ✗ команда '${cmd}' НЕ зарегистрирована (контейнер hollow?)" >&2
@@ -50,11 +101,86 @@ check_commands() {
   return "${missing}"
 }
 
+check_init_fail_fast() {
+  local label="$1"
+  local cwd="$2"
+  shift 2
+
+  local output
+  local status
+
+  set +e
+  output="$(
+    cd "${cwd}" || exit 125
+    APP_CACHE_DIR="${TMP_CWD}/cache/${label}" \
+      APP_LOG_DIR="${TMP_CWD}/log/${label}" \
+      php "${PHAR_PATH}" agent:init "$@" 2>&1
+  )"
+  status=$?
+  set -e
+
+  if [[ "${status}" -ne 1 ]]; then
+    echo "ERROR: agent:init [${label}] завершился с кодом ${status}, ожидался 1" >&2
+    echo "${output}" >&2
+    return 1
+  fi
+
+  for fragment in \
+    'agent:init недоступен в PHAR' \
+    'Composer' \
+    'php vendor/bin/task-orchestrator agent:init'; do
+    if ! grep -Fq -- "${fragment}" <<< "${output}"; then
+      echo "ERROR: agent:init [${label}] не содержит диагностику: ${fragment}" >&2
+      echo "${output}" >&2
+      return 1
+    fi
+  done
+
+  if grep -Fq -- 'phar://' <<< "${output}"; then
+    echo "ERROR: agent:init [${label}] раскрыл внутренний phar:// путь" >&2
+    echo "${output}" >&2
+    return 1
+  fi
+
+  echo "  ✓ agent:init [${label}] fail-fast с exit 1"
+}
+
 # 1) Из checkout CWD (контекст CI).
 check_commands 'checkout' "${ROOT_DIR}"
 
 # 2) Из временного каталога (распространяемый PHAR) + свежий кэш контейнера.
-TMP_CWD="$(mktemp -d)"
-trap 'rm -rf "${TMP_CWD}"' EXIT
-rm -rf "${TMPDIR:-/tmp}/task-orchestrator"
-check_commands 'distributable' "${TMP_CWD}"
+DISTRIBUTABLE_CWD="${TMP_CWD}/distributable"
+mkdir -p "${DISTRIBUTABLE_CWD}"
+check_commands 'distributable' "${DISTRIBUTABLE_CWD}"
+
+# agent:init в PHAR — намеренно неподдерживаемый контракт. Проверяем реальный
+# запуск, устойчивую диагностику и отсутствие записей как без --force, так и с
+# ним при уже существующем sentinel-файле host-проекта.
+NO_WRITE_CWD="${TMP_CWD}/no-write"
+SENTINEL_CWD="${TMP_CWD}/sentinel"
+mkdir -p "${NO_WRITE_CWD}" "${SENTINEL_CWD}/.agents"
+printf 'keep\n' > "${SENTINEL_CWD}/.agents/sentinel.txt"
+
+check_init_fail_fast 'default' "${NO_WRITE_CWD}"
+if [[ -e "${NO_WRITE_CWD}/.agents" ]]; then
+  echo 'ERROR: agent:init создал .agents при запуске PHAR' >&2
+  exit 1
+fi
+
+check_init_fail_fast 'force' "${SENTINEL_CWD}" --force
+if [[ "$(cat "${SENTINEL_CWD}/.agents/sentinel.txt")" != 'keep' ]]; then
+  echo 'ERROR: agent:init --force изменил sentinel в .agents при запуске PHAR' >&2
+  exit 1
+fi
+
+if find "${SENTINEL_CWD}/.agents" -mindepth 1 ! -path "${SENTINEL_CWD}/.agents/sentinel.txt" -print -quit \
+  | grep -q .; then
+  echo 'ERROR: agent:init --force создал лишние .agents-артефакты при запуске PHAR' >&2
+  exit 1
+fi
+
+if [[ "${KEEP_PHAR_ARTIFACT}" == '1' ]]; then
+  echo "Phar release artifact preserved: ${PHAR_PATH}"
+fi
+
+SMOKE_SUCCEEDED=true

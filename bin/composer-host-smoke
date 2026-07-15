@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TMP_ROOT="$(mktemp -d)"
+PACKAGE_SOURCE="${TMP_ROOT}/package-source"
+HOST_DIR="${TMP_ROOT}/host"
+
+cleanup() {
+  rm -rf "${TMP_ROOT}"
+}
+
+trap cleanup EXIT
+
+for command_name in composer git php; do
+  if ! command -v "${command_name}" >/dev/null 2>&1; then
+    echo "ERROR: ${command_name} is required for Composer host smoke check." >&2
+    exit 127
+  fi
+done
+
+mkdir -p "${PACKAGE_SOURCE}" "${HOST_DIR}"
+
+# Создаём чистый source snapshot из tracked и новых non-ignored файлов. Так в
+# Composer path repository не попадают checkout-only vendor/, secrets/ и
+# локальный state, а незакоммиченные изменения всё равно участвуют в smoke.
+while IFS= read -r -d '' relative_path; do
+  source_path="${ROOT_DIR}/${relative_path}"
+
+  if [[ ! -e "${source_path}" && ! -L "${source_path}" ]]; then
+    continue
+  fi
+
+  mkdir -p "${PACKAGE_SOURCE}/$(dirname "${relative_path}")"
+  cp -a "${source_path}" "${PACKAGE_SOURCE}/${relative_path}"
+done < <(cd "${ROOT_DIR}" && git ls-files -z --cached --others --exclude-standard)
+
+cat > "${HOST_DIR}/composer.json" <<'JSON'
+{
+  "name": "task-orchestrator/composer-host-smoke",
+  "type": "project",
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../package-source",
+      "options": {
+        "symlink": false,
+        "versions": {
+          "prikotov/task-orchestrator": "dev-smoke"
+        }
+      }
+    }
+  ],
+  "require": {
+    "prikotov/task-orchestrator": "dev-smoke"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
+JSON
+
+(
+  cd "${HOST_DIR}"
+  composer install --no-dev --no-interaction --no-progress --prefer-dist
+)
+
+INSTALLED_PACKAGE="${HOST_DIR}/vendor/prikotov/task-orchestrator"
+if [[ ! -d "${INSTALLED_PACKAGE}" || -L "${INSTALLED_PACKAGE}" ]]; then
+  echo 'ERROR: Composer path repository did not create a physical package copy.' >&2
+  exit 1
+fi
+
+installed_physical="$(cd "${INSTALLED_PACKAGE}" && pwd -P)"
+source_physical="$(cd "${PACKAGE_SOURCE}" && pwd -P)"
+if [[ "${installed_physical}" == "${source_physical}" ]]; then
+  echo 'ERROR: Composer host smoke resolved the source snapshot instead of an installed copy.' >&2
+  exit 1
+fi
+
+if [[ -e "${HOST_DIR}/docs" ]]; then
+  echo 'ERROR: Composer host unexpectedly contains checkout-only docs/ resources.' >&2
+  exit 1
+fi
+
+(
+  cd "${HOST_DIR}"
+  php vendor/bin/task-orchestrator agent:init
+)
+
+SKILL_LINK="${HOST_DIR}/.agents/skills/become-role"
+EXPECTED_SKILL="${INSTALLED_PACKAGE}/docs/agents/skills/become-role"
+if [[ ! -L "${SKILL_LINK}" ]]; then
+  echo 'ERROR: agent:init did not create the become-role symlink.' >&2
+  exit 1
+fi
+
+link_target="$(readlink "${SKILL_LINK}")"
+if [[ "${link_target}" == /* ]]; then
+  echo 'ERROR: agent:init created an absolute symlink instead of a relative one.' >&2
+  exit 1
+fi
+
+resolved_skill="$(cd "$(dirname "${SKILL_LINK}")/${link_target}" && pwd -P)"
+expected_skill="$(cd "${EXPECTED_SKILL}" && pwd -P)"
+if [[ "${resolved_skill}" != "${expected_skill}" ]]; then
+  echo 'ERROR: become-role symlink does not resolve to the installed Composer package.' >&2
+  exit 1
+fi
+
+if [[ ! -f "${SKILL_LINK}/SKILL.md" || ! -x "${SKILL_LINK}/scripts/become-role.sh" ]]; then
+  echo 'ERROR: installed become-role skill is incomplete.' >&2
+  exit 1
+fi
+
+# jq намеренно подменён падающим shim: smoke остаётся зелёным только если
+# установленный become-role использует гарантированный PHP runtime.
+FORBIDDEN_TOOL_DIR="${TMP_ROOT}/forbidden-tool-bin"
+mkdir -p "${FORBIDDEN_TOOL_DIR}"
+cat > "${FORBIDDEN_TOOL_DIR}/jq" <<'SH'
+#!/usr/bin/env bash
+echo 'ERROR: become-role must not invoke jq.' >&2
+exit 127
+SH
+chmod +x "${FORBIDDEN_TOOL_DIR}/jq"
+
+role_output="$(
+  cd "${HOST_DIR}"
+  PATH="${FORBIDDEN_TOOL_DIR}:${PATH}" \
+    .agents/skills/become-role/scripts/become-role.sh backend_developer_levsha
+)"
+
+for fragment in \
+  'Роль: backend_developer_levsha' \
+  'vendor/prikotov/task-orchestrator/docs/agents/roles/team/backend_developer_levsha.ru.md'; do
+  if ! grep -Fq -- "${fragment}" <<< "${role_output}"; then
+    echo "ERROR: installed become-role script output lacks: ${fragment}" >&2
+    echo "${role_output}" >&2
+    exit 1
+  fi
+done
+
+echo 'Composer host smoke: OK'

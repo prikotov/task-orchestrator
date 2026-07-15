@@ -161,6 +161,18 @@ composer require prikotov/task-orchestrator
 php vendor/bin/task-orchestrator agent:init
 ```
 
+### Матрица возможностей дистрибутивов
+
+| Возможность | Source/Composer | PHAR |
+|---|---|---|
+| `agent:init` и установка `become-role` | Поддерживаются полностью | Не поддерживаются: команда завершается с кодом `1` до любых записей в файловую систему и рекомендует Composer |
+| Запуск установленного `become-role` | `.agents/skills/become-role/scripts/become-role.sh <role\|file>` | Недоступен, поскольку PHAR не устанавливает skill |
+
+Composer — основной канал дистрибуции. PHAR остаётся secondary/best-effort каналом; `--force` не снимает ограничение `agent:init`.
+
+> Полный `agent:init`/`become-role` для PHAR находится в очереди:  
+> [TASK-feat-phar-full-become-role-install](todo/backlog/TASK-feat-phar-full-become-role-install.todo.md).
+
 Минимальный `config/chains.yaml` — две роли и цепочка из двух шагов:
 
 ```yaml

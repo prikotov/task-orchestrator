@@ -4,13 +4,15 @@
 # и прикрепляет его к GitHub Release.
 #
 # Как работает:
-#   1. Запускает официальный контейнер PHP 8.4.1 и проверяет PHP_VERSION_ID
-#   2. composer install (без dev-зависимостей)
-#   3. composer check-platform-reqs --no-dev
-#   4. make phar-smoke:
+#   1. Проверяет Composer-host distribution smoke
+#   2. Запускает официальный контейнер PHP 8.4.1 и проверяет PHP_VERSION_ID
+#   3. composer install (без dev-зависимостей)
+#   4. composer check-platform-reqs --no-dev
+#   5. PHAR_SMOKE_KEEP_ARTIFACT=1 make phar-smoke:
 #      - box compile --config=box.json.dist → task-orchestrator.phar
-#      - php task-orchestrator.phar --version
-#   5. Загрузка task-orchestrator.phar в assets релиза
+#      - version/commands/agent:init smoke в изолированном временном state
+#      - успешно проверенный task-orchestrator.phar сохраняется для upload
+#   6. Загрузка task-orchestrator.phar в assets релиза
 #
 # Ошибка проверки платформы, сборки или smoke-теста блокирует публикацию Phar asset.
 # Box установлен как standalone tool через setup-php (не через Composer,
@@ -44,6 +46,9 @@ jobs:
           php-version: '8.4'
           tools: composer, box
 
+      - name: Smoke-test Composer host distribution
+        run: make composer-host-smoke
+
       - name: Verify production contract and smoke-test Phar on exact PHP 8.4.1
         shell: bash
         run: |
@@ -53,6 +58,7 @@ jobs:
           box_bin="$(readlink -f "$(command -v box)")"
 
           docker run --rm \
+            --env PHAR_SMOKE_KEEP_ARTIFACT=1 \
             --volume "${GITHUB_WORKSPACE}:/workspace" \
             --volume "${composer_bin}:/opt/tools/composer:ro" \
             --volume "${box_bin}:/usr/local/bin/box:ro" \
@@ -75,6 +81,9 @@ jobs:
               php /opt/tools/composer check-platform-reqs --no-dev
               make phar-smoke
             '
+
+      - name: Verify release Phar asset
+        run: test -s task-orchestrator.phar
 
       - name: Upload Phar to GitHub Release
         uses: softprops/action-gh-release@v2

@@ -27,6 +27,9 @@ use Symfony\Component\Filesystem\Path;
  * кросс-клиентскую конвенцию `.agents/skills/`. Сам skill живёт в пакете
  * task-orchestrator; симлинк делает его доступным без копирования.
  *
+ * В PHAR команда намеренно завершается до файловых операций: этот вторичный
+ * канал дистрибуции не содержит установщик внешних skill-ресурсов.
+ *
  * Idempotent: повторный запуск безопасен. Некорректный существующий симлинк
  * заменяется только с --force.
  */
@@ -45,6 +48,7 @@ final class InitCommand extends Command
     public function __construct(
         private readonly string $packageDir,
         private readonly string $basePath,
+        private readonly bool $isPhar,
         private readonly Filesystem $filesystem,
     ) {
         parent::__construct();
@@ -65,6 +69,16 @@ final class InitCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        // Утверждённый контракт PHAR: завершиться до любых операций с файловой
+        // системой host-проекта и направить пользователя в Composer-канал.
+        if ($this->isPhar) {
+            $io->error('agent:init недоступен в PHAR. Используйте Composer.');
+            $output->writeln('php vendor/bin/task-orchestrator agent:init');
+
+            return Command::FAILURE;
+        }
+
         $force = (bool) $input->getOption(self::OPT_FORCE);
 
         $source = Path::canonicalize($this->packageDir . '/' . self::SKILL_RELATIVE_PATH);

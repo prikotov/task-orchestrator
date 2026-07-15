@@ -161,6 +161,18 @@ composer require prikotov/task-orchestrator
 php vendor/bin/task-orchestrator agent:init
 ```
 
+### 發行格式功能矩陣
+
+| 功能 | 原始碼／Composer | PHAR |
+|---|---|---|
+| `agent:init` 與安裝 `become-role` | 完整支援 | 不支援：命令已註冊，但會在任何檔案系統寫入前以代碼 `1` 結束，並建議使用 Composer |
+| 執行已安裝的 `become-role` skill | `.agents/skills/become-role/scripts/become-role.sh <role\|file>` | 無法使用，因為 PHAR 不會安裝此 skill |
+
+Composer 是主要發行管道。PHAR 仍是 secondary/best-effort 管道；`--force` 不會略過 `agent:init` 的限制。
+
+> PHAR 的完整 `agent:init`/`become-role` 支援已規劃在 backlog 中：  
+> [TASK-feat-phar-full-become-role-install](todo/backlog/TASK-feat-phar-full-become-role-install.todo.md)。
+
 最小的 `config/chains.yaml` — 兩個角色和一個兩步驟鏈條：
 
 ```yaml
