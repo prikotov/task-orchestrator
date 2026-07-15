@@ -10,7 +10,7 @@ author: Аналитик (Шерлок)
 assignee: Бэкендер (Левша)
 branch: task/fix-v0-2-0-liveness-platform-contract
 pr: https://github.com/prikotov/task-orchestrator/pull/308
-status: review
+status: done
 ---
 
 # TASK-fix-v0-2-0-liveness-platform-contract: Зафиксировать безопасный платформенный контракт liveness
