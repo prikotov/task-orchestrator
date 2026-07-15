@@ -11,7 +11,7 @@ author: Аналитик Шерлок (system_analyst_sherlock)
 assignee: Бэкендер Левша (backend_developer_levsha)
 branch: task/fix-v0-2-0-runtime-platform-contract
 pr: https://github.com/prikotov/task-orchestrator/pull/306
-status: review
+status: done
 ---
 
 # TASK-fix-v0-2-0-runtime-platform-contract: Зафиксировать единый runtime platform contract для v0.2.0
