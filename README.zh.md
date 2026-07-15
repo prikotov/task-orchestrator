@@ -147,7 +147,7 @@ TasK-orchestrator 相對於已研究方案的優勢：
 
 ## 快速入門
 
-TasK-orchestrator 是一個 CLI 工具。最低需求：PHP >= 8.4 和一個 CLI 代理（例如 [pi CLI](https://github.com/prikotov/pi) 或 [Codex CLI](https://github.com/openi/codex)）。
+TasK-orchestrator 是一個 CLI 工具。最低需求：PHP >= 8.4.1、PHP OpenSSL 擴充套件（`ext-openssl`）與 Zlib 擴充套件（`ext-zlib`），以及一個 CLI 代理（例如 [pi CLI](https://github.com/prikotov/pi) 或 [Codex CLI](https://github.com/openi/codex)）。
 
 安裝：
 

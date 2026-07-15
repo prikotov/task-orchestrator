@@ -21,15 +21,47 @@ jobs:
       - run: vendor/bin/phpunit
 
   phar-smoke:
+    name: PHP 8.4.1 production install & Phar smoke
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: shivammathur/setup-php@v2
+      # setup-php stages the tool PHARs only. The runtime contract is checked
+      # inside the official PHP 8.4.1 container below.
+      - name: Stage Composer and Box for the container
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          tools: box
+          tools: composer, box
 
-      - run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+      - name: Verify production contract and smoke-test Phar on exact PHP 8.4.1
+        shell: bash
+        run: |
+          set -euo pipefail
 
-      - run: make phar-smoke
+          composer_bin="$(readlink -f "$(command -v composer)")"
+          box_bin="$(readlink -f "$(command -v box)")"
+
+          docker run --rm \
+            --volume "${GITHUB_WORKSPACE}:/workspace" \
+            --volume "${composer_bin}:/opt/tools/composer:ro" \
+            --volume "${box_bin}:/usr/local/bin/box:ro" \
+            --workdir /workspace \
+            docker.io/library/php:8.4.1-cli \
+            bash -euo pipefail -c '
+              actual_version_id="$(php -r "echo PHP_VERSION_ID;")"
+              if ! php -r "exit(PHP_VERSION_ID === 80401 ? 0 : 1);"; then
+                actual_version="$(php -r "echo PHP_VERSION;")"
+                echo "ERROR: Expected PHP_VERSION_ID=80401, got ${actual_version_id} (${actual_version})." >&2
+                exit 1
+              fi
+
+              php --version
+              apt-get update
+              apt-get install --yes --no-install-recommends unzip
+              rm -rf /var/lib/apt/lists/*
+              ln --symbolic /opt/tools/composer /usr/local/bin/composer
+              php /opt/tools/composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+              php /opt/tools/composer check-platform-reqs --no-dev
+              make phar-smoke
+            '

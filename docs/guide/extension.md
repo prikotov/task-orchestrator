@@ -531,4 +531,5 @@ chains:
 
 - `pi` (или другой CLI) установлен и доступен в PATH
 - API-ключи для LLM провайдера (конфигурируются в pi)
-- PHP 8.4+, Symfony 7.3+
+- PHP >= 8.4.1 с расширениями OpenSSL (`ext-openssl`) и Zlib (`ext-zlib`)
+- Symfony >= 8.0

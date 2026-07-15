@@ -4,7 +4,9 @@
 
 ## Требования
 
-- **PHP >= 8.4**
+- **PHP >= 8.4.1**
+- **Расширение PHP OpenSSL (`ext-openssl`)**
+- **Расширение PHP Zlib (`ext-zlib`)**
 - **Composer** (для варианта A)
 
 ## Вариант A: Composer (рекомендуется)
@@ -80,7 +82,9 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml 
 
 | Проблема | Решение |
 |----------|---------|
-| `php: command not found` | Установить PHP 8.4+, добавить в `$PATH` |
+| `php: command not found` | Установить PHP >= 8.4.1, добавить в `$PATH` |
+| Composer сообщает об отсутствии `ext-openssl` | Установить и включить расширение PHP OpenSSL |
+| Composer сообщает об отсутствии `ext-zlib` | Установить и включить расширение PHP Zlib |
 | `composer: command not found` | Установить Composer: [getcomposer.org](https://getcomposer.org) |
 | `task-orchestrator: command not found` | Добавить `~/.composer/vendor/bin` в `$PATH` или использовать полный путь |
 | `Could not find package` | Пакет не опубликован на Packagist — использовать Phar |
