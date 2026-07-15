@@ -219,9 +219,16 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
                 exitCode: 128 + $e->getSignal(),
             );
         } finally {
-            // Гарантированная остановка orphan-процесса моста при любом исходе
-            // (включая таймаут/сигнал/нормальное завершение).
-            $bridge?->stop();
+            try {
+                // При fail-fast ошибке liveness-пробы не оставляем agent process
+                // жить до недетерминированного вызова Symfony destructor/GC.
+                if ($process->isRunning()) {
+                    $process->stop(0);
+                }
+            } finally {
+                // Гарантированная остановка orphan-процесса моста при любом исходе.
+                $bridge?->stop();
+            }
         }
 
         if (!$process->isSuccessful()) {

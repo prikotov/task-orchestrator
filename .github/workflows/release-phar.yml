@@ -5,14 +5,15 @@
 #
 # Как работает:
 #   1. Проверяет Composer-host distribution smoke
-#   2. Запускает официальный контейнер PHP 8.4.1 и проверяет PHP_VERSION_ID
-#   3. composer install (без dev-зависимостей)
-#   4. composer check-platform-reqs --no-dev
-#   5. PHAR_SMOKE_KEEP_ARTIFACT=1 make phar-smoke:
+#   2. Запускает liveness smoke с Node worker и exact php:8.4.1-cli без procps/pcntl
+#   3. Запускает официальный контейнер PHP 8.4.1 и проверяет PHP_VERSION_ID
+#   4. composer install (без dev-зависимостей)
+#   5. composer check-platform-reqs --no-dev
+#   6. PHAR_SMOKE_KEEP_ARTIFACT=1 make phar-smoke:
 #      - box compile --config=box.json.dist → task-orchestrator.phar
 #      - version/commands/agent:init smoke в изолированном временном state
 #      - успешно проверенный task-orchestrator.phar сохраняется для upload
-#   6. Загрузка task-orchestrator.phar в assets релиза
+#   7. Загрузка task-orchestrator.phar в assets релиза
 #
 # Ошибка проверки платформы, сборки или smoke-теста блокирует публикацию Phar asset.
 # Box установлен как standalone tool через setup-php (не через Composer,
@@ -46,8 +47,17 @@ jobs:
           php-version: '8.4'
           tools: composer, box
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: composer install --no-interaction --prefer-dist
+
       - name: Smoke-test Composer host distribution
         run: make composer-host-smoke
+
+      - name: Linux liveness smoke with Node worker and exact PHP 8.4.1
+        run: make liveness-smoke
 
       - name: Verify production contract and smoke-test Phar on exact PHP 8.4.1
         shell: bash

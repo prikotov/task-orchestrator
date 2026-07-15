@@ -93,6 +93,12 @@ phar-smoke: ## Собрать Phar и проверить команды и fail-
 	@echo "Phar smoke:"
 	@bin/phar-smoke
 
+.PHONY: liveness-smoke
+liveness-smoke: ## Проверить Linux liveness с Node worker и в точном php:8.4.1-cli без procps/pcntl
+	@echo
+	@echo "Liveness smoke:"
+	@bin/liveness-smoke
+
 .PHONY: composer-host-smoke
 composer-host-smoke: ## Проверить agent:init в физической Composer-копии host-проекта
 	@echo

@@ -6,6 +6,7 @@ parameters:
   # (= __DIR__), поэтому параметр здесь декларативный; сохранён для соответствия
   # конвенции модульной конфигурации.
   module.agent_runner.module_dir: '%task_orchestrator.package_dir%/src/Module/AgentRunner'
+  module.agent_runner.platform_family: '%task_orchestrator.platform_family%'
 
 services:
   _defaults:
@@ -39,3 +40,27 @@ services:
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService:
     arguments:
       $runners: !tagged_iterator agent.runner
+
+  TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessProbeComponentInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessProbeComponent
+
+  TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessProbeComponent:
+    arguments:
+      $platformFamily: '%module.agent_runner.platform_family%'
+      $linuxProcfsProbe: '@TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessProbeLinuxProcfsComponent'
+      $unavailableProbe: '@TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessProbeUnavailableComponent'
+
+  TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcFilesystemComponentInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcFilesystemComponent
+
+  TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessClockComponentInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessClockComponent
+
+  TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessSleeperComponentInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessSleeperComponent
+
+when@test:
+  services:
+    TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcFilesystemComponentInterface:
+      alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcFilesystemComponent
+      public: true
