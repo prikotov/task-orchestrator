@@ -161,7 +161,7 @@ After installation, run `agent:init` once — it creates a symlink for the share
 php vendor/bin/task-orchestrator agent:init
 ```
 
-### Distribution feature matrix for `v0.2.0`
+### Distribution feature matrix
 
 | Capability | Source/Composer | PHAR |
 |---|---|---|
@@ -169,6 +169,9 @@ php vendor/bin/task-orchestrator agent:init
 | Running the installed `become-role` skill | `.agents/skills/become-role/scripts/become-role.sh <role\|file>` | Unavailable because PHAR does not install the skill |
 
 Composer is the primary distribution channel. PHAR remains a secondary, best-effort channel; `--force` does not bypass the `agent:init` limitation.
+
+> Full `agent:init`/`become-role` support for PHAR is planned in backlog:  
+> [TASK-feat-phar-full-become-role-install](todo/backlog/TASK-feat-phar-full-become-role-install.todo.md).
 
 Minimal `config/chains.yaml` — two roles and a two-step chain:
 
