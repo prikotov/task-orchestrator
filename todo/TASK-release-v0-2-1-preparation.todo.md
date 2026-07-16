@@ -9,8 +9,8 @@ epic:
 author: system_analyst_sherlock
 assignee: team_lead_alex
 branch: task/release-v0-2-1
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/312
+status: review
 ---
 
 # TASK-release-v0-2-1-preparation: Подготовить и выпустить patch release v0.2.1
@@ -69,13 +69,15 @@ plan (планом релиза) и финальными проверками. �
 
 ### 🔴 Must Have (Обязательно)
 
-- [ ] `CHANGELOG.md` содержит минимальную запись `0.2.1` о корректном exact SemVer
+- [x] `CHANGELOG.md` содержит минимальную запись `0.2.1` о корректном exact SemVer
   (точном SemVer) в Composer/PHAR и усиленной проверке версии.
-- [ ] `docs/releases/v0.2.1/release-plan.md` фиксирует состав patch release, hotfix PR #310,
+- [x] `docs/releases/v0.2.1/release-plan.md` фиксирует состав patch release, hotfix PR #310,
   риски, проверки и порядок публикации.
-- [ ] Финальные проверки проходят на вершине release candidate (кандидата в релиз), включая
-  точный вывод `Task Orchestrator 0.2.1` в Composer-host/PHAR smoke.
-- [ ] Создан PR `task/release-v0-2-1` → `release/0.2`; поле `pr` заполнено, задача переведена
+- [x] Финальные проверки кода, platform requirements (платформенных требований) и
+  Composer-host smoke проходят на вершине release candidate (кандидата в релиз); Composer-host
+  выводит ровно `Task Orchestrator 0.2.1`.
+- [ ] Финальный PHAR release candidate подтверждает точный вывод `Task Orchestrator 0.2.1`.
+- [x] Создан PR `task/release-v0-2-1` → `release/0.2`; поле `pr` заполнено, задача переведена
   в `review`.
 - [ ] После approval (одобрения), до merge (слияния), задача переведена в `done` и перенесена
   в `todo/done/`.
@@ -93,22 +95,26 @@ plan (планом релиза) и финальными проверками. �
 
 ## 4. Implementation Plan (План реализации)
 
-1. [ ] Добавить минимальный patch entry `0.2.1` в `CHANGELOG.md`.
-2. [ ] Подготовить `docs/releases/v0.2.1/release-plan.md`.
-3. [ ] Выполнить финальные проверки, включая Composer-host/PHAR exact-version smoke.
-4. [ ] Создать PR `task/release-v0-2-1` → `release/0.2`, заполнить `pr` и перевести задачу
+1. [x] Добавить минимальный patch entry `0.2.1` в `CHANGELOG.md`.
+2. [x] Подготовить `docs/releases/v0.2.1/release-plan.md`.
+3. [x] Выполнить `make check`, проверить platform requirements и Composer-host exact-version
+   smoke для `0.2.1`.
+4. [ ] Подтвердить exact-version финального PHAR release candidate для `0.2.1`.
+5. [x] Создать PR `task/release-v0-2-1` → `release/0.2`, заполнить `pr` и перевести задачу
    в `review`.
-5. [ ] После approval перевести задачу в `done`, перенести в `todo/done/` и только по явной
+6. [ ] После approval перевести задачу в `done`, перенести в `todo/done/` и только по явной
    команде пользователя слить PR.
-6. [ ] После отдельного явного разрешения создать и отправить тег `v0.2.1`, затем проверить
+7. [ ] После отдельного явного разрешения создать и отправить тег `v0.2.1`, затем проверить
    GitHub Release и PHAR-артефакт.
 
 ## 5. Definition of Done (Критерии приёмки)
 
-- [ ] Diff (набор изменений) PR ограничен `CHANGELOG.md`, release plan и файлом задачи.
-- [ ] `make check` проходит успешно.
-- [ ] Composer-host и PHAR smoke подтверждают точную версию `0.2.1`.
-- [ ] `todo-md-validate` и `git diff --check` проходят успешно.
+- [x] Diff (набор изменений) PR ограничен `CHANGELOG.md`, release plan и файлом задачи.
+- [x] `make check` проходит успешно.
+- [x] Composer-host smoke подтверждает точную версию `0.2.1`.
+- [x] Platform requirements подтверждены: PHP `>=8.4.1`, `ext-openssl`, `ext-zlib`.
+- [ ] Финальный PHAR smoke подтверждает точную версию `0.2.1`.
+- [x] `todo-md-validate` и `git diff --check` проходят успешно.
 - [ ] PR принят в `release/0.2` по правилам проекта.
 - [ ] Публикация тега выполнена только после отдельного явного разрешения пользователя.
 - [ ] GitHub Release `v0.2.1` опубликован, workflow `Release Phar` успешен, PHAR выводит
@@ -122,6 +128,13 @@ PHAR_EXPECTED_VERSION=0.2.1 make phar-smoke
 php vendor/prikotov/todo-md/bin/todo-md-validate todo/TASK-release-v0-2-1-preparation.todo.md
 git diff --check
 ```
+
+Результаты подготовки:
+
+- `make check`: успешно, PHPUnit — 1462 tests (теста), 3902 assertions (утверждения).
+- Composer-host smoke: точный вывод версии `0.2.1` подтверждён.
+- Platform requirements: PHP `>=8.4.1`, `ext-openssl`, `ext-zlib` подтверждены.
+- Финальная проверка exact-version PHAR выполняется отдельно и пока не отмечена.
 
 После отдельного разрешения на публикацию:
 
@@ -156,3 +169,4 @@ gh release view v0.2.1
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-07-16 | Аналитик Шерлок | Создание задачи и начало подготовки patch release `v0.2.1`. |
+| 2026-07-16 | Тимлид Алекс | CHANGELOG и release plan подготовлены, проверки кода/платформы/Composer-host пройдены; создан PR #312 в `release/0.2`, задача переведена в `review`. |
