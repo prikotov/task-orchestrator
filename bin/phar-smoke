@@ -2,6 +2,58 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+is_exact_semver() {
+  local value="$1"
+  local pattern='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)(\.(0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*))*))?(\+([0-9A-Za-z-]+)(\.[0-9A-Za-z-]+)*)?$'
+
+  [[ "${value}" =~ ${pattern} ]] && [[ "${value}" != *'+no-version-set' ]]
+}
+
+validate_expected_version() {
+  local value="$1"
+  local allow_dev="$2"
+
+  if ! is_exact_semver "${value}" && { [[ "${allow_dev}" != true ]] || [[ "${value}" != 'dev' ]]; }; then
+    echo "ERROR: expected version must be an exact SemVer or \"dev\", got: ${value}" >&2
+    return 2
+  fi
+}
+
+check_version_output() {
+  local expected_version="$1"
+  local actual_with_sentinel
+  local actual_output
+  local expected_line="Task Orchestrator ${expected_version}"
+  local expected_output="${expected_line}"$'\n'
+
+  actual_with_sentinel="$(cat; printf '\001')"
+  actual_output="${actual_with_sentinel%$'\001'}"
+  if [[ "${actual_output}" != "${expected_output}" ]]; then
+    cat >&2 <<MESSAGE
+ERROR: PHAR --version mismatch.
+  expected: ${expected_line}
+  actual:   ${actual_output}
+MESSAGE
+    return 1
+  fi
+
+  echo "Phar smoke [version]: ✓ ${expected_line}"
+}
+
+# Внутренние режимы нужны только для детерминированной проверки shell-контракта
+# без сборки PHAR. Публичный smoke по-прежнему запускается без аргументов.
+if [[ "${1:-}" == '--internal-check-version-output' ]]; then
+  validate_expected_version "${2:-}" true
+  check_version_output "${2:-}"
+  exit $?
+fi
+
+if [[ "${1:-}" == '--internal-validate-release-version' ]]; then
+  validate_expected_version "${2:-}" false
+  exit $?
+fi
+
 PHAR_PATH="${ROOT_DIR}/task-orchestrator.phar"
 BOX_CONFIG="${ROOT_DIR}/box.json.dist"
 TMP_CWD=""
@@ -28,6 +80,24 @@ if [[ "${KEEP_PHAR_ARTIFACT}" != '0' && "${KEEP_PHAR_ARTIFACT}" != '1' ]]; then
   exit 2
 fi
 
+# Ожидаемая версия для точной проверки значения --version. Дымовой тест не
+# должен быть ложнозелёным: он обязан падать при любом отличии фактической
+# версии от ожидаемой, включая нормализованное Composer-значение (1.0.0.0 —
+# дефект PHAR v0.2.0). Для нерелизного контекста (CI на ветке) допускается
+# non-release marker (маркер нерелизной сборки) `dev`.
+# Валидация входа выполняется ДО проверки наличия Box: так фазу required/format
+# можно покрыть bash-тестом и без локальной установки Box (проверяемость вне CI).
+EXPECTED_VERSION="${PHAR_EXPECTED_VERSION:-}"
+if [[ -z "${EXPECTED_VERSION}" ]]; then
+  echo 'ERROR: PHAR_EXPECTED_VERSION must be set (exact SemVer or "dev").' >&2
+  exit 2
+fi
+
+validate_expected_version "${EXPECTED_VERSION}" true
+
+# Build/smoke-фаза требует Box для сборки PHAR. Required/format-вход уже
+# провалидирован выше, поэтому здесь падаем только по отсутствию инструмента
+# сборки (127), а не по ошибке ожидания (2).
 if ! command -v box >/dev/null 2>&1; then
   cat >&2 <<'MESSAGE'
 ERROR: Box is required for Phar smoke check but was not found in PATH.
@@ -50,12 +120,34 @@ fi
 # Cache/log изолируются уже для первого запуска PHAR. Это исключает влияние
 # застарелого prod-контейнера и общий writable state параллельных smoke.
 TMP_CWD="$(mktemp -d)"
-(
+
+# Точная проверка значения --version: вывод должен содержать ровно строку
+# `Task Orchestrator <expected>` и один перевод строки. Дефект PHAR v0.2.0 (вывод
+# 1.0.0.0 вместо 0.2.0) проходил прежний smoke, так как сравнивалась только
+# успешность запуска, а не само значение версии.
+set +e
+actual_version_with_sentinel="$(
   cd "${ROOT_DIR}" || exit 125
   APP_CACHE_DIR="${TMP_CWD}/cache/version" \
     APP_LOG_DIR="${TMP_CWD}/log/version" \
-    php "${PHAR_PATH}" --version
-)
+    php "${PHAR_PATH}" --version 2>&1
+  version_status=$?
+  printf '\001'
+  exit "${version_status}"
+)"
+version_exit_code=$?
+set -e
+actual_version_output="${actual_version_with_sentinel%$'\001'}"
+if [[ ${version_exit_code} -ne 0 ]]; then
+  cat >&2 <<MESSAGE
+ERROR: PHAR --version failed with exit code ${version_exit_code}.
+  output: ${actual_version_output}
+MESSAGE
+  exit 1
+fi
+
+printf '%s' "${actual_version_output}" \
+  | check_version_output "${EXPECTED_VERSION}"
 
 # Smoke: контейнер НЕ hollow — команды модулей apps/console зарегистрированы
 # PHAR-safe регистратором (ModuleServiceRegistrar). Раньше проверка была только
