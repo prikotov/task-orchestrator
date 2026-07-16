@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-07-15
+
+### Added
+
+- Add universal role skill discovery and the `become-role` workflow, including `agent:init` and `agent:role-skills` support for source and Composer installations (#289, #307).
+- Add GitHub App identity support for AI agents through the `agent:token` command and cached installation tokens (#275).
+- Add liveness-adaptive execution for Pi and Codex runners: active processes can continue working, while idle processes are stopped without waiting for the hard timeout (#297, #298, #308).
+
+### Changed
+
+- Require PHP >= 8.4.1 with `ext-openssl` and `ext-zlib`; production installation and PHAR release checks now verify the exact runtime contract (#306).
+- Make module registration explicit and PHAR-safe across the package root, components, modules, and console application (#282).
+- Stream Pi and Codex JSONL output instead of buffering complete process output, reducing memory use on long agent runs (#285).
+- Strengthen release gates with Composer-host, PHAR, and Linux process-liveness smoke tests (#306, #307, #308).
+
+### Fixed
+
+- Preserve static-chain system prompts across the primary and retry execution paths, including resolution of `@system-prompt` and `@append-system-prompt` file markers (#299, #300, #304).
+- Recognize Pi model errors instead of reporting them as empty output, and route Pi HTTPS traffic through the configured proxy bridge (#286, #290).
+- Make runner liveness probing platform-safe without depending on `ps`, `pgrep`, or procps; unavailable probes now fall back to the hard timeout (#308).
+- Keep active subagents alive while enforcing wall-clock and idle timeouts, and eliminate pipe backpressure in the watcher read loop (#273, #292, #295).
+- Enable transient retries for dynamic-chain steps (#293).
+
+### Known limitations
+
+- The PHAR distribution does not install the `become-role` skill through `agent:init`; use the Composer distribution for that workflow until full PHAR support is implemented (#307).
+
 ## [0.1.24] - 2026-06-16
 
 ### Fixed
