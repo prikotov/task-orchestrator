@@ -9,8 +9,8 @@ epic:
 author: system_analyst_sherlock
 assignee: backend_developer_levsha
 branch: hotfix/0.2.1-phar-release-version
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/310
+status: review
 ---
 
 # TASK-fix-phar-release-version-resolution: Исправить версию приложения в PHAR
@@ -92,31 +92,31 @@ PHAR smoke завершается ошибкой при любом отличи�
 
 ### 🔴 Must Have (Обязательно)
 
-- [ ] Публичная версия разрешается из pretty version Composer или release tag, только если
+- [x] Публичная версия разрешается из pretty version Composer или release tag, только если
   значение является точной SemVer (`v?MAJOR.MINOR.PATCH` с допустимыми prerelease/build
   частями); начальный `v` удаляется без иных преобразований.
-- [ ] `Composer\InstalledVersions::getVersion()` и нормализованный root `version` больше не
+- [x] `Composer\InstalledVersions::getVersion()` и нормализованный root `version` больше не
   используются как пользовательское значение версии.
-- [ ] Для Composer distribution точная pretty version пакета имеет приоритет над root package;
+- [x] Для Composer distribution точная pretty version пакета имеет приоритет над root package;
   для root/PHAR используется точная pretty version корневого пакета либо явно переданная
   версия release tag.
-- [ ] При отсутствии точной SemVer (`dev-main`, `1.0.0+no-version-set`, `null`, некорректное
+- [x] При отсутствии точной SemVer (`dev-main`, `1.0.0+no-version-set`, `null`, некорректное
   значение) source checkout возвращает `dev` и не маскируется под опубликованный релиз.
-- [ ] PHAR smoke требует явно ожидаемую SemVer, запускает `--version` и сравнивает полный вывод
+- [x] PHAR smoke требует явно ожидаемую SemVer, запускает `--version` и сравнивает полный вывод
   с `Task Orchestrator <expected>`; отсутствие ожидания, неверный формат или несовпадение
   завершают проверку ошибкой.
-- [ ] Release/CI вызовы существующего `bin/phar-smoke` передают ожидаемую версию из проверенного
+- [x] Release/CI вызовы существующего `bin/phar-smoke` передают ожидаемую версию из проверенного
   тега/контекста без нового механизма публикации.
-- [ ] Unit tests покрывают приоритет pretty version, удаление `v`, prerelease/build SemVer,
+- [x] Unit tests покрывают приоритет pretty version, удаление `v`, prerelease/build SemVer,
   запрет normalized version и fallback `dev`.
-- [ ] Integration regression test (интеграционный регрессионный тест) подтверждает итоговый
+- [x] Integration regression test (интеграционный регрессионный тест) подтверждает итоговый
   вывод CLI для release и source сценариев.
-- [ ] PHAR regression test (регрессионный тест PHAR) падает на `1.0.0.0` при ожидании `0.2.1`
+- [x] PHAR regression test (регрессионный тест PHAR) падает на `1.0.0.0` при ожидании `0.2.1`
   и проходит только при точном совпадении `0.2.1`.
 
 ### 🟡 Should Have (Желательно)
 
-- [ ] Диагностика PHAR smoke печатает ожидаемую и фактическую версии без неоднозначности.
+- [x] Диагностика PHAR smoke печатает ожидаемую и фактическую версии без неоднозначности.
 
 ### ⚫ Won't Have (Не будем делать)
 
@@ -127,26 +127,27 @@ PHAR smoke завершается ошибкой при любом отличи�
 
 ## 4. Implementation Plan (План реализации)
 
-1. [ ] Зафиксировать регрессию тестами разрешения версии для package/root, release/source и
+1. [x] Зафиксировать регрессию тестами разрешения версии для package/root, release/source и
    некорректных normalized values (нормализованных значений).
-2. [ ] Исправить `Kernel::resolveVersion()` либо минимально выделенный тестируемый механизм:
+2. [x] Исправить `Kernel::resolveVersion()` либо минимально выделенный тестируемый механизм:
    брать точную pretty version/версию тега, валидировать SemVer, иначе возвращать `dev`.
-3. [ ] Добавить Integration test (интеграционный тест) итогового `app.version`/CLI `--version`.
-4. [ ] Усилить `bin/phar-smoke` обязательным ожидаемым значением и точным сравнением вывода;
+3. [x] Добавить Integration test (интеграционный тест) итогового `app.version`/CLI `--version`.
+4. [x] Усилить `bin/phar-smoke` обязательным ожидаемым значением и точным сравнением вывода;
    адаптировать только существующие места его вызова.
-5. [ ] Выполнить целевые тесты, `make phar-smoke` с ожидаемой `0.2.1` и полный `make check`.
-6. [ ] Создать hotfix PR (PR срочного исправления) в `release/0.2`; после merge отдельным PR
-   перенести тот же commit (коммит) в `main`, не смешивая merge-back с выпуском `v0.2.1`.
+5. [x] Выполнить целевые тесты, `make phar-smoke` с ожидаемой `0.2.1` и полный `make check`.
+6. [x] Создать hotfix PR (PR срочного исправления) в `release/0.2`.
+7. [ ] После merge отдельным PR перенести тот же commit (коммит) в `main`, не смешивая
+   merge-back с выпуском `v0.2.1`.
 
 ## 5. Definition of Done (Критерии приёмки)
 
-- [ ] PHAR-кандидат `v0.2.1` выводит ровно `Task Orchestrator 0.2.1`.
-- [ ] Composer install (установка Composer) точной версии выводит соответствующую exact SemVer.
-- [ ] Source checkout без exact SemVer выводит `Task Orchestrator dev`.
-- [ ] Значение `1.0.0.0` не может пройти version resolver (разрешение версии) или PHAR smoke.
-- [ ] Добавлены Unit/Integration/PHAR regression tests.
-- [ ] `vendor/bin/phpunit`, `vendor/bin/psalm` и `make check` проходят успешно.
-- [ ] Hotfix PR направлен в активную `release/0.2`.
+- [x] PHAR-кандидат `v0.2.1` выводит ровно `Task Orchestrator 0.2.1`.
+- [x] Composer install (установка Composer) точной версии выводит соответствующую exact SemVer.
+- [x] Source checkout без exact SemVer выводит `Task Orchestrator dev`.
+- [x] Значение `1.0.0.0` не может пройти version resolver (разрешение версии) или PHAR smoke.
+- [x] Добавлены Unit/Integration/PHAR regression tests.
+- [x] `vendor/bin/phpunit`, `vendor/bin/psalm` и `make check` проходят успешно.
+- [x] Hotfix PR направлен в активную `release/0.2`.
 - [ ] После принятия hotfix создан отдельный merge-back PR в `main`.
 - [ ] Подготовка/публикация `v0.2.1` выполняется отдельным релизным шагом с явным разрешением
   пользователя.
@@ -161,6 +162,13 @@ make check
 php vendor/prikotov/todo-md/bin/todo-md-validate todo/TASK-fix-phar-release-version-resolution.todo.md
 git diff --check
 ```
+
+Результаты:
+
+- Self-review (самопроверка реализации): **Approval**.
+- Code review (проверка кода): **Approval**.
+- `make check`: успешно, PHPUnit — 1462 tests (теста), 3902 assertions (утверждения).
+- Composer-host smoke (проверка Composer-дистрибутива): точная версия `0.2.1` подтверждена.
 
 ## 7. Risks and Dependencies (Риски и зависимости)
 
@@ -191,3 +199,4 @@ Hotfix branch создана от production tag `v0.2.0`, а не от `main`. 
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-07-16 | Аналитик Шерлок | Создание P0 hotfix-задачи по подтверждённому дефекту версии PHAR. |
+| 2026-07-16 | Бэкендер Левша | Реализация и проверки завершены; self-review и code review — Approval; создан PR #310 в `release/0.2`, задача переведена в `review`. |
