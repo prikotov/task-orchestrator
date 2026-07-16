@@ -26,17 +26,6 @@ RACI-матрице. При сомнении бери `team_lead_alex` (дефо
 scripts/become-role.sh <role|file>
 ```
 
-Путь **относителен каталогу этого skill** (рядом с `SKILL.md`, поле
-`<location>`). По конвенции [Agent Skills](https://agentskills.io/skill-creation/using-scripts)
-пути к скриптам skill указываются относительно его каталога; pi/codex
-резолвят их автоматически к абсолютному пути каталога skill. Это работает
-и в standalone-репозитории, и в любом host-проекте (Composer), где
-`<location>` указывает на установленный skill.
-
-Альтернатива — прямая CLI-команда `agent:role-skills <role>`:
-`bin/console agent:role-skills` в source checkout, `php vendor/bin/task-orchestrator
-agent:role-skills` в Composer-host.
-
 Пример вывода (`become-role.sh team_lead_alex`):
 
 ```
