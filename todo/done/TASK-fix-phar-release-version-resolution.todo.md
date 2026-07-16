@@ -10,7 +10,7 @@ author: system_analyst_sherlock
 assignee: backend_developer_levsha
 branch: hotfix/0.2.1-phar-release-version
 pr: https://github.com/prikotov/task-orchestrator/pull/310
-status: review
+status: done
 ---
 
 # TASK-fix-phar-release-version-resolution: Исправить версию приложения в PHAR
@@ -62,7 +62,7 @@ PHAR smoke завершается ошибкой при любом отличи�
 
 - `src/Kernel.php`, метод `Kernel::resolveVersion()` — источник параметра `app.version`.
 - Unit tests (модульные тесты) и Integration tests (интеграционные тесты) по
-  [testing convention (конвенции тестирования)](../docs/conventions/testing/index.md).
+  [testing convention (конвенции тестирования)](../../docs/conventions/testing/index.md).
 - `bin/phar-smoke` и только необходимая передача ожидаемой версии существующим release/CI
   workflow (процессам релиза/CI), без добавления нового инструментария выпуска.
 
@@ -136,7 +136,10 @@ PHAR smoke завершается ошибкой при любом отличи�
    адаптировать только существующие места его вызова.
 5. [x] Выполнить целевые тесты, `make phar-smoke` с ожидаемой `0.2.1` и полный `make check`.
 6. [x] Создать hotfix PR (PR срочного исправления) в `release/0.2`.
-7. [ ] После merge отдельным PR перенести тот же commit (коммит) в `main`, не смешивая
+7. [x] Получить Approval (одобрение) PR #310 и подтвердить зелёный CI; перевести задачу в
+   `done` и перенести в `todo/done/` до merge.
+8. [ ] По явной команде пользователя слить PR #310 в `release/0.2`.
+9. [ ] После merge отдельным PR перенести тот же commit (коммит) в `main`, не смешивая
    merge-back с выпуском `v0.2.1`.
 
 ## 5. Definition of Done (Критерии приёмки)
@@ -148,6 +151,8 @@ PHAR smoke завершается ошибкой при любом отличи�
 - [x] Добавлены Unit/Integration/PHAR regression tests.
 - [x] `vendor/bin/phpunit`, `vendor/bin/psalm` и `make check` проходят успешно.
 - [x] Hotfix PR направлен в активную `release/0.2`.
+- [x] PR #310 одобрен, CI зелёный; задача переведена в `done` и перенесена в `todo/done/`.
+- [ ] PR #310 слит в `release/0.2` по явной команде пользователя.
 - [ ] После принятия hotfix создан отдельный merge-back PR в `main`.
 - [ ] Подготовка/публикация `v0.2.1` выполняется отдельным релизным шагом с явным разрешением
   пользователя.
@@ -159,7 +164,7 @@ vendor/bin/phpunit
 vendor/bin/psalm
 PHAR_EXPECTED_VERSION=0.2.1 make phar-smoke
 make check
-php vendor/prikotov/todo-md/bin/todo-md-validate todo/TASK-fix-phar-release-version-resolution.todo.md
+php vendor/prikotov/todo-md/bin/todo-md-validate todo/done/TASK-fix-phar-release-version-resolution.todo.md
 git diff --check
 ```
 
@@ -183,11 +188,11 @@ git diff --check
 
 ## 8. Sources (Источники)
 
-- [`Kernel::resolveVersion()`](../src/Kernel.php)
-- [`bin/phar-smoke`](../bin/phar-smoke)
+- [`Kernel::resolveVersion()`](../../src/Kernel.php)
+- [`bin/phar-smoke`](../../bin/phar-smoke)
 - [SemVer 2.0.0](https://semver.org/spec/v2.0.0.html)
-- [Правила проекта](../AGENTS.md)
-- [Правила работы с задачами](AGENTS.md)
+- [Правила проекта](../../AGENTS.md)
+- [Правила работы с задачами](../AGENTS.md)
 
 ## 9. Comments (Комментарии)
 
@@ -200,3 +205,4 @@ Hotfix branch создана от production tag `v0.2.0`, а не от `main`. 
 | :--- | :--- | :--- |
 | 2026-07-16 | Аналитик Шерлок | Создание P0 hotfix-задачи по подтверждённому дефекту версии PHAR. |
 | 2026-07-16 | Бэкендер Левша | Реализация и проверки завершены; self-review и code review — Approval; создан PR #310 в `release/0.2`, задача переведена в `review`. |
+| 2026-07-16 | Тимлид Алекс | PR #310 одобрен, CI зелёный; задача переведена в `done` и перенесена в `todo/done/` перед merge. |
