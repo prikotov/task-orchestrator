@@ -10,7 +10,7 @@ author: system_analyst_sherlock
 assignee: team_lead_alex
 branch: task/release-v0-2-0
 pr: https://github.com/prikotov/task-orchestrator/pull/309
-status: review
+status: done
 ---
 
 # TASK-release-v0-2-0-preparation: Подготовить и выпустить релиз v0.2.0
@@ -53,7 +53,7 @@ status: review
 ## 2. Context and Scope (Контекст и Границы)
 
 * **Где делаем:** `CHANGELOG.md`, `docs/releases/v0.2.0/release-plan.md`,
-  `todo/TASK-release-v0-2-0-preparation.todo.md`; GitHub PR и тег как отдельные операции.
+  `todo/done/TASK-release-v0-2-0-preparation.todo.md`; GitHub PR и тег как отдельные операции.
 * **Текущее состояние:** релизные изменения уже находятся в `main`; пользователь явно одобрил
   начало выпуска `v0.2.0`; тег `v0.2.0` ещё не опубликован.
 * **Границы (Out of Scope):**
@@ -72,7 +72,7 @@ status: review
   (плане релиза).
 - [x] Создан PR `task/release-v0-2-0` → `release/0.2`; задача переведена в `review`, поле `pr`
   заполнено.
-- [ ] После approval (одобрения), до merge (слияния), задача переведена в `done` и перенесена
+- [x] После approval (одобрения), до merge (слияния), задача переведена в `done` и перенесена
   в `todo/done/`.
 - [ ] PR слит только после явной команды пользователя на merge.
 - [ ] Тег `v0.2.0` создан и отправлен только после отдельного явного разрешения пользователя
@@ -100,9 +100,9 @@ status: review
 3. [x] Выполнить финальные проверки и зафиксировать результат в release plan (плане релиза).
 4. [x] Создать PR `task/release-v0-2-0` → `release/0.2`, заполнить `pr` и перевести задачу
    в `review`.
-5. [ ] После approval (одобрения) перевести задачу в `done`, перенести в `todo/done/` и только
-   по явной команде пользователя слить PR.
-6. [ ] После отдельного явного разрешения пользователя создать и отправить тег `v0.2.0` с
+5. [x] После approval (одобрения) перевести задачу в `done` и перенести в `todo/done/`.
+6. [ ] Только по явной команде пользователя слить PR.
+7. [ ] После отдельного явного разрешения пользователя создать и отправить тег `v0.2.0` с
    проверенной вершины `release/0.2`, затем проверить GitHub Release и PHAR-артефакт.
 
 ## 5. Definition of Done (Критерии приёмки)
@@ -110,7 +110,8 @@ status: review
 - [x] Изменения PR ограничены `CHANGELOG.md`, release plan (планом релиза) и файлом задачи.
 - [x] `make check` проходит успешно.
 - [x] `todo-md-validate` и `git diff --check` проходят успешно.
-- [ ] PR в `release/0.2` принят в соответствии с правилами проекта.
+- [x] PR в `release/0.2` одобрен, задача переведена в `done` и перенесена в `todo/done/`.
+- [ ] PR слит в `release/0.2` по явной команде пользователя.
 - [ ] Публикация тега выполнена только после отдельного явного разрешения пользователя.
 - [ ] GitHub Release `v0.2.0` опубликован, workflow `Release Phar` успешен, PHAR-артефакт доступен.
 
@@ -118,7 +119,7 @@ status: review
 
 ```bash
 make check
-php vendor/prikotov/todo-md/bin/todo-md-validate todo/TASK-release-v0-2-0-preparation.todo.md
+php vendor/prikotov/todo-md/bin/todo-md-validate todo/done/TASK-release-v0-2-0-preparation.todo.md
 git diff --check
 ```
 
@@ -139,10 +140,10 @@ gh release view v0.2.0
 
 ## 8. Sources (Источники)
 
-- [Правила проекта](../AGENTS.md)
-- [Правила работы с задачами](AGENTS.md)
-- [План релиза v0.2.0](../docs/releases/v0.2.0/release-plan.md)
-- [CHANGELOG](../CHANGELOG.md)
+- [Правила проекта](../../AGENTS.md)
+- [Правила работы с задачами](../AGENTS.md)
+- [План релиза v0.2.0](../../docs/releases/v0.2.0/release-plan.md)
+- [CHANGELOG](../../CHANGELOG.md)
 
 ## 9. Comments (Комментарии)
 
@@ -155,3 +156,4 @@ gh release view v0.2.0
 | :--- | :--- | :--- |
 | 2026-07-15 | Аналитик Шерлок | Создание задачи и начало подготовки релиза. |
 | 2026-07-15 | Тимлид Алекс | Подготовка завершена, финальные проверки пройдены, создан PR #309 в `release/0.2`; задача переведена в `review`. |
+| 2026-07-16 | Тимлид Алекс | PR #309 одобрен; задача переведена в `done` и перенесена в `todo/done/` перед merge. |
