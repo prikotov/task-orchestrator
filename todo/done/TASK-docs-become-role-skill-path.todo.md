@@ -10,7 +10,7 @@ author: pi
 assignee: pi
 branch: task/fix-become-role-skill-path
 pr: PR #313
-status: review
+status: done
 ---
 
 # TASK-docs-become-role-skill-path: Относительные пути к скриптам skills по стандарту Agent Skills
@@ -70,3 +70,4 @@ grep -n "scripts/become-role.sh" docs/agents/skills/become-role/SKILL.md
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-07-17 | pi | Создание задачи |
+| 2026-07-17 | pi | Переведена в done (merge PR #313) |
