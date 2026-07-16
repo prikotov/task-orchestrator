@@ -4,6 +4,17 @@
 
 SKILL (навык) — это переносимый модуль (инструкции + скрипты), позволяющий агенту автономно выполнять конкретные задачи, такие как работа с API, анализ файлов или другие специфические действия. Это стандарт для структурирования опыта, который агент загружает по мере необходимости.
 
+## Стандарты и источники
+
+Гайд следует официальному стандарту **Agent Skills**. При расхождениях источник истины — внешние стандарты, а не этот документ:
+
+- [Agent Skills Specification](https://agentskills.io/specification) — формат skill: структура каталога, frontmatter, валидация.
+- [Using scripts in skills](https://agentskills.io/skill-creation/using-scripts) — правило путей к скриптам (относительно каталога skill).
+- [Best practices](https://agentskills.io/skill-creation/best-practices) — рекомендации по написанию skills.
+- [anthropics/skills](https://github.com/anthropics/skills) — официальный репозиторий примеров (pdf, docx, webapp-testing и др.).
+
+Клиенты pi, Claude Code, Codex реализуют этот стандарт.
+
 ## Структура
 
 ```
