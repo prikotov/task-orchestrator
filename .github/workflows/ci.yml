@@ -70,6 +70,7 @@ jobs:
               ln --symbolic /opt/tools/composer /usr/local/bin/composer
               php /opt/tools/composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
               php /opt/tools/composer check-platform-reqs --no-dev
+              export PHAR_EXPECTED_VERSION=dev
               make phar-smoke
             '
 

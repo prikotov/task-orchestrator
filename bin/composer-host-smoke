@@ -46,13 +46,13 @@ cat > "${HOST_DIR}/composer.json" <<'JSON'
       "options": {
         "symlink": false,
         "versions": {
-          "prikotov/task-orchestrator": "dev-smoke"
+          "prikotov/task-orchestrator": "0.2.1"
         }
       }
     }
   ],
   "require": {
-    "prikotov/task-orchestrator": "dev-smoke"
+    "prikotov/task-orchestrator": "0.2.1"
   },
   "minimum-stability": "dev",
   "prefer-stable": true
@@ -79,6 +79,19 @@ fi
 
 if [[ -e "${HOST_DIR}/docs" ]]; then
   echo 'ERROR: Composer host unexpectedly contains checkout-only docs/ resources.' >&2
+  exit 1
+fi
+
+version_output="$(
+  cd "${HOST_DIR}"
+  php vendor/bin/task-orchestrator --version
+)"
+if [[ "${version_output}" != 'Task Orchestrator 0.2.1' ]]; then
+  cat >&2 <<MESSAGE
+ERROR: installed Composer package reports an unexpected version.
+  expected: Task Orchestrator 0.2.1
+  actual:   ${version_output}
+MESSAGE
   exit 1
 fi
 

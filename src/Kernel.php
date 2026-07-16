@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use TaskOrchestrator\Common\Component\ModuleSystem\DependencyInjection\ModuleServiceRegistrar;
 use TaskOrchestrator\Common\Component\ModuleSystem\ModuleKernelTrait;
+use TaskOrchestrator\Common\ValueObject\ReleaseVersionVo;
 
 /**
  * Ядро приложения TaskOrchestrator (console-only).
@@ -301,16 +302,63 @@ class Kernel extends BaseKernel
 
     private function resolveVersion(): string
     {
-        if (class_exists(\Composer\InstalledVersions::class)) {
-            $version = \Composer\InstalledVersions::getVersion('prikotov/task-orchestrator');
-            if ($version === null) {
-                $version = \Composer\InstalledVersions::getRootPackage()['version'];
-            }
+        return ReleaseVersionVo::createFromCandidates(
+            explicitReleaseVersion: $this->readExplicitReleaseVersion(),
+            packagePrettyVersion: $this->readPackagePrettyVersion(),
+            rootPrettyVersion: $this->readRootPrettyVersion(),
+        )->value();
+    }
 
-            return ltrim($version, 'v');
+    /**
+     * Явно переданная версия release tag (инъецируется процессом сборки/окружением).
+     *
+     * null — значение не передано. Чистый nullable-контракт для {@see ReleaseVersionVo};
+     * валидацию SemVer выполняет Value Object.
+     */
+    private function readExplicitReleaseVersion(): ?string
+    {
+        $explicit = $_SERVER['APP_RELEASE_VERSION'] ?? null;
+
+        return is_string($explicit) && $explicit !== '' ? $explicit : null;
+    }
+
+    /**
+     * Точная pretty version (человекочитаемая версия) пакета Composer.
+     *
+     * Для Composer distribution (приложение как зависимость хост-проекта).
+     * null, если Composer runtime недоступен или пакет не установлен.
+     *
+     * В отличие от нормализованного {@see \Composer\InstalledVersions::getVersion()},
+     * pretty-значение сохраняет исходную SemVer и не превращается в `1.0.0.0`.
+     */
+    private function readPackagePrettyVersion(): ?string
+    {
+        if (!class_exists(\Composer\InstalledVersions::class)) {
+            return null;
         }
 
-        return '0.1.0';
+        /** @var string|null $prettyVersion */
+        $prettyVersion = \Composer\InstalledVersions::getPrettyVersion('prikotov/task-orchestrator');
+
+        return $prettyVersion;
+    }
+
+    /**
+     * Точная pretty version корневого пакета.
+     *
+     * Для root/PHAR. null, если Composer runtime недоступен.
+     */
+    private function readRootPrettyVersion(): ?string
+    {
+        if (!class_exists(\Composer\InstalledVersions::class)) {
+            return null;
+        }
+
+        /** @var array<string, mixed> $rootPackage */
+        $rootPackage = \Composer\InstalledVersions::getRootPackage();
+        $prettyVersion = $rootPackage['pretty_version'] ?? null;
+
+        return is_string($prettyVersion) && $prettyVersion !== '' ? $prettyVersion : null;
     }
 
     /**
