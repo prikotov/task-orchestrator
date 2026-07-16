@@ -23,7 +23,7 @@ RACI-матрице. При сомнении бери `team_lead_alex` (дефо
 **Шаг 2.** Вызови скрипт, передав имя роли или путь к файлу роли:
 
 ```bash
-docs/agents/skills/become-role/scripts/become-role.sh <role|file>
+scripts/become-role.sh <role|file>
 ```
 
 Пример вывода (`become-role.sh team_lead_alex`):
