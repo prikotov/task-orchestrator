@@ -62,6 +62,59 @@ final class KernelIntegrationTest extends TestCase
     }
 
     #[Test]
+    public function sourceCheckoutResolvesAppVersionToNonReleaseMarker(): void
+    {
+        // Arrange: source checkout без релизной версии — Composer даёт ветку
+        // `dev-*` либо `1.0.0+no-version-set`, что не является точной SemVer.
+        // Изолируем кэш контейнера: параметр app.version вычисляется при
+        // компиляции и запекается, поэтому без свежей компиляции тест вернул бы
+        // закэшированное значение.
+        $cacheDir = $this->createIsolatedCacheDir();
+        $_SERVER['APP_CACHE_DIR'] = $cacheDir;
+
+        try {
+            // Act
+            $kernel = new Kernel('test', false);
+            $kernel->boot();
+
+            // Assert: параметр app.version равен non-release marker `dev`,
+            // а НЕ нормализованному Composer-значению (`1.0.0.0`) либо ветке.
+            self::assertSame('dev', $kernel->getContainer()->getParameter('app.version'));
+            $kernel->shutdown();
+        } finally {
+            unset($_SERVER['APP_CACHE_DIR']);
+            $this->removeDirectory($cacheDir);
+        }
+    }
+
+    #[Test]
+    public function explicitReleaseVersionOverridesResolvedAppVersion(): void
+    {
+        // Arrange: процесс сборки инъецирует точную SemVer release tag.
+        $cacheDir = $this->createIsolatedCacheDir();
+        $_SERVER['APP_CACHE_DIR'] = $cacheDir;
+        $_SERVER['APP_RELEASE_VERSION'] = '0.2.1';
+
+        try {
+            // Act
+            $kernel = new Kernel('test', false);
+            $kernel->boot();
+
+            // Assert
+            self::assertSame('0.2.1', $kernel->getContainer()->getParameter('app.version'));
+            $kernel->shutdown();
+        } finally {
+            unset($_SERVER['APP_CACHE_DIR'], $_SERVER['APP_RELEASE_VERSION']);
+            $this->removeDirectory($cacheDir);
+        }
+    }
+
+    private function createIsolatedCacheDir(): string
+    {
+        return sys_get_temp_dir() . '/to-kernel-cache-' . bin2hex(random_bytes(6));
+    }
+
+    #[Test]
     public function dualContextResolvesHostResourcesAndPackageConfig(): void
     {
         // Имитируем vendor-binary: хост-проект имеет собственные роли, но без
