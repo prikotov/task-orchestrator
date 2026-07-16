@@ -69,6 +69,7 @@ jobs:
 
           docker run --rm \
             --env PHAR_SMOKE_KEEP_ARTIFACT=1 \
+            --env GITHUB_REF_NAME="${GITHUB_REF_NAME}" \
             --volume "${GITHUB_WORKSPACE}:/workspace" \
             --volume "${composer_bin}:/opt/tools/composer:ro" \
             --volume "${box_bin}:/usr/local/bin/box:ro" \
@@ -87,8 +88,25 @@ jobs:
               apt-get install --yes --no-install-recommends unzip
               rm -rf /var/lib/apt/lists/*
               ln --symbolic /opt/tools/composer /usr/local/bin/composer
+              # Запечь release tag в Composer-метаданные через штатный
+              # COMPOSER_ROOT_VERSION, чтобы упакованный PHAR сообщал точную
+              # SemVer через InstalledVersions::getRootPackage()['pretty_version'].
+              # COMPOSER_ROOT_VERSION — это официальный документированный механизм
+              # Composer для override версии root package без модификации
+              # composer.json (в отличие от `composer config version`, который
+              # мутирует файл и выдаёт предупреждение «could not detect the root
+              # package version»). Значение запекается в сгенерированный
+              # vendor/composer/InstalledVersions.php на этапе install и попадает
+              # в PHAR вместе с vendor/.
+              release_version="${GITHUB_REF_NAME#v}"
+              if ! bin/phar-smoke --internal-validate-release-version "${release_version}"; then
+                echo "ERROR: ref ${GITHUB_REF_NAME} is not a release tag." >&2
+                exit 1
+              fi
+              export COMPOSER_ROOT_VERSION="${release_version}"
               php /opt/tools/composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
               php /opt/tools/composer check-platform-reqs --no-dev
+              export PHAR_EXPECTED_VERSION="${release_version}"
               make phar-smoke
             '
 
