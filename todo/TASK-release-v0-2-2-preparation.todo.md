@@ -9,7 +9,7 @@ epic:
 author: pi
 assignee: pi
 branch: task/release-v0-2-2
-pr:
+pr: PR #314
 status: review
 ---
 
