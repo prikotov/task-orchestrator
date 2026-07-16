@@ -10,7 +10,7 @@ author: pi
 assignee: pi
 branch: task/release-v0-2-2
 pr: PR #314
-status: review
+status: done
 ---
 
 # TASK-release-v0-2-2-preparation: Подготовить и выпустить patch release v0.2.2
@@ -120,3 +120,4 @@ gh release view v0.2.2
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-07-17 | pi | Создание задачи и подготовка patch release `v0.2.2`. |
+| 2026-07-17 | pi | `make check` зелёный (1462 tests); PR #314 в `release/0.2`, задача переведена в `done` перед merge. |
