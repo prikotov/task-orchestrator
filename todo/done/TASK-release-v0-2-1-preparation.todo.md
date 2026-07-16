@@ -10,7 +10,7 @@ author: system_analyst_sherlock
 assignee: team_lead_alex
 branch: task/release-v0-2-1
 pr: https://github.com/prikotov/task-orchestrator/pull/312
-status: review
+status: done
 ---
 
 # TASK-release-v0-2-1-preparation: Подготовить и выпустить patch release v0.2.1
@@ -79,7 +79,7 @@ plan (планом релиза) и финальными проверками. �
 - [ ] Финальный PHAR release candidate подтверждает точный вывод `Task Orchestrator 0.2.1`.
 - [x] Создан PR `task/release-v0-2-1` → `release/0.2`; поле `pr` заполнено, задача переведена
   в `review`.
-- [ ] После approval (одобрения), до merge (слияния), задача переведена в `done` и перенесена
+- [x] После approval (одобрения), до merge (слияния), задача переведена в `done` и перенесена
   в `todo/done/`.
 - [ ] PR слит только после явной команды пользователя на merge.
 - [ ] Тег `v0.2.1` создан и отправлен только после отдельного явного разрешения пользователя
@@ -102,9 +102,9 @@ plan (планом релиза) и финальными проверками. �
 4. [ ] Подтвердить exact-version финального PHAR release candidate для `0.2.1`.
 5. [x] Создать PR `task/release-v0-2-1` → `release/0.2`, заполнить `pr` и перевести задачу
    в `review`.
-6. [ ] После approval перевести задачу в `done`, перенести в `todo/done/` и только по явной
-   команде пользователя слить PR.
-7. [ ] После отдельного явного разрешения создать и отправить тег `v0.2.1`, затем проверить
+6. [x] После approval перевести задачу в `done` и перенести в `todo/done/`.
+7. [ ] Только по явной команде пользователя слить PR в `release/0.2`.
+8. [ ] После отдельного явного разрешения создать и отправить тег `v0.2.1`, затем проверить
    GitHub Release и PHAR-артефакт.
 
 ## 5. Definition of Done (Критерии приёмки)
@@ -115,7 +115,8 @@ plan (планом релиза) и финальными проверками. �
 - [x] Platform requirements подтверждены: PHP `>=8.4.1`, `ext-openssl`, `ext-zlib`.
 - [ ] Финальный PHAR smoke подтверждает точную версию `0.2.1`.
 - [x] `todo-md-validate` и `git diff --check` проходят успешно.
-- [ ] PR принят в `release/0.2` по правилам проекта.
+- [x] PR #312 одобрен, CI зелёный; задача переведена в `done` и перенесена в `todo/done/`.
+- [ ] PR #312 слит в `release/0.2` по явной команде пользователя.
 - [ ] Публикация тега выполнена только после отдельного явного разрешения пользователя.
 - [ ] GitHub Release `v0.2.1` опубликован, workflow `Release Phar` успешен, PHAR выводит
   `Task Orchestrator 0.2.1`.
@@ -125,7 +126,7 @@ plan (планом релиза) и финальными проверками. �
 ```bash
 make check
 PHAR_EXPECTED_VERSION=0.2.1 make phar-smoke
-php vendor/prikotov/todo-md/bin/todo-md-validate todo/TASK-release-v0-2-1-preparation.todo.md
+php vendor/prikotov/todo-md/bin/todo-md-validate todo/done/TASK-release-v0-2-1-preparation.todo.md
 git diff --check
 ```
 
@@ -155,9 +156,9 @@ gh release view v0.2.1
 
 ## 8. Sources (Источники)
 
-- [Исправление версии PHAR](done/TASK-fix-phar-release-version-resolution.todo.md)
-- [Правила проекта](../AGENTS.md)
-- [Правила работы с задачами](AGENTS.md)
+- [Исправление версии PHAR](TASK-fix-phar-release-version-resolution.todo.md)
+- [Правила проекта](../../AGENTS.md)
+- [Правила работы с задачами](../AGENTS.md)
 
 ## 9. Comments (Комментарии)
 
@@ -170,3 +171,4 @@ gh release view v0.2.1
 | :--- | :--- | :--- |
 | 2026-07-16 | Аналитик Шерлок | Создание задачи и начало подготовки patch release `v0.2.1`. |
 | 2026-07-16 | Тимлид Алекс | CHANGELOG и release plan подготовлены, проверки кода/платформы/Composer-host пройдены; создан PR #312 в `release/0.2`, задача переведена в `review`. |
+| 2026-07-16 | Тимлид Алекс | PR #312 одобрен, CI зелёный; задача переведена в `done` и перенесена в `todo/done/` перед merge. |
