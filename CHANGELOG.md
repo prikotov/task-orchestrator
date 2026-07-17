@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2026-07-17
+
+### Changed
+
+- `become-role` skill catalog and `become-role/SKILL.md` now explain how to resolve in-skill relative paths (`scripts/`, `references/`) via `<location>` — prefix with the skill directory — so agents stop looking for skill scripts in the project root in host installations (#315).
+
 ## [0.2.2] - 2026-07-17
 
 ### Fixed
