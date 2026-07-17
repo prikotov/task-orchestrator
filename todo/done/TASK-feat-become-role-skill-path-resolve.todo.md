@@ -10,7 +10,7 @@ author: pi
 assignee: pi
 branch: task/feat-become-role-skill-path-resolve
 pr: https://github.com/prikotov/task-orchestrator/pull/315
-status: review
+status: done
 ---
 
 # TASK-feat-become-role-skill-path-resolve: Подсказать агенту резолвить пути skill'ов через <location>
@@ -78,3 +78,4 @@ make check
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-07-17 | pi | Создание задачи и реализация. |
+| 2026-07-17 | pi | Переведена в done (merge PR #315). |
