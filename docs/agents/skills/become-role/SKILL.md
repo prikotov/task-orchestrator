@@ -61,7 +61,7 @@ scripts/become-role.sh <role|file>
 1. Skills даны описаниями, полные тела загружай при необходимости. Не читай все skills заранее.
 2. Когда текущая задача подходит под описание skill, загрузи его `SKILL.md` (поле `<location>`) через `read` **полностью** и следуй инструкциям.
 3. Связанные файлы skill из `scripts/`, `references/` читай только когда они прямо нужны по инструкции skill.
-4. Относительные пути внутри skill (`scripts/…`, `references/…`) — относительно каталога skill (родитель `SKILL.md`). Резолви через `<location>`: `dirname(<location>) + путь`, в bash выполняй абсолютный путь. Пример: `scripts/x.sh` при `<location>` `…/run-subagent/SKILL.md` → `…/run-subagent/scripts/x.sh`.
+4. Пути внутри skill (`scripts/…`, `references/…`) лежат рядом с `SKILL.md`, а не в корне проекта. Бери каталог из `<location>` и подставляй перед путём. Пример: `scripts/x.sh` при `<location>` `…/run-subagent/SKILL.md` → `…/run-subagent/scripts/x.sh`.
 
 Если блока `<available_skills>` нет — у роли нет skills; работай только от лица роли.
 
