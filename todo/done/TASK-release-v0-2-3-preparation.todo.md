@@ -9,8 +9,8 @@ epic:
 author: pi
 assignee: pi
 branch: task/release-v0-2-3
-pr:
-status: review
+pr: https://github.com/prikotov/task-orchestrator/pull/316
+status: done
 ---
 
 # TASK-release-v0-2-3-preparation: Подготовить и выпустить patch release v0.2.3
@@ -118,3 +118,4 @@ gh release view v0.2.3
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-07-17 | pi | Создание задачи и подготовка patch release `v0.2.3`. |
+| 2026-07-17 | pi | `make check` зелёный (1462 tests); PR #316 в `release/0.2`, задача переведена в `done` перед merge. |
