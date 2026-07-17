@@ -23,7 +23,9 @@ final readonly class FormatSkillCatalogService implements FormatSkillCatalogServ
     private const string HEADER = <<<'TEXT'
         Следующие skills предоставляют специализированные инструкции для конкретных задач.
         Когда задача совпадает с описанием skill — загрузи его SKILL.md инструментом read.
-        Относительные пути внутри skill разрешай относительно его каталога (родителя SKILL.md) и используй абсолютные пути в командах.
+        Пути внутри skill (scripts/…, references/…) указаны относительно каталога skill — родителя SKILL.md.
+        Резолви их через <location> и в bash выполняй по абсолютному пути: dirname(<location>) + относительный путь.
+        Пример: scripts/watch-subagent.sh → dirname(<location>)/scripts/watch-subagent.sh.
         TEXT;
 
     #[Override]
