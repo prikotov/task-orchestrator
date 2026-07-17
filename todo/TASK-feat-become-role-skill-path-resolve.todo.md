@@ -9,7 +9,7 @@ epic:
 author: pi
 assignee: pi
 branch: task/feat-become-role-skill-path-resolve
-pr:
+pr: PR #315
 status: review
 ---
 
