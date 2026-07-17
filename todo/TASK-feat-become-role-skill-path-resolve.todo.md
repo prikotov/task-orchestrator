@@ -9,11 +9,25 @@ epic:
 author: pi
 assignee: pi
 branch: task/feat-become-role-skill-path-resolve
-pr: PR #315
+pr: https://github.com/prikotov/task-orchestrator/pull/315
 status: review
 ---
 
 # TASK-feat-become-role-skill-path-resolve: Подсказать агенту резолвить пути skill'ов через <location>
+
+## 0. Простое описание (Human Brief)
+
+### Проблема простыми словами (Problem)
+
+Агент в host-проекте путался на относительном пути `scripts/watch-subagent.sh` в SKILL.md: не связывал его с `<location>`, искал в корне проекта, тратил лишние шаги. Подсказка в каталоге `become-role` была абстрактной.
+
+### Варианты или путь решения (Solution Sketch)
+
+Усилить подсказку в `FormatSkillCatalogService` и `become-role/SKILL.md` конкретным правилом: пути внутри skill лежат рядом с SKILL.md, каталог брать из `<location>` и подставлять перед путём. Решение централизовано в `become-role`.
+
+### Ожидаемый результат (Expected Result)
+
+Агент при работе с любым role-специфичным skill корректно строит абсолютный путь к скрипту через `<location>` и не ищет его в корне проекта.
 
 ## 1. Concept and Goal (Концепция и Цель)
 ### Story (Job Story)
