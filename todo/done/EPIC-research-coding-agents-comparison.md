@@ -7,7 +7,7 @@ complexity: C4
 priority: P2
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-status: in_progress
+status: done
 pr: "#171"
 branch: epic/research-coding-agents-comparison
 ---
@@ -19,7 +19,7 @@ branch: epic/research-coding-agents-comparison
 > **Job Story:** Когда мы подключаем AI-агенты как сабагентов к ролям команды (docs/agents/roles/team/), я хочу провести систематическое исследование CLI-агентов кодинга, чтобы определить, какие из них подходят для работы с нашей системой ролей, скиллов и системных промптов — и выбрать лучших кандидатов для интеграции.
 
 ### Goal (Цель по SMART)
-Исследовать 14 CLI-агентов кодинга по единой методологии из 10 критериев (системный промпт, роль, скиллы, AGENTS.md, запуск как сабагент, токены, free tier, провайдеры, лицензия). По каждому — вердикт: подходит / частично подходит / не подходит. Сводная таблица в `docs/research/coding-agents-summary.md`. Срок: до конца Q2 2026.
+Исследовать 18 CLI-агентов кодинга по единой методологии из 10 критериев (системный промпт, роль, скиллы, AGENTS.md, запуск как сабагент, токены, free tier, провайдеры, лицензия). По каждому — вердикт: подходит / частично подходит / не подходит. Сводная таблица в `docs/research/coding-agents-summary.md`. Срок: до конца Q2 2026.
 
 ## 2. Context and Scope (Контекст и границы)
 *   **In Scope (Что делаем):**
@@ -37,7 +37,7 @@ branch: epic/research-coding-agents-comparison
 ### 🔴 Must Have (Блокирующие требования)
 - [x] Каждый агент исследован по единой методологии из 10 критериев
 - [x] По каждому агенту создан отчёт в `docs/research/coding-agents/<agent-slug>-comparison.md`
-- [x] Сводная таблица в `docs/research/coding-agents-summary.md` со всеми 14 агентами
+- [x] Сводная таблица в `docs/research/coding-agents-summary.md` со всеми 18 агентами
 - [x] Чёткий вердикт по каждому: подходит / частично подходит / не подходит — с обоснованием
 - [x] Итоговые рекомендации по приоритетам интеграции
 
@@ -59,9 +59,9 @@ branch: epic/research-coding-agents-comparison
 
 Исследование проводится в два этапа:
 
-**Этап 1 — Индивидуальные research-задачи (14 задач, параллельные):** каждая задача изучает один CLI-агент, пишет отдельный comparison-документ и заполняет свою строку в сводной таблице `docs/research/coding-agents-summary.md`. Задачи независимы, могут выполняться параллельно разными сабагентами.
+**Этап 1 — Индивидуальные research-задачи (18 задач, параллельные):** каждая задача изучает один CLI-агент, пишет отдельный comparison-документ и заполняет свою строку в сводной таблице `docs/research/coding-agents-summary.md`. Задачи независимы, могут выполняться параллельно разными сабагентами.
 
-**Этап 2 — Финальная задача:** после завершения всех 14 исследований финальная задача проверяет полноту таблицы, выявляет тренды, ранжирует агенты и составляет итоговые рекомендации.
+**Этап 2 — Финальная задача:** после завершения всех 18 исследований финальная задача проверяет полноту таблицы, выявляет тренды, ранжирует агенты и составляет итоговые рекомендации.
 
 Все отчёты размещаются в `docs/research/coding-agents/`.
 
@@ -80,7 +80,7 @@ branch: epic/research-coding-agents-comparison
 
 ```mermaid
 flowchart LR
-    A[14 Research Tasks] -->|individual reports| B[docs/research/coding-agents/]
+    A[18 Research Tasks] -->|individual reports| B[docs/research/coding-agents/]
     A -->|fill rows| C[coding-agents-summary.md]
     D[Summary Task] -->|verify & analyze| C
     D -->|rank & recommend| E[Final Recommendations]
@@ -105,17 +105,22 @@ flowchart LR
 - [x] [TASK-research-copilot-cli](TASK-research-copilot-cli.todo.md) — GitHub Copilot CLI (проприетарный)
 - [x] [TASK-research-hermes-agent](TASK-research-hermes-agent.todo.md) — Hermes (Nous Research)
 
+
+### Этап 1i: Дополнительные исследования (2026-07-24)
+
+- [x] [TASK-research-omp-coding-agent](TASK-research-omp-coding-agent.todo.md) — omp / Oh My Pi (`@oh-my-pi/pi-coding-agent`, MIT, TypeScript+Bun+Rust), форк Pi от can1357. Вердикт ✅ Подходит (10/10): новый кандидат #1, Pi остаётся fallback/baseline.
+
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
 - [x] [TASK-research-coding-agents-summary](TASK-research-coding-agents-summary.todo.md) — Сводная таблица и итоговые рекомендации
 
 ### Этап 1d: Дополнительные исследования (2026-05-13)
 
-- [ ] [TASK-research-codebuff](TASK-research-codebuff.todo.md) — Codebuff (TypeScript, Apache-2.0, мультиагентный)
+- [x] [TASK-research-codebuff](TASK-research-codebuff.todo.md) — Codebuff (TypeScript, Apache-2.0, мультиагентный)
 
 ### Этап 1e: Дополнительные исследования (2026-05-20)
 
-- [x] [TASK-research-zeroclaw-agent](done/TASK-research-zeroclaw-agent.todo.md) — Zeroclaw (zeroclaw-labs, Rust, agent runtime)
+- [x] [TASK-research-zeroclaw-agent](TASK-research-zeroclaw-agent.todo.md) — Zeroclaw (zeroclaw-labs, Rust, agent runtime)
 
 - [x] ~~TASK-research-oh-my-openagent~~ → перенесён в EPIC-research-agent-frameworks-comparison (OmO — система оркестрации, не кодинг-агент)
 
@@ -124,7 +129,7 @@ flowchart LR
 - [x] [TASK-research-zcode-coding-agent](TASK-research-zcode-coding-agent.todo.md) — ZCode (Z.AI / Zhipu, desktop GUI-агент, GLM-5.2) *(PR #269, merge подтверждён пользователем)*
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [x] Все 14 индивидуальных research-задач выполнены
+- [x] Все 18 индивидуальных research-задач выполнены
 - [x] Каждый comparison-документ создан в `docs/research/coding-agents/`
 - [x] Сводная таблица `docs/research/coding-agents-summary.md` создана и заполнена
 - [x] По каждому агенту есть вердикт: подходит / частично подходит / не подходит
@@ -134,9 +139,9 @@ flowchart LR
 Не требуется — эпик содержит только исследовательские задачи (docs).
 
 ## 8. Risks and Dependencies (Риски и зависимости)
-- 14 агентов — значительный объём исследования
+- 18 агентов — значительный объём исследования
 - Многие агенты активно развиваются — информация может устареть
-- Проприетарные продукты (Claude Code, Copilot CLI, Gemini CLI) — анализ только по документации
+- Проприетарные продукты (Claude Code, Factory Droid, ZCode, GitHub Copilot CLI) — анализ только по документации
 - Названия некоторых агентов могут быть неоднозначны — нужно уточнять, какой именно проект имеется в виду
 - Разные языки/экосистемы (TypeScript, Rust, Go, Python) — оценка применимости паттернов
 
@@ -146,10 +151,11 @@ flowchart LR
 - Ссылки на репозитории и документацию — в индивидуальных задачах
 
 ## 10. Comments (Комментарии)
-Эпик объединяет исследование CLI-агентов кодинга в единый трек с чётким финальным артефактом — сводной таблицей. Задачи Этапа 1 можно выполнять в любом порядке и параллельно. Задача Этапа 2 запускается только после завершения всех 14 исследований. Pi Coding Agent уже подключён как сабагент — его исследование послужит референс-точкой и бенчмарком для остальных.
+Эпик объединяет исследование CLI-агентов кодинга в единый трек с чётким финальным артефактом — сводной таблицей. Задачи Этапа 1 можно выполнять в любом порядке и параллельно. Задача Этапа 2 запускается только после завершения всех 18 исследований. Pi Coding Agent уже подключён как сабагент — его исследование послужит референс-точкой и бенчмарком для остальных.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-05-09 | Тимлид (Алекс) | Создание эпика |
 | 2026-06-17 | Аналитик (Шерлок) | Stage 1h: исследование ZCode (Z.AI) добавлено. Вердикт ❌ Не подходит (4/10) — desktop GUI без headless/JSON-режима (К6 — блокер). Возникший вопрос о необходимости research во втором эпике (`agent-frameworks`) закрыт: субагенты ZCode (read-only Explore + roadmap кастомных) — feature продукта, а не система оркестрации; отдельного исследования в `EPIC-research-agent-frameworks-comparison` не требуется. |
+| 2026-07-24 | Аналитик (Шерлок) | Stage 1i: добавлено исследование omp (Oh My Pi). Сводка обновлена до 18 исследований; omp поставлен #1 как надмножество Pi, Pi сохранён как baseline/fallback. |
