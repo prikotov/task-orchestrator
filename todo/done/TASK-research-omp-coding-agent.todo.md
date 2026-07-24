@@ -10,7 +10,7 @@ epic: EPIC-research-coding-agents-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-omp-coding-agent
-pr:
+pr: "#317"
 status: done
 ---
 
