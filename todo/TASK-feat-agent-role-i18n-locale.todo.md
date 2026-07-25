@@ -1,6 +1,7 @@
 ---
 type: feat
 created: 2026-07-01
+updated: 2026-07-25
 value: V1
 complexity: C2
 priority: P3
@@ -10,7 +11,7 @@ author: Бэкендер (Левша)
 assignee:
 branch:
 pr:
-status: backlog
+status: todo
 ---
 
 # TASK-feat-agent-role-i18n-locale: Локаль-зависимое поведение become-role (i18n)
@@ -29,15 +30,16 @@ status: backlog
 ## 1. Concept and Goal (Концепция и Цель)
 
 ### Goal (Цель по SMART)
-Реализовать локаль-зависимое поведение `become-role` (header каталога skills + приоритет role-file) через существующий env `APP_LOCALE`, когда в проекте появятся локализованные роли помимо `.ru.md`.
+Реализовать локаль-зависимое поведение `become-role` (header каталога skills + приоритет role-file) через существующий env `APP_LOCALE`; **default библиотеки — `en`**, локализованный контент (роли/skills) подключается по мере появления.
 
 ## 2. Context and Scope (Контекст и границы)
 
 ### In Scope (Что делаем)
-- Параметр `task_orchestrator.locale` (Kernel, из env `APP_LOCALE`, default `ru`).
+- Параметр `task_orchestrator.locale` (Kernel, из env `APP_LOCALE`, **default `en`** — нейтральный default библиотеки как зависимости).
 - `FormatSkillCatalogService`: карта `locale → перевод header'а` (`ru`, `en`, `zh`, …), fallback на `en` (формат pi).
 - `FilesystemLocateRoleFileService` + `become-role.sh`: приоритет `<role>.<locale>.md` → `<role>.md` → любой `<role>.*.md`.
 - `AGENTS.md`: фиксация языка проекта по `APP_LOCALE` (модель отвечает на локали).
+- Собственный проект task-orchestrator: `APP_LOCALE=ru` в `.env` — сохранить текущнее русское поведение для своих `.ru.md`-ролей (library default `en` на это не влияет).
 
 ### Out of Scope (Чего НЕ делаем)
 - Перевод самих ролей (role-files) — отдельная задача локализации контента.
@@ -60,16 +62,18 @@ status: backlog
 5. Тесты на локаль (ru/en/zh + fallback).
 
 ## 5. Definition of Done (Критерии приёмки)
-- `APP_LOCALE=en` → английский header skills + приоритет `.en.md`.
-- `APP_LOCALE=ru` → русский header + `.ru.md` (текущее поведение).
-- Fallback на `en`/`.md` при отсутствии перевода/файла.
+- `APP_LOCALE` не задан (или `=en`) → default библиотеки `en`: английский header skills + приоритет `.en.md`.
+- `APP_LOCALE=ru` → русский header + `.ru.md` (текущее поведение сохраняется через `.env` собственного проекта, а не через library default).
+- Fallback на `en`/`<role>.md` при отсутствии перевода/файла.
 
 ## 6. Verification (Самопроверка)
 - [ ] make check зелёный.
 - [ ] Тесты на ru/en/zh + fallback.
 
 ## 7. Risks and Dependencies (Риски и зависимости)
-- Триггер — появление локализованных ролей (пока только `.ru.md`). До этого задача преждевременна (YAGNI).
+- Триггер (видимая ценность) — появление локализованных ролей; пока все роли только `.ru.md`. Само plumbing локали можно строить уже сейчас.
+- ✅ Предусловие выполнено (2026-07-25): env `APP_LOCALE` разрешается корректно через idiomatic env-default (`parameters.env(APP_LOCALE): en` в `config/packages/translation.yaml`, ветка `task/fix-app-locale-env-default`). Раньше `default:en:APP_LOCALE` бросал `Invalid env fallback ... parameter "en" not found`, и любой параметр из `APP_LOCALE` наследовал этот латентный баг.
+- ✅ Решено (2026-07-25): default `task_orchestrator.locale` = `en` (нейтральный default библиотеки как зависимости; task-orchestrator развивается как глобальный проект). task-orchestrator как собственный проект ставит `APP_LOCALE=ru` в `.env` для своих `.ru.md`-ролей — library default на это не влияет.
 
 ## 8. Sources (Источники)
 - `config/packages/translation.yaml` (`APP_LOCALE`).
