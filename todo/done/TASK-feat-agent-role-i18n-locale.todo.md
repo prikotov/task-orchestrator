@@ -10,8 +10,8 @@ epic:
 author: Бэкендер (Левша)
 assignee: Бэкендер Левша
 branch: task/feat-agent-role-i18n-locale
-pr:
-status: in_progress
+pr: '#319'
+status: done
 ---
 
 # TASK-feat-agent-role-i18n-locale: Локаль-зависимое поведение become-role (i18n)
