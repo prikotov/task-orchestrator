@@ -19,16 +19,9 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\RoleProm
  * (нейтральный) → любой доступный перевод `<role>.*.md` — единый env APP_LOCALE
  * управляет выбором role-файла во всех точках приложения.
  *
- * ⚠️ Эквивалентность гарантирована для проектной схемы именования локалей как
- * двух строчных латинских букв (`<role>.<locale>.md` / `<role>.md`, см.
- * {@see deriveRoleName()} и {@see deriveFileLocale()}): шаг 3 «любой перевод»
- * здесь парсит суффикс строго как `[a-z]{2}`, тогда как эталонный `FilesystemLocateRoleFileService`
- * на шаге 3 использует жадный glob `<role>.*.md`. Для двухбуквенных локалей
- * поведения совпадают; формальное расхождение есть лишь для имён файлов с
- * суффиксом, не подпадающим под `[a-z]{2}` (например `<role>.<fr-BR>.md` или
- * `<role>.v2.md`) — такие варианты вне проектной схемы именования и этим
- * сервисом на шаге 3 не распознаются как переводы. Фиксируется в PHPDoc, чтобы
- * не вводить в заблуждение утверждением о полной идентичности.
+ * ⚠️ Эквивалентность гарантируется для двухбуквенных строчных локалей;
+ * формальное расхождение на шаге 3 — см. {@see selectFileForRole()} и
+ * {@see deriveFileLocale()}.
  */
 final class RolePromptBuilderService implements RolePromptBuilderServiceInterface
 {
@@ -36,9 +29,6 @@ final class RolePromptBuilderService implements RolePromptBuilderServiceInterfac
 
     private string $basePath;
 
-    /**
-     * Нормализованная (strtolower) локаль приложения для выбора файла роли.
-     */
     private string $locale;
 
     /** @var array<string, string>|null role-name => содержимое выбранного файла */
@@ -105,14 +95,8 @@ final class RolePromptBuilderService implements RolePromptBuilderServiceInterfac
     }
 
     /**
-     * Загружает кэш ролей из файловой системы (ленивая загрузка).
-     *
-     * Сканирует каталог ролей, группирует файлы по имени роли (имя выводится
-     * из basename — без расширения `.md` и без суффикса локали из двух строчных
-     * букв: `backend_developer_levsha.ru.md` → `backend_developer_levsha`) и для
-     * каждой роли выбирает единственный файл по fallback-цепочке. Список
-     * доступных ролей после рефакторинга включает ВСЕ роли каталога (любой
-     * перевод или нейтральный файл), а не только файлы под фиксированную локаль.
+     * Список доступных ролей включает ВСЕ роли каталога (любой перевод или
+     * нейтральный файл), а не только файлы под фиксированную локаль.
      */
     private function loadCache(): void
     {
@@ -182,9 +166,6 @@ final class RolePromptBuilderService implements RolePromptBuilderServiceInterfac
         return $candidates[0]['path'];
     }
 
-    /**
-     * Извлекает описание роли из первой строки markdown (заголовок #).
-     */
     private function extractDescription(string $content): string
     {
         $lines = explode("\n", $content);
@@ -199,14 +180,9 @@ final class RolePromptBuilderService implements RolePromptBuilderServiceInterfac
     }
 
     /**
-     * Выводит имя роли из имени файла.
-     *
-     * Убирает расширение `.md` и опциональный суффикс локали из двух строчных
-     * букв (`.ru`, `.en`, `.zh`). Совпадает с логикой модуля AgentRole
-     * (`RoleNameVo::createFromFileName`) — дублирование осознанное, модули
-     * изолированы по DDD.
-     *
-     * Пример: `backend_developer_levsha.ru.md` → `backend_developer_levsha`.
+     * Дублирует логику модуля AgentRole (`RoleNameVo::createFromFileName`):
+     * осознанное решение — модули изолированы по DDD и не должны зависеть
+     * друг от друга.
      */
     private function deriveRoleName(string $fileName): string
     {
@@ -224,10 +200,6 @@ final class RolePromptBuilderService implements RolePromptBuilderServiceInterfac
         return $name;
     }
 
-    /**
-     * Возвращает локаль файла (две строчные буквы перед расширением) либо null,
-     * если файл локаль-нейтральный (`<role>.md` без суффикса локали).
-     */
     private function deriveFileLocale(string $fileName): ?string
     {
         $name = basename($fileName);
