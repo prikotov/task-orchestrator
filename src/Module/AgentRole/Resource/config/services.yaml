@@ -40,6 +40,11 @@ services:
   TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemLocateRoleFileService:
     arguments:
       $rolesDir: '%module.agent_role.roles_dir%'
+      $locale: '%task_orchestrator.locale%'
+
+  TaskOrchestrator\Common\Module\AgentRole\Domain\Service\FormatSkillCatalogService:
+    arguments:
+      $locale: '%task_orchestrator.locale%'
 
   TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\YamlLoadSkillFrontmatterService:
     arguments:

@@ -11,8 +11,9 @@ use TaskOrchestrator\Common\Module\AgentRole\Domain\ValueObject\RoleNameVo;
  * Locates (находит) файл роли по её имени.
  *
  * Инфраструктурный контракт: реализация выполняет поиск в каталоге ролей
- * (`task_orchestrator.roles_dir`), учитывая локаль файла (например,
- * `<role>.ru.md`).
+ * (`task_orchestrator.roles_dir`) с учётом локали приложения (env APP_LOCALE).
+ * Приоритет: `<role>.<locale>.md` → `<role>.md` (локаль-нейтральный) →
+ * glob `<role>.*.md` (первый найденный перевод).
  */
 interface LocateRoleFileServiceInterface
 {

@@ -15,6 +15,12 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\RoleProm
  */
 final class RolePromptBuilderService implements RolePromptBuilderServiceInterface
 {
+    /**
+     * @techdebt 2026-07-25 Захардкоженная ru-локаль — второй независимый резолвер
+     * role-файла (расхождение с AgentRole FilesystemLocateRoleFileService, где
+     * локаль берётся из env APP_LOCALE с fallback-цепочкой). Унификация —
+     * задача TASK-techdebt-chain-execution-role-i18n.
+     */
     private const DEFAULT_LOCALE = 'ru';
 
     private string $rolesDir;

@@ -127,6 +127,8 @@ final class KernelIntegrationTest extends TestCase
             $container = $kernel->getContainer();
             // Не задано → дефолт 'en'.
             self::assertSame('en', $container->getParameter('kernel.default_locale'));
+            // task_orchestrator.locale (Kernel, из $_SERVER напрямую) — тот же дефолт 'en'.
+            self::assertSame('en', $container->getParameter('task_orchestrator.locale'));
             // translator конструируется, читая локаль — раньше падал здесь.
             self::assertNotNull($container->get('translator'));
         } finally {
@@ -149,6 +151,8 @@ final class KernelIntegrationTest extends TestCase
             $kernel->boot();
 
             self::assertSame('ru', $kernel->getContainer()->getParameter('kernel.default_locale'));
+            // task_orchestrator.locale следует APP_LOCALE (lower-case).
+            self::assertSame('ru', $kernel->getContainer()->getParameter('task_orchestrator.locale'));
         } finally {
             $kernel->shutdown();
             unset($_SERVER['APP_CACHE_DIR']);

@@ -18,7 +18,7 @@ final class FormatSkillCatalogServiceTest extends TestCase
     public function formatEmptySkillsReturnsEmptyString(): void
     {
         // Arrange
-        $formatter = new FormatSkillCatalogService();
+        $formatter = new FormatSkillCatalogService('en');
 
         // Act
         $result = $formatter->format([]);
@@ -31,7 +31,7 @@ final class FormatSkillCatalogServiceTest extends TestCase
     public function formatSingleSkillProducesAgentskillsXmlBlock(): void
     {
         // Arrange
-        $formatter = new FormatSkillCatalogService();
+        $formatter = new FormatSkillCatalogService('ru');
         $skill = $this->buildSkill('run-subagent', 'Запуск сабагента', '/abs/run-subagent/SKILL.md');
 
         // Act
@@ -51,7 +51,7 @@ final class FormatSkillCatalogServiceTest extends TestCase
     public function formatEscapesXmlSpecialCharactersInValues(): void
     {
         // Arrange
-        $formatter = new FormatSkillCatalogService();
+        $formatter = new FormatSkillCatalogService('ru');
         $skill = $this->buildSkill(
             'pdf-processing',
             'Extract <PDF> & "fill" forms \'now\'',
@@ -66,6 +66,66 @@ final class FormatSkillCatalogServiceTest extends TestCase
         self::assertStringContainsString('&amp;', $result);
         self::assertStringContainsString('&quot;fill&quot;', $result);
         self::assertStringContainsString('&apos;now&apos;', $result);
+    }
+
+    #[Test]
+    public function formatWithRuLocaleProducesRussianHeader(): void
+    {
+        // Arrange
+        $formatter = new FormatSkillCatalogService('ru');
+
+        // Act
+        $result = $formatter->format([$this->buildSkill('demo', 'desc', '/d/SKILL.md')]);
+
+        // Assert: русскоязычный header.
+        self::assertStringContainsString('Следующие skills предоставляют', $result);
+        self::assertStringContainsString('загрузи его SKILL.md инструментом read', $result);
+        self::assertStringNotContainsString('The following skills provide', $result);
+    }
+
+    #[Test]
+    public function formatWithEnLocaleProducesEnglishHeader(): void
+    {
+        // Arrange
+        $formatter = new FormatSkillCatalogService('en');
+
+        // Act
+        $result = $formatter->format([$this->buildSkill('demo', 'desc', '/d/SKILL.md')]);
+
+        // Assert: англоязычный header (формат pi formatSkillsForPrompt).
+        self::assertStringContainsString('The following skills provide specialized instructions', $result);
+        self::assertStringContainsString("skill's description — load its SKILL.md using the read tool", $result);
+        self::assertStringNotContainsString('Следующие skills', $result);
+    }
+
+    #[Test]
+    public function formatWithZhLocaleProducesChineseHeader(): void
+    {
+        // Arrange
+        $formatter = new FormatSkillCatalogService('zh');
+
+        // Act
+        $result = $formatter->format([$this->buildSkill('demo', 'desc', '/d/SKILL.md')]);
+
+        // Assert: перевод header'а на китайский.
+        self::assertStringContainsString('以下技能为特定任务提供专门说明', $result);
+        self::assertStringContainsString('用 read 工具加载该技能的 SKILL.md', $result);
+        self::assertStringNotContainsString('The following skills provide', $result);
+    }
+
+    #[Test]
+    public function formatWithUnknownLocaleFallsBackToEnglishHeader(): void
+    {
+        // Arrange: неизвестная локаль → fallback на en (default библиотеки).
+        $formatter = new FormatSkillCatalogService('fr');
+
+        // Act
+        $result = $formatter->format([$this->buildSkill('demo', 'desc', '/d/SKILL.md')]);
+
+        // Assert
+        self::assertStringContainsString('The following skills provide specialized instructions', $result);
+        self::assertStringNotContainsString('Следующие skills', $result);
+        self::assertStringNotContainsString('以下技能', $result);
     }
 
     private function buildSkill(string $name, string $description, string $location): SkillMetadataVo

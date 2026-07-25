@@ -44,7 +44,7 @@ container-параметра, а не литерал → бросал `Invalid e
 
 - **Где делаем:** `config/packages/translation.yaml`, `tests/Integration/DependencyInjection/KernelIntegrationTest.php`.
 - **Текущее поведение:** `default:en:APP_LOCALE` бросал "parameter 'en' not found".
-- **Границы (Out of Scope):** локаль-зависимое поведение become-role — отдельная задача `TASK-feat-agent-role-i18n-locale` (промотирована в `todo/`).
+- **Границы (Out of Scope):** локаль-зависимое поведение become-role — отдельная задача `TASK-feat-agent-role-i18n-locale` (выполнена, см. `todo/done/`, PR #319).
 
 ## 3. Requirements (Требования, MoSCoW)
 
