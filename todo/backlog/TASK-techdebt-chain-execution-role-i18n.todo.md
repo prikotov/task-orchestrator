@@ -7,10 +7,10 @@ priority: P3
 depends_on:
 epic:
 author: Тимлид Алекс
-assignee:
-branch:
+assignee: Бэкендер Левша
+branch: task/chain-execution-role-i18n
 pr:
-status: backlog
+status: in_progress
 ---
 
 # TASK-techdebt-chain-execution-role-i18n: Локаль-зависимый выбор role-file в ChainExecution
