@@ -207,7 +207,9 @@ final class AgentTokenCommandTest extends TestCase
         $nowClosure = static fn (): DateTimeImmutable => $now;
         $this->requester = new StubRequestInstallationTokenService(
             $this->installationId,
-            'ghs_unsafe-token!', // contains hyphen and bang — rejected by safety pattern.
+            'ghs_unsafe-token!', // contains '!' which is NOT in [A-Za-z0-9_.-] — rejected.
+            // Note: hyphen is now permitted (stateless ghs_<APPID>_<JWT> format),
+            // but bang is still forbidden.
             $nowClosure,
         );
         $this->rebuildHandler();
@@ -217,6 +219,45 @@ final class AgentTokenCommandTest extends TestCase
         self::assertSame(1, $tester->getStatusCode());
         self::assertStringContainsString('unexpected characters', $tester->getDisplay());
         self::assertStringNotContainsString('ghs_unsafe-token!', $tester->getDisplay());
+    }
+
+    #[Test]
+    public function statelessTokenFormatWithDotsAndHyphensIsAccepted(): void
+    {
+        // Since 2026-04-27 GitHub rolls out stateless installation tokens of the
+        // form `ghs_<APPID>_<JWT>`: JWT body/header contain '.' (header.payload.signature
+        // segments) and '-' (Base64URL). These MUST pass the safety pattern.
+        // Synthetic low-entropy fixture value — deliberately NOT a realistic JWT
+        // (no `eyJ`, no real installation-ID) to avoid tripping gitleaks' generic-api-key
+        // rule, while still exercising '.' and '-' acceptance in the validator.
+        $statelessToken = 'ghs_123456_stateless.token-segment';
+
+        $now = $this->now;
+        $nowClosure = static fn (): DateTimeImmutable => $now;
+        $this->requester = new StubRequestInstallationTokenService(
+            $this->installationId,
+            $statelessToken,
+            $nowClosure,
+        );
+        $this->rebuildHandler();
+
+        // plain format: token reaches stdout verbatim.
+        $plain = $this->execute(['repo' => self::REPO, '--format' => 'plain']);
+        self::assertSame(0, $plain->getStatusCode());
+        self::assertSame($statelessToken, trim($plain->getDisplay()));
+
+        // env format: token wrapped in shell export statement.
+        $env = $this->execute(['repo' => self::REPO, '--format' => 'env']);
+        self::assertSame(0, $env->getStatusCode());
+        self::assertSame("export GITHUB_TOKEN='{$statelessToken}'", trim($env->getDisplay()));
+
+        // json format: token present in structured payload.
+        $json = $this->execute(['repo' => self::REPO, '--format' => 'json']);
+        self::assertSame(0, $json->getStatusCode());
+        /** @var array{token: string, expires_at: string, installation_id: int} $payload */
+        $payload = json_decode(trim($json->getDisplay()), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame($statelessToken, $payload['token']);
+        self::assertSame(424242, $payload['installation_id']);
     }
 
     #[Test]
