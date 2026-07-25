@@ -18,6 +18,8 @@
 
 # Local dev tools (Box/Phar-building, not distributed)
 /.tools/
+# .env.local игнорируется git и грузится bin/* вручную.
+# .env.example — закоммиченный шаблон, НЕ игнорируется.
 .env.local
 
 # Local secrets (e.g. GitHub App PEM for agent:token command)

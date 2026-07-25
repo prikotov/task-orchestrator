@@ -2,6 +2,12 @@
 type: feat
 created: 2026-07-01
 updated: 2026-07-25
+value: V1
+complexity: C2
+priority: P3
+depends_on:
+epic:
+author: Бэкендер (Левша)
 assignee: Бэкендер Левша
 branch: task/feat-agent-role-i18n-locale
 pr:
@@ -19,7 +25,9 @@ status: in_progress
 Когда появятся локализованные роли (`.en.md`, `.zh.md`): сделать `APP_LOCALE` единым источником локали; `FormatSkillCatalogService` и `FilesystemLocateRoleFileService` принимают локаль (через DI-параметр `task_orchestrator.locale`); header skills и поиск role-file — по локали с fallback на `en`-формат / `<role>.md`.
 
 ### Ожидаемый результат (Expected Result)
-Один env `APP_LOCALE` управляет языком header'а skills и выбором role-file во всех точках (PHP-сервисы, bash-скрипты). Роли и skills локализуются по локали проекта.
+Один env `APP_LOCALE` управляет языком header'а skills и выбором role-файла в механике `become-role` (модуль AgentRole: PHP-сервисы `FormatSkillCatalogService`/`FilesystemLocateRoleFileService` + `become-role.sh`). Роли и skills локализуются по локали проекта.
+
+> ⚠️ Scope ограничен AgentRole/`become-role`. Независимый резолвер role-файла в ChainExecution (`RolePromptBuilderService`) оставлен ru-hardcoded и не входит в эту задачу — см. Out of Scope и техдолг-задачу `TASK-techdebt-chain-execution-role-i18n`.
 
 ## 1. Concept and Goal (Концепция и Цель)
 
@@ -38,12 +46,13 @@ status: in_progress
 ### Out of Scope (Чего НЕ делаем)
 - Перевод самих ролей (role-files) — отдельная задача локализации контента.
 - Локализация `docs/` и SKILL.md — вне механики become-role.
+- Локаль-зависимый выбор role-файла в ChainExecution (`RolePromptBuilderService`) — отдельная техдолг-задача `TASK-techdebt-chain-execution-role-i18n`; расхождение локаль-механики между модулями вынесено из этого PR по итогам code review (AGENTS.md: отдельный PR для межмодульных изменений).
 
 ## 3. Requirements (Требования, MoSCoW)
 
 ### 🔴 Must Have
-- [ ] `task_orchestrator.locale` из `APP_LOCALE`.
-- [ ] Header skills и поиск role-file по локали.
+- [x] `task_orchestrator.locale` из `APP_LOCALE`.
+- [x] Header skills и поиск role-file по локали.
 
 ### ⟫ Won't Have (Не будем делать)
 - Перевод контента ролей/docs — это задача авторов, не кода.
@@ -57,17 +66,18 @@ status: in_progress
 
 ## 5. Definition of Done (Критерии приёмки)
 - `APP_LOCALE` не задан (или `=en`) → default библиотеки `en`: английский header skills + приоритет `.en.md`.
-- `APP_LOCALE=ru` → русский header + `.ru.md` (текущее поведение сохраняется через `.env` собственного проекта, а не через library default).
+- `APP_LOCALE=ru` → русский header + `.ru.md` (текущее русское поведение сохраняется через `APP_LOCALE=ru` в `.env.local` собственного проекта; `.env` в проекте НЕ используется — Kernel не вызывает Dotenv, `bin/*` грузят только `.env.local`).
 - Fallback на `en`/`<role>.md` при отсутствии перевода/файла.
 
 ## 6. Verification (Самопроверка)
-- [ ] make check зелёный.
-- [ ] Тесты на ru/en/zh + fallback.
+- [x] make check зелёный.
+- [x] Тесты на ru/en/zh + fallback.
 
 ## 7. Risks and Dependencies (Риски и зависимости)
 - Триггер (видимая ценность) — появление локализованных ролей; пока все роли только `.ru.md`. Само plumbing локали можно строить уже сейчас.
 - ✅ Предусловие выполнено (2026-07-25): env `APP_LOCALE` разрешается корректно через idiomatic env-default (`parameters.env(APP_LOCALE): en` в `config/packages/translation.yaml`, ветка `task/fix-app-locale-env-default`). Раньше `default:en:APP_LOCALE` бросал `Invalid env fallback ... parameter "en" not found`, и любой параметр из `APP_LOCALE` наследовал этот латентный баг.
 - ✅ Решено (2026-07-25): default `task_orchestrator.locale` = `en` (нейтральный default библиотеки как зависимости; task-orchestrator развивается как глобальный проект). task-orchestrator как собственный проект ставит `APP_LOCALE=ru` в `.env` для своих `.ru.md`-ролей — library default на это не влияет.
+- ⚠️ Расхождение с ChainExecution (2026-07-25, по итогам code review Пуаро): `RolePromptBuilderService` (модуль ChainExecution) — второй независимый резолвер role-файла, держит локаль захардкоженной (`DEFAULT_LOCALE = 'ru'`). Эта задача его не трогает (In-Scope = AgentRole/`become-role`); унификация вынесена в техдолг `TASK-techdebt-chain-execution-role-i18n`. Текущее поведение ChainExecution не регрессирует.
 
 ## 8. Sources (Источники)
 - `config/packages/translation.yaml` (`APP_LOCALE`).

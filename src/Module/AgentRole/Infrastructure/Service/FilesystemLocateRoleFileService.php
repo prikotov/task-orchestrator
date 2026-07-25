@@ -18,14 +18,19 @@ use TaskOrchestrator\Common\Module\AgentRole\Domain\ValueObject\RoleNameVo;
 /**
  * Поиск файла роли в каталоге ролей (roles_dir) по имени роли.
  *
- * Учитывает локаль файла: предпочтение отдаётся `<role>.ru.md` (основная локаль
- * проекта), затем `<role>.md`, затем любой `<role>.<locale>.md` (первый найденный).
+ * Учитывает локаль файла: предпочтение отдаётся `<role>.<locale>.md` (локаль
+ * приложения из env APP_LOCALE), затем `<role>.md` (локаль-нейтральный), затем
+ * любой `<role>.*.md` (первый найденный).
  */
 final readonly class FilesystemLocateRoleFileService implements LocateRoleFileServiceInterface
 {
+    private string $locale;
+
     public function __construct(
         private string $rolesDir,
+        string $locale,
     ) {
+        $this->locale = strtolower($locale);
     }
 
     #[Override]
@@ -46,12 +51,17 @@ final readonly class FilesystemLocateRoleFileService implements LocateRoleFileSe
     }
 
     /**
+     * Кандидаты на файл роли в порядке приоритета:
+     *   1) `<role>.<locale>.md`  — текущая локаль приложения;
+     *   2) `<role>.md`           — локаль-нейтральный файл;
+     *   3) glob `<role>.*.md`    — любой доступный перевод (первый найденный).
+     *
      * @return list<string>
      */
     private function candidates(string $roleName): array
     {
         $explicit = [
-            $this->rolesDir . '/' . $roleName . '.ru.md',
+            $this->rolesDir . '/' . $roleName . '.' . $this->locale . '.md',
             $this->rolesDir . '/' . $roleName . '.md',
         ];
 
