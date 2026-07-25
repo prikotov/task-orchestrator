@@ -2,16 +2,10 @@
 type: feat
 created: 2026-07-01
 updated: 2026-07-25
-value: V1
-complexity: C2
-priority: P3
-depends_on:
-epic:
-author: Бэкендер (Левша)
-assignee:
-branch:
+assignee: Бэкендер Левша
+branch: task/feat-agent-role-i18n-locale
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-agent-role-i18n-locale: Локаль-зависимое поведение become-role (i18n)
