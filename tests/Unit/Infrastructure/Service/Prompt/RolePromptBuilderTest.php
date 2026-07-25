@@ -30,7 +30,7 @@ final class RolePromptBuilderTest extends TestCase
             "# Backend Developer (Бэкендер)\n\nWrite code.",
         );
 
-        $this->builder = new RolePromptBuilderService($this->fixtureDir, sys_get_temp_dir());
+        $this->builder = new RolePromptBuilderService($this->fixtureDir, sys_get_temp_dir(), 'ru');
     }
 
     protected function tearDown(): void

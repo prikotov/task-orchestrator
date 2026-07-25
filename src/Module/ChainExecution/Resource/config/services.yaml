@@ -107,6 +107,7 @@ services:
     arguments:
       $rolesDir: '%module.chain_execution.roles_dir%'
       $basePath: '%module.chain_execution.base_path%'
+      $locale: '%task_orchestrator.locale%'
 
   TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler:
     arguments:
