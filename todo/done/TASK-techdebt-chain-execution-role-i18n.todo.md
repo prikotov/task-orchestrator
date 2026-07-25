@@ -9,8 +9,8 @@ epic:
 author: Тимлид Алекс
 assignee: Бэкендер Левша
 branch: task/chain-execution-role-i18n
-pr:
-status: in_progress
+pr: '#320'
+status: done
 ---
 
 # TASK-techdebt-chain-execution-role-i18n: Локаль-зависимый выбор role-file в ChainExecution
@@ -47,9 +47,9 @@ status: in_progress
 
 ### 🔴 Must Have (Обязательно)
 
-- [ ] `RolePromptBuilderService` принимает локаль через DI (`task_orchestrator.locale`), без захардкоженного `DEFAULT_LOCALE`.
-- [ ] Унифицированная fallback-цепочка выбора файла: `<role>.<locale>.md` → `<role>.md` → любой `<role>.*.md` (как в `FilesystemLocateRoleFileService`).
-- [ ] Тесты: ru/en/zh + fallback (locale-файл отсутствует → neutral → glob).
+- [x] `RolePromptBuilderService` принимает локаль через DI (`task_orchestrator.locale`), без захардкоженного `DEFAULT_LOCALE`.
+- [x] Унифицированная fallback-цепочка выбора файла: `<role>.<locale>.md` → `<role>.md` → любой `<role>.*.md` (как в `FilesystemLocateRoleFileService`).
+- [x] Тесты: ru/en/zh + fallback (locale-файл отсутствует → neutral → glob).
 
 ### ⟫ Won't Have (Не будем делать)
 
@@ -60,18 +60,18 @@ status: in_progress
 
 *Заполняется исполнителем перед стартом.*
 
-1. [ ] Убрать `DEFAULT_LOCALE`, добавить `string $locale` в конструктор `RolePromptBuilderService`, нормализация strtolower.
-2. [ ] Переработать `loadCache()` / `getPromptFilePath()` на fallback-цепочку по локали.
-3. [ ] DI: передать `%task_orchestrator.locale%` в определении сервиса.
-4. [ ] Тесты на локали и fallback.
-5. [ ] Проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`, `make deptrac` — зелёные.
+1. [x] Убрать `DEFAULT_LOCALE`, добавить `string $locale` в конструктор `RolePromptBuilderService`, нормализация strtolower.
+2. [x] Переработать `loadCache()` / `getPromptFilePath()` на fallback-цепочку по локали.
+3. [x] DI: передать `%task_orchestrator.locale%` в определении сервиса.
+4. [x] Тесты на локали и fallback.
+5. [x] Проверки: `vendor/bin/phpunit`, `vendor/bin/psalm`, `make deptrac` — зелёные.
 
 ## 5. Definition of Done (Критерии приёмки)
 
-- [ ] `RolePromptBuilderService` резолвит role-файл по `APP_LOCALE` с fallback как `FilesystemLocateRoleFileService`.
-- [ ] При `APP_LOCALE=en` и ролях в `.en.md` запуск цепочки работает (не падает `RoleNotFoundException`).
-- [ ] Снять метку `@techdebt` с `RolePromptBuilderService` (см. Sources).
-- [ ] `vendor/bin/phpunit`, `vendor/bin/psalm`, `make deptrac` — зелёные, без регрессий.
+- [x] `RolePromptBuilderService` резолвит role-файл по `APP_LOCALE` с fallback как `FilesystemLocateRoleFileService`.
+- [x] При `APP_LOCALE=en` и ролях в `.en.md` запуск цепочки работает (не падает `RoleNotFoundException`).
+- [x] Снять метку `@techdebt` с `RolePromptBuilderService` (см. Sources).
+- [x] `vendor/bin/phpunit`, `vendor/bin/psalm`, `make deptrac` — зелёные, без регрессий.
 
 ## 6. Verification (Самопроверка)
 
@@ -106,3 +106,4 @@ make deptrac
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-07-25 | Тимлид Алекс | Создание задачи по итогам code review Пуаро (major CR #1 по `TASK-feat-agent-role-i18n-locale`). Расхождение локаль-механики между AgentRole и ChainExecution вынесено в отдельный techdebt. |
+| 2026-07-25 | Тимлид Алекс | Реализация (Бэкендер Левша) → self-review → code review (Ревьювер Бэка Пуаро, conditional→resolved) завершены. PR #320. Задача переведена в `done`, файл перенесён в `todo/done/`. |
