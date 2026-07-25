@@ -2,7 +2,14 @@
 #
 # Модули, реализующие TranslationInterface, добавляют свои каталоги переводов
 # через ModuleKernelTrait (prepend-extension-config translator.paths).
+# Дефолт env-переменной APP_LOCALE, когда она не задана. Используем
+# идиоматичный env-default (parameters.env(VAR)): Symfony-процессор
+# `default:fallback:VAR` трактует fallback как имя container-параметра, а не
+# литерал, поэтому `default:en:APP_LOCALE` бросал "parameter 'en' not found".
+parameters:
+    env(APP_LOCALE): en
+
 framework:
-    default_locale: '%env(default:en:APP_LOCALE)%'
+    default_locale: '%env(APP_LOCALE)%'
     translator:
         fallbacks: ['en']
