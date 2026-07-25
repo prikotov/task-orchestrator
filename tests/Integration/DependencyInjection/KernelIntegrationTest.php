@@ -109,6 +109,94 @@ final class KernelIntegrationTest extends TestCase
         }
     }
 
+    #[Test]
+    public function frameworkDefaultLocaleFallsBackToEnWhenAppLocaleUnset(): void
+    {
+        // Regression для '%env(default:en:APP_LOCALE)%': Symfony-процессор
+        // `default:fallback:VAR` трактует fallback как имя container-параметра, а не
+        // литерал, поэтому при чтении локали бросало "parameter 'en' not found".
+        // Фикс — idiomatic env-default: parameters.env(APP_LOCALE): en.
+        $cacheDir = $this->createIsolatedCacheDir();
+        $_SERVER['APP_CACHE_DIR'] = $cacheDir;
+        $restore = $this->isolateEnvVar('APP_LOCALE', null);
+
+        try {
+            $kernel = new Kernel('test', false);
+            $kernel->boot();
+
+            $container = $kernel->getContainer();
+            // Не задано → дефолт 'en'.
+            self::assertSame('en', $container->getParameter('kernel.default_locale'));
+            // translator конструируется, читая локаль — раньше падал здесь.
+            self::assertNotNull($container->get('translator'));
+        } finally {
+            $kernel->shutdown();
+            unset($_SERVER['APP_CACHE_DIR']);
+            $restore();
+            $this->removeDirectory($cacheDir);
+        }
+    }
+
+    #[Test]
+    public function frameworkDefaultLocaleFollowsAppLocaleEnv(): void
+    {
+        $cacheDir = $this->createIsolatedCacheDir();
+        $_SERVER['APP_CACHE_DIR'] = $cacheDir;
+        $restore = $this->isolateEnvVar('APP_LOCALE', 'ru');
+
+        try {
+            $kernel = new Kernel('test', false);
+            $kernel->boot();
+
+            self::assertSame('ru', $kernel->getContainer()->getParameter('kernel.default_locale'));
+        } finally {
+            $kernel->shutdown();
+            unset($_SERVER['APP_CACHE_DIR']);
+            $restore();
+            $this->removeDirectory($cacheDir);
+        }
+    }
+
+    /**
+     * Изолирует env-переменную на время теста и возвращает restore-callback
+     * (вызвать в finally). $value = null — переменная снимается.
+     */
+    private function isolateEnvVar(string $name, ?string $value): \Closure
+    {
+        $hadServer = \array_key_exists($name, $_SERVER);
+        $server = $_SERVER[$name] ?? null;
+        $hadEnv = \array_key_exists($name, $_ENV);
+        $env = $_ENV[$name] ?? null;
+        $getenv = \getenv($name); // false, когда переменная не задана
+
+        if ($value === null) {
+            unset($_SERVER[$name], $_ENV[$name]);
+            \putenv($name);
+        } else {
+            $_SERVER[$name] = $value;
+            $_ENV[$name] = $value;
+            \putenv($name . '=' . $value);
+        }
+
+        return static function () use ($name, $hadServer, $server, $hadEnv, $env, $getenv): void {
+            if ($hadServer) {
+                $_SERVER[$name] = $server;
+            } else {
+                unset($_SERVER[$name]);
+            }
+            if ($hadEnv) {
+                $_ENV[$name] = $env;
+            } else {
+                unset($_ENV[$name]);
+            }
+            if ($getenv !== false) {
+                \putenv($name . '=' . $getenv);
+            } else {
+                \putenv($name);
+            }
+        };
+    }
+
     private function createIsolatedCacheDir(): string
     {
         return sys_get_temp_dir() . '/to-kernel-cache-' . bin2hex(random_bytes(6));
