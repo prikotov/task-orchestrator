@@ -17,9 +17,9 @@
 - `StaticExecutionStrategy::resume()` → `LogicException('Static chain does not support resume.')`
 - `ConditionalExecutionStrategy::resume()` → `LogicException('Conditional chain does not support resume.')`
 
-Только `DynamicExecutionStrategy` реализует resume через [`ChainSessionLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) — JSONL-based checkpoint/session mechanism.
+Только `DynamicExecutionStrategy` реализует resume через [`ChainSessionLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) — механизм чекпоинтов/сессий на основе JSONL (JSONL-based checkpoint/session mechanism).
 
-**Финансовая боль:** цепочка из 10 шагов, падение на 8-м → все результаты теряются. При стоимости LLM-вызова $0.50–$2.00 за шаг это потеря $3.50–$14.00 на каждый failed run.
+**Финансовая боль:** цепочка из 10 шагов, падение на 8-м → все результаты теряются. При стоимости LLM-вызова $0.50–$2.00 за шаг это потеря $3.50–$14.00 на каждый неудачный запуск (failed run).
 
 ### Существующая инфраструктура
 
@@ -28,10 +28,10 @@
 | [`ExecutionStrategyInterface::resume()`](../../src/Module/ChainDefinition/Application/Service/Chain/ExecutionStrategyInterface.php) | Контракт resume | Dynamic ✅, Static ❌, Conditional ❌ |
 | [`OrchestrateChainCommand::$resumeDir`](../../src/Module/ChainDefinition/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommand.php) | Путь к директории с checkpoint | Dynamic ✅ |
 | [`OrchestrateChainCommandHandler`](../../src/Module/ChainDefinition/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php) | Диспетчер: `resumeDir !== null` → `resume()` | Все стратегии |
-| [`ChainSessionLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) | JSONL session lifecycle (start/logRound/complete/resume) | Dynamic |
+| [`ChainSessionLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) | Жизненный цикл сессии JSONL (start/logRound/complete/resume) | Dynamic |
 | [`ChainSessionStateVo`](../../src/Module/ChainDefinition/Domain/ValueObject/ChainSessionStateVo.php) | VO восстановленного состояния | Dynamic |
-| [`AuditLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Audit/AuditLoggerInterface.php) | JSONL audit: logStepStart, logStepResult | Dynamic |
-| [`StaticChainExecution`](../../src/Module/StaticExecution/Domain/Entity/StaticChainExecution.php) | In-memory mutable state | Static (no persistence) |
+| [`AuditLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Audit/AuditLoggerInterface.php) | JSONL audit: `logStepStart`, `logStepResult` | Dynamic |
+| [`StaticChainExecution`](../../src/Module/StaticExecution/Domain/Entity/StaticChainExecution.php) | Изменяемое состояние в памяти (in-memory mutable state) | Static (no persistence) |
 | [`StaticAuditServiceInterface`](../../src/Module/StaticExecution/Domain/Service/StaticAuditServiceInterface.php) | Audit для static цепочек | Static (optional) |
 
 ### Почему сейчас не реализовано
@@ -40,7 +40,7 @@
 2. **`ChainSessionStateVo` — dynamic-specific:** содержит `facilitator`, `participants`, `discussionHistory`, `facilitatorJournal` — поля, не применимые к static/conditional.
 3. **`ConditionalExecutionStrategy` собирает `$context` на лету:** ассоциативный массив `stepName → {passed, exitCode, status}` накапливается итеративно — его нужно восстанавливать при resume.
 
-### Аналог: Dynamic resume flow
+### Аналог: поток resume для Dynamic (resume flow)
 
 ```
 resumeDir → ChainSessionLogger::resumeSession()
@@ -52,11 +52,11 @@ resumeDir → ChainSessionLogger::resumeSession()
 
 ## Решение
 
-Применить паттерн **Checkpoint + Resume** к static и conditional стратегиям, переиспользуя существующую JSONL-session инфраструктуру.
+Применить паттерн **Checkpoint + Resume** к static и conditional стратегиям, переиспользуя существующую инфраструктуру сессий JSONL (JSONL-session).
 
 ### Чекпоинт: что сохранять
 
-#### Static Chain Checkpoint
+#### Чекпоинт static-цепочки (Static Chain Checkpoint)
 
 ```json
 {
@@ -91,7 +91,7 @@ resumeDir → ChainSessionLogger::resumeSession()
 }
 ```
 
-#### Conditional Chain Checkpoint
+#### Чекпоинт conditional-цепочки (Conditional Chain Checkpoint)
 
 ```json
 {
@@ -112,7 +112,7 @@ resumeDir → ChainSessionLogger::resumeSession()
 
 ### Точка сохранения
 
-Checkpoint записывается **после каждого успешно выполненного шага** (post-step hook execution, но до budget check):
+Checkpoint записывается **после каждого успешно выполненного шага** (выполнение post-step hook, но до budget check):
 
 ```mermaid
 sequenceDiagram
@@ -133,7 +133,7 @@ sequenceDiagram
     Strategy-->>Handler: OrchestrateChainResultDto
 ```
 
-### Resume Flow
+### Поток resume (Resume Flow)
 
 ```mermaid
 sequenceDiagram
@@ -209,7 +209,7 @@ interface CheckpointReaderInterface {
 // resume() — восстановить condition_context, продолжить с шага N+1
 ```
 
-#### 5. `RunStaticChainService` — поддержка startOffset
+#### 5. `RunStaticChainService` — поддержка смещения старта (startOffset)
 
 Метод `execute()` получает опциональные параметры: `$startStepIndex`, `$previousResults`, `$restoredState`.
 
@@ -221,15 +221,15 @@ interface CheckpointReaderInterface {
 | `OrchestrateChainCommand::$resumeDir` | Без изменений. Уже передаётся в `resume()`. |
 | `OrchestrateChainCommandHandler` | Без изменений. Диспетчер уже роутит по `resumeDir`. |
 | `AuditLoggerInterface` | CheckpointWriter может делегировать audit-записи в `AuditLoggerInterface` для единообразия. |
-| `StaticAuditServiceInterface` | Продолжает работать параллельно. Audit ≠ checkpoint (audit = наблюдаемость, checkpoint = recovery). |
+| `StaticAuditServiceInterface` | Продолжает работать параллельно. Audit ≠ checkpoint (audit = наблюдаемость, checkpoint = восстановление (recovery)). |
 | `ChainSessionLoggerInterface` | Dynamic-специфичный. Не переиспользуется напрямую — слишком разные модели (rounds vs steps). |
 
 ### Критерий реализации (Q4 2026)
 
 | Условие | Значение |
 |---------|----------|
-| Триггер | Повторяющиеся падения static цепочек ≥5 шагов на проде, либо финансовая потеря > $50/месяц на re-runs |
-| Необходимые предпосылки | Стабильный hooks API (post_step hooks MVP завершён в Sprint 10) |
+| Триггер | Повторяющиеся падения static цепочек ≥5 шагов на проде, либо финансовая потеря > $50/месяц на повторные запуски (re-runs) |
+| Необходимые предпосылки | Стабильный hooks API (post_step hooks, MVP завершён в Sprint 10) |
 | Объём работ | ~300–400 LOC (Domain VO + интерфейсы + Infrastructure JSONL), ~200 LOC (изменения стратегий), ~500 LOC тесты |
 | Сроки | Q4 2026, Sprint 13–14 |
 | Зависимости | Нет блокирующих. Может выполняться параллельно с другими задачами. |
@@ -238,22 +238,22 @@ interface CheckpointReaderInterface {
 
 ### Положительные
 
-- **Экономия средств:** resume с 8-го шага вместо полного re-run экономит $3.50–$14.00 за failed run.
+- **Экономия средств:** resume с 8-го шага вместо полного повторного запуска (re-run) экономит $3.50–$14.00 за неудачный запуск (failed run).
 - **Единый UX:** `--resume <dir>` работает для всех трёх стратегий (static, conditional, dynamic).
 - **Без изменения контракта:** `ExecutionStrategyInterface::resume()` уже существует, меняем только реализацию.
-- **Append-only checkpoint:** JSONL-формат устойчив к partial writes (краш в середине записи = потеря последней строки, не всего файла).
+- **Чекпоинт с дозаписью (append-only):** JSONL-формат устойчив к частичным записям (partial writes; краш в середине записи = потеря последней строки, не всего файла).
 
 ### Отрицательные
 
-- **I/O overhead:** запись checkpoint после каждого шага добавляет disk I/O. Митигируется: JSONL append = O(1), данные минимальны (~1–5 КБ на шаг).
+- **Накладные расходы I/O (overhead):** запись checkpoint после каждого шага добавляет дисковый I/O (disk I/O). Митигируется: дозапись JSONL (append) = O(1), данные минимальны (~1–5 КБ на шаг).
 - **Состояние `StaticChainExecution` частично дублируется** в checkpoint. При реализации — продумать, не выделить ли checkpoint state в отдельный VO, который делегирует `StaticChainExecution`.
 - **Checkpoint валидность:** конфигурация цепочки может измениться между run и resume (шаги добавлены/удалены). Необходима валидация чексаммы или версии определения цепочки.
 
 ### Риски
 
-1. **Fix Iteration Groups + resume:** при resume в середине retry-группы (шаги 3→4→5 с retry) нужно корректно восстановить итерационное состояние. Сложность: medium.
-2. **Conditional context rebuilding:** при resume conditional-цепочки condition expressions переоцениваются. Если данные окружения изменились между run и resume — ветвление может пойти иначе. Это ожидаемое поведение (fresh evaluation), но должно быть задокументировано.
-3. **Backward compatibility:** существующие цепочки без checkpoint не ломаются — resume продолжает бросать `LogicException` до миграции. Миграция = transparent (checkpoint создаётся автоматически при следующем run).
+1. **Группы итераций исправления (Fix Iteration Groups) + resume:** при resume в середине retry-группы (шаги 3→4→5 с retry) нужно корректно восстановить итерационное состояние. Сложность: средняя (medium).
+2. **Пересборка контекста conditional (Conditional context rebuilding):** при resume conditional-цепочки выражения условий (condition expressions) переоцениваются. Если данные окружения изменились между run и resume — ветвление может пойти иначе. Это ожидаемое поведение (fresh evaluation), но должно быть задокументировано.
+3. **Обратная совместимость (backward compatibility):** существующие цепочки без checkpoint не ломаются — resume продолжает бросать `LogicException` до миграции. Миграция = прозрачна (transparent; checkpoint создаётся автоматически при следующем run).
 
 ## Альтернативы
 
@@ -263,39 +263,39 @@ interface CheckpointReaderInterface {
 
 **Плюсы:** меньше нового кода, единая session model.
 
-**Минусы:** `ChainSessionLoggerInterface` заточен под dynamic модель (rounds, facilitator, participants, discussionHistory). Поля `logRound()` (step, round, isFacilitator) не маппятся на static/conditional семантику. Результат: грязный mapping или раздувание интерфейса.
+**Минусы:** `ChainSessionLoggerInterface` заточен под dynamic модель (rounds, facilitator, participants, discussionHistory). Поля `logRound()` (step, round, isFacilitator) не маппятся на static/conditional семантику. Результат: грязный маппинг (mapping) или раздувание интерфейса.
 
-**Вердикт:** ❌ Отвергнуто. Semantic mismatch перевешивает экономию LOC. Лучше отдельный `CheckpointWriterInterface` с чистым контрактом.
+**Вердикт:** ❌ Отвергнуто. Семантическое несовпадение (semantic mismatch) перевешивает экономию LOC. Лучше отдельный `CheckpointWriterInterface` с чистым контрактом.
 
-### A2: In-memory checkpoint (no persistence)
+### A2: Чекпоинт в памяти (in-memory checkpoint, без persistence)
 
-Сохранять результаты в memory (array), доступные через `StaticChainExecution`.
+Сохранять результаты в памяти (memory, array), доступные через `StaticChainExecution`.
 
 **Плюсы:** ноль I/O, простота.
 
-**Минусы:** при crash процесса (OOM, segfault, power loss) все результаты теряются — та же проблема, что сейчас. Resume требует living process.
+**Минусы:** при сбое процесса (crash; OOM, segfault, power loss) все результаты теряются — та же проблема, что сейчас. Resume требует живого процесса (living process).
 
 **Вердикт:** ❌ Отвергнуто. Не решает исходную проблему (потеря результатов при crash).
 
-### A3: External state store (Redis / DB)
+### A3: Внешнее хранилище состояния (external state store; Redis / DB)
 
 Писать checkpoint в Redis или database.
 
-**Плюсы:** centralised, queryable, shared между instances.
+**Плюсы:** централизованное, запрашиваемое, разделяемое между экземплярами (centralised, queryable, shared between instances).
 
-**Минусы:** добавляет infrastructure dependency. Для CLI-first orchestration tool (единственный consumer — локальный процесс) это overengineering. JSONL-файлы уже доказали свою работоспособность в dynamic chains.
+**Минусы:** добавляет infrastructure dependency. Для инструмента оркестрации, ориентированного на CLI (CLI-first orchestration tool; единственный consumer — локальный процесс), это избыточное усложнение (overengineering). JSONL-файлы уже доказали свою работоспособность в dynamic chains.
 
-**Вердикт:** ❌ Отвергнуто на данном этапе. Может быть пересмотрено при появлении distributed orchestration (Q1 2027+).
+**Вердикт:** ❌ Отвергнуто на данном этапе. Может быть пересмотрено при появлении распределённой оркестрации (distributed orchestration; Q1 2027+).
 
-### A4: Partial re-execution с caching (no checkpoint)
+### A4: Частичное повторное выполнение с кэшированием (partial re-execution с caching, без checkpoint)
 
-Вместо checkpoint — кэшировать результаты шагов по (chainName + stepIndex + inputHash). При re-run проверять кэш.
+Вместо checkpoint — кэшировать результаты шагов по (`chainName` + `stepIndex` + `inputHash`). При повторном запуске (re-run) проверять кэш.
 
 **Плюсы:** не требует явного checkpoint — «автоматический» resume.
 
-**Минусы:** input hash сложен для LLM-вызовов (промпт может быть nondeterministic). Кэш invalidation — классическая проблема двух hard things. Нет гарантии, что закэшированный результат актуален.
+**Минусы:** хэш входных данных (input hash) сложен для LLM-вызовов (промпт может быть недетерминированным (nondeterministic)). Инвалидация кэша (cache invalidation) — классическая «проблема двух сложных вещей» (two hard things). Нет гарантии, что закэшированный результат актуален.
 
-**Вердикт:** ❌ Отвергнуто. Ненадёжно для nondeterministic AI-вызовов. Explicit checkpoint = предсказуемость.
+**Вердикт:** ❌ Отвергнуто. Ненадёжно для недетерминированных (nondeterministic) AI-вызовов. Явный чекпоинт (explicit checkpoint) = предсказуемость.
 
 ## Ссылки
 
@@ -303,6 +303,6 @@ interface CheckpointReaderInterface {
 - [ADR-008: Shared Kernel Contract](008-shared-kernel-contract.md) — общий kernel для модулей
 - [ADR-009: Dynamic остаётся в Orchestrator](009-dynamic-split-decision.md) — почему Dynamic не выделен в отдельный модуль
 - [ExecutionStrategyInterface](../../src/Module/ChainExecution/Application/Contract/Chain/ExecutionStrategyInterface.php) — контракт `resume()`
-- [ChainSessionLogger](../../src/Module/DynamicLoop/Infrastructure/Service/ChainSessionLogger.php) — reference implementation JSONL session
+- [ChainSessionLogger](../../src/Module/DynamicLoop/Infrastructure/Service/ChainSessionLogger.php) — эталонная реализация (reference implementation) сессии JSONL
 - [StaticChainExecution](../../src/Module/ChainExecution/Domain/Entity/StaticChainExecution.php) — in-memory state static-цепочки
 - [RunStaticChainService](../../src/Module/ChainExecution/Domain/Service/Static/RunStaticChainService.php) — цикл выполнения static-цепочки

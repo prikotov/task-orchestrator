@@ -13,10 +13,10 @@
 - Включённые PR: #238
 - Основные изменения:
   - обновлён `prikotov/git-workflow`: `v0.1.0` → `v0.2.0`
-  - поднято Composer constraint: `^0.1.0` → `^0.2.0`
-  - подтверждено, что остальные direct `prikotov/*` dependencies уже latest
+  - поднято ограничение версии (constraint) Composer: `^0.1.0` → `^0.2.0`
+  - подтверждено, что остальные прямые (direct) зависимости `prikotov/*` уже актуальны (latest)
 - Вне состава релиза:
-  - исправление workflow `Release Phar` для smoke/build path mismatch
+  - исправление workflow `Release Phar` для устранения несовпадения путей smoke/build (path mismatch)
 
 ## Риски
 
@@ -27,21 +27,21 @@
 
 ## Проверки перед deploy
 
-- [x] `composer outdated 'prikotov/*' --direct` — all up to date
+- [x] `composer outdated 'prikotov/*' --direct` — все актуальны (all up to date)
 - [x] `composer validate --strict` — OK
-- [x] `composer audit --locked` — no advisories
+- [x] `composer audit --locked` — рекомендаций нет (no advisories)
 - [x] `make check` — зелёный (`PHPUnit`: 954 tests, 2697 assertions)
 
 ## Порядок deploy
 
 1. Библиотека (Packagist) — по тегу `v0.1.19`
-2. Phar asset — через GitHub Actions workflow `Release Phar` по тегу `v0.1.19`
+2. Phar-артефакт — через workflow GitHub Actions `Release Phar` по тегу `v0.1.19`
 
-## Post-check
+## Проверка после deploy
 
 - Проверить, что GitHub Release `v0.1.19` создан
 - Проверить, что workflow `Release Phar` завершился, а `task-orchestrator.phar` приложен к релизу
-- Если Phar asset не приложен, зафиксировать warning: на `v0.1.18` GitHub Release создавался, но asset мог не приложиться из-за smoke/build path mismatch; в `v0.1.19` это не исправлялось
+- Если Phar-артефакт не приложен, зафиксировать предупреждение (warning): на `v0.1.18` GitHub Release создавался, но артефакт мог не приложиться из-за несовпадения путей smoke/build (path mismatch); в `v0.1.19` это не исправлялось
 - Проверить smoke command: `php task-orchestrator.phar --version`
 
 ## Действия при проблеме после релиза

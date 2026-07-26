@@ -1,12 +1,12 @@
-# Анализ Security Policy как Cross-Cutting Concern
+# Анализ Security Policy как сквозной функциональности (cross-cutting concern)
 
 **Автор:** Архитектор Гэндальф  
 **Дата:** 2026-05-01  
 **Задача:** [TASK-docs-security-policy-analysis](../../todo/done/TASK-docs-security-policy-analysis.todo.md)  
 **Roadmap:** AI#14, Sprint 2 → входные данные для Sprint 9 (Security Policy implementation)  
 **Источники:**
-- [Roadmap 2026 Q2–Q3](ROADMAP-2026-Q2-Q3.md) — OQ-3, триггер G4, Sprint 9 plan
-- [Протокол brainstorm #2](../../var/sessions/brainstorm/2026-04-30_16-02-26/result.md) — консенсус: SecurityPolicy = отдельный модуль
+- [Roadmap 2026 Q2–Q3](ROADMAP-2026-Q2-Q3.md) — `OQ-3`, триггер G4, Sprint 9 plan
+- [Протокол brainstorm #2](../../var/sessions/brainstorm/2026-04-30_16-02-26/result.md) — консенсус: `SecurityPolicy` = отдельный модуль
 - [Исследование фреймворков](../research/agent-frameworks-summary.md) — Кластер 2: Безопасность
 - [ADR-006: ExecutionStrategy Composition](../adr/006-execution-strategy-composition.md)
 - [ADR-008: Shared Kernel Contract](../adr/008-shared-kernel-contract.md)
@@ -15,9 +15,9 @@
 
 ## 1. Постановка проблемы
 
-**OQ-3 (Roadmap):** Security Policy — единственный roadmap-сценарий, где разделение Static/Dynamic создаёт архитектурную проблему. Cross-cutting concern зависит от обоих subdomain'ов. Если они в разных модулях → Shared Kernel разрастается.
+**`OQ-3` (Roadmap):** Security Policy — единственный roadmap-сценарий, где разделение Static/Dynamic создаёт архитектурную проблему. `cross-cutting` concern зависит от обоих subdomain'ов. Если они в разных модулях → Shared Kernel разрастается.
 
-**Триггер G4:** Если SecurityPolicy потребует раздельных моделей разрешений для Static и Dynamic — это сигнал к физическому разделению, а не к общему интерфейсу.
+**Триггер G4:** Если `SecurityPolicy` потребует раздельных моделей разрешений для Static и Dynamic — это сигнал к физическому разделению, а не к общему интерфейсу.
 
 **Ключевой вопрос:** как Security Policy модуль взаимодействует со Static и Dynamic стратегиями, не нарушая слоистую архитектуру и не раздувая Shared Kernel?
 
@@ -61,7 +61,7 @@ RunStaticChainService::executeStep()
 
 **Что можно проверить:**
 - **Agent step:** разрешён ли runner (`$step->getRunner()`), tools, model
-- **Quality gate step:** разрешена ли shell-команда (`$step->getCommand()`) — exec policy
+- **Quality gate step:** разрешена ли shell-команда (`$step->getCommand()`) — `exec policy`
 
 **Только Static:** да, только static-цепочки имеют шаги с предопределёнными runner'ами и quality gates.
 
@@ -71,7 +71,7 @@ RunStaticChainService::executeStep()
 RunAgentServiceInterface::run(ChainRunRequestVo)
 ```
 
-**Что можно проверить:** exec policy для runner'а, banned commands, per-path restrictions.
+**Что можно проверить:** `exec policy` для runner'а, banned commands, `per-path` restrictions.
 
 **Одинаково для Static и Dynamic:** оба пути используют `RunAgentServiceInterface` для вызова runner'а. Runner name, tools, model — в `ChainRunRequestVo`.
 
@@ -92,7 +92,7 @@ RunDynamicLoopService::execute()
 QualityGateRunnerInterface::run(QualityGateVo)
 ```
 
-**Что можно проверить:** exec policy — banned prefixes, safe command detection, per-path restrictions.
+**Что можно проверить:** `exec policy` — banned prefixes, safe command detection, `per-path` restrictions.
 
 **Только Static:** quality gates выполняют shell-команды. Dynamic path не имеет quality gates (использует фасилитатора для оценки).
 
@@ -104,23 +104,23 @@ QualityGateRunnerInterface::run(QualityGateVo)
 
 | Аспект | Static path | Dynamic path | Общий? |
 |--------|-------------|--------------|--------|
-| **Authorization** (может ли цепочка запускаться) | ✅ Имя цепочки + окружение | ✅ Имя цепочки + окружение | **Да** |
-| **Exec policy (shell)** | ✅ Quality gates + agent commands | ✅ Agent commands | **Частично** (quality gates — только Static) |
-| **Runner restrictions** | ✅ Per-step runner в `ChainStepVo` | ✅ Per-role runner в `RoleConfigVo` | **Да** |
-| **Tool restrictions** | ✅ Per-step tools в `ChainStepVo` | ✅ Per-role tools в `RoleConfigVo` | **Да** |
-| **Model restrictions** | ✅ Per-step model в `ChainStepVo` | ✅ Per-role model в `RoleConfigVo` | **Да** |
-| **Step-level permissions** | ✅ Предопределённые шаги | ❌ Routing runtime | **Нет** |
-| **Role-level permissions** | ❌ Шаги не привязаны к participants | ✅ Участники + фасилитатор | **Нет** |
-| **Iteration limits** | ✅ Fix iterations → повтор шагов | ❌ Max rounds вместо итераций | **Нет** |
+| **Авторизация (Authorization)** (может ли цепочка запускаться) | ✅ Имя цепочки + окружение | ✅ Имя цепочки + окружение | **Да** |
+| **`exec policy` (shell)** | ✅ Quality gates + команды агента (agent commands) | ✅ Команды агента | **Частично** (quality gates — только Static) |
+| **Ограничения runner** | ✅ `per-step` runner в `ChainStepVo` | ✅ `per-role` runner в `RoleConfigVo` | **Да** |
+| **Ограничения tools** | ✅ `per-step` tools в `ChainStepVo` | ✅ `per-role` tools в `RoleConfigVo` | **Да** |
+| **Ограничения model** | ✅ `per-step` model в `ChainStepVo` | ✅ `per-role` model в `RoleConfigVo` | **Да** |
+| **`step-level` разрешения (permissions)** | ✅ Предопределённые шаги | ❌ Маршрутизация (routing) в runtime | **Нет** |
+| **`role-level` разрешения (permissions)** | ❌ Шаги не привязаны к участникам (participants) | ✅ Участники + фасилитатор | **Нет** |
+| **Лимиты итераций (iteration limits)** | ✅ Fix iterations → повтор шагов | ❌ Максимум раундов (max rounds) вместо итераций | **Нет** |
 
 ### 3.2. Вывод по G4
 
-**Permission model — одна и та же по сути, но разная granularity:**
+**Permission model — одна и та же по сути, но разная гранулярность (granularity):**
 
-- **Общее ядро (Core Permission Model):** exec policy (rules filter), runner/tool/model restrictions. Реализуется через одни и те же interfaces.
-- **Различие в точках применения:** Static проверяет per-step, Dynamic — per-role/per-turn. Это не два разных permission models, а **два контекста применения одной модели**.
+- **Общее ядро (Core Permission Model):** `exec policy` (rules filter), runner/tool/model restrictions. Реализуется через одни и те же `interfaces`.
+- **Различие в точках применения:** Static проверяет `per-step`, Dynamic — `per-role`/`per-turn`. Это не два разных permission models, а **два контекста применения одной модели**.
 
-**Вердикт по G4:** Триггер **НЕ срабатывает**. Static и Dynamic имеют **одну и ту же** permission model с разной granularity применения. Shared Kernel не разрастается — достаточно двух интерфейсов (`ChainSecurityPolicyInterface` + `ExecPolicyInterface`), применяемых в разных точках (см. секцию 4.3).
+**Вердикт по G4:** Триггер **НЕ срабатывает**. Static и Dynamic имеют **одну и ту же** permission model с разной гранулярностью (granularity) применения. Shared Kernel не разрастается — достаточно двух интерфейсов (`ChainSecurityPolicyInterface` + `ExecPolicyInterface`), применяемых в разных точках (см. секцию 4.3).
 
 ---
 
@@ -128,15 +128,15 @@ QualityGateRunnerInterface::run(QualityGateVo)
 
 ### 4.1. Почему не ACL
 
-ACL (Anti-Corruption Layer) между SecurityPolicy и Orchestrator означает:
-- SecurityPolicy определяет свои interfaces
+ACL (Anti-Corruption Layer) между `SecurityPolicy` и Orchestrator означает:
+- `SecurityPolicy` определяет свои `interfaces`
 - Orchestrator создаёт adapters/DTO mapping
 
-Это оправдано при интеграции двух **независимых bounded context'ов** с разными Ubiquitous Languages. Но Security Policy — это **cross-cutting concern**, а не bounded context с собственной бизнес-логикой. Он не производит данные — он фильтрует и проверяет. ACL здесь — overengineering.
+Это оправдано при интеграции двух **независимых ограниченных контекстов (bounded context)** с разными едиными языками (Ubiquitous Language). Но Security Policy — это **сквозная функциональность (`cross-cutting` concern)**, а не bounded context с собственной бизнес-логикой. Он не производит данные — он фильтрует и проверяет. ACL здесь — избыточное усложнение (overengineering).
 
 ### 4.2. Почему Decorator
 
-task-orchestrator уже использует **Decorator pattern** для cross-cutting concerns:
+task-orchestrator уже использует **Decorator pattern** для `cross-cutting` concerns:
 - `RetryingAgentRunner` decorator для retry
 - `CircuitBreakerAgentRunner` decorator для circuit breaker
 - Budget checking через service injection
@@ -153,14 +153,14 @@ Security Policy естественно ложится в тот же патте�
                     └──────┬──────┘
                            │
               SecurityPolicyExecutionStrategyDecorator
-              (проверяет chain-level permissions)
+              (проверяет `chain-level` permissions)
 ```
 
 ```
                        RunAgentServiceInterface
                                   │
               SecurityPolicyRunAgentDecorator
-              (проверяет exec policy, runner/tool/model)
+              (проверяет `exec policy`, runner/tool/model)
                     │
               RetryingAgentRunner (существующий)
                     │
@@ -169,18 +169,18 @@ Security Policy естественно ложится в тот же патте�
               Конкретный Runner
 ```
 
-### 4.3. Эскиз interfaces
+### 4.3. Эскиз `interfaces`
 
-Интерфейсы определяются в **Orchestrator Domain** (как port), реализуются в **SecurityPolicy module Infrastructure**:
+Интерфейсы определяются в **Orchestrator Domain** (как port), реализуются в **`SecurityPolicy` module Infrastructure**:
 
 ```php
 // src/Module/ChainDefinition/Domain/Service/Security/
 
 /**
  * Проверка security policy перед выполнением цепочки.
- * Порт в Orchestrator Domain, реализация — в SecurityPolicy Infrastructure.
+ * Порт в Orchestrator Domain, реализация — в `SecurityPolicy` Infrastructure.
  */
-interface ChainSecurityPolicyInterface
+`interface` ChainSecurityPolicyInterface
 {
     /**
      * Проверяет, авторизован ли запуск цепочки.
@@ -190,10 +190,10 @@ interface ChainSecurityPolicyInterface
 }
 
 /**
- * Проверка exec policy для команды runner'а.
- * Порт в Orchestrator Domain, реализация — в SecurityPolicy Infrastructure.
+ * Проверка `exec policy` для команды runner'а.
+ * Порт в Orchestrator Domain, реализация — в `SecurityPolicy` Infrastructure.
  */
-interface ExecPolicyInterface
+`interface` ExecPolicyInterface
 {
     /**
      * Проверяет, разрешена ли команда runner'а.
@@ -220,7 +220,7 @@ src/Module/
 │   └── Infrastructure/Security/        ← Decorators (если нужно)
 │       └── SecurityPolicyRunAgentDecorator.php
 │
-├── SecurityPolicy/                     ← Sprint 9: отдельный модуль
+├── `SecurityPolicy`/                     ← Sprint 9: отдельный модуль
 │   └── Domain/
 │       ├── Policy/                     ← Rules, Permission models
 │       │   ├── ExecRule.php
@@ -229,28 +229,28 @@ src/Module/
 │           └── SecurityPolicyService.php
 │   └── Infrastructure/
 │       └── Orchestrator/               ← Реализация ports Orchestrator'а
-│           ├── ChainSecurityPolicy.php   (implements ChainSecurityPolicyInterface)
+│           ├── Chain`SecurityPolicy`.php   (implements ChainSecurityPolicyInterface)
 │           └── ExecPolicyCheck.php       (implements ExecPolicyInterface)
 ```
 
 **Зависимости:**
-- `SecurityPolicy Infrastructure` → `Orchestrator Domain` (interfaces only) ✅
-- `Orchestrator Domain` не зависит от `SecurityPolicy` ✅
+- ``SecurityPolicy` Infrastructure` → `Orchestrator Domain` (`interfaces` only) ✅
+- `Orchestrator Domain` не зависит от ``SecurityPolicy`` ✅
 - Инверсия зависимостей через ports в Orchestrator Domain ✅
 
 ---
 
-## 5. Ответ на OQ-3 Roadmap
+## 5. Ответ на `OQ-3` Roadmap
 
-> **OQ-3:** Security Policy module — единственный roadmap-сценарий, где разделение Static/Dynamic создаёт проблему.
+> **`OQ-3`:** Security Policy module — единственный roadmap-сценарий, где разделение Static/Dynamic создаёт проблему.
 
 **Ответ:** Разделение Static/Dynamic **НЕ создаёт проблемы** для Security Policy по трём причинам:
 
-1. **Permission model — единая.** Exec policy (rules filter) и permission checks работают через одни и те же интерфейсы (`ChainSecurityPolicyInterface`, `ExecPolicyInterface`), независимо от типа цепочки. Различие — только в точках применения (per-step для Static, per-role/per-turn для Dynamic), но это реализационная деталь decorator'а.
+1. **Permission model — единая.** `exec policy` (rules filter) и permission checks работают через одни и те же интерфейсы (`ChainSecurityPolicyInterface`, `ExecPolicyInterface`), независимо от типа цепочки. Различие — только в точках применения (`per-step` для Static, `per-role`/`per-turn` для Dynamic), но это реализационная деталь decorator'а.
 
-2. **Shared Kernel не разрастается.** Interfaces размещаются в `Orchestrator/Domain/Service/Security/` — это Domain-слой Orchestrator'а, а не Shared Kernel. Shared Kernel (по ADR-008: name, budget, roles) остаётся неизменным — SecurityPolicy не добавляет в него методы.
+2. **Shared Kernel не разрастается.** Interfaces размещаются в `Orchestrator/Domain/Service/Security/` — это Domain-слой Orchestrator'а, а не Shared Kernel. Shared Kernel (по ADR-008: name, budget, roles) остаётся неизменным — `SecurityPolicy` не добавляет в него методы.
 
-3. **Cross-cutting реализован через Decorator, а не через shared data.** SecurityPolicy не нуждается в доступе к strategy-specific данным (шагам, промптам). Ему достаточно chain identity (имя, тип) + runner info (runner name, tools, command) — всё доступно через существующие VO без расширения контрактов.
+3. **`cross-cutting` реализован через Decorator, а не через shared data.** `SecurityPolicy` не нуждается в доступе к strategy-specific данным (шагам, промптам). Ему достаточно chain identity (имя, тип) + runner info (runner name, tools, command) — всё доступно через существующие VO без расширения контрактов.
 
 ---
 
@@ -260,11 +260,11 @@ src/Module/
 
 | Аспект | Влияние | Митигация |
 |--------|---------|-----------|
-| `ChainSecurityPolicyInterface` | Остается в Orchestrator Domain. StaticExecution module зависит от Orchestrator interfaces — это уже так (ExecutionStrategyInterface) | 0 изменений |
-| `ExecPolicyInterface` | Может потребоваться в StaticExecution module для quality gates | Определить interface в Orchestrator Domain (port). StaticExecution Infrastructure его реализует. ИЛИ: вынести в отдельный shared Security interfaces |
+| `ChainSecurityPolicyInterface` | Остается в Orchestrator Domain. StaticExecution module зависит от Orchestrator `interfaces` — это уже так (ExecutionStrategyInterface) | 0 изменений |
+| `ExecPolicyInterface` | Может потребоваться в StaticExecution module для quality gates | Определить `interface` в Orchestrator Domain (port). StaticExecution Infrastructure его реализует. ИЛИ: вынести в отдельный shared Security `interfaces` |
 | Decorator для RunAgentService | Интеграционный сервис уже проходит через Orchestrator Domain port | 0 изменений |
 
-**Вывод:** Split Static не влияет на архитектуру Security Policy, если interfaces (ports) остаются в Orchestrator Domain. Это согласуется с Integration-паттерном из ADR-007 (VO ACL boundary).
+**Вывод:** Split Static не влияет на архитектуру Security Policy, если `interfaces` (ports) остаются в Orchestrator Domain. Это согласуется с Integration-паттерном из ADR-007 (VO ACL boundary).
 
 ---
 
@@ -272,13 +272,13 @@ src/Module/
 
 | Паттерн | Источник | Применимость в task-orchestrator |
 |---------|----------|----------------------------------|
-| **Exec policy (rules)** | Codex (.rules файлы), Claude Code (allow/deny lists) | ✅ Основной паттерн. Декларативные правила: banned prefixes, safe command detection. Реализуется через `ExecPolicyInterface` |
-| **Permission system** | Claude Code (auto-accept/ask/deny), Crush (allow-list), Codex (split FS permissions) | ✅ Runner/tool/model restrictions per step/role. Реализуется через `ChainSecurityPolicyInterface` |
-| **Guardian (LLM safety reviewer)** | Codex | ⚠️ R&D (Sprint 10+). Pre-execution LLM risk assessment. Дополняет rule-based exec policy. Не для Sprint 9 |
-| **Docker sandbox** | Codex (iptables + Docker), Copilot Cloud Agent (container isolation) | ⚠️ R&D (Q4). Network isolation через container. Infrastructure-level, не Domain concern |
-| **Policy engine** | Copilot Cloud Agent (org-level policies) | ⚠️ Долгосрочная перспектива. Организационные политики. Не для Sprint 9 |
+| **`exec policy` (rules)** | Codex (.rules-файлы), Claude Code (allow/deny lists) | ✅ Основной паттерн. Декларативные правила: запрещённые префиксы (banned prefixes), обнаружение безопасных команд (safe command detection). Реализуется через `ExecPolicyInterface` |
+| **Система разрешений (Permission system)** | Claude Code (auto-accept/ask/deny), Crush (allow-list), Codex (split FS permissions) | ✅ Ограничения runner/tool/model на уровне шага/роли. Реализуется через `ChainSecurityPolicyInterface` |
+| **Guardian (LLM-ревьюер безопасности, safety reviewer)** | Codex | ⚠️ R&D (Sprint 10+). `pre-execution` оценка рисков LLM (risk assessment). Дополняет `rule-based` `exec policy`. Не для Sprint 9 |
+| **Docker-песочница (sandbox)** | Codex (iptables + Docker), Copilot Cloud Agent (изоляция контейнера, container isolation) | ⚠️ R&D (Q4). Сетевая изоляция (network isolation) через контейнер (container). `infrastructure-level`, не Domain-задача (concern) |
+| **Движок политик (Policy engine)** | Copilot Cloud Agent (`org-level` policies) | ⚠️ Долгосрочная перспектива. Организационные политики. Не для Sprint 9 |
 
-**Рекомендация для Sprint 9:** Начать с rule-based exec policy + permission system. Это quick win, подтверждённый Codex и Claude Code.
+**Рекомендация для Sprint 9:** Начать с `rule-based` `exec policy` + permission system. Это quick win, подтверждённый Codex и Claude Code.
 
 ---
 
@@ -286,28 +286,28 @@ src/Module/
 
 ### Архитектурные решения
 
-1. **SecurityPolicy — отдельный модуль** (подтверждено brainstorm #2, все 4 участника).
-2. **Interfaces (ports) в Orchestrator Domain**, реализация в SecurityPolicy Infrastructure — Dependency Inversion.
+1. **`SecurityPolicy` — отдельный модуль** (подтверждено brainstorm #2, все 4 участника).
+2. **Interfaces (ports) в Orchestrator Domain**, реализация в `SecurityPolicy` Infrastructure — Dependency Inversion.
 3. **Decorator pattern** для применения security checks — консистентно с retry/circuit breaker.
-4. **Shared Kernel не расширяется** — SecurityPolicy не добавляет методов в `SharedChainDefinitionVo`.
+4. **Shared Kernel не расширяется** — `SecurityPolicy` не добавляет методов в `SharedChainDefinitionVo`.
 
 ### Что реализовать в Sprint 9
 
 | Приоритет | Компонент | Описание |
 |-----------|-----------|----------|
-| P0 | `ExecPolicyInterface` + реализация | Rule-based command filtering: banned prefixes, safe commands |
-| P0 | `ChainSecurityPolicyInterface` + реализация | Chain-level authorization: может ли цепочка запускаться |
-| P1 | SecurityPolicyRunAgentDecorator | Decorator для `RunAgentServiceInterface` — проверка exec policy перед agent run |
-| P1 | SecurityPolicyExecutionStrategyDecorator | Decorator для `ExecutionStrategyInterface` — chain-level checks |
-| P2 | YAML DSL: `permissions:` block | Декларативные per-chain permissions в YAML-конфигурации |
-| P2 | Exec policy файл | Внешний файл с rules (аналог Codex .rules) |
+| P0 | `ExecPolicyInterface` + реализация | `rule-based` command filtering: banned prefixes, safe commands |
+| P0 | `ChainSecurityPolicyInterface` + реализация | `chain-level` authorization: может ли цепочка запускаться |
+| P1 | SecurityPolicyRunAgentDecorator | Decorator для `RunAgentServiceInterface` — проверка `exec policy` перед agent run |
+| P1 | SecurityPolicyExecutionStrategyDecorator | Decorator для `ExecutionStrategyInterface` — `chain-level` checks |
+| P2 | YAML DSL: `permissions:` block | Декларативные `per-chain` permissions в YAML-конфигурации |
+| P2 | `exec policy` файл | Внешний файл с rules (аналог Codex .rules) |
 
 ### Что НЕ реализовать в Sprint 9
 
 - Docker sandboxing (Q4 R&D)
 - Guardian / LLM safety reviewer (Sprint 10+)
-- Org-level policy engine (долгосрочная перспектива)
-- Per-path filesystem permissions (требует container isolation)
+- `org-level` policy engine (долгосрочная перспектива)
+- `per-path` filesystem permissions (требует container isolation)
 
 ---
 

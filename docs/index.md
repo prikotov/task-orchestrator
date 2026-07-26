@@ -1,6 +1,6 @@
 # TasK Orchestrator — Документация
 
-> Part of **TasK Orchestrator** documentation. See [README](../README.md) for installation and usage.
+> Часть документации **TasK Orchestrator**. Установка и использование описаны в [README](../README.md).
 
 TasK Orchestrator — PHP-оркестратор AI-агентов, который позволяет автоматически запускать цепочки ролей (pi, Codex CLI и другие) для анализа, проектирования, реализации и ревью кода.
 
@@ -18,9 +18,9 @@ TasK Orchestrator — PHP-оркестратор AI-агентов, которы
 | [Исследования](research/) | Сравнение с аналогами |
 | [Агенты](agents/roles/team/) | Роли AI-агентов |
 
-### CLI Integration
+### Интеграция с CLI
 
-For CLI commands (`agent:init`, `agent:role-skills`, `agent:orchestrate`, `agent:run`, `agent:runners`, `validate:connectivity`) see
+Команды CLI (`agent:init`, `agent:role-skills`, `agent:orchestrate`, `agent:run`, `agent:runners`, `validate:connectivity`) описаны в
 [`docs/guide/cli.md`](guide/cli.md).
 
-> **Note:** These commands are part of the TasK Console application (Presentation layer), not the library itself. When integrating into your own project, you will create your own CLI commands that use the library's Application layer (Command/Query handlers).
+> **Примечание:** эти команды относятся к консольному приложению TasK Console (слой Presentation), а не к самой библиотеке. При интеграции в собственный проект вы создаёте свои команды CLI поверх слоя Application (обработчики Command/Query) библиотеки.

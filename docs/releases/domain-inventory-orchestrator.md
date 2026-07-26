@@ -8,7 +8,7 @@
 
 ---
 
-## Summary
+## Сводка
 
 | Метрика | Значение |
 |---|---|
@@ -26,9 +26,9 @@
 | Service (concrete) | 8 | 2 016 | 33.8% | Доменные сервисы с реализацией |
 | Service (interface) | 21 | 879 | 14.7% | Интерфейсы доменных сервисов |
 | Service (total) | **29** | **2 895** | **48.5%** | |
-| ValueObject | 27 | 2 337 | 39.2% | Value Objects |
+| ValueObject | 27 | 2 337 | 39.2% | Объекты-значения (Value Objects) |
 | Entity | 2 | 594 | 10.0% | Сущности |
-| Dto | 2 | 50 | 0.8% | Data Transfer Objects |
+| Dto | 2 | 50 | 0.8% | Объекты передачи данных (Data Transfer Objects) |
 | Exception | 4 | 54 | 0.9% | Исключения |
 | Enum | 2 | 34 | 0.6% | Перечисления |
 
@@ -40,7 +40,7 @@
 
 Subdomain определяется namespace-путём внутри `Service/Chain/`:
 
-| Subdomain | Файлов | LOC | % LOC | Описание |
+| Поддомен | Файлов | LOC | % LOC | Описание |
 |---|---|---|---|---|
 | ROOT | 46 | 3 567 | 59.8% | VO, Entity, Enum, Exception, Dto, Service/Budget, Service/Chain/Audit, Service/Chain/Session, Service/Agent, Service/Prompt |
 | DYNAMIC | 9 | 1 366 | 22.9% | `Service/Chain/Dynamic/` — логика динамических цепей |
@@ -55,7 +55,7 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 
 ### 3.1. Value Objects (27 файлов, 2 337 LOC)
 
-| # | Файл | LOC | Subdomain | Описание |
+| # | Файл | LOC | Поддомен | Описание |
 |---|---|---|---|---|
 | 1 | `ValueObject/ChainDefinitionVo.php` | 483 | ROOT | Определение цепи (конфигурация) |
 | 2 | `ValueObject/BudgetVo.php` | 208 | ROOT | Бюджет (tokens, cost) |
@@ -87,21 +87,21 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 
 ### 3.2. Entities (2 файла, 594 LOC)
 
-| # | Файл | LOC | Subdomain | Описание |
+| # | Файл | LOC | Поддомен | Описание |
 |---|---|---|---|---|
 | 1 | `Entity/DynamicLoopExecution.php` | 307 | ROOT | Сущность выполнения динамического цикла |
 | 2 | `Entity/StaticChainExecution.php` | 287 | ROOT | Сущность выполнения статической цепи |
 
 ### 3.3. Enums (2 файла, 34 LOC)
 
-| # | Файл | LOC | Subdomain | Описание |
+| # | Файл | LOC | Поддомен | Описание |
 |---|---|---|---|---|
 | 1 | `Enum/ChainStepTypeEnum.php` | 17 | ROOT | Тип шага цепи |
 | 2 | `Enum/ChainTypeEnum.php` | 17 | ROOT | Тип цепи (static/dynamic) |
 
 ### 3.4. Exceptions (4 файла, 54 LOC)
 
-| # | Файл | LOC | Subdomain | Описание |
+| # | Файл | LOC | Поддомен | Описание |
 |---|---|---|---|---|
 | 1 | `Exception/OrchestratorException.php` | 12 | ROOT | Базовое исключение модуля |
 | 2 | `Exception/NotFoundExceptionInterface.php` | 12 | ROOT | Интерфейс «не найдено» |
@@ -110,7 +110,7 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 
 ### 3.5. DTO (2 файла, 50 LOC)
 
-| # | Файл | LOC | Subdomain | Описание |
+| # | Файл | LOC | Поддомен | Описание |
 |---|---|---|---|---|
 | 1 | `Dto/ChainResultAuditDto.php` | 31 | ROOT | DTO аудита результата цепи |
 | 2 | `Dto/StepAuditStatusDto.php` | 19 | ROOT | DTO статуса аудита шага |
@@ -119,81 +119,81 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 
 #### Service/Budget (1 файл)
 
-| # | Файл | LOC | Type | Описание |
+| # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
-| 1 | `Service/Budget/CheckDynamicBudgetServiceInterface.php` | 28 | interface | Проверка бюджета динамической цепи |
+| 1 | `Service/Budget/CheckDynamicBudgetServiceInterface.php` | 28 | `interface` | Проверка бюджета динамической цепи |
 
 #### Service/Chain/Audit (2 файла)
 
-| # | Файл | LOC | Type | Описание |
+| # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
-| 1 | `Service/Chain/Audit/AuditLoggerInterface.php` | 49 | interface | Логирование аудита |
-| 2 | `Service/Chain/Audit/AuditLoggerFactoryInterface.php` | 19 | interface | Фабрика логгеров аудита |
+| 1 | `Service/Chain/Audit/AuditLoggerInterface.php` | 49 | `interface` | Логирование аудита |
+| 2 | `Service/Chain/Audit/AuditLoggerFactoryInterface.php` | 19 | `interface` | Фабрика логгеров аудита |
 
 #### Service/Chain/ChainDefinitionValidator (1 файл)
 
-| # | Файл | LOC | Type | Описание |
+| # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
-| 1 | `Service/Chain/ChainDefinitionValidator.php` | 164 | concrete | Валидация определения цепи |
+| 1 | `Service/Chain/ChainDefinitionValidator.php` | 164 | `concrete` | Валидация определения цепи |
 
 #### Service/Chain/Session (3 файла)
 
-| # | Файл | LOC | Type | Описание |
+| # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
-| 1 | `Service/Chain/Session/ChainSessionWriterInterface.php` | 105 | interface | Запись состояния сессии |
-| 2 | `Service/Chain/Session/ChainSessionReaderInterface.php` | 37 | interface | Чтение состояния сессии |
-| 3 | `Service/Chain/Session/ChainSessionLoggerInterface.php` | 32 | interface | Логирование сессии |
+| 1 | `Service/Chain/Session/ChainSessionWriterInterface.php` | 105 | `interface` | Запись состояния сессии |
+| 2 | `Service/Chain/Session/ChainSessionReaderInterface.php` | 37 | `interface` | Чтение состояния сессии |
+| 3 | `Service/Chain/Session/ChainSessionLoggerInterface.php` | 32 | `interface` | Логирование сессии |
 
 #### Service/Agent (1 файл)
 
-| # | Файл | LOC | Type | Описание |
+| # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
-| 1 | `Service/Agent/RunAgentServiceInterface.php` | 27 | interface | Запуск AI-агента |
+| 1 | `Service/Agent/RunAgentServiceInterface.php` | 27 | `interface` | Запуск AI-агента |
 
 #### Service/Prompt (1 файл)
 
-| # | Файл | LOC | Type | Описание |
+| # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
-| 1 | `Service/Prompt/PromptProviderInterface.php` | 37 | interface | Провайдер промптов |
+| 1 | `Service/Prompt/PromptProviderInterface.php` | 37 | `interface` | Провайдер промптов |
 
 ### 3.7. Services — STATIC (4 файла, 771 LOC)
 
-| # | Файл | LOC | Type | Описание |
+| # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
-| 1 | `Service/Chain/Static/RunStaticChainService.php` | 404 | concrete | Оркестрация статической цепи |
-| 2 | `Service/Chain/Static/ExecuteStaticStepService.php` | 228 | concrete | Исполнение одного шага |
-| 3 | `Service/Chain/Static/CheckStaticBudgetService.php` | 102 | concrete | Проверка бюджета статической цепи |
-| 4 | `Service/Chain/Static/CheckStaticBudgetServiceInterface.php` | 37 | interface | Интерфейс проверки бюджета |
+| 1 | `Service/Chain/Static/RunStaticChainService.php` | 404 | `concrete` | Оркестрация статической цепи |
+| 2 | `Service/Chain/Static/ExecuteStaticStepService.php` | 228 | `concrete` | Исполнение одного шага |
+| 3 | `Service/Chain/Static/CheckStaticBudgetService.php` | 102 | `concrete` | Проверка бюджета статической цепи |
+| 4 | `Service/Chain/Static/CheckStaticBudgetServiceInterface.php` | 37 | `interface` | Интерфейс проверки бюджета |
 
 ### 3.8. Services — DYNAMIC (9 файлов, 1 366 LOC)
 
-| # | Файл | LOC | Type | Описание |
+| # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
-| 1 | `Service/Chain/Dynamic/RunDynamicLoopService.php` | 786 | concrete | Главный сервис динамического цикла |
-| 2 | `Service/Chain/Dynamic/FormatDynamicJournalService.php` | 122 | concrete | Форматирование журнала |
-| 3 | `Service/Chain/Dynamic/BuildDynamicContextService.php` | 112 | concrete | Построение контекста |
-| 4 | `Service/Chain/Dynamic/RecordDynamicRoundService.php` | 98 | concrete | Запись раунда |
-| 5 | `Service/Chain/Dynamic/RunDynamicLoopAgentServiceInterface.php` | 78 | interface | Запуск агента динамического цикла |
-| 6 | `Service/Chain/Dynamic/FormatDynamicJournalServiceInterface.php` | 63 | interface | Интерфейс форматирования журнала |
-| 7 | `Service/Chain/Dynamic/BuildDynamicContextServiceInterface.php` | 49 | interface | Интерфейс построения контекста |
-| 8 | `Service/Chain/Dynamic/RunDynamicLoopServiceInterface.php` | 28 | interface | Интерфейс запуска динамического цикла |
-| 9 | `Service/Chain/Dynamic/RecordDynamicRoundServiceInterface.php` | 30 | interface | Интерфейс записи раунда |
+| 1 | `Service/Chain/Dynamic/RunDynamicLoopService.php` | 786 | `concrete` | Главный сервис динамического цикла |
+| 2 | `Service/Chain/Dynamic/FormatDynamicJournalService.php` | 122 | `concrete` | Форматирование журнала |
+| 3 | `Service/Chain/Dynamic/BuildDynamicContextService.php` | 112 | `concrete` | Построение контекста |
+| 4 | `Service/Chain/Dynamic/RecordDynamicRoundService.php` | 98 | `concrete` | Запись раунда |
+| 5 | `Service/Chain/Dynamic/RunDynamicLoopAgentServiceInterface.php` | 78 | `interface` | Запуск агента динамического цикла |
+| 6 | `Service/Chain/Dynamic/FormatDynamicJournalServiceInterface.php` | 63 | `interface` | Интерфейс форматирования журнала |
+| 7 | `Service/Chain/Dynamic/BuildDynamicContextServiceInterface.php` | 49 | `interface` | Интерфейс построения контекста |
+| 8 | `Service/Chain/Dynamic/RunDynamicLoopServiceInterface.php` | 28 | `interface` | Интерфейс запуска динамического цикла |
+| 9 | `Service/Chain/Dynamic/RecordDynamicRoundServiceInterface.php` | 30 | `interface` | Интерфейс записи раунда |
 
 ### 3.9. Services — SHARED (7 файлов, 260 LOC)
 
-| # | Файл | LOC | Type | Описание |
+| # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
-| 1 | `Service/Chain/Shared/PromptFormatterInterface.php` | 86 | interface | Форматирование промптов |
-| 2 | `Service/Chain/Shared/ResolveChainRunnerServiceInterface.php` | 32 | interface | Резолв раннера цепи |
-| 3 | `Service/Chain/Shared/ChainLoaderInterface.php` | 35 | interface | Загрузка определения цепи |
-| 4 | `Service/Chain/Shared/SessionCompletedNotifierInterface.php` | 29 | interface | Уведомление о завершении сессии |
-| 5 | `Service/Chain/Shared/RoundCompletedNotifierInterface.php` | 30 | interface | Уведомление о завершении раунда |
-| 6 | `Service/Chain/Shared/QualityGateRunnerInterface.php` | 22 | interface | Запуск quality gate |
-| 7 | `Service/Chain/Shared/FacilitatorResponseParserInterface.php` | 26 | interface | Парсинг ответа фасилитатора |
+| 1 | `Service/Chain/Shared/PromptFormatterInterface.php` | 86 | `interface` | Форматирование промптов |
+| 2 | `Service/Chain/Shared/ResolveChainRunnerServiceInterface.php` | 32 | `interface` | Резолв раннера цепи |
+| 3 | `Service/Chain/Shared/ChainLoaderInterface.php` | 35 | `interface` | Загрузка определения цепи |
+| 4 | `Service/Chain/Shared/SessionCompletedNotifierInterface.php` | 29 | `interface` | Уведомление о завершении сессии |
+| 5 | `Service/Chain/Shared/RoundCompletedNotifierInterface.php` | 30 | `interface` | Уведомление о завершении раунда |
+| 6 | `Service/Chain/Shared/QualityGateRunnerInterface.php` | 22 | `interface` | Запуск quality gate |
+| 7 | `Service/Chain/Shared/FacilitatorResponseParserInterface.php` | 26 | `interface` | Парсинг ответа фасилитатора |
 
 ---
 
-## 4. Карта зависимостей между subdomain'ами
+## 4. Карта зависимостей между поддоменами (subdomain)
 
 ### 4.1. Топология
 
@@ -253,39 +253,39 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 
 ---
 
-## 5. Таблица «VO → consumer count» (blast radius)
+## 5. Таблица «VO → число потребителей (consumer count)» (радиус последствий, blast radius)
 
 Ранжирование по количеству потребителей (consumers) внутри Orchestrator-модуля (Domain + Application + Infrastructure + Integration):
 
-| # | Value Object | Consumers | Blast Radius | Примечание |
+| # | Value Object | Потребители (Consumers) | Радиус (Blast Radius) | Примечание |
 |---|---|---|---|---|
-| 1 | `ChainDefinitionVo` | 15 | 🔴 Critical | Ядро конфигурации цепи — используется везде |
-| 2 | `ChainRunRequestVo` | 10 | 🔴 Critical | Запрос на выполнение — используется в Application |
-| 3 | `ChainRunResultVo` | 9 | 🔴 Critical | Результат выполнения — сквозная структура |
-| 4 | `BudgetVo` | 9 | 🔴 Critical | Бюджет — используется в Static, Dynamic, Infrastructure |
-| 5 | `ChainRetryPolicyVo` | 8 | 🟡 High | Политика retry —VO→VO и Service→VO |
-| 6 | `ChainStepVo` | 5 | 🟡 High | Шаг цепи — Static + Validator |
-| 7 | `DynamicChainContextVo` | 5 | 🟡 High | Контекст Dynamic — Application + Domain |
-| 8 | `DynamicRoundResultVo` | 5 | 🟡 High | Результат раунда Dynamic |
-| 9 | `FixIterationGroupVo` | 4 | 🟢 Medium | Группа итераций — Static + Infrastructure |
-| 10 | `DynamicLoopResultVo` | 4 | 🟢 Medium | Результат Dynamic — Application + Entity |
-| 11 | `DynamicBudgetCheckVo` | 4 | 🟢 Medium | Проверка бюджета Dynamic |
-| 12 | `FacilitatorResponseVo` | 4 | 🟢 Medium | Ответ фасилитатора — Dynamic + Shared |
-| 13 | `ChainTurnResultVo` | 3 | 🟢 Medium | Ход цепи — только Dynamic |
-| 14 | `FacilitatorTurnResultVo` | 3 | 🟢 Medium | Ход фасилитатора — только Dynamic |
-| 15 | `RoleConfigVo` | 3 | 🟢 Medium | Конфигурация роли — Static + Dynamic |
-| 16 | `StaticStepResultVo` | 3 | 🟢 Medium | Результат шага Static |
-| 17 | `FallbackConfigVo` | 3 | 🟢 Medium | Fallback — Shared + Infrastructure |
-| 18 | `StaticChainResultVo` | 2 | ⚪ Low | Результат Static — Application |
-| 19 | `QualityGateResultVo` | 2 | ⚪ Low | Quality Gate — Shared + Infrastructure |
-| 20 | `QualityGateVo` | 2 | ⚪ Low | Quality Gate — Shared + Infrastructure |
-| 21 | `ChainSessionStateVo` | 2 | ⚪ Low | Состояние сессии — Session + Infrastructure |
-| 22 | `ChainConfigViolationVo` | 2 | ⚪ Low | Нарушение конфигурации — Application |
-| 23 | `StaticProcessResultVo` | 1 | ⚪ Low | Только RunStaticChainService |
-| 24 | `DynamicTurnResultVo` | 1 | ⚪ Low | Только RunDynamicLoopService |
-| 25 | `PromptConfigurationVo` | 1 | ⚪ Low | Только BuildDynamicContextService |
-| 26 | `FallbackAttemptVo` | 1 | ⚪ Low | Только ExecuteStaticStepService |
-| 27 | `SharedChainDefinitionVo` | 0 | ⚪ Unused | **Нет потребителей!** Кандидат на удаление |
+| 1 | `ChainDefinitionVo` | 15 | 🔴 `Critical` | Ядро конфигурации цепи — используется везде |
+| 2 | `ChainRunRequestVo` | 10 | 🔴 `Critical` | Запрос на выполнение — используется в Application |
+| 3 | `ChainRunResultVo` | 9 | 🔴 `Critical` | Результат выполнения — сквозная структура |
+| 4 | `BudgetVo` | 9 | 🔴 `Critical` | Бюджет — используется в Static, Dynamic, Infrastructure |
+| 5 | `ChainRetryPolicyVo` | 8 | 🟡 `High` | Политика retry —VO→VO и Service→VO |
+| 6 | `ChainStepVo` | 5 | 🟡 `High` | Шаг цепи — Static + Validator |
+| 7 | `DynamicChainContextVo` | 5 | 🟡 `High` | Контекст Dynamic — Application + Domain |
+| 8 | `DynamicRoundResultVo` | 5 | 🟡 `High` | Результат раунда Dynamic |
+| 9 | `FixIterationGroupVo` | 4 | 🟢 `Medium` | Группа итераций — Static + Infrastructure |
+| 10 | `DynamicLoopResultVo` | 4 | 🟢 `Medium` | Результат Dynamic — Application + Entity |
+| 11 | `DynamicBudgetCheckVo` | 4 | 🟢 `Medium` | Проверка бюджета Dynamic |
+| 12 | `FacilitatorResponseVo` | 4 | 🟢 `Medium` | Ответ фасилитатора — Dynamic + Shared |
+| 13 | `ChainTurnResultVo` | 3 | 🟢 `Medium` | Ход цепи — только Dynamic |
+| 14 | `FacilitatorTurnResultVo` | 3 | 🟢 `Medium` | Ход фасилитатора — только Dynamic |
+| 15 | `RoleConfigVo` | 3 | 🟢 `Medium` | Конфигурация роли — Static + Dynamic |
+| 16 | `StaticStepResultVo` | 3 | 🟢 `Medium` | Результат шага Static |
+| 17 | `FallbackConfigVo` | 3 | 🟢 `Medium` | Fallback — Shared + Infrastructure |
+| 18 | `StaticChainResultVo` | 2 | ⚪ `Low` | Результат Static — Application |
+| 19 | `QualityGateResultVo` | 2 | ⚪ `Low` | Quality Gate — Shared + Infrastructure |
+| 20 | `QualityGateVo` | 2 | ⚪ `Low` | Quality Gate — Shared + Infrastructure |
+| 21 | `ChainSessionStateVo` | 2 | ⚪ `Low` | Состояние сессии — Session + Infrastructure |
+| 22 | `ChainConfigViolationVo` | 2 | ⚪ `Low` | Нарушение конфигурации — Application |
+| 23 | `StaticProcessResultVo` | 1 | ⚪ `Low` | Только RunStaticChainService |
+| 24 | `DynamicTurnResultVo` | 1 | ⚪ `Low` | Только RunDynamicLoopService |
+| 25 | `PromptConfigurationVo` | 1 | ⚪ `Low` | Только BuildDynamicContextService |
+| 26 | `FallbackAttemptVo` | 1 | ⚪ `Low` | Только ExecuteStaticStepService |
+| 27 | `SharedChainDefinitionVo` | 0 | ⚪ `Unused` | **Нет потребителей!** Кандидат на удаление |
 
 > **Вывод:** 4 VO (`ChainDefinitionVo`, `ChainRunRequestVo`, `ChainRunResultVo`, `BudgetVo`) имеют ≥9 потребителей — изменение любого из них затронет 9–15 файлов. `SharedChainDefinitionVo` не имеет потребителей — потенциально мёртвый код.
 
@@ -330,7 +330,7 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 
 ---
 
-## 7. Mermaid: Dependency Graph (subdomain level)
+## 7. Mermaid: граф зависимостей (уровень поддоменов)
 
 ```mermaid
 graph TD
@@ -357,7 +357,7 @@ graph TD
 
 ---
 
-## 8. Mermaid: VO Consumer Map (top-6 critical VO)
+## 8. Mermaid: карта потребителей VO (топ-6 критичных VO)
 
 ```mermaid
 graph LR
@@ -420,7 +420,7 @@ graph LR
 
 ---
 
-## 10. Recommendations for next steps (not in scope, but noted)
+## 10. Рекомендации для следующих шагов (не в scope, но отмечено)
 
 > ⚠️ Рекомендации по декомпозиции не входят в scope данной задачи (Won't Have). Они будут выполнены в отдельном анализе.
 

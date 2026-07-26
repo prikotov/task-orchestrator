@@ -1,15 +1,15 @@
 # DISC
 
-В role frontmatter проекта TasK `DISC` используется как компактный internal prompt encoding для настройки личности агента.
+В метаданных роли (frontmatter) проекта TasK `DISC` используется как компактное внутреннее кодирование промпта (internal prompt encoding) для настройки личности агента.
 
 Формат записи:
 `D6 I8 S3 C4`
 
 Где:
-- `D` — [Dominance](dominance.md)
-- `I` — [Influence](influence.md)
-- `S` — [Steadiness](steadiness.md)
-- `C` — [Conscientiousness](conscientiousness.md)
+- `D` — [Доминирование (Dominance)](dominance.md)
+- `I` — [Влияние (Influence)](influence.md)
+- `S` — [Постоянство (Steadiness)](steadiness.md)
+- `C` — [Добросовестность (Conscientiousness)](conscientiousness.md)
 
 Шкала для каждого измерения: от `0` до `10`.
 
@@ -18,5 +18,5 @@
 - `5` — умеренно выраженный, сбалансированный уровень
 - `10` — доминирующий, определяющий признак
 
-Эта шкала не является официальной psychometric DISC assessment scoring methodology.
-Это проектная нормализованная запись, предназначенная для интуитивного чтения LLM и человеком без дополнительных разъяснений.
+Эта шкала не является официальной психометрической методологией оценки DISC (psychometric DISC assessment scoring methodology).
+Это проектная нормализованная запись, предназначенная для интуитивного чтения языковой моделью (LLM) и человеком без дополнительных разъяснений.
