@@ -46,10 +46,18 @@ final class AgentTokenCommand extends Command
     private const string FORMAT_ENV = 'env';
 
     /**
-     * Допустимые символы токена GitHub (ghs_*, gh*_*): буквенно-цифровые и _.
-     * Используется для fail-fast при неожиданных символах перед shell-escape.
+     * Допустимые символы токена GitHub (ghs_*, gh*_*): буквенно-цифровые, а также
+     * «.» и «-».
+     *
+     * С 2026-04-27 GitHub вводит stateless-формат installation-токенов вида
+     * `ghs_<APPID>_<JWT>`, где JWT содержит точки (сегменты header.payload.signature)
+     * и дефисы (Base64URL). Поэтому паттерн расширен до `[A-Za-z0-9_.-]`.
+     *
+     * Используется для fail-fast при неожиданных символах перед shell-escape:
+     * по-прежнему отсекаются injection-опасные символы (пробел, кавычки, `;`,
+     * `|`, `$`, `!` и пр.), не входящие в алфавит токена.
      */
-    private const string TOKEN_SAFE_PATTERN = '/^[A-Za-z0-9_]+$/';
+    private const string TOKEN_SAFE_PATTERN = '/^[A-Za-z0-9_.-]+$/';
 
     public function __construct(
         private readonly ObtainTokenCommandHandler $handler,
