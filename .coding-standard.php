@@ -7,10 +7,10 @@ declare(strict_types=1);
 return [
     'docs_path' => 'docs/conventions',
 
-    // validate-language: доля англицизмов в русскоязычной документации/задачах.
+    // validate-language: доля англицизмов в русскоязычной документации.
     'language' => [
-        // Пути для сканирования.
-        'paths' => ['docs/', 'todo/', 'README.md', 'AGENTS.md'],
+        // Пути для сканирования (todo/ исключён — рабочие постановки с шаблонными англ. заголовками секций).
+        'paths' => ['docs/', 'README.md', 'AGENTS.md'],
 
         // Фрагменты путей для исключения (англоязычные справочники, research с английскими цитатами).
         'exclude' => [
