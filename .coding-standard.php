@@ -17,6 +17,9 @@ return [
             'docs/research',          // research-отчёты содержат английские названия продуктов/цитаты
             'docs/agents/reports',    // agent-reports с техническими английскими выводами
             'README.en.md',           // англоязычный README
+            'docs/conventions',      // внешний — из prikotov/coding-standard (через coding-standard-init)
+            'docs/todo-md',          // внешний — из prikotov/todo-md
+            'docs/git-workflow',     // внешний — из prikotov/git-workflow
         ],
 
         // Максимально допустимая доля англицизмов (0.08 = 8%).
