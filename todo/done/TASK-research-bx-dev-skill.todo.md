@@ -9,7 +9,7 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-bx-dev-skill
-pr:
+pr: "#324"
 status: done
 ---
 
