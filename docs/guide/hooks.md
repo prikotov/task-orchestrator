@@ -90,7 +90,7 @@ curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/install.sh 
 echo "Цепочка: $HOOK_CHAIN_NAME, шаг: $HOOK_STEP_NAME" >&2
 ```
 
-Укажите путь в `post_step` — task-orchestrator вызовет его через процесс Symfony (Symfony Process) с таймаутом 30 секунд.
+Укажите путь в `post_step` — task-orchestrator вызовет его через компонент Symfony Process с таймаутом 30 секунд.
 
 ## Ссылки
 
