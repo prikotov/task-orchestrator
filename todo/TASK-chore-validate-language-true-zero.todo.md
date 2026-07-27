@@ -79,10 +79,11 @@ status: todo
 | God Object → «объект-бог» | **Божественный объект (God object)** | Устоявшийся рус. термин; [Википедия «Божественный объект»](https://ru.wikipedia.org/wiki/Божественный_объект). «Объект-бог» — нестандарт, статьи нет. (исправлено в #328) |
 | `execution` (в «static-chain execution») | **выполнение** | общее слово, не термин. «выполнение `static-chain`» |
 | `path` (в «dynamic-loop path», «Dynamic path») | **путь** | общее слово. «динамический путь», «поведенческий путь» |
+| концепт `resume` (в «реализует resume», «Контракт resume», «поток resume») | **возобновление** | концепт/общее слово (НЕ метод `resume()`, НЕ `$resumeDir`). «реализует возобновление», «поток возобновления (resume flow)» (исправлено в #328) |
 | _пополняется по замечаниям_ | | |
 
 ### Кандидаты на удаление из allowlist (общие слова)
-`execution`, `path`, `design`, `action`, `time`, `step`, `fix`, `changes`, `draft`, `ok`, `open`, `user`, `cases`, `shared`, `free`, `tier`, `source`, `big`, `matter`, `five`, `and`, `of`, `in`, `out`.
+`execution`, `path`, `resume`, `design`, `action`, `time`, `step`, `fix`, `changes`, `draft`, `ok`, `open`, `user`, `cases`, `shared`, `free`, `tier`, `source`, `big`, `matter`, `five`, `and`, `of`, `in`, `out`.
 
 **Оставить** (термины/жаргон/имена): `chain`, `runner`, `retry`, `fallback`, `payload`, `CircuitBreaker`, `AgentRunner`, `ChainDefinition`, `namespace`, `enum`, `byok`, `bootstrap`, `Symfony`, `PHP`, `DDD`, …
 
