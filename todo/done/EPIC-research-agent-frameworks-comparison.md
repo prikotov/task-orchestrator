@@ -9,7 +9,7 @@ author: Тимлид (Алекс)
 assignee:
 branch: task/research-agent-frameworks-comparison
 status: in_progress
-reopened: 2026-07-10
+reopened: 2026-07-26
 pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация)"
 ---
 
@@ -117,6 +117,10 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 - [x] [TASK-research-onorca-ade](TASK-research-onorca-ade.todo.md) — Orca ADE (stablyai/orca, MIT, TypeScript/Electron + mobile; «AI Orchestrator» — параллельная ручная оркестрация coding-агентов в изолированных git worktrees: fan-out prompt → N agents → merge winner; BYO subscription; Ghostty-class terminal IDE; mobile companion; Orca Tasks/Automations; `orca.yaml`) *(verdict 🟡 паттерны / 🔴 не dependency; code review Approval)*
 
+### Этап 1j: Дополнительные исследования (2026-07-26)
+
+- [x] [TASK-research-bx-dev-skill](TASK-research-bx-dev-skill.todo.md) — bx-dev (`bish-x/bx-dev-skill`, Codex-skill/manual workflow harness; session branch from `origin/dev`, state `.bx-dev/<session-id>/`, single-shot Codex subagents: Dev → review → conventional commit → optional post-commit QA → Merger; strict flags `--solo`/`--careful`/`--no-review`/`--plan-approve`/`--no-sop`; MERGE-PROTOCOL; 105 support skills / 9 categories) *(verdict 🟡 паттерны / 🔴 не dependency; code review Approval — 1 CR устранён)*
+
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
 - [x] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
@@ -157,3 +161,5 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-06-18 | Тимлид (Алекс) | Stage 1h: TASK-research-swarm-forge принята (PR #272, verdict 🟡 паттерны / 🔴 не dependency, 29/29). Эпик возвращён в `done`. |
 | 2026-07-10 | Аналитик (Шерлок) | Эпик reopened (статус `in_progress`, стадия `1i`): добавлена постановка TASK-research-onorca-ade — Orca ADE (stablyai/orca, MIT, TypeScript/Electron, ≈15.3k★, YC-backed). Orca — система ручной оркестрации (ADE/harness поверх coding-агентов в worktrees), не coding-агент → отнесён в этот эпик по прецеденту oh-my-openagent (#23). Ближайшие аналоги: SwarmForge (#29), AgentCraft (#16), Sandcastle (#20). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. |
 | 2026-07-10 | Тимлид (Алекс) | Stage 1i: TASK-research-onorca-ade выполнена — comparison-отчёт `orca-ade-comparison.md`, строка `Orca ADE` (#30) в summary (`30 / 30`). Verdict 🟡 заимствовать паттерны (parallel fan-out comparison, structured worker_done/dispatch-id, BYO runner ergonomics, worktree isolation, live monitoring) / 🔴 не dependency. Code review Архитектор Локи → Approval (5 CR устранены, сверено с `skills/orchestration/SKILL.md` и `src/main/runtime/orchestration/db.ts`). Задача перенесена в `done/`. |
+| 2026-07-26 | Аналитик (Шерлок) | Эпик reopened (статус `in_progress`, стадия `1j`): добавлено исследование `TASK-research-bx-dev-skill` — `bish-x/bx-dev-skill` (`$bx-dev`, Codex-skill/manual workflow harness). Классификация: система оркестрации/harness, не coding-агент, по прецеденту oh-my-openagent #23 / Orca ADE #30. Предварительный verdict: 🟡 паттерны (session-state `.bx-dev/`, strict flags, scout-plan gate, MERGE-PROTOCOL, conventional commit per task, optional QA, skill-library governance) / 🔴 не dependency (Codex-specific, no retry/CB/quality gates/budget/fix_iterations parity). |
+| 2026-07-26 | Тимлид (Алекс) | Stage 1j: TASK-research-bx-dev-skill выполнена — comparison-отчёт `bx-dev-skill-comparison.md`, строка `bx-dev` (#31) в summary (`31 / 31`). Verdict 🟡 заимствовать паттерны (strict workflow flags, scout-plan approval gate, session-state resume metadata, structured single-shot subagent report/close contract, optional post-commit QA flag, MERGE-PROTOCOL artifact, skill-library router/manifest) / 🔴 не dependency (Codex-specific, нет retry/CB/quality gates/budget/fix_iterations). Code review Архитектор Локи → 1 CR (порядок commit/QA в lifecycle) → доработка Шерлока → повторное ревью Approval (св. со `skills/bx-dev/SKILL.md` Step 9/10). `make md-links`/`validate-todo` — зелёные. Задача перенесена в `done/`. |
