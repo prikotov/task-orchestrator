@@ -10,12 +10,12 @@
 
 ## Контекст
 
-`OrchestrateChainCommandHandler` (328 строк) содержит два поведенческих пути: `static-chain` execution (C1) и `dynamic-loop` execution (C4). Выбор пути реализован через проверки `isDynamic()` в 5 точках кода. Dynamic path занимает ~170 строк и превращает CommandHandler в объект-бог (God-object), объединяющий диспетчеризацию, оркестрацию и обработку ошибок.
+`OrchestrateChainCommandHandler` (328 строк) содержит два поведенческих пути: `static-chain` execution (C1) и `dynamic-loop` execution (C4). Выбор пути реализован через проверки `isDynamic()` в 5 точках кода. Dynamic path занимает ~170 строк и превращает CommandHandler в божественный объект (God object), объединяющий диспетчеризацию, оркестрацию и обработку ошибок.
 
 Текущие проблемы:
 
 1. **Switch-точки:** 5 мест с `isDynamic()` растут линейно с каждой новой стратегией выполнения (conditional branching, parallel execution, sub-agents).
-2. **Объект-бог CommandHandler (God-object):** 328 строк, 2 совершенно разных поведенческих пути в одном классе. При добавлении conditional branching количество путей вырастет до 3, и handler станет нечитаемым.
+  2. **Божественный объект CommandHandler (God object):** 328 строк, 2 совершенно разных поведенческих пути в одном классе. При добавлении conditional branching количество путей вырастет до 3, и handler станет нечитаемым.
 3. **Roadmap-тренды:** анализ 16 AI-agent фреймворков (Archon, Agno, Mastra AI) показывает паттерн движка рабочих процессов (workflow engine) с типизированными стратегиями выполнения.
 
 ## Решение
@@ -67,7 +67,7 @@ protected function handle(OrchestrateChainCommand $command): OrchestrateChainRes
 | Критерий                      | Текущее состояние                        | После ExecutionStrategy                |
 |-------------------------------|------------------------------------------|----------------------------------------|
 | Switch-точки                  | 5 проверок `isDynamic()`                 | 0 (стратегия определяется через `supports()`) |
-| CommandHandler размер         | 328 строк, объект-бог (God-object)        | ~30 строк, чистый диспетчер           |
+| CommandHandler размер         | 328 строк, божественный объект (God object)        | ~30 строк, чистый диспетчер           |
 | Добавление новой стратегии    | Редактирование handler + 5 switch-точек  | Новый класс стратегии, 0 изменений handler |
 | Зависимости `DynamicStrategy`   | 5 (включая ChainLoaderInterface)         | 4 (ChainDefinitionVo через параметр)  |
 | Тестируемость                 | Интеграционный тест 1095 строк           | Unit-тесты на каждую стратегию отдельно |
@@ -83,7 +83,7 @@ protected function handle(OrchestrateChainCommand $command): OrchestrateChainRes
 
 ### Отрицательные
 
-- Отложенная реализация означает, что switch-точки и объект-бог (God-object) сохраняются до триггера (conditional branching).
+- Отложенная реализация означает, что switch-точки и божественный объект (God object) сохраняются до триггера (conditional branching).
 - Существующий интеграционный тест CommandHandler (1095 строк) потребует разделения/адаптации при реализации.
 
 ### Риски
