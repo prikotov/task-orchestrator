@@ -12,12 +12,12 @@
 
 ### Проблема
 
-`StaticExecutionStrategy` и `ConditionalExecutionStrategy` не поддерживают resume — при вызове `resume()` бросают `LogicException`:
+`StaticExecutionStrategy` и `ConditionalExecutionStrategy` не поддерживают возобновление — при вызове `resume()` бросают `LogicException`:
 
 - `StaticExecutionStrategy::resume()` → `LogicException('Static chain does not support resume.')`
 - `ConditionalExecutionStrategy::resume()` → `LogicException('Conditional chain does not support resume.')`
 
-Только `DynamicExecutionStrategy` реализует resume через [`ChainSessionLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) — механизм чекпоинтов/сессий на основе JSONL (JSONL-based checkpoint/session mechanism).
+Только `DynamicExecutionStrategy` реализует возобновление через [`ChainSessionLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) — механизм чекпоинтов/сессий на основе JSONL (JSONL-based checkpoint/session mechanism).
 
 **Финансовая боль:** цепочка из 10 шагов, падение на 8-м → все результаты теряются. При стоимости LLM-вызова $0.50–$2.00 за шаг это потеря $3.50–$14.00 на каждый неудачный запуск (failed run).
 
@@ -25,7 +25,7 @@
 
 | Компонент | Назначение | Используется в |
 |-----------|------------|----------------|
-| [`ExecutionStrategyInterface::resume()`](../../src/Module/ChainDefinition/Application/Service/Chain/ExecutionStrategyInterface.php) | Контракт resume | Dynamic ✅, Static ❌, Conditional ❌ |
+| [`ExecutionStrategyInterface::resume()`](../../src/Module/ChainDefinition/Application/Service/Chain/ExecutionStrategyInterface.php) | Контракт возобновления | Dynamic ✅, Static ❌, Conditional ❌ |
 | [`OrchestrateChainCommand::$resumeDir`](../../src/Module/ChainDefinition/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommand.php) | Путь к директории с checkpoint | Dynamic ✅ |
 | [`OrchestrateChainCommandHandler`](../../src/Module/ChainDefinition/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php) | Диспетчер: `resumeDir !== null` → `resume()` | Все стратегии |
 | [`ChainSessionLoggerInterface`](../../src/Module/ChainDefinition/Domain/Service/Chain/Session/ChainSessionLoggerInterface.php) | Жизненный цикл сессии JSONL (start/logRound/complete/resume) | Dynamic |
@@ -38,9 +38,9 @@
 
 1. **`StaticChainExecution` — in-memory:** нет persistence-механизма. State живёт только в рамках одного вызова `runStaticChain()`.
 2. **`ChainSessionStateVo` — dynamic-specific:** содержит `facilitator`, `participants`, `discussionHistory`, `facilitatorJournal` — поля, не применимые к static/conditional.
-3. **`ConditionalExecutionStrategy` собирает `$context` на лету:** ассоциативный массив `stepName → {passed, exitCode, status}` накапливается итеративно — его нужно восстанавливать при resume.
+3. **`ConditionalExecutionStrategy` собирает `$context` на лету:** ассоциативный массив `stepName → {passed, exitCode, status}` накапливается итеративно — его нужно восстанавливать при возобновлении.
 
-### Аналог: поток resume для Dynamic (resume flow)
+### Аналог: поток возобновления для Dynamic (resume flow)
 
 ```
 resumeDir → ChainSessionLogger::resumeSession()
@@ -133,7 +133,7 @@ sequenceDiagram
     Strategy-->>Handler: OrchestrateChainResultDto
 ```
 
-### Поток resume (Resume Flow)
+### Поток возобновления (Resume Flow)
 
 ```mermaid
 sequenceDiagram
