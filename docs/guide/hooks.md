@@ -1,7 +1,7 @@
-# Hooks (Post-step)
+# Hooks — хуки после шага (post-step)
 
-Post-step hooks — shell-скрипты, выполняемые после завершения каждого шага цепочки.
-Hook failure = warning, не прерывает цепочку.
+Хуки после шага (post-step hooks) — shell-скрипты, выполняемые после завершения каждого шага цепочки.
+Сбой хука (hook failure) даёт предупреждение (warning) и не прерывает цепочку.
 
 ## YAML DSL
 
@@ -17,21 +17,21 @@ chains:
         post_step: "bin/notify.sh"    # вызовется после завершения шага
 ```
 
-## Env vars
+## Переменные окружения
 
-Hook получает контекст через env vars:
+Хук (hook) получает контекст через переменные окружения (env vars):
 
-| Var | Описание | Пример |
+| Переменная | Описание | Пример |
 |-----|----------|--------|
 | `HOOK_CHAIN_NAME` | Имя цепочки | `implement` |
 | `HOOK_STEP_NAME` | Имя шага | `implement` |
 | `HOOK_ROLE` | Роль агента | `backend_developer_levsha` |
-| `HOOK_EXIT_CODE` | Exit code шага | `0` |
+| `HOOK_EXIT_CODE` | Код возврата (exit code) шага | `0` |
 | `HOOK_DURATION` | Длительность (секунды) | `12.5` |
 
 ## Desktop-уведомления со звуком
 
-В комплекте идёт `bin/notify.sh` — CESP-aware скрипт с звуками через peon-ping.
+В комплекте идёт `bin/notify.sh` — скрипт с поддержкой CESP (CESP-aware) и звуками через peon-ping.
 
 ### Установка peon-ping
 
@@ -81,7 +81,7 @@ curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/install.sh 
 | `task.complete` | Шаг завершён успешно (exit code = 0) |
 | `task.error` | Шаг завершён с ошибкой (exit code ≠ 0) |
 
-## Свой hook
+## Свой хук (hook)
 
 Любой исполняемый скрипт:
 
@@ -90,10 +90,10 @@ curl -fsSL https://raw.githubusercontent.com/PeonPing/peon-ping/main/install.sh 
 echo "Цепочка: $HOOK_CHAIN_NAME, шаг: $HOOK_STEP_NAME" >&2
 ```
 
-Укажите путь в `post_step` — task-orchestrator вызовет его через Symfony Process с таймаутом 30 секунд.
+Укажите путь в `post_step` — task-orchestrator вызовет его через компонент Symfony Process с таймаутом 30 секунд.
 
 ## Ссылки
 
 - [OpenPeon — звуковые пакеты](https://openpeon.com/packs)
-- [CESP Spec](https://openpeon.com/spec)
-- [peon-ping GitHub](https://github.com/PeonPing/peon-ping)
+- [Спецификация CESP (CESP Spec)](https://openpeon.com/spec)
+- [peon-ping на GitHub](https://github.com/PeonPing/peon-ping)

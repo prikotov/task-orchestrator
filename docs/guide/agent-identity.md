@@ -32,20 +32,20 @@ AI-агенты (`pi`, Codex, OpenCode) создают PR через CLI `gh`. �
 | Слой | Что это | Сколько | Срок жизни |
 |---|---|---|---|
 | **Идентичность (Identity)** | Сам App как участник GitHub (`<your-app>[bot]`) | **Один** на все проекты и всех агентов | Постоянно |
-| **Токен (Token)** | Installation access token, который агент подставляет в `GITHUB_TOKEN` | По одному на установку в моменте | Короткоживущий, TTL ~1 ч |
+| **Токен (Token)** | Токен доступа установки (installation access token), который агент подставляет в `GITHUB_TOKEN` | По одному на установку в моменте | Короткоживущий, время жизни ~1 ч (TTL) |
 | **Доступ (Access)** | Список репозиториев, к которым у установки App есть права | Управляется галочками в настройках установки | До явного отзыва |
 
 Ключевой вывод: **одна идентичность — много короткоживущих токенов — гранулярный доступ по репо**. Утечка токена компрометирует максимум один репо на один час, а не все проекты навсегда.
 
 ### Почему именно GitHub App
 
-GitHub App — официальный механизм GitHub для автоматизации: гранулярные permissions, установка на конкретные репозитории, встроенные короткоживущие токены.
+GitHub App — официальный механизм GitHub для автоматизации: гранулярные разрешения (permissions), установка на конкретные репозитории, встроенные короткоживущие токены.
 
-Альтернатива — «бот-аккаунт» (второй обычный пользовательский аккаунт под выдуманной личностью с PAT). У неё три минуса:
+Альтернатива — «бот-аккаунт» (второй обычный пользовательский аккаунт под выдуманной личностью с личным токеном доступа (PAT, Personal Access Token)). У неё три минуса:
 
-- **Нарушает ToS (Terms of Service, условия использования) GitHub.** Один человек — один личный аккаунт; служебный аккаунт с PAT (Personal Access Token, личный токен доступа) — серая зона, GitHub официально для автоматизации предлагает именно GitHub Apps.
-- **Большой blast radius (радиус поражения).** PAT долгоживущий и привязан к аккаунту. Утечка = доступ ко всем репо, где аккаунт — collaborator (соавтор).
-- **Не масштабируется.** На десятках репозиториев добавлять второй аккаунт collaborator'ом в каждый — ручная и хрупкая операция.
+- **Нарушает условия использования GitHub (ToS, Terms of Service).** Один человек — один личный аккаунт; служебный аккаунт с личным токеном (PAT) — серая зона, GitHub официально для автоматизации предлагает именно GitHub Apps.
+- **Большой радиус поражения (blast radius).** Токен (PAT) долгоживущий и привязан к аккаунту. Утечка = доступ ко всем репо, где аккаунт — соавтор (collaborator).
+- **Не масштабируется.** На десятках репозиториев добавлять второй аккаунт соавтором (collaborator) в каждый — ручная и хрупкая операция.
 
 ### Почему один App на всех агентов
 
@@ -53,11 +53,11 @@ GitHub App — официальный механизм GitHub для автом�
 
 - Один App → одна команда `bin/console agent:token` → одна переменная `GITHUB_TOKEN`.
 - Любой агент, запущенный после `eval "$(bin/console agent:token <owner>/<repo> --format=env)"`, автоматически работает от имени App.
-- Отдельные App'ы, токены или аккаунты на каждый агент избыточны.
+- Отдельные приложения (App'ы), токены или аккаунты на каждый агент избыточны.
 
 ### Имя App выбирает пользователь
 
-Имя App выбирает пользователь. Это **свойство GitHub**: slug (короткое имя) App глобально уникален на всей платформе, поэтому каждый берёт свободное имя самостоятельно.
+Имя App выбирает пользователь. Это **свойство GitHub**: короткое имя (slug) App глобально уникально на всей платформе, поэтому каждый берёт свободное имя самостоятельно.
 
 - Рекомендуемый паттерн имени: `<your-username>-agent` (например, для автора гайда это `prikotov-agent`).
 - После создания App фигурирует в репозитории как `<your-app>[bot]` (например, `prikotov-agent[bot]` — **только пример**; у вас будет ваше имя).
@@ -70,30 +70,30 @@ GitHub App — официальный механизм GitHub для автом�
 
 ### a. Создание GitHub App
 
-1. GitHub → **Settings** (учётной записи/организации) → **Developer settings** → **GitHub Apps** → **New GitHub App**.
-2. **GitHub App name:** выберите собственное имя, например `<your-username>-agent`. Slug App глобально уникален на GitHub — если имя занято, выберите другое.
+1. GitHub → `Settings` (учётной записи/организации) → `Developer settings` → `GitHub Apps` → `New GitHub App`.
+2. `GitHub App name:` выберите собственное имя, например `<your-username>-agent`. Короткое имя (slug) App глобально уникально на GitHub — если имя занято, выберите другое.
    > Иллюстративный пример: автор гайда использует `prikotov-agent`. Выберите **своё** имя.
-3. **Homepage URL:** любой (например, URL профиля владельца).
-4. **Webhook** → **Active**: можно снять галочку (нам webhook не нужен).
+3. `Homepage URL:` любой (например, URL профиля владельца).
+4. `Webhook` → `Active`: можно снять галочку (нам webhook не нужен).
 
-### b. Permissions (разрешения)
+### b. Разрешения (Permissions)
 
-В разделе **Repository permissions** выставить:
+В разделе `Repository permissions` выставить:
 
 | Permission | Уровень | Зачем |
 |---|---|---|
-| **Contents** | Read and write | Пуш веток, работа с файлами |
-| **Pull requests** | Read and write | Создание и обновление PR |
-| **Workflows** | Read and write | Если агент пушит изменения в `.github/workflows` |
-| **Metadata** | Read-only | **Обязательно** — GitHub требует её для любого доступа к репо |
+| `Contents` | `Read and write` | Пуш веток, работа с файлами |
+| `Pull requests` | `Read and write` | Создание и обновление PR |
+| `Workflows` | `Read and write` | Если агент пушит изменения в `.github/workflows` |
+| `Metadata` | `Read-only` | **Обязательно** — GitHub требует её для любого доступа к репо |
 
-Остальные permissions оставляем **No access** — принцип минимальных привилегий.
+Остальные разрешения (permissions) оставляем `No access` — принцип минимальных привилегий.
 
-### c. Generate private key (PEM)
+### c. Выпуск приватного ключа (PEM)
 
-1. После создания App открыть его страницу (Settings → Developer settings → GitHub Apps → ваше App).
-2. Запомнить **App ID** (число вверху страницы) — оно понадобится на шаге `e`.
-3. Внизу в разделе **Private keys** → **Generate a private key**.
+1. После создания App открыть его страницу (`Settings` → `Developer settings` → `GitHub Apps` → ваше App).
+2. Запомнить `App ID` (число вверху страницы) — оно понадобится на шаге `e`.
+3. Внизу в разделе `Private keys` → `Generate a private key`.
 4. GitHub скачает файл вида `<your-app>.private-key.<date>.pem`.
 
 ### d. Сохранить PEM в каталог секретов проекта
@@ -132,9 +132,9 @@ AGENT_PRIVATE_KEY_PATH=/absolute/path/to/secrets/agent-identity/private-key.pem
 
 ### f. Install App (установка на репозиторий)
 
-1. На странице App → **Install App** (слева в меню).
+1. На странице App → `Install App` (слева в меню).
 2. Выбрать аккаунт/организацию для установки.
-3. **Repository access** → **Only select repositories** → отметить галочками нужные репо.
+3. `Repository access` → `Only select repositories` → отметить галочками нужные репо.
 4. Для пилота — отметить целевой репо (например, `task-orchestrator` — подставьте свой).
 
 После установки App получает `installation_id` (внутренний идентификатор установки) — он нужен команде для запроса токена. Команда находит его автоматически по `<owner>/<repo>`.
@@ -154,7 +154,7 @@ AGENT_PRIVATE_KEY_PATH=/absolute/path/to/secrets/agent-identity/private-key.pem
 
 ## 4. Использование команды `bin/console agent:token`
 
-Команда `bin/console agent:token` инкапсулирует весь цикл получения токена: чтение PEM → сборка JWT (RS256, через `ext-openssl`, без сторонних зависимостей) → поиск `installation_id` по `<owner>/<repo>` → запрос installation access token → кеширование.
+Команда `bin/console agent:token` инкапсулирует весь цикл получения токена: чтение PEM → сборка JWT (RS256, через `ext-openssl`, без сторонних зависимостей) → поиск `installation_id` по `<owner>/<repo>` → запрос токена доступа установки (installation access token) → кеширование.
 
 > **Архитектура.** Функционал идентичности агента — полноценная часть продукта, а не dev-утилита. Реализован как DDD-модуль `src/Module/GitIdentity` со слоями Domain/Application/Infrastructure; команда `agent:token` — точка входа в Presentation-слое CLI (`apps/console/src/Module/GitIdentity/Command/AgentTokenCommand.php`), делегирующая в use case `ObtainTokenCommandHandler`.
 
@@ -243,18 +243,18 @@ Env-переменные модуля (`AGENT_*`):
 
 | Env | Тип | По умолчанию | Назначение |
 |---|---|---|---|
-| `AGENT_APP_ID` | число > 0 | — (обязателен) | GitHub App ID. **Обязателен** при использовании команды |
-| `AGENT_PRIVATE_KEY_PATH` | путь \| null | null | Путь к PEM-файлу (обязательно `chmod 0600`). Предпочтительный источник ключа |
-| `AGENT_PRIVATE_KEY` | строка \| null | null | Inline-содержимое PEM. Альтернатива файлу |
-| `AGENT_API_BASE_URI` | строка | `https://api.github.com` | Базовый URI GitHub API (переопределяется для GitHub Enterprise) |
+| `AGENT_APP_ID` | `int` (> 0) | — (обязателен) | Идентификатор GitHub App (`App ID`). **Обязателен** при использовании команды |
+| `AGENT_PRIVATE_KEY_PATH` | путь \| `null` | `null` | Путь к файлу ключа (PEM; обязательно `chmod 0600`). Предпочтительный источник ключа |
+| `AGENT_PRIVATE_KEY` | строка \| `null` | `null` | Inline-содержимое ключа (PEM). Альтернатива файлу |
+| `AGENT_API_BASE_URI` | строка | `https://api.github.com` | Базовый URI GitHub API (переопределяется для GitHub Enterprise (GHES)) |
 | `AGENT_GITHUB_API_VERSION` | строка | `2022-11-28` | Значение заголовка `X-GitHub-Api-Version` |
 | `AGENT_USER_AGENT` | строка | `task-orchestrator-git-identity` | HTTP `User-Agent` (требование GitHub) |
-| `AGENT_JWT_TTL_SECONDS` | int | `540` | TTL JWT, диапазон `1..600` (лимит GitHub — 600) |
-| `AGENT_JWT_CLOCK_SKEW_SECONDS` | int | `60` | Сдвиг `iat` назад (толерантность к drift NTP) |
-| `AGENT_TOKEN_EXPIRY_SAFETY_MARGIN_SECONDS` | int | `60` | Запас, вычитаемый из expiry для TTL кеша токена |
-| `AGENT_INSTALLATION_ID_CACHE_TTL_SECONDS` | int \| `null` | `86400` | TTL кеша installation id; значение `null` = без expiry |
-| `AGENT_SCOPE_TO_REPOSITORY` | bool | `true` | Ограничивать installation token запрошенным репозиторием |
-| `AGENT_REQUEST_TIMEOUT_SECONDS` | int | `30` | Таймаут HTTP-запросов к GitHub |
+| `AGENT_JWT_TTL_SECONDS` | `int` | `540` | Время жизни (TTL) токена (JWT), диапазон `1..600` (лимит GitHub — 600) |
+| `AGENT_JWT_CLOCK_SKEW_SECONDS` | `int` | `60` | Сдвиг `iat` назад (толерантность к рассинхрону часов NTP (drift)) |
+| `AGENT_TOKEN_EXPIRY_SAFETY_MARGIN_SECONDS` | `int` | `60` | Запас, вычитаемый из момента истечения (expiry) для TTL кеша токена |
+| `AGENT_INSTALLATION_ID_CACHE_TTL_SECONDS` | `int` \| `null` | `86400` | TTL кеша идентификатора установки (installation id); значение `null` = без истечения (expiry) |
+| `AGENT_SCOPE_TO_REPOSITORY` | `bool` | `true` | Ограничивать токен установки (installation token) запрошенным репозиторием |
+| `AGENT_REQUEST_TIMEOUT_SECONDS` | `int` | `30` | Таймаут HTTP-запросов к GitHub |
 
 > Каталог кеша токенов не задаётся через env: он всегда `<base_path>/var/cache/git-identity` (пробрасывается в `FilesystemTokenCacheService` из параметра модуля `module.git_identity.cache_dir`, по умолчанию `<base_path>/var/cache/git-identity`).
 
@@ -286,7 +286,7 @@ AGENT_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KE
 | Секрет | Источник | Примечание |
 |---|---|---|
 | App ID | env `AGENT_APP_ID` (или переменная окружения процесса) | Обязателен; положительное целое |
-| PEM private key | `AGENT_PRIVATE_KEY_PATH` (файл, `0600`) **либо** `AGENT_PRIVATE_KEY` (inline env) | Inline приоритетнее; файл требует `chmod 0600` |
+| Приватный ключ (PEM private key) | `AGENT_PRIVATE_KEY_PATH` (файл, `0600`) **либо** `AGENT_PRIVATE_KEY` (inline env) | inline-ключ (Inline) приоритетнее; файл требует `chmod 0600` |
 
 ## 6. Переключение авторизации: человек ↔ App
 
@@ -313,8 +313,8 @@ gh auth status                             # посмотреть активну
 
 Подключение нового репозитория — **одно действие**, без новых токенов и collaborator'ов:
 
-1. GitHub → Settings → Developer settings → GitHub Apps → ваше App → **Configure** → **Install App**.
-2. В настройках установки добавить нужный репо галочкой в **Repository access**.
+1. GitHub → `Settings` → `Developer settings` → `GitHub Apps` → ваше App → `Configure` → `Install App`.
+2. В настройках установки добавить нужный репо галочкой в `Repository access`.
 3. Получить токен под новый репо:
 
 ```bash
@@ -340,7 +340,7 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --j
 # → <your-app>[bot]
 ```
 
-> Installation tokens при ротации трогать избыточно — они короткоживущие (TTL ~1 ч) и перевыпускаются сами. Ротируется только PEM (средство подписи JWT).
+> Токены установки (installation tokens) при ротации трогать избыточно — они короткоживущие (TTL ~1 ч) и перевыпускаются сами. Ротируется только PEM (средство подписи JWT).
 
 ## 9. Чек-лист DoD (эксплуатационная часть)
 
@@ -367,10 +367,10 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --j
 | `Private key file has insecure permissions (expected 0600): <path>` | Файл ключа читается группой/остальными | `chmod 0600 secrets/agent-identity/private-key.pem` |
 | `Failed to read private key file: <path>` | Файл существует, но нечитается/повреждён | Проверить содержимое PEM; при подозрении — перевыпустить (раздел [8](#8-ротация-pem-private-key)) |
 | `GitHub API error: HTTP 404 ... /repos/.../installation` | App **не установлен** на репо | Установить App (раздел [3, шаг f](#f-install-app-установка-на-репозиторий)), проверить `owner/repo` на опечатки |
-| `GitHub API error: HTTP 403/404` при операциях в репо | Недостаточные permissions App | Проверить repository permissions (раздел [3, шаг b](#b-permissions-разрешения)) |
+| `GitHub API error: HTTP 403/404` при операциях в репо | Недостаточные permissions App | Проверить repository permissions (раздел [3, шаг b](#b-разрешения-permissions)) |
 | `GitHub API request failed: network error ...` | Нет сети / прокси / DNS | Проверить подключение (как `CODEX_HTTP_PROXY`); при GHES — env `AGENT_API_BASE_URI` |
 | `gh auth status` показывает старую учётку после `eval` | `gh` кеширует авторизацию поверх `GITHUB_TOKEN` | `bin/console agent:token <owner>/<repo> --format=plain \| gh auth login --with-token`, либо `gh auth switch -u <your-app>[bot]` |
-| Команды `gh` внезапно падают с `401` спустя ~1 ч | Installation token протух (TTL ~1 ч) | Перевыпустить: повторный `eval "$(bin/console agent:token ... --format=env)"` (кеш обновится автоматически) |
+| Команды `gh` внезапно падают с `401` спустя ~1 ч | Токен установки (installation token) протух (TTL ~1 ч) | Перевыпустить: повторный `eval "$(bin/console agent:token ... --format=env)"` (кеш обновится автоматически) |
 
 ## Источники
 

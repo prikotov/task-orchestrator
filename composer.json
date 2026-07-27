@@ -29,7 +29,7 @@
         "psr/clock": "^1.0"
     },
     "require-dev": {
-        "prikotov/coding-standard": "^0.20.0",
+        "prikotov/coding-standard": "^0.26.0",
         "phpunit/phpunit": "^10.5",
         "prikotov/todo-md": "^0.0",
         "prikotov/git-workflow": "^0.3.0",

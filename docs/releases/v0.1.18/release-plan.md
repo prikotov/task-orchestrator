@@ -13,10 +13,10 @@
 - Включённые PR: #231, #232, #233, #234, #235, #236
 - Основные изменения:
   - `validate:connectivity` — проверка запуска ролей из `chains.yaml` без запуска цепочки
-  - усиление валидатора AI role files
-  - поддержка role runner profiles при делегировании сабагентов
-  - стабилизация flaky static-chain metrics integration test
-  - обновление `prikotov/*` tooling dependencies и Symfony security patches
+  - усиление валидатора файлов ролей AI (role files)
+  - поддержка профилей ролей и движков (role runner profiles) при делегировании сабагентов
+  - стабилизация нестабильного (flaky) интеграционного теста метрик `static-chain`
+  - обновление dev-инструментов (tooling) и зависимостей `prikotov/*`, заплаток безопасности Symfony (security patches)
 - Вне состава релиза: остальные изменения после `release/0.1` на момент подготовки релиза отсутствуют
 
 ## Риски
@@ -28,19 +28,19 @@
 
 ## Проверки перед deploy
 
-- [x] `composer audit --locked` — no security vulnerability advisories found
+- [x] `composer audit --locked` — уязвимостей и рекомендаций по безопасности не найдено
 - [x] `make check` — зелёный
-- [ ] `make tests-e2e` — target отсутствует в текущем Makefile
+- [ ] `make tests-e2e` — цель (target) отсутствует в текущем `Makefile`
 
 ## Порядок deploy
 
 1. Библиотека (Packagist) — по тегу `v0.1.18`
-2. Phar asset — через GitHub Actions workflow `Release Phar` по тегу `v0.1.18`
+2. Phar-артефакт — через workflow GitHub Actions `Release Phar` по тегу `v0.1.18`
 
-## Post-check
+## Проверка после deploy
 
 - Проверить, что GitHub Release `v0.1.18` создан
-- Проверить, что workflow `Release Phar` завершился, а `task-orchestrator.phar` приложен к релизу или зафиксирован warning
+- Проверить, что workflow `Release Phar` завершился, а `task-orchestrator.phar` приложен к релизу или зафиксировано предупреждение (warning)
 - Проверить smoke command: `php task-orchestrator.phar --version`
 
 ## Действия при проблеме после релиза
