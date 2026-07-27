@@ -10,7 +10,7 @@ epic: EPIC-research-approaches-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-why-software-factories-fail
-pr:
+pr: "#330"
 status: review
 ---
 
