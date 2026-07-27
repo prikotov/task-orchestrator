@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)  
 **Дата:** 2026-07-27  
 **Объект:** Dex Horthy / HumanLayer — `Why Software Factories Fail` и тезис `Harness Engineering is not Enough`  
-**Задача:** [TASK-research-why-software-factories-fail](../../../todo/TASK-research-why-software-factories-fail.todo.md)  
+**Задача:** [TASK-research-why-software-factories-fail](../../../todo/done/TASK-research-why-software-factories-fail.todo.md)
 **Эпик:** [EPIC-research-approaches-comparison](../../../todo/EPIC-research-approaches-comparison.md)
 
 ---

@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)  
 **Дата:** 2026-07-27  
 **Объект:** `docs/research/approaches/why-software-factories-fail-comparison.md`, `docs/research/approaches-summary.md`  
-**Задача:** `todo/TASK-research-why-software-factories-fail.todo.md`
+**Задача:** `todo/done/TASK-research-why-software-factories-fail.todo.md`
 
 ---
 

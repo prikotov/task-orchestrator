@@ -11,7 +11,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-why-software-factories-fail
 pr: "#330"
-status: review
+status: done
 ---
 
 # TASK-research-why-software-factories-fail: Подход Dex Horthy «Why Software Factories Fail» (front-loaded alignment)

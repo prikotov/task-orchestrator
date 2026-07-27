@@ -85,7 +85,7 @@ flowchart LR
 
 ### Этап 1: Индивидуальные исследования (параллельные)
 
-- [ ] [TASK-research-why-software-factories-fail](TASK-research-why-software-factories-fail.todo.md) — Dex Horthy «Why Software Factories Fail» (Harness Engineering is not Enough), AI Engineer World's Fair. Подход: front-loaded alignment (4 шага), dark vs lit factory, провал maintainability-награды.
+- [x] [TASK-research-why-software-factories-fail](done/TASK-research-why-software-factories-fail.todo.md) — Dex Horthy «Why Software Factories Fail» (Harness Engineering is not Enough), AI Engineer World's Fair. Подход: front-loaded alignment (4 шага), dark vs lit factory, провал maintainability-награды.
 
 ### Этап 2: Сводный анализ (после завершения серии исследований)
 
@@ -119,3 +119,4 @@ flowchart LR
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-07-27 | Тимлид (Алекс) | Создание эпика. Третий ресерч-трек: подходы/процессы разработки с AI. Первая задача — TASK-research-why-software-factories-fail. |
+| 2026-07-27 | Тимлид (Алекс) | Stage 1: TASK-research-why-software-factories-fail выполнена — вердикт **adapt** (23/24). Гипотеза про `program design` подтверждена: шаг не формализован в шаблоне `task.md`. Файл задачи перенесён в `todo/done/`. Эпик остаётся в работе (Этап 2 — сводный анализ — после накопления подходов). |
