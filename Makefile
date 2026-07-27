@@ -87,6 +87,12 @@ validate-roles: ## Валидация файлов ролей AI-агентов
 	@echo "Validate-Roles:"
 	@php bin/validate-roles
 
+.PHONY: validate-language
+validate-language: ## Валидация англицизмов в русскоязычной документации (warning mode)
+	@echo
+	@echo "Validate-Language:"
+	@vendor/bin/validate-language
+
 .PHONY: phar-smoke
 phar-smoke: ## Собрать Phar и проверить команды и fail-fast agent:init
 	@echo
@@ -106,7 +112,7 @@ composer-host-smoke: ## Проверить agent:init в физической Co
 	@bin/composer-host-smoke
 
 .PHONY: check
-check: ## Запустить все проверки (phpstan + deptrac + psalm + phpmd + phpcs + md-links + validate-todo + validate-roles + tests)
-	@${MAKE} --no-print-directory phpstan deptrac psalm phpmd phpcs md-links validate-todo validate-roles tests && \
+check: ## Запустить все проверки (phpstan + deptrac + psalm + phpmd + phpcs + md-links + validate-todo + validate-roles + validate-language + tests)
+	@${MAKE} --no-print-directory phpstan deptrac psalm phpmd phpcs md-links validate-todo validate-roles validate-language tests && \
 		{ echo; echo "✅ Все проверки завершены успешно."; } || \
 		{ echo; echo "❌ Проверки завершены с ошибками."; exit 1; }
