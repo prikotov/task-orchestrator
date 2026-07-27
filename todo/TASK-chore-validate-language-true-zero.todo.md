@@ -89,6 +89,7 @@ status: todo
 
 ### Пометки исполнителю (на что обращать внимание)
 - Не переводить **имена классов/идентификаторы**: `ExecutionStrategyInterface`, `AgentRunner`, `TASK-feat-...`, `PR #N`, имена файлов.
+- Не переводить **имена компонентов/библиотек**: «Symfony Process», «Doctrine ORM» — `Process`/`ORM` здесь часть имени компонента, не «процесс Symfony» (ошибка из ревью #328, исправлено).
 - Не переводить **термины-жаргон из allowlist**: `chain`, `runner`, `retry`, `fallback`, `payload`, `CircuitBreaker`, и т.д.
 - **Общие английские слова** (`execution`, `path`, `design`, `action`, `time`, `step`, …) — переводить.
 - Сохранять формат markdown, ссылки, якоря; после правок заголовков — `make md-links`.
