@@ -1,7 +1,7 @@
 # Coding Agents — Сводная таблица сравнения (финальная версия)
 
 **Дата создания:** 2026-05-09
-**Дата обновления:** 2026-07-24 (18 исследований)
+**Дата обновления:** 2026-07-28 (20 исследований)
 **Эпик:** [EPIC-research-coding-agents-comparison](../../todo/done/EPIC-research-coding-agents-comparison.md)
 **Автор:** Аналитик (Шерлок)
 
@@ -33,14 +33,16 @@
 | 8 | **Codebuff** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **23** | ⚠️ Частично (6/10) |
 | 9 | **Gemini CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | **22** | ⚠️ Частично (6/10) |
 | 10 | **Kilo Code CLI** | MIT | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | **22** | ⚠️ Частично (6/10) |
-| 11 | **Claude Code** | Пропр. | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ✅ | ✅ | ❌ | ⚠️ | ❌ | **21** | ⚠️ Частично (7/10) |
-| 12 | **OpenClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ✅ | ✅ | **21** | ❌ Не подходит (4/10) |
-| 13 | **Warp AI (Oz)** | AGPL | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **20** | ⚠️ Частично (7/10) |
-| 14 | **Crush** | FSL | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | **20** | ⚠️ Частично (6/10) |
-| 15 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
-| 16 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
-| 17 | **ZCode (Z.AI)** | Пропр. | ❌ | ❌ | ⚠️ | ✅ | ❌ | ❌ | ⚠️ | ⚠️ | ✅ | ❌ | **17** | ❌ Не подходит (4/10) |
-| 18 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
+| 11 | **Nanocoder** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ❌ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | **22** | ⚠️ Частично (7/10) |
+| 12 | **Claude Code** | Пропр. | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ✅ | ✅ | ❌ | ⚠️ | ❌ | **21** | ⚠️ Частично (7/10) |
+| 13 | **OpenClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ✅ | ✅ | **21** | ❌ Не подходит (4/10) |
+| 14 | **NanoClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ❌ | ⚠️ | ✅ | ⚠️ | ✅ | **21** | ❌ Не подходит (4/10) |
+| 15 | **Warp AI (Oz)** | AGPL | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **20** | ⚠️ Частично (7/10) |
+| 16 | **Crush** | FSL | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | **20** | ⚠️ Частично (6/10) |
+| 17 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
+| 18 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
+| 19 | **ZCode (Z.AI)** | Пропр. | ❌ | ❌ | ⚠️ | ✅ | ❌ | ❌ | ⚠️ | ⚠️ | ✅ | ❌ | **17** | ❌ Не подходит (4/10) |
+| 20 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
 
 > **Примечание:** omp и Pi имеют одинаковую формальную сумму 30/30, но omp занимает первое место как надмножество Pi: сохраняет критичный JSON/headless surface (поверхность запуска без интерфейса) и добавляет Rust-core, LSP/DAP, native subagents, advisor, memory, ACP и 40+ провайдеров. Pi остаётся стабильным baseline (базовой точкой) и fallback (резервом).
 
@@ -48,7 +50,7 @@
 
 ## Часть 2. Детальная сводная таблица по 10 критериям
 
-### 2.1. Open Source агенты (14 из 18)
+### 2.1. Open Source агенты (16 из 20)
 
 #### Критерий 1. Системный промпт (замена / дополнение)
 
@@ -68,6 +70,8 @@
 | **OpenClaw** | ❌ Нет CLI | ❌ Нет CLI | Workspace-файлы (SOUL.md) ⚠️ | — |
 | **Warp Oz** | ❌ Нет CLI | ❌ Нет CLI | Config/profile ⚠️ | — |
 | **Codebuff** | SDK `AgentDefinition.systemPrompt` ⚠️ | SDK `instructionsPrompt` ⚠️ | `.agents/*.ts` ⚠️ | — |
+| **Nanocoder** | ❌ Нет CLI-флагов | ❌ Нет CLI-флагов | `systemPrompt.file` в `agents.config.json` ⚠️ | `systemPrompt.mode: append` ⚠️ |
+| **NanoClaw** | ❌ Нет CLI | ❌ Нет CLI | `instructions.prepend.md` (group) ⚠️ | `instructions.prepend.md` + `memory/` ⚠️ |
 
 #### Критерий 2. Промпт агента / Роль
 
@@ -87,6 +91,8 @@
 | **OpenClaw** | Multi-agent routing (config) ⚠️ | ✅ Workspace-изоляция |
 | **Warp Oz** | Config/profile ⚠️ | ⚠️ Через profile |
 | **Codebuff** | SDK / `.agents/*.ts` custom agents ⚠️ | ✅ Через `AgentDefinition` |
+| **Nanocoder** | Subagents `.nanocoder/agents/*.md` ⚠️ | ✅ Изолированный контекст, per-agent tools/model |
+| **NanoClaw** | Multi-agent routing (agent groups) ⚠️ | ✅ Контейнерная изоляция |
 
 #### Критерий 3. Скиллы
 
@@ -106,6 +112,8 @@
 | **OpenClaw** | ⚠️ Per-agent allowlist | ❌ Нет CLI | ⚠️ Через config |
 | **Zeroclaw** | ✅ SKILL.md + SkillForge | ❌ Нет CLI | ⚠️ Через workspace |
 | **Codebuff** | ✅ Agent Skills standard | ❌ Нет CLI | ⚠️ SDK/global session |
+| **Nanocoder** | ❌ Собственный формат `skill.yaml`, не `SKILL.md` | ❌ Нет CLI | ❌ Все глобальны |
+| **NanoClaw** | ⚠️ SKILL.md есть, но иной концепт (install workflows) | ❌ Нет CLI | ⚠️ DB-колонка `skills` per-group |
 
 #### Критерий 4. AGENTS.md (контекстные файлы)
 
@@ -125,6 +133,8 @@
 | **Warp Oz** | ⚠️ Частично | — | `WARP.md` | Нет |
 | **Zeroclaw** | ⚠️ Из daemon workspace | — | Personality files | Нет CLI |
 | **Codebuff** | ✅ Авто | ✅ | `knowledge.md` | Нет CLI |
+| **Nanocoder** | ✅ Авто-загрузка из CWD | ✅ Merge при `/init` | `AGENTS.md` (generated) | Нет (косвенно config) |
+| **NanoClaw** | ❌ Нет автообнаружения | ⚠️ Генерируемый (read-only) | `instructions.prepend.md` | Нет |
 
 #### Критерий 5. `.agents/skills/` автосканирование
 
@@ -144,6 +154,8 @@
 | **Warp Oz** | ✅ | `.warp/skills/`, `.codex/skills/` | `--skill <path>` |
 | **Zeroclaw** | ❌ | `<workspace>/skills/`, open-skills opt-in | install/symlink |
 | **Codebuff** | ✅ | `.claude/skills/`, SDK `skillsDir` | Symlink или SDK |
+| **Nanocoder** | ❌ | `.nanocoder/skills/`, `~/.config/nanocoder/skills/` | Конвертация в `.nanocoder/` |
+| **NanoClaw** | ⚠️ Только для Codex-provider | `.claude-shared/skills/`, `container/skills/` | Ручное копирование в группу |
 
 #### Критерий 6. Запуск как сабагент (JSON-режим)
 
@@ -163,6 +175,8 @@
 | **Warp Oz** | `--output-format ndjson` ⚠️ | Нет | Внешний timeout | ⚠️ |
 | **Zeroclaw** | ✅ ACP JSON-RPC | ✅ isolated sessions | ✅ cancel/session timeout | ✅ |
 | **Codebuff** | ⚠️ SDK events, нет CLI JSON | SDK run | AbortSignal | ✅ SDK |
+| **Nanocoder** | `--json` ⚠️ (финальный объект) + `--acp` | Нет | `maxTurns` (200) | ⚠️ `toolCalls[]` в финальном объекте |
+| **NanoClaw** | ❌ Plain text / gateway | Нет | Host-sweep SLA | ❌ |
 
 #### Критерий 7. Токены и стоимость
 
@@ -182,6 +196,8 @@
 | **Warp Oz** | ❌ Серверно | ❌ Нет CLI | ❌ |
 | **Zeroclaw** | ✅ Prometheus + done frame | ✅ `cost_usd` | ✅ |
 | **Codebuff** | ⚠️ `totalCost`, `contextTokenCount` | ⚠️ Без детальной разбивки | ❌ |
+| **Nanocoder** | ❌ Нет в `--json` output | ❌ Не подтверждена | ❌ |
+| **NanoClaw** | ⚠️ `.jsonl` transcripts на диске | ❌ Нет CLI | ❌ |
 
 #### Критерий 8. Free tier / стоимость
 
@@ -201,6 +217,8 @@
 | **Warp Oz** | AGPL-3.0/MIT | ⚠️ Limited free tier | ✅ 4 providers | ❌ |
 | **Zeroclaw** | MIT/Apache-2.0 | ✅ Бесплатный | ✅ | ✅ Ollama/LM Studio |
 | **Codebuff** | Apache-2.0 | ⚠️ Credits + Freebuff | ✅ OpenRouter/OAuth | ❌ Нет напрямую |
+| **Nanocoder** | MIT | ✅ Бесплатный, no telemetry | ✅ BYOM | ✅ Ollama, LM Studio, llama.cpp, vLLM, MLX |
+| **NanoClaw** | MIT | ✅ | ✅ OneCLI vault | ✅ Ollama (LM Studio через OpenCode) |
 
 #### Критерий 9. Провайдеры и модели
 
@@ -220,6 +238,8 @@
 | **Gemini CLI** | 1 | Google Gemini | ❌ | ❌ |
 | **Codex CLI** | 1 + OSS/BYOK | OpenAI, Ollama, LM Studio | ❌ | ✅ |
 | **Codebuff** | 5+ + OpenRouter | OpenRouter, Anthropic OAuth, OpenAI OAuth | ✅ | ❌ |
+| **Nanocoder** | 25+ | OpenRouter, Anthropic, Google, Copilot, 8 local runners | ✅ | ✅ Ollama, llama.cpp, LM Studio, vLLM, MLX |
+| **NanoClaw** | 4 пути | Claude (default), OpenCode, Codex, Ollama | ❌ (через OpenCode) | ✅ Ollama |
 
 #### Критерий 10. Лицензия
 
@@ -239,8 +259,10 @@
 | **Warp Oz** | AGPL-3.0 + MIT | ✅ client | ✅ | ⚠️ Server proprietary |
 | **Zeroclaw** | MIT OR Apache-2.0 | ✅ | ✅ | ❌ Нет |
 | **Codebuff** | Apache-2.0 | ✅ | ✅ | ⚠️ Codebuff backend по умолчанию |
+| **Nanocoder** | MIT | ✅ TypeScript | ✅ | ❌ Нет |
+| **NanoClaw** | MIT | ✅ TypeScript/Node.js | ✅ Независимая база | ⚠️ Anthropic-centric + OneCLI |
 
-### 2.2. Проприетарные агенты (4 из 18)
+### 2.2. Проприетарные агенты (4 из 20)
 
 | Агент | К1 Промпт | К2 Роль | К3 Скиллы | К4 AGENTS.md | К5 .agents/skills/ | К6 JSON-режим | К7 Токены | К8 Free tier | К9 Провайдеры | К10 Лицензия | Вердикт |
 |-------|-----------|---------|-----------|--------------|--------------------|---------------|-----------|--------------|---------------|-------------|---------|
@@ -372,15 +394,15 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 
 | Паттерн | Агенты | Частота |
 |---------|--------|---------|
-| **Agent Skills standard** | omp, Pi, Qwen, OpenCode, Goose, Crush, Hermes, Warp, Kilo, Codex, Gemini, OpenClaw, Zeroclaw, Codebuff, ZCode | 15/18 (83%) |
-| **AGENTS.md автосканирование** | omp, Pi, Qwen, OpenCode, Hermes, Goose, Codex, Gemini, Kilo, Crush, Codebuff, ZCode | 12/18 (67%) |
-| **`.agents/skills/` автосканирование** | omp, Pi, Qwen, OpenCode, Hermes, Goose, Gemini, Kilo, Crush, OpenClaw, Warp, Codebuff | 12/18 (67%) |
-| **JSON/JSONL/RPC headless** | omp, Pi, Qwen, Claude, OpenCode, Goose, Gemini, Kilo, Codex, Warp, Zeroclaw, Factory Droid | 12/18 (67%) |
-| **Ephemeral / no-session** | omp, Pi, Goose, Codex, Zeroclaw | 5/18 (28%) |
-| **`--append-system-prompt`** | omp, Pi, Qwen, Claude | 4/18 (22%) |
-| **CLI-фильтрация/выбор скиллов** | omp, Pi, Hermes, Warp | 4/18 (22%) |
-| **Стоимость в $ в CLI/JSON** | omp, Pi, Claude, OpenCode, Zeroclaw | 5/18 (28%) |
-| **Кастомные агенты / native subagents** | omp, OpenCode, Kilo, Claude, Droid, Codebuff, Warp | 7/18 (39%) |
+| **Agent Skills standard** | omp, Pi, Qwen, OpenCode, Goose, Crush, Hermes, Warp, Kilo, Codex, Gemini, OpenClaw, Zeroclaw, Codebuff, ZCode, NanoClaw | 16/20 (80%) |
+| **AGENTS.md автосканирование** | omp, Pi, Qwen, OpenCode, Hermes, Goose, Codex, Gemini, Kilo, Crush, Codebuff, ZCode, Nanocoder | 13/20 (65%) |
+| **`.agents/skills/` автосканирование** | omp, Pi, Qwen, OpenCode, Hermes, Goose, Gemini, Kilo, Crush, OpenClaw, Warp, Codebuff | 12/20 (60%) |
+| **JSON/JSONL/RPC headless** | omp, Pi, Qwen, Claude, OpenCode, Goose, Gemini, Kilo, Codex, Warp, Zeroclaw, Factory Droid, Nanocoder | 13/20 (65%) |
+| **Ephemeral / no-session** | omp, Pi, Goose, Codex, Zeroclaw | 5/20 (25%) |
+| **`--append-system-prompt`** | omp, Pi, Qwen, Claude | 4/20 (20%) |
+| **CLI-фильтрация/выбор скиллов** | omp, Pi, Hermes, Warp | 4/20 (20%) |
+| **Стоимость в $ в CLI/JSON** | omp, Pi, Claude, OpenCode, Zeroclaw | 5/20 (25%) |
+| **Кастомные агенты / native subagents** | omp, OpenCode, Kilo, Claude, Droid, Codebuff, Warp, Nanocoder, NanoClaw | 9/20 (45%) |
 
 ### 5.2. Пробелы — что не покрывается единым стандартом
 
@@ -395,8 +417,8 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 ### 5.3. Экосистемные тренды
 
 1. **omp меняет baseline:** Pi больше не вершина по возможностям, а стабильное подмножество omp.
-2. **Agent Skills standard закрепился:** формат `SKILL.md` поддерживают 83% исследованных агентов.
-3. **AGENTS.md стал cross-agent стандартом:** 12 из 18 агентов явно поддерживают или совместимы через импортеры.
+2. **Agent Skills standard закрепился:** формат `SKILL.md` поддерживают 80% исследованных агентов.
+3. **AGENTS.md стал cross-agent стандартом:** 13 из 20 агентов явно поддерживают или совместимы через импортеры.
 4. **Native/Rust hot path:** omp и ряд новых агентов выносят поиск/парсинг/инструменты в нативный слой ради скорости.
 5. **Subagents становятся first-class:** omp (`task`), Codebuff (`spawn_agents`), Warp (inter-agent messaging) показывают тренд к внутренней оркестрации.
 6. **ACP/RPC растут как интеграционные протоколы:** omp, Goose, Kilo, Hermes, OpenClaw, Zeroclaw двигаются в сторону editor/host protocols.
@@ -438,12 +460,14 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 | 16 | OpenClaw | [openclaw-agent-comparison.md](coding-agents/openclaw-agent-comparison.md) | ❌ Не подходит (4/10) |
 | 17 | ZCode (Z.AI) | [zcode-coding-agent-comparison.md](coding-agents/zcode-coding-agent-comparison.md) | ❌ Не подходит (4/10) |
 | 18 | GitHub Copilot CLI | [copilot-cli-comparison.md](coding-agents/copilot-cli-comparison.md) | ❌ Не подходит (3/10) |
+| 19 | Nanocoder | [nanocoder-comparison.md](coding-agents/nanocoder-comparison.md) | ⚠️ Частично (7/10) |
+| 20 | NanoClaw | [nanoclaw-comparison.md](coding-agents/nanoclaw-comparison.md) | ❌ Не подходит (4/10) |
 
 ---
 
 ## Приложение. Сводка по группам
 
-### Open Source (14 из 18)
+### Open Source (16 из 20)
 
 | Агент | Язык | Лицензия | Провайдеры | Score / вердикт |
 |-------|------|----------|------------|-----------------|
@@ -454,6 +478,7 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 | Hermes Agent | Python | MIT | 30+ | 7/10 |
 | Goose | Rust | Apache-2.0 | 30+ | 7/10 |
 | Warp Oz | Rust | AGPL-3.0/MIT | 4 BYOK + 4 harness | 7/10 |
+| Nanocoder | TypeScript/Node.js | MIT | 25+ | 7/10 |
 | Zeroclaw | Rust | MIT/Apache-2.0 | 25+ | 6/10 |
 | Codex CLI | Rust/Node.js | Apache-2.0 | OpenAI + OSS | 6/10 |
 | Gemini CLI | TypeScript/Node.js | Apache-2.0 | Google only | 6/10 |
@@ -461,8 +486,9 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 | Crush | Go | FSL-1.1-MIT | 20+ | 6/10 |
 | Codebuff | TypeScript/Bun | Apache-2.0 | 5+ + OpenRouter | 6/10 |
 | OpenClaw | TypeScript/Node.js | MIT | 40+ | 4/10 |
+| NanoClaw | TypeScript/Node.js | MIT | 4 пути | 4/10 |
 
-### Проприетарные (4 из 18)
+### Проприетарные (4 из 20)
 
 | Агент | Язык | Провайдеры | Цена | Score |
 |-------|------|------------|------|-------|

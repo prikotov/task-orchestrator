@@ -128,6 +128,11 @@ flowchart LR
 
 - [x] [TASK-research-zcode-coding-agent](TASK-research-zcode-coding-agent.todo.md) — ZCode (Z.AI / Zhipu, desktop GUI-агент, GLM-5.2) *(PR #269, merge подтверждён пользователем)*
 
+### Этап 1j: Дополнительные исследования (2026-07-28)
+
+- [ ] [TASK-research-nanoclaw](../TASK-research-nanoclaw.todo.md) — NanoClaw (gavrielc/nanoclaw, security-first alternative to OpenClaw, Anthropic Agents SDK). Из телеграм-поста «лёгкие альтернативы OpenClaw: zero, nano, pi» — кандидат под «nano» (Claw-семейство). Сводка обновляется единым Stage 1j-коммитом вместе с Nanocoder.
+- [ ] [TASK-research-nanocoder](../TASK-research-nanocoder.todo.md) — Nanocoder (Nano-Collective/nanocoder, `@nanocollective/nanocoder`, local-first, MIT). Второй «nano»-кандидат (не Claw-семейство), BYOM (Ollama/OpenRouter/OpenAI-compatible).
+
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все 18 индивидуальных research-задач выполнены
 - [x] Каждый comparison-документ создан в `docs/research/coding-agents/`
@@ -159,3 +164,4 @@ flowchart LR
 | 2026-05-09 | Тимлид (Алекс) | Создание эпика |
 | 2026-06-17 | Аналитик (Шерлок) | Stage 1h: исследование ZCode (Z.AI) добавлено. Вердикт ❌ Не подходит (4/10) — desktop GUI без headless/JSON-режима (К6 — блокер). Возникший вопрос о необходимости research во втором эпике (`agent-frameworks`) закрыт: субагенты ZCode (read-only Explore + roadmap кастомных) — feature продукта, а не система оркестрации; отдельного исследования в `EPIC-research-agent-frameworks-comparison` не требуется. |
 | 2026-07-24 | Аналитик (Шерлок) | Stage 1i: добавлено исследование omp (Oh My Pi). Сводка обновлена до 18 исследований; omp поставлен #1 как надмножество Pi, Pi сохранён как baseline/fallback. |
+| 2026-07-28 | Тимлид (Алекс) | Stage 1j (post-epic): постановка research-задач на NanoClaw и Nanocoder. Происхождение: проверка по телеграм-посту — из «zero, nano, pi» уже ресерчены `zero`=ZeroClaw (#7, 6/10) и `pi` (#2, 10/10); `nano` отсутствует → два кандидата (NanoClaw как Claw-семейство, Nanocoder как независимый local-first агент). Сводная таблица обновляется один раз для обоих во избежание конфликта слияния. |
