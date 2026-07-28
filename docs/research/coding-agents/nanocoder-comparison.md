@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-07-28
 **Объект:** Nanocoder v1.29.0 (`@nanocollective/nanocoder`, TypeScript/Node.js, 2.3k★ GitHub)
-**Задача:** [TASK-research-nanocoder](../../../todo/TASK-research-nanocoder.todo.md)
+**Задача:** [TASK-research-nanocoder](../../../todo/done/TASK-research-nanocoder.todo.md)
 
 ---
 

@@ -130,11 +130,11 @@ flowchart LR
 
 ### Этап 1j: Дополнительные исследования (2026-07-28)
 
-- [ ] [TASK-research-nanoclaw](../TASK-research-nanoclaw.todo.md) — NanoClaw (gavrielc/nanoclaw, security-first alternative to OpenClaw, Anthropic Agents SDK). Из телеграм-поста «лёгкие альтернативы OpenClaw: zero, nano, pi» — кандидат под «nano» (Claw-семейство). Сводка обновляется единым Stage 1j-коммитом вместе с Nanocoder.
-- [ ] [TASK-research-nanocoder](../TASK-research-nanocoder.todo.md) — Nanocoder (Nano-Collective/nanocoder, `@nanocollective/nanocoder`, local-first, MIT). Второй «nano»-кандидат (не Claw-семейство), BYOM (Ollama/OpenRouter/OpenAI-compatible).
+- [x] [TASK-research-nanoclaw](TASK-research-nanoclaw.todo.md) — NanoClaw (`nanocoai/nanoclaw`, security-first alternative to OpenClaw, Anthropic Agents SDK). **❌ Не подходит (4/10, 21/30)** — К6-блокер сохранён (архитектурно ≡ OpenClaw, Docker-only). Канонический репозиторий — `nanocoai/nanoclaw` (`gavrielc/nanoclaw` — раннее зеркало).
+- [x] [TASK-research-nanocoder](TASK-research-nanocoder.todo.md) — Nanocoder (`Nano-Collective/nanocoder`, `@nanocollective/nanocoder`, local-first, MIT). **⚠️ Частично (7/10, 22/30)** — К6 (CLI JSON) закрыт (`--json` + `--acp`), BYOM (Ollama/OpenRouter/OpenAI-compatible).
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [x] Все 18 индивидуальных research-задач выполнены
+- [x] Все 20 индивидуальных research-задач выполнены
 - [x] Каждый comparison-документ создан в `docs/research/coding-agents/`
 - [x] Сводная таблица `docs/research/coding-agents-summary.md` создана и заполнена
 - [x] По каждому агенту есть вердикт: подходит / частично подходит / не подходит
@@ -144,7 +144,7 @@ flowchart LR
 Не требуется — эпик содержит только исследовательские задачи (docs).
 
 ## 8. Risks and Dependencies (Риски и зависимости)
-- 18 агентов — значительный объём исследования
+- 20 агентов — значительный объём исследования
 - Многие агенты активно развиваются — информация может устареть
 - Проприетарные продукты (Claude Code, Factory Droid, ZCode, GitHub Copilot CLI) — анализ только по документации
 - Названия некоторых агентов могут быть неоднозначны — нужно уточнять, какой именно проект имеется в виду
@@ -156,7 +156,7 @@ flowchart LR
 - Ссылки на репозитории и документацию — в индивидуальных задачах
 
 ## 10. Comments (Комментарии)
-Эпик объединяет исследование CLI-агентов кодинга в единый трек с чётким финальным артефактом — сводной таблицей. Задачи Этапа 1 можно выполнять в любом порядке и параллельно. Задача Этапа 2 запускается только после завершения всех 18 исследований. Pi Coding Agent уже подключён как сабагент — его исследование послужит референс-точкой и бенчмарком для остальных.
+Эпик объединяет исследование CLI-агентов кодинга в единый трек с чётким финальным артефактом — сводной таблицей. Задачи Этапа 1 можно выполнять в любом порядке и параллельно. Задача Этапа 2 запускается только после завершения всех 20 исследований. Pi Coding Agent уже подключён как сабагент — его исследование послужит референс-точкой и бенчмарком для остальных.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
@@ -165,3 +165,4 @@ flowchart LR
 | 2026-06-17 | Аналитик (Шерлок) | Stage 1h: исследование ZCode (Z.AI) добавлено. Вердикт ❌ Не подходит (4/10) — desktop GUI без headless/JSON-режима (К6 — блокер). Возникший вопрос о необходимости research во втором эпике (`agent-frameworks`) закрыт: субагенты ZCode (read-only Explore + roadmap кастомных) — feature продукта, а не система оркестрации; отдельного исследования в `EPIC-research-agent-frameworks-comparison` не требуется. |
 | 2026-07-24 | Аналитик (Шерлок) | Stage 1i: добавлено исследование omp (Oh My Pi). Сводка обновлена до 18 исследований; omp поставлен #1 как надмножество Pi, Pi сохранён как baseline/fallback. |
 | 2026-07-28 | Тимлид (Алекс) | Stage 1j (post-epic): постановка research-задач на NanoClaw и Nanocoder. Происхождение: проверка по телеграм-посту — из «zero, nano, pi» уже ресерчены `zero`=ZeroClaw (#7, 6/10) и `pi` (#2, 10/10); `nano` отсутствует → два кандидата (NanoClaw как Claw-семейство, Nanocoder как независимый local-first агент). Сводная таблица обновляется один раз для обоих во избежание конфликта слияния. |
+| 2026-07-28 | Аналитик (Шерлок) | Stage 1j выполнен: исследования NanoClaw и Nanocoder завершены. NanoClaw (`nanocoai/nanoclaw`) — ❌ Не подходит (4/10, 21/30), К6-блокер сохранён (≡ OpenClaw, Docker-only). Nanocoder (`Nano-Collective/nanocoder`) — ⚠️ Частично (7/10, 22/30), К6 закрыт (`--json`+`--acp`), local-first BYOM. Сводная таблица обновлена до 20 исследований (NanoClaw #14, Nanocoder #11). PR #331. |

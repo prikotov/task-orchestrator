@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-07-28
 **Объект:** NanoClaw v2.1.53 (`nanocoai/nanoclaw`, TypeScript/Node.js + Bun-container, 30.4k★ GitHub)
-**Задача:** [TASK-research-nanoclaw](../../../todo/TASK-research-nanoclaw.todo.md)
+**Задача:** [TASK-research-nanoclaw](../../../todo/done/TASK-research-nanoclaw.todo.md)
 
 > **Примечание о репозитории.** Канонический репозиторий — `github.com/nanocoai/nanoclaw` (README, package.json `v2.1.53`, лицензия MIT, Copyright © 2026 Gavriel). URL `github.com/gavrielc/nanoclaw` из постановки задачи — ранний/зеркальный адрес (упоминается в LinkedIn-посте автора Рэнди Байаса); контент идентичен. В отчёте используется канонический `nanocoai/nanoclaw`.
 

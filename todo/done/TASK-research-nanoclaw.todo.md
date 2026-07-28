@@ -11,7 +11,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-nanoclaw-and-nanocoder
 pr: '#331'
-status: review
+status: done
 ---
 
 # TASK-research-nanoclaw: NanoClaw — CLI-агент кодинга (экосистема OpenClaw)
