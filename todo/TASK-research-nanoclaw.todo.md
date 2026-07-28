@@ -10,8 +10,8 @@ epic: EPIC-research-coding-agents-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-nanoclaw-and-nanocoder
-pr:
-status: in_progress
+pr: '#331'
+status: review
 ---
 
 # TASK-research-nanoclaw: NanoClaw — CLI-агент кодинга (экосистема OpenClaw)
