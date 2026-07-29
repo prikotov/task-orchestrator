@@ -8,8 +8,7 @@ priority: P2
 depends_on:
 epic: EPIC-research-orchestration-articles
 author: Тимлид (Алекс)
-assignee: Аналитик (Шерлок)
-branch: —
+branch: task/research-orchestrator-tax
 pr: —
 status: pending
 ---
