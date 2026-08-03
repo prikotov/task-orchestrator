@@ -7,7 +7,8 @@ complexity: C4
 priority: P2
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-status: done
+status: in_progress
+reopened: 2026-08-03
 pr: "#171"
 branch: epic/research-coding-agents-comparison
 ---
@@ -133,6 +134,10 @@ flowchart LR
 - [x] [TASK-research-nanoclaw](TASK-research-nanoclaw.todo.md) — NanoClaw (`nanocoai/nanoclaw`, security-first alternative to OpenClaw, Anthropic Agents SDK). **❌ Не подходит (4/10, 21/30)** — К6-блокер сохранён (архитектурно ≡ OpenClaw, Docker-only). Канонический репозиторий — `nanocoai/nanoclaw` (`gavrielc/nanoclaw` — раннее зеркало).
 - [x] [TASK-research-nanocoder](TASK-research-nanocoder.todo.md) — Nanocoder (`Nano-Collective/nanocoder`, `@nanocollective/nanocoder`, local-first, MIT). **⚠️ Частично (7/10, 22/30)** — К6 (CLI JSON) закрыт (`--json` + `--acp`), BYOM (Ollama/OpenRouter/OpenAI-compatible).
 
+### Этап 1k: Дополнительные исследования (2026-08-03)
+
+- [ ] [TASK-research-deepagents](../TASK-research-deepagents.todo.md) — Deep Agents (`langchain-ai/deepagents`, Python, MIT, ≈27.3k★; agent-харнес на LangGraph + CLI-продукт **Deep Agents Code** «similar to Claude Code or Cursor», «Inspired by Claude Code»; sub-agents, filesystem, context management, HITL, skills-on-demand, tools/MCP, BYO LLM/model-agnostic). Перенесён из `EPIC-research-agent-frameworks-comparison` (зеркальный прецедент строки 125: OmO ушли отсюда в frameworks; deepagents возвращён как coding-агент). Предварительный verdict: ✅ Подходит (подтвердить по 10 критериям).
+
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все 20 индивидуальных research-задач выполнены
 - [x] Каждый comparison-документ создан в `docs/research/coding-agents/`
@@ -166,3 +171,4 @@ flowchart LR
 | 2026-07-24 | Аналитик (Шерлок) | Stage 1i: добавлено исследование omp (Oh My Pi). Сводка обновлена до 18 исследований; omp поставлен #1 как надмножество Pi, Pi сохранён как baseline/fallback. |
 | 2026-07-28 | Тимлид (Алекс) | Stage 1j (post-epic): постановка research-задач на NanoClaw и Nanocoder. Происхождение: проверка по телеграм-посту — из «zero, nano, pi» уже ресерчены `zero`=ZeroClaw (#7, 6/10) и `pi` (#2, 10/10); `nano` отсутствует → два кандидата (NanoClaw как Claw-семейство, Nanocoder как независимый local-first агент). Сводная таблица обновляется один раз для обоих во избежание конфликта слияния. |
 | 2026-07-28 | Аналитик (Шерлок) | Stage 1j выполнен: исследования NanoClaw и Nanocoder завершены. NanoClaw (`nanocoai/nanoclaw`) — ❌ Не подходит (4/10, 21/30), К6-блокер сохранён (≡ OpenClaw, Docker-only). Nanocoder (`Nano-Collective/nanocoder`) — ⚠️ Частично (7/10, 22/30), К6 закрыт (`--json`+`--acp`), local-first BYOM. Сводная таблица обновлена до 20 исследований (NanoClaw #14, Nanocoder #11). PR #331. |
+| 2026-08-03 | Тимлид (Алекс) | Эпик reopened (статус `in_progress`, стадия `1k`): добавлена постановка TASK-research-deepagents — `langchain-ai/deepagents` (Python, MIT, ≈27.3k★; agent-харнес на LangGraph + CLI-продукт Deep Agents Code «similar to Claude Code», «Inspired by Claude Code»; BYO LLM/model-agnostic, skills/MCP, HITL, sub-agents, programmatic API). Перенесён из `EPIC-research-agent-frameworks-comparison` по решению пользователя (coding-агент по аналогии с Claude Code). Предварительный verdict: ✅ Подходит (подтвердить по 10 критериям). |

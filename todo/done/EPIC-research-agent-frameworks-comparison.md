@@ -9,7 +9,7 @@ author: Тимлид (Алекс)
 assignee:
 branch: task/research-agent-frameworks-comparison
 status: in_progress
-reopened: 2026-07-26
+reopened: 2026-08-03
 pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация)"
 ---
 
@@ -121,6 +121,14 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 - [x] [TASK-research-bx-dev-skill](TASK-research-bx-dev-skill.todo.md) — bx-dev (`bish-x/bx-dev-skill`, Codex-skill/manual workflow harness; session branch from `origin/dev`, state `.bx-dev/<session-id>/`, single-shot Codex subagents: Dev → review → conventional commit → optional post-commit QA → Merger; strict flags `--solo`/`--careful`/`--no-review`/`--plan-approve`/`--no-sop`; MERGE-PROTOCOL; 105 support skills / 9 categories) *(verdict 🟡 паттерны / 🔴 не dependency; code review Approval — 1 CR устранён)*
 
+### Этап 1k: Дополнительные исследования (2026-08-03)
+
+- [ ] [TASK-research-qm](../TASK-research-qm.todo.md) — qm (`yc-software/qm`, TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: per-employee scopes, Slack+web, per-scope durable sandbox, shared skills с org-governance, security postures Strict/Auto/Dangerous + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты; потребляет `SKILL.md`/`.claude/skills`/`.codex/skills`/`AGENTS.md`). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency.
+
+### Этап 1l: Дополнительные исследования (2026-08-03)
+
+- [ ] [TASK-research-omnigent](../TASK-research-omnigent.todo.md) — omnigent (`omnigent-ai/omnigent`, Python, Apache-2.0, ≈8k★, **alpha**; open-source meta-harness над внешними coding-агентами Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML-агенты: multi-device surfaces (terminal/browser/phone/desktop), cloud sandboxes (Modal/E2B/K8s/…), OS-sandboxing (bwrap/seatbelt/Job Objects + L7 egress), policies (approval/spend/tool-limits), multi-agent supervision, collaboration; потребляет `.claude/skills`/`AGENTS.md`). Классификация: open-source meta-harness / orchestration platform over external agents, ближайший аналог qm (#32), по прецеденту Orca ADE (#30)/OmO (#23). Предварительный verdict: 🟡 паттерны / 🔴 не dependency.
+
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
 - [x] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
@@ -163,3 +171,6 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-07-10 | Тимлид (Алекс) | Stage 1i: TASK-research-onorca-ade выполнена — comparison-отчёт `orca-ade-comparison.md`, строка `Orca ADE` (#30) в summary (`30 / 30`). Verdict 🟡 заимствовать паттерны (parallel fan-out comparison, structured worker_done/dispatch-id, BYO runner ergonomics, worktree isolation, live monitoring) / 🔴 не dependency. Code review Архитектор Локи → Approval (5 CR устранены, сверено с `skills/orchestration/SKILL.md` и `src/main/runtime/orchestration/db.ts`). Задача перенесена в `done/`. |
 | 2026-07-26 | Аналитик (Шерлок) | Эпик reopened (статус `in_progress`, стадия `1j`): добавлено исследование `TASK-research-bx-dev-skill` — `bish-x/bx-dev-skill` (`$bx-dev`, Codex-skill/manual workflow harness). Классификация: система оркестрации/harness, не coding-агент, по прецеденту oh-my-openagent #23 / Orca ADE #30. Предварительный verdict: 🟡 паттерны (session-state `.bx-dev/`, strict flags, scout-plan gate, MERGE-PROTOCOL, conventional commit per task, optional QA, skill-library governance) / 🔴 не dependency (Codex-specific, no retry/CB/quality gates/budget/fix_iterations parity). |
 | 2026-07-26 | Тимлид (Алекс) | Stage 1j: TASK-research-bx-dev-skill выполнена — comparison-отчёт `bx-dev-skill-comparison.md`, строка `bx-dev` (#31) в summary (`31 / 31`). Verdict 🟡 заимствовать паттерны (strict workflow flags, scout-plan approval gate, session-state resume metadata, structured single-shot subagent report/close contract, optional post-commit QA flag, MERGE-PROTOCOL artifact, skill-library router/manifest) / 🔴 не dependency (Codex-specific, нет retry/CB/quality gates/budget/fix_iterations). Code review Архитектор Локи → 1 CR (порядок commit/QA в lifecycle) → доработка Шерлока → повторное ревью Approval (св. со `skills/bx-dev/SKILL.md` Step 9/10). `make md-links`/`validate-todo` — зелёные. Задача перенесена в `done/`. |
+| 2026-08-03 | Тимлид (Алекс) | TASK-research-deepagents перенесён из этого эпика в `EPIC-research-coding-agents-comparison` (стадия `1k` там): deepagents — CLI-агент кодинга по аналогии с Claude Code («Inspired by Claude Code»), не фреймворк оркестрации. |
+| 2026-08-03 | Тимлид (Алекс) | Эпик reopened (стадия `1k`): добавлена постановка TASK-research-qm — `yc-software/qm` (TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: scopes, Slack+web, per-scope durable sandbox, shared skills governance, security postures + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. |
+| 2026-08-03 | Тимлид (Алекс) | Эпик reopened (стадия `1l`): добавлена постановка TASK-research-omnigent — `omnigent-ai/omnigent` (Python, Apache-2.0, ≈8k★, alpha; open-source meta-harness над Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML: multi-device, cloud+OS sandboxing, policies, multi-agent supervision). Классификация: meta-harness / orchestration platform over external agents, ближайший аналог qm (#32), по прецеденту Orca ADE (#30)/OmO (#23). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. |
