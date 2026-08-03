@@ -8,9 +8,10 @@ priority: P2
 depends_on:
 epic: EPIC-research-orchestration-articles
 author: Тимлид (Алекс)
+assignee: Аналитик (Шерлок)
 branch: task/research-orchestrator-tax
 pr: —
-status: pending
+status: done
 ---
 
 # TASK-research-orchestrator-tax: Статья Martin Fowler «Orchestrator Tax» (orchestration overhead)
@@ -48,35 +49,35 @@ status: pending
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] **Критерий 1–6** — по единой методологии эпика (тезис/проблема, паттерн/концепция, domain, failure handling, маппинг на нашу архитектуру, применяемость)
-- [ ] Маппинг КАЖДОГО паттерна/anti-pattern'а из статьи на компоненты task-orchestrator (AgentRunner, ChainExecution, DynamicLoop, GitIdentity, ChainDefinition) — со ссылками
-- [ ] Вердикт по каждому паттерну: apply / study / skip — с обоснованием и оценкой усилий
-- [ ] Отдельно проверить гипотезу: наша система — это orchestrator или choreography? Какой overhead («налог») мы платим?
+- [x] **Критерий 1–6** — по единой методологии эпика (тезис/проблема, паттерн/концепция, domain, failure handling, маппинг на нашу архитектуру, применяемость)
+- [x] Маппинг КАЖДОГО паттерна/anti-pattern'а из статьи на компоненты task-orchestrator (AgentRunner, ChainExecution, DynamicLoop, GitIdentity, ChainDefinition) — со ссылками
+- [x] Вердикт по каждому паттерну: apply / study / skip — с обоснованием и оценкой усилий
+- [x] Отдельно проверить гипотезу: наша система — это orchestrator или choreography? Какой overhead («налог») мы платим?
 
 ### 🟡 Should Have (Желательно)
-- [ ] Итоговая сводка: что мы УЖЕ делаем правильно (валидация), что нужно ИЗУЧИТЬ детально (gaps), что НЕ ПРИМЕНИМО к AI-агентам
-- [ ] Оценка, как паттерн «orchestrator tax» влияет на архитектуру task-orchestrator (можем ли мы уменьшить overhead?)
-- [ ] Явное разделение: паттерны про МИКРОСЕРВИСЫ (информационные) vs паттерны про AI-АГЕНТЫ (применимые к нам)
+- [x] Итоговая сводка: что мы УЖЕ делаем правильно (валидация), что нужно ИЗУЧИТЬ детально (gaps), что НЕ ПРИМЕНИМО к AI-агентам
+- [x] Оценка, как паттерн «orchestrator tax» влияет на архитектуру task-orchestrator (можем ли мы уменьшить overhead?)
+- [x] Явное разделение: паттерны про МИКРОСЕРВИСЫ (информационные) vs паттерны про AI-АГЕНТЫ (применимые к нам)
 
 ### ⚫ Won't Have (Не будем делать)
 - [ ] Код/конфиги, изменение архитектуры, бенчмарки
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Изучить первоисточник (см. секцию Sources) — статью Martin Fowler «Orchestrator Tax»
-2. [ ] Актуализировать знание нашей архитектуры: `src/Module/AgentRunner/`, `src/Module/ChainExecution/`, `src/Module/DynamicLoop/`, `src/Module/ChainDefinition/`, `src/Module/GitIdentity/`, `docs/guide/architecture.md`
-3. [ ] Оценить каждый из 6 критериев; по каждому паттерну/anti-pattern'у — маппинг + вердикт
-4. [ ] Проверить гипотезу: orchestrator vs choreography? Какой overhead мы платим?
-5. [ ] Создать отчёт в `docs/research/orchestration-articles/orchestrator-tax-research.md`
-6. [ ] Создать/обновить сводную таблицу `docs/research/orchestration-articles-summary.md` (строка #1, статус `1 / N`)
-7. [ ] Создать аналитический отчёт в `docs/agents/reports/system-analyst/` по формату проекта
+1. [x] Изучить первоисточник (см. секцию Sources) — статью Martin Fowler «Orchestrator Tax»
+2. [x] Актуализировать знание нашей архитектуры: `src/Module/AgentRunner/`, `src/Module/ChainExecution/`, `src/Module/DynamicLoop/`, `src/Module/ChainDefinition/`, `src/Module/GitIdentity/`, `docs/guide/architecture.md`
+3. [x] Оценить каждый из 6 критериев; по каждому паттерну/anti-pattern'у — маппинг + вердикт
+4. [x] Проверить гипотезу: orchestrator vs choreography? Какой overhead мы платим?
+5. [x] Создать отчёт в `docs/research/orchestration-articles/orchestrator-tax-research.md`
+6. [x] Создать/обновить сводную таблицу `docs/research/orchestration-articles-summary.md` (строка #1, статус `1 / N`)
+7. [x] Создать аналитический отчёт в `docs/agents/reports/system-analyst/` по формату проекта
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт создан, все 6 критериев оценены
-- [ ] Маппинг каждого паттерна на нашу архитектуру — со ссылками на конкретные файлы/компоненты
-- [ ] Вердикт apply/study/skip по каждому паттерну с обоснованием и усилиями
-- [ ] Гипотеза про orchestrator vs choreography проверена
-- [ ] Строка добавлена в сводную таблицу `docs/research/orchestration-articles-summary.md`
-- [ ] Аналитический отчёт в `docs/agents/reports/system-analyst/` создан
+- [x] Отчёт создан, все 6 критериев оценены
+- [x] Маппинг каждого паттерна на нашу архитектуру — со ссылками на конкретные файлы/компоненты
+- [x] Вердикт apply/study/skip по каждому паттерну с обоснованием и усилиями
+- [x] Гипотеза про orchestrator vs choreography проверена
+- [x] Строка добавлена в сводную таблицу `docs/research/orchestration-articles-summary.md`
+- [x] Аналитический отчёт в `docs/agents/reports/system-analyst/` создан
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -120,3 +121,5 @@ ls docs/agents/reports/system-analyst/*orchestrator-tax*.md
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-07-29 | Тимлид (Алекс) | Создание задачи. Первая задача эпика EPIC-research-orchestration-articles. |
+| 2026-07-29 | Аналитик (Шерлок) | Исследование выполнено: создан research-документ `docs/research/orchestration-articles/orchestrator-tax-research.md`, сводная таблица `docs/research/orchestration-articles-summary.md`, аналитический отчёт. Обнаружено расхождение постановки с первоисточником: фактическая статья Rahul Garg (2026) про working memory orchestrator, а не Martin Fowler (2012) про saga/choreography. Гипотеза подтверждена: task-orchestrator — orchestrator, не choreography. PHPUnit/Psalm пропущены (docs-only). |
+| 2026-08-03 | Тимлид (Алекс) | Контроль и code review. Ревьювер Бэка Пуаро: **APPROVE** + 4 advisory CR (неблокирующие) — CR-1 маркировка источника секц. 7, CR-2 прояснение оценки К6, CR-3 мини-таблица «микросервисы vs AI-агенты», CR-4 кириллический якорь. Advisory приняты как backlog для следующих статей эпика. Все DoD закрыты, маппинг сверен с кодом. Задача переведена в `done`, подготовлен PR. |

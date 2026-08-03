@@ -84,7 +84,7 @@ flowchart LR
 
 ### Этап 1: Индивидуальные исследования (параллельные)
 
-- [ ] TASK-research-orchestrator-tax — Martin Fowler «Orchestrator Tax» (https://martinfowler.com/articles/orchestrator-tax.html). Overhead от централизованной оркестрации, альтернативы (choreography), когда стоит платить цену.
+- [x] [TASK-research-orchestrator-tax](done/TASK-research-orchestrator-tax.todo.md) — Martin Fowler «Orchestrator Tax» (https://martinfowler.com/articles/orchestrator-tax.html). Overhead от централизованной оркестрации, альтернативы (choreography), когда стоит платить цену.
 
 ### Этап 2: Сводный анализ (после завершения серии исследований)
 
