@@ -2,8 +2,8 @@
 
 **Роль:** Аналитик (Шерлок)  
 **Дата:** 2026-07-29  
-**Объект:** `todo/TASK-research-orchestrator-tax.todo.md`, первоисточник `https://martinfowler.com/articles/orchestrator-tax.html`, модули `AgentRunner`, `ChainExecution`, `DynamicLoop`, `ChainDefinition`, `GitIdentity`  
-**Задача:** [TASK-research-orchestrator-tax](../../../../todo/TASK-research-orchestrator-tax.todo.md)
+**Объект:** `todo/done/TASK-research-orchestrator-tax.todo.md`, первоисточник `https://martinfowler.com/articles/orchestrator-tax.html`, модули `AgentRunner`, `ChainExecution`, `DynamicLoop`, `ChainDefinition`, `GitIdentity`  
+**Задача:** [TASK-research-orchestrator-tax](../../../../todo/done/TASK-research-orchestrator-tax.todo.md)
 
 ---
 
