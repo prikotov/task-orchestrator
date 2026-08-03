@@ -9,7 +9,7 @@ epic: EPIC-research-coding-agents-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch:
-pr: "#335"
+pr: "https://github.com/prikotov/task-orchestrator/pull/335"
 status: todo
 ---
 
