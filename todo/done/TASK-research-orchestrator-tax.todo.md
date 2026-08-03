@@ -10,7 +10,7 @@ epic: EPIC-research-orchestration-articles
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-orchestrator-tax
-pr: —
+pr: '#332'
 status: done
 ---
 
