@@ -4,7 +4,7 @@
 **Дата первоисточника:** 2026-07-28  
 **Дата анализа:** 2026-07-29  
 **Эпик:** [EPIC-research-orchestration-articles](../../../todo/EPIC-research-orchestration-articles.md)  
-**Задача:** [TASK-research-orchestrator-tax](../../../todo/TASK-research-orchestrator-tax.todo.md)  
+**Задача:** [TASK-research-orchestrator-tax](../../../todo/done/TASK-research-orchestrator-tax.todo.md)  
 **Аналитик:** Аналитик (Шерлок)
 
 ---
