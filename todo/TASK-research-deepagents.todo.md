@@ -9,7 +9,7 @@ epic: EPIC-research-coding-agents-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch:
-pr:
+pr: "#335"
 status: todo
 ---
 
