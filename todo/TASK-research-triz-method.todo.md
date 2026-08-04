@@ -9,7 +9,7 @@ epic:
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch:
-pr:
+pr: "https://github.com/prikotov/task-orchestrator/pull/336"
 status: todo
 ---
 
