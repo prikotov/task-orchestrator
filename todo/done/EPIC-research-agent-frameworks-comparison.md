@@ -10,7 +10,7 @@ assignee:
 branch: task/research-agent-frameworks-comparison
 status: in_progress
 reopened: 2026-08-11
-pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация)"
+pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация), #339 (Herdr)"
 ---
 
 # EPIC-research-agent-frameworks-comparison: Исследование AI-agent фреймворков и оркестраторов
@@ -131,7 +131,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1m: Дополнительное исследование (2026-08-11)
 
-- [ ] [TASK-research-herdr](../TASK-research-herdr.todo.md) — Herdr (`herdrdev/herdr` `v0.8.0`, Rust, Apache-2.0; постоянный фоновый server (сервер) реальных PTY-терминалов для 19+ внешних coding agents (агентов программирования), состояния `idle/working/blocked/done/unknown`, 90-method CLI/socket API, события, Git worktrees, native resume, experimental live handoff, executable plugins и release-matched `SKILL.md`). Классификация: `terminal agent runtime / control surface` (терминальная среда выполнения и управляющая поверхность), не coding agent и не chain engine. Исследование выполнено; строка #34 добавлена как 32-й завершённый результат из 34 запланированных. Verdict: 🟡 паттерны / 🔴 не core dependency / 🟢 опциональная ручная среда.
+- [x] [TASK-research-herdr](TASK-research-herdr.todo.md) — Herdr (`herdrdev/herdr` `v0.8.0`, Rust, Apache-2.0; постоянный фоновый server (сервер) реальных PTY-терминалов для 19+ внешних coding agents (агентов программирования), состояния `idle/working/blocked/done/unknown`, 90-method CLI/socket API, события, Git worktrees, native resume, experimental live handoff, executable plugins и release-matched `SKILL.md`). Классификация: `terminal agent runtime / control surface` (терминальная среда выполнения и управляющая поверхность), не coding agent и не chain engine. Исследование выполнено; строка #34 добавлена как 32-й завершённый результат из 34 запланированных. Verdict: 🟡 паттерны / 🔴 не core dependency / 🟢 опциональная ручная среда.
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
@@ -179,3 +179,4 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-08-03 | Тимлид (Алекс) | Эпик reopened (стадия `1k`): добавлена постановка TASK-research-qm — `yc-software/qm` (TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: scopes, Slack+web, per-scope durable sandbox, shared skills governance, security postures + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. |
 | 2026-08-03 | Тимлид (Алекс) | Эпик reopened (стадия `1l`): добавлена постановка TASK-research-omnigent — `omnigent-ai/omnigent` (Python, Apache-2.0, ≈8k★, alpha; open-source meta-harness над Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML: multi-device, cloud+OS sandboxing, policies, multi-agent supervision). Классификация: meta-harness / orchestration platform over external agents, ближайший аналог qm (#32), по прецеденту Orca ADE (#30)/OmO (#23). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. |
 | 2026-08-11 | Аналитик (Шерлок) | Эпик reopened стадией `1m`: добавлена и выполнена постановка TASK-research-herdr по `herdrdev/herdr` `v0.8.0`. Herdr классифицирован как terminal agent runtime / control surface над внешними coding agents, а не chain engine. Создан `herdr-comparison.md`, заполнена строка #34; текущий прогресс — 32 завершённых из 34 запланированных исследований. Verdict: 🟡 заимствовать lifecycle/wait/ownership/worktree patterns; 🔴 не core dependency; 🟢 допустим как опциональная ручная среда. |
+| 2026-08-11 | Тимлид (Алекс) | Stage 1m: TASK-research-herdr принята пользователем, переведена в `done` и подготовлена к слиянию PR #339. |
