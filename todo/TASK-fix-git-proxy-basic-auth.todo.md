@@ -9,8 +9,8 @@ epic:
 author: codex-cli
 assignee: codex-cli
 branch: task/fix-git-proxy-basic-auth
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/344
+status: review
 ---
 
 # TASK-fix-git-proxy-basic-auth: Безопасный рецепт push: принудительный Basic auth прокси
@@ -114,3 +114,4 @@ git diff --check
 | 2026-08-12 | Технический писатель (Гермиона) | Создание задачи, перевод в `in_progress`, план реализации заполнен. |
 | 2026-08-12 | Технический писатель (Гермиона) | Точечная доработка: поля `author`/`assignee` приведены к справочнику `AI_AGENTS.md` (`codex-cli`); из Risks удалён `@techdebt` про внешний парсер — причина warnings устранена заменой значений во front matter. |
 | 2026-08-12 | Технический писатель (Гермиона) | Self-review по замечаниям ревью (Пуаро, Approval): отмечены фактически выполненные Must/Should критерии; из Problem/Story убрано недоказанное указание `(Cloudflare)` (это пользовательский HTTPS-прокси, принадлежность Cloudflare не подтверждена); в Comments уточнён источник proxy-credentials — стандартная конфигурация Git/libcurl (env или git config), а не `CODEX_HTTP_PROXY`. |
+| 2026-08-12 | Тимлид (Алекс) | Создан PR [#344](https://github.com/prikotov/task-orchestrator/pull/344); задача переведена в `review`. |
