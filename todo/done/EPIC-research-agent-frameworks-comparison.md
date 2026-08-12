@@ -9,8 +9,8 @@ author: Тимлид (Алекс)
 assignee:
 branch: task/research-agent-frameworks-comparison
 status: in_progress
-reopened: 2026-08-03
-pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация)"
+reopened: 2026-08-11
+pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация), #340 (Herdr; замена #339)"
 ---
 
 # EPIC-research-agent-frameworks-comparison: Исследование AI-agent фреймворков и оркестраторов
@@ -129,6 +129,10 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 - [ ] [TASK-research-omnigent](../TASK-research-omnigent.todo.md) — omnigent (`omnigent-ai/omnigent`, Python, Apache-2.0, ≈8k★, **alpha**; open-source meta-harness над внешними coding-агентами Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML-агенты: multi-device surfaces (terminal/browser/phone/desktop), cloud sandboxes (Modal/E2B/K8s/…), OS-sandboxing (bwrap/seatbelt/Job Objects + L7 egress), policies (approval/spend/tool-limits), multi-agent supervision, collaboration; потребляет `.claude/skills`/`AGENTS.md`). Классификация: open-source meta-harness / orchestration platform over external agents, ближайший аналог qm (#32), по прецеденту Orca ADE (#30)/OmO (#23). Предварительный verdict: 🟡 паттерны / 🔴 не dependency.
 
+### Этап 1m: Дополнительное исследование (2026-08-11)
+
+- [x] [TASK-research-herdr](TASK-research-herdr.todo.md) — Herdr (`herdrdev/herdr` `v0.8.0`, Rust, Apache-2.0; постоянный фоновый server (сервер) реальных PTY-терминалов для 19+ внешних coding agents (агентов программирования), состояния `idle/working/blocked/done/unknown`, 90-method CLI/socket API, события, Git worktrees, native resume, experimental live handoff, executable plugins и release-matched `SKILL.md`). Классификация: `terminal agent runtime / control surface` (терминальная среда выполнения и управляющая поверхность), не coding agent и не chain engine. Исследование выполнено; строка #34 добавлена как 32-й завершённый результат из 34 запланированных. Verdict: 🟡 паттерны / 🔴 не core dependency / 🟢 опциональная ручная среда.
+
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
 - [x] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
@@ -174,3 +178,6 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-08-03 | Тимлид (Алекс) | TASK-research-deepagents перенесён из этого эпика в `EPIC-research-coding-agents-comparison` (стадия `1k` там): deepagents — CLI-агент кодинга по аналогии с Claude Code («Inspired by Claude Code»), не фреймворк оркестрации. |
 | 2026-08-03 | Тимлид (Алекс) | Эпик reopened (стадия `1k`): добавлена постановка TASK-research-qm — `yc-software/qm` (TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: scopes, Slack+web, per-scope durable sandbox, shared skills governance, security postures + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. |
 | 2026-08-03 | Тимлид (Алекс) | Эпик reopened (стадия `1l`): добавлена постановка TASK-research-omnigent — `omnigent-ai/omnigent` (Python, Apache-2.0, ≈8k★, alpha; open-source meta-harness над Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML: multi-device, cloud+OS sandboxing, policies, multi-agent supervision). Классификация: meta-harness / orchestration platform over external agents, ближайший аналог qm (#32), по прецеденту Orca ADE (#30)/OmO (#23). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. |
+| 2026-08-11 | Аналитик (Шерлок) | Эпик reopened стадией `1m`: добавлена и выполнена постановка TASK-research-herdr по `herdrdev/herdr` `v0.8.0`. Herdr классифицирован как terminal agent runtime / control surface над внешними coding agents, а не chain engine. Создан `herdr-comparison.md`, заполнена строка #34; текущий прогресс — 32 завершённых из 34 запланированных исследований. Verdict: 🟡 заимствовать lifecycle/wait/ownership/worktree patterns; 🔴 не core dependency; 🟢 допустим как опциональная ручная среда. |
+| 2026-08-11 | Тимлид (Алекс) | Stage 1m: TASK-research-herdr принята пользователем, переведена в `done` и подготовлена к слиянию PR #340 (замена PR #339 из-за неверной идентичности отправителя). |
+| 2026-08-12 | Тимлид (Алекс) | Для Stage 1m создан PR #340 с отправкой ветки только от GitHub App; PR #339 заменён из-за блокировки правилом последнего отправителя. |
