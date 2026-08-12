@@ -9,8 +9,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-triz-method
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/343
+status: review
 ---
 
 # TASK-research-triz-method: Исследование TRIZ-метода (теория решения изобретательских задач) для реализации в task-orchestrator
@@ -133,3 +133,4 @@ TRIZ-задача открывает новый тип исследования 
 | 2026-08-12 | Аналитик (Шерлок) | Перевёл задачу в `in_progress`, зафиксировал ветку `task/research-triz-method`, выполнил исследование, отметил выполненные пункты плана и критерии. |
 | 2026-08-12 | Аналитик (Шерлок) | По self-review уточнил маппинг условного ветвления на реальные примитивы: текущий `when:` работает на уровне шагов по `passed`/`exitCode`/`status`, а смысловой routing и вложенный `DynamicLoop` требуют отдельной композиции или feat-доработки. |
 | 2026-08-12 | Аналитик (Шерлок) | По Change Requests Архитектора Локи доработал research: убрал `tool` как готовый gate для conditional MVP (оставлен `quality_gate`; tool/output conditions вынесены в draft), уточнил активацию skill через role frontmatter или manual explicit invocation, снял предпосылку фазности `DynamicLoop` от `max_rounds`, разделил effort гибрида (ручные запуски S/M, wrapper command M, nested DSL L), добавил альтернативы и обновил вердикт: implement Phase 0–1 now; full hybrid defer до eval/composition decision; усилил критерии для Domain-модуля. |
+| 2026-08-12 | Тимлид (Алекс) | Создан PR [#343](https://github.com/prikotov/task-orchestrator/pull/343); задача переведена в `review`. |
