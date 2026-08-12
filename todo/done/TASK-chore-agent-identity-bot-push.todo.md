@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/chore-agent-identity-bot-push
 pr: https://github.com/prikotov/task-orchestrator/pull/341
-status: review
+status: done
 ---
 
 # TASK-chore-agent-identity-bot-push: Зафиксировать «push PR-веток только токеном бота» и правила из ретро branch-protection
@@ -95,4 +95,4 @@ make validate-language
 
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
-| 2026-08-12 | Бэкендер (Левша) | PR #341 сужен до локального `AGENTS.md`, опциональных `agent-identity`/`troubleshooting` и трассировки задачи. Рецепт bot push отключает shell/Git-трассировку до получения секрета и явно не является контрактом для внешних потребителей; имя App настраиваемое. Helper-эксперимент, тесты и изменения consumer-facing ролей/навыков исключены. |
+| 2026-08-12 | Бэкендер (Левша) | После пользовательского approval задача переведена в `done` и подготовлена к merge. PR #341 сужен до локального `AGENTS.md`, опциональных `agent-identity`/`troubleshooting` и трассировки задачи. Рецепт bot push отключает shell/Git-трассировку до получения секрета и явно не является контрактом для внешних потребителей; имя App настраиваемое. Helper-эксперимент, тесты и изменения consumer-facing ролей/навыков исключены. |
