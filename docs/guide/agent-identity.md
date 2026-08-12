@@ -200,7 +200,7 @@ unset BOT_TOKEN
 (
     unset GIT_CONFIG GIT_CONFIG_PARAMETERS
     for VARIABLE in "${!GIT_TRACE@}"; do unset "$VARIABLE"; done
-    export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=6
+    export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=7
     export GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0=
     export GIT_CONFIG_KEY_1=credential.interactive GIT_CONFIG_VALUE_1=never
     export GIT_CONFIG_KEY_2=core.hooksPath GIT_CONFIG_VALUE_2=/dev/null
@@ -208,6 +208,7 @@ unset BOT_TOKEN
     export GIT_CONFIG_KEY_4=http.https://github.com/.extraHeader
     export GIT_CONFIG_VALUE_4="Authorization: Basic $AUTH_HEADER"
     export GIT_CONFIG_KEY_5=http.version GIT_CONFIG_VALUE_5=HTTP/1.1
+    export GIT_CONFIG_KEY_6=http.proxyAuthMethod GIT_CONFIG_VALUE_6=basic
     unset AUTH_HEADER
     GIT_ASKPASS=/bin/false GIT_TERMINAL_PROMPT=0 \
         git push "https://github.com/<owner>/<repo>.git" \
@@ -216,7 +217,7 @@ unset BOT_TOKEN
 unset AUTH_HEADER
 ```
 
-`set +x` и сброс `GIT_CURL_VERBOSE` выполняются до получения секрета, чтобы оболочка и Git не записали токен или Authorization header в диагностический вывод. `GIT_CONFIG_GLOBAL=/dev/null`, `GIT_CONFIG_NOSYSTEM=1`, пустые `credential.helper` и первый `http.extraHeader` изолируют push от учётных данных и заголовков владельца. Отключение repository hooks и остальных переменных Git-трассировки не позволяет им унаследовать Authorization header. `HTTP/1.1` обеспечивает совместимость с используемым HTTPS-прокси. Рецепт не меняет remote/upstream: каждый следующий push выполняйте так же.
+`set +x` и сброс `GIT_CURL_VERBOSE` выполняются до получения секрета, чтобы оболочка и Git не записали токен или Authorization header в диагностический вывод. `GIT_CONFIG_GLOBAL=/dev/null`, `GIT_CONFIG_NOSYSTEM=1`, пустые `credential.helper` и первый `http.extraHeader` изолируют push от учётных данных и заголовков владельца. Отключение repository hooks и остальных переменных Git-трассировки не позволяет им унаследовать Authorization header. `HTTP/1.1` обеспечивает совместимость с используемым HTTPS-прокси. `http.proxyAuthMethod=basic` заставляет Git послать учётные данные прокси в первом же `CONNECT` внутри TLS к HTTPS-прокси: по умолчанию Git использует `anyauth`, который сначала получает `407 Proxy Authentication Required`, прокси закрывает соединение (`Connection: close`), и текущая связка libcurl/OpenSSL может упасть на повторном подключении с ошибкой `SSL_write()`. Basic обходит цикл `407`/reconnect, не отключая прокси. Рецепт не меняет remote/upstream: каждый следующий push выполняйте так же.
 
 Перед запросом approval сверьтесь с журналом собственных действий: **все** push ветки должны быть выполнены по этому рецепту. GitHub API не предоставляет надёжной проверки полной истории отправителей ветки, поэтому не заявляйте о такой API-проверке. Если способ любого push неизвестен или был иным, остановитесь и согласуйте восстановление с пользователем.
 
@@ -406,6 +407,7 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --j
 | `GitHub API error: HTTP 404 ... /repos/.../installation` | App **не установлен** на репо | Установить App (раздел [3, шаг f](#f-install-app-установка-на-репозиторий)), проверить `owner/repo` на опечатки |
 | `GitHub API error: HTTP 403/404` при операциях в репо | Недостаточные permissions App | Проверить repository permissions (раздел [3, шаг b](#b-разрешения-permissions)) |
 | `GitHub API request failed: network error ...` | Нет сети / прокси / DNS | Проверить подключение (как `CODEX_HTTP_PROXY`); при GHES — env `AGENT_API_BASE_URI` |
+| `git push` падает с `SSL_write() failed: …` через HTTPS-прокси | По умолчанию `anyauth` сначала получает `407`, прокси закрывает соединение (`Connection: close`), libcurl/OpenSSL падает на повторном подключении | Использовать [безопасный рецепт](#локальный-режим-проекта-push-pr-веток-токеном-бота) с `http.proxyAuthMethod=basic`: он посылает учётные данные прокси в первом `CONNECT`, минуя цикл `407`/reconnect. Прокси не отключать |
 | `gh auth status` показывает старую учётку после `eval` | `gh` кеширует авторизацию поверх `GITHUB_TOKEN` | `bin/console agent:token <owner>/<repo> --format=plain \| gh auth login --with-token`, либо `gh auth switch -u <your-app>[bot]` |
 | Команды `gh` внезапно падают с `401` спустя ~1 ч | Токен установки (installation token) протух (TTL ~1 ч) | Перевыпустить: повторный `eval "$(bin/console agent:token ... --format=env)"` (кеш обновится автоматически) |
 
@@ -415,3 +417,4 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --j
 - [Authenticating with an installation access token](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation) — installation access tokens.
 - [Choosing permissions for a GitHub App](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/choosing-permissions-for-a-github-app) — список repository permissions.
 - [Approving a pull request with required reviews](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/approving-a-pull-request-with-required-reviews) — branch protection и почему автор не может approve свой PR.
+- [git-config — http.proxyAuthMethod](https://git-scm.com/docs/git-config#Documentation/git-config.txt-httpproxyAuthMethod) — метод аутентификации HTTP-прокси (`anyauth` по умолчанию против `basic`).
