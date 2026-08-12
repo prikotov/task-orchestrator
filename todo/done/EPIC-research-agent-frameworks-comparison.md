@@ -9,7 +9,7 @@ author: Тимлид (Алекс)
 assignee:
 branch: task/research-agent-frameworks-comparison
 status: in_progress
-reopened: 2026-08-11
+reopened: 2026-08-12
 pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация), #340 (Herdr; замена #339)"
 ---
 
@@ -131,7 +131,11 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1m: Дополнительное исследование (2026-08-11)
 
-- [x] [TASK-research-herdr](TASK-research-herdr.todo.md) — Herdr (`herdrdev/herdr` `v0.8.0`, Rust, Apache-2.0; постоянный фоновый server (сервер) реальных PTY-терминалов для 19+ внешних coding agents (агентов программирования), состояния `idle/working/blocked/done/unknown`, 90-method CLI/socket API, события, Git worktrees, native resume, experimental live handoff, executable plugins и release-matched `SKILL.md`). Классификация: `terminal agent runtime / control surface` (терминальная среда выполнения и управляющая поверхность), не coding agent и не chain engine. Исследование выполнено; строка #34 добавлена как 32-й завершённый результат из 34 запланированных. Verdict: 🟡 паттерны / 🔴 не core dependency / 🟢 опциональная ручная среда.
+- [x] [TASK-research-herdr](TASK-research-herdr.todo.md) — Herdr (`herdrdev/herdr` `v0.8.0`, Rust, Apache-2.0; постоянный фоновый server (сервер) реальных PTY-терминалов для 19+ внешних coding agents (агентов программирования), состояния `idle/working/blocked/done/unknown`, 90-method CLI/socket API, события, Git worktrees, native resume, experimental live handoff, executable plugins и release-matched `SKILL.md`). Классификация: `terminal agent runtime / control surface` (терминальная среда выполнения и управляющая поверхность), не coding agent и не chain engine. Исследование выполнено; строка #34 добавлена как 32-й завершённый результат из 34 запланированных на момент stage `1m`. После stage `1n` общий прогресс указан ниже в новой строке ALK. Verdict: 🟡 паттерны / 🔴 не core dependency / 🟢 опциональная ручная среда.
+
+### Этап 1n: Дополнительное исследование (2026-08-12)
+
+- [x] [TASK-research-agent-lifecycle-kit](TASK-research-agent-lifecycle-kit.todo.md) — Agent Lifecycle Kit (`avksp/agent-lifecycle-kit` `v1.62.0`, Python 3.11–3.14, Apache-2.0; provider-neutral lifecycle/evidence controller — нейтральный контроллер жизненного цикла и доказательств — вокруг внешних coding agents: draft intake (черновой вход) → reviewed/frozen plan (проверенный/замороженный план) → bounded host-owned execution (ограниченное исполнение внешним хостом) → implementation audit (аудит реализации) → final proof (финальное доказательство); file-backed (файловые) workflow state/runner state/receipts, public JSON schemas, 12 adapter descriptors/capability manifests, Review Mesh, model-class routing, sandbox/proof integrity receipts). Классификация: `provider-neutral lifecycle controller / evidence layer`, не coding agent (не агент программирования) и не chain engine (не движок цепочек). Исследование завершено, прошло self-review (самопроверку) и независимое Approval (одобрение) Пуаро; PR #342 создан. Строка #35 добавлена как 33-й завершённый research-результат из 35 запланированных, при этом #32 (`qm`) и #33 (`omnigent`) остаются незавершёнными и не входят в completed-счётчик. Verdict (вердикт): 🟡 заимствовать frozen-plan/proof/adapter-support patterns (паттерны замороженного плана, доказательств и поддержки адаптеров); 🔴 не core dependency (не основная зависимость).
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
@@ -152,6 +156,8 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 - Многие продукты активно развиваются — информация может устареть
 - Проприетарные продукты (Claude Code, Copilot, Codex) — анализ только по документации
 - Разные языки/экосистемы (Python, TypeScript, Rust, Go) — нужна аккуратность при переносе паттернов в PHP
+- Номера #32 (`qm`) и #33 (`omnigent`) зарезервированы активными задачами и не должны учитываться как завершённые до появления отчётов.
+- ALK быстро развивается; выводы stage `1n` (стадии 1n) привязаны к release (выпуску) `v1.62.0` и main snapshot (снимку основной ветки) 2026-08-12, переносить можно только проверенные паттерны, не Python dependency (зависимость Python).
 
 ## 9. Sources (Источники)
 - Существующие comparison-документы: `docs/research/framework-comparisons/agent-bernstein-comparison.md`, `docs/research/framework-comparisons/agent-orchestrator-comparison.md`, `docs/research/framework-comparisons/superpowers-brainstorming-comparison.md`
@@ -181,3 +187,5 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-08-11 | Аналитик (Шерлок) | Эпик reopened стадией `1m`: добавлена и выполнена постановка TASK-research-herdr по `herdrdev/herdr` `v0.8.0`. Herdr классифицирован как terminal agent runtime / control surface над внешними coding agents, а не chain engine. Создан `herdr-comparison.md`, заполнена строка #34; текущий прогресс — 32 завершённых из 34 запланированных исследований. Verdict: 🟡 заимствовать lifecycle/wait/ownership/worktree patterns; 🔴 не core dependency; 🟢 допустим как опциональная ручная среда. |
 | 2026-08-11 | Тимлид (Алекс) | Stage 1m: TASK-research-herdr принята пользователем, переведена в `done` и подготовлена к слиянию PR #340 (замена PR #339 из-за неверной идентичности отправителя). |
 | 2026-08-12 | Тимлид (Алекс) | Для Stage 1m создан PR #340 с отправкой ветки только от GitHub App; PR #339 заменён из-за блокировки правилом последнего отправителя. |
+| 2026-08-12 | Аналитик (Шерлок) | Эпик reopened стадией `1n`: создана и выполнена research-задача TASK-research-agent-lifecycle-kit по `avksp/agent-lifecycle-kit` `v1.62.0`. ALK классифицирован как provider-neutral lifecycle/evidence controller (нейтральный контроллер жизненного цикла и доказательств) вокруг внешних coding agents (агентов программирования), не coding agent и не chain engine (движок цепочек). Создан `agent-lifecycle-kit-comparison.md`, заполнена строка #35; текущий прогресс — 33 завершённых из 35 запланированных исследований, #32 `qm` и #33 `omnigent` остаются незавершёнными. Verdict (вердикт): 🟡 заимствовать frozen-plan/proof/adapter-support patterns (паттерны замороженного плана, доказательств и поддержки адаптеров); 🔴 не core dependency (не основная зависимость). |
+| 2026-08-12 | Аналитик (Шерлок) | Stage 1n: TASK-research-agent-lifecycle-kit принята после self-review (самопроверки) и независимого Approval (одобрения) Пуаро, переведена в `done`, ссылка обновлена на `todo/done/`, создан PR #342. |
