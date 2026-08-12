@@ -189,37 +189,27 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)"
 
 > **⚠️ Важно.** Следующие правила — локальная политика сопровождения репозитория `prikotov/task-orchestrator`, а не обязательный контракт библиотеки для внешних потребителей. В этом репозитории каждый push PR-ветки, начиная с первого, выполняйте через HTTPS installation token'ом настроенного GitHub App. Имя App выбирает владелец установки; `prikotov-agent` — лишь локальный пример. SSH владельца, обычный `git push` и `gh auth git-credential` запрещены: push человека может сделать его approval неучитываемым при `require_last_push_approval`. Не рассчитывайте, что последующий bot push надёжно исправит уже нарушенный процесс.
 
-Токен нельзя выводить в терминал или сессию агента. Единственный ручной рецепт проекта:
+Токен нельзя выводить в терминал или сессию агента, поэтому безопасный push выполняется исполняемым helper'ом `bin/push-pr-branch` — он и есть единственный источник истины (source of truth) для публикации PR-ветки. Ручной shell-рецепт намеренно не дублируется: контракт и изоляция реализованы в скрипте и покрыты тестами.
 
 ```bash
-set +x
-unset GIT_CURL_VERBOSE
-BOT_TOKEN="$(bin/console agent:token <owner>/<repo> --format=plain)"
-AUTH_HEADER="$(printf 'x-access-token:%s' "$BOT_TOKEN" | base64 | tr -d '\r\n')"
-unset BOT_TOKEN
-(
-    unset GIT_CONFIG GIT_CONFIG_PARAMETERS
-    for VARIABLE in "${!GIT_TRACE@}"; do unset "$VARIABLE"; done
-    export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=7
-    export GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0=
-    export GIT_CONFIG_KEY_1=credential.interactive GIT_CONFIG_VALUE_1=never
-    export GIT_CONFIG_KEY_2=core.hooksPath GIT_CONFIG_VALUE_2=/dev/null
-    export GIT_CONFIG_KEY_3=http.https://github.com/.extraHeader GIT_CONFIG_VALUE_3=
-    export GIT_CONFIG_KEY_4=http.https://github.com/.extraHeader
-    export GIT_CONFIG_VALUE_4="Authorization: Basic $AUTH_HEADER"
-    export GIT_CONFIG_KEY_5=http.version GIT_CONFIG_VALUE_5=HTTP/1.1
-    export GIT_CONFIG_KEY_6=http.proxyAuthMethod GIT_CONFIG_VALUE_6=basic
-    unset AUTH_HEADER
-    GIT_ASKPASS=/bin/false GIT_TERMINAL_PROMPT=0 \
-        git push "https://github.com/<owner>/<repo>.git" \
-        "HEAD:refs/heads/$(git branch --show-current)"
-)
-unset AUTH_HEADER
+bin/push-pr-branch <owner>/<repo>
+# Пример (подставьте свой owner/repo):
+# bin/push-pr-branch prikotov/task-orchestrator
 ```
 
-`set +x` и сброс `GIT_CURL_VERBOSE` выполняются до получения секрета, чтобы оболочка и Git не записали токен или Authorization header в диагностический вывод. `GIT_CONFIG_GLOBAL=/dev/null`, `GIT_CONFIG_NOSYSTEM=1`, пустые `credential.helper` и первый `http.extraHeader` изолируют push от учётных данных и заголовков владельца. Отключение repository hooks и остальных переменных Git-трассировки не позволяет им унаследовать Authorization header. `HTTP/1.1` обеспечивает совместимость с используемым HTTPS-прокси. `http.proxyAuthMethod=basic` заставляет Git послать учётные данные прокси в первом же `CONNECT` внутри TLS к HTTPS-прокси: по умолчанию Git использует `anyauth`, который сначала получает `407 Proxy Authentication Required`, прокси закрывает соединение (`Connection: close`), и текущая связка libcurl/OpenSSL может упасть на повторном подключении с ошибкой `SSL_write()`. Basic обходит цикл `407`/reconnect, не отключая прокси. Рецепт не меняет remote/upstream: каждый следующий push выполняйте так же.
+**Контракт helper'а** (fail-fast, без guessed defaults):
 
-Перед запросом approval сверьтесь с журналом собственных действий: **все** push ветки должны быть выполнены по этому рецепту. GitHub API не предоставляет надёжной проверки полной истории отправителей ветки, поэтому не заявляйте о такой API-проверке. Если способ любого push неизвестен или был иным, остановитесь и согласуйте восстановление с пользователем.
+- Обязательный аргумент `<owner>/<repo>`; пустой/некорректный slug отклоняется.
+- Текущая ветка определяется через Git; detached HEAD запрещён.
+- `main`, `master` и `release/*` отклоняются как целевые защищённые ветки — helper публикует только PR-ветки (`task/*`, `hotfix/*` и т. п.).
+- installation token получается только через `bin/console agent:token <owner>/<repo> --format=plain` в command substitution и **никогда не печатается**; недопустимые символы в токене вызывают отказ.
+- Git изолирован: `GIT_CONFIG_GLOBAL=/dev/null`, `GIT_CONFIG_NOSYSTEM=1`, пустые `credential.helper` и первый `http.extraHeader` отсекают учётные данные и заголовки владельца; `core.hooksPath=/dev/null` и сброс переменных `GIT_TRACE*` не дают им унаследовать `Authorization` header.
+- Обязательно `http.proxyAuthMethod=basic` и `HTTP/1.1` (см. ниже).
+- Прокси **не отключается**, fallback'ов нет, `remote`/`upstream` не меняется — каждый push выполняется одним и тем же вызовом.
+
+**Почему `http.proxyAuthMethod=basic`.** По умолчанию Git использует `anyauth`: первый `CONNECT` выполняется без учётных данных прокси, прокси отвечает `407 Proxy Authentication Required` и закрывает соединение (`Connection: close`), после чего текущая связка libcurl/OpenSSL может упасть на повторном подключении с ошибкой `SSL_write()`. `basic` заставляет Git послать учётные данные прокси в первом же `CONNECT` внутри TLS к HTTPS-прокси, обходя цикл `407`/reconnect, не отключая прокси. `HTTP/1.1` обеспечивает совместимость с используемым HTTPS-прокси.
+
+Перед запросом approval сверьтесь с журналом собственных действий: **все** push ветки должны быть выполнены через `bin/push-pr-branch`. GitHub API не предоставляет надёжной проверки полной истории отправителей ветки, поэтому не заявляйте о такой API-проверке. Если способ любого push неизвестен или был иным (например, SSH владельца или обычный `git push`), остановитесь и согласуйте восстановление с пользователем.
 
 ### Проверка, что авторизация сменилась на App
 
@@ -388,8 +378,8 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --j
 - [ ] Каталог `secrets/` присутствует в `.gitignore` проекта.
 - [ ] `eval "$(bin/console agent:token <owner>/<repo> --format=env)"` выполняется без ошибок.
 - [ ] `gh api user --jq .login` → `<your-app>[bot]`.
-- [ ] Для локального режима этого репозитория первый и каждый последующий push PR-ветки выполнен от настроенного GitHub App по [безопасному HTTPS-рецепту](#локальный-режим-проекта-push-pr-веток-токеном-бота), никогда не через SSH или обычный `git push`.
-- [ ] Перед запросом approval по журналу собственных действий подтверждено, что все push выполнены безопасным рецептом; недоступная через GitHub API проверка полной истории отправителей не заявлялась.
+- [ ] Для локального режима этого репозитория первый и каждый последующий push PR-ветки выполнен от настроенного GitHub App через [`bin/push-pr-branch`](#локальный-режим-проекта-push-pr-веток-токеном-бота), никогда не через SSH или обычный `git push`.
+- [ ] Перед запросом approval по журналу собственных действий подтверждено, что все push выполнены через `bin/push-pr-branch`; недоступная через GitHub API проверка полной истории отправителей не заявлялась.
 - [ ] Тестовый PR создан от имени `<your-app>[bot]` (`gh pr view --json author --jq .author.login`).
 - [ ] Владелец (человек) видит и может нажать **Approve** в UI.
 - [ ] Merge проходит **без** `--admin` (branch protection реально работает).
@@ -407,7 +397,10 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --j
 | `GitHub API error: HTTP 404 ... /repos/.../installation` | App **не установлен** на репо | Установить App (раздел [3, шаг f](#f-install-app-установка-на-репозиторий)), проверить `owner/repo` на опечатки |
 | `GitHub API error: HTTP 403/404` при операциях в репо | Недостаточные permissions App | Проверить repository permissions (раздел [3, шаг b](#b-разрешения-permissions)) |
 | `GitHub API request failed: network error ...` | Нет сети / прокси / DNS | Проверить подключение (как `CODEX_HTTP_PROXY`); при GHES — env `AGENT_API_BASE_URI` |
-| `git push` падает с `SSL_write() failed: …` через HTTPS-прокси | По умолчанию `anyauth` сначала получает `407`, прокси закрывает соединение (`Connection: close`), libcurl/OpenSSL падает на повторном подключении | Использовать [безопасный рецепт](#локальный-режим-проекта-push-pr-веток-токеном-бота) с `http.proxyAuthMethod=basic`: он посылает учётные данные прокси в первом `CONNECT`, минуя цикл `407`/reconnect. Прокси не отключать |
+| `git push` падает с `SSL_write() failed: …` через HTTPS-прокси | По умолчанию `anyauth` сначала получает `407`, прокси закрывает соединение (`Connection: close`), libcurl/OpenSSL падает на повторном подключении | Публиковать PR-ветку через [`bin/push-pr-branch`](#локальный-режим-проекта-push-pr-веток-токеном-бота): он задаёт `http.proxyAuthMethod=basic` и посылает учётные данные прокси в первом `CONNECT`, минуя цикл `407`/reconnect. Прокси не отключать |
+| `bin/push-pr-branch` отказывает с «refusing to push protected branch» | helper запустили на `main`/`master`/`release/*` — целевых защищённых ветках | Перейти на PR-ветку (`task/*`, `hotfix/*`) и повторить вызов; прямая публикация целевых веток намеренно запрещена |
+| `bin/push-pr-branch` отказывает с «detached HEAD» | текущее состояние репозитория — detached HEAD (нет активной ветки) | `git checkout <branch>` на PR-ветку и повторить вызов |
+| `bin/push-pr-branch` отказывает с «invalid repository slug» | аргумент не вида `<owner>/<repo>` или содержит недопустимые символы | Передать корректный slug, например `prikotov/task-orchestrator` |
 | `gh auth status` показывает старую учётку после `eval` | `gh` кеширует авторизацию поверх `GITHUB_TOKEN` | `bin/console agent:token <owner>/<repo> --format=plain \| gh auth login --with-token`, либо `gh auth switch -u <your-app>[bot]` |
 | Команды `gh` внезапно падают с `401` спустя ~1 ч | Токен установки (installation token) протух (TTL ~1 ч) | Перевыпустить: повторный `eval "$(bin/console agent:token ... --format=env)"` (кеш обновится автоматически) |
 
