@@ -8,8 +8,8 @@ depends_on:
 epic: EPIC-research-agent-frameworks-comparison
 author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
-branch: task/research-herdr
-pr: https://github.com/prikotov/task-orchestrator/pull/339
+branch: task/research-herdr-bot-push
+pr: https://github.com/prikotov/task-orchestrator/pull/340
 status: done
 ---
 
@@ -159,3 +159,4 @@ PHPUnit и Psalm можно не запускать: изменения огра
 | 2026-08-11 | Аналитик (Шерлок) | Задача создана и немедленно взята в работу по запросу пользователя. Объект зафиксирован на Herdr `v0.8.0`; предварительная классификация — терминальная среда выполнения над внешними агентами. |
 | 2026-08-11 | Аналитик (Шерлок) | Исследование завершено, документальные проверки пройдены, создан PR [#339](https://github.com/prikotov/task-orchestrator/pull/339); задача переведена в `review`. |
 | 2026-08-11 | Тимлид (Алекс) | Пользователь принял результат и явно подтвердил слияние PR #339; задача переведена в `done` перед слиянием. |
+| 2026-08-12 | Тимлид (Алекс) | PR #340 создан из ветки с чистой историей отправки от `prikotov-agent[bot]`; он заменяет заблокированный политикой последнего отправителя PR #339. |
