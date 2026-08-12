@@ -52,7 +52,7 @@ GitHub App — официальный механизм GitHub для автом�
 `pi`, Codex CLI и OpenCode — разные инструменты, но **все они работают через CLI `gh`**, который читает токен из переменных окружения `GH_TOKEN`/`GITHUB_TOKEN`. Поэтому:
 
 - Один App → одна команда `bin/console agent:token` → одна переменная `GITHUB_TOKEN`.
-- Любой агент, запущенный после `eval "$(bin/console agent:token <owner>/<repo> --format=env)"`, автоматически выполняет команды `gh` от имени App; Git push всё равно выполняется только через `bin/agent-push`.
+- Любой агент, запущенный после `eval "$(bin/console agent:token <owner>/<repo> --format=env)"`, автоматически работает от имени App.
 - Отдельные приложения (App'ы), токены или аккаунты на каждый агент избыточны.
 
 ### Имя App выбирает пользователь
@@ -185,55 +185,21 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)"
 
 > `gh` CLI читает обе переменные окружения — `GH_TOKEN` и `GITHUB_TOKEN`. Команда экспортирует `GITHUB_TOKEN`; этого достаточно для `gh` и работающих через него агентов (`pi`, Codex CLI, OpenCode).
 
-### Безопасное обращение с выводом токена
-
-`agent:token` печатает секрет. Не запускайте `--format=plain`, `--format=json` или `--format=env` отдельно «для проверки»: токен попадёт в вывод терминала или сессии агента. Используйте только непосредственное присваивание:
-
-```bash
-GH_TOKEN="$(bin/console agent:token <owner>/<repo> --format=plain)"
-export GH_TOKEN
-# либо:
-eval "$(bin/console agent:token <owner>/<repo> --format=env)"
-```
-
-Для push PR-ветки токен вручную получать не нужно: используйте `bin/agent-push` из следующего раздела.
-
 ### Push PR-веток только токеном бота
 
-> **⚠️ Важно.** PR-ветку необходимо пушить через HTTPS только installation token'ом GitHub App, начиная с первого push. Запрещены SSH владельца, обычный `git push` и `gh auth git-credential`: credential helper может отдать token human-аккаунта. При `require_last_push_approval` и `enforce_admins` push владельца может помешать засчитать его последующий approval. Не рассчитывайте, что ещё один bot push надёжно исправит уже нарушенный процесс.
+> **⚠️ Важно.** Каждый push PR-ветки, начиная с первого, выполняйте через HTTPS installation token'ом GitHub App. SSH владельца, обычный `git push` и `gh auth git-credential` запрещены: push человека может сделать его approval неучитываемым при `require_last_push_approval`. Не рассчитывайте, что последующий bot push надёжно исправит уже нарушенный процесс.
 
-#### Приоритет проектного процесса
-
-Каталог `docs/git-workflow/` генерируется из Composer-пакета `prikotov/git-workflow`, игнорируется Git в этом проекте и может содержать общий устаревший рецепт обычного `git push`. При конфликте для PR-веток этого репозитория выше по приоритету отслеживаемые `AGENTS.md`, навыки `task-via-subagents`/`epic-via-subagents` и этот гайд: допустим только `bin/agent-push`. Правка и выпуск общего vendor-пакета не входят в границы этой задачи; локальные изменения сгенерированного каталога коммитить нельзя.
-
-Безопасный рецепт проекта:
+Токен нельзя выводить в терминал или сессию агента. Единственный ручной рецепт проекта:
 
 ```bash
-export CODEX_HTTP_PROXY='http://proxy.example.test:8080' # только если нужен прокси
-bin/agent-push <owner>/<repo> "$(git branch --show-current)"
-```
-
-`bin/agent-push` работает fail-fast:
-
-- принимает только `<owner>/<repo>` и текущую локальную ветку;
-- сверяет `<owner>/<repo>` с `remote.origin.url`, нормализуя поддерживаемые SSH/HTTPS GitHub URL;
-- запрещает push в `main` и `release/*`;
-- получает installation token через `bin/console agent:token`, не печатая его;
-- очищает унаследованные `GIT_CONFIG*`, отключает системный/глобальный Git config и сбрасывает локальные `credential.helper` и `http.extraHeader`;
-- передаёт авторизацию через `http.extraHeader` без токена в аргументах процесса;
-- отключает repository hooks, интерактивный запрос credentials и потенциально раскрывающую заголовки Git-трассировку;
-- если `CODEX_HTTP_PROXY` уже экспортирован, передаёт его в `HTTP_PROXY`/`HTTPS_PROXY`;
-- принудительно использует Git HTTP/1.1 для совместимости с HTTPS-прокси;
-- не сохраняет upstream URL в локальном Git config: каждый следующий push этой PR-ветки также выполняйте явным повторным вызовом `bin/agent-push`.
-
-Ручной эквивалент нужен только при отладке helper'а. Не выводите `BOT_TOKEN` и не включайте `GIT_TRACE_CURL`:
-
-```bash
+set +x
+unset GIT_CURL_VERBOSE
 BOT_TOKEN="$(bin/console agent:token <owner>/<repo> --format=plain)"
 AUTH_HEADER="$(printf 'x-access-token:%s' "$BOT_TOKEN" | base64 | tr -d '\r\n')"
 unset BOT_TOKEN
 (
     unset GIT_CONFIG GIT_CONFIG_PARAMETERS
+    for VARIABLE in "${!GIT_TRACE@}"; do unset "$VARIABLE"; done
     export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=6
     export GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0=
     export GIT_CONFIG_KEY_1=credential.interactive GIT_CONFIG_VALUE_1=never
@@ -243,13 +209,16 @@ unset BOT_TOKEN
     export GIT_CONFIG_VALUE_4="Authorization: Basic $AUTH_HEADER"
     export GIT_CONFIG_KEY_5=http.version GIT_CONFIG_VALUE_5=HTTP/1.1
     unset AUTH_HEADER
-    GIT_TERMINAL_PROMPT=0 git push "https://github.com/<owner>/<repo>.git" \
+    GIT_ASKPASS=/bin/false GIT_TERMINAL_PROMPT=0 \
+        git push "https://github.com/<owner>/<repo>.git" \
         "HEAD:refs/heads/$(git branch --show-current)"
 )
 unset AUTH_HEADER
 ```
 
-`gh auth git-credential` не является эквивалентом этого рецепта: он может использовать сохранённую учётную запись человека независимо от `GH_TOKEN`. Helper намеренно изолирует этот источник credentials.
+`set +x` и сброс `GIT_CURL_VERBOSE` выполняются до получения секрета, чтобы оболочка и Git не записали токен или Authorization header в диагностический вывод. `GIT_CONFIG_GLOBAL=/dev/null`, `GIT_CONFIG_NOSYSTEM=1`, пустые `credential.helper` и первый `http.extraHeader` изолируют push от учётных данных и заголовков владельца. Отключение repository hooks и остальных переменных Git-трассировки не позволяет им унаследовать Authorization header. `HTTP/1.1` обеспечивает совместимость с используемым HTTPS-прокси. Рецепт не меняет remote/upstream: каждый следующий push выполняйте так же.
+
+Перед запросом approval сверьтесь с журналом собственных действий: **все** push ветки должны быть выполнены по этому рецепту. GitHub API не предоставляет надёжной проверки полной истории отправителей ветки, поэтому не заявляйте о такой API-проверке. Если способ любого push неизвестен или был иным, остановитесь и согласуйте восстановление с пользователем.
 
 ### Проверка, что авторизация сменилась на App
 
@@ -276,7 +245,7 @@ bin/console agent:token <owner>/<repo> --format=plain | gh auth login --with-tok
 
 ### Как агенты подхватывают токен
 
-`pi`, Codex CLI и OpenCode работают через CLI `gh`, который читает `GITHUB_TOKEN`/`GH_TOKEN` из окружения. Любой процесс, запущенный в той же оболочке после `eval "$(bin/console agent:token ... --format=env)"`, автоматически выполняет команды `gh` от имени `<your-app>[bot]`; для Git push всё равно обязателен `bin/agent-push`.
+`pi`, Codex CLI и OpenCode работают через CLI `gh`, который читает `GITHUB_TOKEN`/`GH_TOKEN` из окружения. Любой процесс, запущенный в той же оболочке после `eval "$(bin/console agent:token ... --format=env)"`, автоматически работает от имени `<your-app>[bot]` — отдельной конфигурации на агент не требуется.
 
 ### Механика и кеш
 
@@ -358,7 +327,7 @@ AGENT_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KE
 
 Возможны два режима работы.
 
-### Режим 1: команды `gh` агента под App, человек — в браузере
+### Режим 1: агент всегда под App, человек — в браузере
 
 - В CLI `gh` всегда выставлен токен App (через `eval ... --format=env` перед запуском агента или `gh auth login --with-token` из `--format=plain`).
 - Человек одобряет PR и выполняет merge вручную через GitHub UI в браузере от своего аккаунта.
@@ -418,9 +387,9 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --j
 - [ ] Каталог `secrets/` присутствует в `.gitignore` проекта.
 - [ ] `eval "$(bin/console agent:token <owner>/<repo> --format=env)"` выполняется без ошибок.
 - [ ] `gh api user --jq .login` → `<your-app>[bot]`.
-- [ ] Первый и каждый последующий push PR-ветки выполнен через `bin/agent-push <owner>/<repo> <branch>`, никогда не через SSH или credential helper владельца.
+- [ ] Первый и каждый последующий push PR-ветки выполнен от GitHub App по [безопасному HTTPS-рецепту](#push-pr-веток-только-токеном-бота), никогда не через SSH или обычный `git push`.
+- [ ] Перед запросом approval по журналу собственных действий подтверждено, что все push выполнены безопасным рецептом; недоступная через GitHub API проверка полной истории отправителей не заявлялась.
 - [ ] Тестовый PR создан от имени `<your-app>[bot]` (`gh pr view --json author --jq .author.login`).
-- [ ] Перед запросом approval подтверждено по журналу действий агента, что **все** push этой PR-ветки выполнялись через `bin/agent-push`; GitHub API не предоставляет надёжной проверки полной истории отправителей ветки, поэтому не заявляйте о такой API-проверке.
 - [ ] Владелец (человек) видит и может нажать **Approve** в UI.
 - [ ] Merge проходит **без** `--admin` (branch protection реально работает).
 
@@ -438,7 +407,6 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --j
 | `GitHub API error: HTTP 403/404` при операциях в репо | Недостаточные permissions App | Проверить repository permissions (раздел [3, шаг b](#b-разрешения-permissions)) |
 | `GitHub API request failed: network error ...` | Нет сети / прокси / DNS | Проверить подключение (как `CODEX_HTTP_PROXY`); при GHES — env `AGENT_API_BASE_URI` |
 | `gh auth status` показывает старую учётку после `eval` | `gh` кеширует авторизацию поверх `GITHUB_TOKEN` | `bin/console agent:token <owner>/<repo> --format=plain \| gh auth login --with-token`, либо `gh auth switch -u <your-app>[bot]` |
-| Владелец не может дать учитываемый approval после push | PR-ветка могла быть запушена через SSH или credential helper человека | Не применяйте force-push/обход `--admin`; остановитесь и согласуйте восстановление с пользователем. Новые PR-ветки с первого push отправляйте через `bin/agent-push` |
 | Команды `gh` внезапно падают с `401` спустя ~1 ч | Токен установки (installation token) протух (TTL ~1 ч) | Перевыпустить: повторный `eval "$(bin/console agent:token ... --format=env)"` (кеш обновится автоматически) |
 
 ## Источники

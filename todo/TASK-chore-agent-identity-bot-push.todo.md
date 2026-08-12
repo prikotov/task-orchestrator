@@ -2,7 +2,7 @@
 type: chore
 created: 2026-08-03
 value: V3
-complexity: C2
+complexity: C1
 priority: P1
 depends_on:
 epic:
@@ -38,52 +38,46 @@ status: review
 Зафиксировать в документации и ролях проекта правила, выявленные ретроспективой `2026-08-03_20-20-orchestrator-tax-branch-protection-incident.md`, чтобы исключить повторение трех классов ошибок: push PR-веток через SSH владельца, самовольные деструктивные операции, попадание installation token в output.
 
 ## 2. Context and Scope (Контекст и Границы)
-* **Где делаем:** `bin/agent-push`, `tests/Integration/Bin/`, `docs/guide/agent-identity.md`, роли/skills (навыки), корневые правила и связанные документы.
-* **Границы (Out of Scope):** изменение настроек branch protection репозитория; код Domain/Application/Infrastructure и конфиги продукта.
+* **Где делаем:** проектные `AGENTS.md`, `docs/guide/agent-identity.md`, роль Тимлида, навыки `task-via-subagents`/`epic-via-subagents` и точечную диагностику.
+* **Границы (Out of Scope):** изменение branch protection; код, тесты и конфиги продукта; внешние и генерируемые документы пакетов `prikotov/*`.
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [x] `bin/agent-push` — fail-fast helper для HTTPS push текущей PR-ветки installation token'ом GitHub App, без credential helper владельца, с запретом `main`/`release/*` и поддержкой экспортированного `CODEX_HTTP_PROXY`.
-- [x] Автоматические интеграционные тесты helper'а без сети и реальных секретов.
-- [x] `docs/guide/agent-identity.md` — раздел «Push PR-веток только токеном бота» с warning и рабочим рецептом (`GIT_CONFIG_GLOBAL=/dev/null` + `http.extraHeader` с installation token; пояснение, что `gh auth git-credential` отдаёт token human-аккаунта и его надо отключать). Пункт в чек-лист DoD.
-- [x] Роль Тимлида (`team_lead_alex.ru.md`, мини-чеклист) + skill `task-via-subagents` (Шаг 6) — правило про деструктивные операции (close PR, delete branch, force-push, mass move/delete) только по явному согласию пользователя.
-- [x] `AGENTS.md` (раздел «Работа с секретами») + роль Тимлида — `agent:token` не выводить в output/stdout, только `GH_TOKEN=$(...)` или `eval "$(... --format=env)"`.
+- [x] `docs/guide/agent-identity.md` — warning и единый безопасный HTTPS-рецепт push installation token'ом GitHub App без вывода токена, SSH и credentials владельца; пункт в DoD.
+- [x] Роль Тимлида и навыки — деструктивные операции только по отдельному явному согласию пользователя.
+- [x] `AGENTS.md` и роль Тимлида — `agent:token` не выводить в output/stdout, использовать только command substitution или `eval`.
 
 ### 🟡 Should Have (Желательно)
-- [x] `task-via-subagents` (Шаг 6) — порядок commit → push → create PR → metadata commit с `pr: '#NNN'` → push → merge.
-- [x] Чек-лист перед commit (из ретро 2026-06-20, повтор) — `git status` чист, метаданные задачи обновлены.
+- [x] Навыки фиксируют порядок commit → bot push → create PR → metadata commit → bot push → approval/merge.
+- [x] Чек-лист перед commit — `git status` проверен, метаданные задачи обновлены.
 
 ### ⚫ Won't Have (Не будем делать)
 - Изменение настроек branch protection репозитория (вне кода проекта).
-- Правки в Domain/Application/Infrastructure и конфигах продукта.
+- Правки в коде или конфигах продукта.
+- Helper, автоматические тесты и изменение внешних/генерируемых документов `prikotov/*`.
 
 ## 4. Implementation Plan (План реализации)
-1. [x] Реализовать `bin/agent-push`: fail-fast push через HTTPS и installation token без credential helper владельца, с поддержкой `CODEX_HTTP_PROXY`.
-2. [x] Покрыть helper автоматическими интеграционными тестами без сети и реальных секретов.
-3. [x] Дополнить `docs/guide/agent-identity.md` разделом про push от бота (warning + рецепт + пункт DoD).
-4. [x] Дополнить роль Тимлида `docs/agents/roles/team/team_lead_alex.ru.md` (мини-чеклист) и skill `docs/agents/skills/task-via-subagents/SKILL.md` (Шаг 6) правилом деструктивных операций по согласию.
-5. [x] Дополнить `AGENTS.md` (раздел «Работа с секретами») и роль Тимлида правилом про токен не в output.
-6. [x] Уточнить порядок `pr: '#NNN'` в `task-via-subagents`.
-7. [x] Проверить целевые автоматические тесты, `make md-links` и `make validate-language`.
+1. [x] Добавить в `agent-identity.md` единый безопасный ручной рецепт bot push и пункт DoD.
+2. [x] Точечно обновить проектные правила, роль Тимлида и навыки без изменения внешних/генерируемых документов.
+3. [x] Зафиксировать согласие на деструктивные операции, защиту token output и metadata-before-approval.
+4. [x] Удалить локальный эксперимент helper'а и его тесты из PR.
+5. [x] Проверить документацию и задачу.
 
 ## 5. Definition of Done (Критерии приёмки)
-- [x] Гайд `agent-identity.md` содержит warning и рецепт push от бота.
-- [x] `bin/agent-push` безопасно изолирует bot push и покрыт тестами без сети/секретов.
-- [x] Роль и скиллы фиксируют правило деструктивных операций по согласию.
+- [x] Гайд `agent-identity.md` содержит warning и единственный безопасный рецепт push от бота.
+- [x] Роль и навыки фиксируют bot push, metadata-before-approval и согласие на деструктивные операции.
 - [x] Правило «токен не в output» зафиксировано в `AGENTS.md` и роли Тимлида.
-- [x] `make md-links` — зелёный.
-- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные.
+- [x] PR содержит только проектные docs-only изменения; helper, тесты и внешние/генерируемые документы отсутствуют.
+- [x] `make md-links`, `make validate-todo` и `make validate-language` — зелёные (предсуществующее предупреждение языка не блокирует проверку).
 
 ## 6. Verification (Самопроверка)
 ```bash
 grep -n "push.*токеном бота\|http.extraheader" docs/guide/agent-identity.md
 grep -n "деструктив" docs/agents/roles/team/team_lead_alex.ru.md docs/agents/skills/task-via-subagents/SKILL.md
 grep -n "не выводить в output\|agent:token" AGENTS.md
-vendor/bin/phpunit tests/Integration/Bin/AgentPushScriptTest.php
 make md-links
+make validate-todo
 make validate-language
-vendor/bin/phpunit
-vendor/bin/psalm
 ```
 
 ## 7. Sources (Источники)
@@ -96,11 +90,10 @@ vendor/bin/psalm
 - Гайд: `docs/guide/agent-identity.md`.
 
 ## 8. Comments (Комментарии)
-Задача-фоллоуап к инциденту merge PR #333. Приоритет P1 — предотвратить повторение в следующих merge-циклах.
+Задача-фоллоуап к инциденту merge PR #333. Приоритет P1 — предотвратить повторение в следующих merge-циклах. Изменения docs-only; PHPUnit и Psalm пропущены по исключению. Локальный эксперимент с helper'ом и автоматическими тестами удалён из PR; внешние/генерируемые документы не изменяются.
 
 ## Change History (История изменений)
 
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
-| 2026-08-12 | Бэкендер (Левша) | Реализован `bin/agent-push` с изоляцией учётных данных владельца и защитой секрета, сверкой origin и HTTP/1.1 для совместимости с HTTPS-прокси; добавлены интеграционные тесты и обновлён обязательный процесс PR. Перед запросом approval обязательна сверка всех push с журналом действий без заявления о недоступной через API проверке полной истории отправителей. После self-review целевые тесты — 18 тестов и 81 проверка; ранее полный PHPUnit — 1499 тестов и 4020 проверок; Psalm и документальные проверки успешны. |
-| 2026-08-12 | Тимлид (Алекс) | Создан PR [#341](https://github.com/prikotov/task-orchestrator/pull/341) из ветки, отправленной GitHub App; задача переведена в `review`. |
+| 2026-08-12 | Бэкендер (Левша) | PR #341 сужен до точечных проектных docs-only правил: единый безопасный ручной рецепт bot push с отключением shell/Git-трассировки до получения секрета, защита token output, согласие на деструктивные операции и metadata-before-approval. Локальный helper-эксперимент и тесты исключены. `md-links`, `validate-todo`, `validate-language` успешны; предсуществующее предупреждение языка не блокирует проверку. |

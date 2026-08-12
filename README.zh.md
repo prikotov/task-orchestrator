@@ -216,7 +216,6 @@ php vendor/bin/task-orchestrator validate:connectivity --role=system_analyst_she
 |---|---|
 | [架構](docs/guide/architecture.md) | DDD 分層、模組、CQRS |
 | [CLI 命令](docs/guide/cli.md) | 編排、單一代理執行、角色連通性檢查 |
-| [代理身分](docs/guide/agent-identity.md) | GitHub App 與僅供原始碼工作區使用的 PR 分支安全推送工具 `bin/agent-push` |
 | [鏈條](docs/guide/chains.md) | Static / Dynamic / Conditional、YAML DSL |
 | [角色](docs/guide/roles.md) | 角色配置、prompt files、runners |
 | [可靠性](docs/guide/reliability.md) | Retry、Circuit Breaker、Fallback、Sessions/Resume |

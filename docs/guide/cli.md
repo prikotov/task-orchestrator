@@ -9,10 +9,6 @@ composer install
 php vendor/bin/task-orchestrator list
 ```
 
-## Repository helper `bin/agent-push`
-
-`bin/agent-push <owner>/<repo> <branch>` — служебный helper для сопровождающего исходного checkout: безопасно пушит текущую PR-ветку через HTTPS от GitHub App, не используя credential helper владельца. Он не входит в Composer binary и запускается только из корня этого репозитория. Контракт, ограничения и настройка прокси описаны в [гайде по идентичности агента](agent-identity.md#push-pr-веток-только-токеном-бота).
-
 ## Команды
 
 ### `agent:orchestrate`
