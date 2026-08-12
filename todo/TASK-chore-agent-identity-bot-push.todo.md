@@ -9,8 +9,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Бэкендер (Левша)
 branch: task/chore-agent-identity-bot-push
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/341
+status: review
 ---
 
 # TASK-chore-agent-identity-bot-push: Зафиксировать «push PR-веток только токеном бота» и правила из ретро branch-protection
@@ -103,3 +103,4 @@ vendor/bin/psalm
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-12 | Бэкендер (Левша) | Реализован `bin/agent-push` с изоляцией учётных данных владельца и защитой секрета, сверкой origin и HTTP/1.1 для совместимости с HTTPS-прокси; добавлены интеграционные тесты и обновлён обязательный процесс PR. Перед запросом approval обязательна сверка всех push с журналом действий без заявления о недоступной через API проверке полной истории отправителей. После self-review целевые тесты — 18 тестов и 81 проверка; ранее полный PHPUnit — 1499 тестов и 4020 проверок; Psalm и документальные проверки успешны. |
+| 2026-08-12 | Тимлид (Алекс) | Создан PR [#341](https://github.com/prikotov/task-orchestrator/pull/341) из ветки, отправленной GitHub App; задача переведена в `review`. |
