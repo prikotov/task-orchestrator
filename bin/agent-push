@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+# Запретить xtrace даже при `bash -x` или унаследованном SHELLOPTS:
+# installation token и Authorization header никогда не должны попасть в stderr.
+set +x
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+usage() {
+    cat >&2 <<'EOF'
+Usage: bin/agent-push <owner>/<repo> <branch>
+
+Push the current HEAD to a PR branch over HTTPS using a GitHub App
+installation token. The branch must be the currently checked-out branch.
+EOF
+}
+
+fail() {
+    printf 'ERROR: %s\n' "$1" >&2
+    exit 2
+}
+
+if [[ $# -ne 2 ]]; then
+    usage
+    exit 2
+fi
+
+repository="$1"
+branch="$2"
+
+if [[ ! "$repository" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+    fail 'repository must have the form <owner>/<repo>.'
+fi
+
+for command_name in git base64 tr mktemp; do
+    if ! command -v "$command_name" >/dev/null 2>&1; then
+        fail "$command_name is required."
+    fi
+done
+
+# Очищаем потенциально опасную унаследованную конфигурацию до первого вызова
+# Git: даже проверки checkout не должны читать подменённый GIT_CONFIG или писать
+# трассировку с данными локальной конфигурации.
+unset GIT_CURL_VERBOSE GH_TOKEN GITHUB_TOKEN GIT_ASKPASS SSH_ASKPASS
+unset GIT_CONFIG GIT_CONFIG_COUNT GIT_CONFIG_PARAMETERS
+for variable_name in "${!GIT_TRACE@}" \
+    "${!GIT_CONFIG_KEY_@}" "${!GIT_CONFIG_VALUE_@}"; do
+    unset "$variable_name"
+done
+
+if [[ ! -x "$ROOT_DIR/bin/console" ]]; then
+    fail 'bin/console is missing or is not executable.'
+fi
+
+repository_root="$(git rev-parse --show-toplevel 2>/dev/null)" \
+    || fail 'current directory is not inside a Git repository.'
+repository_root="$(cd "$repository_root" 2>/dev/null && pwd -P)" \
+    || fail 'Git repository root does not exist or is inaccessible.'
+if [[ "$repository_root" != "$(cd "$ROOT_DIR" && pwd -P)" ]]; then
+    fail 'bin/agent-push must run for the repository checkout that contains it.'
+fi
+
+origin_url="$(git config --local --get remote.origin.url 2>/dev/null)" \
+    || fail 'remote.origin.url is missing.'
+
+normalize_github_repository() {
+    local url="$1"
+    local slug
+
+    case "$url" in
+        https://github.com/*)
+            slug="${url#https://github.com/}"
+            ;;
+        git@github.com:*)
+            slug="${url#git@github.com:}"
+            ;;
+        ssh://git@github.com/*)
+            slug="${url#ssh://git@github.com/}"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+
+    slug="${slug%.git}"
+    if [[ ! "$slug" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+        return 1
+    fi
+
+    printf '%s\n' "${slug,,}"
+}
+
+origin_repository="$(normalize_github_repository "$origin_url")" \
+    || fail 'remote.origin.url must be a supported SSH or HTTPS GitHub URL.'
+if [[ "$origin_repository" != "${repository,,}" ]]; then
+    fail "remote.origin.url does not match repository '$repository'."
+fi
+
+if ! git check-ref-format --branch "$branch" >/dev/null 2>&1; then
+    fail 'branch is not a valid Git branch name.'
+fi
+
+if [[ "$branch" == 'main' || "$branch" == release/* ]]; then
+    fail 'protected branches main and release/* cannot be pushed by this helper.'
+fi
+
+current_branch="$(git symbolic-ref --quiet --short HEAD)" \
+    || fail 'HEAD is detached; check out the PR branch before pushing.'
+
+if [[ "$current_branch" != "$branch" ]]; then
+    fail "current branch is '$current_branch', expected '$branch'."
+fi
+
+if [[ -n "${CODEX_HTTP_PROXY:-}" ]]; then
+    export HTTP_PROXY="$CODEX_HTTP_PROXY"
+    export HTTPS_PROXY="$CODEX_HTTP_PROXY"
+    export http_proxy="$CODEX_HTTP_PROXY"
+    export https_proxy="$CODEX_HTTP_PROXY"
+fi
+
+umask 077
+token_error_file="$(mktemp)"
+trap 'rm -f "$token_error_file"' EXIT
+if ! bot_token="$("$ROOT_DIR/bin/console" agent:token "$repository" --format=plain 2>"$token_error_file")"; then
+    fail 'failed to obtain a GitHub App installation token.'
+fi
+rm -f "$token_error_file"
+trap - EXIT
+
+if [[ ! "$bot_token" =~ ^[A-Za-z0-9_.-]+$ ]]; then
+    fail 'agent:token returned an empty or malformed token.'
+fi
+
+basic_credentials="$(printf 'x-access-token:%s' "$bot_token" | base64 | tr -d '\r\n')"
+unset bot_token
+
+# GIT_CONFIG_GLOBAL=/dev/null и GIT_CONFIG_NOSYSTEM=1 изолируют push от
+# credential helper владельца. Пустой credential.helper сбрасывает helper из
+# локального config, пустой http.extraHeader сбрасывает заголовки из local
+# config, а core.hooksPath отключает repository hooks, которым нельзя
+# наследовать Authorization header. Header передаётся через окружение, поэтому
+# секрет не появляется ни в аргументах процесса, ни в stdout.
+export GIT_CONFIG_GLOBAL=/dev/null
+export GIT_CONFIG_NOSYSTEM=1
+export GIT_CONFIG_COUNT=6
+export GIT_CONFIG_KEY_0=credential.helper
+export GIT_CONFIG_VALUE_0=
+export GIT_CONFIG_KEY_1=credential.interactive
+export GIT_CONFIG_VALUE_1=never
+export GIT_CONFIG_KEY_2=core.hooksPath
+export GIT_CONFIG_VALUE_2=/dev/null
+export GIT_CONFIG_KEY_3=http.https://github.com/.extraHeader
+export GIT_CONFIG_VALUE_3=
+export GIT_CONFIG_KEY_4=http.https://github.com/.extraHeader
+export GIT_CONFIG_VALUE_4="Authorization: Basic $basic_credentials"
+export GIT_CONFIG_KEY_5=http.version
+export GIT_CONFIG_VALUE_5=HTTP/1.1
+export GIT_ASKPASS=/bin/false
+export GIT_TERMINAL_PROMPT=0
+unset basic_credentials
+
+git push "https://github.com/${repository}.git" \
+    "HEAD:refs/heads/${branch}"

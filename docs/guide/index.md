@@ -13,4 +13,4 @@
 - [Устранение неполадок](troubleshooting.md) — типичные проблемы, симптомы, причины, решения
 - [CLI-команды](cli.md) — консольные команды: оркестрация, запуск агента, список движков, проверка запуска ролей из `chains.yaml`
 - [Расширение](extension.md) — пошаговые гайды: добавление runner'а, цепочки, роли
-- [Идентичность агента (Agent Identity)](agent-identity.md) — разделение идентичности AI-агента и владельца репо через приложение GitHub (GitHub App; имя выбирает пользователь), команда `bin/console agent:token` (модуль GitIdentity)
+- [Идентичность агента (Agent Identity)](agent-identity.md) — разделение идентичности AI-агента и владельца репо через GitHub App, команда `bin/console agent:token` и безопасный checkout-helper `bin/agent-push`

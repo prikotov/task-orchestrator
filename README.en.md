@@ -216,6 +216,7 @@ How to configure executors, choose YAML options, and connect to a project — se
 |---|---|
 | [Architecture](docs/guide/architecture.md) | DDD layers, modules, CQRS |
 | [CLI commands](docs/guide/cli.md) | Orchestration, single-agent run, role connectivity check |
+| [Agent identity](docs/guide/agent-identity.md) | GitHub App and safe source-checkout `bin/agent-push` for PR branches |
 | [Chains](docs/guide/chains.md) | Static / Dynamic / Conditional, YAML DSL |
 | [Roles](docs/guide/roles.md) | Role configuration, prompt files, runners |
 | [Reliability](docs/guide/reliability.md) | Retry, Circuit Breaker, Fallback, Sessions/Resume |
