@@ -10,8 +10,8 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-agent-lifecycle-kit
-pr:
-status: in_progress
+pr: "#342"
+status: done
 ---
 
 # TASK-research-agent-lifecycle-kit: Исследовать avksp/agent-lifecycle-kit как lifecycle controller (контроллер жизненного цикла) для coding-agent задач
@@ -95,7 +95,7 @@ status: in_progress
 4. [x] Изучить README, changelog (журнал изменений), architecture (архитектуру), workflow (рабочий процесс), public contracts (публичные контракты), adapter support (поддержку адаптеров), security docs (документацию безопасности).
 5. [x] Выборочно проверить исходный код и тесты: workflow state (состояние рабочего процесса), managed runner (управляемый запускатель), task transitions (переходы задач), gates (ворота), runner (запускатель), launcher (модуль запуска), redaction (редактирование секретов), model routing (маршрутизация моделей), proof integrity (целостность доказательств), managed-run tests (тесты управляемого запуска).
 6. [x] Сравнить ALK с `task-orchestrator` и соседями summary.
-7. [x] Создать `todo/TASK-research-agent-lifecycle-kit.todo.md`.
+7. [x] Создать и после approval (одобрения) финализировать задачу в `todo/done/TASK-research-agent-lifecycle-kit.todo.md`.
 8. [x] Создать `docs/research/framework-comparisons/agent-lifecycle-kit-comparison.md`.
 9. [x] Обновить `docs/research/agent-frameworks-summary.md`: строка #35, счётчики и только изменившиеся выводы.
 10. [x] Обновить `todo/done/EPIC-research-agent-frameworks-comparison.md`: стадия `1n`, счётчики, риски, история.
@@ -153,3 +153,4 @@ PHPUnit и Psalm можно не запускать: изменения docs-onl
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-12 | Аналитик (Шерлок) | Создание задачи и выполнение исследования `avksp/agent-lifecycle-kit` для stage `1n` research-эпика. |
+| 2026-08-12 | Аналитик (Шерлок) | Выполнены self-review (самопроверка) и независимое Approval (одобрение) Ревьювера Бэка Пуаро; создан PR #342, задача переведена в `done`. |

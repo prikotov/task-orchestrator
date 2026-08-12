@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-08-12
 **Объект:** `avksp/agent-lifecycle-kit` (`v1.62.0`, commit `88bc33f72070835a88422f499b10158bea099ab1`; `main` HEAD `87201e09e356700e8fc5c39b5bc2fbbac591b399`)
-**Задача:** `todo/TASK-research-agent-lifecycle-kit.todo.md`
+**Задача:** `todo/done/TASK-research-agent-lifecycle-kit.todo.md`
 
 ---
 
@@ -11,7 +11,7 @@
 
 Исследование выполнено docs-only (только документация). Созданы/обновлены:
 
-- `todo/TASK-research-agent-lifecycle-kit.todo.md`
+- `todo/done/TASK-research-agent-lifecycle-kit.todo.md`
 - `docs/research/framework-comparisons/agent-lifecycle-kit-comparison.md`
 - `docs/research/agent-frameworks-summary.md`
 - `todo/done/EPIC-research-agent-frameworks-comparison.md`
@@ -51,10 +51,10 @@
 Проверено:
 
 - [x] Задача создана как research-задача; `type: docs` выбран по `docs/todo-md/reference/TYPES.md` и `todo-md` validator (валидатору задач), а `research_kind: research` фиксирует исследовательскую семантику из RACI. Конфликт RACI (`research`) и TYPES.md (`docs`) явно описан в рисках задачи, а не скрыт как guessed workaround (угаданный обходной путь).
-- [x] Новая задача не переведена в `done` и не перенесена в `todo/done/`.
+- [x] На момент первичного self-review (самопроверки) задача ещё не была переведена в `done`; после независимого Approval (одобрения) и PR #342 финальный путь задачи — `todo/done/TASK-research-agent-lifecycle-kit.todo.md`.
 - [x] Отчёт содержит дату, release/commit snapshot (снимок выпуска/коммита), ссылки на primary sources (первичные источники), границы анализа и ограничения.
 - [x] Summary (сводка) обновляет только затронутые счётчики и выводы; `qm`/`omnigent` не включены в completed-счётчик (счётчик завершённых).
-- [x] Эпик получил stage `1n`, ссылку на активный todo-файл, риски и историю изменений без изменения старой истории.
+- [x] Эпик получил stage `1n`, финальную ссылку на done-задачу, риски и историю изменений без изменения старой истории.
 - [x] Код приложения, конфигурации и скрипты не изменялись.
 
 ## Источники

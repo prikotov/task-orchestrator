@@ -2,14 +2,14 @@
 
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-08-12
-**Объект:** рабочий diff (разница изменений) ветки `task/research-agent-lifecycle-kit`: [`todo/TASK-research-agent-lifecycle-kit.todo.md`](../../../../todo/TASK-research-agent-lifecycle-kit.todo.md), [`docs/research/framework-comparisons/agent-lifecycle-kit-comparison.md`](../../../research/framework-comparisons/agent-lifecycle-kit-comparison.md), [`docs/research/agent-frameworks-summary.md`](../../../research/agent-frameworks-summary.md), [`todo/done/EPIC-research-agent-frameworks-comparison.md`](../../../../todo/done/EPIC-research-agent-frameworks-comparison.md), [`docs/agents/reports/system-analyst/2026-08-12_14-12_agent-lifecycle-kit-research.md`](2026-08-12_14-12_agent-lifecycle-kit-research.md)
-**Задача:** [`todo/TASK-research-agent-lifecycle-kit.todo.md`](../../../../todo/TASK-research-agent-lifecycle-kit.todo.md)
+**Объект:** рабочий diff (разница изменений) ветки `task/research-agent-lifecycle-kit`: [`todo/done/TASK-research-agent-lifecycle-kit.todo.md`](../../../../todo/done/TASK-research-agent-lifecycle-kit.todo.md), [`docs/research/framework-comparisons/agent-lifecycle-kit-comparison.md`](../../../research/framework-comparisons/agent-lifecycle-kit-comparison.md), [`docs/research/agent-frameworks-summary.md`](../../../research/agent-frameworks-summary.md), [`todo/done/EPIC-research-agent-frameworks-comparison.md`](../../../../todo/done/EPIC-research-agent-frameworks-comparison.md), [`docs/agents/reports/system-analyst/2026-08-12_14-12_agent-lifecycle-kit-research.md`](2026-08-12_14-12_agent-lifecycle-kit-research.md)
+**Задача:** [`todo/done/TASK-research-agent-lifecycle-kit.todo.md`](../../../../todo/done/TASK-research-agent-lifecycle-kit.todo.md)
 
 ---
 
 ## Verdict (вердикт) self-review
 
-✅ **Passed after fixes (пройдено после исправлений).** Критических замечаний в текущем рабочем diff (разнице изменений) не осталось. Изменения соответствуют постановке: research/docs-only (исследование и документация), без PHP-кода, конфигурации и скриптов; задача остаётся `in_progress` и не перенесена в `todo/done/`.
+✅ **Passed after fixes (пройдено после исправлений).** Критических замечаний в рабочем diff (разнице изменений) на момент self-review (самопроверки) не осталось. Изменения соответствовали постановке: research/docs-only (исследование и документация), без PHP-кода, конфигурации и скриптов. После независимого Approval (одобрения) Пуаро и PR #342 задача финализирована в `todo/done/`.
 
 ## Что проверено
 
@@ -32,7 +32,7 @@
 ## Проверки
 
 - `make md-links` — **passed (успешно)**: все внутренние Markdown-ссылки валидны.
-- `make validate-todo` — **passed (успешно)**: активные todo-файлы, включая `TASK-research-agent-lifecycle-kit`, валидируются с `0 error(s), 0 warning(s)`.
+- `make validate-todo` — **passed (успешно)**: todo-файлы, включая `TASK-research-agent-lifecycle-kit`, валидируются с `0 error(s), 0 warning(s)`.
 - `make validate-language` — **warning mode (режим предупреждений)**: новая ошибка не добавлена; остаётся прежнее несвязанное предупреждение в `docs/agents/team-retro/2026-08-03_20-20-orchestrator-tax-branch-protection-incident.md` (`ratio 8.9%`).
 
 PHPUnit/Psalm не запускались: изменения docs-only (только документация и todo-файл), код, конфигурация и скрипты не затрагивались.
