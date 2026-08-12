@@ -185,6 +185,41 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)"
 
 > `gh` CLI читает обе переменные окружения — `GH_TOKEN` и `GITHUB_TOKEN`. Команда экспортирует `GITHUB_TOKEN`; этого достаточно для `gh` и работающих через него агентов (`pi`, Codex CLI, OpenCode).
 
+### Локальный режим проекта: push PR-веток токеном бота
+
+> **⚠️ Важно.** Следующие правила — локальная политика сопровождения репозитория `prikotov/task-orchestrator`, а не обязательный контракт библиотеки для внешних потребителей. В этом репозитории каждый push PR-ветки, начиная с первого, выполняйте через HTTPS installation token'ом настроенного GitHub App. Имя App выбирает владелец установки; `prikotov-agent` — лишь локальный пример. SSH владельца, обычный `git push` и `gh auth git-credential` запрещены: push человека может сделать его approval неучитываемым при `require_last_push_approval`. Не рассчитывайте, что последующий bot push надёжно исправит уже нарушенный процесс.
+
+Токен нельзя выводить в терминал или сессию агента. Единственный ручной рецепт проекта:
+
+```bash
+set +x
+unset GIT_CURL_VERBOSE
+BOT_TOKEN="$(bin/console agent:token <owner>/<repo> --format=plain)"
+AUTH_HEADER="$(printf 'x-access-token:%s' "$BOT_TOKEN" | base64 | tr -d '\r\n')"
+unset BOT_TOKEN
+(
+    unset GIT_CONFIG GIT_CONFIG_PARAMETERS
+    for VARIABLE in "${!GIT_TRACE@}"; do unset "$VARIABLE"; done
+    export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=6
+    export GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0=
+    export GIT_CONFIG_KEY_1=credential.interactive GIT_CONFIG_VALUE_1=never
+    export GIT_CONFIG_KEY_2=core.hooksPath GIT_CONFIG_VALUE_2=/dev/null
+    export GIT_CONFIG_KEY_3=http.https://github.com/.extraHeader GIT_CONFIG_VALUE_3=
+    export GIT_CONFIG_KEY_4=http.https://github.com/.extraHeader
+    export GIT_CONFIG_VALUE_4="Authorization: Basic $AUTH_HEADER"
+    export GIT_CONFIG_KEY_5=http.version GIT_CONFIG_VALUE_5=HTTP/1.1
+    unset AUTH_HEADER
+    GIT_ASKPASS=/bin/false GIT_TERMINAL_PROMPT=0 \
+        git push "https://github.com/<owner>/<repo>.git" \
+        "HEAD:refs/heads/$(git branch --show-current)"
+)
+unset AUTH_HEADER
+```
+
+`set +x` и сброс `GIT_CURL_VERBOSE` выполняются до получения секрета, чтобы оболочка и Git не записали токен или Authorization header в диагностический вывод. `GIT_CONFIG_GLOBAL=/dev/null`, `GIT_CONFIG_NOSYSTEM=1`, пустые `credential.helper` и первый `http.extraHeader` изолируют push от учётных данных и заголовков владельца. Отключение repository hooks и остальных переменных Git-трассировки не позволяет им унаследовать Authorization header. `HTTP/1.1` обеспечивает совместимость с используемым HTTPS-прокси. Рецепт не меняет remote/upstream: каждый следующий push выполняйте так же.
+
+Перед запросом approval сверьтесь с журналом собственных действий: **все** push ветки должны быть выполнены по этому рецепту. GitHub API не предоставляет надёжной проверки полной истории отправителей ветки, поэтому не заявляйте о такой API-проверке. Если способ любого push неизвестен или был иным, остановитесь и согласуйте восстановление с пользователем.
+
 ### Проверка, что авторизация сменилась на App
 
 ```bash
@@ -352,6 +387,8 @@ eval "$(bin/console agent:token <owner>/<repo> --format=env)" && gh api user --j
 - [ ] Каталог `secrets/` присутствует в `.gitignore` проекта.
 - [ ] `eval "$(bin/console agent:token <owner>/<repo> --format=env)"` выполняется без ошибок.
 - [ ] `gh api user --jq .login` → `<your-app>[bot]`.
+- [ ] Для локального режима этого репозитория первый и каждый последующий push PR-ветки выполнен от настроенного GitHub App по [безопасному HTTPS-рецепту](#локальный-режим-проекта-push-pr-веток-токеном-бота), никогда не через SSH или обычный `git push`.
+- [ ] Перед запросом approval по журналу собственных действий подтверждено, что все push выполнены безопасным рецептом; недоступная через GitHub API проверка полной истории отправителей не заявлялась.
 - [ ] Тестовый PR создан от имени `<your-app>[bot]` (`gh pr view --json author --jq .author.login`).
 - [ ] Владелец (человек) видит и может нажать **Approve** в UI.
 - [ ] Merge проходит **без** `--admin` (branch protection реально работает).

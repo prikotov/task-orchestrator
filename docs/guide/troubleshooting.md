@@ -277,6 +277,14 @@ Quality gate "PHP CodeSniffer" failed (exit code 1)
 
 ## Ошибки конфигурации
 
+### Push PR-ветки идёт от владельца
+
+**Симптом:** владелец не может дать учитываемый approval, хотя PR создан от GitHub App.
+
+**Возможная причина:** PR-ветку пушили через SSH или обычный `git push` с учётными данными владельца.
+
+**Решение для локального режима сопровождения этого репозитория:** не применяйте force-push или `--admin`. Остановитесь и согласуйте восстановление с пользователем. Новые ветки с первого push отправляйте по [безопасному HTTPS-рецепту настроенного GitHub App](agent-identity.md#локальный-режим-проекта-push-pr-веток-токеном-бота).
+
 **Симптом:**
 ```
 The service "TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Prompt\RolePromptBuilder" has a dependency on a non-existent parameter "task_orchestrator.roles_dir".
