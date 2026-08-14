@@ -8,9 +8,9 @@ depends_on:
 epic: EPIC-research-coding-agents-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-branch:
+branch: task/research-deepagents
 pr: "https://github.com/prikotov/task-orchestrator/pull/335"
-status: todo
+status: in_progress
 ---
 
 # TASK-research-deepagents: Deep Agents (langchain-ai/deepagents) — agent-харнес + Deep Agents Code CLI
