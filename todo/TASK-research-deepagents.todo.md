@@ -9,7 +9,7 @@ epic: EPIC-research-coding-agents-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-deepagents
-pr: "https://github.com/prikotov/task-orchestrator/pull/335"
+pr: "https://github.com/prikotov/task-orchestrator/pull/345"
 status: review
 ---
 
@@ -115,4 +115,6 @@ deepagents — batteries-included agent harness на LangGraph (`create_agent` �
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-03 | Тимлид (Алекс) | Создание задачи. Источник: пользователь указал репозиторий `langchain-ai/deepagents`. Классифицирован как CLI-агент кодинга (по аналогии с Claude Code, «Inspired by Claude Code») → `EPIC-research-coding-agents-comparison`, стадия `1k` (строка #21). Перенесён из `EPIC-research-agent-frameworks-comparison` по решению пользователя. Предварительный verdict: ✅ Подходит (подтвердить по 10 критериям). |
+| 2026-08-14 | Тимлид (Алекс) | Создан отдельный PR #345 для проверки результатов исследования; задача переведена в статус `review`. |
+
 | 2026-08-14 | Аналитик (Шерлок) | Исследование выполнено и подготовлено к review: создан отчёт `docs/research/coding-agents/deepagents-comparison.md` по 10 критериям, сводная таблица обновлена до 21 исследования, строка #21 добавлена в детальные отчёты, эпик `EPIC-research-coding-agents-comparison` обновлён стадией `1k`. Self-review уточнил snapshot-ссылки на commit и счётчик Agent Skills standard (17/21 → 81%). |
