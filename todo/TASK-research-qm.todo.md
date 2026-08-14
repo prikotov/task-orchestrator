@@ -8,9 +8,9 @@ depends_on:
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-branch:
+branch: task/research-qm
 pr: "https://github.com/prikotov/task-orchestrator/pull/335"
-status: todo
+status: in_progress
 ---
 
 # TASK-research-qm: Исследовать yc-software/qm (multiplayer/multi-tenant agent-платформа-оркестратор поверх внешних харнесов)
