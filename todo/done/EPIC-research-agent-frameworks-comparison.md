@@ -123,7 +123,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1k: Дополнительные исследования (2026-08-03)
 
-- [ ] [TASK-research-qm](../TASK-research-qm.todo.md) — qm (`yc-software/qm`, TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: per-employee scopes, Slack+web, per-scope durable sandbox, shared skills с org-governance, security postures Strict/Auto/Dangerous + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты; потребляет `SKILL.md`/`.claude/skills`/`.codex/skills`/`AGENTS.md`). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency.
+- [ ] [TASK-research-qm](../TASK-research-qm.todo.md) — qm (`yc-software/qm`, TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: per-employee scopes, Slack+web, per-scope durable sandbox, shared skills с org-governance, security postures Strict/Auto/Dangerous + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты; потребляет `SKILL.md`/`.claude/skills`/`.codex/skills`/`AGENTS.md`). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. Статус: review.
 
 ### Этап 1l: Дополнительные исследования (2026-08-03)
 
@@ -169,6 +169,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
+| 2026-08-14 | Тимлид (Алекс) | Stage 1k, отчёт qm и строка #32 готовы к review, задача не done. |
 | 2026-04-21 | Тимлид (Алекс) | Создание эпика |
 | 2026-04-22 | Технический писатель (Гермиона) | Все 11 задач выполнены. Эпик завершён. |
 | 2026-04-22 | Тимлид (Алекс) + Пуаро + Локи | Постфактум ревью всех 11 отчётов через сабагентов. 5 критических и 15+ значимых исправлений. PR #52. |

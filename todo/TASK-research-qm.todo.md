@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-qm
 pr: "https://github.com/prikotov/task-orchestrator/pull/335"
-status: in_progress
+status: review
 ---
 
 # TASK-research-qm: Исследовать yc-software/qm (multiplayer/multi-tenant agent-платформа-оркестратор поверх внешних харнесов)
@@ -132,3 +132,4 @@ make validate-todo
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-03 | Тимлид (Алекс) | Создание задачи. Источник: пользователь указал репозиторий `yc-software/qm`. Классифицирован как multiplayer/multi-tenant agent-платформа-оркестратор / harness над внешними агентами → `EPIC-research-agent-frameworks-comparison` (эпик ресерча систем/фреймворков оркестрации, не статей), стадия `1k` (строка #32). Предварительный verdict: 🟡 patterns / 🔴 not dependency. |
+| 2026-08-14 | Аналитик (Шерлок) | `status: review`: исследование `yc-software/qm` завершено, comparison-отчёт и строка #32 подготовлены; артефакты готовы к review тимлидом. См. agent-report `docs/agents/reports/system-analyst/2026-08-14_qm-research.md`. |
