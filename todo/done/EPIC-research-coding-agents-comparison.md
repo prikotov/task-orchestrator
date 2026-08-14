@@ -20,7 +20,7 @@ branch: epic/research-coding-agents-comparison
 > **Job Story:** Когда мы подключаем AI-агенты как сабагентов к ролям команды (docs/agents/roles/team/), я хочу провести систематическое исследование CLI-агентов кодинга, чтобы определить, какие из них подходят для работы с нашей системой ролей, скиллов и системных промптов — и выбрать лучших кандидатов для интеграции.
 
 ### Goal (Цель по SMART)
-Исследовать 18 CLI-агентов кодинга по единой методологии из 10 критериев (системный промпт, роль, скиллы, AGENTS.md, запуск как сабагент, токены, free tier, провайдеры, лицензия). По каждому — вердикт: подходит / частично подходит / не подходит. Сводная таблица в `docs/research/coding-agents-summary.md`. Срок: до конца Q2 2026.
+Исследовать 21 CLI-агент кодинга по единой методологии из 10 критериев (системный промпт, роль, скиллы, AGENTS.md, запуск как сабагент, токены, free tier, провайдеры, лицензия). По каждому — вердикт: подходит / частично подходит / не подходит. Сводная таблица в `docs/research/coding-agents-summary.md`. Срок: до конца Q2 2026.
 
 ## 2. Context and Scope (Контекст и границы)
 *   **In Scope (Что делаем):**
@@ -38,7 +38,7 @@ branch: epic/research-coding-agents-comparison
 ### 🔴 Must Have (Блокирующие требования)
 - [x] Каждый агент исследован по единой методологии из 10 критериев
 - [x] По каждому агенту создан отчёт в `docs/research/coding-agents/<agent-slug>-comparison.md`
-- [x] Сводная таблица в `docs/research/coding-agents-summary.md` со всеми 18 агентами
+- [x] Сводная таблица в `docs/research/coding-agents-summary.md` со всеми исследованными агентами (21)
 - [x] Чёткий вердикт по каждому: подходит / частично подходит / не подходит — с обоснованием
 - [x] Итоговые рекомендации по приоритетам интеграции
 
@@ -60,9 +60,9 @@ branch: epic/research-coding-agents-comparison
 
 Исследование проводится в два этапа:
 
-**Этап 1 — Индивидуальные research-задачи (18 задач, параллельные):** каждая задача изучает один CLI-агент, пишет отдельный comparison-документ и заполняет свою строку в сводной таблице `docs/research/coding-agents-summary.md`. Задачи независимы, могут выполняться параллельно разными сабагентами.
+**Этап 1 — Индивидуальные research-задачи (18 базовых задач + дополнительные стадии, параллельные):** каждая задача изучает один CLI-агент, пишет отдельный comparison-документ и заполняет свою строку в сводной таблице `docs/research/coding-agents-summary.md`. Задачи независимы, могут выполняться параллельно разными сабагентами.
 
-**Этап 2 — Финальная задача:** после завершения всех 18 исследований финальная задача проверяет полноту таблицы, выявляет тренды, ранжирует агенты и составляет итоговые рекомендации.
+**Этап 2 — Финальная задача:** после завершения всех актуальных исследований финальная задача проверяет полноту таблицы, выявляет тренды, ранжирует агенты и составляет итоговые рекомендации.
 
 Все отчёты размещаются в `docs/research/coding-agents/`.
 
@@ -81,7 +81,7 @@ branch: epic/research-coding-agents-comparison
 
 ```mermaid
 flowchart LR
-    A[18 Research Tasks] -->|individual reports| B[docs/research/coding-agents/]
+    A[Research Tasks] -->|individual reports| B[docs/research/coding-agents/]
     A -->|fill rows| C[coding-agents-summary.md]
     D[Summary Task] -->|verify & analyze| C
     D -->|rank & recommend| E[Final Recommendations]
@@ -136,10 +136,10 @@ flowchart LR
 
 ### Этап 1k: Дополнительные исследования (2026-08-03)
 
-- [ ] [TASK-research-deepagents](../TASK-research-deepagents.todo.md) — Deep Agents (`langchain-ai/deepagents`, Python, MIT, ≈27.3k★; agent-харнес на LangGraph + CLI-продукт **Deep Agents Code** «similar to Claude Code or Cursor», «Inspired by Claude Code»; sub-agents, filesystem, context management, HITL, skills-on-demand, tools/MCP, BYO LLM/model-agnostic). Перенесён из `EPIC-research-agent-frameworks-comparison` (зеркальный прецедент строки 125: OmO ушли отсюда в frameworks; deepagents возвращён как coding-агент). Предварительный verdict: ✅ Подходит (подтвердить по 10 критериям).
+- [ ] [TASK-research-deepagents](../TASK-research-deepagents.todo.md) — Deep Agents (`langchain-ai/deepagents`, Python, MIT, ≈27.3k★; agent-харнес на LangGraph + CLI-продукт **Deep Agents Code** «similar to Claude Code or Cursor», «Inspired by Claude Code»; sub-agents, filesystem, context management, HITL, skills-on-demand, tools/MCP, BYO LLM/model-agnostic). Перенесён из `EPIC-research-agent-frameworks-comparison` (зеркальный прецедент строки 125: OmO ушли отсюда в frameworks; deepagents возвращён как coding-агент). Статус: review; вердикт CLI: ⚠️ Частично подходит (7/10, 27/30); SDK: ✅ Подходит для отдельной программной интеграции (9/10).
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [x] Все 20 индивидуальных research-задач выполнены
+- [x] Все 21 индивидуальное research-исследование выполнено
 - [x] Каждый comparison-документ создан в `docs/research/coding-agents/`
 - [x] Сводная таблица `docs/research/coding-agents-summary.md` создана и заполнена
 - [x] По каждому агенту есть вердикт: подходит / частично подходит / не подходит
@@ -149,7 +149,7 @@ flowchart LR
 Не требуется — эпик содержит только исследовательские задачи (docs).
 
 ## 8. Risks and Dependencies (Риски и зависимости)
-- 20 агентов — значительный объём исследования
+- 21 агент — значительный объём исследования
 - Многие агенты активно развиваются — информация может устареть
 - Проприетарные продукты (Claude Code, Factory Droid, ZCode, GitHub Copilot CLI) — анализ только по документации
 - Названия некоторых агентов могут быть неоднозначны — нужно уточнять, какой именно проект имеется в виду
@@ -161,7 +161,7 @@ flowchart LR
 - Ссылки на репозитории и документацию — в индивидуальных задачах
 
 ## 10. Comments (Комментарии)
-Эпик объединяет исследование CLI-агентов кодинга в единый трек с чётким финальным артефактом — сводной таблицей. Задачи Этапа 1 можно выполнять в любом порядке и параллельно. Задача Этапа 2 запускается только после завершения всех 20 исследований. Pi Coding Agent уже подключён как сабагент — его исследование послужит референс-точкой и бенчмарком для остальных.
+Эпик объединяет исследование CLI-агентов кодинга в единый трек с чётким финальным артефактом — сводной таблицей. Задачи Этапа 1 можно выполнять в любом порядке и параллельно. Задача Этапа 2 запускается после завершения актуального набора исследований. Pi Coding Agent уже подключён как сабагент — его исследование послужит референс-точкой и бенчмарком для остальных.
 
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
@@ -172,3 +172,4 @@ flowchart LR
 | 2026-07-28 | Тимлид (Алекс) | Stage 1j (post-epic): постановка research-задач на NanoClaw и Nanocoder. Происхождение: проверка по телеграм-посту — из «zero, nano, pi» уже ресерчены `zero`=ZeroClaw (#7, 6/10) и `pi` (#2, 10/10); `nano` отсутствует → два кандидата (NanoClaw как Claw-семейство, Nanocoder как независимый local-first агент). Сводная таблица обновляется один раз для обоих во избежание конфликта слияния. |
 | 2026-07-28 | Аналитик (Шерлок) | Stage 1j выполнен: исследования NanoClaw и Nanocoder завершены. NanoClaw (`nanocoai/nanoclaw`) — ❌ Не подходит (4/10, 21/30), К6-блокер сохранён (≡ OpenClaw, Docker-only). Nanocoder (`Nano-Collective/nanocoder`) — ⚠️ Частично (7/10, 22/30), К6 закрыт (`--json`+`--acp`), local-first BYOM. Сводная таблица обновлена до 20 исследований (NanoClaw #14, Nanocoder #11). PR #331. |
 | 2026-08-03 | Тимлид (Алекс) | Эпик reopened (статус `in_progress`, стадия `1k`): добавлена постановка TASK-research-deepagents — `langchain-ai/deepagents` (Python, MIT, ≈27.3k★; agent-харнес на LangGraph + CLI-продукт Deep Agents Code «similar to Claude Code», «Inspired by Claude Code»; BYO LLM/model-agnostic, skills/MCP, HITL, sub-agents, programmatic API). Перенесён из `EPIC-research-agent-frameworks-comparison` по решению пользователя (coding-агент по аналогии с Claude Code). Предварительный verdict: ✅ Подходит (подтвердить по 10 критериям). |
+| 2026-08-14 | Аналитик (Шерлок) | Stage 1k подготовлен к review: исследование Deep Agents / Deep Agents Code оформлено. CLI-вердикт: ⚠️ Частично подходит (7/10, 27/30) из-за отсутствия подтверждённых `--system-prompt`/`--append-system-prompt` и JSONL event stream в `dcode -n`; SDK-вердикт: ✅ Подходит для отдельной программной интеграции (9/10). Сводная таблица обновлена до 21 исследования, Deep Agents добавлен в рейтинг как #4 по сумме 27/30 и в детальные отчёты как #21. |

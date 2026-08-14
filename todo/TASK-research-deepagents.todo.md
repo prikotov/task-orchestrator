@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-deepagents
 pr: "https://github.com/prikotov/task-orchestrator/pull/335"
-status: in_progress
+status: review
 ---
 
 # TASK-research-deepagents: Deep Agents (langchain-ai/deepagents) — agent-харнес + Deep Agents Code CLI
@@ -47,7 +47,7 @@ status: in_progress
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] **Критерии 1–10** — по единной методологии coding-agents-эпика:
+- [x] **Критерии 1–10** — по единой методологии coding-agents-эпика:
   1. Системный промпт — замена/дополнение/передача файла роли (`system_prompt` в `create_deep_agent`, CLI Deep Agents Code).
   2. Промпт агента / роль — инъекция контекста роли через CLI/env/файл.
   3. Скиллы (skills) — встроенная поддержка skills-on-demand, подключение файлов/каталогов.
@@ -58,33 +58,33 @@ status: in_progress
   8. Free tier — наличие/лимиты (BYO LLM → сам инструмент бесплатный/Open Source).
   9. Провайдеры и модели — model-agnostic (любой LLM с tool calling: OpenAI/Anthropic/Google, open-weight Baseten/Fireworks, локальные Ollama/vLLM/llama.cpp), BYOK.
   10. Лицензия — MIT (open source).
-- [ ] Вердикт: ✅/⚠️/❌ (X/10) с обоснованием.
-- [ ] Оценить отличия: deepagents (Python-харнес/programmatic) vs Deep Agents Code (CLI coding-агент) — по каким критериям оцениваем CLI-продукт.
+- [x] Вердикт: ✅/⚠️/❌ (X/10) с обоснованием.
+- [x] Оценить отличия: deepagents (Python-харнес/programmatic) vs Deep Agents Code (CLI coding-агент) — по каким критериям оцениваем CLI-продукт.
 
 ### 🟡 Should Have (Желательно)
-- [ ] Практические примеры запуска Deep Agents Code как CLI и `create_deep_agent(...)` как programmatic API.
-- [ ] Оценка уникальных возможностей: sub-agents (isolated context), context management (summarize + offload на диск), persistent memory, HITL (approve/edit/reject tool calls), MCP, filesystem (pluggable backends).
+- [x] Практические примеры запуска Deep Agents Code как CLI и `create_deep_agent(...)` как programmatic API.
+- [x] Оценка уникальных возможностей: sub-agents (isolated context), context management (summarize + offload на диск), persistent memory, HITL (approve/edit/reject tool calls), MCP, filesystem (pluggable backends).
 
 ### ⚫ Won't Have (Не будем делать)
 - [ ] Код интеграции, бенчмарки.
 
 ## 4. Implementation Plan (План реализации)
 *План предзаполнен автором (Тимлид Алекс); исполнитель подтверждает понимание (Reverse Briefing).*
-1. [ ] Создать/переключиться на ветку `task/research-deepagents`, без переключения на `main`.
-2. [ ] Прочитать reference: `done/TASK-research-omp-coding-agent.todo.md`, `done/TASK-research-claude-code-agent.todo.md`, comparison-документы Claude Code/omp.
-3. [ ] Получить GitHub metadata и commit snapshot `langchain-ai/deepagents`; зафиксировать версию PyPI.
-4. [ ] Изучить README, docs.langchain.com overview, API reference (`create_deep_agent`), страницу Deep Agents Code.
-5. [ ] Оценить каждый из 10 критериев (акцент на Deep Agents Code как CLI-поверхности; programmatic API — как контекст).
-6. [ ] Создать отчёт `docs/research/coding-agents/deepagents-comparison.md`.
-7. [ ] Добавить строку #21 в `docs/research/coding-agents-summary.md` (→ 21/21), обновить ранжирование и рекомендации.
-8. [ ] Reopen'уть эпик: `reopened: <дата>`, стадия `1k`, change history.
-9. [ ] Сохранить agent-report; запустить `make md-links` и `make validate-todo`.
+1. [x] Создать/переключиться на ветку `task/research-deepagents`, без переключения на `main`.
+2. [x] Прочитать reference: `done/TASK-research-omp-coding-agent.todo.md`, `done/TASK-research-claude-code-agent.todo.md`, comparison-документы Claude Code/omp.
+3. [x] Получить GitHub metadata и commit snapshot `langchain-ai/deepagents`; зафиксировать версию PyPI.
+4. [x] Изучить README, docs.langchain.com overview, API reference (`create_deep_agent`), страницу Deep Agents Code.
+5. [x] Оценить каждый из 10 критериев (акцент на Deep Agents Code как CLI-поверхности; programmatic API — как контекст).
+6. [x] Создать отчёт `docs/research/coding-agents/deepagents-comparison.md`.
+7. [x] Добавить строку #21 в `docs/research/coding-agents-summary.md` (→ 21/21), обновить ранжирование и рекомендации.
+8. [x] Reopen'уть эпик: `reopened: <дата>`, стадия `1k`, change history.
+9. [x] Сохранить agent-report; запустить `make md-links` и `make validate-todo`.
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт создан, все 10 критериев оценены.
-- [ ] Вердикт ✅/⚠️/❌ (X/10) с обоснованием.
-- [ ] Строка #21 добавлена в сводную таблицу (21/21).
-- [ ] Ранжирование и рекомендации обновлены с учётом deepagents.
+- [x] Отчёт создан, все 10 критериев оценены.
+- [x] Вердикт ✅/⚠️/❌ (X/10) с обоснованием.
+- [x] Строка #21 добавлена в сводную таблицу (21/21).
+- [x] Ранжирование и рекомендации обновлены с учётом deepagents.
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -102,11 +102,11 @@ make validate-todo
 - LangSmith-зависимость для tracing/eval/deploy — учитывать как вендор-локап (критерий 7).
 
 ## 8. Sources (Источники)
-- [ ] [langchain-ai/deepagents — GitHub](https://github.com/langchain-ai/deepagents)
-- [ ] [Deep Agents — Overview (docs.langchain.com)](https://docs.langchain.com/oss/python/deepagents/overview)
-- [ ] [Deep Agents — API reference (`create_deep_agent`)](https://reference.langchain.com/python/deepagents/)
-- [ ] [Deep Agents Code — документация CLI-продукта](https://docs.langchain.com/deepagents-code)
-- [ ] [deepagentsjs — GitHub (JS/TS-порт)](https://github.com/langchain-ai/deepagentsjs)
+- [x] [langchain-ai/deepagents — GitHub](https://github.com/langchain-ai/deepagents)
+- [x] [Deep Agents — Overview (docs.langchain.com)](https://docs.langchain.com/oss/python/deepagents/overview)
+- [x] [Deep Agents — API reference (`create_deep_agent`)](https://reference.langchain.com/python/deepagents/)
+- [x] [Deep Agents Code — документация CLI-продукта](https://docs.langchain.com/deepagents-code)
+- [x] [deepagentsjs — GitHub (JS/TS-порт)](https://github.com/langchain-ai/deepagentsjs)
 
 ## 9. Comments (Комментарии)
 deepagents — batteries-included agent harness на LangGraph (`create_agent` → `deepagents`: добавлены filesystem, sub-agents, context management, skills, HITL). CLI-продукт **Deep Agents Code** — готовый coding-агент для терминала, BYO LLM, «similar to Claude Code or Cursor», install через curl. По прямой аналогии с Claude Code (уже в этом эпике) классифицирован как CLI-агент кодинга. Перенесён из `EPIC-research-agent-frameworks-comparison` (зеркальный прецедент строки 125 этого эпика: OmO ушли отсюда в frameworks как «система оркестрации»; deepagents возвращён как «кодинг-агент»). Предварительный verdict: ✅ Подходит (MIT, BYO LLM/model-agnostic, skills/MCP, HITL, sub-agents, programmatic API) — подтвердить по 10 критериям.
@@ -115,3 +115,4 @@ deepagents — batteries-included agent harness на LangGraph (`create_agent` �
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-03 | Тимлид (Алекс) | Создание задачи. Источник: пользователь указал репозиторий `langchain-ai/deepagents`. Классифицирован как CLI-агент кодинга (по аналогии с Claude Code, «Inspired by Claude Code») → `EPIC-research-coding-agents-comparison`, стадия `1k` (строка #21). Перенесён из `EPIC-research-agent-frameworks-comparison` по решению пользователя. Предварительный verdict: ✅ Подходит (подтвердить по 10 критериям). |
+| 2026-08-14 | Аналитик (Шерлок) | Исследование выполнено и подготовлено к review: создан отчёт `docs/research/coding-agents/deepagents-comparison.md` по 10 критериям, сводная таблица обновлена до 21 исследования, строка #21 добавлена в детальные отчёты, эпик `EPIC-research-coding-agents-comparison` обновлён стадией `1k`. Self-review уточнил snapshot-ссылки на commit и счётчик Agent Skills standard (17/21 → 81%). |
