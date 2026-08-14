@@ -9,7 +9,7 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-omnigent
-pr: "https://github.com/prikotov/task-orchestrator/pull/335"
+pr: "https://github.com/prikotov/task-orchestrator/pull/346"
 status: review
 ---
 
@@ -132,6 +132,7 @@ make validate-todo
 Первичный вывод тимлида: `omnigent` — не coding-агент и не framework dependency для нас (Python, alpha, multi-device collaboration-платформа). Ценность — как зеркало и источник паттернов, причём **ближайший аналог qm (#32)**: оба — open-source meta-harness над внешними coding-агентами. Наибольший потенциал заимствования: **meta-harness abstraction** (единый интерфейс над Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML-агенты — прямой мост к нашему coding-agents-эпику и runner-модели), **custom agents в YAML** (богатая параллель нашим ролям/`config/chains.yaml`), **policies/governance** (approval/spend/tool-limits с гранулярным scope — релевантно quality gates/budget), **cloud + OS sandboxing** (10 providers + bwrap/seatbelt/L7 egress — релевантно `TASK-feat-docker-sandboxing`), **multi-agent supervision** (review-between-agents — релевантно нашему review/сабагентам). Дельта vs qm: omnigent шире по harness-покрытию и sandboxing, но слабее в multi-tenant/team/org-governance (где силён qm). Классификация в эпике: open-source meta-harness / orchestration platform over external agents, по прецеденту qm (#32, ближайший аналог) + Orca ADE (#30) + OmO (#23).
 
 ## Change History (История изменений)
+| 2026-08-14 | Тимлид (Алекс) | Создан отдельный PR #346 для проверки результатов исследования; задача остаётся в статусе `review`. |
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-03 | Тимлид (Алекс) | Создание задачи. Источник: пользователь указал репозиторий `omnigent-ai/omnigent`. Классифицирован как open-source meta-harness / orchestration platform над внешними coding-агентами (ближайший аналог qm #32) → `EPIC-research-agent-frameworks-comparison`, стадия `1l` (строка #33). Status: alpha — отмечен как риск. Предварительный verdict: 🟡 patterns / 🔴 not dependency. |
