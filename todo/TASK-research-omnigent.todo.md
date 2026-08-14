@@ -8,9 +8,9 @@ depends_on:
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-branch:
+branch: task/research-omnigent
 pr: "https://github.com/prikotov/task-orchestrator/pull/335"
-status: todo
+status: in_progress
 ---
 
 # TASK-research-omnigent: Исследовать omnigent-ai/omnigent (open-source meta-harness над внешними coding-агентами)
