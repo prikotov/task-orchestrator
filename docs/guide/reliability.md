@@ -1,8 +1,8 @@
 # Надёжность
 
-## Retry Policy (повторные попытки)
+## Политика повторов (Retry Policy)
 
-Каждый шаг может иметь retry-policy — автоматический повтор при временных ошибках (таймаут, network error).
+Каждый шаг может иметь политику повторов — автоматический повтор при временных ошибках (таймаут, ошибка сети).
 
 ```yaml
 chains:
@@ -44,9 +44,9 @@ chains:
 **Архитектура:** `CircuitBreakerAgentRunner` (модуль AgentRunner, Infrastructure) оборачивает `AgentRunnerInterface`,
 состояние хранится в `CircuitBreakerStateVo` (`CircuitStateEnum`).
 
-## Fallback
+## Резервный запуск
 
-Роль может определить fallback-команду — альтернативный runner при недоступности основного.
+Роль может определить резервную команду — альтернативный запускатель при недоступности основного.
 
 ```yaml
 roles:
@@ -60,9 +60,9 @@ roles:
 **Архитектура:** `ResolveChainRunnerService` (Orchestrator Infrastructure) пытается выполнить шаг через основной runner,
 при ошибке — через fallback. Результат: `StepResultDto::fallbackRunnerUsed`.
 
-## Сессии и Resume
+## Сессии и возобновление
 
-Dynamic-цепочки поддерживают **resume** — промежуточное состояние сохраняется в JSONL-файлы.
+Dynamic-цепочки поддерживают **возобновление** — промежуточное состояние сохраняется в JSONL-файлы.
 
 - `ChainSessionWriter` / `ChainSessionReader` / `ChainSessionLogger` — запись и чтение состояния сессии
 - `ChainSessionStateVo` — VO состояния сессии

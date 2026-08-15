@@ -1,17 +1,17 @@
 ---
 name: task-orchestrator
-description: Запуск оркестрации AI-агентов по цепочке: static/dynamic chains, quality gates, отчёты, resume
+description: Запуск оркестрации ИИ-агентов по цепочке: статические и динамические цепочки, контрольные точки качества, отчёты, возобновление
 ---
 
-# Use Task Orchestrator
+# Использование Task Orchestrator
 
-Инструкция для AI-агента по запуску оркестрации цепочек через `task-orchestrator`.
+Инструкция для ИИ-агента по запуску оркестрации цепочек через `task-orchestrator`.
 
 ## Когда использовать
 
 - Пользователь просит запустить цепочку, оркестрировать задачу
 - Нужно выполнить задачу через последовательность AI-агентов
-- Требуется dynamic-обсуждение (brainstorm, code review)
+- Требуется динамическое обсуждение (мозговой штурм, ревью кода)
 - Нужно проверить конфигурацию цепочек
 - Нужно проверить, что настроенные роли запускаются и отвечают
 
@@ -37,13 +37,13 @@ php vendor/bin/task-orchestrator agent:orchestrate [options] [--] <task>
 | `--dry-run` | — | Показать план без запуска | — |
 | `--config` | — | Путь к файлу `chains.yaml` (переопределяет путь по умолчанию) | — |
 | `--validate-config` | — | Проверить конфигурацию без запуска | — |
-| `--resume` | — | Путь к директории сессии для resume | — |
+| `--resume` | — | Путь к директории сессии для возобновления | — |
 | `--report-format` | — | Формат отчёта: `text`, `json`, `none` | `text` |
-| `--report-file` | — | Путь к файлу для записи отчёта | stdout |
-| `--no-audit-log` | — | Отключить audit-логирование | — |
+| `--report-file` | — | Путь к файлу для записи отчёта | стандартный вывод |
+| `--no-audit-log` | — | Отключить аудит-логирование | — |
 | `--no-context-files` | — | Не загружать AGENTS.md/CLAUDE.md | — |
 
-Dynamic-цепочки дополнительно:
+Дополнительно для динамических цепочек:
 
 | Опция | Описание | По умолчанию |
 |-------|----------|--------------|
@@ -70,7 +70,7 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml 
 
 `<task>` обязателен, но при `--validate-config` игнорируется — подойдёт любая строка.
 
-Exit codes: `0` — конфиг валиден, `5` — ошибки (подробности в выводе).
+Коды завершения: `0` — конфиг корректен, `5` — ошибки (подробности в выводе).
 
 ### Проверка запуска ролей из chains.yaml (`validate:connectivity`)
 
@@ -85,7 +85,7 @@ php vendor/bin/task-orchestrator validate:connectivity
 php vendor/bin/task-orchestrator validate:connectivity --role=backend_developer_tony --timeout=60
 ```
 
-Команда читает top-level `roles`, резолвит `@system-prompt`/`@append-system-prompt`, запускает каждую `command` как argv array и добавляет минимальный user prompt `Ответь ровно ok без Markdown.` последним argv-аргументом. Exit codes: `0` — все роли OK, `1` — есть fail/timeout/empty output/invalid input.
+Команда читает верхнеуровневую секцию `roles`, разрешает `@system-prompt`/`@append-system-prompt`, запускает каждую `command` как массив аргументов и добавляет минимальный запрос пользователя `Ответь ровно ok без Markdown.` последним аргументом. Коды завершения: `0` — все роли успешно проверены, `1` — есть ошибка, превышение таймаута, пустой вывод или неверные входные данные.
 
 ### План без запуска (dry-run)
 
@@ -104,12 +104,12 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=/path/to/chains.yaml
 php vendor/bin/task-orchestrator agent:orchestrate --config=/path/to/chains.yaml --validate-config "check"
 ```
 
-Без `--config` используется путь по умолчанию (из Symfony-конфигурации). Несуществующий файл → exit code `5`.
+Без `--config` используется путь по умолчанию (из Symfony-конфигурации). Несуществующий файл → код завершения `5`.
 
-### Static-цепочка
+### Статическая цепочка
 
 ```bash
-# Полный цикл реализации (implement)
+# Полный цикл реализации (`implement`)
 php vendor/bin/task-orchestrator agent:orchestrate "Создать endpoint POST /users"
 
 # Анализ без реализации
@@ -128,14 +128,14 @@ php vendor/bin/task-orchestrator agent:orchestrate --timeout=600 "Сложная
 ### Dynamic-цепочка (brainstorm)
 
 ```bash
-# С defaults из конфига
+# Со значениями по умолчанию из конфига
 php vendor/bin/task-orchestrator agent:orchestrate --chain=brainstorm "Архитектура платёжного модуля"
 
 # Переопределить участников
 php vendor/bin/task-orchestrator agent:orchestrate --chain=brainstorm --participants=dev1,dev2 "Тема"
 ```
 
-### Resume прерванной цепочки
+### Возобновление прерванной цепочки
 
 ```bash
 php vendor/bin/task-orchestrator agent:orchestrate --resume=var/agent/chains/implement_2026-04-24_12-30 "Продолжить"
@@ -145,9 +145,9 @@ php vendor/bin/task-orchestrator agent:orchestrate --resume=var/agent/chains/imp
 
 CLI выводит ход выполнения: роль, runner, токены, стоимость, время.
 
-Exit codes:
+Коды завершения:
 
-| Code | Meaning |
+| Код | Значение |
 |------|---------|
 | `0` | Успех |
 | `1` | Ошибка шага/агента |
@@ -156,4 +156,4 @@ Exit codes:
 | `5` | Неверная конфигурация или аргументы |
 | `6` | Превышен таймаут шага/раунда |
 
-Отчёт — в выбранном формате (`text`/`json`; `none` — отключить). JSONL audit-log — в `var/agent_audit.jsonl` (если не отключён).
+Отчёт — в выбранном формате (`text`/`json`; `none` — отключить). JSONL-журнал аудита — в `var/agent_audit.jsonl` (если не отключён).

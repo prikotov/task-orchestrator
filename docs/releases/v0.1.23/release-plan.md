@@ -6,11 +6,11 @@
 - Линия релиза: `release/0.1`
 - Исходная ветка: `release/0.1` (коммит рефакторинга `0602297` до коммита релиза)
 - Ответственный: dp
-- Плановая дата deploy: 2026-06-06
+- Плановая дата публикации: 2026-06-06
 
 ## Состав
 
-- Предыдущий тег рабочей версии: `v0.1.22`
+- Предыдущий тег релиза: `v0.1.22`
 - Включённые PR: #249
 - Включённые задачи:
   - `todo/done/TASK-refactor-domain-service-chain-definition-path.todo.md`
@@ -30,23 +30,23 @@
 - Риск окна несовместимости: нет
 - Обратно несовместимые изменения: нет
 
-## Проверки перед deploy
+## Проверки перед публикацией
 
 - [x] `make check` — пройден (`PHPUnit`: 955 тестов, 2701 проверка)
 - [ ] CI `test` — ожидается в PR релиза
 - [ ] CI `phar-smoke` — ожидается в PR релиза
 
-## Порядок deploy
+## Порядок публикации
 
 1. Библиотека (Packagist) — по тегу `v0.1.23`
-2. Phar-артефакт — через GitHub Actions workflow `Release Phar` по тегу `v0.1.23`
+2. Phar-артефакт — через рабочий процесс GitHub Actions `Release Phar` по тегу `v0.1.23`
 
-## Post-check
+## Проверка после публикации
 
 - Проверить, что GitHub Release `v0.1.23` создан
-- Проверить, что workflow `Release Phar` завершился успешно для тега `v0.1.23`
+- Проверить, что рабочий процесс `Release Phar` завершился успешно для тега `v0.1.23`
 - Проверить, что GitHub Release `v0.1.23` содержит артефакт `task-orchestrator.phar`
-- Скачать asset `task-orchestrator.phar` из GitHub Release `v0.1.23` и проверить команду: `php task-orchestrator.phar --version`
+- Скачать артефакт `task-orchestrator.phar` из GitHub Release `v0.1.23` и проверить команду: `php task-orchestrator.phar --version`
 
 ## Действия при проблеме после релиза
 

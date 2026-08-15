@@ -29,80 +29,48 @@ return [
         // Разрешённые термины (case-insensitive) — легитимный жаргон и методология.
         // Граница: общие английские слова нужно переводить, а не добавлять в allowlist.
         'allowlist' => [
-            // Методология разработки и проверки
-            'brainstorm',
-            'self-review', 'code-review', 'retrospective',
+            // Технологии, стандарты и контракты, используемые проектом.
+            'Symfony', 'PHP', 'SQL', 'API', 'REST', 'DTO', 'DDD',
+            'CLI', 'JSON', 'JSONL', 'YAML', 'HTTP', 'HTTPS',
+            'URL', 'URI', 'UUID', 'PSR', 'MCP', 'SDK', 'ORM', 'SOLID',
+            'SRP', 'DI', 'ACL', 'KISS', 'YAGNI', 'DRY',
 
-            // Технологии и стандарты
-            'Symfony', 'Doctrine', 'PHP', 'SQL', 'MySQL', 'PostgreSQL', 'SQLite',
-            'API', 'REST', 'GraphQL', 'DTO', 'DDD', 'CLI', 'JSON', 'JSONL', 'YAML',
-            'HTML', 'CSS', 'HTTP', 'HTTPS', 'URL', 'URI', 'UUID', 'PSR', 'MIT',
-            'MCP', 'SDK', 'ORM', 'DBAL', 'SOLID', 'SRP', 'DI', 'IoC', 'ACL',
-            'TDD', 'BDD', 'MoSCoW', 'SMART', 'RACI', 'KISS', 'YAGNI', 'DRY',
-            'Vo', 'Entity', 'Repository', 'UseCase', 'Application', 'Domain',
-            'Infrastructure', 'Presentation', 'Integration', 'Module', 'Bundle',
-            'Component', 'Helper', 'Factory', 'Mapper', 'Service', 'Decorator',
-            'CQRS', 'ES', 'EDA', 'enum', 'namespace',
+            // Термины конвенций и имена компонентов DDD.
+            'VO', 'Value Object', 'Value Objects', 'Clean Architecture', 'Shared Kernel',
+            'Command Handler', 'Query Handler', 'Event Listener', 'CriteriaMapper',
+            'Circuit Breaker', 'Quality Gate', 'CQRS', 'GRASP', 'RACI',
+            'Entity', 'Repository',
+            'UseCase', 'Application', 'Domain', 'Infrastructure', 'Presentation',
+            'Integration', 'Module', 'Bundle', 'Component', 'Helper', 'Factory',
+            'Mapper', 'Service', 'Decorator',
 
-            // Инструменты
-            'PHPUnit', 'Psalm', 'PHPStan', 'Deptrac', 'PHPMD', 'PHPCS',
-            'PHP_CodeSniffer', 'Composer', 'Packagist', 'GitHub', 'GitLab',
-            'Git', 'Codex', 'Bun', 'Node', 'Node.js', 'npm', 'JavaScript',
-            'TypeScript', 'Python', 'Rust', 'Go', 'Clojure', 'Babashka',
-            'Linux', 'Docker', 'Podman', 'Electron', 'React', 'Ghostty',
-            'Warp', 'tmux', 'Vercel', 'Effect-TS', 'Twig', 'phpdoc', 'Phar',
+            // Установленные инструменты и интеграции.
+            'PHPUnit', 'Psalm', 'Deptrac', 'PHPCS', 'PHP_CodeSniffer', 'Composer',
+            'GitHub', 'Codex', 'Pi', 'Qwen', 'Gemini', 'OpenCode', 'Kilo', 'Twig',
+            'PHPDoc',
 
-            // Git / процесс
-            'PR', 'merge', 'commit', 'push', 'branch', 'checkout', 'rebase',
-            'tag', 'release', 'issue', 'epic', 'task', 'todo', 'backlog',
-            'sprint', 'milestone', 'label', 'review', 'approval', 'status',
-            'pipeline', 'workflow', 'hotfix', 'cherry-pick', 'squash',
-            'fork', 'clone', 'origin', 'upstream', 'HEAD', 'main', 'dev', 'master',
-            'pull', 'exit', 'changelog', 'docs', 'research', 'roadmap', 'ADR',
-            'loc', 'LOC',
+            // Имена классов и ключей конфигурации task-orchestrator.
+            'fix_iterations', 'max_iterations', 'CircuitBreaker', 'CommandHandler',
+            'ChainDefinition', 'ChainExecution', 'AgentRunner', 'DynamicLoop',
+            'ExecutionStrategy', 'ChainStep', 'ChainSecurityPolicy', 'Orchestrator',
+            'DynamicExecutionStrategy', 'StaticExecutionStrategy', 'ConditionalExecutionStrategy',
+            'StaticExecution',
+            'AgentDtoMapper', 'AgentRunnerInterface', 'BuildDynamicContextService',
+            'ChainDefinitionVo', 'ChainRetryPolicyVo', 'ChainSessionLogger',
+            'CheckpointWriter', 'DynamicLoopExecution', 'ExecutionStrategyInterface',
+            'GitHubHttpComponent', 'GitHubHttpException', 'HttpsProxyBridge',
+            'RunAgentService', 'RunDynamicLoopService', 'RunStaticChainService',
+            'SharedChainDefinitionVo', 'StaticChainExecution',
 
-            // Архитектура оркестрации (жаргон проекта)
-            'chain', 'chains', 'runner', 'retry', 'fallback', 'payload', 'audit',
-            'loop', 'agent', 'subagent', 'provider', 'model', 'skill', 'skills',
-            'role', 'token', 'budget', 'gate', 'gates', 'breaker', 'circuit',
-            'quality', 'iteration', 'snapshot', 'baseline', 'scope', 'checkpoint',
-            'liveness', 'stall', 'backoff', 'timeout', 'handoff', 'fan-out',
-            'fanout', 'dispatch', 'orchestrator', 'orchestration', 'harness',
-            'runtime', 'spawn', 'turn', 'context', 'compaction', 'doom', 'intent',
-            'discipline', 'fix_iterations', 'max_iterations', 'CircuitBreaker',
-            'commandhandler', 'CommandHandler', 'ChainDefinition', 'chaindefinition',
-            'ChainExecution', 'chainexecution', 'AgentRunner', 'agentrunner',
-            'DynamicLoop', 'dynamic', 'conditional', 'branching', 'dependency',
-            'violations', 'violation', 'suppression', 'deploy', 'static', 'query',
-            'rule', 'hooks', 'prompt', 'architecture', 'stdout', 'smoke', 'voter',
-            'web', 'ui', 'dsl', 'ci', 'ai', 'ai-agent', 'multi-agent',
-
-            // Продукт/идентичность
-            'TasK', 'task-orchestrator', 'OhMyPi', 'omp', 'Pi', 'Codex',
-            'Claude', 'ClaudeCode', 'Gemini', 'Copilot', 'OpenCode', 'OpenClaw',
-            'Orca', 'SwarmForge', 'OmO', 'AgentCraft', 'prikotov', 'GLM',
-            'Archon', 'Mastra', 'Paperclip', 'Hermes', 'Zeroclaw', 'Sandcastle',
-            'Duet', 'Multica', 'Kilo', 'ZCode',
-
-            // Роли / психометрия (из файлов ролей)
-            'jung', 'belbin', 'disc', 'dp',
+            // Идентичность проекта и модель личности ролей.
+            'task-orchestrator', 'Task Orchestrator', 'prikotov', 'GLM', 'jung', 'belbin', 'disc', 'dp',
             // Психометрическая модель.
             'Big Five',
 
-            // Прочий технический жаргон
-            'allowlist', 'denylist', 'blocklist', 'backoffice', 'frontend',
-            'backend', 'fullstack', 'oneline', 'multiline', 'standalone',
-            'plugin', 'extension', 'addon', 'feature', 'fixture', 'stub',
-            'mock', 'spy', 'fake', 'dummy', 'bootstrap', 'seed', 'migration',
-            'coding', 'code', 'self-contained',
-
-            // Дополнение из validate-language baseline
-            'env', 'md', 'programmatic', 'non-interactive',
-            'ephemeral', 'byok', 'breaking', 'agent-frameworks-summary',
-            'framework-comparisons', 'kernel', 'staticexecution', 'rfc',
-            'readme', 'policy', 'permission', 'xml', 'specification',
-            'in-memory', 'executionstrategy', 'chaindefinitionvo',
-            'open-source',
+            // Идентификаторы форматов, skills и CLI-команд проекта.
+            'allowlist', 'env', 'XML', 'SKILL', 'ADR', 'OQ', 'TASK', 'YAML DSL',
+            'agent:init', 'agent:orchestrate', 'agent:role-skills', 'agent:run',
+            'agent:runners', 'agent:token',
         ],
     ],
 ];
