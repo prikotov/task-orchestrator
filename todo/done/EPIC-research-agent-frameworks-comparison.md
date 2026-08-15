@@ -123,11 +123,11 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1k: Дополнительные исследования (2026-08-03)
 
-- [ ] [TASK-research-qm](../TASK-research-qm.todo.md) — qm (`yc-software/qm`, TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: per-employee scopes, Slack+web, per-scope durable sandbox, shared skills с org-governance, security postures Strict/Auto/Dangerous + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты; потребляет `SKILL.md`/`.claude/skills`/`.codex/skills`/`AGENTS.md`). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency.
+- [x] [TASK-research-qm](TASK-research-qm.todo.md) — qm (`yc-software/qm`, TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: per-employee scopes, Slack+web, per-scope durable sandbox, shared skills с org-governance, security postures Strict/Auto/Dangerous + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты; потребляет `SKILL.md`/`.claude/skills`/`.codex/skills`/`AGENTS.md`). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. Статус: done, PR #347.
 
 ### Этап 1l: Дополнительные исследования (2026-08-03)
 
-- [x] [TASK-research-omnigent](TASK-research-omnigent.todo.md) — omnigent (`omnigent-ai/omnigent`, Python, Apache-2.0, ≈8k★, **alpha**; open-source meta-harness над внешними coding-агентами Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML-агенты: multi-device surfaces (terminal/browser/phone/desktop), cloud sandboxes (Modal/E2B/K8s/…), OS-sandboxing (bwrap/seatbelt/Job Objects + L7 egress), policies (approval/spend/tool-limits), multi-agent supervision, collaboration; потребляет `.claude/skills`/`AGENTS.md`). Классификация: open-source meta-harness / orchestration platform over external agents, ближайший аналог qm (#32), по прецеденту Orca ADE (#30)/OmO (#23). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. Статус: done, PR #346. Статус: review.
+- [x] [TASK-research-omnigent](TASK-research-omnigent.todo.md) — omnigent (`omnigent-ai/omnigent`, Python, Apache-2.0, ≈8k★, **alpha**; open-source meta-harness над внешними coding-агентами Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML-агенты: multi-device surfaces (terminal/browser/phone/desktop), cloud sandboxes (Modal/E2B/K8s/…), OS-sandboxing (bwrap/seatbelt/Job Objects + L7 egress), policies (approval/spend/tool-limits), multi-agent supervision, collaboration; потребляет `.claude/skills`/`AGENTS.md`). Классификация: open-source meta-harness / orchestration platform over external agents, ближайший аналог qm (#32), по прецеденту Orca ADE (#30)/OmO (#23). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. Статус: done, PR #346.
 
 ### Этап 1m: Дополнительное исследование (2026-08-11)
 
@@ -169,6 +169,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
+| 2026-08-14 | Тимлид (Алекс) | Stage 1k, отчёт qm и строка #32 готовы к review, задача не done. |
 | 2026-04-21 | Тимлид (Алекс) | Создание эпика |
 | 2026-04-22 | Технический писатель (Гермиона) | Все 11 задач выполнены. Эпик завершён. |
 | 2026-04-22 | Тимлид (Алекс) + Пуаро + Локи | Постфактум ревью всех 11 отчётов через сабагентов. 5 критических и 15+ значимых исправлений. PR #52. |
@@ -192,3 +193,5 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-08-14 | Аналитик (Шерлок) | Stage 1l: артефакты TASK-research-omnigent подготовлены к review — создан `omnigent-comparison.md`, заполнена строка сводки #33, verdict 🟡 паттерны / 🔴 не dependency (Python, alpha, multi-device collaboration-платформа, нет chain-level resilience). Задача помечена «Статус: review» и не отмечена done — ожидает review и PR. |
 
 | 2026-08-15 | Тимлид (Алекс) | Stage 1l: TASK-research-omnigent принята, переведена в `done`; ссылка обновлена на `TASK-research-omnigent.todo.md`, PR #346 готов к слиянию. |
+
+| 2026-08-15 | Тимлид (Алекс) | Stage 1k: TASK-research-qm принята, переведена в `done`; ссылка обновлена на `TASK-research-qm.todo.md`, PR #347 готов к слиянию. |
