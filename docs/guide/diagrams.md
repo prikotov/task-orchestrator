@@ -1,6 +1,6 @@
 # Диаграммы
 
-Mermaid-диаграммы Orchestrator. Рендерятся нативно в GitHub markdown preview.
+Mermaid-диаграммы Orchestrator. Рендерятся нативно в предпросмотре Markdown в GitHub.
 
 ## Component-диаграмма: два модуля
 
@@ -131,7 +131,7 @@ graph TB
         QGI["QualityGateRunnerInterface"]
         RSC["RunStaticChainService"]
         RDLI["RunDynamicLoopServiceInterface"]
-        VO["Chain*-Value Objects"]
+        VO["Chain*-объекты-значения"]
     end
 
     subgraph Integration["Orchestrator · Integration"]
@@ -169,7 +169,7 @@ graph TB
     style Infrastructure fill:#fce4ec,stroke:#c62828
 ```
 
-## Class-диаграмма: Integration-слой (ACL)
+## Диаграмма классов: Integration-слой (ACL)
 
 Механизм связи между Orchestrator и AgentRunner через Integration-слой.
 
@@ -234,9 +234,9 @@ classDiagram
     note for AgentDtoMapper "Stateless маппер\nOrchestrator Domain VO ↔ AgentRunner Application DTO"
 ```
 
-## Class-диаграмма Domain-слоя Orchestrator
+## Диаграмма классов Domain-слоя Orchestrator
 
-Интерфейсы, Value Objects и исключения Orchestrator Domain.
+Интерфейсы, объекты-значения и исключения Orchestrator Domain.
 
 ```mermaid
 classDiagram
@@ -336,9 +336,9 @@ classDiagram
     note for RoleNotFoundException "extends OrchestratorException\nimplements NotFoundExceptionInterface"
 ```
 
-## Class-диаграмма Domain-слоя AgentRunner
+## Диаграмма классов Domain-слоя AgentRunner
 
-Интерфейсы и Value Objects модуля AgentRunner.
+Интерфейсы и объекты-значения модуля AgentRunner.
 
 ```mermaid
 classDiagram
@@ -423,7 +423,7 @@ classDiagram
     note for RunnerNotFoundException "extends AgentException\nimplements NotFoundExceptionInterface"
 ```
 
-## Sequence: оркестрация static-цепочки
+## Последовательность: оркестрация static-цепочки
 
 Линейное выполнение шагов с поддержкой итерационных циклов и quality gates.
 
@@ -465,7 +465,7 @@ sequenceDiagram
     H-->>CLI: result
 ```
 
-## Sequence: оркестрация dynamic-цепочки
+## Последовательность: оркестрация dynamic-цепочки
 
 Фасилитатор решает в рантайме, кому дать слово. Цикл завершается когда фасилитатор возвращает `{done: true}`.
 
@@ -525,7 +525,7 @@ sequenceDiagram
     H-->>CLI: OrchestrateChainResultDto
 ```
 
-## Sequence: Integration → AgentRunner Application
+## Последовательность: Integration → AgentRunner Application
 
 Детализация вызова через Integration-слой при `RunAgentServiceInterface::run()`.
 
@@ -566,7 +566,7 @@ sequenceDiagram
     RASI-->>RSC: ChainRunResultVo
 ```
 
-## Flowchart: PiAgentRunner
+## Блок-схема: PiAgentRunner
 
 Внутренний поток `PiAgentRunner::run()` — разрешение команды, формирование аргументов, запуск процесса, парсинг результата.
 

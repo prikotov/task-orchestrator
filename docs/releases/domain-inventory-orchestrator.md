@@ -1,4 +1,4 @@
-# Domain Inventory: Orchestrator Module
+# Инвентаризация Domain-модуля Orchestrator
 
 **Дата:** 2026-05-01
 **Аналитик:** Шерлок (system_analyst_sherlock)
@@ -26,96 +26,96 @@
 | Service (concrete) | 8 | 2 016 | 33.8% | Доменные сервисы с реализацией |
 | Service (interface) | 21 | 879 | 14.7% | Интерфейсы доменных сервисов |
 | Service (total) | **29** | **2 895** | **48.5%** | |
-| ValueObject | 27 | 2 337 | 39.2% | Объекты-значения (Value Objects) |
+| Объекты-значения (Value Objects) | 27 | 2 337 | 39.2% | Объекты-значения |
 | Entity | 2 | 594 | 10.0% | Сущности |
 | Dto | 2 | 50 | 0.8% | Объекты передачи данных (Data Transfer Objects) |
-| Exception | 4 | 54 | 0.9% | Исключения |
+| Исключения | 4 | 54 | 0.9% | Исключения |
 | Enum | 2 | 34 | 0.6% | Перечисления |
 
-> **Ключевое наблюдение:** Services + VO = 87.7% всей кодовой базы Domain-слоя. Entity составляют всего 10%.
+> **Ключевое наблюдение:** Сервисы + VO = 87.7% всей кодовой базы Domain-слоя. Entity составляют всего 10%.
 
 ---
 
-## 2. Распределение по subdomain
+## 2. Распределение по поддоменам
 
-Subdomain определяется namespace-путём внутри `Service/Chain/`:
+Поддомен определяется namespace-путём внутри `Service/Chain/`:
 
 | Поддомен | Файлов | LOC | % LOC | Описание |
 |---|---|---|---|---|
-| ROOT | 46 | 3 567 | 59.8% | VO, Entity, Enum, Exception, Dto, Service/Budget, Service/Chain/Audit, Service/Chain/Session, Service/Agent, Service/Prompt |
+| ВНЕ ПОДДОМЕНОВ | 46 | 3 567 | 59.8% | VO, Entity, Enum, Exception, Dto, Service/Budget, Service/Chain/Audit, Service/Chain/Session, Service/Agent, Service/Prompt |
 | DYNAMIC | 9 | 1 366 | 22.9% | `Service/Chain/Dynamic/` — логика динамических цепей |
 | STATIC | 4 | 771 | 12.9% | `Service/Chain/Static/` — логика статических цепей |
-| SHARED | 7 | 260 | 4.4% | `Service/Chain/Shared/` — общие интерфейсы |
+| ОБЩИЕ ИНТЕРФЕЙСЫ | 7 | 260 | 4.4% | `Service/Chain/Shared/` — общие интерфейсы |
 
-> **Ключевое наблюдение:** ROOT — «общий котёл» без чётких границ. Более 59% кода не относится к конкретному subdomain. Из них VO = 2 337 LOC (40% всего Domain).
+> **Ключевое наблюдение:** Код вне поддоменов — «общий котёл» без чётких границ. Более 59% кода не относится к конкретному поддомену. Из них VO = 2 337 LOC (40% всего Domain).
 
 ---
 
 ## 3. Полный каталог файлов
 
-### 3.1. Value Objects (27 файлов, 2 337 LOC)
+### 3.1. Объекты-значения (27 файлов, 2 337 LOC)
 
 | # | Файл | LOC | Поддомен | Описание |
 |---|---|---|---|---|
-| 1 | `ValueObject/ChainDefinitionVo.php` | 483 | ROOT | Определение цепи (конфигурация) |
-| 2 | `ValueObject/BudgetVo.php` | 208 | ROOT | Бюджет (tokens, cost) |
-| 3 | `ValueObject/ChainStepVo.php` | 195 | ROOT | Определение шага цепи |
-| 4 | `ValueObject/ChainRunResultVo.php` | 144 | ROOT | Результат выполнения цепи |
-| 5 | `ValueObject/ChainRunRequestVo.php` | 145 | ROOT | Запрос на выполнение цепи |
-| 6 | `ValueObject/ChainRetryPolicyVo.php` | 134 | ROOT | Политика retry |
-| 7 | `ValueObject/FixIterationGroupVo.php` | 102 | ROOT | Группа итераций исправления |
-| 8 | `ValueObject/PromptConfigurationVo.php` | 103 | ROOT | Конфигурация промпта |
-| 9 | `ValueObject/RoleConfigVo.php` | 70 | ROOT | Конфигурация роли агента |
-| 10 | `ValueObject/FallbackConfigVo.php` | 53 | ROOT | Конфигурация fallback |
-| 11 | `ValueObject/DynamicLoopResultVo.php` | 55 | ROOT | Результат динамического цикла |
-| 12 | `ValueObject/ChainSessionStateVo.php` | 61 | ROOT | Состояние сессии цепи |
-| 13 | `ValueObject/FacilitatorResponseVo.php` | 62 | ROOT | Ответ фасилитатора |
-| 14 | `ValueObject/StaticStepResultVo.php` | 56 | ROOT | Результат шага статической цепи |
-| 15 | `ValueObject/SharedChainDefinitionVo.php` | 121 | ROOT | Общее определение цепи |
-| 16 | `ValueObject/DynamicChainContextVo.php` | 27 | ROOT | Контекст динамической цепи |
-| 17 | `ValueObject/DynamicRoundResultVo.php` | 32 | ROOT | Результат раунда динамической цепи |
-| 18 | `ValueObject/DynamicBudgetCheckVo.php` | 25 | ROOT | Результат проверки бюджета |
-| 19 | `ValueObject/ChainTurnResultVo.php` | 26 | ROOT | Результат хода цепи |
-| 20 | `ValueObject/DynamicTurnResultVo.php` | 26 | ROOT | Результат хода динамической цепи |
-| 21 | `ValueObject/StaticChainResultVo.php` | 29 | ROOT | Результат статической цепи |
-| 22 | `ValueObject/StaticProcessResultVo.php` | 26 | ROOT | Результат статического процесса |
-| 23 | `ValueObject/FacilitatorTurnResultVo.php` | 21 | ROOT | Результат хода фасилитатора |
-| 24 | `ValueObject/FallbackAttemptVo.php` | 28 | ROOT | Попытка fallback |
-| 25 | `ValueObject/QualityGateResultVo.php` | 29 | ROOT | Результат quality gate |
-| 26 | `ValueObject/QualityGateVo.php` | 35 | ROOT | Определение quality gate |
-| 27 | `ValueObject/ChainConfigViolationVo.php` | 41 | ROOT | Нарушение конфигурации цепи |
+| 1 | `ValueObject/ChainDefinitionVo.php` | 483 | ВНЕ ПОДДОМЕНОВ | Определение цепи (конфигурация) |
+| 2 | `ValueObject/BudgetVo.php` | 208 | ВНЕ ПОДДОМЕНОВ | Бюджет (tokens, cost) |
+| 3 | `ValueObject/ChainStepVo.php` | 195 | ВНЕ ПОДДОМЕНОВ | Определение шага цепи |
+| 4 | `ValueObject/ChainRunResultVo.php` | 144 | ВНЕ ПОДДОМЕНОВ | Результат выполнения цепи |
+| 5 | `ValueObject/ChainRunRequestVo.php` | 145 | ВНЕ ПОДДОМЕНОВ | Запрос на выполнение цепи |
+| 6 | `ValueObject/ChainRetryPolicyVo.php` | 134 | ВНЕ ПОДДОМЕНОВ | Политика retry |
+| 7 | `ValueObject/FixIterationGroupVo.php` | 102 | ВНЕ ПОДДОМЕНОВ | Группа итераций исправления |
+| 8 | `ValueObject/PromptConfigurationVo.php` | 103 | ВНЕ ПОДДОМЕНОВ | Конфигурация промпта |
+| 9 | `ValueObject/RoleConfigVo.php` | 70 | ВНЕ ПОДДОМЕНОВ | Конфигурация роли агента |
+| 10 | `ValueObject/FallbackConfigVo.php` | 53 | ВНЕ ПОДДОМЕНОВ | Конфигурация fallback |
+| 11 | `ValueObject/DynamicLoopResultVo.php` | 55 | ВНЕ ПОДДОМЕНОВ | Результат динамического цикла |
+| 12 | `ValueObject/ChainSessionStateVo.php` | 61 | ВНЕ ПОДДОМЕНОВ | Состояние сессии цепи |
+| 13 | `ValueObject/FacilitatorResponseVo.php` | 62 | ВНЕ ПОДДОМЕНОВ | Ответ фасилитатора |
+| 14 | `ValueObject/StaticStepResultVo.php` | 56 | ВНЕ ПОДДОМЕНОВ | Результат шага статической цепи |
+| 15 | `ValueObject/SharedChainDefinitionVo.php` | 121 | ВНЕ ПОДДОМЕНОВ | Общее определение цепи |
+| 16 | `ValueObject/DynamicChainContextVo.php` | 27 | ВНЕ ПОДДОМЕНОВ | Контекст динамической цепи |
+| 17 | `ValueObject/DynamicRoundResultVo.php` | 32 | ВНЕ ПОДДОМЕНОВ | Результат раунда динамической цепи |
+| 18 | `ValueObject/DynamicBudgetCheckVo.php` | 25 | ВНЕ ПОДДОМЕНОВ | Результат проверки бюджета |
+| 19 | `ValueObject/ChainTurnResultVo.php` | 26 | ВНЕ ПОДДОМЕНОВ | Результат хода цепи |
+| 20 | `ValueObject/DynamicTurnResultVo.php` | 26 | ВНЕ ПОДДОМЕНОВ | Результат хода динамической цепи |
+| 21 | `ValueObject/StaticChainResultVo.php` | 29 | ВНЕ ПОДДОМЕНОВ | Результат статической цепи |
+| 22 | `ValueObject/StaticProcessResultVo.php` | 26 | ВНЕ ПОДДОМЕНОВ | Результат статического процесса |
+| 23 | `ValueObject/FacilitatorTurnResultVo.php` | 21 | ВНЕ ПОДДОМЕНОВ | Результат хода фасилитатора |
+| 24 | `ValueObject/FallbackAttemptVo.php` | 28 | ВНЕ ПОДДОМЕНОВ | Попытка fallback |
+| 25 | `ValueObject/QualityGateResultVo.php` | 29 | ВНЕ ПОДДОМЕНОВ | Результат quality gate |
+| 26 | `ValueObject/QualityGateVo.php` | 35 | ВНЕ ПОДДОМЕНОВ | Определение quality gate |
+| 27 | `ValueObject/ChainConfigViolationVo.php` | 41 | ВНЕ ПОДДОМЕНОВ | Нарушение конфигурации цепи |
 
 ### 3.2. Entities (2 файла, 594 LOC)
 
 | # | Файл | LOC | Поддомен | Описание |
 |---|---|---|---|---|
-| 1 | `Entity/DynamicLoopExecution.php` | 307 | ROOT | Сущность выполнения динамического цикла |
-| 2 | `Entity/StaticChainExecution.php` | 287 | ROOT | Сущность выполнения статической цепи |
+| 1 | `Entity/DynamicLoopExecution.php` | 307 | ВНЕ ПОДДОМЕНОВ | Сущность выполнения динамического цикла |
+| 2 | `Entity/StaticChainExecution.php` | 287 | ВНЕ ПОДДОМЕНОВ | Сущность выполнения статической цепи |
 
 ### 3.3. Enums (2 файла, 34 LOC)
 
 | # | Файл | LOC | Поддомен | Описание |
 |---|---|---|---|---|
-| 1 | `Enum/ChainStepTypeEnum.php` | 17 | ROOT | Тип шага цепи |
-| 2 | `Enum/ChainTypeEnum.php` | 17 | ROOT | Тип цепи (static/dynamic) |
+| 1 | `Enum/ChainStepTypeEnum.php` | 17 | ВНЕ ПОДДОМЕНОВ | Тип шага цепи |
+| 2 | `Enum/ChainTypeEnum.php` | 17 | ВНЕ ПОДДОМЕНОВ | Тип цепи (static/dynamic) |
 
-### 3.4. Exceptions (4 файла, 54 LOC)
+### 3.4. Исключения (4 файла, 54 LOC)
 
 | # | Файл | LOC | Поддомен | Описание |
 |---|---|---|---|---|
-| 1 | `Exception/OrchestratorException.php` | 12 | ROOT | Базовое исключение модуля |
-| 2 | `Exception/NotFoundExceptionInterface.php` | 12 | ROOT | Интерфейс «не найдено» |
-| 3 | `Exception/ChainNotFoundException.php` | 15 | ROOT | Цепь не найдена |
-| 4 | `Exception/RoleNotFoundException.php` | 15 | ROOT | Роль не найдена |
+| 1 | `Exception/OrchestratorException.php` | 12 | ВНЕ ПОДДОМЕНОВ | Базовое исключение модуля |
+| 2 | `Exception/NotFoundExceptionInterface.php` | 12 | ВНЕ ПОДДОМЕНОВ | Интерфейс «не найдено» |
+| 3 | `Exception/ChainNotFoundException.php` | 15 | ВНЕ ПОДДОМЕНОВ | Цепь не найдена |
+| 4 | `Exception/RoleNotFoundException.php` | 15 | ВНЕ ПОДДОМЕНОВ | Роль не найдена |
 
 ### 3.5. DTO (2 файла, 50 LOC)
 
 | # | Файл | LOC | Поддомен | Описание |
 |---|---|---|---|---|
-| 1 | `Dto/ChainResultAuditDto.php` | 31 | ROOT | DTO аудита результата цепи |
-| 2 | `Dto/StepAuditStatusDto.php` | 19 | ROOT | DTO статуса аудита шага |
+| 1 | `Dto/ChainResultAuditDto.php` | 31 | ВНЕ ПОДДОМЕНОВ | DTO аудита результата цепи |
+| 2 | `Dto/StepAuditStatusDto.php` | 19 | ВНЕ ПОДДОМЕНОВ | DTO статуса аудита шага |
 
-### 3.6. Services — ROOT (13 файлов, 1 093 LOC)
+### 3.6. Сервисы — основной поддомен (13 файлов, 1 093 LOC)
 
 #### Service/Budget (1 файл)
 
@@ -156,7 +156,7 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 |---|---|---|---|---|
 | 1 | `Service/Prompt/PromptProviderInterface.php` | 37 | `interface` | Провайдер промптов |
 
-### 3.7. Services — STATIC (4 файла, 771 LOC)
+### 3.7. Сервисы — STATIC (4 файла, 771 LOC)
 
 | # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
@@ -165,7 +165,7 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 | 3 | `Service/Chain/Static/CheckStaticBudgetService.php` | 102 | `concrete` | Проверка бюджета статической цепи |
 | 4 | `Service/Chain/Static/CheckStaticBudgetServiceInterface.php` | 37 | `interface` | Интерфейс проверки бюджета |
 
-### 3.8. Services — DYNAMIC (9 файлов, 1 366 LOC)
+### 3.8. Сервисы — DYNAMIC (9 файлов, 1 366 LOC)
 
 | # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
@@ -179,7 +179,7 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 | 8 | `Service/Chain/Dynamic/RunDynamicLoopServiceInterface.php` | 28 | `interface` | Интерфейс запуска динамического цикла |
 | 9 | `Service/Chain/Dynamic/RecordDynamicRoundServiceInterface.php` | 30 | `interface` | Интерфейс записи раунда |
 
-### 3.9. Services — SHARED (7 файлов, 260 LOC)
+### 3.9. Сервисы — общий поддомен (7 файлов, 260 LOC)
 
 | # | Файл | LOC | Тип | Описание |
 |---|---|---|---|---|
@@ -193,14 +193,14 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 
 ---
 
-## 4. Карта зависимостей между поддоменами (subdomain)
+## 4. Карта зависимостей между поддоменами
 
 ### 4.1. Топология
 
 ```
              ┌──────────────┐
-             │     ROOT     │ ← VO, Entity, Enum, Exception, Dto, Service (core)
-             │  46 files    │
+             │ВНЕ ПОДДОМЕНОВ│ ← VO, Entity, Enum, Exception, Dto, Service
+             │  46 файлов   │
              │  3 567 LOC   │
              └──────┬───────┘
                     │
@@ -208,36 +208,36 @@ Subdomain определяется namespace-путём внутри `Service/Ch
           │         │          │
           ▼         ▼          ▼
    ┌────────────┐ ┌──────────┐ ┌─────────────┐
-   │   STATIC   │ │  SHARED  │ │   DYNAMIC   │
-   │  4 files   │ │ 7 files  │ │  9 files    │
+   │   STATIC   │ │ОБЩИЕ ИНТ.│ │   DYNAMIC   │
+   │  4 файла   │ │ 7 файлов │ │  9 файлов   │
    │  771 LOC   │ │ 260 LOC  │ │  1 366 LOC  │
    └─────┬──────┘ └────┬─────┘ └──────┬──────┘
          │              │              │
-         └──────►SHARED◄──────┘
+         └─►ОБЩИЕ ИНТЕРФЕЙСЫ◄─┘
 ```
 
-### 4.2. Cross-reference таблица
+### 4.2. Таблица перекрёстных ссылок
 
-| Откуда ↓ / Куда → | ROOT | STATIC | DYNAMIC | SHARED |
+| Откуда ↓ / Куда → | ВНЕ ПОДДОМЕНОВ | STATIC | DYNAMIC | ОБЩИЕ ИНТЕРФЕЙСЫ |
 |---|---|---|---|---|
-| **ROOT** | — | — | — | — |
+| **ВНЕ ПОДДОМЕНОВ** | — | — | — | — |
 | **STATIC** | ✅ (VO, Entity, Dto, Audit, Integration) | — | ❌ **0** | ✅ 3 ссылки |
 | **DYNAMIC** | ✅ (VO, Entity, Dto, Budget, Audit, Session) | ❌ **0** | — | ✅ 2 ссылки |
-| **SHARED** | ✅ (VO) | ❌ **0** | ❌ **0** | — |
+| **ОБЩИЕ ИНТЕРФЕЙСЫ** | ✅ (VO) | ❌ **0** | ❌ **0** | — |
 
-### 4.3. Детализация cross-references
+### 4.3. Детализация перекрёстных ссылок
 
-#### STATIC → SHARED (3 ссылки)
+#### STATIC → ОБЩИЕ ИНТЕРФЕЙСЫ (3 ссылки)
 
-| Файл STATIC | Зависит от SHARED |
+| Файл STATIC | Зависит от общих интерфейсов |
 |---|---|
 | `ExecuteStaticStepService.php` | `PromptFormatterInterface` |
 | `ExecuteStaticStepService.php` | `QualityGateRunnerInterface` |
 | `ExecuteStaticStepService.php` | `ResolveChainRunnerServiceInterface` |
 
-#### DYNAMIC → SHARED (2 ссылки)
+#### DYNAMIC → ОБЩИЕ ИНТЕРФЕЙСЫ (2 ссылки)
 
-| Файл DYNAMIC | Зависит от SHARED |
+| Файл DYNAMIC | Зависит от общих интерфейсов |
 |---|---|
 | `RecordDynamicRoundService.php` | `RoundCompletedNotifierInterface` |
 | `RunDynamicLoopService.php` | `FacilitatorResponseParserInterface` |
@@ -249,11 +249,11 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 | STATIC → DYNAMIC | **0** |
 | DYNAMIC → STATIC | **0** |
 
-> **Вывод:** Прямых зависимостей между Static и Dynamic **нет**. Оба subdomain зависят только от ROOT (VO/Entity/Enum/Exception/Dto) и от SHARED (интерфейсы). Это чистая граница для потенциального split.
+> **Вывод:** Прямых зависимостей между Static и Dynamic **нет**. Оба subdomain зависят только от общего кода вне поддоменов (VO/Entity/Enum/Exception/Dto) и от общих интерфейсов. Это чистая граница для потенциального split.
 
 ---
 
-## 5. Таблица «VO → число потребителей (consumer count)» (радиус последствий, blast radius)
+## 5. Таблица «VO → число потребителей (consumer count)» (радиус последствий, радиус влияния)
 
 Ранжирование по количеству потребителей (consumers) внутри Orchestrator-модуля (Domain + Application + Infrastructure + Integration):
 
@@ -291,9 +291,9 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 
 ---
 
-## 6. Кластерный анализ для split
+## 6. Кластерный анализ для разделения
 
-### Кластер 1: Static Execution (4 файла, 771 LOC)
+### Кластер 1: Выполнение Static (4 файла, 771 LOC)
 
 | Файл | LOC |
 |---|---|
@@ -302,9 +302,9 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 | `CheckStaticBudgetService.php` | 102 |
 | `CheckStaticBudgetServiceInterface.php` | 37 |
 
-**Зависимости:** ROOT VO (`BudgetVo`, `ChainDefinitionVo`, `ChainStepVo`, `ChainRunRequestVo`, `ChainRunResultVo`, `StaticStepResultVo`, `StaticChainResultVo`, `StaticProcessResultVo`, `FixIterationGroupVo`, `RoleConfigVo`, `FallbackAttemptVo`), Entity (`StaticChainExecution`), Dto, Audit, Integration + SHARED (`PromptFormatterInterface`, `QualityGateRunnerInterface`, `ResolveChainRunnerServiceInterface`).
+**Зависимости:** общие VO вне поддоменов (`BudgetVo`, `ChainDefinitionVo`, `ChainStepVo`, `ChainRunRequestVo`, `ChainRunResultVo`, `StaticStepResultVo`, `StaticChainResultVo`, `StaticProcessResultVo`, `FixIterationGroupVo`, `RoleConfigVo`, `FallbackAttemptVo`), Entity (`StaticChainExecution`), Dto, Audit, Integration + общие интерфейсы (`PromptFormatterInterface`, `QualityGateRunnerInterface`, `ResolveChainRunnerServiceInterface`).
 
-### Кластер 2: Dynamic Execution (9 файлов, 1 366 LOC)
+### Кластер 2: Выполнение Dynamic (9 файлов, 1 366 LOC)
 
 | Файл | LOC |
 |---|---|
@@ -318,13 +318,13 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 | `RecordDynamicRoundServiceInterface.php` | 30 |
 | `RunDynamicLoopServiceInterface.php` | 28 |
 
-**Зависимости:** ROOT VO (`BudgetVo`, `ChainDefinitionVo`, `ChainTurnResultVo`, `DynamicBudgetCheckVo`, `DynamicChainContextVo`, `DynamicLoopResultVo`, `DynamicRoundResultVo`, `DynamicTurnResultVo`, `FacilitatorResponseVo`, `FacilitatorTurnResultVo`, `RoleConfigVo`, `ChainRunResultVo`), Entity (`DynamicLoopExecution`), Dto, Budget, Audit, Session + SHARED (`FacilitatorResponseParserInterface`, `RoundCompletedNotifierInterface`).
+**Зависимости:** общие VO вне поддоменов (`BudgetVo`, `ChainDefinitionVo`, `ChainTurnResultVo`, `DynamicBudgetCheckVo`, `DynamicChainContextVo`, `DynamicLoopResultVo`, `DynamicRoundResultVo`, `DynamicTurnResultVo`, `FacilitatorResponseVo`, `FacilitatorTurnResultVo`, `RoleConfigVo`, `ChainRunResultVo`), Entity (`DynamicLoopExecution`), Dto, Budget, Audit, Session + общие интерфейсы (`FacilitatorResponseParserInterface`, `RoundCompletedNotifierInterface`).
 
-### Кластер 3: Shared Interfaces (7 файлов, 260 LOC)
+### Кластер 3: Общие интерфейсы (7 файлов, 260 LOC)
 
-Все файлы — интерфейсы. Зависят только от ROOT VO.
+Все файлы — интерфейсы. Зависят только от общих VO вне поддоменов.
 
-### Кластер 4: ROOT — общий котёл (46 файлов, 3 567 LOC)
+### Кластер 4: Код вне поддоменов — общий котёл (46 файлов, 3 567 LOC)
 
 Включает все VO, Entity, Enum, Exception, Dto, и «остаточные» сервисы (Budget, Audit, Session, ChainDefinitionValidator, Integration, Prompt). Значительная часть — VO (2 337 LOC / 65%).
 
@@ -334,25 +334,25 @@ Subdomain определяется namespace-путём внутри `Service/Ch
 
 ```mermaid
 graph TD
-    ROOT["ROOT<br/>46 files / 3 567 LOC<br/>VO + Entity + Enum + Exception + Dto<br/>+ Service (Budget, Audit, Session,<br/>Integration, Prompt, Validator)"]
+    A["ВНЕ ПОДДОМЕНОВ<br/>46 файлов / 3 567 LOC<br/>VO + Entity + Enum + Exception + Dto<br/>+ Service (Budget, Audit, Session,<br/>Integration, Prompt, Validator)"]
 
-    STATIC["STATIC<br/>4 files / 771 LOC<br/>RunStaticChainService<br/>ExecuteStaticStepService<br/>CheckStaticBudgetService"]
-    DYNAMIC["DYNAMIC<br/>9 files / 1 366 LOC<br/>RunDynamicLoopService<br/>BuildDynamicContextService<br/>FormatDynamicJournalService<br/>RecordDynamicRoundService"]
-    SHARED["SHARED<br/>7 files / 260 LOC<br/>ChainLoaderInterface<br/>PromptFormatterInterface<br/>QualityGateRunnerInterface<br/>ResolveChainRunnerServiceInterface<br/>FacilitatorResponseParserInterface<br/>RoundCompletedNotifierInterface<br/>SessionCompletedNotifierInterface"]
+    STATIC["STATIC<br/>4 файла / 771 LOC<br/>RunStaticChainService<br/>ExecuteStaticStepService<br/>CheckStaticBudgetService"]
+    DYNAMIC["DYNAMIC<br/>9 файлов / 1 366 LOC<br/>RunDynamicLoopService<br/>BuildDynamicContextService<br/>FormatDynamicJournalService<br/>RecordDynamicRoundService"]
+    B["ОБЩИЕ ИНТЕРФЕЙСЫ<br/>7 файлов / 260 LOC<br/>ChainLoaderInterface<br/>PromptFormatterInterface<br/>QualityGateRunnerInterface<br/>ResolveChainRunnerServiceInterface<br/>FacilitatorResponseParserInterface<br/>RoundCompletedNotifierInterface<br/>SessionCompletedNotifierInterface"]
 
-    STATIC -->|"VO, Entity, Dto,<br/>Audit, Integration"| ROOT
-    STATIC -->|"3 interfaces"| SHARED
-    DYNAMIC -->|"VO, Entity, Dto,<br/>Budget, Audit, Session"| ROOT
-    DYNAMIC -->|"2 interfaces"| SHARED
-    SHARED -->|"VO"| ROOT
+    STATIC -->|"VO, Entity, Dto,<br/>Audit, Integration"| A
+    STATIC -->|"3 интерфейса"| B
+    DYNAMIC -->|"VO, Entity, Dto,<br/>Budget, Audit, Session"| A
+    DYNAMIC -->|"2 интерфейса"| B
+    B -->|"VO"| A
 
     STATIC -.->|"0 deps"| DYNAMIC
     DYNAMIC -.->|"0 deps"| STATIC
 
-    style ROOT fill:#e8e8e8,stroke:#333
+    style A fill:#e8e8e8,stroke:#333
     style STATIC fill:#4a9eff,stroke:#2171b5,color:#fff
     style DYNAMIC fill:#ff6b6b,stroke:#c92a2a,color:#fff
-    style SHARED fill:#51cf66,stroke:#2b8a3e,color:#fff
+    style B fill:#51cf66,stroke:#2b8a3e,color:#fff
 ```
 
 ---
@@ -372,18 +372,18 @@ graph LR
     CD --> APP1["Application"]
     CD --> STATIC1["Static"]
     CD --> DYNAMIC1["Dynamic"]
-    CD --> SHARED1["Shared"]
+    CD --> X1["Общие интерфейсы"]
     CD --> INFRA1["Infrastructure"]
 
     CRQ --> APP2["Application"]
     CRQ --> STATIC2["Static"]
-    CRQ --> SHARED2["Shared"]
+    CRQ --> X2["Общие интерфейсы"]
     CRQ --> INFRA2["Infrastructure"]
     CRQ --> INT2["Integration"]
 
     CRR --> STATIC3["Static"]
     CRR --> DYNAMIC3["Dynamic"]
-    CRR --> SHARED3["Shared"]
+    CRR --> X3["Общие интерфейсы"]
     CRR --> INFRA3["Infrastructure"]
     CRR --> INT3["Integration"]
 
@@ -393,7 +393,7 @@ graph LR
 
     CRP --> VO4["ChainDefinitionVo"]
     CRP --> VO5["ChainStepVo"]
-    CRP --> SHARED4["Shared"]
+    CRP --> X4["Общие интерфейсы"]
     CRP --> INT4["Integration"]
     CRP --> INFRA5["Infrastructure"]
 ```
@@ -403,26 +403,26 @@ graph LR
 ## 9. Ключевые находки
 
 ### 🟢 Позитивные
-1. **Чистая граница Static ↔ Dynamic:** 0 прямых зависимостей между subdomain'ами. Оба общаются только через ROOT VO и SHARED интерфейсы.
-2. **SHARED не зависит ни от Static, ни от Dynamic:** чистый «общий знаменатель».
+1. **Чистая граница Static ↔ Dynamic:** 0 прямых зависимостей между поддоменами. Оба общаются только через общие VO вне поддоменов и общие интерфейсы.
+2. **Общие интерфейсы не зависят ни от Static, ни от Dynamic:** чистый «общий знаменатель».
 3. **Интерфейс-ориентированность:** 21 из 29 Service-файлов — интерфейсы (72%). Конкретных реализаций всего 8.
 
 ### 🟡 Точки внимания
-1. **ROOT — монолитный котёл (3 567 LOC, 59.8%):** VO не распределены по subdomain'ам. Все 27 VO лежат в общем namespace `Domain/ValueObject/`, хотя 8 из них носят имена с префиксом `Dynamic*` или `Static*`.
+1. **Код вне поддоменов — монолитный котёл (3 567 LOC, 59.8%):** VO не распределены по поддоменам. Все 27 VO лежат в общем namespace `Domain/ValueObject/`, хотя 8 из них носят имена с префиксом `Dynamic*` или `Static*`.
 2. **RunDynamicLoopService — крупнейший файл (786 LOC):** один сервис содержит 13% всей кодовой базы Domain-слоя.
 3. **SharedChainDefinitionVo — 0 потребителей:** потенциально мёртвый код.
-4. **4 критических VO** с blast radius ≥9: `ChainDefinitionVo` (15), `ChainRunRequestVo` (10), `ChainRunResultVo` (9), `BudgetVo` (9). Любое изменение затрагивает 9–15 файлов.
+4. **4 критических VO** с радиус влияния ≥9: `ChainDefinitionVo` (15), `ChainRunRequestVo` (10), `ChainRunResultVo` (9), `BudgetVo` (9). Любое изменение затрагивает 9–15 файлов.
 
 ### 🔴 Архитектурные риски
-1. **Высокая coupling через ROOT VO:** и Static, и Dynamic используют одни и те же VO (`BudgetVo`, `ChainDefinitionVo`). При split эти VO придётся либо дублировать, либо выделять в отдельный Shared Kernel.
-2. **Budget-интерфейсы в ROOT, а не в subdomain:** `CheckDynamicBudgetServiceInterface` лежит в ROOT, хотя его единственный потребитель — Dynamic.
-3. **Session-интерфейсы в ROOT, хотя используются Static и Dynamic:** `ChainSessionWriterInterface` используется `RecordDynamicRoundService` (Dynamic), а `ChainSessionReaderInterface` — Application-слоем.
+1. **Высокая связанность через общие VO вне поддоменов:** и Static, и Dynamic используют одни и те же VO (`BudgetVo`, `ChainDefinitionVo`). При разделении эти VO придётся либо дублировать, либо выделять в отдельный Shared Kernel.
+2. **Budget-интерфейсы расположены вне поддоменов:** `CheckDynamicBudgetServiceInterface` находится вне поддоменов, хотя его единственный потребитель — Dynamic.
+3. **Session-интерфейсы расположены вне поддоменов, хотя используются Static и Dynamic:** `ChainSessionWriterInterface` используется `RecordDynamicRoundService` (Dynamic), а `ChainSessionReaderInterface` — Application-слоем.
 
 ---
 
 ## 10. Рекомендации для следующих шагов (не в scope, но отмечено)
 
-> ⚠️ Рекомендации по декомпозиции не входят в scope данной задачи (Won't Have). Они будут выполнены в отдельном анализе.
+> ⚠️ Рекомендации по декомпозиции не входят в объём данной задачи (Won't Have). Они будут выполнены в отдельном анализе.
 
 Данный каталог предоставляет данные для:
 - AI#11: Декомпозиция RunDynamicLoopService (786 LOC)

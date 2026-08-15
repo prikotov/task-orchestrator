@@ -15,16 +15,16 @@
 
 ## Риски
 
-- Основные риски: минимальные — bump dev-dependency, без изменений бизнес-логики
+- Основные риски: минимальные — обновление зависимости для разработки (`dev-dependency`), без изменений бизнес-логики
 - Наличие миграций данных: нет
-- Риск окна несовместимости: нет — `coding-standard` является dev-dependency
+- Риск окна несовместимости: нет — `coding-standard` является `dev-dependency`
 
 ## Проверки перед deploy
 
-- [x] PHPUnit: 926 tests, 2549 assertions — OK
-- [x] Psalm: OK
-- [x] PHPStan: OK
-- [x] PHPCS: OK
+- [x] PHPUnit: 926 тестов, 2549 проверок — пройден
+- [x] Psalm — пройден
+- [x] PHPStan — пройден
+- [x] PHPCS — пройден
 - [x] Deptrac: 0 violations
 - [x] `make check`: все проверки пройдены
 

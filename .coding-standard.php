@@ -27,15 +27,11 @@ return [
         'max_ratio' => 0.08,
 
         // Разрешённые термины (case-insensitive) — легитимный жаргон и методология.
+        // Граница: общие английские слова нужно переводить, а не добавлять в allowlist.
         'allowlist' => [
-            // Методология и шаблон todo/epic (двуязычные заголовки секций)
-            'Concept', 'Goal', 'Story', 'Job', 'Requirements', 'Must', 'Have',
-            'Should', 'Could', "Won't", 'and', 'of', 'In', 'Out', 'Use', 'Case',
-            'Solution', 'Sketch', 'Expected', 'Result', 'Human', 'Brief', 'Problem',
-            'Definition', 'Done', 'Verification', 'Risks', 'Sources', 'Comments',
-            'Implementation', 'Plan', 'Context', 'Change', 'History', 'Release',
-            'Notes', 'Deployment', 'Dependencies', 'brainstorm', 'self-review',
-            'code-review', 'retrospective', 'acceptance', 'criteria', 'story',
+            // Методология разработки и проверки
+            'brainstorm',
+            'self-review', 'code-review', 'retrospective', 'acceptance', 'criteria',
 
             // Технологии и стандарты
             'Symfony', 'Doctrine', 'PHP', 'SQL', 'MySQL', 'PostgreSQL', 'SQLite',
@@ -46,7 +42,7 @@ return [
             'Vo', 'Entity', 'Repository', 'UseCase', 'Application', 'Domain',
             'Infrastructure', 'Presentation', 'Integration', 'Module', 'Bundle',
             'Component', 'Helper', 'Factory', 'Mapper', 'Service', 'Decorator',
-            'CQRS', 'ES', 'EDA', 'enum', 'namespace', 'value', 'object', 'class',
+            'CQRS', 'ES', 'EDA', 'enum', 'namespace',
 
             // Инструменты
             'PHPUnit', 'Psalm', 'PHPStan', 'Deptrac', 'PHPMD', 'PHPCS',
@@ -60,7 +56,7 @@ return [
             'PR', 'merge', 'commit', 'push', 'branch', 'checkout', 'rebase',
             'tag', 'release', 'issue', 'epic', 'task', 'todo', 'backlog',
             'sprint', 'milestone', 'label', 'review', 'approval', 'status',
-            'draft', 'pipeline', 'workflow', 'hotfix', 'cherry-pick', 'squash',
+            'pipeline', 'workflow', 'hotfix', 'cherry-pick', 'squash',
             'fork', 'clone', 'origin', 'upstream', 'HEAD', 'main', 'dev', 'master',
             'pull', 'exit', 'changelog', 'docs', 'research', 'roadmap', 'ADR',
             'loc', 'LOC',
@@ -74,14 +70,11 @@ return [
             'fanout', 'dispatch', 'orchestrator', 'orchestration', 'harness',
             'runtime', 'spawn', 'turn', 'context', 'compaction', 'doom', 'intent',
             'discipline', 'fix_iterations', 'max_iterations', 'CircuitBreaker',
-            'state', 'management', 'error', 'handling', 'handler', 'command',
             'commandhandler', 'CommandHandler', 'ChainDefinition', 'chaindefinition',
             'ChainExecution', 'chainexecution', 'AgentRunner', 'agentrunner',
             'DynamicLoop', 'dynamic', 'conditional', 'branching', 'dependency',
-            'violations', 'violation', 'suppression', 'request', 'patch',
-            'production', 'deploy', 'static', 'query', 'rule', 'rules', 'hooks',
-            'prompt', 'resume', 'default', 'architecture', 'tests', 'test',
-            'unit', 'source', 'stdout', 'smoke', 'security', 'voter', 'root',
+            'violations', 'violation', 'suppression', 'deploy', 'static', 'query',
+            'rule', 'hooks', 'prompt', 'architecture', 'stdout', 'smoke', 'voter',
             'front', 'web', 'ui', 'dsl', 'ci', 'ai', 'ai-agent', 'multi-agent',
 
             // Продукт/идентичность
@@ -92,7 +85,7 @@ return [
             'Duet', 'Multica', 'Kilo', 'ZCode',
 
             // Роли / психометрия (из файлов ролей)
-            'jung', 'belbin', 'disc', 'dp', 'big', 'five', 'matter',
+            'jung', 'belbin', 'disc', 'dp',
 
             // Прочий технический жаргон
             'allowlist', 'denylist', 'blocklist', 'backoffice', 'frontend',
@@ -102,14 +95,12 @@ return [
             'coding', 'code', 'self-contained',
 
             // Дополнение из validate-language baseline
-            'won', 'env', 'md', 'free', 'tier', 'programmatic', 'non-interactive',
+            'env', 'md', 'programmatic', 'non-interactive',
             'ephemeral', 'byok', 'breaking', 'agent-frameworks-summary',
             'framework-comparisons', 'kernel', 'staticexecution', 'rfc',
             'readme', 'policy', 'permission', 'xml', 'specification',
-            'in-memory', 'executionstrategy', 'execution', 'chaindefinitionvo',
-            'system', 'console', 'split', 'open-source', 'source', 'shared',
-            'cases', 'user', 'path', 'design', 'action', 'tools', 'time',
-            'step', 'fix', 'changes', 'draft', 'ok', 'open', 'big',
+            'in-memory', 'executionstrategy', 'chaindefinitionvo',
+            'open-source',
         ],
     ],
 ];
