@@ -31,7 +31,7 @@ return [
         'allowlist' => [
             // Методология разработки и проверки
             'brainstorm',
-            'self-review', 'code-review', 'retrospective', 'acceptance', 'criteria',
+            'self-review', 'code-review', 'retrospective',
 
             // Технологии и стандарты
             'Symfony', 'Doctrine', 'PHP', 'SQL', 'MySQL', 'PostgreSQL', 'SQLite',
@@ -75,7 +75,7 @@ return [
             'DynamicLoop', 'dynamic', 'conditional', 'branching', 'dependency',
             'violations', 'violation', 'suppression', 'deploy', 'static', 'query',
             'rule', 'hooks', 'prompt', 'architecture', 'stdout', 'smoke', 'voter',
-            'front', 'web', 'ui', 'dsl', 'ci', 'ai', 'ai-agent', 'multi-agent',
+            'web', 'ui', 'dsl', 'ci', 'ai', 'ai-agent', 'multi-agent',
 
             // Продукт/идентичность
             'TasK', 'task-orchestrator', 'OhMyPi', 'omp', 'Pi', 'Codex',
