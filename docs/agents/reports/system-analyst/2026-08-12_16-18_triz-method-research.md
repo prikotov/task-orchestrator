@@ -2,8 +2,8 @@
 
 **Роль:** Аналитик Шерлок
 **Дата:** 2026-08-12
-**Объект:** `todo/TASK-research-triz-method.todo.md`, `docs/research/methods/triz-method-research.md`, внешний репозиторий `snow-ghost/triz`
-**Задача:** [TASK-research-triz-method](../../../../todo/TASK-research-triz-method.todo.md)
+**Объект:** `todo/done/TASK-research-triz-method.todo.md`, `docs/research/methods/triz-method-research.md`, внешний репозиторий `snow-ghost/triz`
+**Задача:** [TASK-research-triz-method](../../../../todo/done/TASK-research-triz-method.todo.md)
 
 ---
 
@@ -60,7 +60,7 @@ PHPUnit и Psalm не запускались: задача docs-only (тольк
 
 ## Изменённые файлы
 
-- `todo/TASK-research-triz-method.todo.md`
+- `todo/done/TASK-research-triz-method.todo.md`
 - `docs/research/methods/triz-method-research.md`
 - `docs/agents/reports/system-analyst/2026-08-12_16-18_triz-method-research.md`
 

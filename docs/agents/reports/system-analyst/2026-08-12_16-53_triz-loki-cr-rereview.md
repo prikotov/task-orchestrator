@@ -2,8 +2,8 @@
 
 **Роль:** Аналитик Шерлок
 **Дата:** 2026-08-12
-**Объект:** `docs/research/methods/triz-method-research.md`, `todo/TASK-research-triz-method.todo.md`
-**Задача:** [TASK-research-triz-method](../../../../todo/TASK-research-triz-method.todo.md)
+**Объект:** `docs/research/methods/triz-method-research.md`, `todo/done/TASK-research-triz-method.todo.md`
+**Задача:** [TASK-research-triz-method](../../../../todo/done/TASK-research-triz-method.todo.md)
 
 ---
 
@@ -54,7 +54,7 @@ git diff --check
 Результаты:
 
 - `make md-links`: PASS, все внутренние ссылки валидны.
-- `make validate-todo`: PASS, `todo/TASK-research-triz-method.todo.md` валиден, 0 ошибок, 0 предупреждений.
+- `make validate-todo`: PASS, `todo/done/TASK-research-triz-method.todo.md` валиден, 0 ошибок, 0 предупреждений.
 - `git diff --check`: PASS, whitespace (пробельных) ошибок нет.
 
 PHPUnit и Psalm не запускались: изменения docs-only (только документация), код, конфигурация и скрипты не менялись.

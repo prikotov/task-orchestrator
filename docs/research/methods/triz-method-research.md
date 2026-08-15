@@ -1,6 +1,6 @@
 # Исследование TRIZ-метода для task-orchestrator
 
-> **Задача:** [TASK-research-triz-method](../../../todo/TASK-research-triz-method.todo.md)
+> **Задача:** [TASK-research-triz-method](../../../todo/done/TASK-research-triz-method.todo.md)
 > **Дата исследования:** 2026-08-12
 > **Аналитик:** Аналитик Шерлок
 > **Объект:** TRIZ (теория решения изобретательских задач, Theory of Inventive Problem Solving) и репозиторий [`snow-ghost/triz`](https://github.com/snow-ghost/triz)

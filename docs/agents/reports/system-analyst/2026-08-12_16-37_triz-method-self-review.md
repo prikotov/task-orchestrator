@@ -2,8 +2,8 @@
 
 **Роль:** Аналитик Шерлок
 **Дата:** 2026-08-12
-**Объект:** незакоммиченный diff ветки `task/research-triz-method`: `todo/TASK-research-triz-method.todo.md`, `docs/research/methods/triz-method-research.md`, `docs/agents/reports/system-analyst/2026-08-12_16-18_triz-method-research.md`
-**Задача:** [TASK-research-triz-method](../../../../todo/TASK-research-triz-method.todo.md)
+**Объект:** незакоммиченный diff ветки `task/research-triz-method`: `todo/done/TASK-research-triz-method.todo.md`, `docs/research/methods/triz-method-research.md`, `docs/agents/reports/system-analyst/2026-08-12_16-18_triz-method-research.md`
+**Задача:** [TASK-research-triz-method](../../../../todo/done/TASK-research-triz-method.todo.md)
 
 ---
 
@@ -13,7 +13,7 @@
 
 ## Проверенный scope
 
-- Весь текущий незакоммиченный diff: `git diff` по `todo/TASK-research-triz-method.todo.md`.
+- Весь текущий незакоммиченный diff: `git diff` по `todo/done/TASK-research-triz-method.todo.md`.
 - Новые файлы:
   - `docs/research/methods/triz-method-research.md`;
   - `docs/agents/reports/system-analyst/2026-08-12_16-18_triz-method-research.md`.
@@ -67,7 +67,7 @@
 
 **Замечание:** после self-review нужно отразить уточнения в истории задачи.
 
-**Исправлено:** в `todo/TASK-research-triz-method.todo.md` добавлена запись Change History о self-review и уточнении маппинга conditional/DynamicLoop.
+**Исправлено:** в `todo/done/TASK-research-triz-method.todo.md` добавлена запись Change History о self-review и уточнении маппинга conditional/DynamicLoop.
 
 ## Проверка фактов и ссылок
 
