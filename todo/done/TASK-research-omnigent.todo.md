@@ -8,9 +8,9 @@ depends_on:
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-branch:
-pr: "https://github.com/prikotov/task-orchestrator/pull/335"
-status: todo
+branch: task/research-omnigent
+pr: "https://github.com/prikotov/task-orchestrator/pull/346"
+status: done
 ---
 
 # TASK-research-omnigent: Исследовать omnigent-ai/omnigent (open-source meta-harness над внешними coding-агентами)
@@ -48,29 +48,29 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Зафиксировать GitHub metadata `omnigent-ai/omnigent`: description, default branch, language, license, stars/forks/issues, topics, created/pushed, commit snapshot, версию PyPI `omnigent`, подтвердить status: alpha.
-- [ ] Изучить README: что такое Omnigent, capabilities (multi-device, multi-agent supervision, any-model, collaboration, cloud sandboxes, policies/governance), meta-harness модель (Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML), install (extras), supported harnesses/sandboxes/models.
-- [ ] Изучить **meta-harness abstraction**: единый интерфейс над харнесами, swap/combine без переписывания; native terminal-обёртки (tmux/PTY) vs SDK-harnesses; точки расширения (свой harness).
-- [ ] Изучить **custom agents в YAML** (`.github/agents/*.yaml`, `omnigent run <agent.yaml>`): схема определения агента, mapping на наши роли/`config/chains.yaml`.
-- [ ] Изучить **policies/governance**: approval-gates (pause перед рискованными действиями), spend caps, tool limits; scope server/agent/chat; mapping на наши quality gates/budget/approval.
-- [ ] Изучить **sandboxing**: cloud providers (Modal/Daytona/E2B/CoreWeave/K8s/OpenShell/Boxlite/Databricks, disposable per-session managed hosts) + OS-level (bwrap/seatbelt/Job Objects + L7 egress proxy); mapping на `TASK-feat-docker-sandboxing`.
-- [ ] Изучить **multi-agent supervision** (review-between-agents, task split across agents) и collaboration (shared sessions, co-drive, fork); `.claude/skills/` + `AGENTS.md`.
-- [ ] Сравнить с `task-orchestrator`: `config/chains.yaml`, `ChainExecution`, `DynamicLoop`, retry/CB/quality gates/budget/`fix_iterations`, JSONL audit, `run-subagent`/`task-via-subagents`, наши skills.
-- [ ] Сопоставить с аналогами: qm #32 (ближайший — meta-harness над внешними агентами), Orca ADE #30, OmO #23, bx-dev #31; уточнить дельту `omnigent` vs `qm` (harness-покрытие, sandboxing, policies, multi-device vs multi-tenant).
-- [ ] Оформить отчёт `docs/research/framework-comparisons/omnigent-comparison.md` со стандартной comparison table (orchestration model, state management, error handling, extensibility, applicability).
-- [ ] Добавить строку `omnigent` (#33) в `docs/research/agent-frameworks-summary.md`, обновить счётчик до `33 / 33` и пересчитать затронутые тренды (agent loop, SKILL.md, MCP, sub-agents/multi-agent, context compression, sandboxing, policy/HITL).
-- [ ] Reopen'уть эпик: `reopened: <дата>`, стадия `1l`, change history.
-- [ ] Дать чёткий verdict: 🟡 patterns / 🔴 not dependency (предварительно).
+- [x] Зафиксировать GitHub metadata `omnigent-ai/omnigent`: description, default branch, language, license, stars/forks/issues, topics, created/pushed, commit snapshot, версию PyPI `omnigent`, подтвердить status: alpha.
+- [x] Изучить README: что такое Omnigent, capabilities (multi-device, multi-agent supervision, any-model, collaboration, cloud sandboxes, policies/governance), meta-harness модель (Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML), install (extras), supported harnesses/sandboxes/models.
+- [x] Изучить **meta-harness abstraction**: единый интерфейс над харнесами, swap/combine без переписывания; native terminal-обёртки (tmux/PTY) vs SDK-harnesses; точки расширения (свой harness).
+- [x] Изучить **custom agents в YAML** (`.github/agents/*.yaml`, `omnigent run <agent.yaml>`): схема определения агента, mapping на наши роли/`config/chains.yaml`.
+- [x] Изучить **policies/governance**: approval-gates (pause перед рискованными действиями), spend caps, tool limits; scope server/agent/chat; mapping на наши quality gates/budget/approval.
+- [x] Изучить **sandboxing**: cloud providers (Modal/Daytona/E2B/CoreWeave/K8s/OpenShell/Boxlite/Databricks, disposable per-session managed hosts) + OS-level (bwrap/seatbelt/Job Objects + L7 egress proxy); mapping на `TASK-feat-docker-sandboxing`.
+- [x] Изучить **multi-agent supervision** (review-between-agents, task split across agents) и collaboration (shared sessions, co-drive, fork); `.claude/skills/` + `AGENTS.md`.
+- [x] Сравнить с `task-orchestrator`: `config/chains.yaml`, `ChainExecution`, `DynamicLoop`, retry/CB/quality gates/budget/`fix_iterations`, JSONL audit, `run-subagent`/`task-via-subagents`, наши skills.
+- [x] Сопоставить с аналогами: qm #32 (ближайший — meta-harness над внешними агентами), Orca ADE #30, OmO #23, bx-dev #31; уточнить дельту `omnigent` vs `qm` (harness-покрытие, sandboxing, policies, multi-device vs multi-tenant).
+- [x] Оформить отчёт `docs/research/framework-comparisons/omnigent-comparison.md` со стандартной comparison table (orchestration model, state management, error handling, extensibility, applicability).
+- [x] Добавить строку `omnigent` (#33) в `docs/research/agent-frameworks-summary.md`, обновить счётчик до `33 / 33` и пересчитать затронутые тренды (agent loop, SKILL.md, MCP, sub-agents/multi-agent, context compression, sandboxing, policy/HITL). *(Фактический счётчик на момент завершения — 34/35, т.к. позже добавлены Herdr #34 и ALK #35; omnigent #33 учтён как завершённый.)*
+- [x] Reopen'уть эпик: `reopened: <дата>`, стадия `1l`, change history.
+- [x] Дать чёткий verdict: 🟡 patterns / 🔴 not dependency (предварительно).
 
 ### 🟡 Should Have (Желательно)
-- [ ] Выделить concrete patterns (конкретные паттерны) для заимствования: meta-harness abstraction (единый интерфейс над 6+ харнесами + custom YAML), custom agents в YAML, policies (approval/spend/tool-limits с гранулярным scope), cloud + OS sandboxing, multi-agent supervision (review-between-agents).
-- [ ] Отдельно отметить ограничения: Python, **alpha** (незрелый, API/поведение могут меняться), multi-device collaboration-платформа (phone/desktop/co-drive), не single-tenant chain-оркестрация; resilience (retry/CB/budget/fix_iterations) — на уровне platform/sandbox/policy, не нашего chain-уровня.
-- [ ] Уточнить место в таксономии эпика: open-source meta-harness / orchestration platform over external agents, ближайший аналог qm (#32), по прецеденту Orca ADE (#30)/OmO (#23).
-- [ ] Оценить релевантность meta-harness abstraction для нашего coding-agents-эпика (omnigent оркестрирует тех же агентов: Claude Code/Codex/Cursor/Pi/OpenCode).
+- [x] Выделить concrete patterns (конкретные паттерны) для заимствования: meta-harness abstraction (единый интерфейс над 6+ харнесами + custom YAML), custom agents в YAML, policies (approval/spend/tool-limits с гранулярным scope), cloud + OS sandboxing, multi-agent supervision (review-between-agents).
+- [x] Отдельно отметить ограничения: Python, **alpha** (незрелый, API/поведение могут меняться), multi-device collaboration-платформа (phone/desktop/co-drive), не single-tenant chain-оркестрация; resilience (retry/CB/budget/fix_iterations) — на уровне platform/sandbox/policy, не нашего chain-уровня.
+- [x] Уточнить место в таксономии эпика: open-source meta-harness / orchestration platform over external agents, ближайший аналог qm (#32), по прецеденту Orca ADE (#30)/OmO (#23).
+- [x] Оценить релевантность meta-harness abstraction для нашего coding-agents-эпика (omnigent оркестрирует тех же агентов: Claude Code/Codex/Cursor/Pi/OpenCode).
 
 ### 🟢 Could Have (Опционально)
-- [ ] Добавить Mermaid-диаграмму слоёв `omnigent` (meta-harness ↔ harness backends ↔ sandboxes ↔ surfaces) и сопоставления с chain-моделью `task-orchestrator`.
-- [ ] Сравнительная таблица `omnigent` vs `qm` (оба meta-harness): по осям harness-покрытие, sandboxing, policies, multi-tenancy, multi-device, зрелость.
+- [x] Добавить Mermaid-диаграмму слоёв `omnigent` (meta-harness ↔ harness backends ↔ sandboxes ↔ surfaces) и сопоставления с chain-моделью `task-orchestrator`. *(Раздел 4.3 отчёта.)*
+- [x] Сравнительная таблица `omnigent` vs `qm` (оба meta-harness): по осям harness-покрытие, sandboxing, policies, multi-tenancy, multi-device, зрелость. *(Раздел 5 отчёта.)*
 - [ ] Создать backlog tasks на отдельные паттерны — только по решению тимлида после review.
 
 ### ⚫ Won't Have (Не будем делать)
@@ -81,27 +81,27 @@ status: todo
 
 ## 4. Implementation Plan (План реализации)
 *План предзаполнен автором (Тимлид Алекс); исполнитель (Аналитик Шерлок) подтверждает понимание перед стартом (Reverse Briefing) и уточняет при необходимости.*
-1. [ ] Проверить рабочую ветку (создать/переключиться на `task/research-omnigent`), без переключения на `main`.
-2. [ ] Прочитать reference-задачи: `TASK-research-qm.todo.md` (#32, ближайший аналог — meta-harness), `done/TASK-research-onorca-ade.todo.md` (#30), `done/TASK-research-oh-my-openagent.todo.md` (#23), comparison-документы qm/Orca/OmO.
-3. [ ] Получить GitHub metadata и commit snapshot `omnigent-ai/omnigent`; зафиксировать версию PyPI `omnigent`, подтвердить status: alpha.
-4. [ ] Прочитать README целиком; выписать capabilities, meta-harness модель, harnesses/sandboxes/models, install (extras).
-5. [ ] Изучить meta-harness abstraction (harness backends, native vs SDK, точки расширения).
-6. [ ] Изучить custom agents в YAML (`.github/agents/*.yaml`, схема) и policies/governance (approval/spend/tools, scope).
-7. [ ] Изучить sandboxing (10 cloud providers + OS-level bwrap/seatbelt/Job Objects/L7 egress) и multi-agent supervision/collaboration.
-8. [ ] Сравнить с `task-orchestrator` (chains/DynamicLoop/retry/CB/gates/budget/fix_iterations/JSONL/наши skills) и с аналогами (qm #32, Orca #30, OmO #23, bx-dev #31).
-9. [ ] Создать comparison report `docs/research/framework-comparisons/omnigent-comparison.md`.
-10. [ ] Обновить summary: строка #33, счётчики `33 / 33`, пересчёт затронутых трендов.
-11. [ ] Обновить epic: `reopened`, стадия `1l`, change history.
-12. [ ] Сохранить self-contained agent-report в `docs/agents/reports/system-analyst/`.
-13. [ ] Запустить `make md-links` и `make validate-todo`.
+1. [x] Проверить рабочую ветку (создать/переключиться на `task/research-omnigent`), без переключения на `main`.
+2. [x] Прочитать reference-задачи: `TASK-research-qm.todo.md` (#32, ближайший аналог — meta-harness), `done/TASK-research-onorca-ade.todo.md` (#30), `done/TASK-research-oh-my-openagent.todo.md` (#23), comparison-документы qm/Orca/OmO.
+3. [x] Получить GitHub metadata и commit snapshot `omnigent-ai/omnigent`; зафиксировать версию PyPI `omnigent`, подтвердить status: alpha.
+4. [x] Прочитать README целиком; выписать capabilities, meta-harness модель, harnesses/sandboxes/models, install (extras).
+5. [x] Изучить meta-harness abstraction (harness backends, native vs SDK, точки расширения).
+6. [x] Изучить custom agents в YAML (`.github/agents/*.yaml`, схема) и policies/governance (approval/spend/tools, scope).
+7. [x] Изучить sandboxing (10 cloud providers + OS-level bwrap/seatbelt/Job Objects/L7 egress) и multi-agent supervision/collaboration.
+8. [x] Сравнить с `task-orchestrator` (chains/DynamicLoop/retry/CB/gates/budget/fix_iterations/JSONL/наши skills) и с аналогами (qm #32, Orca #30, OmO #23, bx-dev #31).
+9. [x] Создать comparison report `docs/research/framework-comparisons/omnigent-comparison.md`.
+10. [x] Обновить summary: строка #33, счётчики, пересчёт затронутых трендов. *(Фактический счётчик — 34/35, см. примечание в §3 Must Have.)*
+11. [x] Обновить epic: `reopened`, стадия `1l`, change history.
+12. [x] Сохранить self-contained agent-report в `docs/agents/reports/system-analyst/`.
+13. [x] Запустить `make md-links` и `make validate-todo`.
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт `docs/research/framework-comparisons/omnigent-comparison.md` создан и содержит сравнение с `task-orchestrator`.
-- [ ] В отчёте есть стандартная comparison table: orchestration model, state management, error handling, extensibility, applicability.
-- [ ] В отчёте разобраны ключевые механизмы: meta-harness abstraction, custom YAML-агенты, multi-agent supervision, policies/governance, cloud + OS sandboxing, multi-device surfaces, collaboration.
-- [ ] В `docs/research/agent-frameworks-summary.md` добавлена строка `omnigent` (#33), счётчик `33 / 33`, пересчитаны затронутые тренды.
-- [ ] Эпик reopened стадией `1l`, есть change history.
-- [ ] Указаны sources, версия PyPI, status: alpha и дата анализа.
+- [x] Отчёт `docs/research/framework-comparisons/omnigent-comparison.md` создан и содержит сравнение с `task-orchestrator`.
+- [x] В отчёте есть стандартная comparison table: orchestration model, state management, error handling, extensibility, applicability.
+- [x] В отчёте разобраны ключевые механизмы: meta-harness abstraction, custom YAML-агенты, multi-agent supervision, policies/governance, cloud + OS sandboxing, multi-device surfaces, collaboration.
+- [x] В `docs/research/agent-frameworks-summary.md` добавлена строка `omnigent` (#33), счётчик, пересчитаны затронутые тренды. *(Фактический счётчик на дату завершения — 34 завершённых / 35 запланированных; №32 `qm` остаётся единственным незавершённым.)*
+- [x] Эпик reopened стадией `1l`, есть change history.
+- [x] Указаны sources, версия PyPI, status: alpha и дата анализа.
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -122,16 +122,21 @@ make validate-todo
 - `omnigent` потребляет skill-конвенции (`.claude/skills/`, `AGENTS.md`), но сам определяет custom-агентов в YAML — и consumer skills, и producer agent-definitions; учитывать при сравнении с нашими skills/ролями.
 
 ## 8. Sources (Источники)
-- [ ] [omnigent-ai/omnigent — GitHub](https://github.com/omnigent-ai/omnigent)
-- [ ] [omnigent — README (capabilities, harnesses, sandboxes, policies)](https://github.com/omnigent-ai/omnigent#readme)
-- [ ] [omnigent — PyPI](https://pypi.org/project/omnigent/)
-- [ ] [omnigent.ai — сайт + download desktop app](https://omnigent.ai)
-- [ ] [.github/agents/*.yaml — custom agent definitions (примеры)](https://github.com/omnigent-ai/omnigent/tree/main/.github/agents)
+- [x] [omnigent-ai/omnigent — GitHub](https://github.com/omnigent-ai/omnigent)
+- [x] [omnigent — README (capabilities, harnesses, sandboxes, policies)](https://github.com/omnigent-ai/omnigent#readme)
+- [x] [omnigent — PyPI](https://pypi.org/project/omnigent/)
+- [x] [omnigent.ai — сайт + download desktop app](https://omnigent.ai)
+- [x] [.github/agents/*.yaml — custom agent definitions (примеры)](https://github.com/omnigent-ai/omnigent/tree/main/.github/agents)
 
 ## 9. Comments (Комментарии)
 Первичный вывод тимлида: `omnigent` — не coding-агент и не framework dependency для нас (Python, alpha, multi-device collaboration-платформа). Ценность — как зеркало и источник паттернов, причём **ближайший аналог qm (#32)**: оба — open-source meta-harness над внешними coding-агентами. Наибольший потенциал заимствования: **meta-harness abstraction** (единый интерфейс над Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML-агенты — прямой мост к нашему coding-agents-эпику и runner-модели), **custom agents в YAML** (богатая параллель нашим ролям/`config/chains.yaml`), **policies/governance** (approval/spend/tool-limits с гранулярным scope — релевантно quality gates/budget), **cloud + OS sandboxing** (10 providers + bwrap/seatbelt/L7 egress — релевантно `TASK-feat-docker-sandboxing`), **multi-agent supervision** (review-between-agents — релевантно нашему review/сабагентам). Дельта vs qm: omnigent шире по harness-покрытию и sandboxing, но слабее в multi-tenant/team/org-governance (где силён qm). Классификация в эпике: open-source meta-harness / orchestration platform over external agents, по прецеденту qm (#32, ближайший аналог) + Orca ADE (#30) + OmO (#23).
 
 ## Change History (История изменений)
+| 2026-08-14 | Тимлид (Алекс) | Создан отдельный PR #346 для проверки результатов исследования; задача остаётся в статусе `review`. |
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-03 | Тимлид (Алекс) | Создание задачи. Источник: пользователь указал репозиторий `omnigent-ai/omnigent`. Классифицирован как open-source meta-harness / orchestration platform над внешними coding-агентами (ближайший аналог qm #32) → `EPIC-research-agent-frameworks-comparison`, стадия `1l` (строка #33). Status: alpha — отмечен как риск. Предварительный verdict: 🟡 patterns / 🔴 not dependency. |
+| 2026-08-14 | Аналитик (Шерлок) | Исследование завершено: создан `docs/research/framework-comparisons/omnigent-comparison.md` (snapshot `main` `bee2b751`, дата анализа 2026-08-14; PyPI `omnigent` `0.9.0`, `Development Status :: 3 - Alpha`), заполнена строка `omnigent` (#33) в сводке; счётчик summary — 34 завершённых / 35 запланированных (остаётся только №32 `qm`). Verdict подтверждён: 🟡 заимствовать паттерны (meta-harness abstraction, custom-agent YAML, policy engine с гранулярным scope, OS+cloud sandboxing, cross-vendor multi-agent supervision) / 🔴 не dependency (Python, alpha, multi-device collaboration-платформа, нет chain-level resilience). Эпик обновлён стадией `1l` + change history. Критерии/план/источники отмечены выполненными. Status оставлен `in_progress`: артефакты готовы, PR ещё не создан (поле `pr` сохранено как есть до создания PR); задача будет переведена в `review`→`done` и перенесена в `done/` после PR/merge. |
+| 2026-08-14 | Аналитик (Шерлок) | Подготовлено к review: артефакты исследования (comparison-отчёт `omnigent-comparison.md`, строка сводки #33, стадия эпика `1l`) готовы, пункты плана/DoD/источников отмечены выполненными (за исключением backlog-задач по паттернам — по решению тимлида после review). Status переведён `in_progress` → `review`; задача не `done` — ожидает review/одобрения и создания PR. |
+
+| 2026-08-15 | Тимлид (Алекс) | PR #346 принят: задача переведена в `done` перед слиянием. |
