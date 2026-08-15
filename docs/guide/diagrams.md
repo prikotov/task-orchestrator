@@ -131,7 +131,7 @@ graph TB
         QGI["QualityGateRunnerInterface"]
         RSC["RunStaticChainService"]
         RDLI["RunDynamicLoopServiceInterface"]
-        VO["Chain*-объекты-значения"]
+        VO["Chain*-Value Objects"]
     end
 
     subgraph Integration["Orchestrator · Integration"]
@@ -236,7 +236,7 @@ classDiagram
 
 ## Диаграмма классов Domain-слоя Orchestrator
 
-Интерфейсы, объекты-значения и исключения Orchestrator Domain.
+Интерфейсы, Value Objects и исключения Orchestrator Domain.
 
 ```mermaid
 classDiagram
@@ -338,7 +338,7 @@ classDiagram
 
 ## Диаграмма классов Domain-слоя AgentRunner
 
-Интерфейсы и объекты-значения модуля AgentRunner.
+Интерфейсы и Value Objects модуля AgentRunner.
 
 ```mermaid
 classDiagram
