@@ -9,8 +9,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Бэкендер Тони
 branch: task/validate-language-true-zero
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/348
+status: review
 ---
 
 # TASK-chore-validate-language-true-zero: Довести validate-language до настоящего 0 over (чистка allowlist + перевод общих слов)
