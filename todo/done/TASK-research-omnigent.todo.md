@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-omnigent
 pr: "https://github.com/prikotov/task-orchestrator/pull/346"
-status: review
+status: done
 ---
 
 # TASK-research-omnigent: Исследовать omnigent-ai/omnigent (open-source meta-harness над внешними coding-агентами)
@@ -138,3 +138,5 @@ make validate-todo
 | 2026-08-03 | Тимлид (Алекс) | Создание задачи. Источник: пользователь указал репозиторий `omnigent-ai/omnigent`. Классифицирован как open-source meta-harness / orchestration platform над внешними coding-агентами (ближайший аналог qm #32) → `EPIC-research-agent-frameworks-comparison`, стадия `1l` (строка #33). Status: alpha — отмечен как риск. Предварительный verdict: 🟡 patterns / 🔴 not dependency. |
 | 2026-08-14 | Аналитик (Шерлок) | Исследование завершено: создан `docs/research/framework-comparisons/omnigent-comparison.md` (snapshot `main` `bee2b751`, дата анализа 2026-08-14; PyPI `omnigent` `0.9.0`, `Development Status :: 3 - Alpha`), заполнена строка `omnigent` (#33) в сводке; счётчик summary — 34 завершённых / 35 запланированных (остаётся только №32 `qm`). Verdict подтверждён: 🟡 заимствовать паттерны (meta-harness abstraction, custom-agent YAML, policy engine с гранулярным scope, OS+cloud sandboxing, cross-vendor multi-agent supervision) / 🔴 не dependency (Python, alpha, multi-device collaboration-платформа, нет chain-level resilience). Эпик обновлён стадией `1l` + change history. Критерии/план/источники отмечены выполненными. Status оставлен `in_progress`: артефакты готовы, PR ещё не создан (поле `pr` сохранено как есть до создания PR); задача будет переведена в `review`→`done` и перенесена в `done/` после PR/merge. |
 | 2026-08-14 | Аналитик (Шерлок) | Подготовлено к review: артефакты исследования (comparison-отчёт `omnigent-comparison.md`, строка сводки #33, стадия эпика `1l`) готовы, пункты плана/DoD/источников отмечены выполненными (за исключением backlog-задач по паттернам — по решению тимлида после review). Status переведён `in_progress` → `review`; задача не `done` — ожидает review/одобрения и создания PR. |
+
+| 2026-08-15 | Тимлид (Алекс) | PR #346 принят: задача переведена в `done` перед слиянием. |

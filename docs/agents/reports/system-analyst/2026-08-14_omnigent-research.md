@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-08-14
 **Объект:** `omnigent-ai/omnigent` — open-source meta-harness (Python, Apache-2.0, status: alpha) над внешними coding-агентами. Snapshot ветки `main` — commit `bee2b751`, дата анализа 2026-08-14; PyPI `omnigent` `0.9.0` (`Development Status :: 3 - Alpha`).
-**Задача:** `todo/TASK-research-omnigent.todo.md` → `todo/done/EPIC-research-agent-frameworks-comparison.md`, стадия `1l`.
+**Задача:** `todo/done/TASK-research-omnigent.todo.md` → `todo/done/EPIC-research-agent-frameworks-comparison.md`, стадия `1l`.
 
 ---
 
@@ -34,7 +34,7 @@
 - `docs/research/framework-comparisons/omnigent-comparison.md` — comparison-отчёт (создан ранее).
 - `docs/research/agent-frameworks-summary.md` — строка `omnigent` (#33), счётчик и затронутые тренды (обновлён ранее).
 - `todo/done/EPIC-research-agent-frameworks-comparison.md` — стадия `1l`, change history; пометка «Статус: review».
-- `todo/TASK-research-omnigent.todo.md` — статус `review`, change history, пункты плана/DoD/источников.
+- `todo/done/TASK-research-omnigent.todo.md` — статус `review`, change history, пункты плана/DoD/источников.
 - `docs/agents/reports/system-analyst/2026-08-14_omnigent-research.md` — этот отчёт.
 
 ## Итог
