@@ -123,7 +123,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1k: Дополнительные исследования (2026-08-03)
 
-- [ ] [TASK-research-qm](../TASK-research-qm.todo.md) — qm (`yc-software/qm`, TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: per-employee scopes, Slack+web, per-scope durable sandbox, shared skills с org-governance, security postures Strict/Auto/Dangerous + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты; потребляет `SKILL.md`/`.claude/skills`/`.codex/skills`/`AGENTS.md`). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency.
+- [x] [TASK-research-qm](TASK-research-qm.todo.md) — qm (`yc-software/qm`, TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: per-employee scopes, Slack+web, per-scope durable sandbox, shared skills с org-governance, security postures Strict/Auto/Dangerous + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты; потребляет `SKILL.md`/`.claude/skills`/`.codex/skills`/`AGENTS.md`). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. Статус: done, PR #347.
 
 ### Этап 1l: Дополнительные исследования (2026-08-03)
 
@@ -169,6 +169,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 ## Change History (История изменений)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
+| 2026-08-14 | Тимлид (Алекс) | Stage 1k, отчёт qm и строка #32 готовы к review, задача не done. |
 | 2026-04-21 | Тимлид (Алекс) | Создание эпика |
 | 2026-04-22 | Технический писатель (Гермиона) | Все 11 задач выполнены. Эпик завершён. |
 | 2026-04-22 | Тимлид (Алекс) + Пуаро + Локи | Постфактум ревью всех 11 отчётов через сабагентов. 5 критических и 15+ значимых исправлений. PR #52. |
@@ -189,3 +190,5 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-08-12 | Тимлид (Алекс) | Для Stage 1m создан PR #340 с отправкой ветки только от GitHub App; PR #339 заменён из-за блокировки правилом последнего отправителя. |
 | 2026-08-12 | Аналитик (Шерлок) | Эпик reopened стадией `1n`: создана и выполнена research-задача TASK-research-agent-lifecycle-kit по `avksp/agent-lifecycle-kit` `v1.62.0`. ALK классифицирован как provider-neutral lifecycle/evidence controller (нейтральный контроллер жизненного цикла и доказательств) вокруг внешних coding agents (агентов программирования), не coding agent и не chain engine (движок цепочек). Создан `agent-lifecycle-kit-comparison.md`, заполнена строка #35; текущий прогресс — 33 завершённых из 35 запланированных исследований, #32 `qm` и #33 `omnigent` остаются незавершёнными. Verdict (вердикт): 🟡 заимствовать frozen-plan/proof/adapter-support patterns (паттерны замороженного плана, доказательств и поддержки адаптеров); 🔴 не core dependency (не основная зависимость). |
 | 2026-08-12 | Аналитик (Шерлок) | Stage 1n: TASK-research-agent-lifecycle-kit принята после self-review (самопроверки) и независимого Approval (одобрения) Пуаро, переведена в `done`, ссылка обновлена на `todo/done/`, создан PR #342. |
+
+| 2026-08-15 | Тимлид (Алекс) | Stage 1k: TASK-research-qm принята, переведена в `done`; ссылка обновлена на `TASK-research-qm.todo.md`, PR #347 готов к слиянию. |
