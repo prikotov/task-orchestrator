@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-08-14
 **Объект:** `yc-software/qm` (TypeScript/Node, MIT, multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами)
-**Задача:** [TASK-research-qm](../../../../todo/TASK-research-qm.todo.md) (stage `1k`, `EPIC-research-agent-frameworks-comparison`)
+**Задача:** [TASK-research-qm](../../../../todo/done/TASK-research-qm.todo.md) (stage `1k`, `EPIC-research-agent-frameworks-comparison`)
 
 ---
 
@@ -25,7 +25,7 @@
 
 В рамках этого шага изменены только metadata-артефакты (код не затронут):
 
-- `todo/TASK-research-qm.todo.md` — `status: in_progress` → `status: review`; запись в Change History о готовности к review.
+- `todo/done/TASK-research-qm.todo.md` — `status: in_progress` → `status: review`; запись в Change History о готовности к review.
 - `todo/done/EPIC-research-agent-frameworks-comparison.md` — строка TASK-research-qm (stage `1k`) помечена `Статус: review`; запись в Change History о подготовке stage 1k.
 - `docs/agents/reports/system-analyst/2026-08-14_qm-research.md` — данный отчёт.
 

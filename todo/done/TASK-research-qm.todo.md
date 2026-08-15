@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-qm
 pr: "https://github.com/prikotov/task-orchestrator/pull/347"
-status: review
+status: done
 ---
 
 # TASK-research-qm: Исследовать yc-software/qm (multiplayer/multi-tenant agent-платформа-оркестратор поверх внешних харнесов)
@@ -48,57 +48,57 @@ status: review
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] Зафиксировать GitHub metadata `yc-software/qm`: description, default branch, language, license, stars/forks/issues, topics, created/pushed, commit snapshot, версию npm `@yc-software/qm`.
-- [ ] Изучить README: что такое QM, фичи (scopes, Slack+web, admin control, web apps, shared skills, background work), multi-harness модель (Pi/OpenCode/Codex/Claude Code за одним интерфейсом), архитектуру (Postgres ↔ core ↔ sandbox), security postures, deployment (deployment repo vs private fork), `qm init`.
-- [ ] Изучить `cli/README.md` и deployment-directory contract: generic core + org-specific deployment dir, interface-backed субстраты (harness/session store/sandbox/memory), `qm` CLI (init/infra/setup/sandbox/conformance/check/outputs).
-- [ ] Изучить `SECURITY.md` (threat model): security postures (Strict/Auto/Dangerous), predeclared command policy (hard denials для деструктива), provenance-labelling + классификатор-скрининг external data.
-- [ ] Изучить архитектуру shared skills: scope-owned, shareable by grant, admin-gated org-promotion, skill packs из git; использование `SKILL.md` + `.claude/skills` + `.codex/skills` + `AGENTS.md`.
-- [ ] Сравнить с `task-orchestrator`: `config/chains.yaml`, `ChainExecution`, `DynamicLoop`, retry/CB/quality gates/budget/`fix_iterations`, JSONL audit, `run-subagent`/`task-via-subagents`, наши skills (`docs/agents/skills/` + `become-role`).
-- [ ] Сопоставить с аналогами: Orca ADE #30 (ближайший — control-surface над внешними агентами), OmO #23 (coordination layer), bx-dev #31, LangGraph (#4); уточнить дельту `qm` vs Orca (multiplayer/multi-tenant + Slack/web + durable sandboxes + skills governance).
-- [ ] Оформить отчёт `docs/research/framework-comparisons/qm-comparison.md` со стандартной comparison table (orchestration model, state management, error handling, extensibility, applicability).
-- [ ] Добавить строку `qm` (#32) в `docs/research/agent-frameworks-summary.md`, обновить счётчик до `32 / 32` и пересчитать затронутые тренды (agent loop, SKILL.md, MCP, sub-agents/multi-agent, context compression, security posture/HITL).
-- [ ] Reopen'уть эпик: `reopened: <дата>`, стадия `1k`, change history.
-- [ ] Дать чёткий verdict: 🟡 patterns / 🔴 not dependency (предварительно).
+- [x] Зафиксировать GitHub metadata `yc-software/qm`: description, default branch, language, license, stars/forks/issues, topics, created/pushed, commit snapshot, версию npm `@yc-software/qm`.
+- [x] Изучить README: что такое QM, фичи (scopes, Slack+web, admin control, web apps, shared skills, background work), multi-harness модель (Pi/OpenCode/Codex/Claude Code за одним интерфейсом), архитектуру (Postgres ↔ core ↔ sandbox), security postures, deployment (deployment repo vs private fork), `qm init`.
+- [x] Изучить `cli/README.md` и deployment-directory contract: generic core + org-specific deployment dir, interface-backed субстраты (harness/session store/sandbox/memory), `qm` CLI (init/infra/setup/sandbox/conformance/check/outputs).
+- [x] Изучить `SECURITY.md` (threat model): security postures (Strict/Auto/Dangerous), predeclared command policy (hard denials для деструктива), provenance-labelling + классификатор-скрининг external data.
+- [x] Изучить архитектуру shared skills: scope-owned, shareable by grant, admin-gated org-promotion, skill packs из git; использование `SKILL.md` + `.claude/skills` + `.codex/skills` + `AGENTS.md`.
+- [x] Сравнить с `task-orchestrator`: `config/chains.yaml`, `ChainExecution`, `DynamicLoop`, retry/CB/quality gates/budget/`fix_iterations`, JSONL audit, `run-subagent`/`task-via-subagents`, наши skills (`docs/agents/skills/` + `become-role`).
+- [x] Сопоставить с аналогами: Orca ADE #30 (ближайший — control-surface над внешними агентами), OmO #23 (coordination layer), bx-dev #31, LangGraph (#4); уточнить дельту `qm` vs Orca (multiplayer/multi-tenant + Slack/web + durable sandboxes + skills governance).
+- [x] Оформить отчёт `docs/research/framework-comparisons/qm-comparison.md` со стандартной comparison table (orchestration model, state management, error handling, extensibility, applicability).
+- [x] Добавить строку `qm` (#32) в `docs/research/agent-frameworks-summary.md`, обновить счётчик до `32 / 32` и пересчитать затронутые тренды (agent loop, SKILL.md, MCP, sub-agents/multi-agent, context compression, security posture/HITL).
+- [x] Reopen'уть эпик: `reopened: <дата>`, стадия `1k`, change history.
+- [x] Дать чёткий verdict: 🟡 patterns / 🔴 not dependency (предварительно).
 
 ### 🟡 Should Have (Желательно)
-- [ ] Выделить concrete patterns (конкретные паттерны) для заимствования: multi-harness abstraction (единый интерфейс над Pi/OpenCode/Codex/Claude Code), shared skills governance (scope-owned + grant + admin-gated org-promotion + git import), security postures с hard denials, deployment-directory контракт (generic core + org-слой, interface-backed субстраты), per-scope durable sandbox.
-- [ ] Отдельно отметить ограничения: multi-tenant SaaS-платформа (Slack/web/admin), не single-tenant chain-оркестрация; Postgres/Bolt/Vite-стек; resilience (retry/CB/budget/fix_iterations) — на уровне platform/sandbox, не нашего chain-уровня.
-- [ ] Уточнить место в таксономии эпика: multiplayer/multi-tenant agent platform-оркестратор / harness-over-external-agents, по прецеденту Orca ADE (#30) + OmO (#23).
-- [ ] Оценить релевантность multi-harness abstraction для нашего coding-agents-эпика (qm абстрагирует ровно тех агентов, что мы исследовали: Pi/OpenCode/Codex/Claude Code).
+- [x] Выделить concrete patterns (конкретные паттерны) для заимствования: multi-harness abstraction (единый интерфейс над Pi/OpenCode/Codex/Claude Code), shared skills governance (scope-owned + grant + admin-gated org-promotion + git import), security postures с hard denials, deployment-directory контракт (generic core + org-слой, interface-backed субстраты), per-scope durable sandbox.
+- [x] Отдельно отметить ограничения: multi-tenant SaaS-платформа (Slack/web/admin), не single-tenant chain-оркестрация; Postgres/Bolt/Vite-стек; resilience (retry/CB/budget/fix_iterations) — на уровне platform/sandbox, не нашего chain-уровня.
+- [x] Уточнить место в таксономии эпика: multiplayer/multi-tenant agent platform-оркестратор / harness-over-external-agents, по прецеденту Orca ADE (#30) + OmO (#23).
+- [x] Оценить релевантность multi-harness abstraction для нашего coding-agents-эпика (qm абстрагирует ровно тех агентов, что мы исследовали: Pi/OpenCode/Codex/Claude Code).
 
 ### 🟢 Could Have (Опционально)
 - [ ] Добавить Mermaid-диаграмму слоёв `qm` (Postgres ↔ core ↔ sandbox ↔ Slack/web) и сопоставления с chain-моделью `task-orchestrator`.
 - [ ] Создать backlog tasks на отдельные паттерны — только по решению тимлида после review.
 
 ### ⚫ Won't Have (Не будем делать)
-- [ ] Интеграция `qm` как dependency.
-- [ ] Локальный запуск `qm init` / развёртывание Slack/web.
-- [ ] Порт Postgres/Slack/web-стека или multi-tenant-модели в PHP.
-- [ ] Изменение production цепочек/ролей/конвенций.
+- [x] Интеграция `qm` как dependency.
+- [x] Локальный запуск `qm init` / развёртывание Slack/web.
+- [x] Порт Postgres/Slack/web-стека или multi-tenant-модели в PHP.
+- [x] Изменение production цепочек/ролей/конвенций.
 
 ## 4. Implementation Plan (План реализации)
 *План предзаполнен автором (Тимлид Алекс); исполнитель (Аналитик Шерлок) подтверждает понимание перед стартом (Reverse Briefing) и уточняет при необходимости.*
-1. [ ] Проверить рабочую ветку (создать/переключиться на `task/research-qm`), без переключения на `main`.
-2. [ ] Прочитать reference-задачи: `done/TASK-research-onorca-ade.todo.md` (#30, ближайший аналог), `done/TASK-research-oh-my-openagent.todo.md` (#23), `done/TASK-research-bx-dev-skill.todo.md` (#31), comparison-документы Orca/OmO.
-3. [ ] Получить GitHub metadata и commit snapshot `yc-software/qm`; зафиксировать версию npm `@yc-software/qm`.
-4. [ ] Прочитать README целиком; выписать фичи, multi-harness модель, архитектуру, security postures, deployment-режимы, `qm init`.
-5. [ ] Изучить `cli/README.md` и deployment-directory contract (`qm` CLI, interface-backed субстраты).
-6. [ ] Изучить `SECURITY.md` (threat model, postures, command policy, screening).
-7. [ ] Разобрать shared skills-модель и `SKILL.md`/`.claude/skills`/`.codex/skills`/`AGENTS.md` (сравнить с нашими skills).
-8. [ ] Сравнить с `task-orchestrator` (chains/DynamicLoop/retry/CB/gates/budget/fix_iterations/JSONL/наши skills) и с аналогами (Orca #30, OmO #23, bx-dev #31, LangGraph #4).
-9. [ ] Создать comparison report `docs/research/framework-comparisons/qm-comparison.md`.
-10. [ ] Обновить summary: строка #32, счётчики `32 / 32`, пересчёт затронутых трендов.
-11. [ ] Обновить epic: `reopened`, стадия `1k`, change history.
-12. [ ] Сохранить self-contained agent-report в `docs/agents/reports/system-analyst/`.
-13. [ ] Запустить `make md-links` и `make validate-todo`.
+1. [x] Проверить рабочую ветку (создать/переключиться на `task/research-qm`), без переключения на `main`.
+2. [x] Прочитать reference-задачи: `done/TASK-research-onorca-ade.todo.md` (#30, ближайший аналог), `done/TASK-research-oh-my-openagent.todo.md` (#23), `done/TASK-research-bx-dev-skill.todo.md` (#31), comparison-документы Orca/OmO.
+3. [x] Получить GitHub metadata и commit snapshot `yc-software/qm`; зафиксировать версию npm `@yc-software/qm`.
+4. [x] Прочитать README целиком; выписать фичи, multi-harness модель, архитектуру, security postures, deployment-режимы, `qm init`.
+5. [x] Изучить `cli/README.md` и deployment-directory contract (`qm` CLI, interface-backed субстраты).
+6. [x] Изучить `SECURITY.md` (threat model, postures, command policy, screening).
+7. [x] Разобрать shared skills-модель и `SKILL.md`/`.claude/skills`/`.codex/skills`/`AGENTS.md` (сравнить с нашими skills).
+8. [x] Сравнить с `task-orchestrator` (chains/DynamicLoop/retry/CB/gates/budget/fix_iterations/JSONL/наши skills) и с аналогами (Orca #30, OmO #23, bx-dev #31, LangGraph #4).
+9. [x] Создать comparison report `docs/research/framework-comparisons/qm-comparison.md`.
+10. [x] Обновить summary: строка #32, счётчики `32 / 32`, пересчёт затронутых трендов.
+11. [x] Обновить epic: `reopened`, стадия `1k`, change history.
+12. [x] Сохранить self-contained agent-report в `docs/agents/reports/system-analyst/`.
+13. [x] Запустить `make md-links` и `make validate-todo`.
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Отчёт `docs/research/framework-comparisons/qm-comparison.md` создан и содержит сравнение с `task-orchestrator`.
-- [ ] В отчёте есть стандартная comparison table: orchestration model, state management, error handling, extensibility, applicability.
-- [ ] В отчёте разобраны ключевые механизмы: multi-harness abstraction, scopes (personal/shared), per-scope durable sandbox, shared skills governance, security postures + command policy, deployment-directory контракт, background work (crons/watches).
-- [ ] В `docs/research/agent-frameworks-summary.md` добавлена строка `qm` (#32), счётчик `32 / 32`, пересчитаны затронутые тренды.
-- [ ] Эпик reopened стадией `1k`, есть change history.
-- [ ] Указаны sources, версия npm и дата анализа.
+- [x] Отчёт `docs/research/framework-comparisons/qm-comparison.md` создан и содержит сравнение с `task-orchestrator`.
+- [x] В отчёте есть стандартная comparison table: orchestration model, state management, error handling, extensibility, applicability.
+- [x] В отчёте разобраны ключевые механизмы: multi-harness abstraction, scopes (personal/shared), per-scope durable sandbox, shared skills governance, security postures + command policy, deployment-directory контракт, background work (crons/watches).
+- [x] В `docs/research/agent-frameworks-summary.md` добавлена строка `qm` (#32), счётчик `32 / 32`, пересчитаны затронутые тренды.
+- [x] Эпик reopened стадией `1k`, есть change history.
+- [x] Указаны sources, версия npm и дата анализа.
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -119,11 +119,11 @@ make validate-todo
 - Версия/стабильность: `qm` — относительно молодой продукт; оценивать зрелость архитектуры по документации и контракту, а не по runtime-тестам.
 
 ## 8. Sources (Источники)
-- [ ] [yc-software/qm — GitHub](https://github.com/yc-software/qm)
-- [ ] [qm — README (архитектура, фичи, deployment)](https://github.com/yc-software/qm#readme)
-- [ ] [qm CLI + deployment directory contract — cli/README.md](https://github.com/yc-software/qm/blob/main/cli/README.md)
-- [ ] [SECURITY.md — threat model, security postures](https://github.com/yc-software/qm/blob/main/SECURITY.md)
-- [ ] [@yc-software/qm — npm](https://www.npmjs.com/package/@yc-software/qm)
+- [x] [yc-software/qm — GitHub](https://github.com/yc-software/qm)
+- [x] [qm — README (архитектура, фичи, deployment)](https://github.com/yc-software/qm#readme)
+- [x] [qm CLI + deployment directory contract — cli/README.md](https://github.com/yc-software/qm/blob/main/cli/README.md)
+- [x] [SECURITY.md — threat model, security postures](https://github.com/yc-software/qm/blob/main/SECURITY.md)
+- [x] [@yc-software/qm — npm](https://www.npmjs.com/package/@yc-software/qm)
 
 ## 9. Comments (Комментарии)
 Первичный вывод тимлида: `qm` — не coding-агент и не framework dependency для нас (multi-tenant TS/Node SaaS-платформа). Ценность — как зеркало и источник паттернов. Наибольший потенциал заимствования: **multi-harness abstraction** (Pi/OpenCode/Codex/Claude Code за одним интерфейсом — прямой мост к нашему coding-agents-эпику и runner-модели), **shared skills governance** (scope-owned + grant + admin-gated org-promotion + git import — богатая параллель нашим `SKILL.md`/`become-role`), **security postures + predeclared command policy** (Strict/Auto/Dangerous + hard denials — релевантно sandboxing и approval gates), **deployment-directory контракт** (generic core + org-слой, interface-backed субстраты), **per-scope durable sandbox** (релевантно `TASK-feat-docker-sandboxing`). Классификация в эпике: multiplayer/multi-tenant agent platform-оркестратор / harness-over-external-agents, по прецеденту Orca ADE (#30, ближайший аналог) + OmO (#23) + bx-dev (#31).
@@ -134,3 +134,5 @@ make validate-todo
 | 2026-08-03 | Тимлид (Алекс) | Создание задачи. Источник: пользователь указал репозиторий `yc-software/qm`. Классифицирован как multiplayer/multi-tenant agent-платформа-оркестратор / harness над внешними агентами → `EPIC-research-agent-frameworks-comparison` (эпик ресерча систем/фреймворков оркестрации, не статей), стадия `1k` (строка #32). Предварительный verdict: 🟡 patterns / 🔴 not dependency. |
 | 2026-08-14 | Аналитик (Шерлок) | `status: review`: исследование `yc-software/qm` завершено, comparison-отчёт и строка #32 подготовлены; артефакты готовы к review тимлидом. См. agent-report `docs/agents/reports/system-analyst/2026-08-14_qm-research.md`. |
 | 2026-08-14 | Тимлид (Алекс) | Создан отдельный PR #347 для проверки пользователем; задача остаётся в `review`. |
+
+| 2026-08-15 | Тимлид (Алекс) | PR #347 принят: задача переведена в `done` перед слиянием. |
