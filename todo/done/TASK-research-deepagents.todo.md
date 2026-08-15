@@ -10,7 +10,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-deepagents
 pr: "https://github.com/prikotov/task-orchestrator/pull/345"
-status: review
+status: done
 ---
 
 # TASK-research-deepagents: Deep Agents (langchain-ai/deepagents) — agent-харнес + Deep Agents Code CLI
@@ -118,3 +118,5 @@ deepagents — batteries-included agent harness на LangGraph (`create_agent` �
 | 2026-08-14 | Тимлид (Алекс) | Создан отдельный PR #345 для проверки результатов исследования; задача переведена в статус `review`. |
 
 | 2026-08-14 | Аналитик (Шерлок) | Исследование выполнено и подготовлено к review: создан отчёт `docs/research/coding-agents/deepagents-comparison.md` по 10 критериям, сводная таблица обновлена до 21 исследования, строка #21 добавлена в детальные отчёты, эпик `EPIC-research-coding-agents-comparison` обновлён стадией `1k`. Self-review уточнил snapshot-ссылки на commit и счётчик Agent Skills standard (17/21 → 81%). |
+
+| 2026-08-15 | Тимлид (Алекс) | PR #345 принят: задача переведена в `done` перед слиянием. |

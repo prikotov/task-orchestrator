@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)  
 **Дата анализа:** 2026-08-14  
 **Объект:** `langchain-ai/deepagents` (`deepagents` 0.7.6, `deepagents-code` 0.1.55, Python, MIT)  
-**Задача:** [TASK-research-deepagents](../../../todo/TASK-research-deepagents.todo.md)  
+**Задача:** [TASK-research-deepagents](../../../todo/done/TASK-research-deepagents.todo.md)
 **Срез источников:** GitHub `main` commit `822f7c9b02e6d99bdb46b5545bb2543783c01769` от 2026-08-13 22:54:26 UTC; PyPI версии: `deepagents` 0.7.6 от 2026-08-13, `deepagents-code` 0.1.55 от 2026-08-12.  
 **GitHub metadata:** ~27.7k stars (звёзд), ~3.9k forks (форков), лицензия MIT.
 
