@@ -86,6 +86,8 @@ return [
 
             // Роли / психометрия (из файлов ролей)
             'jung', 'belbin', 'disc', 'dp',
+            // Части названия психометрической модели Big Five.
+            'big', 'five',
 
             // Прочий технический жаргон
             'allowlist', 'denylist', 'blocklist', 'backoffice', 'frontend',
