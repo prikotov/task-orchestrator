@@ -24,7 +24,7 @@ return [
     // Канонические агенты (lowercase-идентификатор в скобках) — AI-харнесы,
     // которыми выполняется работа. Персона роли указывается в 'roles', здесь —
     // только инструмент: pi (Pi Coding Agent) и codex/codex-cli (Codex).
-    'agents' => ['pi', 'codex', 'codex-cli'],
+    'agents' => ['pi', 'codex', 'codex-cli', 'omp', 'opencode'],
 
     // Считать нарушения author/assignee ошибками (аналог флага --strict).
     'strict' => false,
