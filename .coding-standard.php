@@ -49,28 +49,13 @@ return [
             'GitHub', 'Codex', 'Pi', 'Qwen', 'Gemini', 'OpenCode', 'Kilo', 'Twig',
             'PHPDoc',
 
-            // Имена классов и ключей конфигурации task-orchestrator.
-            'fix_iterations', 'max_iterations', 'CircuitBreaker', 'CommandHandler',
-            'ChainDefinition', 'ChainExecution', 'AgentRunner', 'DynamicLoop',
-            'ExecutionStrategy', 'ChainStep', 'ChainSecurityPolicy', 'Orchestrator',
-            'DynamicExecutionStrategy', 'StaticExecutionStrategy', 'ConditionalExecutionStrategy',
-            'StaticExecution',
-            'AgentDtoMapper', 'AgentRunnerInterface', 'BuildDynamicContextService',
-            'ChainDefinitionVo', 'ChainRetryPolicyVo', 'ChainSessionLogger',
-            'CheckpointWriter', 'DynamicLoopExecution', 'ExecutionStrategyInterface',
-            'GitHubHttpComponent', 'GitHubHttpException', 'HttpsProxyBridge',
-            'RunAgentService', 'RunDynamicLoopService', 'RunStaticChainService',
-            'SharedChainDefinitionVo', 'StaticChainExecution',
-
             // Идентичность проекта и модель личности ролей.
             'task-orchestrator', 'Task Orchestrator', 'prikotov', 'GLM', 'jung', 'belbin', 'disc', 'dp',
             // Психометрическая модель.
             'Big Five',
 
-            // Идентификаторы форматов, skills и CLI-команд проекта.
+            // Идентификаторы форматов и skills проекта.
             'allowlist', 'env', 'XML', 'SKILL', 'ADR', 'OQ', 'TASK', 'YAML DSL',
-            'agent:init', 'agent:orchestrate', 'agent:role-skills', 'agent:run',
-            'agent:runners', 'agent:token',
         ],
     ],
 ];

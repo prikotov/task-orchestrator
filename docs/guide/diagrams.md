@@ -1,10 +1,10 @@
 # Диаграммы
 
-Mermaid-диаграммы Orchestrator. Рендерятся нативно в предпросмотре Markdown в GitHub.
+`Mermaid`-диаграммы `Orchestrator`. Рендерятся нативно в предпросмотре `Markdown` в GitHub.
 
 ## Component-диаграмма: два модуля
 
-Обзор модулей AgentRunner и Orchestrator, их DDD-слоёв и связей через Integration-слой.
+Обзор модулей `AgentRunner` и `Orchestrator`, их DDD-слоёв и связей через Integration-слой.
 
 ```mermaid
 graph TB
@@ -171,7 +171,7 @@ graph TB
 
 ## Диаграмма классов: Integration-слой (ACL)
 
-Механизм связи между Orchestrator и AgentRunner через Integration-слой.
+Механизм связи между `Orchestrator` и `AgentRunner` через Integration-слой.
 
 ```mermaid
 classDiagram
@@ -234,9 +234,9 @@ classDiagram
     note for AgentDtoMapper "Stateless маппер\nOrchestrator Domain VO ↔ AgentRunner Application DTO"
 ```
 
-## Диаграмма классов Domain-слоя Orchestrator
+## Диаграмма классов Domain-слоя `Orchestrator`
 
-Интерфейсы, Value Objects и исключения Orchestrator Domain.
+Интерфейсы, Value Objects и исключения `Orchestrator` Domain.
 
 ```mermaid
 classDiagram
@@ -336,9 +336,9 @@ classDiagram
     note for RoleNotFoundException "extends OrchestratorException\nimplements NotFoundExceptionInterface"
 ```
 
-## Диаграмма классов Domain-слоя AgentRunner
+## Диаграмма классов Domain-слоя `AgentRunner`
 
-Интерфейсы и Value Objects модуля AgentRunner.
+Интерфейсы и Value Objects модуля `AgentRunner`.
 
 ```mermaid
 classDiagram
@@ -425,7 +425,7 @@ classDiagram
 
 ## Последовательность: оркестрация static-цепочки
 
-Линейное выполнение шагов с поддержкой итерационных циклов и quality gates.
+Линейное выполнение шагов с поддержкой итерационных циклов и ворот качества.
 
 ```mermaid
 sequenceDiagram
@@ -566,7 +566,7 @@ sequenceDiagram
     RASI-->>RSC: ChainRunResultVo
 ```
 
-## Блок-схема: PiAgentRunner
+## Блок-схема: `PiAgentRunner`
 
 Внутренний поток `PiAgentRunner::run()` — разрешение команды, формирование аргументов, запуск процесса, парсинг результата.
 

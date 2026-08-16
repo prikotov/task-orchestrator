@@ -32,25 +32,25 @@ src/Module/
 
 ### Правило межмодульного взаимодействия
 
-Модули взаимодействуют **только через Application-слой**: Integration обращается к Application другого модуля (QueryHandler / CommandHandler), а не к Domain другого модуля. Domain каждого модуля — чёрный ящик. Подробнее — в [ADR-011: Межмодульное взаимодействие через Application](../adr/011-cross-module-application-api.md).
+Модули взаимодействуют **только через Application-слой**: Integration обращается к Application другого модуля (`QueryHandler` / `CommandHandler`), а не к Domain другого модуля. Domain каждого модуля — чёрный ящик. Подробнее — в [ADR-011: Межмодульное взаимодействие через Application](../adr/011-cross-module-application-api.md).
 
-### Модуль AgentRunner
+### Модуль `AgentRunner`
 
 Отвечает за запуск AI-агента через конкретный CLI-инструмент. Не знает об оркестрации и цепочках.
 
 **Domain-слой:**
 - `AgentRunnerInterface` — контракт движка: `run()`, `getName()`, `isAvailable()`
-- `AgentRunnerRegistryService` — реестр по имени → AgentRunnerInterface
+- `AgentRunnerRegistryService` — реестр по имени → `AgentRunnerInterface`
 - `AgentRunnerRegistryServiceInterface` — интерфейс реестра
 - `RetryableRunnerFactoryInterface` — фабрика обёртки с повторами
 - VO: `AgentResultVo`, `AgentRunRequestVo`, `AgentTurnResultVo`, `RetryPolicyVo`, `CircuitBreakerStateVo`
-- Enum: `CircuitStateEnum` (closed | half_open | open)
+- Перечисление: `CircuitStateEnum` (closed | half_open | open)
 - Исключения: `AgentException`, `RunnerNotFoundException`, `NotFoundExceptionInterface`
 
 **Application-слой:**
 - `RunAgentCommandHandler` — запуск агента с повторами, выбор запускателя по имени из реестра
 - `GetRunnersQueryHandler` — список доступных запускателей
-- `GetRunnerByNameQueryHandler` — получение runner по имени
+- `GetRunnerByNameQueryHandler` — получение запускателя по имени
 - DTO: `RunAgentCommand`, `RunAgentResultDto`, `GetRunnersQuery`, `GetRunnersResultDto`
 
 **Infrastructure-слой:**
@@ -60,14 +60,14 @@ src/Module/
 - `CircuitBreakerAgentRunner` — обёртка Circuit Breaker (closed → open → half_open)
 - `RetryableRunnerFactory` — фабрика для создания обёртки с повторами
 
-### Модуль ChainDefinition
+### Модуль `ChainDefinition`
 
 Отвечает за загрузку, валидацию и определение цепочек. Не зависит ни от кого — единственный независимый модуль.
 
 **Domain-слой:**
 - `ChainLoaderInterface` — контракт загрузки цепочек
 - VO: `ChainDefinitionVo`, `SharedChainDefinitionVo`, `ChainStepVo`, и др.
-- Enum: `ChainStepTypeEnum`, `ChainTypeEnum`
+- Перечисления: `ChainStepTypeEnum`, `ChainTypeEnum`
 - Исключения: `ChainNotFoundException`, `OrchestratorException`
 
 **Application-слой:**
@@ -77,42 +77,42 @@ src/Module/
 **Infrastructure-слой:**
 - `YamlChainLoader` — загрузка из YAML-файлов
 
-### Модуль ChainExecution
+### Модуль `ChainExecution`
 
-Отвечает за выполнение цепочек Static и Conditional. Зависит от ChainDefinition (через Integration) и AgentRunner (через Integration).
+Отвечает за выполнение статических и условных цепочек. Зависит от `ChainDefinition` (через Integration) и `AgentRunner` (через Integration).
 
 **Domain-слой:**
 - `RunAgentServiceInterface` — интеграционный интерфейс запуска AI-агента
 - `AuditLoggerInterface` — интерфейс для журналирования аудита
 - `PromptProviderInterface` — интерфейс для системных промптов
-- Сервисы: Budget, Hooks, Static, Conditional, Prompt, Audit
+- Сервисы: бюджет, перехватчики, статическая и условная стратегии, промпт, аудит
 - Entity: `StaticChainExecution`
 - VO: `ChainRunRequestVo`, `ChainRunResultVo`, `FallbackAttemptVo`, и др.
 
 **Application-слой:**
 - Сценарии применения: `OrchestrateChainCommandHandler` (диспетчер стратегий), `RunAgentCommandHandler`, `RunAgentQueryHandler`, `GetPromptFilePathQueryHandler`, `GenerateReportQueryHandler`
 - Стратегии: `ExecutionStrategyInterface`, `StaticExecutionStrategy`, `ConditionalExecutionStrategy`
-- Сервисы: `ExecuteStaticChainService`, `DynamicExecutionStrategy` (делегирует в DynamicLoop через Integration)
+- Сервисы: `ExecuteStaticChainService`, `DynamicExecutionStrategy` (делегирует в `DynamicLoop` через Integration)
 - DTO: команды и результаты
 
 **Integration-слой:**
-- `ChainExecutionDefinitionMapper` — загрузка и маппинг определений из ChainDefinition (через `LoadRawChainQueryHandler` — Application другого модуля)
-- `RunAgentService` — реализует `RunAgentServiceInterface`, делегирует в AgentRunner Application
+- `ChainExecutionDefinitionMapper` — загрузка и маппинг определений из `ChainDefinition` (через `LoadRawChainQueryHandler` — Application другого модуля)
+- `RunAgentService` — реализует `RunAgentServiceInterface`, делегирует в `AgentRunner` Application
 - `StaticAuditService` — реализует интерфейс аудита
 
 **Infrastructure-слой:**
 - `JsonlAuditLogger` — JSONL журнал аудита (реализует `AuditLoggerInterface`)
 - `RolePromptBuilder`, `ExecuteConditionalStepService`, `ResolveChainRunnerService`
 
-### Модуль DynamicLoop
+### Модуль `DynamicLoop`
 
-Отвечает за выполнение циклов Dynamic (сессия, раунд, контекст, фасилитатор). Зависит от ChainDefinition (через Integration) и ChainExecution (через Integration → Application другого модуля).
+Отвечает за выполнение динамических циклов (сессия, раунд, контекст, фасилитатор). Зависит от `ChainDefinition` (через Integration) и `ChainExecution` (через Integration → Application другого модуля).
 
 **Domain-слой:**
 - `RunDynamicLoopAgentServiceInterface` — интерфейс запуска агента
 - `DynamicLoopAuditLoggerInterface` — интерфейс аудита
 - `ChainDefinitionProviderInterface` — интерфейс получения определений цепочек
-- Сервисы: Dynamic, Session, Budget, Audit
+- Сервисы: динамический цикл, сессия, бюджет, аудит
 - Entity: `DynamicLoopExecution`
 - VO: `DynamicRoundResultVo`, `DynamicLoopResultVo`, `ChainSessionStateVo`, и др.
 
@@ -120,16 +120,16 @@ src/Module/
 - Сервисы: `DynamicExecutionStrategy`, `DispatchRoundEventService`, `DispatchSessionCompletedEventService`
 
 **Integration-слой:**
-- `DynamicLoopDefinitionMapper` — загрузка и маппинг определений из ChainDefinition (через `LoadRawChainQueryHandler` — Application другого модуля)
-- `RunDynamicLoopAgentService` — реализует `RunDynamicLoopAgentServiceInterface`, делегирует в `RunAgentQueryHandler` (ChainExecution.Application) и `GetPromptFilePathQueryHandler`
+- `DynamicLoopDefinitionMapper` — загрузка и маппинг определений из `ChainDefinition` (через `LoadRawChainQueryHandler` — Application другого модуля)
+- `RunDynamicLoopAgentService` — реализует `RunDynamicLoopAgentServiceInterface`, делегирует в `RunAgentQueryHandler` (`ChainExecution`.Application) и `GetPromptFilePathQueryHandler`
 
 **Infrastructure-слой:**
 - `JsonlAuditLogger` — JSONL журнал аудита (реализует `DynamicLoopAuditLoggerInterface`)
 - `ChainSessionLogger`, `ChainSessionReader`, `ChainSessionWriter`, `CheckDynamicBudgetService`, `FacilitatorResponseParserService`
 
-## Паттерн ExecutionStrategy
+## Паттерн `ExecutionStrategy`
 
-Оркестрация использует **Strategy** для разделения поведенческих путей цепочек Static, Dynamic и Conditional. Паттерн введён в ADR-006.
+Оркестрация использует **Strategy** для разделения поведенческих путей статических, динамических и условных цепочек. Паттерн введён в ADR-006.
 
 **Как работает:**
 
@@ -141,13 +141,13 @@ src/Module/
 
 | Стратегия | Модуль | Тип цепочки | Описание |
 |---|---|---|---|
-| `StaticExecutionStrategy` | ChainExecution | static | Делегирует в `ExecuteStaticChainServiceInterface`. Возобновление не поддерживается. |
-| `ConditionalExecutionStrategy` | ChainExecution | conditional | Условное ветвление шагов. Возобновление не поддерживается. |
-| `DynamicExecutionStrategy` | DynamicLoop | dynamic | Полный цикл: сессия, контекст, цикл, завершение, маппинг DTO, отправка события. |
+| `StaticExecutionStrategy` | `ChainExecution` | static | Делегирует в `ExecuteStaticChainServiceInterface`. Возобновление не поддерживается. |
+| `ConditionalExecutionStrategy` | `ChainExecution` | conditional | Условное ветвление шагов. Возобновление не поддерживается. |
+| `DynamicExecutionStrategy` | `DynamicLoop` | dynamic | Полный цикл: сессия, контекст, цикл, завершение, маппинг DTO, отправка события. |
 
 **Конфигурация DI:**
 
-Тег `orchestrator.execution_strategy` регистрируется **на уровне контейнера** (на уровне всего контейнера) в `Kernel::build()` через `registerForAutoconfiguration()`, а не локальным для модуля `_instanceof` (последнее работало только в пределах своего файла и ломалось в PHAR — см. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-автообнаружения-вариант-4)). Поэтому любая реализация `ExecutionStrategyInterface` тегируется автоматически, в каком бы модуле она ни лежала. Итератор по тегам (итератор по тегам) для `OrchestrateChainCommandHandler` остаётся явным определением в модульной конфигурации ChainExecution:
+Тег `orchestrator.execution_strategy` регистрируется **на уровне контейнера** (на уровне всего контейнера) в `Kernel::build()` через `registerForAutoconfiguration()`, а не локальным для модуля `_instanceof` (последнее работало только в пределах своего файла и ломалось в PHAR — см. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-автообнаружения-вариант-4)). Поэтому любая реализация `ExecutionStrategyInterface` тегируется автоматически, в каком бы модуле она ни лежала. Итератор по тегам (итератор по тегам) для `OrchestrateChainCommandHandler` остаётся явным определением в модульной конфигурации `ChainExecution`:
 
 ```yaml
 # src/Module/ChainExecution/Resource/config/services.yaml
@@ -157,7 +157,7 @@ services:
             $strategies: !tagged_iterator orchestrator.execution_strategy
 ```
 
-`DynamicExecutionStrategy` реализован в модуле DynamicLoop (контракт `ExecutionStrategyInterface` лежит в ChainExecution). С на уровне контейнера autoconfiguration он тегируется автоматически. В `DynamicLoop/services.yaml` на нём оставлен явный `tags: ['orchestrator.execution_strategy']` как опциональная перестраховка (приоритет явного определения):
+`DynamicExecutionStrategy` реализован в модуле `DynamicLoop` (контракт `ExecutionStrategyInterface` лежит в `ChainExecution`). С на уровне контейнера autoconfiguration он тегируется автоматически. В `DynamicLoop/services.yaml` на нём оставлен явный `tags: ['orchestrator.execution_strategy']` как опциональная перестраховка (приоритет явного определения):
 
 ```yaml
 # src/Module/DynamicLoop/Resource/config/services.yaml
@@ -172,7 +172,7 @@ services:
 
 ## Integration-слой между модулями
 
-Модули связаны через **Integration-слой**, который обращается к чужому **Application** (QueryHandler / CommandHandler), а не к чужому Domain. Модель формализована в [ADR-011](../adr/011-cross-module-application-api.md).
+Модули связаны через **Integration-слой**, который обращается к чужому **Application** (`QueryHandler` / `CommandHandler`), а не к чужому Domain. Модель формализована в [ADR-011](../adr/011-cross-module-application-api.md).
 
 ### Правило: Integration → Application другого модуля
 
@@ -186,7 +186,7 @@ Integration-слой модуля A
 
 ### Примеры Integration → Application другого модуля
 
-#### ChainExecution ← ChainDefinition
+#### `ChainExecution` ← `ChainDefinition`
 
 ```
 ChainExecution.Integration.ChainExecutionDefinitionMapper
@@ -196,7 +196,7 @@ ChainExecution.Integration.ChainExecutionDefinitionMapper
   → ChainDefinition.Domain.ChainLoaderInterface              ✗ Domain другого модуля (ЗАПРЕЩЕНО)
 ```
 
-#### DynamicLoop ← ChainExecution
+#### `DynamicLoop` ← `ChainExecution`
 
 ```
 DynamicLoop.Integration.RunDynamicLoopAgentService
@@ -236,13 +236,13 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 | Откуда | Куда | Примечание |
 |---|---|---|
-| ChainExecution.Integration | ChainDefinition.Application | `LoadRawChainQueryHandler` — загрузка определений |
-| DynamicLoop.Integration | ChainDefinition.Application | `LoadRawChainQueryHandler` — загрузка определений |
-| DynamicLoop.Integration | ChainExecution.Application | `RunAgentQueryHandler`, `GetPromptFilePathQueryHandler` |
-| ChainExecution.Integration | AgentRunner.Application | `RunAgentCommandHandler` — запуск агента |
-| DynamicLoop.Integration | AgentRunner.Application | (через ChainExecution) |
+| `ChainExecution.Integration` | `ChainDefinition.Application` | `LoadRawChainQueryHandler` — загрузка определений |
+| `DynamicLoop.Integration` | `ChainDefinition.Application` | `LoadRawChainQueryHandler` — загрузка определений |
+| `DynamicLoop.Integration` | `ChainExecution.Application` | `RunAgentQueryHandler`, `GetPromptFilePathQueryHandler` |
+| `ChainExecution.Integration` | `AgentRunner.Application` | `RunAgentCommandHandler` — запуск агента |
+| `DynamicLoop.Integration` | `AgentRunner.Application` | (через `ChainExecution`) |
 
-**Межмодульное правило:** Integration → Application другого модуля (QueryHandler/CommandHandler). Запрещено Integration → Domain другого модуля.
+**Межмодульное правило:** Integration → Application другого модуля (`QueryHandler`/`CommandHandler`). Запрещено Integration → Domain другого модуля.
 
 ### Внешние зависимости
 
@@ -254,20 +254,20 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 Все модули следуют принципу: Domain-слой не содержит зависимостей на другие слои или сторонние библиотеки (кроме `Psr\Log\LoggerInterface`).
 
-### Почему CommandHandler для оркестрации
+### Почему `CommandHandler` для оркестрации
 
 Оркестрация запускает AI-агентов (побочные эффекты: выполнение команд оболочки, запись файлов, трата токенов).
 Поэтому `OrchestrateChainCommandHandler` и `RunAgentCommandHandler` используют паттерн Command.
-CommandHandler может возвращать DTO — это допустимо для CQRS с побочными эффектами.
+`CommandHandler` может возвращать DTO — это допустимо для CQRS с побочными эффектами.
 
-### Почему QueryHandler для запускателей и отчётов
+### Почему `QueryHandler` для запускателей и отчётов
 
 `GetRunnersQueryHandler` и `GenerateReportQueryHandler` — readonly-операции без побочными эффектами.
 Они используют паттерн Query.
 
 ## Структура каталогов
 
-### AgentRunner
+### `AgentRunner`
 
 ```
 src/Module/AgentRunner/
@@ -315,7 +315,7 @@ src/Module/AgentRunner/
         └── RetryingAgentRunner.php                      # обёртка с политикой повторов
 ```
 
-### ChainDefinition
+### `ChainDefinition`
 
 ```
 src/Module/ChainDefinition/
@@ -353,7 +353,7 @@ src/Module/ChainDefinition/
         └── YamlChainLoader.php                         # загрузка из YAML
 ```
 
-### ChainExecution
+### `ChainExecution`
 
 ```
 src/Module/ChainExecution/
@@ -422,7 +422,7 @@ src/Module/ChainExecution/
             └── RolePromptBuilder.php
 ```
 
-### DynamicLoop
+### `DynamicLoop`
 
 ```
 src/Module/DynamicLoop/
@@ -576,7 +576,7 @@ task_orchestrator:
 ## Мультидвижковая архитектура
 
 - `AgentRunnerInterface` — контракт движка: `run()`, `getName()`, `isAvailable()`
-- `AgentRunnerRegistryService` — реестр по имени → AgentRunnerInterface
+- `AgentRunnerRegistryService` — реестр по имени → `AgentRunnerInterface`
 - `PiAgentRunner` — реализация для pi CLI
 - `RetryingAgentRunner` — обёртка с политикой повторов (экспоненциальная задержка)
 - `CircuitBreakerAgentRunner` — обёртка Circuit Breaker (closed → open → half_open)
@@ -587,7 +587,7 @@ task_orchestrator:
   реализаций в других модулях; общий `config/services.yaml` для этого не изменяется. Module-local
   `_instanceof` больше не используется (см. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-автообнаружения-вариант-4)).
 
-Подробнее о retry и circuit breaker — в [Надёжность](reliability.md).
+Подробнее о повторах и Circuit Breaker — в [Надёжность](reliability.md).
 
 ## Deptrac
 
