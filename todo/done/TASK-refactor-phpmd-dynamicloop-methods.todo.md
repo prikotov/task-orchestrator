@@ -96,7 +96,7 @@ make check
 ### Порядок действий
 1. Переключись в ветку `task/refactor-phpmd-dynamicloop-methods`: `git checkout task/refactor-phpmd-dynamicloop-methods`.
 2. Реализуй задачу согласно описанию выше: уменьшить `runParticipantTurn()` и `runFacilitatorStep()` до ≤79 LOC экстракцией приватных методов, **не меняя поведение**.
-3. Следуй [Конвенциям](../docs/conventions/index.md) проекта и AGENTS.md.
+3. Следуй [Конвенциям](../../docs/conventions/index.md) проекта и AGENTS.md.
 4. Делай промежуточные коммиты после каждого логического этапа (Conventional Commits, scope `DynamicLoop`).
 5. После реализации запусти проверки: `make check`. Должен быть зелёным.
 6. Сделай `git push`.

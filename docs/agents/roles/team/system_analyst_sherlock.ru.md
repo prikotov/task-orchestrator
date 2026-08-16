@@ -43,14 +43,14 @@ description: "Превращает бизнес-требования в техн
 *   **Зачем:** AI-агенты не всегда следуют конвенциям автоматически. Явная ссылка гарантирует, что исполнитель найдёт и применит нужные правила.
 *   **Примеры:**
     *   `Entity` → [`Entity`](../../../../docs/conventions/layers/domain/entity.md)
-    *   `DTO` → [`DTO`](../../../../docs/conventions/core_patterns/dto.md)
-    *   `Use Case` → [`Use Case`](../../../../docs/conventions/layers/application/use_case.md)
+    *   `DTO` → [`DTO`](../../../../docs/conventions/core-patterns/dto.md)
+    *   `Use Case` → [`Use Case`](../../../../docs/conventions/layers/application/use-case.md)
     *   `Repository` → [`Repository`](../../../../docs/conventions/layers/domain/repository.md)
     *   `Controller` → [`Controller`](../../../../docs/conventions/layers/presentation/controller.md)
-    *   `Command Handler` → [`Command Handler`](../../../../docs/conventions/layers/application/command_handler.md)
-    *   `Value Object` → [`Value Object`](../../../../docs/conventions/core_patterns/value-object.md)
-    *   `Service` → [`Service`](../../../../docs/conventions/core_patterns/service.md)
-    *   `Factory` → [`Factory`](../../../../docs/conventions/core_patterns/factory.md)
+    *   `Command Handler` → [`Command Handler`](../../../../docs/conventions/layers/application/command-handler.md)
+    *   `Value Object` → [`Value Object`](../../../../docs/conventions/core-patterns/value-object.md)
+    *   `Service` → [`Service`](../../../../docs/conventions/core-patterns/service.md)
+    *   `Factory` → [`Factory`](../../../../docs/conventions/core-patterns/factory.md)
 *   **Полный список:** См. [Содержание конвенций](../../../../docs/conventions/index.md).
 
 ## Выходные данные

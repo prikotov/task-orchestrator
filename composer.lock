@@ -6846,16 +6846,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.29.1",
+            "version": "v0.29.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/coding-standard.git",
-                "reference": "0cf5e4adad8476f7969b24ca1afb9caeea442ec9"
+                "reference": "287fb71e74686dfd7f2911696d73cc31a50a776c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/0cf5e4adad8476f7969b24ca1afb9caeea442ec9",
-                "reference": "0cf5e4adad8476f7969b24ca1afb9caeea442ec9",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/287fb71e74686dfd7f2911696d73cc31a50a776c",
+                "reference": "287fb71e74686dfd7f2911696d73cc31a50a776c",
                 "shasum": ""
             },
             "require": {
@@ -6965,17 +6965,17 @@
                 "sniffs"
             ],
             "support": {
-                "source": "https://github.com/prikotov/coding-standard/tree/v0.29.1",
+                "source": "https://github.com/prikotov/coding-standard/tree/v0.29.3",
                 "issues": "https://github.com/prikotov/coding-standard/issues"
             },
-            "time": "2026-08-14T02:42:10+00:00"
+            "time": "2026-08-16T02:14:11+00:00"
         },
         {
             "name": "prikotov/git-workflow",
             "version": "v0.3.1",
             "source": {
                 "type": "git",
-                "url": "git@github.com:prikotov/git-workflow.git",
+                "url": "https://github.com/prikotov/git-workflow.git",
                 "reference": "37acb8970a16a210015d74e8dcbe25f643152206"
             },
             "dist": {
@@ -7017,28 +7017,31 @@
                 "release",
                 "workflow"
             ],
+            "support": {
+                "source": "https://github.com/prikotov/git-workflow/tree/v0.3.1",
+                "issues": "https://github.com/prikotov/git-workflow/issues"
+            },
             "time": "2026-07-01T14:32:29+00:00"
         },
         {
             "name": "prikotov/todo-md",
-            "version": "v0.0.7",
+            "version": "v0.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/todo-md.git",
-                "reference": "f235345f46c207234faea24f1ff6bf4867677aad"
+                "reference": "f23c1b15eb290ba4a74c2e0d949ea3118957d5d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/todo-md/zipball/f235345f46c207234faea24f1ff6bf4867677aad",
-                "reference": "f235345f46c207234faea24f1ff6bf4867677aad",
+                "url": "https://api.github.com/repos/prikotov/todo-md/zipball/f23c1b15eb290ba4a74c2e0d949ea3118957d5d4",
+                "reference": "f23c1b15eb290ba4a74c2e0d949ea3118957d5d4",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.4"
             },
             "bin": [
-                "bin/todo-md-init",
-                "bin/todo-md-validate"
+                "bin/todo-md"
             ],
             "type": "library",
             "extra": {
@@ -7063,10 +7066,10 @@
                 "todo"
             ],
             "support": {
-                "source": "https://github.com/prikotov/todo-md/tree/v0.0.7",
+                "source": "https://github.com/prikotov/todo-md/tree/v0.0.10",
                 "issues": "https://github.com/prikotov/todo-md/issues"
             },
-            "time": "2026-06-04T03:45:19+00:00"
+            "time": "2026-08-09T15:06:11+00:00"
         },
         {
             "name": "psalm/plugin-symfony",
@@ -8597,16 +8600,16 @@
         },
         {
             "name": "slevomat/coding-standard",
-            "version": "8.31.0",
+            "version": "8.31.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/slevomat/coding-standard.git",
-                "reference": "ae5e938b49986fa48b494557445e22ee1ca795b7"
+                "reference": "0a40807a48873948bfa7ffce2a4e69ba40cf5e76"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/slevomat/coding-standard/zipball/ae5e938b49986fa48b494557445e22ee1ca795b7",
-                "reference": "ae5e938b49986fa48b494557445e22ee1ca795b7",
+                "url": "https://api.github.com/repos/slevomat/coding-standard/zipball/0a40807a48873948bfa7ffce2a4e69ba40cf5e76",
+                "reference": "0a40807a48873948bfa7ffce2a4e69ba40cf5e76",
                 "shasum": ""
             },
             "require": {
@@ -8618,11 +8621,11 @@
             "require-dev": {
                 "phing/phing": "3.0.1|3.1.2",
                 "php-parallel-lint/php-parallel-lint": "1.4.0",
-                "phpstan/phpstan": "2.2.5",
-                "phpstan/phpstan-deprecation-rules": "2.0.4",
+                "phpstan/phpstan": "2.2.7",
+                "phpstan/phpstan-deprecation-rules": "2.0.5",
                 "phpstan/phpstan-phpunit": "2.0.18",
                 "phpstan/phpstan-strict-rules": "2.0.12",
-                "phpunit/phpunit": "9.6.34|10.5.63|11.4.4|11.5.55|12.5.30"
+                "phpunit/phpunit": "9.6.34|10.5.63|11.4.4|11.5.56|12.5.33"
             },
             "type": "phpcodesniffer-standard",
             "extra": {
@@ -8646,7 +8649,7 @@
             ],
             "support": {
                 "issues": "https://github.com/slevomat/coding-standard/issues",
-                "source": "https://github.com/slevomat/coding-standard/tree/8.31.0"
+                "source": "https://github.com/slevomat/coding-standard/tree/8.31.1"
             },
             "funding": [
                 {
@@ -8658,7 +8661,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-07-21T16:20:20+00:00"
+            "time": "2026-07-31T10:42:43+00:00"
         },
         {
             "name": "spatie/array-to-xml",
@@ -8730,19 +8733,20 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "4.0.1",
+            "version": "4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "0525c73950de35ded110cffafb9892946d7771b5"
+                "reference": "bbdc3d0532623e21838b7041a4364383a8126f96"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/0525c73950de35ded110cffafb9892946d7771b5",
-                "reference": "0525c73950de35ded110cffafb9892946d7771b5",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/bbdc3d0532623e21838b7041a4364383a8126f96",
+                "reference": "bbdc3d0532623e21838b7041a4364383a8126f96",
                 "shasum": ""
             },
             "require": {
+                "ext-libxml": "*",
                 "ext-simplexml": "*",
                 "ext-tokenizer": "*",
                 "ext-xmlwriter": "*",
@@ -8750,6 +8754,10 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^8.4.0 || ^9.3.4 || ^10.5.32 || 11.3.3 - 11.5.28 || ^11.5.31"
+            },
+            "suggest": {
+                "ext-iconv": "For accurate character length calculation when the checked files contain multi-byte characters.",
+                "ext-pcntl": "For parallel processing support via the --parallel CLI option."
             },
             "bin": [
                 "bin/phpcbf",
@@ -8805,7 +8813,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-11-10T16:43:36+00:00"
+            "time": "2026-08-06T02:45:27+00:00"
         },
         {
             "name": "symfony/expression-language",

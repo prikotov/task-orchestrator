@@ -13,7 +13,7 @@
 
 - `docs/agents/reports/system-architect/2026-06-15_00-10_fixiterations-validation-redesign.md` — исходный дизайн Локи, особенно разделы 3.2, 4.3, 8.
 - `docs/agents/reports/code-reviewer-backend/2026-06-15_08-50_pr-261-fixiterations-redesign-architecture-review.md` — ревью Пуаро и слепые зоны №1–№4.
-- `docs/conventions/core_patterns/value-object.md`, `docs/conventions/layers/domain/specification.md`, `docs/conventions/core_patterns/factory.md` — релевантные конвенции.
+- `docs/conventions/core-patterns/value-object.md`, `docs/conventions/layers/domain/specification.md`, `docs/conventions/core-patterns/factory.md` — релевантные конвенции.
 - Фактический код PR: `ChainDefinitionVo`, `ChainDefinitionFactory`, `FixIterationsReferenceIntegritySpecification`, `ChainDefinitionValidatorService`.
 
 Внешние источники не использовались.

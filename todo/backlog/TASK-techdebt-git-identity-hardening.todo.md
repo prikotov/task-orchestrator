@@ -160,8 +160,8 @@ ls -la var/cache/git-identity/*.json
 ## 8. Sources (Источники)
 
 - Code review Пуаро, PR #275 (разделы L1, L2, L4, INFO).
-- Конвенции: `docs/conventions/core_patterns/value-object.md` (фабрики `createFrom*`),
-  `docs/conventions/core_patterns/exception.md` (типизированные исключения).
+- Конвенции: `docs/conventions/core-patterns/value-object.md` (фабрики `createFrom*`),
+  `docs/conventions/core-patterns/exception.md` (типизированные исключения).
 - Принцип defense-in-depth (эшелонированная защита) — OWASP.
 
 ## 9. Comments (Комментарии)

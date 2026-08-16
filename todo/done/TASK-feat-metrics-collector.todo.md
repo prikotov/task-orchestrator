@@ -20,13 +20,13 @@ status: todo
 > Когда [`AuditLoggerInterface`](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) пишет в JSONL-файл, но нет способа агрегировать метрики — какая цепочка дольше, какая роль дороже, какой runner чаще падает — я хочу добавить `MetricsCollectorInterface` в Domain с in-memory реализацией, чтобы заложить observability-фундамент и дать команде данные для приоритизации оптимизаций.
 
 ### Goal (Цель по SMART)
-Создать [`Interface`](../../docs/conventions/core_patterns/external-service.md) `MetricsCollectorInterface` в Domain (AgentRunner или Orchestrator) с методами для записи и чтения метрик. In-memory реализация в Infrastructure. Интеграция в decorator'ы ([`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php), [`CircuitBreakerAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php)). Foundation для hooks system в Sprint 10. Срок: 1 день.
+Создать [`Interface`](../../docs/conventions/core-patterns/external-service.md) `MetricsCollectorInterface` в Domain (AgentRunner или Orchestrator) с методами для записи и чтения метрик. In-memory реализация в Infrastructure. Интеграция в decorator'ы ([`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php), [`CircuitBreakerAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php)). Foundation для hooks system в Sprint 10. Срок: 1 день.
 
 ## 2. Context and Scope (Контекст и Границы)
 ### Где делаем
-- `src/Module/AgentRunner/Domain/Service/MetricsCollectorInterface.php` — новый [`Interface`](../../docs/conventions/core_patterns/external-service.md) (агностичный к Orchestrator)
-- `src/Module/AgentRunner/Domain/ValueObject/MetricVo.php` — новый [`Value Object`](../../docs/conventions/core_patterns/value-object.md) для единичной метрики
-- `src/Module/AgentRunner/Infrastructure/Metrics/InMemoryMetricsCollector.php` — новый [`Service`](../../docs/conventions/core_patterns/service.md)
+- `src/Module/AgentRunner/Domain/Service/MetricsCollectorInterface.php` — новый [`Interface`](../../docs/conventions/core-patterns/external-service.md) (агностичный к Orchestrator)
+- `src/Module/AgentRunner/Domain/ValueObject/MetricVo.php` — новый [`Value Object`](../../docs/conventions/core-patterns/value-object.md) для единичной метрики
+- `src/Module/AgentRunner/Infrastructure/Metrics/InMemoryMetricsCollector.php` — новый [`Service`](../../docs/conventions/core-patterns/service.md)
 - [`src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php) — интеграция (record attempt, latency, result)
 - [`src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php) — интеграция (record CB state transitions)
 - DI-конфигурация
@@ -121,7 +121,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - [ ] [AuditLoggerInterface](../../../src/Module/Orchestrator/Domain/Service/Chain/Audit/AuditLoggerInterface.php) — существующий observability механизм
 - [ ] [RetryingAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php)
 - [ ] [CircuitBreakerAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php)
-- [ ] [Конвенция: External Service (Interface)](../../docs/conventions/core_patterns/external-service.md)
+- [ ] [Конвенция: External Service (Interface)](../../docs/conventions/core-patterns/external-service.md)
 
 ## 9. Comments (Комментарии)
 - Pain level: 5/10 — observability gap. Мы не знаем, какая боль самая острая, потому что не измеряем.

@@ -126,7 +126,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ### Порядок действий
 1. Реализуй задачу в текущей ветке согласно описанию выше (Must Have / Should Have).
-2. Следуй [Конвенциям](../docs/conventions/index.md) проекта и AGENTS.md.
+2. Следуй [Конвенциям](../../docs/conventions/index.md) проекта и AGENTS.md.
 3. Опирайся на дизайн (`docs/agents/reports/system-architect/2026-06-15_00-10_fixiterations-validation-redesign.md`, §3.2) и ревью (`docs/agents/reports/code-reviewer-backend/2026-06-15_08-50_pr-261-fixiterations-redesign-architecture-review.md`, слепая зона №3).
 4. После реализации запусти проверки: `make check`. Должен быть зелёным.
 5. НЕ делай коммит и НЕ пуш — Тимлид контролирует git.

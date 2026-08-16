@@ -11,7 +11,7 @@
 - Оригинал helper: `git show c8f2789:src/Module/ChainDefinition/Infrastructure/Service/Chain/Helper/ChainStepParserHelper.php`
 - Precedent: `src/Module/ChainDefinition/Domain/Factory/ChainDefinitionFactory.php`
 
-**Применённые конвенции:** `docs/conventions/core_patterns/factory.md`, `docs/conventions/core_patterns/mapper.md`, `docs/conventions/core_patterns/helper.md`, `docs/conventions/layers/domain.md`, `docs/conventions/layers/domain/specification.md`.
+**Применённые конвенции:** `docs/conventions/core-patterns/factory.md`, `docs/conventions/core-patterns/mapper.md`, `docs/conventions/core-patterns/helper.md`, `docs/conventions/layers/domain.md`, `docs/conventions/layers/domain/specification.md`.
 
 ---
 

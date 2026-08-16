@@ -3,7 +3,7 @@
 **Источник:** [Rahul Garg, The Orchestrator's Tax, martinfowler.com](https://martinfowler.com/articles/orchestrator-tax.html)  
 **Дата первоисточника:** 2026-07-28  
 **Дата анализа:** 2026-07-29  
-**Эпик:** [EPIC-research-orchestration-articles](../../../todo/EPIC-research-orchestration-articles.md)  
+**Эпик:** [EPIC-research-orchestration-articles](../../../todo/EPIC-research-orchestration-articles.todo.md)  
 **Задача:** [TASK-research-orchestrator-tax](../../../todo/done/TASK-research-orchestrator-tax.todo.md)  
 **Аналитик:** Аналитик (Шерлок)
 

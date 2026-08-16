@@ -5,13 +5,25 @@ created: 2026-07-29
 value: V3
 complexity: C3
 priority: P2
-author: Тимлид (Алекс)
-assignee: Аналитик (Шерлок)
-status: pending
+author: Тимлид Алекс (pi)
+assignee: Аналитик Шерлок (pi)
+status: todo
 branch: —
+pr:
 ---
 
 # EPIC-research-orchestration-articles: Исследование статей по оркестрации (Orchestration Patterns, Saga, Choreography vs Orchestration)
+
+## 0. Простое описание (Human Brief)
+
+### Проблема простыми словами (Problem)
+Движок оркестрации AI-агентов развивается без систематического обзора классических и современных паттернов оркестрации (orchestrator tax, saga, choreography vs orchestration, compensation, failure handling). Архитектурные решения принимаются вслепую: команда рискует повторно изобретать колёса и упускать проверенные решения, которые уже описаны в литературе по распределённым системам.
+
+### Варианты или путь решения (Solution Sketch)
+Серия исследовательских задач по единой методологии из 6 критериев: каждая статья изучается отдельной задачей, по ней пишется research-отчёт с маппингом на компоненты task-orchestrator и вердиктом apply / study / skip. Финальная задача сводит результаты в таблицу с классификацией и рекомендациями.
+
+### Ожидаемый результат (Expected Result)
+По каждому известному паттерну оркестрации есть обоснованный вердикт: применять его в task-orchestrator или нет — с маппингом на конкретные модули и оценкой усилий. Сводная таблица с ранжированием паттернов служит основой для планирования доработок движка.
 
 ## 1. Concept and Goal (Концепция и цель)
 ### Story (Job Story)
@@ -106,7 +118,7 @@ flowchart LR
 - Некоторые статьи могут быть устаревшими — учитывать дату публикации
 
 ## 9. Sources (Источники)
-- Прецеденты: `todo/EPIC-research-approaches-comparison.md`, `todo/done/EPIC-research-coding-agents-comparison.md`, `todo/done/EPIC-research-agent-frameworks-comparison.md`
+- Прецеденты: `todo/EPIC-research-approaches-comparison.todo.md`, `todo/done/EPIC-research-coding-agents-comparison.md`, `todo/done/EPIC-research-agent-frameworks-comparison.md`
 - Существующие research-документы: `docs/research/`
 - Первоисточники: Martin Fowler, blogposts, conference talks
 
@@ -117,3 +129,4 @@ flowchart LR
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-07-29 | Тимлид (Алекс) | Создание эпика. Четвёртый ресерч-трек: статьи по оркестрации (patterns, anti-patterns). Первая задача — TASK-research-orchestrator-tax. |
+| 2026-08-16 | Бэкендер Левша (pi) | Миграция на формат todo-md 0.0.10: файл переименован в `EPIC-*.todo.md`, статус `pending` → `todo`, добавлены разделы Human Brief и поле `pr`, формат author/assignee приведён к виду «Роль (агент)». |

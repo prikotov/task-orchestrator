@@ -17,7 +17,7 @@
 - Новые файлы:
   - `docs/research/methods/triz-method-research.md`;
   - `docs/agents/reports/system-analyst/2026-08-12_16-18_triz-method-research.md`.
-- Конвенция документации: [docs/conventions/doc-writing-rules.md](../../../conventions/doc-writing-rules.md).
+- Конвенция документации: [docs/conventions/doc-writing-rules.md](../../../../docs/conventions/principles/doc-style.md).
 - Реальные примитивы проекта:
   - `ChainTypeEnum` (`static`, `dynamic`, `conditional`);
   - `ChainStepTypeEnum` (`agent`, `quality_gate`, `tool`);

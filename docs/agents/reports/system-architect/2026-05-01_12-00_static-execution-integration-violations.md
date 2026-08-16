@@ -21,7 +21,7 @@
 
 ### 2.1. Нарушение: каталог `Port/` и суффикс `PortInterface`
 
-**Конвенция:** [`docs/conventions/core_patterns/service.md`](../../../docs/conventions/core_patterns/service.md) → Integration Service:
+**Конвенция:** [`docs/conventions/core-patterns/service.md`](../../../../docs/conventions/core-patterns/service.md) → Integration Service:
 
 > **Расположение**
 > - Интерфейс: `Common\Module\{ModuleName}\Domain\Service\{Context?}\{ServiceName}ServiceInterface`
@@ -39,7 +39,7 @@
 
 ### 2.2. Нарушение: реализация называется `*Adapter`, а не `*Service`
 
-**Конвенция:** [`docs/conventions/core_patterns/service.md`](../../../docs/conventions/core_patterns/service.md):
+**Конвенция:** [`docs/conventions/core-patterns/service.md`](../../../../docs/conventions/core-patterns/service.md):
 
 > | Класс     | `{Action}{Target}Service`          | ChangeStatusService               |
 

@@ -25,7 +25,7 @@ status: in_progress
 ## 2. Context and Scope (Контекст и Границы)
 ### Где делаем
 - `src/Module/Orchestrator/Application/Service/Chain/` — новый файл `ConditionalExecutionStrategy.php`
-- `src/Module/Orchestrator/Domain/` — возможный новый [`Service`](../../docs/conventions/core_patterns/service.md) для condition evaluation
+- `src/Module/Orchestrator/Domain/` — возможный новый [`Service`](../../docs/conventions/core-patterns/service.md) для condition evaluation
 - `src/Module/Orchestrator/Application/UseCase/Command/OrchestrateChain/OrchestrateChainCommandHandler.php` — диспетчер (не меняется, tagged iterator уже есть)
 
 ### Текущее поведение
@@ -46,7 +46,7 @@ status: in_progress
   - `supports(ChainDefinitionVo $chain): bool` — `true` для `ChainTypeEnum::conditionalType`
   - `execute(ChainDefinitionVo $chain, OrchestrateChainCommand $command): OrchestrateChainResultDto` — выполнение с ветвлением
   - `resume()` — `LogicException` (MVP: conditional chains не поддерживают resume)
-- [ ] Condition evaluator [`Service`](../../docs/conventions/core_patterns/service.md): принимает `ConditionExpressionVo` + context (results of previous steps) → `bool`
+- [ ] Condition evaluator [`Service`](../../docs/conventions/core-patterns/service.md): принимает `ConditionExpressionVo` + context (results of previous steps) → `bool`
   - Evaluator в Domain-слое (чистая логика, без I/O)
   - Context = map of step results: `{stepName: {passed: bool, exitCode: int, status: string}}`
 - [ ] Step execution: iterate steps → evaluate `when:` → execute or skip → collect results

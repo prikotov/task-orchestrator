@@ -196,7 +196,7 @@ DynamicLoop → ChainExecution = FORBIDDEN
 - [ADR-006](../../docs/adr/006-execution-strategy-composition.md) — ExecutionStrategy
 - [ADR-009](../../docs/adr/009-dynamic-split-decision.md) — Dynamic split
 - [Конвенции: layers.md](../../docs/conventions/layers/layers.md)
-- [Конвенции: service.md](../../docs/conventions/core_patterns/service.md)
+- [Конвенции: service.md](../../docs/conventions/core-patterns/service.md)
 
 ## 10. Comments (Комментарии)
 - Неймспейс: `TaskOrchestrator\Common\Module\ChainDefinition\`, `ChainExecution\`, `DynamicLoop\`

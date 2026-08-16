@@ -51,7 +51,7 @@ status: done
       name: deploy
       when: 'steps.tests.passed == true'
   ```
-- [ ] Создать [`Value Object`](../../docs/conventions/core_patterns/value-object.md) `ConditionExpressionVo` в Orchestrator Domain для представления conditions:
+- [ ] Создать [`Value Object`](../../docs/conventions/core-patterns/value-object.md) `ConditionExpressionVo` в Orchestrator Domain для представления conditions:
   - Поддержка простых сравнений: `==`, `!=`
   - Поддержка path references: `steps.<name>.passed`, `steps.<name>.exitCode`, `result.status`
   - Immutable, validated в конструкторе
@@ -115,7 +115,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 ## 8. Sources (Источники)
 - [ ] [Roadmap: Sprint 8 — Conditional Branching](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
 - [ ] [ADR-006: ExecutionStrategy composition](../../docs/adr/006-execution-strategy-composition.md)
-- [ ] [Конвенция: Value Object](../../docs/conventions/core_patterns/value-object.md)
+- [ ] [Конвенция: Value Object](../../docs/conventions/core-patterns/value-object.md)
 - [ ] [YamlChainLoader](../../../src/Module/Orchestrator/Infrastructure/Service/Chain/YamlChainLoader.php) — текущий парсер
 - [ ] [ChainStepVo](../../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) — текущее определение шага
 

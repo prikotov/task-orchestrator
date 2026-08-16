@@ -76,8 +76,8 @@ status: done
 
 Sprint 9 фокусируется на wiring существующих механизмов, а не на новой архитектуре:
 1. **Model failover** — связать [`CircuitBreakerAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/CircuitBreakerAgentRunner.php) с [`FallbackConfigVo`](../../src/Module/Orchestrator/Domain/ValueObject/FallbackConfigVo.php) через [`RoleConfigVo::$fallback`](../../src/Module/Orchestrator/Domain/ValueObject/RoleConfigVo.php). Вариант A из отчёта Локи: CB open → trigger fallback
-2. **Error classification** — [`Value Object`](../../docs/conventions/core_patterns/value-object.md) `ErrorClassificationVo` в Domain AgentRunner, интеграция в [`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php)
-3. **MetricsCollector** — [`Interface`](../../docs/conventions/core_patterns/external-service.md) в Domain (AgentRunner или Orchestrator), in-memory реализация в Infrastructure
+2. **Error classification** — [`Value Object`](../../docs/conventions/core-patterns/value-object.md) `ErrorClassificationVo` в Domain AgentRunner, интеграция в [`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php)
+3. **MetricsCollector** — [`Interface`](../../docs/conventions/core-patterns/external-service.md) в Domain (AgentRunner или Orchestrator), in-memory реализация в Infrastructure
 4. **ADR** — чисто документальная задача
 
 ### Поток данных: Model Failover
@@ -123,7 +123,7 @@ flowchart TD
 
 | Модуль | Изменения |
 |---|---|
-| `AgentRunner\Domain` | `ErrorClassificationVo` (новый [`Value Object`](../../docs/conventions/core_patterns/value-object.md)), `MetricsCollectorInterface` (новый [`Interface`](../../docs/conventions/core_patterns/external-service.md)) |
+| `AgentRunner\Domain` | `ErrorClassificationVo` (новый [`Value Object`](../../docs/conventions/core-patterns/value-object.md)), `MetricsCollectorInterface` (новый [`Interface`](../../docs/conventions/core-patterns/external-service.md)) |
 | `AgentRunner\Infrastructure` | `CircuitBreakerAgentRunner` — fallback wiring, `RetryingAgentRunner` — classification, `InMemoryMetricsCollector` (новый) |
 | `Orchestrator\Domain` | Чтение `RoleConfigVo::$fallback` для передачи в CB runner |
 | `docs/adr/` | ADR Dynamic split |

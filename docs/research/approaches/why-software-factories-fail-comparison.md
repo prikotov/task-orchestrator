@@ -4,7 +4,7 @@
 **Дата:** 2026-07-27  
 **Объект:** Dex Horthy / HumanLayer — `Why Software Factories Fail` и тезис `Harness Engineering is not Enough`  
 **Задача:** [TASK-research-why-software-factories-fail](../../../todo/done/TASK-research-why-software-factories-fail.todo.md)
-**Эпик:** [EPIC-research-approaches-comparison](../../../todo/EPIC-research-approaches-comparison.md)
+**Эпик:** [EPIC-research-approaches-comparison](../../../todo/EPIC-research-approaches-comparison.todo.md)
 
 ---
 
@@ -103,7 +103,7 @@ flowchart LR
 |------------|--------------------------------------|-----|
 | `product review` | [task template / Concept and Goal + Requirements](../../todo-md/templates/task.md), [Аналитик Шерлок](../../agents/roles/team/system_analyst_sherlock.ru.md) | Нет критичного gap |
 | `system architecture` | [Архитектор Гэндальф](../../agents/roles/team/system_architect_gandalf.ru.md), [Архитектор Локи](../../agents/roles/team/system_architect_loki.ru.md), [Architecture](../../guide/architecture.md), [Conventions](../../conventions/index.md) | Нет критичного gap |
-| `program design` | Частично: типизация и контракты в [DTO](../../conventions/core_patterns/dto.md), [Use Case](../../conventions/layers/application/use_case.md), [Layer Interaction](../../conventions/layers/layers.md) | ⚠️ Нет обязательного planning-подэтапа |
+| `program design` | Частично: типизация и контракты в [DTO](../../conventions/core-patterns/dto.md), [Use Case](../../conventions/layers/application/use-case.md), [Layer Interaction](../../conventions/layers/layers.md) | ⚠️ Нет обязательного planning-подэтапа |
 | `vertical slicing` | [todo/AGENTS.md / 1 задача = 1 логическая подзадача](../../../todo/AGENTS.md#декомпозиция-задач), [epic-via-subagents](../../agents/skills/epic-via-subagents/SKILL.md) | Частично: можно усилить чекпоинты между фазами |
 | Human review | [code_reviewer_backend_puaro](../../agents/roles/team/code_reviewer_backend_puaro.ru.md), [task-via-subagents](../../agents/skills/task-via-subagents/SKILL.md), [AGENTS.md / merge only by confirmation](../../../AGENTS.md#pull-request-запросы-на-слияние) | Нет gap |
 
@@ -204,7 +204,7 @@ flowchart LR
 
 1. [task template](../../todo-md/templates/task.md) содержит `Implementation Plan` (план реализации), но не содержит `Solution Design` и не требует указывать типы, сигнатуры методов или графы вызовов.
 2. [epic template](../../todo-md/templates/epic.md) содержит `Solution Design`, но описание ограничено «архитектурным подходом, затронутыми модулями, ссылками на схемы или RFC»; `program design` как подэтап не выделен.
-3. [Conventions](../../conventions/index.md) хорошо формализуют типизацию и контракты на уровне кода: [DTO](../../conventions/core_patterns/dto.md), [Use Case](../../conventions/layers/application/use_case.md), [Layer Interaction](../../conventions/layers/layers.md). Но это правила реализации и review, а не обязательный planning-артефакт до кодинга.
+3. [Conventions](../../conventions/index.md) хорошо формализуют типизацию и контракты на уровне кода: [DTO](../../conventions/core-patterns/dto.md), [Use Case](../../conventions/layers/application/use-case.md), [Layer Interaction](../../conventions/layers/layers.md). Но это правила реализации и review, а не обязательный planning-артефакт до кодинга.
 4. [system_analyst_sherlock](../../agents/roles/team/system_analyst_sherlock.ru.md) описывает системные контракты, API, edge cases; [system_architect_gandalf](../../agents/roles/team/system_architect_gandalf.ru.md) — DDD-границы и архитектуру. Ни одна роль не требует явно приложить таблицу типов/сигнатур/граф вызовов к задаче перед implementation (реализацией).
 
 **Рекомендация:** отдельной задачей добавить в task template (шаблон задачи) секцию `Program Design` для C3+ code tasks (задачи с изменением кода):
@@ -230,7 +230,7 @@ flowchart LR
 | Faros: throughput up, quality down | [Tests and Validation](../../../AGENTS.md#тесты-и-проверки), [QA Хаус](../../agents/roles/team/qa_backend_house.ru.md) | **adopt** — использовать как risk framing (рамка риска) | Low |
 | `Product review` | [task template](../../todo-md/templates/task.md), [Шерлок](../../agents/roles/team/system_analyst_sherlock.ru.md) | **adopt** — уже есть | Low |
 | `System architecture` | [Гэндальф](../../agents/roles/team/system_architect_gandalf.ru.md), [Локи](../../agents/roles/team/system_architect_loki.ru.md), [Architecture](../../guide/architecture.md) | **adopt** — уже есть | Low |
-| `Program design` | Частично: [DTO](../../conventions/core_patterns/dto.md), [Use Case](../../conventions/layers/application/use_case.md), [Layer Interaction](../../conventions/layers/layers.md) | **adapt** — добавить planning-секцию | Medium |
+| `Program design` | Частично: [DTO](../../conventions/core-patterns/dto.md), [Use Case](../../conventions/layers/application/use-case.md), [Layer Interaction](../../conventions/layers/layers.md) | **adapt** — добавить planning-секцию | Medium |
 | `Vertical slicing` | [todo/AGENTS.md / decomposition](../../../todo/AGENTS.md#декомпозиция-задач), [epic-via-subagents](../../agents/skills/epic-via-subagents/SKILL.md) | **adapt** — усилить phase checkpoints для больших задач | Low/Medium |
 | Построчное human review | [Пуаро](../../agents/roles/team/code_reviewer_backend_puaro.ru.md), [AGENTS.md / merge confirmation](../../../AGENTS.md#pull-request-запросы-на-слияние) | **adopt** — уже принято | Low |
 | Research/plan review важнее code-only review | [agent-report](../../agents/skills/agent-report/SKILL.md), [todo/AGENTS.md / Reverse Briefing](../../../todo/AGENTS.md#процесс-работы-с-задачами) | **adapt** — ревьюить research/plan явно для C3+ | Medium |

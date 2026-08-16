@@ -17,8 +17,8 @@
   - `TooManyPublicMethods`: **14 public methods** при пороге **10**;
   - `TooManyFields`: **18 fields** при пороге **12**.
 - `TooManyPublicMethods` берёт default (стандартные) свойства из `vendor/phpmd/phpmd/rulesets/codesize.xml`: `maxmethods=10`, `ignorepattern=(^(set|get|is|has|with))i`. `__construct` считается, `get*/set*/is*/has*/with*` не считаются.
-- Запрошенный файл `docs/conventions/layers/domain/value_object.md` в репозитории отсутствует. Для правил `Value Object` использована действующая конвенция `docs/conventions/core_patterns/value-object.md`.
-- `docs/conventions/layers/domain.md` существует, но пустой; применены `docs/conventions/layers/domain/entity.md`, `docs/conventions/core_patterns/value-object.md` и карта `docs/conventions/index.md`.
+- Запрошенный файл `docs/conventions/layers/domain/value-object.md` в репозитории отсутствует. Для правил `Value Object` использована действующая конвенция `docs/conventions/core-patterns/value-object.md`.
+- `docs/conventions/layers/domain.md` существует, но пустой; применены `docs/conventions/layers/domain/entity.md`, `docs/conventions/core-patterns/value-object.md` и карта `docs/conventions/index.md`.
 
 Внешние источники не использовались; анализ опирается на репозиторий и установленный `vendor/phpmd`.
 
@@ -118,7 +118,7 @@ $execution->getJournal()->appendFacilitatorSummary($entry);
 
 **Решение: не `Value Object`; использовать `Domain\Entity` owned mutable state components без суффикса `Vo`.**
 
-Конвенция `Value Object` (`docs/conventions/core_patterns/value-object.md`) требует:
+Конвенция `Value Object` (`docs/conventions/core-patterns/value-object.md`) требует:
 
 - `final readonly class`;
 - отсутствие setters (сеттеров);

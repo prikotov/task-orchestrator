@@ -3,12 +3,12 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-06-15
 **Объект:** `src/Module/ChainDefinition/Infrastructure/Service/Chain/Helper/ChainStepParserHelper.php` (весь класс)
-**Задача:** Узкий аудит на вопрос «он простой?» в терминах `docs/conventions/core_patterns/helper.md`.
+**Задача:** Узкий аудит на вопрос «он простой?» в терминах `docs/conventions/core-patterns/helper.md`.
 
 **Применённые конвенции:**
-- `docs/conventions/core_patterns/helper.md` — основная (чек-лист + общие правила).
-- `docs/conventions/core_patterns/factory.md` — для диагностики маскировки паттерна.
-- `docs/conventions/core_patterns/service.md` — для контраста (нужен ли DI).
+- `docs/conventions/core-patterns/helper.md` — основная (чек-лист + общие правила).
+- `docs/conventions/core-patterns/factory.md` — для диагностики маскировки паттерна.
+- `docs/conventions/core-patterns/service.md` — для контраста (нужен ли DI).
 
 **Использование класса в коде:** `YamlChainLoaderService` вызывает `parseSteps(...)` (стр. 137, 191) и `parseRetryPolicy(...)` (стр. 133, 187). Покрытие тестами — только косвенное, через `tests/Unit/Infrastructure/Service/Chain/YamlChainLoaderTest.php` (декларация `#[CoversClass(ChainStepParserHelper::class)]`, но вызовы идут через I/O загрузчика).
 

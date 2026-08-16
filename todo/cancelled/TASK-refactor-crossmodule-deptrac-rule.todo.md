@@ -111,7 +111,7 @@ vendor/bin/psalm
 - [Отчёт Архитектора Гэндальфа](../docs/agents/reports/system-architect/2026-05-06_10-00_deptrac-violations-analysis.md)
 - [Критический анализ Архитектора Локи](../docs/agents/reports/system-architect/2026-05-06_12-00_critical-review-deptrac-violations.md)
 - [`CrossModuleDomainRule.php`](../vendor/prikotov/coding-standard/src/Deptrac/CrossModuleDomainRule.php)
-- [`docs/conventions/layers/layers.md`](../docs/conventions/layers/layers.md) — конвенции Integration-слоя
+- [`docs/conventions/layers/layers.md`](../../docs/conventions/layers/layers.md) — конвенции Integration-слоя
 
 ## 9. Comments (Комментарии)
 Решение принято по результатам консультации двух архитекторов (Гэндальф + Локи). Локи обоснованно раскритиковал первоначальное предложение Гэндальфа добавить `Domain\Service\Integration\` — ни одно из 15 violations не попадает под это исключение. Финальное решение — консенсус обоих архитекторов.

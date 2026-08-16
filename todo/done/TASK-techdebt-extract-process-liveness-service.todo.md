@@ -24,8 +24,8 @@ Liveness-adaptive timeout реализован идентично в двух р
 Вынести liveness в отдельный service `ProcessLivenessWatcher` (Infrastructure-слой, модуль AgentRunner). Service принимает `Process`, возвращает `bool` (completed/idle-killed); env-чтение (`AGENT_RUNNER_*`) и I/O (`ps`, `/proc/<pid>/io`) — внутри service. Раннеры инжектируют его через constructor и делегируют вызов.
 
 **Почему именно service, а не trait/helper:** конвенции это запрещают.
-- `docs/conventions/core_patterns/trait.md`: trait не может использовать скрытые источники данных (`getenv`/`$_ENV`/`$_SERVER`) — liveness их читает.
-- `docs/conventions/core_patterns/helper.md`: helper не может делать I/O (`shell_exec`, `file_get_contents('/proc/...')`) — liveness их делает.
+- `docs/conventions/core-patterns/trait.md`: trait не может использовать скрытые источники данных (`getenv`/`$_ENV`/`$_SERVER`) — liveness их читает.
+- `docs/conventions/core-patterns/helper.md`: helper не может делать I/O (`shell_exec`, `file_get_contents('/proc/...')`) — liveness их делает.
 
 Service — единственный законный по конвенциям вариант.
 

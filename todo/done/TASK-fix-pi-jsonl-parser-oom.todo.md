@@ -130,8 +130,8 @@ make check
 
 ## 8. Sources (Источники)
 - `docs/conventions/index.md`
-- `docs/conventions/principles/code_style.md`
-- `docs/conventions/core_patterns/service.md`
+- `docs/conventions/principles/code-style.md`
+- `docs/conventions/core-patterns/service.md`
 - `docs/guide/architecture.md`
 - `todo/AGENTS.md`
 

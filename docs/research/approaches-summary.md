@@ -2,7 +2,7 @@
 
 **Дата создания:** 2026-07-27  
 **Дата обновления:** 2026-08-16 (2 исследования)  
-**Эпик:** [EPIC-research-approaches-comparison](../../todo/EPIC-research-approaches-comparison.md)  
+**Эпик:** [EPIC-research-approaches-comparison](../../todo/EPIC-research-approaches-comparison.todo.md)  
 **Автор:** Аналитик (Шерлок)
 
 ---
