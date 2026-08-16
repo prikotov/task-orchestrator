@@ -5,8 +5,8 @@ created: 2026-07-29
 value: V3
 complexity: C3
 priority: P2
-author: Тимлид Алекс (alex)
-assignee: Аналитик Шерлок (sherlock)
+author: Тимлид Алекс (pi)
+assignee: Аналитик Шерлок (pi)
 status: todo
 branch: —
 pr:
@@ -129,4 +129,4 @@ flowchart LR
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-07-29 | Тимлид (Алекс) | Создание эпика. Четвёртый ресерч-трек: статьи по оркестрации (patterns, anti-patterns). Первая задача — TASK-research-orchestrator-tax. |
-| 2026-08-16 | Бэкендер Левша (levsha) | Миграция на формат todo-md 0.0.10: файл переименован в `EPIC-*.todo.md`, статус `pending` → `todo`, добавлены разделы Human Brief и поле `pr`, формат author/assignee приведён к виду «Роль (агент)». |
+| 2026-08-16 | Бэкендер Левша (pi) | Миграция на формат todo-md 0.0.10: файл переименован в `EPIC-*.todo.md`, статус `pending` → `todo`, добавлены разделы Human Brief и поле `pr`, формат author/assignee приведён к виду «Роль (агент)». |

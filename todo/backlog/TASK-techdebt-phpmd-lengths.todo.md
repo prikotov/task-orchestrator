@@ -13,7 +13,7 @@ cost_plan:
 cost_fact:
 depends_on:
 epic:
-author: Бэкендер Левша (levsha)
+author: Бэкендер Левша (pi)
 assignee:
 branch:
 pr:
@@ -92,4 +92,4 @@ status: backlog
 ## История изменений (Change History)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
-| 2026-08-16 | Бэкендер Левша (levsha) | Создание задачи в backlog по итогам обновления prikotov/*. |
+| 2026-08-16 | Бэкендер Левша (pi) | Создание задачи в backlog по итогам обновления prikotov/*. |

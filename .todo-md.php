@@ -21,13 +21,10 @@ return [
         'Технический писатель Остап',
     ],
 
-    // Канонические агенты (lowercase-идентификатор в скобках):
-    // харнесы (pi, codex) + слаги персон команды.
-    'agents' => [
-        'pi', 'codex',
-        'alex', 'sherlock', 'gandalf', 'loki',
-        'levsha', 'tony', 'puaro', 'house', 'hermione', 'ostap',
-    ],
+    // Канонические агенты (lowercase-идентификатор в скобках) — AI-харнесы,
+    // которыми выполняется работа. Персона роли указывается в 'roles', здесь —
+    // только инструмент: pi (Pi Coding Agent) и codex/codex-cli (Codex).
+    'agents' => ['pi', 'codex', 'codex-cli'],
 
     // Считать нарушения author/assignee ошибками (аналог флага --strict).
     'strict' => false,
