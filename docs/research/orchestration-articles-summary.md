@@ -2,7 +2,7 @@
 
 **Дата создания:** 2026-07-29  
 **Дата обновления:** 2026-07-29 (1 исследование)  
-**Эпик:** [EPIC-research-orchestration-articles](../../todo/EPIC-research-orchestration-articles.md)  
+**Эпик:** [EPIC-research-orchestration-articles](../../todo/EPIC-research-orchestration-articles.todo.md)  
 **Автор:** Аналитик (Шерлок)
 
 ---

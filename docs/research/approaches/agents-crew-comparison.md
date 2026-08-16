@@ -4,7 +4,7 @@
 **Дата:** 2026-08-16  
 **Объект:** Rai220/agents_crew — подход «сотрудник — это каталог»  
 **Задача:** [TASK-research-agents-crew](../../../todo/done/TASK-research-agents-crew.todo.md)  
-**Эпик:** [EPIC-research-approaches-comparison](../../../todo/EPIC-research-approaches-comparison.md)
+**Эпик:** [EPIC-research-approaches-comparison](../../../todo/EPIC-research-approaches-comparison.todo.md)
 
 ---
 
