@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-08-16
 **Объект:** `deepseek-ai/deepseek-harness` (`dsh`) — snapshot commit `47f9438` (master, 2026-08-13), npm `@deepseek-ai/dsh` 0.1.0-rc.6, PyPI `deepseek-harness-sdk` 0.1.0rc6
-**Задача:** [TASK-research-deepseek-harness](../../../../todo/TASK-research-deepseek-harness.todo.md), эпик [EPIC-research-coding-agents-comparison](../../../../todo/done/EPIC-research-coding-agents-comparison.md), стадия 1l
+**Задача:** [TASK-research-deepseek-harness](../../../../todo/done/TASK-research-deepseek-harness.todo.md), эпик [EPIC-research-coding-agents-comparison](../../../../todo/done/EPIC-research-coding-agents-comparison.md), стадия 1l
 
 ---
 
@@ -44,7 +44,7 @@
 
 - Отчёт: `docs/research/coding-agents/deepseek-harness-comparison.md`
 - Сводная таблица (22/22): `docs/research/coding-agents-summary.md`
-- Задача: `todo/TASK-research-deepseek-harness.todo.md`; эпик — стадия 1l
+- Задача: `todo/done/TASK-research-deepseek-harness.todo.md`; эпик — стадия 1l
 
 ## Источники
 

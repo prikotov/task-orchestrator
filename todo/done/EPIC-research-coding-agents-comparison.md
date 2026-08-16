@@ -140,7 +140,7 @@ flowchart LR
 
 ### Этап 1l: Дополнительные исследования (2026-08-16)
 
-- [ ] [TASK-research-deepseek-harness](../TASK-research-deepseek-harness.todo.md) — DeepSeek Harness (`deepseek-ai/deepseek-harness`, `dsh`, TypeScript, MIT, ≈116.8k★; агентный харнес «Everything is a Plugin» на Cordis + продуктовые поверхности Web UI / headless CLI / JSON-RPC SDK TS+Python / ACP; эталонные AGENTS.md и `.agents/skills`; субагент-провайдеры codex/claude-code/acp/dsh-sdk; LLM-каталог pi-ai как у Pi). Вердикт: ⚠️ Частично (7/10, 26/30; SDK ✅ 9/10) — developer preview без релизов, CLI без JSONL stdout.
+- [x] [TASK-research-deepseek-harness](TASK-research-deepseek-harness.todo.md) — DeepSeek Harness (`deepseek-ai/deepseek-harness`, `dsh`, TypeScript, MIT, ≈116.8k★; агентный харнес «Everything is a Plugin» на Cordis + продуктовые поверхности Web UI / headless CLI / JSON-RPC SDK TS+Python / ACP; эталонные AGENTS.md и `.agents/skills`; субагент-провайдеры codex/claude-code/acp/dsh-sdk; LLM-каталог pi-ai как у Pi). Вердикт: ⚠️ Частично (7/10, 26/30; SDK ✅ 9/10) — developer preview без релизов, CLI без JSONL stdout.
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все 21 индивидуальное research-исследование выполнено
@@ -180,3 +180,4 @@ flowchart LR
 
 | 2026-08-15 | Тимлид (Алекс) | Stage 1k: TASK-research-deepagents принята, переведена в `done`; ссылка обновлена на `TASK-research-deepagents.todo.md`, PR #345 готов к слиянию. |
 | 2026-08-16 | Аналитик (Шерлок) | Stage 1l: добавлена постановка TASK-research-deepseek-harness — `deepseek-ai/deepseek-harness` по явной классификации пользователя («агент, не фреймворк»; прецедент deepagents). Исследование выполнено: вердикт ⚠️ Частично (7/10, 26/30; SDK ✅ 9/10) — developer preview (без релизов, ломающие изменения задекларированы), CLI headless печатает plain text без JSONL-событий; при этом К3–К5/К8–К10 ✅ (эталонные AGENTS.md + `.agents/skills`, MIT, pi-ai-каталог провайдеров, токен-метр без $). Сводная таблица обновлена до 22 исследований (dsh #6 по сумме 26, после OpenCode при равной сумме из-за preview-статуса). |
+| 2026-08-16 | Тимлид (Алекс) | Stage 1l: PR #349 апрувнут, задача переведена в `done` (ссылки актуализированы на `done/…`), PR готов к слиянию. |

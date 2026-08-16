@@ -3,7 +3,7 @@
 **Дата исследования:** 2026-08-16
 **Объект:** [`deepseek-ai/deepseek-harness`](https://github.com/deepseek-ai/deepseek-harness) — DeepSeek Harness (`dsh`), «Everything is a Plugin»
 **Snapshot:** commit [`47f9438`](https://github.com/deepseek-ai/deepseek-harness/tree/47f943859bef60e4160492346772ded9b24f765a) (master, 2026-08-13); npm `@deepseek-ai/dsh` [0.1.0-rc.6](https://www.npmjs.com/package/@deepseek-ai/dsh) (2026-08-10); PyPI `deepseek-harness-sdk` 0.1.0rc6
-**Задача:** [TASK-research-deepseek-harness](../../../todo/TASK-research-deepseek-harness.todo.md)
+**Задача:** [TASK-research-deepseek-harness](../../../todo/done/TASK-research-deepseek-harness.todo.md)
 **Эпик:** [EPIC-research-coding-agents-comparison](../../../todo/done/EPIC-research-coding-agents-comparison.md) (стадия 1l, строка #22)
 
 ---

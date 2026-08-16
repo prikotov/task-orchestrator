@@ -10,7 +10,7 @@ author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-deepseek-harness
 pr: "https://github.com/prikotov/task-orchestrator/pull/349"
-status: review
+status: done
 ---
 
 # TASK-research-deepseek-harness: DeepSeek Harness (`deepseek-ai/deepseek-harness`) — агентный харнес с CLI/SDK-поверхностями
@@ -108,3 +108,4 @@ make validate-todo
 | :--- | :--- | :--- |
 | 2026-08-16 | Аналитик (Шерлок) | Создание задачи по запросу пользователя (классификация: агент). Стадия `1l`, строка #22. |
 | 2026-08-16 | Аналитик (Шерлок) | Исследование выполнено, PR #349 создан; задача переведена в `review`. |
+| 2026-08-16 | Тимлид (Алекс) | PR #349 апрувнут владельцем; задача переведена в `done` перед слиянием. |
