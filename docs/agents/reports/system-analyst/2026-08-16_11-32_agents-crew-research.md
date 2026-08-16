@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)  
 **Дата:** 2026-08-16  
 **Объект:** `Rai220/agents_crew` и фактическая модель ролей/скиллов task-orchestrator  
-**Задача:** [TASK-research-agents-crew](../../../../todo/TASK-research-agents-crew.todo.md), эпик [EPIC-research-approaches-comparison](../../../../todo/EPIC-research-approaches-comparison.md)
+**Задача:** [TASK-research-agents-crew](../../../../todo/done/TASK-research-agents-crew.todo.md), эпик [EPIC-research-approaches-comparison](../../../../todo/EPIC-research-approaches-comparison.md)
 
 ---
 

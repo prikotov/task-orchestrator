@@ -86,7 +86,7 @@ flowchart LR
 ### Этап 1: Индивидуальные исследования (параллельные)
 
 - [x] [TASK-research-why-software-factories-fail](done/TASK-research-why-software-factories-fail.todo.md) — Dex Horthy «Why Software Factories Fail» (Harness Engineering is not Enough), AI Engineer World's Fair. Подход: front-loaded alignment (4 шага), dark vs lit factory, провал maintainability-награды.
-- [ ] [TASK-research-agents-crew](TASK-research-agents-crew.todo.md) — Rai220/agents_crew: «сотрудник — это каталог, а не промпт». Подход: роль-каталог с регламентом, память по специальности (`lessons.md`, `projects/`), мета-харнес, консультации соседей. Проверка гипотезы про отсутствие персистентной памяти у наших ролей.
+- [x] [TASK-research-agents-crew](done/TASK-research-agents-crew.todo.md) — Rai220/agents_crew: «сотрудник — это каталог, а не промпт». Подход: роль-каталог с регламентом, память по специальности (`lessons.md`, `projects/`), мета-харнес, консультации соседей. Проверка гипотезы про отсутствие персистентной памяти у наших ролей.
 
 ### Этап 2: Сводный анализ (после завершения серии исследований)
 
@@ -122,3 +122,4 @@ flowchart LR
 | 2026-07-27 | Тимлид (Алекс) | Создание эпика. Третий ресерч-трек: подходы/процессы разработки с AI. Первая задача — TASK-research-why-software-factories-fail. |
 | 2026-07-27 | Тимлид (Алекс) | Stage 1: TASK-research-why-software-factories-fail выполнена — вердикт **adapt** (23/24). Гипотеза про `program design` подтверждена: шаг не формализован в шаблоне `task.md`. Файл задачи перенесён в `todo/done/`. Эпик остаётся в работе (Этап 2 — сводный анализ — после накопления подходов). |
 | 2026-08-16 | Тимлид (Алекс) | Добавлена задача TASK-research-agents-crew (Rai220/agents_crew, предложен пользователем): роль-каталог + память по специальности + мета-харнес. |
+| 2026-08-16 | Тимлид (Алекс) | Stage 1: TASK-research-agents-crew выполнена (PR #350) — вердикт **adapt** (22/24). Гипотеза про персистентную память ролей подтверждена. Файл задачи перенесён в `todo/done/`. Эпик остаётся в работе (Этап 2 — сводный анализ — после накопления подходов). |

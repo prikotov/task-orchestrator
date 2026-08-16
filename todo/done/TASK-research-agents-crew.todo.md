@@ -11,7 +11,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик Шерлок
 branch: task/research-agents-crew
 pr: '#350'
-status: review
+status: done
 ---
 
 # TASK-research-agents-crew: Подход agents_crew (Rai220) — «сотрудник — это каталог» (role-as-directory + память по специальности)
