@@ -4,7 +4,7 @@ type: chore
 created: 2026-08-16
 due:
 started: 2026-08-16
-completed:
+completed: 2026-08-16 13:59:57 (1786888797)
 cancelled:
 value: V2
 complexity: C1
@@ -17,7 +17,7 @@ author: Бэкендер Левша (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/update-prikotov-deps
 pr: https://github.com/prikotov/task-orchestrator/pull/351
-status: review
+status: done
 ---
 
 # TASK-chore-update-prikotov-deps: Обновление зависимостей prikotov/* до последних версий
@@ -109,7 +109,7 @@ status: review
 
 ## 8. Источники (Sources)
 - CHANGELOG `prikotov/todo-md` — версии 0.0.8–0.0.10
-- [CONFIG.md](../docs/todo-md/reference/CONFIG.md) — конфигурация `.todo-md.php`
+- [CONFIG.md](../../docs/todo-md/reference/CONFIG.md) — конфигурация `.todo-md.php`
 
 ## 9. Комментарии (Comments)
 Пользователь явно запросил: обновить все `prikotov/*`, переименовать эпики, настроить валидацию текстов задач, выполнить иниты обновившихся библиотек.
