@@ -8,7 +8,7 @@ priority: P2
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 status: in_progress
-reopened: 2026-08-03
+reopened: 2026-08-16
 pr: "#171"
 branch: epic/research-coding-agents-comparison
 ---
@@ -138,6 +138,10 @@ flowchart LR
 
 - [x] [TASK-research-deepagents](TASK-research-deepagents.todo.md) — Deep Agents (`langchain-ai/deepagents`, Python, MIT, ≈27.3k★; agent-харнес на LangGraph + CLI-продукт **Deep Agents Code** «similar to Claude Code or Cursor», «Inspired by Claude Code»; sub-agents, filesystem, context management, HITL, skills-on-demand, tools/MCP, BYO LLM/model-agnostic). Перенесён из `EPIC-research-agent-frameworks-comparison` (зеркальный прецедент строки 125: OmO ушли отсюда в frameworks; deepagents возвращён как coding-агент). Статус: done, PR #345; вердикт CLI: ⚠️ Частично подходит (7/10, 27/30); SDK: ✅ Подходит для отдельной программной интеграции (9/10).
 
+### Этап 1l: Дополнительные исследования (2026-08-16)
+
+- [ ] [TASK-research-deepseek-harness](../TASK-research-deepseek-harness.todo.md) — DeepSeek Harness (`deepseek-ai/deepseek-harness`, `dsh`, TypeScript, MIT, ≈116.8k★; агентный харнес «Everything is a Plugin» на Cordis + продуктовые поверхности Web UI / headless CLI / JSON-RPC SDK TS+Python / ACP; эталонные AGENTS.md и `.agents/skills`; субагент-провайдеры codex/claude-code/acp/dsh-sdk; LLM-каталог pi-ai как у Pi). Вердикт: ⚠️ Частично (7/10, 26/30; SDK ✅ 9/10) — developer preview без релизов, CLI без JSONL stdout.
+
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все 21 индивидуальное research-исследование выполнено
 - [x] Каждый comparison-документ создан в `docs/research/coding-agents/`
@@ -175,3 +179,4 @@ flowchart LR
 | 2026-08-14 | Аналитик (Шерлок) | Stage 1k подготовлен к review: исследование Deep Agents / Deep Agents Code оформлено. CLI-вердикт: ⚠️ Частично подходит (7/10, 27/30) из-за отсутствия подтверждённых `--system-prompt`/`--append-system-prompt` и JSONL event stream в `dcode -n`; SDK-вердикт: ✅ Подходит для отдельной программной интеграции (9/10). Сводная таблица обновлена до 21 исследования, Deep Agents добавлен в рейтинг как #4 по сумме 27/30 и в детальные отчёты как #21. |
 
 | 2026-08-15 | Тимлид (Алекс) | Stage 1k: TASK-research-deepagents принята, переведена в `done`; ссылка обновлена на `TASK-research-deepagents.todo.md`, PR #345 готов к слиянию. |
+| 2026-08-16 | Аналитик (Шерлок) | Stage 1l: добавлена постановка TASK-research-deepseek-harness — `deepseek-ai/deepseek-harness` по явной классификации пользователя («агент, не фреймворк»; прецедент deepagents). Исследование выполнено: вердикт ⚠️ Частично (7/10, 26/30; SDK ✅ 9/10) — developer preview (без релизов, ломающие изменения задекларированы), CLI headless печатает plain text без JSONL-событий; при этом К3–К5/К8–К10 ✅ (эталонные AGENTS.md + `.agents/skills`, MIT, pi-ai-каталог провайдеров, токен-метр без $). Сводная таблица обновлена до 22 исследований (dsh #6 по сумме 26, после OpenCode при равной сумме из-за preview-статуса). |
