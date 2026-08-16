@@ -9,8 +9,8 @@ epic: EPIC-research-coding-agents-comparison
 author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-deepseek-harness
-pr:
-status: in_progress
+pr: "https://github.com/prikotov/task-orchestrator/pull/349"
+status: review
 ---
 
 # TASK-research-deepseek-harness: DeepSeek Harness (`deepseek-ai/deepseek-harness`) — агентный харнес с CLI/SDK-поверхностями
@@ -107,3 +107,4 @@ make validate-todo
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-16 | Аналитик (Шерлок) | Создание задачи по запросу пользователя (классификация: агент). Стадия `1l`, строка #22. |
+| 2026-08-16 | Аналитик (Шерлок) | Исследование выполнено, PR #349 создан; задача переведена в `review`. |
