@@ -72,12 +72,12 @@ md-links: ## Валидация внутренних ссылок в Markdown
 validate-todo: ## Валидация задач todo-md (только активные)
 	@echo
 	@echo "Validate-Todo:"
-	@files=$$(find todo/ -maxdepth 1 -name '*.todo.md' -o -name 'EPIC-*.md' 2>/dev/null); \
+	@files=$$(find todo/ -maxdepth 1 -name '*.todo.md' 2>/dev/null); \
 	if [ -z "$$files" ]; then \
 		echo "  No active task files found in todo/. Skipping."; \
 	else \
 		for f in $$files; do \
-			php vendor/prikotov/todo-md/bin/todo-md-validate "$$f"; \
+			vendor/bin/todo-md validate "$$f"; \
 		done; \
 	fi
 
