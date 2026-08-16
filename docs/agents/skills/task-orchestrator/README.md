@@ -1,6 +1,6 @@
-# Install Task Orchestrator
+# Установка Task Orchestrator
 
-Инструкция по установке `task-orchestrator` — CLI-утилиты для оркестрации AI-агентов.
+Инструкция по установке `task-orchestrator` — утилиты командной строки для оркестрации ИИ-агентов.
 
 ## Требования
 
@@ -28,13 +28,13 @@ composer require prikotov/task-orchestrator
 Проверка:
 
 ```bash
-~/.composer/vendor/bin/task-orchestrator --version   # global
-vendor/bin/task-orchestrator --version                # project
+~/.composer/vendor/bin/task-orchestrator --version   # глобальная установка
+vendor/bin/task-orchestrator --version                # установка в проекте
 ```
 
 ## Вариант B: PHAR (альтернатива)
 
-Скачать из [GitHub Releases](https://github.com/prikotov/task-orchestrator/releases):
+Скачать из [релизов GitHub](https://github.com/prikotov/task-orchestrator/releases):
 
 ```bash
 curl -L -o task-orchestrator.phar https://github.com/prikotov/task-orchestrator/releases/latest/download/task-orchestrator.phar
@@ -43,13 +43,13 @@ mv task-orchestrator.phar /usr/local/bin/task-orchestrator
 task-orchestrator --version
 ```
 
-> **Примечание:** PHAR публикуется на best-effort основе. Для полной поддержки, включая установку `become-role`, используйте Composer.
+> **Примечание:** PHAR публикуется по мере возможности. Для полной поддержки, включая установку `become-role`, используйте Composer.
 
 ## Матрица возможностей `v0.2.0`
 
-| Возможность | Source/Composer | PHAR |
+| Возможность | Исходники/Composer | PHAR |
 |---|---|---|
-| Основные CLI-команды | Полная поддержка | Secondary/best-effort |
+| Основные CLI-команды | Полная поддержка | Вторичная поддержка по мере возможности |
 | `agent:init` и установка `become-role` | Поддерживаются полностью | Не поддерживаются: команда зарегистрирована, но завершается с кодом `1` до любых записей в файловую систему |
 | Запуск установленного `become-role` | `.agents/skills/become-role/scripts/become-role.sh <role\|file>` | Недоступен |
 
@@ -57,14 +57,14 @@ task-orchestrator --version
 
 ## Подключение `become-role`
 
-В Composer host-проекте после установки пакета выполните:
+В проекте-потребителе Composer после установки пакета выполните:
 
 ```bash
 php vendor/bin/task-orchestrator agent:init
 .agents/skills/become-role/scripts/become-role.sh <role|file>
 ```
 
-В source checkout (локальной копии исходников) используйте `bin/console agent:init`, затем тот же установленный путь `.agents/skills/become-role/scripts/become-role.sh`. PHAR не устанавливает этот skill в `v0.2.0`.
+В локальной копии исходников используйте `bin/console agent:init`, затем тот же установленный путь `.agents/skills/become-role/scripts/become-role.sh`. PHAR не устанавливает этот навык в `v0.2.0`.
 
 ## Первый запуск
 
@@ -91,7 +91,7 @@ php vendor/bin/task-orchestrator agent:orchestrate "Ваша задача"
 
 Конфигурация состоит из двух секций: `roles` (роли агентов) и `chains` (цепочки).
 
-Полный пример со всеми возможностями (retry, budget, fallback, quality gates, dynamic chains, разные CLI-раннеры) — в [assets/chains-example.yaml](assets/chains-example.yaml).
+Полный пример со всеми возможностями (повторные попытки, бюджет, альтернативный путь, контрольные точки качества, динамические цепочки, разные CLI-раннеры) — в [assets/chains-example.yaml](assets/chains-example.yaml).
 
 По умолчанию используется путь к `chains.yaml` из Symfony-конфигурации. Чтобы указать произвольный конфиг — опция `--config`:
 
@@ -99,7 +99,7 @@ php vendor/bin/task-orchestrator agent:orchestrate "Ваша задача"
 php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml "Задача"
 ```
 
-## Troubleshooting
+## Устранение неполадок
 
 | Проблема | Решение |
 |----------|---------|
@@ -108,5 +108,5 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml 
 | Composer сообщает об отсутствии `ext-zlib` | Установить и включить расширение PHP Zlib |
 | `composer: command not found` | Установить Composer: [getcomposer.org](https://getcomposer.org) |
 | `task-orchestrator: command not found` | Добавить `~/.composer/vendor/bin` в `$PATH` или использовать полный путь |
-| `Could not find package` | Проверьте имя и доступность пакета на Packagist; PHAR подходит только для best-effort возможностей из матрицы выше |
-| `Chain not found` | Проверить путь к `chains.yaml` в конфигурации |
+| `Could not find package` | Проверьте имя и доступность пакета на Packagist; PHAR подходит только для возможностей с вторичной поддержкой из матрицы выше |
+| `Chain not found` | Проверьте путь к `chains.yaml` в конфигурации |

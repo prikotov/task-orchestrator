@@ -142,7 +142,7 @@ services:
 ```
 
 Подробнее о переходе с `_instanceof` на container-wide autoconfiguration — в
-[ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-auto-discovery-вариант-4).
+[ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-автообнаружения-вариант-4).
 
 > **Важно:** декораторы (`RetryingAgentRunner`, `CircuitBreakerAgentRunner`) исключены из auto-discovery — не добавляйте их в реестр.
 

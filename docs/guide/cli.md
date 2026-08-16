@@ -13,7 +13,7 @@ php vendor/bin/task-orchestrator list
 
 ### `agent:orchestrate`
 
-Основная команда оркестрации — запускает цепочку агентов (static или dynamic).
+Основная команда оркестрации — запускает цепочку агентов (Static или Dynamic).
 
 ```bash
 php vendor/bin/task-orchestrator <task> [options]
@@ -47,16 +47,16 @@ php vendor/bin/task-orchestrator <task> [options]
 # Запуск цепочки "implement" с задачей
 php vendor/bin/task-orchestrator agent:orchestrate "Add user registration endpoint"
 
-# Dry run — показать план без запуска
+# Предварительный запуск — показать план без выполнения
 php vendor/bin/task-orchestrator agent:orchestrate "Refactor billing" --dry-run
 
-# Dynamic-цепочка с кастомными участниками
+# Цепочка Dynamic с пользовательскими участниками
 php vendor/bin/task-orchestrator agent:orchestrate "Design API" -c dynamic --participants "architect,analyst" --max-rounds 5
 
-# Resume прерванной сессии
+# Возобновление прерванной сессии
 php vendor/bin/task-orchestrator agent:orchestrate "Fix bug" --resume var/sessions/2026-04-16_abc123
 
-# Запуск с кастомной моделью и audit-логом
+# Запуск с пользовательской моделью и журналом аудита
 php vendor/bin/task-orchestrator agent:orchestrate "Add tests" -m claude-4-sonnet --audit-log var/log/audit.jsonl
 
 # Кастомный конфиг цепочек
@@ -66,9 +66,9 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml 
 php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml --validate-config "check"
 ```
 
-**Exit codes:**
+**Коды завершения:**
 
-| Code | Constant | Meaning |
+| Код | Константа | Значение |
 |------|----------|---------|
 | `0` | `success` | Успех |
 | `1` | `chainFailed` | Ошибка шага/агента |
@@ -116,9 +116,9 @@ php vendor/bin/task-orchestrator validate:connectivity --role=backend_developer_
 php vendor/bin/task-orchestrator validate:connectivity --config=path/to/chains.yaml --timeout=60
 ```
 
-**Exit codes:**
+**Коды завершения:**
 
-| Code | Meaning |
+| Код | Значение |
 |------|---------|
 | `0` | Все выбранные роли ответили успешно |
 | `1` | Хотя бы одна роль завершилась с ошибкой, timeout, пустым stdout или входные параметры невалидны |
@@ -183,7 +183,7 @@ php vendor/bin/task-orchestrator agent:runners
 
 Устанавливает общий skill `become-role` в host-проект: создаёт симлинк в `<project>/.agents/skills/`, чтобы AI-инструменты (pi, codex и др.) видели его как нативный skill через кросс-клиентскую конвенцию `.agents/skills/`. Сам skill остаётся внутри пакета task-orchestrator.
 
-Команда идемпотентна: повторный запуск безопасен. Для source checkout (локальной копии исходников) используйте:
+Команда идемпотентна: повторный запуск безопасен. Для локальной копии исходников используйте:
 
 ```bash
 bin/console agent:init [--force]
@@ -195,7 +195,7 @@ bin/console agent:init [--force]
 php vendor/bin/task-orchestrator agent:init [--force]
 ```
 
-После успешной установки вызывайте skill только по установленному пути:
+После успешной установки вызывайте навык только по установленному пути:
 
 ```bash
 .agents/skills/become-role/scripts/become-role.sh <role|file>
@@ -203,7 +203,7 @@ php vendor/bin/task-orchestrator agent:init [--force]
 
 #### Матрица возможностей `v0.2.0`
 
-| Возможность | Source/Composer | PHAR |
+| Возможность | Исходники/Composer | PHAR |
 |---|---|---|
 | Регистрация команды `agent:init` | Да | Да |
 | Установка `become-role` | Поддерживается полностью | Не поддерживается: fail-fast с кодом `1` до любых файловых записей |
@@ -215,7 +215,7 @@ PHAR остаётся secondary/best-effort каналом. В PHAR `agent:init`
 |---|---|
 | `--force`, `-f` | Пересоздать симлинк, если он существует и некорректен |
 
-**Exit codes:** `0` — успех (или уже установлен); `1` — PHAR не поддерживает установку, skill не найден в пакете либо обнаружен конфликт без `--force`.
+**Коды завершения:** `0` — успех (или уже установлен); `1` — PHAR не поддерживает установку, skill не найден в пакете либо обнаружен конфликт без `--force`.
 
 ---
 
@@ -237,19 +237,19 @@ php vendor/bin/task-orchestrator agent:role-skills <role> [--format=block|list|j
 **Примеры:**
 
 ```bash
-# XML-каталог skills тимлида для system prompt
+# XML-каталог навыков тимлида для системного промпта
 php vendor/bin/task-orchestrator agent:role-skills team_lead_alex --format=block
 
 # Человекочитаемый список
 php vendor/bin/task-orchestrator agent:role-skills team_lead_alex --format=list
 
-# JSON (имя, описание, путь каждого skill + готовый catalog)
+# JSON (имя, описание, путь каждого навыка + готовый каталог)
 php vendor/bin/task-orchestrator agent:role-skills team_lead_alex --format=json
 ```
 
-**Exit codes:**
+**Коды завершения:**
 
-| Code | Meaning |
+| Код | Значение |
 |------|---------|
 | `0` | Успех |
 | `1` | Роль или её skill не найдены, цикл `depends_on` (fail-fast) |

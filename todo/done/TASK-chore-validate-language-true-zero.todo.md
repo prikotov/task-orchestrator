@@ -7,10 +7,10 @@ priority: P3
 depends_on:
 epic:
 author: Тимлид (Алекс)
-assignee:
+assignee: Бэкендер Тони
 branch: task/validate-language-true-zero
-pr:
-status: todo
+pr: https://github.com/prikotov/task-orchestrator/pull/348
+status: done
 ---
 
 # TASK-chore-validate-language-true-zero: Довести validate-language до настоящего 0 over (чистка allowlist + перевод общих слов)

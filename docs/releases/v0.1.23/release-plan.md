@@ -4,51 +4,51 @@
 
 - Тег релиза: `v0.1.23`
 - Линия релиза: `release/0.1`
-- Исходная ветка: `release/0.1` (refactor commit `0602297` до release commit)
+- Исходная ветка: `release/0.1` (коммит рефакторинга `0602297` до коммита релиза)
 - Ответственный: dp
-- Плановая дата deploy: 2026-06-06
+- Плановая дата публикации: 2026-06-06
 
 ## Состав
 
-- Предыдущий production tag: `v0.1.22`
+- Предыдущий тег релиза: `v0.1.22`
 - Включённые PR: #249
 - Включённые задачи:
   - `todo/done/TASK-refactor-domain-service-chain-definition-path.todo.md`
 - Основные изменения:
-  - контракты ChainExecution и DynamicLoop для загрузки ChainDefinition перенесены из технического пути `Domain/Service/Integration` в бизнес-контекст `Domain/Service/ChainDefinition`
-  - обновлены imports, DI aliases, unit-тесты и актуальная документация
-  - прикладной architecture unit test для проверки конвенции не добавлен: контроль таких правил должен жить в `prikotov/coding-conventions`
+  - контракты ChainExecution и DynamicLoop для загрузки ChainDefinition перенесены из технического расположения `Domain/Service/Integration` в бизнес-контекст `Domain/Service/ChainDefinition`
+  - обновлены операторы `use`, псевдонимы DI, модульные тесты и актуальная документация
+  - прикладной модульный тест архитектуры для проверки конвенции не добавлен: контроль таких правил должен жить в `prikotov/coding-conventions`
 - Вне состава релиза:
-  - runtime behavior приложения не меняется
+  - поведение приложения при выполнении не меняется
   - миграции данных не требуются
-  - breaking changes отсутствуют
+  - обратно несовместимые изменения отсутствуют
 
 ## Риски
 
-- Основные риски: низкие — изменение затрагивает namespace/path и DI aliases, без изменения поведения выполнения цепочек
+- Основные риски: низкие — изменение затрагивает пространство имён/путь и псевдонимы DI, без изменения поведения выполнения цепочек
 - Наличие миграций данных: нет
 - Риск окна несовместимости: нет
-- Breaking changes: нет
+- Обратно несовместимые изменения: нет
 
-## Проверки перед deploy
+## Проверки перед публикацией
 
-- [x] `make check` — зелёный (`PHPUnit`: 955 tests, 2701 assertions)
+- [x] `make check` — пройден (`PHPUnit`: 955 тестов, 2701 проверка)
 - [ ] CI `test` — ожидается в PR релиза
 - [ ] CI `phar-smoke` — ожидается в PR релиза
 
-## Порядок deploy
+## Порядок публикации
 
 1. Библиотека (Packagist) — по тегу `v0.1.23`
-2. Phar asset — через GitHub Actions workflow `Release Phar` по тегу `v0.1.23`
+2. Phar-артефакт — через рабочий процесс GitHub Actions `Release Phar` по тегу `v0.1.23`
 
-## Post-check
+## Проверка после публикации
 
 - Проверить, что GitHub Release `v0.1.23` создан
-- Проверить, что workflow `Release Phar` завершился успешно для тега `v0.1.23`
-- Проверить, что GitHub Release `v0.1.23` содержит asset `task-orchestrator.phar`
-- Скачать asset `task-orchestrator.phar` из GitHub Release `v0.1.23` и проверить команду: `php task-orchestrator.phar --version`
+- Проверить, что рабочий процесс `Release Phar` завершился успешно для тега `v0.1.23`
+- Проверить, что GitHub Release `v0.1.23` содержит артефакт `task-orchestrator.phar`
+- Скачать артефакт `task-orchestrator.phar` из GitHub Release `v0.1.23` и проверить команду: `php task-orchestrator.phar --version`
 
 ## Действия при проблеме после релиза
 
-- Стратегия исправления: patch release v0.1.24
+- Стратегия исправления: исправляющий релиз v0.1.24
 - Ответственный инженер: dp

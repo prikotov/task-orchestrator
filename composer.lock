@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fef27eaf0c6b6dde251fc0915459f917",
+    "content-hash": "49666e3a360b9bab9106f9f2c8e007ce",
     "packages": [
         {
             "name": "monolog/monolog",
@@ -5611,20 +5611,19 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v5.7.0",
+            "version": "v5.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "dca41cd15c2ac9d055ad70dbfd011130757d1f82"
+                "reference": "044a6a392ff8ad0d61f14370a5fbbd0a0107152f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/dca41cd15c2ac9d055ad70dbfd011130757d1f82",
-                "reference": "dca41cd15c2ac9d055ad70dbfd011130757d1f82",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/044a6a392ff8ad0d61f14370a5fbbd0a0107152f",
+                "reference": "044a6a392ff8ad0d61f14370a5fbbd0a0107152f",
                 "shasum": ""
             },
             "require": {
-                "ext-ctype": "*",
                 "ext-json": "*",
                 "ext-tokenizer": "*",
                 "php": ">=7.4"
@@ -5663,9 +5662,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v5.7.0"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v5.8.0"
             },
-            "time": "2025-12-06T11:56:16+00:00"
+            "time": "2026-07-04T14:30:18+00:00"
         },
         {
             "name": "opis/json-schema",
@@ -6847,19 +6846,21 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.26.1",
+            "version": "v0.29.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/coding-standard.git",
-                "reference": "6f626b3ec890497208d1123686f58308e29497ce"
+                "reference": "0cf5e4adad8476f7969b24ca1afb9caeea442ec9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/6f626b3ec890497208d1123686f58308e29497ce",
-                "reference": "6f626b3ec890497208d1123686f58308e29497ce",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/0cf5e4adad8476f7969b24ca1afb9caeea442ec9",
+                "reference": "0cf5e4adad8476f7969b24ca1afb9caeea442ec9",
                 "shasum": ""
             },
             "require": {
+                "ext-simplexml": "*",
+                "nikic/php-parser": "^5.8",
                 "php": "^8.4",
                 "slevomat/coding-standard": "^8.0",
                 "squizlabs/php_codesniffer": "^4.0"
@@ -6867,9 +6868,10 @@
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
                 "deptrac/deptrac": "^2.0",
+                "php-code-archeology/php-code-archeology": "^2.11",
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^10.5",
-                "prikotov/todo-md": "^0.0"
+                "prikotov/todo-md": "^0.0.10"
             },
             "suggest": {
                 "deptrac/deptrac": "For using ServiceContractDependencyRule — custom Deptrac rule that enforces service contract boundaries",
@@ -6878,7 +6880,14 @@
             "bin": [
                 "bin/coding-standard-init",
                 "bin/validate-md-links",
-                "bin/validate-language"
+                "bin/validate-language",
+                "bin/coding-standard-metrics",
+                "bin/coding-standard-metrics-compare",
+                "bin/coding-standard-metrics-review",
+                "bin/metrics-collect",
+                "bin/metrics-scc",
+                "bin/metrics-coverage",
+                "bin/test-stats"
             ],
             "type": "phpcodesniffer-standard",
             "extra": {
@@ -6918,11 +6927,10 @@
                     "php bin/validate-md-links"
                 ],
                 "validate-language": [
-                    "php bin/validate-language"
+                    "php bin/validate-language --strict"
                 ],
                 "validate-todo": [
-                    "php vendor/bin/todo-md-validate todo/*.todo.md",
-                    "php vendor/bin/todo-md-validate todo/backlog/"
+                    "php vendor/bin/todo-md validate todo/*.todo.md todo/backlog/"
                 ],
                 "check": [
                     "@test",
@@ -6933,6 +6941,12 @@
                     "@validate-todo",
                     "@phpstan",
                     "phpcs src/"
+                ],
+                "coverage": [
+                    "bin/metrics-coverage"
+                ],
+                "metrics-test-stats": [
+                    "bin/test-stats --format=json --output var/metrics/test-stats.json"
                 ]
             },
             "license": [
@@ -6951,10 +6965,10 @@
                 "sniffs"
             ],
             "support": {
-                "source": "https://github.com/prikotov/coding-standard/tree/v0.26.1",
+                "source": "https://github.com/prikotov/coding-standard/tree/v0.29.1",
                 "issues": "https://github.com/prikotov/coding-standard/issues"
             },
-            "time": "2026-07-25T16:33:45+00:00"
+            "time": "2026-08-14T02:42:10+00:00"
         },
         {
             "name": "prikotov/git-workflow",

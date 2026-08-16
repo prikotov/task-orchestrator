@@ -63,7 +63,7 @@ Dex Horthy описывает провал `dark factory` (тёмная фабр
 
 | Тезис | Наши артефакты | Покрытие |
 |-------|----------------|----------|
-| Нельзя убирать человеческий `review` | [AGENTS.md / Pull Requests](../../../AGENTS.md#pull-requests), [task-via-subagents / Self-review и Code Review](../../agents/skills/task-via-subagents/SKILL.md#шаг-4-self-review), [epic-via-subagents / ревью обязательно](../../agents/skills/epic-via-subagents/SKILL.md#шаг-6-ревью) | ✅ Уже покрыто |
+| Нельзя убирать человеческий `review` | [AGENTS.md / Pull Requests](../../../AGENTS.md#pull-request-запросы-на-слияние), [task-via-subagents / Self-review и Code Review](../../agents/skills/task-via-subagents/SKILL.md#шаг-4-самопроверка), [epic-via-subagents / ревью обязательно](../../agents/skills/epic-via-subagents/SKILL.md#шаг-6-ревью) | ✅ Уже покрыто |
 | Поддерживаемость важнее локально зелёных тестов | [Конвенции первичны](../../../AGENTS.md#терминология), [Layer Interaction](../../conventions/layers/layers.md), [Architecture](../../guide/architecture.md) | ✅ Уже покрыто |
 | Риск `bad PR` дороже риска `many PRs` | [Один PR содержит одну задачу](../../../AGENTS.md#мини-чеклист-для-самопроверки), [todo/AGENTS.md / декомпозиция](../../../todo/AGENTS.md#декомпозиция-задач) | ✅ Уже покрыто |
 | Модель/RL не гарантирует качество | В проекте нет зависимости от конкретного обучения модели; качество обеспечивается процессом, ролями и проверками. | ⚠️ Информационный тезис |
@@ -105,7 +105,7 @@ flowchart LR
 | `system architecture` | [Архитектор Гэндальф](../../agents/roles/team/system_architect_gandalf.ru.md), [Архитектор Локи](../../agents/roles/team/system_architect_loki.ru.md), [Architecture](../../guide/architecture.md), [Conventions](../../conventions/index.md) | Нет критичного gap |
 | `program design` | Частично: типизация и контракты в [DTO](../../conventions/core_patterns/dto.md), [Use Case](../../conventions/layers/application/use_case.md), [Layer Interaction](../../conventions/layers/layers.md) | ⚠️ Нет обязательного planning-подэтапа |
 | `vertical slicing` | [todo/AGENTS.md / 1 задача = 1 логическая подзадача](../../../todo/AGENTS.md#декомпозиция-задач), [epic-via-subagents](../../agents/skills/epic-via-subagents/SKILL.md) | Частично: можно усилить чекпоинты между фазами |
-| Human review | [code_reviewer_backend_puaro](../../agents/roles/team/code_reviewer_backend_puaro.ru.md), [task-via-subagents](../../agents/skills/task-via-subagents/SKILL.md), [AGENTS.md / merge only by confirmation](../../../AGENTS.md#pull-requests) | Нет gap |
+| Human review | [code_reviewer_backend_puaro](../../agents/roles/team/code_reviewer_backend_puaro.ru.md), [task-via-subagents](../../agents/skills/task-via-subagents/SKILL.md), [AGENTS.md / merge only by confirmation](../../../AGENTS.md#pull-request-запросы-на-слияние) | Нет gap |
 
 **Оценка:** ✅ 3/3. Процессная модель совместима. Единственная существенная доработка — формализация `program design`.
 
@@ -122,9 +122,9 @@ flowchart LR
 
 **Ключевые правила проекта:**
 
-- `self-review` и внешний `review` обязательны в [task-via-subagents](../../agents/skills/task-via-subagents/SKILL.md#шаг-4-self-review) и [epic-via-subagents](../../agents/skills/epic-via-subagents/SKILL.md#шаг-5-self-review);
-- `merge` (слияние) запрещён без явного подтверждения пользователя: [AGENTS.md / Pull Requests](../../../AGENTS.md#pull-requests);
-- прямые изменения `main` (основной ветки) запрещены: [AGENTS.md / Работа с кодом](../../../AGENTS.md#работа-с-кодом-working-with-code).
+- `self-review` и внешний `review` обязательны в [task-via-subagents](../../agents/skills/task-via-subagents/SKILL.md#шаг-4-самопроверка) и [epic-via-subagents](../../agents/skills/epic-via-subagents/SKILL.md#шаг-5-self-review);
+- `merge` (слияние) запрещён без явного подтверждения пользователя: [AGENTS.md / Pull Requests](../../../AGENTS.md#pull-request-запросы-на-слияние);
+- прямые изменения `main` (основной ветки) запрещены: [AGENTS.md / Работа с кодом](../../../AGENTS.md#работа-с-кодом).
 
 **Оценка:** ✅ 3/3. Наш процесс уже `lit factory`, не `dark factory`.
 
@@ -150,7 +150,7 @@ flowchart LR
 | Слоистая архитектура | [Layer Interaction](../../conventions/layers/layers.md), [Architecture](../../guide/architecture.md) | ✅ Поддерживаемость задаётся архитектурными границами. |
 | Reviewer role | [Ревьювер Пуаро](../../agents/roles/team/code_reviewer_backend_puaro.ru.md) | ✅ Проверяет DDD, безопасность, типизацию, тесты. |
 | QA role | [Тестировщик Хаус](../../agents/roles/team/qa_backend_house.ru.md) | ✅ Усиливает edge cases (пограничные сценарии). |
-| Mandatory checks | [AGENTS.md / Tests and Validation](../../../AGENTS.md#tests-and-validation) | ✅ Tests/Psalm дополняют, но не заменяют review. |
+| Mandatory checks | [AGENTS.md / Tests and Validation](../../../AGENTS.md#тесты-и-проверки) | ✅ Tests/Psalm дополняют, но не заменяют review. |
 | Product harness | Модули `AgentRunner`, `ChainExecution`, `DynamicLoop` в [Architecture](../../guide/architecture.md) | ⚠️ Harness полезен как качество исполнения, но не как замена ownership. |
 
 **Оценка:** ✅ 3/3. Подход подтверждает, что `quality gates` должны быть не только автоматическими, но и человеческими.
@@ -223,16 +223,16 @@ flowchart LR
 
 | Ключевой тезис | Наш артефакт | Вердикт | Effort (усилия) |
 |----------------|--------------|---------|-----------------|
-| `Dark factory` не работает | [AGENTS.md / Pull Requests](../../../AGENTS.md#pull-requests), [task-via-subagents](../../agents/skills/task-via-subagents/SKILL.md), [epic-via-subagents](../../agents/skills/epic-via-subagents/SKILL.md) | **adopt** — уже принято | Low |
-| `Harness engineering is not enough` | [Architecture / AgentRunner + ChainExecution + DynamicLoop](../../guide/architecture.md), [AGENTS.md / review gates](../../../AGENTS.md#tests-and-validation) | **adapt** — позиционировать как `lit-factory harness`, не как автопилот | Medium |
+| `Dark factory` не работает | [AGENTS.md / Pull Requests](../../../AGENTS.md#pull-request-запросы-на-слияние), [task-via-subagents](../../agents/skills/task-via-subagents/SKILL.md), [epic-via-subagents](../../agents/skills/epic-via-subagents/SKILL.md) | **adopt** — уже принято | Low |
+| `Harness engineering is not enough` | [Architecture / AgentRunner + ChainExecution + DynamicLoop](../../guide/architecture.md), [AGENTS.md / review gates](../../../AGENTS.md#тесты-и-проверки) | **adapt** — позиционировать как `lit-factory harness`, не как автопилот | Medium |
 | RL-награда не учит поддерживаемости | [Conventions](../../conventions/index.md), [Пуаро](../../agents/roles/team/code_reviewer_backend_puaro.ru.md) | **adopt as rationale** — использовать как обоснование review/conventions | Low |
 | Model + harness co-training даёт vendor advantage | Нет прямого артефакта: мы не обучаем модели | **reject direct** — не строить roadmap на конкуренции с model vendors (поставщиками моделей) в training | None |
-| Faros: throughput up, quality down | [Tests and Validation](../../../AGENTS.md#tests-and-validation), [QA Хаус](../../agents/roles/team/qa_backend_house.ru.md) | **adopt** — использовать как risk framing (рамка риска) | Low |
+| Faros: throughput up, quality down | [Tests and Validation](../../../AGENTS.md#тесты-и-проверки), [QA Хаус](../../agents/roles/team/qa_backend_house.ru.md) | **adopt** — использовать как risk framing (рамка риска) | Low |
 | `Product review` | [task template](../../todo-md/templates/task.md), [Шерлок](../../agents/roles/team/system_analyst_sherlock.ru.md) | **adopt** — уже есть | Low |
 | `System architecture` | [Гэндальф](../../agents/roles/team/system_architect_gandalf.ru.md), [Локи](../../agents/roles/team/system_architect_loki.ru.md), [Architecture](../../guide/architecture.md) | **adopt** — уже есть | Low |
 | `Program design` | Частично: [DTO](../../conventions/core_patterns/dto.md), [Use Case](../../conventions/layers/application/use_case.md), [Layer Interaction](../../conventions/layers/layers.md) | **adapt** — добавить planning-секцию | Medium |
 | `Vertical slicing` | [todo/AGENTS.md / decomposition](../../../todo/AGENTS.md#декомпозиция-задач), [epic-via-subagents](../../agents/skills/epic-via-subagents/SKILL.md) | **adapt** — усилить phase checkpoints для больших задач | Low/Medium |
-| Построчное human review | [Пуаро](../../agents/roles/team/code_reviewer_backend_puaro.ru.md), [AGENTS.md / merge confirmation](../../../AGENTS.md#pull-requests) | **adopt** — уже принято | Low |
+| Построчное human review | [Пуаро](../../agents/roles/team/code_reviewer_backend_puaro.ru.md), [AGENTS.md / merge confirmation](../../../AGENTS.md#pull-request-запросы-на-слияние) | **adopt** — уже принято | Low |
 | Research/plan review важнее code-only review | [agent-report](../../agents/skills/agent-report/SKILL.md), [todo/AGENTS.md / Reverse Briefing](../../../todo/AGENTS.md#процесс-работы-с-задачами) | **adapt** — ревьюить research/plan явно для C3+ | Medium |
 | Малые задачи не всегда требуют полного 4-step flow | [todo/AGENTS.md / декомпозиция](../../../todo/AGENTS.md#декомпозиция-задач) | **adapt** — сохранить lightweight mode (облегчённый режим), не отменяя gates | Medium |
 

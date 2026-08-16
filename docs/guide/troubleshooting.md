@@ -1,27 +1,27 @@
-# Troubleshooting
+# Устранение неполадок
 
 Типичные проблемы при работе Orchestrator, их симптомы, причины и решения.
 
 ## Содержание
 
-- [Runner не найден](#runner-не-найден)
+- [Запускатель не найден](#запускатель-не-найден)
 - [Цепочка не найдена](#цепочка-не-найдена)
 - [Роль не найдена](#роль-не-найдена)
 - [Таймаут выполнения](#таймаут-выполнения)
 - [Ошибка парсинга JSONL](#ошибка-парсинга-jsonl)
 - [Circuit Breaker заблокировал вызов](#circuit-breaker-заблокировал-вызов)
-- [Budget exceeded — цепочка прервана](#budget-exceeded-цепочка-прервана)
-- [Fallback runner не сработал](#fallback-runner-не-сработал)
-- [Quality Gate упал](#quality-gate-упал)
+- [Превышен бюджет — цепочка прервана](#превышен-бюджет-цепочка-прервана)
+- [Резервный запускатель не сработал](#резервный-запускатель-не-сработал)
+- [Проверка качества не пройдена](#проверка-качества-не-пройдена)
 - [Ошибки конфигурации](#ошибки-конфигурации)
 - [Отладочные команды](#отладочные-команды)
 - [`agent:init` недоступен в PHAR](#agentinit-недоступен-в-phar)
-- [PHAR собирается, но команды модулей недоступны (hollow-контейнер)](#phar-собирается-но-команды-модулей-недоступны-hollow-контейнер)
+- [PHAR собирается, но команды модулей недоступны (пустой контейнер)](#phar-собирается-но-команды-модулей-недоступны-пустой-контейнер)
 - [Таблица исключений](#таблица-исключений)
 
 ---
 
-## Runner не найден
+## Запускатель не найден
 
 **Симптом:**
 ```
@@ -32,15 +32,15 @@ Agent runner "codex" not found.
 
 **Решение:**
 
-1. Убедитесь, что класс runner'а реализует `AgentRunnerInterface`:
+1. Убедитесь, что класс запускателя реализует `AgentRunnerInterface`:
    ```php
    final class CodexAgentRunner implements AgentRunnerInterface { ... }
    ```
 
-2. Проверьте, что класс не исключён из auto-discovery (автообнаружение сервисов).
-   Auto-discovery выполняет `ModuleServiceRegistrar` (PHAR-safe регистратор), а исключения
+2. Проверьте, что класс не исключён из автообнаружения сервисов.
+   Автообнаружение выполняет `ModuleServiceRegistrar` (PHAR-safe регистратор), а исключения
    объявляются в контракте модуля — `ModuleInterface::getServiceExcludePaths()` (а не в `services.yaml`).
-   Тег `agent.runner` назначается автоматически через container-wide autoconfiguration
+   Тег `agent.runner` назначается автоматически через на уровне контейнера autoconfiguration
    (`Kernel::build()` → `registerForAutoconfiguration()`), единообразно для классов модуля
    `AgentRunner` и реализаций в других модулях. Module-local `_instanceof` больше не используется.
 
@@ -91,7 +91,7 @@ Agent role "verifier" not found.
    Описание роли...
    ```
 
-4. Параметр `task_orchestrator.roles_dir` задаётся ядром `TaskOrchestrator\Common\Kernel` в `getKernelParameters()` (значение по умолчанию — `<project_root>/docs/agents/roles/team` с fallback на package root). Независимой YAML-настройки этого параметра нет — путь определяется каталогами ядра.
+4. Параметр `task_orchestrator.roles_dir` задаётся ядром `TaskOrchestrator\Common\Kernel` в `getKernelParameters()` (значение по умолчанию — `<project_root>/docs/agents/roles/team` с fallback на корень пакета). Независимой YAML-настройки этого параметра нет — путь определяется каталогами ядра.
 
 ---
 
@@ -107,22 +107,22 @@ Agent timed out after 1800 seconds.
 
 **Решение:**
 
-1. Увеличьте таймаут (в секундах). Действует precedence (от высшего к низшему):
+1. Увеличьте таймаут (в секундах). Действует порядок приоритета (от высшего к низшему):
 
    **явный CLI `--timeout`** → **`chain.timeout`** (YAML) → **hard default**.
 
-   Hard default — **600 с** (10 мин) для static, dynamic и conditional; для dynamic также
+   Жёсткое значение по умолчанию — **600 с** (10 мин) для Static, Dynamic и Conditional; для Dynamic также
    `max_time=3600` с (1 ч). Значение передаётся в `Symfony Process::setTimeout()`.
 
    > CLI-опция `--timeout` учитывается **только при явном указании** — значение по умолчанию
    > из `--help` не затирает `chain.timeout`. Поэтому static-цепочка без `chain.timeout`
-   > использует таймаут 600 с (как и dynamic). Подробности: [chains.md → Chain-level timeout](chains.md#chain-level-timeout-и-maxtime).
+   > использует таймаут 600 с (как и dynamic). Подробности: [chains.md → Таймаут уровня цепочки](chains.md#chain-level-timeout-и-maxtime).
 
 2. Если проблема в сети — проверьте доступность API-эндпоинта LLM-провайдера.
 
 3. Разбейте задачу на более мелкие — используйте цепочку `analyze` вместо `implement`.
 
-4. Проверьте нагрузку через audit-лог.
+4. Проверьте нагрузку через журнал аудита.
 
 ---
 
@@ -161,9 +161,9 @@ Circuit breaker is open for runner "pi". CircuitBreaker(state=open, failures=5/5
 
 **Решение:**
 
-1. Выясните причину падений runner'а (недоступность API, неверные ключи, таймауты).
+1. Выясните причину падений запускателя (недоступность API, неверные ключи, таймауты).
 
-2. Circuit Breaker хранит состояние **in-memory** — перезапуск процесса сбрасывает состояние.
+2. Circuit Breaker хранит состояние **в памяти** — перезапуск процесса сбрасывает состояние.
 
 3. После `resetTimeoutSeconds` Breaker переходит в `half_open` — один пробный вызов. При успехе → `closed`, при ошибке → снова `open`.
 
@@ -171,7 +171,7 @@ Circuit breaker is open for runner "pi". CircuitBreaker(state=open, failures=5/5
 
 ---
 
-## Budget exceeded — цепочка прервана
+## Превышен бюджет — цепочка прервана
 
 **Симптом:**
 ```
@@ -208,9 +208,9 @@ Circuit breaker is open for runner "pi". CircuitBreaker(state=open, failures=5/5
 
 ---
 
-## Fallback runner не сработал
+## Резервный запускатель не сработал
 
-**Симптом:** Основной runner упал, но fallback не был выполнен — в логе:
+**Симптом:** Основной запускатель завершился с ошибкой, но резервный запуск не был выполнен — в логе:
 ```
 [ResolveChainRunnerService] Fallback runner "codex" not found: ...
 ```
@@ -219,13 +219,13 @@ Circuit breaker is open for runner "pi". CircuitBreaker(state=open, failures=5/5
 [ResolveChainRunnerService] Fallback runner "codex" also failed for role "backend_developer": ...
 ```
 
-**Причина:** Fallback runner не зарегистрирован в реестре, или его команда содержит ошибки, или fallback тоже упал.
+**Причина:** Резервный запускатель не зарегистрирован в реестре, или его команда содержит ошибки, или fallback тоже упал.
 
 **Решение:**
 
-1. Убедитесь, что fallback runner зарегистрирован (см. [Runner не найден](#runner-не-найден)).
+1. Убедитесь, что резервный запускатель зарегистрирован (см. [Запускатель не найден](#запускатель-не-найден)).
 
-2. Проверьте конфигурацию fallback в YAML — он указывается на уровне роли:
+2. Проверьте конфигурацию резервного запуска в YAML — он указывается на уровне роли:
    ```yaml
    roles:
      backend_developer:
@@ -239,11 +239,11 @@ Circuit breaker is open for runner "pi". CircuitBreaker(state=open, failures=5/5
 
 3. Слот `@system-prompt` в fallback-команде автоматически резолвится в путь к `prompt_file` роли через `PromptFormatterInterface::resolveSlot()`.
 
-4. При ошибке fallback — `ResolveChainRunnerService` возвращает `null`, шаг считается упавшим.
+4. При ошибке резервного запуска — `ResolveChainRunnerService` возвращает `null`, шаг считается упавшим.
 
 ---
 
-## Quality Gate упал
+## Проверка качества не пройдена
 
 **Симптом:**
 ```
@@ -251,7 +251,7 @@ Circuit breaker is open for runner "pi". CircuitBreaker(state=open, failures=5/5
 Quality gate "PHP CodeSniffer" failed (exit code 1)
 ```
 
-**Причина:** Shell-команда quality gate вернула ненулевой exit code. Gate не прерывает цепочку, но помечается как failed (warning).
+**Причина:** Команда оболочки проверки качества вернула ненулевой код завершения. Проверка не прерывает цепочку, но помечается как неуспешная с предупреждением.
 
 **Решение:**
 
@@ -277,9 +277,9 @@ Quality gate "PHP CodeSniffer" failed (exit code 1)
 
 ## Ошибки конфигурации
 
-### Push PR-ветки идёт от владельца
+### PR-ветка отправлена от имени владельца
 
-**Симптом:** владелец не может дать учитываемый approval, хотя PR создан от GitHub App.
+**Симптом:** владелец не может дать учитываемое одобрение, хотя PR создан от GitHub App.
 
 **Возможная причина:** PR-ветку пушили через SSH или обычный `git push` с учётными данными владельца.
 
@@ -294,15 +294,15 @@ The service "TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Servi
 
 **Решение:**
 
-1. Проверьте, что контейнер собирается ядром. Entry points (`bin/console`, `bin/task-orchestrator`) создают `new Kernel($env, $debug, $projectRoot)`, затем `boot()` и `getContainer()`. Если ядро падает на этапе compile — запустите любую команду, и Symfony покажет причину:
+1. Проверьте, что контейнер собирается ядром. Entry points (`bin/console`, `bin/task-orchestrator`) создают `new Kernel($env, $debug, $projectRoot)`, затем `boot()` и `getContainer()`. Если ядро падает на этапе сборки — запустите любую команду, и Symfony покажет причину:
    ```bash
    bin/console agent:token --help
    ```
    Ошибка `Kernel`/compile укажет на отсутствующий bundle, модуль или битый `config/services.yaml`.
 
-2. Параметры вычисляются в `Kernel::getKernelParameters()` из двух каталогов: **package root** (`getPackageDir()` = `dirname(__DIR__)` от `src/Kernel.php` — CWD-независимо, источник `config/`, `task_orchestrator.package_dir`) и **host-проект** (`getProjectRoot()`, источник ролей, цепочек и `base_path`). Проверьте, что файлы существуют и разрешаются корректно:
-   - роли: `<project_root>/docs/agents/roles/team` (fallback на package root);
-   - цепочки: `<project_root>/config/chains.yaml` (fallback на package root);
+2. Параметры вычисляются в `Kernel::getKernelParameters()` из двух каталогов: **корень пакета** (`getPackageDir()` = `dirname(__DIR__)` от `src/Kernel.php` — CWD-независимо, источник `config/`, `task_orchestrator.package_dir`) и **проект-потребитель** (`getProjectRoot()`, источник ролей, цепочек и `base_path`). Проверьте, что файлы существуют и разрешаются корректно:
+   - роли: `<project_root>/docs/agents/roles/team` (fallback на корень пакета);
+   - цепочки: `<project_root>/config/chains.yaml` (fallback на корень пакета);
    - конфигурация контейнера: `config/bundles.php`, `config/modules.php`, `config/packages/`, `config/services.yaml`, `config/console_services.yaml`.
 
 3. Если параметр нужен доменному модулю — убедитесь, что модуль зарегистрирован в `config/modules.php` и содержит `Resource/config/services.yaml` (его подгружает `ModuleCompilerPass` через `ModuleKernelTrait`).
@@ -327,7 +327,7 @@ bin/console agent:runners
 vendor/bin/task-orchestrator agent:orchestrate "Test task" --chain=implement --dry-run
 ```
 
-Выводит список шагов цепочки с ролями и runner'ами без фактического запуска.
+Выводит список шагов цепочки с ролями и запускателями без фактического запуска.
 
 ### Проверка запуска ролей из chains.yaml (`validate:connectivity`)
 
@@ -346,7 +346,7 @@ bin/console agent:run --role=system_analyst --task="Analyze codebase"
 
 Полезно для проверки, что pi корректно запускается и возвращает валидный JSONL.
 
-### Проверить audit-лог
+### Проверить журнал аудита
 
 ```bash
 cat var/log/agent_audit.jsonl | python3 -m json.tool
@@ -364,7 +364,7 @@ cat var/log/agent_audit.jsonl | python3 -m json.tool
 
 Это безопасный fail-fast: команда завершается до любых файловых записей, не создаёт `.agents` и не изменяет существующие файлы. `--force` не снимает ограничение.
 
-**Решение:** установите пакет через Composer в host-проект и повторите инициализацию:
+**Решение:** установите пакет через Composer в проект-потребитель и повторите инициализацию:
 
 ```bash
 composer require prikotov/task-orchestrator
@@ -372,17 +372,17 @@ php vendor/bin/task-orchestrator agent:init
 .agents/skills/become-role/scripts/become-role.sh <role|file>
 ```
 
-Для source checkout (локальной копии исходников) используйте `bin/console agent:init`. Полный контракт и матрица возможностей приведены в разделе [`agent:init`](cli.md#agentinit).
+Для локальную копию исходников используйте `bin/console agent:init`. Полный контракт и матрица возможностей приведены в разделе [`agent:init`](cli.md#agentinit).
 
 ---
 
-## PHAR собирается, но команды модулей недоступны (hollow-контейнер)
+## PHAR собирается, но команды модулей недоступны (пустой контейнер)
 
 **Симптом:** собранный `task-orchestrator.phar` запускается (`--version` работает), но `list` не показывает команд модулей (`agent:init`, `agent:role-skills`, `agent:token`, `agent:run`, `validate:connectivity`), либо команда падает на этапе autowire (автосвязывания) с `ServiceNotFoundException`.
 
-**Причина:** контейнер собран «пустым» по модулям (hollow — полым). Обычно это CWD-зависимая сборка в PHAR:
+**Причина:** контейнер собран «пустым» по модулям (пустым). Обычно это сборка, зависящая от рабочего каталога в PHAR:
 
-- сломан package-root: наследуемый `getProjectDir()` в PHAR даёт неверный `phar://.../src` (`composer.json` не упакован в PHAR) → `getModules()` возвращает `[]` → ни один модуль не грузится. Фикс — `Kernel::getPackageDir() = dirname(__DIR__)`;
+- сломан корень пакета: наследуемый `getProjectDir()` в PHAR даёт неверный `phar://.../src` (`composer.json` не упакован в PHAR) → `getModules()` возвращает `[]` → ни один модуль не грузится. Фикс — `Kernel::getPackageDir() = dirname(__DIR__)`;
 - сломан PHAR-safe регистратор (`ModuleServiceRegistrar`): если вместо него остался оператор `resource:` — `GlobResource` возвращает 0 файлов по `phar://`.
 
 **Диагностика:**
@@ -393,7 +393,7 @@ cd /tmp && php /path/to/task-orchestrator.phar list \
   | grep -E 'agent:init|agent:role-skills|agent:token|agent:run|validate:connectivity'
 ```
 
-Если пусто — контейнер hollow. Проверьте, что `bin/phar-smoke` (усиленный) зелёный из distributable CWD: он специально ловит этот случай (`--version` ложнозелёный и проходит даже при hollow). См. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-auto-discovery-вариант-4).
+Если пусто — контейнер пуст. Проверьте, что `bin/phar-smoke` (усиленный) зелёный из рабочего каталога распространяемой версии: он специально ловит этот случай (`--version` ложнозелёный и проходит даже при hollow). См. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-автообнаружения-вариант-4).
 
 ---
 
