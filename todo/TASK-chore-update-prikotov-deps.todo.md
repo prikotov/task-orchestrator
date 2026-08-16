@@ -16,8 +16,8 @@ epic:
 author: Бэкендер Левша (levsha)
 assignee: Бэкендер Левша (levsha)
 branch: task/update-prikotov-deps
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/351
+status: review
 ---
 
 # TASK-chore-update-prikotov-deps: Обновление зависимостей prikotov/* до последних версий
@@ -119,3 +119,4 @@ status: in_progress
 | :--- | :--- | :--- |
 | 2026-08-16 | Бэкендер Левша (levsha) | Создание задачи. Обновление зависимостей, адаптация Makefile, иниты, миграция эпиков. |
 | 2026-08-16 | Бэкендер Левша (levsha) | Дополнено по решению пользователя: чистая регенерация `docs/conventions/` из пакета 0.29.3 (удалены слои копий 0.0.1/до-0.17.0 и устаревший пример с `resource:`), починены все битые ссылки на конвенции (72 → 0). |
+| 2026-08-16 | Бэкендер Левша (levsha) | Работа завершена, PR #351 создан; статус → review. |
