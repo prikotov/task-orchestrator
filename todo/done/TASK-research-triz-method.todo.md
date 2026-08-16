@@ -121,7 +121,7 @@ make validate-todo
 - [x] [TRIZ Skill — SKILL.md](https://github.com/snow-ghost/triz/blob/main/skills/triz/SKILL.md)
 - [x] [Core Method — references/core-method.md](https://github.com/snow-ghost/triz/blob/main/skills/triz/references/core-method.md)
 - [x] [План реализации skill — docs/plan.md](https://github.com/snow-ghost/triz/blob/main/docs/plan.md)
-- [x] [Архитектура task-orchestrator — docs/guide/architecture.md](../docs/guide/architecture.md), [Конвенции — docs/conventions/index.md](../docs/conventions/index.md)
+- [x] [Архитектура task-orchestrator — docs/guide/architecture.md](../docs/guide/architecture.md), [Конвенции — docs/conventions/index.md](../../docs/conventions/index.md)
 
 ## 9. Comments (Комментарии)
 TRIZ-задача открывает новый тип исследования — «метод для реализации» (method-for-implementation): в отличие от четырёх существующих ресерч-треков (coding-agents, agent-frameworks, approaches, orchestration-articles), которые сравнивают инструменты/подходы/паттерны, эта задача исследует конкретный метод с целью его последующей нативной реализации в оркестраторе. Эпик не назначен: задача самостоятельна; по результатам (вердикт implement) она может породить `EPIC-feat-triz-method`. Отчёт размещается в новом подкаталоге `docs/research/methods/` (новый профиль ресерча). Предварительный вердикт: реализовать через гибрид YAML-chain + `DynamicLoop` (переиспользование существующих примитивов, минимальные новые сущности) — подтвердить исследованием. Ссылку на репозиторий указал пользователь.

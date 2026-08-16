@@ -57,7 +57,7 @@
 | **A5.** Работает только с domain values | ✅ PASS | Параметры: `list<ChainStepVo>`, `list<FixIterationGroupVo>`. Никаких DTO/Infrastructure. |
 
 ### B. Фабрика `ChainDefinitionFactory`
-*(конвенция: `docs/conventions/core_patterns/factory.md`)*
+*(конвенция: `docs/conventions/core-patterns/factory.md`)*
 
 | Пункт | Статус | Цитата / комментарий |
 |---|---|---|
@@ -69,7 +69,7 @@
 | **B6.** Не делает I/O, не ходит во внешние сервисы | ✅ PASS | Только создание VO + вызов spec. |
 
 ### C. VO конструкторы
-*(конвенция: `docs/conventions/core_patterns/value-object.md`)*
+*(конвенция: `docs/conventions/core-patterns/value-object.md`)*
 
 | Пункт | Статус | Цитата / комментарий |
 |---|---|---|
@@ -187,8 +187,8 @@
 
 Внутренние:
 - `docs/conventions/layers/domain/specification.md`
-- `docs/conventions/core_patterns/factory.md`
-- `docs/conventions/core_patterns/value-object.md`
-- `docs/conventions/core_patterns/helper.md`
+- `docs/conventions/core-patterns/factory.md`
+- `docs/conventions/core-patterns/value-object.md`
+- `docs/conventions/core-patterns/helper.md`
 - `vendor/prikotov/coding-standard/config/deptrac/depfile.yaml` (ruleset `DomainVo`/`DomainSpecification`)
 - `docs/agents/reports/system-architect/2026-06-15_00-10_fixiterations-validation-redesign.md`

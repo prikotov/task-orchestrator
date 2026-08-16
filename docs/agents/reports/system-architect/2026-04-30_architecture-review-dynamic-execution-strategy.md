@@ -249,6 +249,6 @@ DynamicExecutionStrategy управляет session persistence, audit log, even
 
 1. [`docs/conventions/layers/application.md`](../../conventions/layers/application.md) — конвенция Application-слоя
 2. [`docs/conventions/layers/layers.md`](../../conventions/layers/layers.md) — матрица зависимостей
-3. [`docs/conventions/core_patterns/service.md`](../../conventions/core_patterns/service.md) — конвенция Application Service
+3. [`docs/conventions/core-patterns/service.md`](../../conventions/core-patterns/service.md) — конвенция Application Service
 4. [`docs/adr/006-execution-strategy-composition.md`](../../adr/006-execution-strategy-composition.md) — ADR-006: Strategy Composition
 5. [`docs/guide/architecture.md`](../../guide/architecture.md) — архитектура модуля Orchestrator

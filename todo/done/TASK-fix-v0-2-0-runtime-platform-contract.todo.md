@@ -220,7 +220,7 @@ Production-like команды должны быть выполнены имен
   [`README.zh.md`](../README.zh.md) — действующие пользовательские требования.
 - [Task Orchestrator skill README](../docs/agents/skills/task-orchestrator/README.md) — требования
   альтернативного канала установки.
-- [Конвенция конфигурации](../docs/conventions/configuration/configuration.md).
+- [Конвенция конфигурации](../../docs/conventions/configuration/configuration.md).
 
 ## 9. Comments (Комментарии)
 

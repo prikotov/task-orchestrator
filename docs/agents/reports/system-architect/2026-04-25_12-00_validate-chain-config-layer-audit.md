@@ -50,7 +50,7 @@ ValidateChainConfigService (Application)
 
 > Application слой не содержит бизнес-логику — он лишь координирует выполнение операций, делегируя бизнес-правила в Domain слой.
 
-И (`docs/conventions/core_patterns/service.md`, Application Service):
+И (`docs/conventions/core-patterns/service.md`, Application Service):
 
 > ❗ Запрещено содержать бизнес-логику — только оркестрация.
 
@@ -172,10 +172,10 @@ Presentation → Application Service → Domain Specification → Domain VO
 
 ### A. Ссылки на конвенции
 
-- [`docs/conventions/layers/layers.md`](docs/conventions/layers/layers.md) — матрица зависимостей между слоями
-- [`docs/conventions/layers/application.md`](docs/conventions/layers/application.md) — правила Application-слоя
-- [`docs/conventions/core_patterns/service.md`](docs/conventions/core_patterns/service.md) — классификация сервисов (Domain / Application / Infrastructure)
-- [`docs/conventions/layers/domain.md`](docs/conventions/layers/domain.md) — Domain Specification
+- [`docs/conventions/layers/layers.md`](../../../../docs/conventions/layers/layers.md) — матрица зависимостей между слоями
+- [`docs/conventions/layers/application.md`](../../../../docs/conventions/layers/application.md) — правила Application-слоя
+- [`docs/conventions/core-patterns/service.md`](../../../../docs/conventions/core-patterns/service.md) — классификация сервисов (Domain / Application / Infrastructure)
+- [`docs/conventions/layers/domain.md`](../../../../docs/conventions/layers/domain.md) — Domain Specification
 
 ### B. Связанная техдолг-задача
 

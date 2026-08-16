@@ -20,12 +20,12 @@ status: todo
 > Когда [`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php) получает ошибку от runner'а и retry-all без разбора — даже при FATAL ошибках (невалидный API-ключ, process crash) — я хочу добавить классификацию ошибок по [`AgentResultVo`](../../src/Module/AgentRunner/Domain/ValueObject/AgentResultVo.php)-полям (`exitCode`, `isTimedOut()`, `isError()`), чтобы FATAL ошибки не retryлись и цепочка падала быстрее.
 
 ### Goal (Цель по SMART)
-Создать [`Value Object`](../../docs/conventions/core_patterns/value-object.md) `ErrorClassificationVo` в Domain AgentRunner с enum `ErrorClassificationEnum` (FATAL/TRANSIENT/UNKNOWN). Интегрировать в [`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php): FATAL → не retry, TRANSIENT → retry с backoff, UNKNOWN → retry (консервативно). Правила классификации: по `exitCode` + `isTimedOut()`. ~30 строк бизнес-логики. Срок: 0.5 дня.
+Создать [`Value Object`](../../docs/conventions/core-patterns/value-object.md) `ErrorClassificationVo` в Domain AgentRunner с enum `ErrorClassificationEnum` (FATAL/TRANSIENT/UNKNOWN). Интегрировать в [`RetryingAgentRunner`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php): FATAL → не retry, TRANSIENT → retry с backoff, UNKNOWN → retry (консервативно). Правила классификации: по `exitCode` + `isTimedOut()`. ~30 строк бизнес-логики. Срок: 0.5 дня.
 
 ## 2. Context and Scope (Контекст и Границы)
 ### Где делаем
-- `src/Module/AgentRunner/Domain/ValueObject/ErrorClassificationVo.php` — новый [`Value Object`](../../docs/conventions/core_patterns/value-object.md)
-- `src/Module/AgentRunner/Domain/Enum/ErrorClassificationEnum.php` — новый [`Enum`](../../docs/conventions/core_patterns/enum.md)
+- `src/Module/AgentRunner/Domain/ValueObject/ErrorClassificationVo.php` — новый [`Value Object`](../../docs/conventions/core-patterns/value-object.md)
+- `src/Module/AgentRunner/Domain/Enum/ErrorClassificationEnum.php` — новый [`Enum`](../../docs/conventions/core-patterns/enum.md)
 - [`src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php`](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php) — интеграция classification
 - `tests/Unit/Module/AgentRunner/Domain/ValueObject/ErrorClassificationVoTest.php` — новый тест
 - `tests/Unit/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunnerTest.php` — обновить
@@ -42,8 +42,8 @@ status: todo
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [ ] [`Enum`](../../docs/conventions/core_patterns/enum.md) `ErrorClassificationEnum`: FATAL, TRANSIENT, UNKNOWN
-- [ ] [`Value Object`](../../docs/conventions/core_patterns/value-object.md) `ErrorClassificationVo` с factory-методом `classify(AgentResultVo): self` и статическими правилами классификации
+- [ ] [`Enum`](../../docs/conventions/core-patterns/enum.md) `ErrorClassificationEnum`: FATAL, TRANSIENT, UNKNOWN
+- [ ] [`Value Object`](../../docs/conventions/core-patterns/value-object.md) `ErrorClassificationVo` с factory-методом `classify(AgentResultVo): self` и статическими правилами классификации
 - [ ] Правила классификации:
   - `isTimedOut() == true` → TRANSIENT (network issue, retry имеет смысл)
   - `exitCode >= 100` → FATAL (process-level crash, retry бессмысленен)
@@ -107,7 +107,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - [ ] [RetryingAgentRunner](../../src/Module/AgentRunner/Infrastructure/Service/RetryingAgentRunner.php)
 - [ ] [AgentResultVo](../../src/Module/AgentRunner/Domain/ValueObject/AgentResultVo.php)
 - [ ] [RetryPolicyVo](../../src/Module/AgentRunner/Domain/ValueObject/RetryPolicyVo.php)
-- [ ] [Конвенция: Value Object](../../docs/conventions/core_patterns/value-object.md)
+- [ ] [Конвенция: Value Object](../../docs/conventions/core-patterns/value-object.md)
 
 ## 9. Comments (Комментарии)
 - Pain level: 2/10, но cost = 0.5 дня (~30 строк). Value/Cost = высокий. Дешёвая победа.

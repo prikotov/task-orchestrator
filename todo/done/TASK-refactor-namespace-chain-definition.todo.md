@@ -148,7 +148,7 @@ php vendor/prikotov/coding-standard/bin/run-sniff-tests.php
 - [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md)
 - [ADR-009: Dynamic Split Decision](../../docs/adr/009-dynamic-split-decision.md) — суперседится данным эпиком
 - [Конвенции: layers.md](../../docs/conventions/layers/layers.md) — правила зависимостей Domain → никто
-- [Конвенции: service.md](../../docs/conventions/core_patterns/service.md) — alias Interface → Implementation
+- [Конвенции: service.md](../../docs/conventions/core-patterns/service.md) — alias Interface → Implementation
 
 ## 9. Comments (Комментарии)
 

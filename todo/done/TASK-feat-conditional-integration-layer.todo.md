@@ -20,7 +20,7 @@ status: done
 > Когда `ConditionalExecutionStrategy` реализована как третья стратегия, я хочу создать Integration-слой по тому же паттерну, что StaticExecution (ACL, DTO mapping, cross-module wiring), чтобы валидировать G6: Integration-паттерн масштабируется на ≥2 стратегии без God-interface.
 
 ### Goal (Цель по SMART)
-Создать Integration-слой для Conditional Branching: Integration [`Service`](../../docs/conventions/core_patterns/service.md) по конвенциям проекта (не Port/Adapter). Integration-паттерн воспроизводится на 3-й стратегии без God-interface (≤15 методов, < 200 LOC). Integration-тесты с реальными YAML-файлами, содержащими `when:` conditions. Срок: Sprint 8 (финальная задача).
+Создать Integration-слой для Conditional Branching: Integration [`Service`](../../docs/conventions/core-patterns/service.md) по конвенциям проекта (не Port/Adapter). Integration-паттерн воспроизводится на 3-й стратегии без God-interface (≤15 методов, < 200 LOC). Integration-тесты с реальными YAML-файлами, содержащими `when:` conditions. Срок: Sprint 8 (финальная задача).
 
 ## 2. Context and Scope (Контекст и Границы)
 ### Где делаем
@@ -41,7 +41,7 @@ status: done
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Обязательно)
-- [x] Integration [`Service`](../../docs/conventions/core_patterns/service.md) для ConditionalExecution (по конвенциям — Integration Layer, не Port/Adapter):
+- [x] Integration [`Service`](../../docs/conventions/core-patterns/service.md) для ConditionalExecution (по конвенциям — Integration Layer, не Port/Adapter):
   - ConditionalExecutionStrategy в Orchestrator: `ExecuteConditionalStepServiceInterface` (Domain/Service/) → `ExecuteConditionalStepService` (Infrastructure/)
   - Wiring через `ConditionalExecutionStrategy` в Application
 - [x] G6 Validation: Integration-паттерн воспроизводится на 3-й стратегии:
@@ -85,7 +85,7 @@ status: done
 7. [x] Закоммитить и запушить
 
 ## 5. Definition of Done (Критерии приёмки)
-- [x] Integration [`Service`](../../docs/conventions/core_patterns/service.md) создан по конвенциям Integration Layer
+- [x] Integration [`Service`](../../docs/conventions/core-patterns/service.md) создан по конвенциям Integration Layer
 - [x] G6 Validation: Integration-паттерн масштабируется на 3-ю стратегию:
   - Integration Service < 200 LOC, ≤15 public методов
   - Тот же паттерн, что StaticExecution (ACL + DTO mapping)
@@ -111,7 +111,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 
 ## 8. Sources (Источники)
 - [ ] [Конвенция: Integration Layer](../../docs/conventions/layers/integration.md)
-- [ ] [Конвенция: Service](../../docs/conventions/core_patterns/service.md)
+- [ ] [Конвенция: Service](../../docs/conventions/core-patterns/service.md)
 - [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md)
 - [ ] [StaticExecution Integration](../../../src/Module/StaticExecution/Integration/) — референс паттерна
 - [ ] [Roadmap: G6 trigger](../../docs/releases/ROADMAP-2026-Q2-Q3.md) — Integration-паттерн работает для ≥2 стратегий
@@ -119,7 +119,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 ## 9. Comments (Комментарии)
 - Это задача — **точка валидации G6**: Integration-паттерн должен масштабироваться на 3-ю стратегию без God-interface. Если валидация провалена — это стратегический сигнал к пересмотру Integration-паттерна (brainstorm #2, решение #7).
 - Критерий успеха G6 (из протокола brainstorm #2): «Integration-слой для второй стратегии создан по тому же паттерну без God-interface на 15 методов». Для 3-й стратегии — тот же критерий.
-- Integration [`Service`](../../docs/conventions/core_patterns/service.md) — по конвенциям Integration Layer (координирует работу между модулями, реагирует на доменные события, не содержит бизнес-логики). НЕ Port/Adapter.
+- Integration [`Service`](../../docs/conventions/core-patterns/service.md) — по конвенциям Integration Layer (координирует работу между модулями, реагирует на доменные события, не содержит бизнес-логики). НЕ Port/Adapter.
 
 ## Инструкции для сабагента
 

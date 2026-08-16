@@ -28,12 +28,12 @@
 - `ConditionalChainDefinitionVo.php`: **222 raw LOC**; такая же inline-проверка в `createFromConditionalSteps()` на строках ~69–103.
 - `DynamicChainDefinitionVo.php`: dynamic-цепь не содержит `fix_iterations`.
 - `ChainDefinitionVo.php`: deprecated (устаревший) legacy VO вызывает `ChainFixIterationsValidatorHelper::assertValidReferences()` в `createLinearChain()`.
-- `ChainFixIterationsValidatorHelper.php`: содержит доменную проверку, кидает `InvalidArgumentException` и потому нарушает `docs/conventions/core_patterns/helper.md`: helper (хелпер) допускает только технические преобразования, бизнес-логика запрещена.
+- `ChainFixIterationsValidatorHelper.php`: содержит доменную проверку, кидает `InvalidArgumentException` и потому нарушает `docs/conventions/core-patterns/helper.md`: helper (хелпер) допускает только технические преобразования, бизнес-логика запрещена.
 - `phpmd.xml`: `StaticAccess exceptions` содержит FQCN helper-а: `TaskOrchestrator\Common\Module\ChainDefinition\Domain\Helper\ChainFixIterationsValidatorHelper`.
 - `ChainDefinitionValidatorService::validate(ChainDefinitionInterface): list<ChainConfigViolationVo>` уже возвращает детальные нарушения, включая `fix_iteration group "%s" references unknown step "%s"`.
 - `ValidateChainConfigQueryHandler` сейчас вызывает `$chainLoader->load()` **до** `$chainValidator->validate($chainVo)`. Это важная слепая зона: если loader (загрузчик) / factory (фабрика) бросит fail-fast exception (быстрое исключение), detailed validator path (путь детальной валидации) может не выполниться.
 
-Дополнительно: запрошенный файл `docs/conventions/core_patterns/specification.md` в репозитории отсутствует. Для specification использована действующая конвенция `docs/conventions/layers/domain/specification.md`.
+Дополнительно: запрошенный файл `docs/conventions/core-patterns/specification.md` в репозитории отсутствует. Для specification использована действующая конвенция `docs/conventions/layers/domain/specification.md`.
 
 ---
 
@@ -470,7 +470,7 @@ ChainDefinitionValidatorService::validateStepBasedChain()      detailed diagnost
 
 ### `ChainDefinitionFactory`
 
-Конвенция: `docs/conventions/core_patterns/factory.md`.
+Конвенция: `docs/conventions/core-patterns/factory.md`.
 
 Почему подходит:
 
@@ -482,7 +482,7 @@ ChainDefinitionValidatorService::validateStepBasedChain()      detailed diagnost
 
 ### `StaticChainDefinitionVo` / `ConditionalChainDefinitionVo` / `DynamicChainDefinitionVo`
 
-Конвенция: `docs/conventions/core_patterns/value-object.md`.
+Конвенция: `docs/conventions/core-patterns/value-object.md`.
 
 Почему подходит:
 
@@ -493,7 +493,7 @@ ChainDefinitionValidatorService::validateStepBasedChain()      detailed diagnost
 
 ### `ChainFixIterationsValidatorHelper`
 
-Конвенция: `docs/conventions/core_patterns/helper.md`.
+Конвенция: `docs/conventions/core-patterns/helper.md`.
 
 Почему **не** подходит:
 

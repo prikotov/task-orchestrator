@@ -37,7 +37,7 @@ status: done
 ### Варианты или путь решения (Solution Sketch)
 
 Оставить `ProcessLivenessWatcher` policy service (сервисом политики ожидания), а чтение ОС вынести в отдельный
-[`Infrastructure Component`](../docs/conventions/core_patterns/component.md) с обязательным интерфейсом. Компонент
+[`Infrastructure Component`](../../docs/conventions/core-patterns/component.md) с обязательным интерфейсом. Компонент
 возвращает typed immutable snapshot/result (типизированный неизменяемый снимок/результат) со строгими внутренними
 состояниями `ACTIVE`, `INACTIVE`, `UNKNOWN`. Linux procfs implementation (реализация Linux procfs) читает
 монотонные CPU/IO-счётчики и direct children (непосредственные дочерние процессы) без внешних команд;
@@ -68,8 +68,8 @@ status: done
 ### Goal (Цель по SMART)
 
 До выпуска `v0.2.0` изменить платформенное поведение Infrastructure Service (инфраструктурного сервиса)
-[`ProcessLivenessWatcher`](../docs/conventions/core_patterns/service.md) в соответствии с
-[`Infrastructure` convention (конвенцией инфраструктурного слоя)](../docs/conventions/layers/infrastructure.md):
+[`ProcessLivenessWatcher`](../../docs/conventions/core-patterns/service.md) в соответствии с
+[`Infrastructure` convention (конвенцией инфраструктурного слоя)](../../docs/conventions/layers/infrastructure.md):
 
 - отделить `available but idle` (доступная метрика без роста) от `unavailable` (метрика недоступна);
 - отделить OS I/O (ввод-вывод ОС) в Infrastructure Component с интерфейсом и неизменяемыми DTO;
@@ -91,10 +91,10 @@ status: done
   (контракт исполнения) и policy service. Он не читает procfs и не исполняет внешние команды.
 - Новый `ProcessLivenessProbeComponentInterface` (рабочее имя интерфейса компонента) и две реализации в
   `src/Module/AgentRunner/Infrastructure/Component/`: Linux procfs и `Unavailable`. Имена/namespace должны
-  соответствовать [`Component convention`](../docs/conventions/core_patterns/component.md).
+  соответствовать [`Component convention`](../../docs/conventions/core-patterns/component.md).
 - Typed immutable probe snapshot/result оформляются как `final readonly` Infrastructure
-  [`DTO`](../docs/conventions/core_patterns/dto.md); фиксированное состояние `ACTIVE`/`INACTIVE`/`UNKNOWN` — как
-  Infrastructure [`Enum`](../docs/conventions/core_patterns/enum.md) либо эквивалентный строго типизированный
+  [`DTO`](../../docs/conventions/core-patterns/dto.md); фиксированное состояние `ACTIVE`/`INACTIVE`/`UNKNOWN` — как
+  Infrastructure [`Enum`](../../docs/conventions/core-patterns/enum.md) либо эквивалентный строго типизированный
   закрытый контракт без строковых magic values (магических значений).
 - Явный platform-family provider/selector (поставщик/селектор семейства ОС) в composition root (точке сборки):
   Linux implementation и `Unavailable` implementation выбираются по внедрённому значению, а не через скрытое
@@ -105,7 +105,7 @@ status: done
 - Unit tests (модульные тесты) отдельно проверяют policy с fake clock/sleeper/probe (поддельными часами,
   ожиданием и пробой), без запуска реальных процессов. Real-process scenarios (сценарии с реальными процессами)
   располагаются в Integration tests (интеграционных тестах) и Linux smoke check по
-  [`Testing convention`](../docs/conventions/testing/index.md).
+  [`Testing convention`](../../docs/conventions/testing/index.md).
 - PHPDoc `ProcessLivenessWatcher` — краткая матрица платформ и политика ошибок.
 
 ### 2.2. Наблюдаемое текущее поведение
@@ -211,7 +211,7 @@ status: done
 - **Fail-fast для неожиданных ошибок:** `Error`, `TypeError`, `LogicException`, `RuntimeException` и иной
   неожиданный `Throwable` не
   преобразуются в `0`, `[]`, `null`, `false` или успешный результат; они распространяются наружу согласно
-  [`Exception convention`](../docs/conventions/core_patterns/exception.md). Предыдущий PHP error handler всегда
+  [`Exception convention`](../../docs/conventions/core-patterns/exception.md). Предыдущий PHP error handler всегда
   восстанавливается через `finally`, если временный handler вообще остаётся в реализации.
 
 Pi/Codex runner не ловят и не нормализуют исходный probe Throwable (исключение пробы), но в своём `finally`

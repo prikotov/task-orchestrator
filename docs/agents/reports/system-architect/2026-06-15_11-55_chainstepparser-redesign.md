@@ -23,7 +23,7 @@
 
 ### **Выбор: вариант 3 — тонкий Infrastructure Mapper + Domain Factory через DI**
 
-- `Domain\Factory\ChainStepFactory` — основной паттерн refactor-а. Он создаёт объект своего слоя (`ChainStepVo`) и централизует инварианты/сложность сборки, что прямо соответствует `docs/conventions/core_patterns/factory.md`: factory нужен, когда одного конструктора недостаточно и требуется централизовать проверку инвариантов/сложность создания.
+- `Domain\Factory\ChainStepFactory` — основной паттерн refactor-а. Он создаёт объект своего слоя (`ChainStepVo`) и централизует инварианты/сложность сборки, что прямо соответствует `docs/conventions/core-patterns/factory.md`: factory нужен, когда одного конструктора недостаточно и требуется централизовать проверку инвариантов/сложность создания.
 - `Infrastructure\Mapper\Chain\YamlChainStepMapper` — техническая граница YAML array shape → вызовы доменной фабрики. Это не helper и не доменная фабрика: он знает ключи YAML (`type`, `runner`, `retry_policy`, `timeout_seconds`) и только извлекает/нормализует форму внешнего формата.
 - DI вместо static: `factory.md` требует подключать фабрики через DI; `mapper.md` также ожидает получение mapper-а из DI. Static helper удаляется.
 

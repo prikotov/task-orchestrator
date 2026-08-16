@@ -100,7 +100,7 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 ## 7. Risks and Dependencies (Риски и зависимости)
 - **Cross-module dependency:** `CircuitBreakerAgentRunner` (AgentRunner) читает `FallbackConfigVo` (Orchestrator). Это нарушение направления зависимости. Митигация: передавать fallback runner через DI как `AgentRunnerInterface`, не читать Orchestrator VO напрямую в AgentRunner.
 - **DI complexity:** wiring fallback runner через config может потребовать named services или factory. Проверить существующий DI wiring pattern.
-- **Зависимость от конвенций:** [`Value Object`](../../docs/conventions/core_patterns/value-object.md), [`Decorator pattern`](../../docs/conventions/core_patterns/wrapper.md)
+- **Зависимость от конвенций:** [`Value Object`](../../docs/conventions/core-patterns/value-object.md), [`Decorator pattern`](../../docs/conventions/core-patterns/wrapper.md)
 
 ## 8. Sources (Источники)
 - [ ] [Roadmap: Sprint 9](../../docs/releases/ROADMAP-2026-Q2-Q3.md)

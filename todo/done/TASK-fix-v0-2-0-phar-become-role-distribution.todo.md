@@ -51,8 +51,8 @@ Composer-host получает рабочий `become-role` через `agent:in
 
 ### Где делаем
 
-- `apps/console/src/Module/Orchestrator/Command/InitCommand.php` — `InitCommand` ([консольная команда Presentation](../docs/conventions/layers/presentation/console_command.md));
-- `tests/Integration/Module/Orchestrator/Command/InitCommandTest.php` и distribution smoke tests согласно [конвенции тестирования](../docs/conventions/testing/index.md);
+- `apps/console/src/Module/Orchestrator/Command/InitCommand.php` — `InitCommand` ([консольная команда Presentation](../../docs/conventions/layers/presentation/console-command.md));
+- `tests/Integration/Module/Orchestrator/Command/InitCommandTest.php` и distribution smoke tests согласно [конвенции тестирования](../../docs/conventions/testing/index.md);
 - `bin/phar-smoke`, отдельный Composer-host smoke и их `Makefile`/CI entry points;
 - `docs/agents/skills/become-role/SKILL.md` и связанная публичная документация;
 - `README.md`, `README.en.md`, `README.zh.md`, `docs/guide/cli.md`, `docs/guide/troubleshooting.md`, `docs/agents/skills/become-role/README.md`, `docs/agents/skills/task-orchestrator/README.md` — по фактическим упоминаниям изменённого контракта.
@@ -152,8 +152,8 @@ rg -n "agent:init|become-role\\.sh|PHAR|Phar" README.md README.en.md README.zh.m
 ## 8. Sources (Источники)
 
 - [RFC: дистрибуция task-orchestrator как CLI-утилиты](../docs/research/rfc/cli-distribution-rfc.md) — Composer full, PHAR best-effort.
-- [Конвенция консольных команд](../docs/conventions/layers/presentation/console_command.md).
-- [Конвенция тестирования](../docs/conventions/testing/index.md).
+- [Конвенция консольных команд](../../docs/conventions/layers/presentation/console-command.md).
+- [Конвенция тестирования](../../docs/conventions/testing/index.md).
 - [Исходная задача PHAR-сборки](done/TASK-chore-phar-build.todo.md).
 - [Исходная задача become-role](done/TASK-feat-become-role-skills.todo.md).
 - `apps/console/src/Module/Orchestrator/Command/InitCommand.php`.

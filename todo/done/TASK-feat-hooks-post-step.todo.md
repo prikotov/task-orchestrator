@@ -73,7 +73,7 @@ status: done
 ## 4. Implementation Plan (План реализации)
 *Заполняется исполнителем (агентом) перед стартом.*
 
-1. [ ] Создать `HookResultVo` в Domain (`success()`, `warning(reason, stdout, stderr)`, `skipped()`) — immutable [`Value Object`](../../docs/conventions/core_patterns/value-object.md)
+1. [ ] Создать `HookResultVo` в Domain (`success()`, `warning(reason, stdout, stderr)`, `skipped()`) — immutable [`Value Object`](../../docs/conventions/core-patterns/value-object.md)
 2. [ ] Создать `HookContextVo` в Domain — context для hook execution (step name, chain name, step result summary)
 3. [ ] Создать `HookExecutorInterface` в Domain — `execute(string $scriptPath, HookContextVo $context): HookResultVo`
 4. [ ] Добавить `?string $postStep` в [`ChainStepVo`](../../../src/Module/Orchestrator/Domain/ValueObject/ChainStepVo.php) — через конструктор (nullable, default null)
@@ -146,8 +146,8 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - [ ] [Roadmap: Sprint 10](../../docs/releases/ROADMAP-2026-Q2-Q3.md)
 - [ ] [Анализ Локи: Hooks System](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — Sprint 10, Задача 1
 - [ ] [Symfony Process Component](https://symfony.com/doc/current/components/process.html)
-- [ ] [Конвенции: Value Object](../../docs/conventions/core_patterns/value-object.md)
-- [ ] [Конвенции: External Service](../../docs/conventions/core_patterns/external-service.md)
+- [ ] [Конвенции: Value Object](../../docs/conventions/core-patterns/value-object.md)
+- [ ] [Конвенции: External Service](../../docs/conventions/core-patterns/external-service.md)
 
 ## 9. Comments (Комментарии)
 - Pain level: 6/10 — единственный способ declarative расширения без изменения Domain. Подтверждён 3+ фреймворками (Claude Code 20+ events, OpenHands SDK 6 lifecycle events, Codex hooks).

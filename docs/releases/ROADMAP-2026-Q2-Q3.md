@@ -73,7 +73,7 @@
 
 | AI# | Задача | Ответственный | Область влияния | Оценка |
 |---|---|---|---|---|
-| **#2** | **`PromptConfiguration` VO** — создать [`Value Object`](../conventions/core_patterns/value-object.md) для 7 промпт-полей, добавить `getPromptConfiguration()` в `ChainDefinitionVo`, пометить старые геттеры `@deprecated` | Левша | 1 VO + 1 метод | 2–3 часа |
+| **#2** | **`PromptConfiguration` VO** — создать [`Value Object`](../conventions/core-patterns/value-object.md) для 7 промпт-полей, добавить `getPromptConfiguration()` в `ChainDefinitionVo`, пометить старые геттеры `@deprecated` | Левша | 1 VO + 1 метод | 2–3 часа |
 | **#1** | **Инлайнинг `ExecuteDynamicTurnService`** — удалить сервис (308 строк), перенести 3 метода как `private` в `RunDynamicLoopService`. Вложенность: 7 → 5 уровней | Левша | 1 файл удалён, 1 файл +90 строк | 3–4 часа |
 | **#3** | **Переключение 3 потребителей на `ChainSessionWriterInterface`** — `RecordDynamicRoundService`, `CheckDynamicBudgetService`, `RunDynamicLoopAgentService` инжектят `Writer` вместо `Logger` | Левша | 3 файла + DI-конфиг | 1–2 часа |
 | **#4** | **ADR-006: композиция ExecutionStrategy** — зафиксировать решение, альтернативы, критерий реализации (условное ветвление) | Гэндальф | 1 документ | 1 час |

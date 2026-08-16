@@ -168,7 +168,7 @@
 | Документация | Низкий | Обновить `docs/guide/cli.md` / troubleshooting, если формулировки вывода `--validate-config` меняются; проверить поиском по «fix_iteration» / «validate-config». |
 
 📚 **Источники:**
-- Конвенции: `docs/conventions/core_patterns/exception.md`, `docs/conventions/core_patterns/factory.md`, `docs/conventions/layers/domain/specification.md`, `docs/conventions/core_patterns/service.md`.
+- Конвенции: `docs/conventions/core-patterns/exception.md`, `docs/conventions/core-patterns/factory.md`, `docs/conventions/layers/domain/specification.md`, `docs/conventions/core-patterns/service.md`.
 - Deptrac: `vendor/prikotov/coding-standard/config/deptrac/depfile.yaml`.
 - Предшествующий дизайн: `docs/agents/reports/system-architect/2026-06-15_00-10_fixiterations-validation-redesign.md`.
 - Ревью (слепая зона №2): `docs/agents/reports/code-reviewer-backend/2026-06-15_08-50_pr-261-fixiterations-redesign-architecture-review.md`.

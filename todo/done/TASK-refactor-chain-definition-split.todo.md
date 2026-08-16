@@ -139,8 +139,8 @@ vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
 - [ ] [Roadmap: Sprint 10](../../docs/releases/ROADMAP-2026-Q2-Q3.md) — Sprint 10, Задача 2
 - [ ] [Анализ Локи: ChainDefinitionVo — God-VO](../../docs/research/analytical/loki-roadmap-review-2026-05.md) — Упущенная боль #2
 - [ ] [ADR-008: Shared Kernel Contract](../../docs/adr/008-shared-kernel-contract.md) — заложенный контракт
-- [ ] [Конвенции: Value Object](../../docs/conventions/core_patterns/value-object.md)
-- [ ] [Конвенции: External Service](../../docs/conventions/core_patterns/external-service.md)
+- [ ] [Конвенции: Value Object](../../docs/conventions/core-patterns/value-object.md)
+- [ ] [Конвенции: External Service](../../docs/conventions/core-patterns/external-service.md)
 
 ## 9. Comments (Комментарии)
 - Pain level: 4/10 — техдолг от Sprint 4. `SharedChainDefinitionVo` создан, но оригинальный `ChainDefinitionVo` (546 LOC) не стал легче. ISP violation: каждая стратегия видит ненужные поля.

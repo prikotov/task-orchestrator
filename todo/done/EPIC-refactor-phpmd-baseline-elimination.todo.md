@@ -90,7 +90,7 @@ make check
 ## 8. Sources
 - [phpmd.xml](../phpmd.xml) — текущие пороги
 - [phpmd.baseline.xml](../phpmd.baseline.xml) — текущие suppression
-- [docs/conventions/core_patterns/service.md](../docs/conventions/core_patterns/service.md)
+- [docs/conventions/core-patterns/service.md](../../docs/conventions/core-patterns/service.md)
 
 ## 9. Comments
 
