@@ -10,7 +10,7 @@ epic: EPIC-research-approaches-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик Шерлок
 branch: task/research-agents-crew
-pr:
+pr: '#350'
 status: review
 ---
 
