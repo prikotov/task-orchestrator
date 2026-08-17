@@ -10,8 +10,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/fix-codex-idle-kill-mismatch
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/352
+status: done
 ---
 
 # TASK-fix-codex-idle-kill-mismatch: Согласовать таймауты запуска codex с его внутренним бюджетом восстановления (stream idle 300s + ретраи)
@@ -60,20 +60,20 @@ Codex-сабагенты переживают сетевые паузы 3–5 м
 
 ## 3. Requirements (Требования, MoSCoW)
 ### 🔴 Must Have (Блокирующие требования)
-- [ ] **watch-subagent.sh: per-runner stall-порог.** Для `--runner codex` эффективный stall_timeout по умолчанию ≥ 360s (300s codex idle + буфер на reconect), даже если глобальный `-t/--stall-timeout` меньше; явный `-t` пользователя для codex не должен опускаться ниже 360s без явного opt-in (env). Для `--runner pi` поведение не меняется (default 180s).
-- [ ] **watch-subagent.sh: убрать `--ephemeral`** из codex-запуска по умолчанию; опциональный возврат через env (например `WATCH_CODEX_EPHEMERAL=1`). Rollout-журналы codex (`~/.codex/sessions`) сохраняются.
-- [ ] **watch-subagent.sh: `-o <file>` (output-last-message)** для codex-раннера — финальный ответ агента пишется в файл даже при смерти стрима посреди хода.
-- [ ] **PHP: per-runner idle-порог.** `CodexAgentRunnerService` использует отдельный порог для codex (env `AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC`, default ≥ 330), `PiAgentRunnerService` — прежний `AGENT_RUNNER_IDLE_TIMEOUT_SEC` (60). Механизм передачи (параметр `ProcessLivenessWatcher`, фабрика, отдельный watcher) — на решении исполнителя по конвенциям.
-- [ ] Unit-тесты: резолвинг per-runner порога (codex ≥ 330, pi = 60, env-override работает).
-- [ ] Обновлена документация: `docs/agents/skills/run-subagent/SKILL.md` (таймауты codex, env-переключатели, rollout), `docs/guide/codex.md` если затронуто.
+- [x] **watch-subagent.sh: per-runner stall-порог.** Для `--runner codex` эффективный stall_timeout по умолчанию ≥ 360s (300s codex idle + буфер на reconect), даже если глобальный `-t/--stall-timeout` меньше; явный `-t` пользователя для codex не должен опускаться ниже 360s без явного opt-in (env). Для `--runner pi` поведение не меняется (default 180s).
+- [x] **watch-subagent.sh: убрать `--ephemeral`** из codex-запуска по умолчанию; опциональный возврат через env (например `WATCH_CODEX_EPHEMERAL=1`). Rollout-журналы codex (`~/.codex/sessions`) сохраняются.
+- [x] **watch-subagent.sh: `-o <file>` (output-last-message)** для codex-раннера — финальный ответ агента пишется в файл даже при смерти стрима посреди хода.
+- [x] **PHP: per-runner idle-порог.** `CodexAgentRunnerService` использует отдельный порог для codex (env `AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC`, default ≥ 330), `PiAgentRunnerService` — прежний `AGENT_RUNNER_IDLE_TIMEOUT_SEC` (60). Механизм передачи (параметр `ProcessLivenessWatcher`, фабрика, отдельный watcher) — на решении исполнителя по конвенциям.
+- [x] Unit-тесты: резолвинг per-runner порога (codex ≥ 330, pi = 60, env-override работает).
+- [x] Обновлена документация: `docs/agents/skills/run-subagent/SKILL.md` (таймауты codex, env-переключатели, rollout), `docs/guide/codex.md` если затронуто.
 
 ### 🟡 Should Have (Важные требования)
 - [ ] Интеграционная проверка: процесс codex в фазе штатного idle-ожидания (сеть молчит) не убивается раньше порога; реальный зависший процесс — убивается.
-- [ ] Лог-строка run.log/watcher фиксирует эффективный stall-порог для codex (наблюдаемость).
-- [ ] Отметка в run-summary, если сессия завершена с сохранённым rollout (файл-путь) — для быстрого поиска улик.
+- [x] Лог-строка run.log/watcher фиксирует эффективный stall-порог для codex (наблюдаемость).
+- [x] Отметка в run-summary, если сессия завершена с сохранённым rollout (файл-путь) — для быстрого поиска улик.
 
 ### 🟢 Could Have (Желательно)
-- [ ] Документировать в SKILL.md таблицу внутренних бюджетов codex (idle 300s / retries 5 / request retries 4) как обоснование порогов.
+- [x] Документировать в SKILL.md таблицу внутренних бюджетов codex (idle 300s / retries 5 / request retries 4) как обоснование порогов.
 
 ### ⚫ Won't Have (Не в этот раз)
 - [ ] Настройка `stream_idle_timeout`/`stream_max_retries` на стороне codex (через `-c` overrides) — только наши пороги убийства.
@@ -81,21 +81,21 @@ Codex-сабагенты переживают сетевые паузы 3–5 м
 - [ ] Фолбэк раннера на другого провайдера (`TASK-feat-runner-provider-fallback` в backlog).
 
 ## 4. Implementation Plan (План реализации)
-1. [ ] Разведка: `watch-subagent.sh` — где применяется `STALL_TIMEOUT` (главный `read -t`-цикл ~903 и watcher ~826); как per-runner дефолт вписать в текущую структуру (runtime-переопределение после `build_runner_command`, не ломая `--stall-timeout` для pi).
-2. [ ] watch-subagent.sh: effective stall для codex ≥ 360s + логирование эффективного значения.
-3. [ ] watch-subagent.sh: убрать `--ephemeral` (env-опция возврата), добавить `-o "$RUN_DIR/last_message.txt"` для codex.
-4. [ ] PHP: механизм per-runner idle-порога (решение по конвенциям: DI-параметр `ProcessLivenessWatcher` / отдельный watcher-сервис); `CodexAgentRunnerService` — codex-порог, `PiAgentRunnerService` — без изменений.
-5. [ ] Unit-тесты per-runner порога (минимум 80% покрытия нового кода).
-6. [ ] Обновить `SKILL.md` / `docs/guide/codex.md`.
-7. [ ] `make check` зелёный.
+1. [x] Разведка: `watch-subagent.sh` — где применяется `STALL_TIMEOUT` (главный `read -t`-цикл ~903 и watcher ~826); как per-runner дефолт вписать в текущую структуру (runtime-переопределение после `build_runner_command`, не ломая `--stall-timeout` для pi).
+2. [x] watch-subagent.sh: effective stall для codex ≥ 360s + логирование эффективного значения.
+3. [x] watch-subagent.sh: убрать `--ephemeral` (env-опция возврата), добавить `-o "$RUN_DIR/last_message.txt"` для codex.
+4. [x] PHP: механизм per-runner idle-порога (решение по конвенциям: DI-параметр `ProcessLivenessWatcher` / отдельный watcher-сервис); `CodexAgentRunnerService` — codex-порог, `PiAgentRunnerService` — без изменений.
+5. [x] Unit-тесты per-runner порога (минимум 80% покрытия нового кода).
+6. [x] Обновить `SKILL.md` / `docs/guide/codex.md`.
+7. [x] `make check` зелёный.
 
 ## 5. Definition of Done (Критерии приёмки)
-- [ ] Codex-запуск через watch-subagent с молчанием стрима < 360s не терминируется по stall (наши пороги ≥ внутреннего бюджета codex).
-- [ ] Codex-запуск пишет rollout в `~/.codex/sessions` (нет `--ephemeral` по умолчанию); опциональный env-возврат задокументирован.
-- [ ] Финальное сообщение codex-агента сохраняется через `-o` даже при обрыве стрима.
+- [x] Codex-запуск через watch-subagent с молчанием стрима < 360s не терминируется по stall (наши пороги ≥ внутреннего бюджета codex).
+- [x] Codex-запуск пишет rollout в `~/.codex/sessions` (нет `--ephemeral` по умолчанию); опциональный env-возврат задокументирован.
+- [x] Финальное сообщение codex-агента сохраняется через `-o` даже при обрыве стрима.
 - [ ] PHP-раннер: codex idle-порог ≥ 330s, pi — 60s; unit-тесты зелёные.
-- [ ] Документация обновлена (`SKILL.md`, при необходимости `docs/guide/codex.md`).
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные; `make validate-todo` — зелёный.
+- [x] Документация обновлена (`SKILL.md`, при необходимости `docs/guide/codex.md`).
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` — зелёные; `make validate-todo` — зелёный.
 
 ## 6. Verification (Самопроверка)
 ```bash
@@ -138,3 +138,4 @@ make check
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-17 | Тимлид (Алекс) | Создание задачи по итогам расследования смертей codex-сессий 15.08 и анализа исходников codex 0.147.0. |
+| 2026-08-17 | Тимлид (Алекс) | Реализовано через конвейер: Левша (реализация + доработки по self-review CR-1..3), Пуаро (ревью: блокер KernelTestCase + 3 неблокирующих → доработка → APPROVE). PR #352. PHPUnit 1493/3992 OK, Psalm 0, make check зелёный. N-2/N-4 (поведенческий stall-тест, флаки liveness) вынесены в отдельные задачи. |
