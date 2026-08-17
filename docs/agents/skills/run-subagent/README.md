@@ -25,7 +25,7 @@ docs/agents/skills/run-subagent/
 |-------------------|------------|--------------------------------------------------------------------------------|--------------|
 | `--soft-timeout`  | `-s`       | Целевое время задачи в секундах (обязателен). Превышение мягкого лимита **завершает** запуск по умолчанию (страховка от сжигания токенов: pi крутит turn'ы без лимита). `WATCH_SOFT_WARN_ONLY=1` — только предупреждать | — |
 | `--hard-timeout`  | `-m`       | Абсолютный максимум в секундах. Фактическое значение (`EFFECTIVE_HARD`) = `max(--hard-timeout, --soft-timeout × 2)` | 1800 |
-| `--stall-timeout` | `-t`       | Нет событий N секунд → агент завис → завершить принудительно                   | 180          |
+| `--stall-timeout` | `-t`       | Нет событий N секунд → агент завис → завершить принудительно. Для codex минимум 360 секунд | pi: 180; codex: 360 |
 | `--output`        | `-o`       | Формат вывода через запятую: `raw`, `text`, `tools`, `files`                   | `raw`        |
 | `--role-file`     | `-r`       | Путь к файлу описания роли (обязателен)                                        | —            |
 | `--runner`        | —          | Раннер: `pi` или `codex` (приоритеты резолва см. ниже)                         | профиль роли, иначе `pi` |
@@ -70,6 +70,9 @@ model (`--model`), reasoning (`--thinking`/`--reasoning` или
 | `WATCH_KEEP_TMP=1`      | Сохранять `events/` ВСЕГДА, даже при успехе (по умолчанию — только при сбое) |
 | `WATCH_SOFT_WARN_ONLY=1`| мягкий лимит времени только предупреждать, НЕ убивать (только для экспериментов) |
 | `WATCH_WATCHER_INTERVAL`| Интервал опроса фонового наблюдателя в секундах (default: 5) |
+| `WATCH_STALL_RESPECT_LIVENESS=0` | Отключить liveness-проверку stall-порога |
+| `WATCH_CODEX_ALLOW_SHORT_STALL=1` | Разрешить codex stall-порог меньше 360 секунд |
+| `WATCH_CODEX_EPHEMERAL=1` | Добавить `--ephemeral`; по умолчанию codex сохраняет rollout-журналы |
 
 ## Контроль таймаутов
 
@@ -106,6 +109,7 @@ model (`--model`), reasoning (`--thinking`/`--reasoning` или
 ```
 <RUN_ID>/
 ├── run.log              # всегда: RUN START, heartbeat, RUN SUMMARY
+├── last_message.txt     # последнее сообщение codex (если codex его сформировал)
 └── events/              # архивируется при неуспехе (или WATCH_KEEP_TMP=1)
     ├── events.ndjson    # полный поток событий
     ├── gaps.tsv         # ts<TAB>gap_s<TAB>event_type — паузы между событиями

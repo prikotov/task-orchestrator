@@ -29,7 +29,7 @@ PROMPT
 |-------------------|------------|--------------------------------------------------------------|--------------|
 | `--soft-timeout`  | `-s`       | Базовый таймаут в секундах (обязателен). Целевое время задачи; превышение soft **убивает** запуск по умолчанию (страховка от сжигания токенов: pi крутит turn'ы без лимита) | —            |
 | `--hard-timeout`  | `-m`       | Абсолютный максимум в секундах                               | 1800         |
-| `--stall-timeout` | `-t`       | Нет событий N секунд → агент завис. **Не убивает**, если процесс активен (CPU/IO) — см. `WATCH_STALL_RESPECT_LIVENESS` | 180          |
+| `--stall-timeout` | `-t`       | Нет событий N секунд → агент завис. **Не убивает**, если процесс активен (CPU/IO) — см. `WATCH_STALL_RESPECT_LIVENESS`. Для codex эффективное значение не ниже 360 | pi: 180; codex: 360 |
 | `--output`        | `-o`       | Формат вывода через запятую (см. ниже)                       | `raw`        |
 | `--role-file`     | `-r`       | Путь к файлу описания роли (обязателен)                      | —            |
 | `--runner`        | —          | Раннер: `pi` или `codex` (env `RUNNER`)                      | `roles.<role>.command[0]`, иначе `pi` |
@@ -84,9 +84,11 @@ scripts/watch-subagent.sh --runner codex -s 600 -r docs/agents/roles/team/system
 PROMPT
 ```
 
-Команда: `codex exec --json --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check --ephemeral`
+Команда: `codex exec --json --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check -o <run-dir>/last_message.txt`
 
 Системный промпт и роль передаются через `-c model_instructions_file=...` и `-c additional_instructions=...`.
+Rollout-журналы сохраняются в `~/.codex/sessions`; `--ephemeral` добавляется только при `WATCH_CODEX_EPHEMERAL=1`.
+Последнее сообщение агента записывается в `last_message.txt` в каталоге запуска.
 
 ### Контроль
 
@@ -94,6 +96,36 @@ PROMPT
 2. Нет событий дольше `--stall-timeout` — если процесс **простаивает** (idle) → завис → завершить. Если процесс **активен** (грузит CPU/IO — ретраит провайдера, ожидание длинного ответа) → НЕ убивается, а ждёт до `--hard-timeout`. Env `WATCH_STALL_RESPECT_LIVENESS=0` отключает эту проверку (старое поведение — всегда убивать по stall). Linux-only (`/proc`).
 3. `--hard-timeout` достигнут — завершить в любом случае (абсолютный потолок).
 4. Агент стримит события → ждать (каждая новая строка продлевает ожидание).
+
+#### Таймауты codex
+
+Codex 0.147.0 ждёт до 300 секунд тишины стрима до штатных повторов
+(`stream_max_retries=5`, `request_max_retries=4`). Поэтому для codex скрипт поднимает
+эффективный `--stall-timeout` до 360 секунд, даже если передано меньшее `-t`.
+Исходное и эффективное значения фиксируются в `run.log`.
+Опасное снижение разрешается только явно: `WATCH_CODEX_ALLOW_SHORT_STALL=1`.
+Для pi порог остаётся 180 секунд.
+Гарантия 360 секунд относится только к прерыванию по stall. Два независимых
+ограничения могут завершить codex раньше: `--soft-timeout` по умолчанию завершает
+запуск (если не задан `WATCH_SOFT_WARN_ONLY=1`), а `--hard-timeout` остаётся
+абсолютным потолком. Оба ограничения нужно задавать с учётом бюджета
+восстановления codex.
+
+В PHP-раннере аналогично разделены пороги: codex использует
+`AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC` (330 секунд), pi —
+`AGENT_RUNNER_IDLE_TIMEOUT_SEC` (60 секунд). Если в конфигурации codex изменён
+внутренний `stream_idle_timeout_ms`, внешние пороги нужно согласовать с ним вручную.
+
+Переменные окружения управления запуском:
+
+| Переменная | По умолчанию | Назначение |
+|------------|---------------|------------|
+| `WATCH_CODEX_EPHEMERAL` | `0` | `1` добавляет `--ephemeral` и отключает сохранение rollout-журнала codex |
+| `WATCH_CODEX_ALLOW_SHORT_STALL` | `0` | `1` разрешает codex stall-порог меньше 360 секунд |
+| `WATCH_STALL_RESPECT_LIVENESS` | `1` | `0` отключает liveness-проверку и всегда завершает процесс по stall |
+| `WATCH_SOFT_WARN_ONLY` | `0` | `1` превращает soft-timeout в предупреждение |
+| `WATCH_KEEP_TMP` | `0` | `1` сохраняет дамп `events/` и при успехе |
+| `WATCH_WATCHER_INTERVAL` | `5` | Интервал опроса фонового наблюдателя в секундах |
 
 ### Логи и отладка
 
@@ -108,6 +140,13 @@ PID исключает коллизию при параллельных/повт
 `var/log/watch-subagent/20260616_120323-pi-backend-developer-levsha-12345/run.log`.
 
 Env `WATCH_KEEP_TMP=1` — сохранять `events/` и для успешных запусков.
+
+Env `WATCH_CODEX_EPHEMERAL=1` — не сохранять rollout-журнал codex. По умолчанию
+журнал остаётся в `~/.codex/sessions`; его ротация не входит в задачу.
+
+Env `WATCH_CODEX_ALLOW_SHORT_STALL=1` — разрешить для codex эффективный
+`--stall-timeout` меньше 360 секунд. Используйте только как явное принятие
+риска преждевременного завершения восстанавливающейся codex-сессии.
 
 Env `WATCH_STALL_RESPECT_LIVENESS=0` — отключить liveness-gate для stall-timeout: при тишине убивать всегда (старое поведение). По умолчанию (`1`) при молчании в потоке процесс не убивается, если он активен (грузит CPU/IO): watcher ждёт до `--hard-timeout`. Требует Linux (`/proc`).
 

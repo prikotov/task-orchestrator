@@ -238,6 +238,111 @@ YAML);
     }
 
     #[Test]
+    public function codexRunnerPersistsRolloutAndRequestsLastMessageByDefault(): void
+    {
+        $logDir = $this->tempDir . '/logs';
+
+        $this->runScript(
+            arguments: ['--runner', 'codex'],
+            env: ['WATCH_LOG_DIR' => $logDir],
+        );
+
+        $args = (string) file_get_contents($this->argsCaptureFile);
+        $runLog = $this->findLatestRunLog($logDir);
+
+        self::assertNotNull($runLog);
+        self::assertStringNotContainsString('--ephemeral', $args);
+        self::assertStringContainsString('-o ' . dirname($runLog) . '/last_message.txt', $args);
+        self::assertStringContainsString(
+            'codex_rollout_dir=~/.codex/sessions ephemeral=0',
+            (string) file_get_contents($runLog),
+        );
+    }
+
+    #[Test]
+    public function codexRunnerCanRestoreEphemeralModeAndStillRequestsLastMessage(): void
+    {
+        $logDir = $this->tempDir . '/logs';
+
+        $this->runScript(
+            arguments: ['--runner', 'codex'],
+            env: [
+                'WATCH_CODEX_EPHEMERAL' => '1',
+                'WATCH_LOG_DIR' => $logDir,
+            ],
+        );
+
+        $args = (string) file_get_contents($this->argsCaptureFile);
+        $runLog = $this->findLatestRunLog($logDir);
+
+        self::assertNotNull($runLog);
+        self::assertStringContainsString('--ephemeral', $args);
+        self::assertStringContainsString('-o ' . dirname($runLog) . '/last_message.txt', $args);
+        self::assertStringContainsString(
+            'codex_rollout_dir=disabled ephemeral=1',
+            (string) file_get_contents($runLog),
+        );
+    }
+
+    #[Test]
+    public function codexRunnerRaisesShortStallTimeoutAndLogsEffectiveValue(): void
+    {
+        $logDir = $this->tempDir . '/logs';
+
+        $this->runScript(
+            arguments: ['--runner', 'codex', '-t', '120'],
+            env: ['WATCH_LOG_DIR' => $logDir],
+        );
+
+        $runLog = $this->findLatestRunLog($logDir);
+        self::assertNotNull($runLog);
+        self::assertStringContainsString(
+            'requested_stall_timeout=120s effective_stall_timeout=360s',
+            (string) file_get_contents($runLog),
+        );
+    }
+
+    #[Test]
+    public function shortCodexStallTimeoutRequiresExplicitEnvOptIn(): void
+    {
+        $logDir = $this->tempDir . '/logs';
+
+        $this->runScript(
+            arguments: ['--runner', 'codex', '-t', '120'],
+            env: [
+                'WATCH_CODEX_ALLOW_SHORT_STALL' => '1',
+                'WATCH_LOG_DIR' => $logDir,
+            ],
+        );
+
+        $runLog = $this->findLatestRunLog($logDir);
+        self::assertNotNull($runLog);
+        self::assertStringContainsString(
+            'requested_stall_timeout=120s effective_stall_timeout=120s',
+            (string) file_get_contents($runLog),
+        );
+    }
+
+    #[Test]
+    public function piRunnerKeepsConfiguredStallTimeout(): void
+    {
+        $logDir = $this->tempDir . '/logs';
+
+        $this->runScript(
+            arguments: ['--runner', 'pi', '-t', '120'],
+            env: ['WATCH_LOG_DIR' => $logDir],
+            roleFile: $this->piRoleFile,
+        );
+
+        $runLog = $this->findLatestRunLog($logDir);
+        self::assertNotNull($runLog);
+        self::assertStringContainsString(
+            'requested_stall_timeout=120s effective_stall_timeout=120s',
+            (string) file_get_contents($runLog),
+        );
+    }
+
+    #[Test]
     public function codexRunnerPrefersTurnCompletedItemsOverItemCompletedFallback(): void
     {
         $process = $this->runScript(

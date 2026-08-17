@@ -33,6 +33,7 @@ final class ProcessLivenessWatcherTest extends TestCase
     protected function tearDown(): void
     {
         putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC');
+        putenv('AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC');
         putenv('AGENT_RUNNER_HARD_TIMEOUT_SEC');
     }
 
@@ -321,7 +322,7 @@ final class ProcessLivenessWatcherTest extends TestCase
     }
 
     #[Test]
-    public function getIdleThresholdReadsOverrideAndDefault(): void
+    public function getIdleThresholdUsesPiDefaultAndEnvOverride(): void
     {
         // Arrange
         $watcher = $this->watcher(new ProcessLivenessProbeStub([]), new ProcessLivenessClockFake());
@@ -333,15 +334,37 @@ final class ProcessLivenessWatcherTest extends TestCase
         self::assertSame(45, $watcher->getIdleThreshold());
     }
 
+    #[Test]
+    public function getIdleThresholdUsesCodexDefaultAndEnvOverride(): void
+    {
+        // Arrange
+        $watcher = $this->watcher(
+            new ProcessLivenessProbeStub([]),
+            new ProcessLivenessClockFake(),
+            idleThresholdEnvName: 'AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC',
+            defaultIdleThreshold: 330,
+        );
+
+        // Act + Assert
+        self::assertSame(330, $watcher->getIdleThreshold());
+
+        putenv('AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC=420');
+        self::assertSame(420, $watcher->getIdleThreshold());
+    }
+
     private function watcher(
         ProcessLivenessProbeComponentInterface $probe,
         ProcessLivenessClockFake $clock,
         ?Closure $onSleep = null,
+        string $idleThresholdEnvName = 'AGENT_RUNNER_IDLE_TIMEOUT_SEC',
+        int $defaultIdleThreshold = 60,
     ): ProcessLivenessWatcher {
         return new ProcessLivenessWatcher(
             probe: $probe,
             clock: $clock,
             sleeper: new ProcessLivenessSleeperFake($clock, $onSleep),
+            idleThresholdEnvName: $idleThresholdEnvName,
+            defaultIdleThreshold: $defaultIdleThreshold,
         );
     }
 
