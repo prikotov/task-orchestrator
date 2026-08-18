@@ -3,7 +3,7 @@
 type: docs
 created: 2026-08-18
 due:
-started:
+started: 2026-08-18
 completed:
 cancelled:
 value: V2
@@ -14,10 +14,10 @@ cost_fact:
 depends_on:
 epic:
 author: Технический писатель Гермиона (codex)
-assignee:
-branch:
+assignee: Технический писатель Гермиона (pi)
+branch: task/docs-teamlead-data-before-hypotheses
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-docs-teamlead-data-before-hypotheses: Правило «сначала данные, потом гипотезы» для Тимлида
