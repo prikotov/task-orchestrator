@@ -3,7 +3,7 @@
 type: feat
 created: 2026-08-18
 due:
-started:
+started: 2026-08-18
 completed:
 cancelled:
 value: V2
@@ -14,10 +14,10 @@ cost_fact:
 depends_on:
 epic:
 author: Тимлид Алекс (pi)
-assignee:
-branch:
+assignee: Технический писатель (Гермиона)
+branch: task/retro-registry-standard
 pr:
-status: todo
+status: in_progress
 ---
 
 # TASK-feat-retro-registry-standard: Реестр ретро с порогом эскалации и стандарт проведения ретроспектив
