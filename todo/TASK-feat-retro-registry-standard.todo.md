@@ -16,8 +16,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Технический писатель Гермиона (codex)
 branch: task/retro-registry-standard
-pr:
-status: in_progress
+pr: '#353'
+status: review
 ---
 
 # TASK-feat-retro-registry-standard: Реестр ретро с порогом эскалации и стандарт проведения ретроспектив
