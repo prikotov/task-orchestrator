@@ -16,7 +16,7 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Технический писатель Гермиона (codex)
 branch: task/retro-registry-standard
-pr: '#353'
+pr: https://github.com/prikotov/task-orchestrator/pull/353
 status: review
 ---
 
