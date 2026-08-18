@@ -26,8 +26,12 @@ codex exec --json --skip-git-repo-check -o /tmp/codex-last-message.txt "..."
 `watch-subagent.sh` по умолчанию сохраняет rollout-журналы в
 `~/.codex/sessions` и последнее сообщение в `last_message.txt` каталога запуска.
 Для отключения rollout-журнала явно задайте `WATCH_CODEX_EPHEMERAL=1`.
-Его эффективный stall-порог не опускается ниже 360 секунд без
-`WATCH_CODEX_ALLOW_SHORT_STALL=1`, чтобы не прерывать 300-секундное ожидание стрима codex.
+
+Для всех раннеров `watch-subagent.sh` использует stall-порог 360 секунд, а
+PHP-раннер — общий idle-порог `AGENT_RUNNER_IDLE_TIMEOUT_SEC=330`. Модели любых
+провайдеров могут молчать до ~5 минут в фазе ожидания или восстановления (stream
+idle budget), поэтому меньшие общие пороги преждевременно срывают штатные
+автоповторы. При необходимости пользователь может задать любое значение `-t`.
 
 ## Шум `Reconnecting…` — это нормально
 

@@ -28,9 +28,9 @@ use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessL
  * наружу (fail-fast). Pi/Codex runners синхронно очищают живой agent process
  * в своём finally.
  *
- * Имя env-переменной и порог по умолчанию задаются для каждого runner
- * через DI. Общий сервис сохраняет прежний контракт:
- * AGENT_RUNNER_IDLE_TIMEOUT_SEC с default 60.
+ * Общий порог простоя задаётся AGENT_RUNNER_IDLE_TIMEOUT_SEC. По умолчанию
+ * он равен 330 секундам для всех runner-ов, чтобы не прерывать штатное
+ * ожидание и восстановление моделей у любого провайдера.
  *
  * Hard cap задаёт runner через Process::setTimeout() до вызова waitFor().
  */
@@ -43,8 +43,6 @@ final readonly class ProcessLivenessWatcher
         private ProcessLivenessProbeComponentInterface $probe,
         private ProcessLivenessClockComponentInterface $clock,
         private ProcessLivenessSleeperComponentInterface $sleeper,
-        private string $idleThresholdEnvName = 'AGENT_RUNNER_IDLE_TIMEOUT_SEC',
-        private int $defaultIdleThreshold = 60,
     ) {
     }
 
@@ -117,7 +115,7 @@ final readonly class ProcessLivenessWatcher
      */
     public function getIdleThreshold(): int
     {
-        return $this->envInt($this->idleThresholdEnvName, $this->defaultIdleThreshold);
+        return $this->envInt('AGENT_RUNNER_IDLE_TIMEOUT_SEC', 330);
     }
 
     /**

@@ -285,61 +285,55 @@ YAML);
     }
 
     #[Test]
-    public function codexRunnerRaisesShortStallTimeoutAndLogsEffectiveValue(): void
+    public function defaultStallTimeoutIs360SecondsForEveryRunner(): void
     {
-        $logDir = $this->tempDir . '/logs';
+        $piLogDir = $this->tempDir . '/pi-logs';
+        $codexLogDir = $this->tempDir . '/codex-logs';
 
         $this->runScript(
-            arguments: ['--runner', 'codex', '-t', '120'],
-            env: ['WATCH_LOG_DIR' => $logDir],
-        );
-
-        $runLog = $this->findLatestRunLog($logDir);
-        self::assertNotNull($runLog);
-        self::assertStringContainsString(
-            'requested_stall_timeout=120s effective_stall_timeout=360s',
-            (string) file_get_contents($runLog),
-        );
-    }
-
-    #[Test]
-    public function shortCodexStallTimeoutRequiresExplicitEnvOptIn(): void
-    {
-        $logDir = $this->tempDir . '/logs';
-
-        $this->runScript(
-            arguments: ['--runner', 'codex', '-t', '120'],
-            env: [
-                'WATCH_CODEX_ALLOW_SHORT_STALL' => '1',
-                'WATCH_LOG_DIR' => $logDir,
-            ],
-        );
-
-        $runLog = $this->findLatestRunLog($logDir);
-        self::assertNotNull($runLog);
-        self::assertStringContainsString(
-            'requested_stall_timeout=120s effective_stall_timeout=120s',
-            (string) file_get_contents($runLog),
-        );
-    }
-
-    #[Test]
-    public function piRunnerKeepsConfiguredStallTimeout(): void
-    {
-        $logDir = $this->tempDir . '/logs';
-
-        $this->runScript(
-            arguments: ['--runner', 'pi', '-t', '120'],
-            env: ['WATCH_LOG_DIR' => $logDir],
+            arguments: ['--runner', 'pi'],
+            env: ['WATCH_LOG_DIR' => $piLogDir],
             roleFile: $this->piRoleFile,
+            stallTimeout: null,
+        );
+        $this->runScript(
+            arguments: ['--runner', 'codex'],
+            env: ['WATCH_LOG_DIR' => $codexLogDir],
+            stallTimeout: null,
         );
 
-        $runLog = $this->findLatestRunLog($logDir);
-        self::assertNotNull($runLog);
-        self::assertStringContainsString(
-            'requested_stall_timeout=120s effective_stall_timeout=120s',
-            (string) file_get_contents($runLog),
+        $piRunLog = $this->findLatestRunLog($piLogDir);
+        $codexRunLog = $this->findLatestRunLog($codexLogDir);
+        self::assertNotNull($piRunLog);
+        self::assertNotNull($codexRunLog);
+        self::assertStringContainsString('stall_timeout=360s', (string) file_get_contents($piRunLog));
+        self::assertStringContainsString('stall_timeout=360s', (string) file_get_contents($codexRunLog));
+    }
+
+    #[Test]
+    public function explicitStallTimeoutIsAppliedWithoutClampingForEveryRunner(): void
+    {
+        $piLogDir = $this->tempDir . '/pi-logs';
+        $codexLogDir = $this->tempDir . '/codex-logs';
+
+        $this->runScript(
+            arguments: ['--runner', 'pi'],
+            env: ['WATCH_LOG_DIR' => $piLogDir],
+            roleFile: $this->piRoleFile,
+            stallTimeout: 120,
         );
+        $this->runScript(
+            arguments: ['--runner', 'codex'],
+            env: ['WATCH_LOG_DIR' => $codexLogDir],
+            stallTimeout: 120,
+        );
+
+        $piRunLog = $this->findLatestRunLog($piLogDir);
+        $codexRunLog = $this->findLatestRunLog($codexLogDir);
+        self::assertNotNull($piRunLog);
+        self::assertNotNull($codexRunLog);
+        self::assertStringContainsString('stall_timeout=120s', (string) file_get_contents($piRunLog));
+        self::assertStringContainsString('stall_timeout=120s', (string) file_get_contents($codexRunLog));
     }
 
     #[Test]
@@ -499,6 +493,7 @@ YAML);
         ?string $roleFile = null,
         string $prompt = 'Test prompt',
         bool $expectSuccess = true,
+        ?int $stallTimeout = 2,
     ): Process {
         $projectRoot = dirname(__DIR__, 6);
         $script = $projectRoot . '/docs/agents/skills/run-subagent/scripts/watch-subagent.sh';
@@ -506,17 +501,9 @@ YAML);
 
         $process = new Process(
             array_merge(
-                [
-                    $script,
-                    '-s',
-                    '2',
-                    '-t',
-                    '2',
-                    '-m',
-                    '4',
-                    '-r',
-                    $roleFile ?? $this->roleFile,
-                ],
+                [$script, '-s', '2'],
+                $stallTimeout === null ? [] : ['-t', (string) $stallTimeout],
+                ['-m', '4', '-r', $roleFile ?? $this->roleFile],
                 $arguments,
                 [$prompt],
             ),

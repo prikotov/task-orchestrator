@@ -33,7 +33,6 @@ final class ProcessLivenessWatcherTest extends TestCase
     protected function tearDown(): void
     {
         putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC');
-        putenv('AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC');
         putenv('AGENT_RUNNER_HARD_TIMEOUT_SEC');
     }
 
@@ -322,33 +321,15 @@ final class ProcessLivenessWatcherTest extends TestCase
     }
 
     #[Test]
-    public function getIdleThresholdUsesPiDefaultAndEnvOverride(): void
+    public function getIdleThresholdUsesCommonDefaultAndEnvOverride(): void
     {
         // Arrange
         $watcher = $this->watcher(new ProcessLivenessProbeStub([]), new ProcessLivenessClockFake());
 
         // Act + Assert
-        self::assertSame(60, $watcher->getIdleThreshold());
-
-        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=45');
-        self::assertSame(45, $watcher->getIdleThreshold());
-    }
-
-    #[Test]
-    public function getIdleThresholdUsesCodexDefaultAndEnvOverride(): void
-    {
-        // Arrange
-        $watcher = $this->watcher(
-            new ProcessLivenessProbeStub([]),
-            new ProcessLivenessClockFake(),
-            idleThresholdEnvName: 'AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC',
-            defaultIdleThreshold: 330,
-        );
-
-        // Act + Assert
         self::assertSame(330, $watcher->getIdleThreshold());
 
-        putenv('AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC=420');
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=420');
         self::assertSame(420, $watcher->getIdleThreshold());
     }
 
@@ -356,15 +337,11 @@ final class ProcessLivenessWatcherTest extends TestCase
         ProcessLivenessProbeComponentInterface $probe,
         ProcessLivenessClockFake $clock,
         ?Closure $onSleep = null,
-        string $idleThresholdEnvName = 'AGENT_RUNNER_IDLE_TIMEOUT_SEC',
-        int $defaultIdleThreshold = 60,
     ): ProcessLivenessWatcher {
         return new ProcessLivenessWatcher(
             probe: $probe,
             clock: $clock,
             sleeper: new ProcessLivenessSleeperFake($clock, $onSleep),
-            idleThresholdEnvName: $idleThresholdEnvName,
-            defaultIdleThreshold: $defaultIdleThreshold,
         );
     }
 

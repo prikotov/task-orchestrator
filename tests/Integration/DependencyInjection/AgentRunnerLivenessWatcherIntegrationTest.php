@@ -15,7 +15,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgent
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLivenessWatcher;
 
 /**
- * Интеграционная проверка DI-связки runner-специфичных liveness watcher-ов.
+ * Интеграционная проверка общей DI-связки liveness watcher-а.
  */
 #[CoversClass(ProcessLivenessWatcher::class)]
 final class AgentRunnerLivenessWatcherIntegrationTest extends KernelTestCase
@@ -27,7 +27,7 @@ final class AgentRunnerLivenessWatcherIntegrationTest extends KernelTestCase
     {
         parent::setUp();
 
-        foreach (['AGENT_RUNNER_IDLE_TIMEOUT_SEC', 'AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC'] as $name) {
+        foreach (['AGENT_RUNNER_IDLE_TIMEOUT_SEC'] as $name) {
             $this->originalEnv[$name] = getenv($name);
             putenv($name);
         }
@@ -51,7 +51,7 @@ final class AgentRunnerLivenessWatcherIntegrationTest extends KernelTestCase
     }
 
     #[Test]
-    public function containerWiresIndependentRunnerSpecificIdleThresholds(): void
+    public function containerWiresCommonIdleThresholdForAllRunners(): void
     {
         self::bootKernel(['environment' => 'test', 'debug' => false]);
         $container = self::getContainer();
@@ -64,17 +64,12 @@ final class AgentRunnerLivenessWatcherIntegrationTest extends KernelTestCase
         $codexWatcher = $this->watcherFrom($codexRunner);
         $piWatcher = $this->watcherFrom($piRunner);
 
-        self::assertNotSame($codexWatcher, $piWatcher);
         self::assertSame(330, $codexWatcher->getIdleThreshold());
-        self::assertSame(60, $piWatcher->getIdleThreshold());
+        self::assertSame(330, $piWatcher->getIdleThreshold());
 
-        putenv('AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC=420');
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=420');
         self::assertSame(420, $codexWatcher->getIdleThreshold());
-        self::assertSame(60, $piWatcher->getIdleThreshold());
-
-        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=75');
-        self::assertSame(420, $codexWatcher->getIdleThreshold());
-        self::assertSame(75, $piWatcher->getIdleThreshold());
+        self::assertSame(420, $piWatcher->getIdleThreshold());
     }
 
     private function watcherFrom(CodexAgentRunnerService|PiAgentRunnerService $runner): ProcessLivenessWatcher

@@ -37,16 +37,6 @@ services:
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\RetryableRunnerFactoryInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\RetryableRunnerFactory
 
-  module.agent_runner.codex_process_liveness_watcher:
-    class: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLivenessWatcher
-    arguments:
-      $idleThresholdEnvName: 'AGENT_RUNNER_CODEX_IDLE_TIMEOUT_SEC'
-      $defaultIdleThreshold: 330
-
-  TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexAgentRunnerService:
-    arguments:
-      $livenessWatcher: '@module.agent_runner.codex_process_liveness_watcher'
-
   TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryService:
     arguments:
       $runners: !tagged_iterator agent.runner

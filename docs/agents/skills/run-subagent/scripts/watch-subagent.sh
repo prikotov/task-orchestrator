@@ -16,7 +16,7 @@
 #                          предупреждать, не убивать (для экспериментов).
 #   -m, --hard-timeout   — абсолютный максимум в секундах (default: 1800).
 #   -t, --stall-timeout  — секунд без событий до признания зависания
-#                            (pi: default 180; codex: minimum 360).
+#                            (default: 360 для всех раннеров).
 #   -o, --output         — формат вывода через запятую: raw, text, tools, files (default: raw).
 #   -r, --role-file <file> — путь к файлу описания роли (обязателен).
 #   --runner <pi|codex>  — раннер (priority: CLI > env RUNNER > role profile > pi).
@@ -50,8 +50,6 @@
 #                            ретраит провайдера, ожидание длинного ответа):
 #                            watcher ждёт до hard-timeout. Убивает только реально
 #                            простаивающий (idle) процесс. Linux-only (/proc).
-#   WATCH_CODEX_ALLOW_SHORT_STALL=1 — разрешить codex stall-timeout < 360s.
-#                            Без opt-in даже явный -t поднимается до 360s.
 #   WATCH_CODEX_EPHEMERAL=1 — добавить --ephemeral в codex-запуск. По
 #                            умолчанию rollout-журналы сохраняются.
 #
@@ -77,8 +75,7 @@
 set -euo pipefail
 
 HARD_TIMEOUT=1800
-STALL_TIMEOUT=180
-CODEX_MIN_STALL_TIMEOUT=360
+STALL_TIMEOUT=360
 SOFT_TIMEOUT=""
 WATCHER_INTERVAL="${WATCH_WATCHER_INTERVAL:-5}"
 OUTPUT="raw"
@@ -130,7 +127,7 @@ while [[ $# -gt 0 ]]; do
             echo "Использование: $0 -s <soft-timeout> [options] [prompt text]"
             echo "  -s, --soft-timeout   базовый таймаут в секундах (обязателен)"
             echo "  -m, --hard-timeout   абсолютный максимум в секундах (default: 1800)"
-            echo "  -t, --stall-timeout  секунд без событий до зависания (pi: 180; codex: min 360 (WATCH_CODEX_ALLOW_SHORT_STALL=1 разрешает меньше))"
+            echo "  -t, --stall-timeout  секунд без событий до зависания (default: 360)"
             echo "  -o, --output         формат вывода через запятую: raw, text, tools, files (default: raw)"
             echo "  -r, --role-file <file> путь к файлу описания роли (обязателен)"
             echo "  --runner <pi|codex>  раннер (priority: CLI > env RUNNER > role profile > pi)"
@@ -340,13 +337,6 @@ if [[ "$RUNNER" != "pi" ]]; then
     PROVIDER=""
 fi
 
-REQUESTED_STALL_TIMEOUT="$STALL_TIMEOUT"
-if [[ "$RUNNER" == "codex" ]] \
-   && [[ "${WATCH_CODEX_ALLOW_SHORT_STALL:-0}" != "1" ]] \
-   && (( STALL_TIMEOUT < CODEX_MIN_STALL_TIMEOUT )); then
-    STALL_TIMEOUT="$CODEX_MIN_STALL_TIMEOUT"
-fi
-
 IFS=',' read -ra FORMATS <<< "$OUTPUT"
 VALID="raw text tools files"
 for fmt in "${FORMATS[@]}"; do
@@ -543,7 +533,7 @@ log_run() {
 log_run "=== RUN START ==="
 log_run "runner=$RUNNER role=$ROLE_FILE role_slug=$RUN_ROLE_SLUG"
 log_run "provider=${PROVIDER:-<none>} model=${MODEL:-<none>} reasoning=${REASONING:-<none>}"
-log_run "soft_timeout=${SOFT_TIMEOUT}s hard_timeout=${HARD_TIMEOUT}s requested_stall_timeout=${REQUESTED_STALL_TIMEOUT}s effective_stall_timeout=${STALL_TIMEOUT}s output=${OUTPUT}"
+log_run "soft_timeout=${SOFT_TIMEOUT}s hard_timeout=${HARD_TIMEOUT}s stall_timeout=${STALL_TIMEOUT}s output=${OUTPUT}"
 log_run "effective_hard=${EFFECTIVE_HARD:-<computed-later>}s"
 log_run "run_log=$RUN_LOG"
 log_run "watch_keep_tmp=${WATCH_KEEP_TMP:-0}"
