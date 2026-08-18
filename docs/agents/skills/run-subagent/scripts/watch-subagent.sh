@@ -15,7 +15,8 @@
 #                          сжигания токенов). Env WATCH_SOFT_WARN_ONLY=1 → только
 #                          предупреждать, не убивать (для экспериментов).
 #   -m, --hard-timeout   — абсолютный максимум в секундах (default: 1800).
-#   -t, --stall-timeout  — секунд без событий до признания зависания (default: 180).
+#   -t, --stall-timeout  — секунд без событий до признания зависания
+#                            (default: 360 для всех раннеров).
 #   -o, --output         — формат вывода через запятую: raw, text, tools, files (default: raw).
 #   -r, --role-file <file> — путь к файлу описания роли (обязателен).
 #   --runner <pi|codex>  — раннер (priority: CLI > env RUNNER > role profile > pi).
@@ -49,6 +50,8 @@
 #                            ретраит провайдера, ожидание длинного ответа):
 #                            watcher ждёт до hard-timeout. Убивает только реально
 #                            простаивающий (idle) процесс. Linux-only (/proc).
+#   WATCH_CODEX_EPHEMERAL=1 — добавить --ephemeral в codex-запуск. По
+#                            умолчанию rollout-журналы сохраняются.
 #
 # Переменные окружения (наследование от внешней обёртки):
 #   RUNNER/PROVIDER/MODEL/REASONING — см. приоритеты выше.
@@ -72,7 +75,7 @@
 set -euo pipefail
 
 HARD_TIMEOUT=1800
-STALL_TIMEOUT=180
+STALL_TIMEOUT=360
 SOFT_TIMEOUT=""
 WATCHER_INTERVAL="${WATCH_WATCHER_INTERVAL:-5}"
 OUTPUT="raw"
@@ -124,7 +127,7 @@ while [[ $# -gt 0 ]]; do
             echo "Использование: $0 -s <soft-timeout> [options] [prompt text]"
             echo "  -s, --soft-timeout   базовый таймаут в секундах (обязателен)"
             echo "  -m, --hard-timeout   абсолютный максимум в секундах (default: 1800)"
-            echo "  -t, --stall-timeout  секунд без событий до зависания (default: 180)"
+            echo "  -t, --stall-timeout  секунд без событий до зависания (default: 360)"
             echo "  -o, --output         формат вывода через запятую: raw, text, tools, files (default: raw)"
             echo "  -r, --role-file <file> путь к файлу описания роли (обязателен)"
             echo "  --runner <pi|codex>  раннер (priority: CLI > env RUNNER > role profile > pi)"
@@ -367,7 +370,9 @@ build_runner_command() {
             RUNNER_CMD+=(--append-system-prompt "Работай от лица роли: $ROLE_NAME. Войди в роль через skill become-role (он доступен как нативный skill и объявит твои skills вместе с файлом роли), затем выполняй задачу.")
             ;;
         codex)
-            RUNNER_CMD=(codex exec --json --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check --ephemeral)
+            RUNNER_CMD=(codex exec --json --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check)
+            [[ "${WATCH_CODEX_EPHEMERAL:-0}" == "1" ]] && RUNNER_CMD+=(--ephemeral)
+            RUNNER_CMD+=(-o "$LAST_MESSAGE_FILE")
             [[ -n "$MODEL" ]] && RUNNER_CMD+=(--model "$MODEL")
             [[ -n "$REASONING" ]] && RUNNER_CMD+=(-c "model_reasoning_effort=$REASONING")
             # codex использует системный промпт через instructions
@@ -516,6 +521,7 @@ RUN_ID="${RUN_TS}-${RUNNER}-${RUN_ROLE_SLUG}-$$"
 # runner+role не перемешают логи/дампы друг друга.
 RUN_DIR="$LOG_DIR/${RUN_ID}"
 RUN_LOG="$RUN_DIR/run.log"
+LAST_MESSAGE_FILE="$RUN_DIR/last_message.txt"
 _EXIT_REASON="unknown"
 mkdir -p "$RUN_DIR"
 
@@ -702,6 +708,13 @@ emit_run_summary() {
         max_gap=$(awk -F'\t' '{print $2}' "$GAPS_FILE" 2>/dev/null | sort -rn | head -1)
         avg_gap=$(awk -F'\t' '{s+=$2; n++} END {if(n>0) printf "%d", s/n; else print 0}' "$GAPS_FILE" 2>/dev/null)
         log_run "gaps_recorded=$gaps_count max_gap=${max_gap:-0}s avg_gap=${avg_gap:-0}s"
+    fi
+    if [[ "$RUNNER" == "codex" ]]; then
+        if [[ "${WATCH_CODEX_EPHEMERAL:-0}" == "1" ]]; then
+            log_run "codex_rollout_dir=disabled ephemeral=1 last_message=${LAST_MESSAGE_FILE} last_message_saved=$([[ -f "$LAST_MESSAGE_FILE" ]] && echo yes || echo no)"
+        else
+            log_run "codex_rollout_dir=~/.codex/sessions ephemeral=0 last_message=${LAST_MESSAGE_FILE} last_message_saved=$([[ -f "$LAST_MESSAGE_FILE" ]] && echo yes || echo no)"
+        fi
     fi
     log_run "=== END SUMMARY ==="
 }

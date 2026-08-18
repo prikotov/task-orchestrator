@@ -18,10 +18,20 @@ Codex CLI требует HTTPS-прокси: без него — `403 Forbidden`
 
 ```bash
 set -a; . ./.env.local; set +a
-codex exec --json --skip-git-repo-check --ephemeral "..."
+codex exec --json --skip-git-repo-check -o /tmp/codex-last-message.txt "..."
 ```
 
 или `export HTTPS_PROXY="$CODEX_HTTP_PROXY" HTTP_PROXY="$CODEX_HTTP_PROXY"` перед вызовом.
+
+`watch-subagent.sh` по умолчанию сохраняет rollout-журналы в
+`~/.codex/sessions` и последнее сообщение в `last_message.txt` каталога запуска.
+Для отключения rollout-журнала явно задайте `WATCH_CODEX_EPHEMERAL=1`.
+
+Для всех раннеров `watch-subagent.sh` использует stall-порог 360 секунд, а
+PHP-раннер — общий idle-порог `AGENT_RUNNER_IDLE_TIMEOUT_SEC=330`. Модели любых
+провайдеров могут молчать до ~5 минут в фазе ожидания или восстановления (stream
+idle budget), поэтому меньшие общие пороги преждевременно срывают штатные
+автоповторы. При необходимости пользователь может задать любое значение `-t`.
 
 ## Шум `Reconnecting…` — это нормально
 

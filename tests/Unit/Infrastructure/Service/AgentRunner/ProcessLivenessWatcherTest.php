@@ -321,16 +321,16 @@ final class ProcessLivenessWatcherTest extends TestCase
     }
 
     #[Test]
-    public function getIdleThresholdReadsOverrideAndDefault(): void
+    public function getIdleThresholdUsesCommonDefaultAndEnvOverride(): void
     {
         // Arrange
         $watcher = $this->watcher(new ProcessLivenessProbeStub([]), new ProcessLivenessClockFake());
 
         // Act + Assert
-        self::assertSame(60, $watcher->getIdleThreshold());
+        self::assertSame(330, $watcher->getIdleThreshold());
 
-        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=45');
-        self::assertSame(45, $watcher->getIdleThreshold());
+        putenv('AGENT_RUNNER_IDLE_TIMEOUT_SEC=420');
+        self::assertSame(420, $watcher->getIdleThreshold());
     }
 
     private function watcher(
