@@ -155,7 +155,7 @@
 
 - **Счётчик:** 4
 - **Ретро:** [2026-06-30](2026-06-30_20-10-pi-jsonl-parser-oom-fix.md), [2026-07-01](2026-07-01_18-12-brainstorm-pi-empty-output-root-cause.md), [2026-08-05](2026-08-05_00-08-triz-task-merge-last-pusher-repeat.md), [2026-08-18](2026-08-18_10-35-codex-idle-kill-investigation.md)
-- **Решение и ссылки:** Решено этим механизмом: реестр + обязательный шаг в [`retrospective`](../skills/retrospective/SKILL.md). См. задачу [`TASK-feat-retro-registry-standard`](../../../todo/TASK-feat-retro-registry-standard.todo.md).
+- **Решение и ссылки:** Решено этим механизмом: реестр + обязательный шаг в [`retrospective`](../skills/retrospective/SKILL.md). См. задачу [`TASK-feat-retro-registry-standard`](../../../todo/done/TASK-feat-retro-registry-standard.todo.md).
 
 ### Ранние таймауты и ложное убийство активных агентов — `resolved`
 
