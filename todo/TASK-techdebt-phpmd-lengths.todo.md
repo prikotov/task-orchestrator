@@ -2,6 +2,7 @@
 # Metadata (Метаданные)
 type: refactor
 created: 2026-08-16
+started: 2026-08-19
 due:
 started:
 completed:
@@ -14,10 +15,10 @@ cost_fact:
 depends_on:
 epic:
 author: Бэкендер Левша (pi)
-assignee:
-branch:
+assignee: Бэкендер Левша (pi)
+branch: task/techdebt-phpmd-lengths
 pr:
-status: backlog
+status: in_progress
 ---
 
 # TASK-techdebt-phpmd-lengths: Устранение нарушений длины методов и классов из phpmd.baseline
