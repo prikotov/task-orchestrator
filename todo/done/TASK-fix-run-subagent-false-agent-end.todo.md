@@ -4,7 +4,7 @@ type: fix
 created: 2026-08-18
 due:
 started: 2026-08-19
-completed:
+completed: 2026-08-19
 cancelled:
 value: V3
 complexity: C2
@@ -16,8 +16,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Бэкендер Тони (codex)
 branch: task/fix-run-subagent-false-agent-end
-pr: '#354'
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/354
+status: done
 ---
 
 # TASK-fix-run-subagent-false-agent-end: Ложное срабатывание `agent_end` по подстроке в `watch-subagent.sh`
@@ -72,18 +72,18 @@ status: in_progress
 - [ ] Не менять поведение codex-ветки и PHP-раннера.
 
 ## 4. План реализации (Implementation Plan)
-1. [ ] Воспроизвести баг тестом на текущем коде (красный): `FAKE_RUNNER_EVENTS` с подстрокой `agent_end` внутри `tool_execution_end`.
-2. [ ] Исправить три места классификации (`is_runner_success_event`, `outfile_has_success_event`, подсчёт статистики) на якорные проверки.
-3. [ ] Добавить осушение FIFO в `wait_agent` с остановкой после ожидания.
-4. [ ] Прогнать `vendor/bin/phpunit tests/Integration/Docs/Agents/Skills/RunSubagent/` и `make md-links validate-language`.
-5. [ ] Ручная сверка на живом прогоне: воспроизвести сценарий чтения RETRO-ROADMAP.md через реальный `watch-subagent.sh` с коротким stall-окном.
+1. [x] Воспроизвести баг тестом на текущем коде (красный): `FAKE_RUNNER_EVENTS` с подстрокой `agent_end` внутри `tool_execution_end`.
+2. [x] Исправить три места классификации (`is_runner_success_event`, `outfile_has_success_event`, подсчёт статистики) на якорные проверки.
+3. [x] Добавить осушение FIFO в `wait_agent` с остановкой после ожидания.
+4. [x] Прогнать `vendor/bin/phpunit tests/Integration/Docs/Agents/Skills/RunSubagent/` и `make md-links validate-language`.
+5. [x] Ручная сверка на живом прогоне: стресс 60/60; ревью через pi-раннер (см. DoD).
 
 ## 5. Критерии приёмки (Definition of Done)
-- [ ] Ложных срабатываний `agent_end` на содержимом событий нет (якорные проверки во всех трёх местах).
-- [ ] Канал событий осушается во время ожидания процесса; дедлок «полный FIFO ↔ wait4» невозможен.
-- [ ] Регрессионный тест зелёный; существующие тесты `WatchSubagentScriptTest` не сломаны.
-- [ ] `vendor/bin/phpunit tests/Integration/Docs/Agents/Skills/RunSubagent/` и `make md-links validate-language` проходят.
-- [ ] Живой прогон чтения файла с `agent_end` в тексте завершается успехом (manual smoke).
+- [x] Ложных срабатываний `agent_end` на содержимом событий нет (якорные проверки во всех трёх местах).
+- [x] Канал событий осушается во время ожидания процесса; дедлок «полный FIFO ↔ wait4» невозможен.
+- [x] Регрессионный тест зелёный; существующие тесты `WatchSubagentScriptTest` не сломаны.
+- [x] `vendor/bin/phpunit tests/Integration/Docs/Agents/Skills/RunSubagent/` и `make md-links validate-language` проходят.
+- [x] Живой прогон чтения файла с `agent_end` в тексте завершается успехом: стресс 60/60 итераций без зависаний; ревью Пуаро через pi-раннер прочитал все файлы задачи с `agent_end` и завершился корректно.
 
 ## 6. Самопроверка (Verification)
 ```bash
@@ -105,7 +105,10 @@ make md-links validate-language
 ## 9. Комментарии (Comments)
 Расследование выполнено Тимлидом 2026-08-18 по принципу «сначала данные, потом гипотезы»: дифференциальные прогоны (прямой запуск 5/5 успех против watcher 7/7 stall), инспекция `/proc` (wchan, syscall, FIONREAD), Node Inspector (CDP) и `bash -x` трейс, зафиксировавший ложное срабатывание `is_runner_success_event` на событии `tool_execution_end` с текстом ретро-файла. Задача закрывает и старый «Pattern A» из ретро 2026-06-30.
 
+Should Have #2 (дым-тест дедлок-симптома) осознанно пропущен — таймингово-нестабильный smoke, регрессия полностью покрыта Must Have тестом (решение согласовано на ревью Пуаро).
+
 ## История изменений (Change History)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-18 | Тимлид Алекс (pi) | Создание задачи по результатам расследования дедлока pi-раннера. |
+| 2026-08-19 | Тимлид Алекс (pi) | Задача выполнена: реализация — Бэкендер Тони (codex), ревью — Ревьювер Бэка Пуаро (pi), флак drain закрыт kill -9 (стресс 60/60). |

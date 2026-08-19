@@ -553,6 +553,7 @@ mkfifo "$PIPE"
 
 AGENT_PID=""
 WATCHER_PID=""
+PIPE_DRAIN_PID=""
 
 # Рекурсивно собрать все PID-потомки процесса
 _get_descendants() {
@@ -593,11 +594,31 @@ wait_agent() {
     local exit_code=0
 
     if [[ -n "$AGENT_PID" ]]; then
+        # После события завершения основной цикл больше не читает FIFO. Осушаем
+        # его параллельно с wait, иначе pi может заблокироваться на заполненном
+        # буфере. Сценарий зафиксирован в TASK-fix-run-subagent-false-agent-end.
+        (
+            # O_RDWR не блокируется, если раннер уже закрыл write-end FIFO.
+            # FD 3 удерживает локальный write-end до остановки drain.
+            exec 3<>"$PIPE"
+            exec cat <&3
+        ) >> "$OUTFILE" &
+        PIPE_DRAIN_PID=$!
+
         set +e
         wait "$AGENT_PID" 2>/dev/null
         exit_code=$?
         set -e
         AGENT_PID=""
+
+        # После завершения раннера читатель больше не нужен. Не ждём EOF: его
+        # может удерживать дочерний процесс раннера с унаследованным stdout.
+        # TERM ненадёжен в окне до первого исполнения сабшелла (наследованные обработчики): доказано трейсом и стресс-тестом в TASK-fix-run-subagent-false-agent-end; KILL пережить нельзя.
+        # kill может оборвать cat посреди записи: хвостовая строка events.ndjson
+        # может быть обрезана, но это косметически и не влияет на функциональность.
+        kill -9 "$PIPE_DRAIN_PID" 2>/dev/null || true
+        wait "$PIPE_DRAIN_PID" 2>/dev/null || true
+        PIPE_DRAIN_PID=""
     fi
 
     return "$exit_code"
@@ -620,7 +641,9 @@ is_runner_success_event() {
 
     case "$RUNNER" in
         pi)
-            [[ "$line" == *"agent_end"* ]]
+            # Подстрочный матч ложноположителен для tool result с текстом
+            # agent_end и приводит к дедлоку FIFO (TASK-fix-run-subagent-false-agent-end).
+            [[ "$line" == '{"type":"agent_end",'* || "$line" == '{"type":"agent_end"}' ]]
             ;;
         codex)
             jq -Rre 'fromjson? | select(type == "object" and .type == "turn.completed")' <<< "$line" >/dev/null 2>&1
@@ -644,7 +667,7 @@ is_runner_failure_event() {
 outfile_has_success_event() {
     case "$RUNNER" in
         pi)
-            grep -q 'agent_end' "$OUTFILE" 2>/dev/null
+            grep -qE '^\{"type":"agent_end"(,|\})' "$OUTFILE" 2>/dev/null
             ;;
         codex)
             jq -Rre 'fromjson? | select(type == "object" and .type == "turn.completed")' "$OUTFILE" >/dev/null 2>&1
@@ -697,7 +720,7 @@ emit_run_summary() {
     if [[ -f "${OUTFILE:-}" ]]; then
         local total agent_end_count last_type
         total=$(wc -l < "$OUTFILE" 2>/dev/null || echo 0)
-        agent_end_count=$(grep -c '"agent_end"' "$OUTFILE" 2>/dev/null || echo 0)
+        agent_end_count=$(grep -cE '^\{"type":"agent_end"(,|\})' "$OUTFILE" 2>/dev/null || true)
         last_type=$(tail -1 "$OUTFILE" 2>/dev/null | jq -r '.type // "?"' 2>/dev/null || echo "?")
         log_run "events_total=$total agent_end_count=$agent_end_count last_event_type=$last_type"
         log_run "events_by_type: $(jq -r '.type' "$OUTFILE" 2>/dev/null | sort | uniq -c | sort -rn | head -8 | tr '\n' '|' | sed 's/|$//')"
@@ -865,6 +888,12 @@ cleanup() {
 
     # Сначала освобождаем ресурсы агента.
     kill_agent_tree
+
+    if [[ -n "$PIPE_DRAIN_PID" ]]; then
+        kill -9 "$PIPE_DRAIN_PID" 2>/dev/null || true
+        wait "$PIPE_DRAIN_PID" 2>/dev/null || true
+        PIPE_DRAIN_PID=""
+    fi
 
     # --- Run summary + архив (best-effort, идемпотентно через маркеры) ---
     emit_run_summary "$reason" "$exit_code" main
