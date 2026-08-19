@@ -33,11 +33,7 @@
 
 ## Статус `escalated`
 
-### Сначала данные, потом гипотезы; нарратив вместо фактов — `escalated`
-
-- **Счётчик:** 3
-- **Ретро:** [2026-06-30](2026-06-30_20-10-pi-jsonl-parser-oom-fix.md), [2026-07-01](2026-07-01_18-12-brainstorm-pi-empty-output-root-cause.md), [2026-08-18](2026-08-18_10-35-codex-idle-kill-investigation.md)
-- **Решение и ссылки:** Создана задача [`TASK-docs-teamlead-data-before-hypotheses`](../../../todo/TASK-docs-teamlead-data-before-hypotheses.todo.md): добавить правило в роль Тимлида.
+_Записей нет: все эскалации закрыты._
 
 ## Статус `watch`
 
@@ -180,6 +176,12 @@
 - **Счётчик:** 1
 - **Ретро:** [2026-06-20](2026-06-20_09-25-bot-account-agent-identity.md)
 - **Решение и ссылки:** Решено в PR #275 и закреплено правилом первичности конвенций. Связанный техдолг: [`TASK-techdebt-modules-configuration-convention`](../../../todo/done/TASK-techdebt-modules-configuration-convention.todo.md).
+
+### Сначала данные, потом гипотезы; нарратив вместо фактов — `resolved`
+
+- **Счётчик:** 3
+- **Ретро:** [2026-06-30](2026-06-30_20-10-pi-jsonl-parser-oom-fix.md), [2026-07-01](2026-07-01_18-12-brainstorm-pi-empty-output-root-cause.md), [2026-08-18](2026-08-18_10-35-codex-idle-kill-investigation.md)
+- **Решение и ссылки:** Решено PR #355: в роль Тимлида добавлено правило расследования «сначала данные, потом гипотезы» — сырые данные до гипотез, запрет обхода до проверки причины, обязательная фиксация обещанного «фиксирую». Задача `TASK-docs-teamlead-data-before-hypotheses` удалена как ретро-временная; при новом повторе вернуть запись в `watch` и пересчитать.
 
 ## Покрытие пилота
 
