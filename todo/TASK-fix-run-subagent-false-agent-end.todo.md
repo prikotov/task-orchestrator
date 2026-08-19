@@ -3,7 +3,7 @@
 type: fix
 created: 2026-08-18
 due:
-started:
+started: 2026-08-19
 completed:
 cancelled:
 value: V3
@@ -14,10 +14,10 @@ cost_fact:
 depends_on:
 epic:
 author: Тимлид Алекс (pi)
-assignee:
+assignee: Бэкендер Тони (codex)
 branch: task/fix-run-subagent-false-agent-end
-pr:
-status: todo
+pr: '#354'
+status: in_progress
 ---
 
 # TASK-fix-run-subagent-false-agent-end: Ложное срабатывание `agent_end` по подстроке в `watch-subagent.sh`
