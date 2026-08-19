@@ -18,7 +18,7 @@ epic:
 author: Бэкендер Левша (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/techdebt-phpmd-lengths
-pr:
+pr: '#356'
 status: done
 ---
 
