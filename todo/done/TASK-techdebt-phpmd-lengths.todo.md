@@ -3,6 +3,7 @@
 type: refactor
 created: 2026-08-16
 started: 2026-08-19
+completed: 2026-08-19
 due:
 started:
 completed:
@@ -18,7 +19,7 @@ author: Бэкендер Левша (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/techdebt-phpmd-lengths
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-techdebt-phpmd-lengths: Устранение нарушений длины методов и классов из phpmd.baseline
@@ -54,27 +55,27 @@ status: in_progress
 ## 3. Требования, MoSCoW (Requirements)
 
 ### 🔴 Блокирующие требования (Must Have)
-- [ ] Нарушения устранены, записи удалены из `phpmd.baseline.xml`
-- [ ] Существующие тесты проходят без изменений assertions
+- [x] Нарушения устранены, записи удалены из `phpmd.baseline.xml`
+- [x] Существующие тесты проходят без изменений assertions
 
 ### 🟡 Важные требования (Should Have)
-- [ ] Покрытие новых методов тестами не ниже текущего
+- [x] Покрытие новых методов тестами не ниже текущего
 
 ### 🟢 Желательно (Could Have)
-- [ ] Общий шаблон декомпозиции для обоих раннеров
+- [x] Общий шаблон декомпозиции для обоих раннеров (симметричные приватные методы `createConfiguredProcess`/`attachProxyEnvironment`/`stopProcessAndBridge`/`buildResult`; вынос общего Infrastructure-хелпера — отдельный техдолг, см. комментарий)
 
 ### ⚫ Не в этот раз (Won't Have)
-- [ ] Переписывание JSONL-парсинга
+- [x] Переписывание JSONL-парсинга — не выполнялось (out of scope)
 
 ## 4. План реализации (Implementation Plan)
-- [ ] Декомпозиция `CodexAgentRunnerService::run()`
-- [ ] Декомпозиция `PiAgentRunnerService::run()`
-- [ ] Сокращение `ChainDefinitionVo`
-- [ ] Удаление записей из baseline, полный `make check`
+- [x] Декомпозиция `CodexAgentRunnerService::run()`
+- [x] Декомпозиция `PiAgentRunnerService::run()`
+- [x] Сокращение `ChainDefinitionVo`
+- [x] Удаление записей из baseline, полный `make check`
 
 ## 5. Критерии приёмки (Definition of Done)
-- [ ] `vendor/bin/phpmd` без нарушений при пустом baseline для этих файлов
-- [ ] `make check` зелёный
+- [x] `vendor/bin/phpmd` без нарушений при пустом baseline для этих файлов
+- [x] `make check` зелёный
 
 ## 6. Самопроверка (Verification)
 - Запуск: `vendor/bin/phpunit` — все тесты зелёные.
@@ -90,7 +91,10 @@ status: in_progress
 ## 9. Комментарии (Comments)
 Задача создана по регламенту работы с техдолгом при обновлении зависимостей.
 
+**Результат (2026-08-19):** `run()` обоих раннеров декомпозирован до 64 строк (порог 80) симметричными приватными методами `createConfiguredProcess`/`attachProxyEnvironment`/`stopProcessAndBridge`/`buildResult`; `ChainDefinitionVo` сжат до 489 строк по метрике phpmd (порог 500) композицией существующих sub-VO `SharedChainDefinitionVo` + `PromptConfigurationVo` (ADR-008), публичный API сохранён. Три записи удалены из `phpmd.baseline.xml`. Поведение не изменено; добавлены тесты на env-подмену прокси без моста и hard-cap таймаут. Пройдены самопроверка и ревью (Ревьювер Бэка Пуаро, финальное одобрение); правки по замечаниям ревью внесены. Техдолг-кандидат: выделение общего Infrastructure-хелпера жизненного цикла раннеров (дублирование декомпозиции Codex/Pi).
+
 ## История изменений (Change History)
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-16 | Бэкендер Левша (pi) | Создание задачи в backlog по итогам обновления prikotov/*. |
+| 2026-08-19 | Тимлид Алекс (pi) | Конвейер task-via-subagents: реализация (Бэкендер Левша), самопроверка, ревью (Ревьювер Бэка Пуаро) — выполнено. |
