@@ -2,7 +2,6 @@
 <phpmd-baseline>
   <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/Kernel.php"/>
   <violation rule="PHPMD\Rule\UnusedPrivateMethod" file="src/Kernel.php" method="isEnvironmentIncluded"/>
-  <violation rule="PHPMD\Rule\Design\LongClass" file="src/Module/ChainDefinition/Domain/ValueObject/ChainDefinitionVo.php"/>
   <violation rule="PHPMD\Rule\CleanCode\ElseExpression" file="src/Module/GitIdentity/Application/UseCase/Command/ObtainToken/ObtainTokenCommandHandler.php"/>
   <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/Module/GitIdentity/Infrastructure/Component/GitHub/GitHubHttpComponent.php"/>
   <violation rule="PHPMD\Rule\CleanCode\ErrorControlOperator" file="src/Module/GitIdentity/Infrastructure/Service/FilesystemTokenCacheService.php" method="atomicWrite"/>
