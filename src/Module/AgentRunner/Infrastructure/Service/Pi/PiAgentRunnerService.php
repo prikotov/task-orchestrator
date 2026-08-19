@@ -6,6 +6,7 @@ namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi;
 
 use InvalidArgumentException;
 use Override;
+use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -135,46 +136,18 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
     #[Override]
     public function run(AgentRunRequestVo $request): AgentResultVo
     {
-        $command = $this->buildCommand($request);
-
-        $process = new Process($command);
-        // Liveness-adaptive timeout: Symfony setTimeout = абсолютный hard cap (fallback),
-        // poll-loop ниже убивает раньше при простое (idle). Активный процесс (модель
-        // рассуждает/стримит) дорабатывает до cap, не обрезаясь по жёсткому таймеру.
         $hardCap = $this->livenessWatcher->resolveHardCap($request->getTimeout());
-        $process->setTimeout($hardCap);
+        $process = $this->createConfiguredProcess($request, $hardCap);
 
-        if ($request->getWorkingDir() !== null) {
-            $process->setWorkingDirectory($request->getWorkingDir());
-        }
-
-        // HTTPS-прокси мост: если CODEX_HTTP_PROXY содержит https:// схему,
-        // запускаем локальный HTTP-прокси-мост для пересылки через TLS.
-        // Ошибки запуска моста не должны бросать исключение из run() —
-        // возвращаем AgentResultVo::createError() по контракту AgentRunnerInterface.
-        $bridge = null;
+        // Ошибки подготовки прокси-окружения (запуск моста, env-настройка) не должны
+        // бросать исключение из run() — возвращаем AgentResultVo::createError()
+        // по контракту AgentRunnerInterface.
         try {
-            $bridge = $this->createBridgeIfNeeded();
+            $bridge = $this->attachProxyEnvironment($process);
         } catch (\Throwable $e) {
             return AgentResultVo::createError(
-                errorMessage: sprintf('Failed to start HTTPS proxy bridge: %s', $e->getMessage()),
+                errorMessage: sprintf('Failed to prepare proxy environment: %s', $e->getMessage()),
             );
-        }
-
-        // Передача HTTP-прокси через env-переменные:
-        // CODEX_HTTP_PROXY (приоритет) подменяет HTTPS_PROXY для pi-процесса.
-        // Если CODEX_HTTP_PROXY не задан — Process наследует env родителя (HTTPS_PROXY, HTTP_PROXY).
-        $codexProxy = getenv('CODEX_HTTP_PROXY');
-        if ($codexProxy !== false && $codexProxy !== '') {
-            $processEnv = $this->buildProcessEnv(getenv());
-
-            // Если мост запущен — подменяем HTTPS_PROXY на локальный URL моста
-            if ($bridge !== null) {
-                $processEnv['HTTPS_PROXY'] = $bridge->getLocalProxyUrl();
-                $processEnv['HTTP_PROXY'] = $bridge->getLocalProxyUrl();
-            }
-
-            $process->setEnv($processEnv);
         }
 
         $this->parser->reset();
@@ -219,18 +192,96 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
                 exitCode: 128 + $e->getSignal(),
             );
         } finally {
-            try {
-                // При fail-fast ошибке liveness-пробы не оставляем agent process
-                // жить до недетерминированного вызова Symfony destructor/GC.
-                if ($process->isRunning()) {
-                    $process->stop(0);
-                }
-            } finally {
-                // Гарантированная остановка orphan-процесса моста при любом исходе.
-                $bridge?->stop();
-            }
+            $this->stopProcessAndBridge($process, $bridge);
         }
 
+        return $this->buildResult($process, $errorOutput);
+    }
+
+    /**
+     * Создаёт Symfony Process с командой, hard-cap таймаутом и рабочей директорией.
+     *
+     * Liveness-adaptive timeout: Symfony setTimeout = абсолютный hard cap (fallback),
+     * poll-loop waitFor() убивает раньше при простое (idle). Активный процесс (модель
+     * рассуждает/стримит) дорабатывает до cap, не обрезаясь по жёсткому таймеру.
+     * Симметрично CodexAgentRunnerService (#297).
+     *
+     * @param AgentRunRequestVo $request запрос на запуск агента
+     * @param int $hardCap абсолютный hard cap в секундах (уже резолвнут через resolveHardCap)
+     */
+    private function createConfiguredProcess(AgentRunRequestVo $request, int $hardCap): Process
+    {
+        $process = new Process($this->buildCommand($request));
+        $process->setTimeout($hardCap);
+
+        if ($request->getWorkingDir() !== null) {
+            $process->setWorkingDirectory($request->getWorkingDir());
+        }
+
+        return $process;
+    }
+
+    /**
+     * Создаёт HTTPS-прокси-мост (если нужен) и настраивает env Symfony Process.
+     *
+     * HTTPS-прокси мост: если CODEX_HTTP_PROXY содержит https:// схему,
+     * запускается локальный HTTP-прокси-мост для пересылки через TLS.
+     *
+     * Передача HTTP-прокси через env-переменные:
+     * CODEX_HTTP_PROXY (приоритет) подменяет HTTPS_PROXY для pi-процесса.
+     * Если CODEX_HTTP_PROXY не задан — Process наследует env родителя (HTTPS_PROXY, HTTP_PROXY).
+     *
+     * @return HttpsProxyBridge|null мост или null, если прокси не требуется
+     *
+     * @throws RuntimeException при ошибке запуска моста; любые сбои подготовки
+     *                         прокси-окружения перехватываются в run()
+     */
+    private function attachProxyEnvironment(Process $process): ?HttpsProxyBridge
+    {
+        $bridge = $this->createBridgeIfNeeded();
+
+        $codexProxy = getenv('CODEX_HTTP_PROXY');
+        if ($codexProxy !== false && $codexProxy !== '') {
+            $processEnv = $this->buildProcessEnv(getenv());
+
+            // Если мост запущен — подменяем HTTPS_PROXY на локальный URL моста
+            if ($bridge !== null) {
+                $processEnv['HTTPS_PROXY'] = $bridge->getLocalProxyUrl();
+                $processEnv['HTTP_PROXY'] = $bridge->getLocalProxyUrl();
+            }
+
+            $process->setEnv($processEnv);
+        }
+
+        return $bridge;
+    }
+
+    /**
+     * Гарантированно останавливает agent-процесс и orphan-процесс моста.
+     *
+     * При fail-fast ошибке liveness-пробы не оставляем agent process
+     * жить до недетерминированного вызова Symfony destructor/GC.
+     */
+    private function stopProcessAndBridge(Process $process, ?HttpsProxyBridge $bridge): void
+    {
+        try {
+            if ($process->isRunning()) {
+                $process->stop(0);
+            }
+        } finally {
+            $bridge?->stop();
+        }
+    }
+
+    /**
+     * Формирует итоговый AgentResultVo по завершившемуся процессу.
+     *
+     * Неуспешный exit — ошибка с stderr-tail (или кодом выхода);
+     * успешный — метрики из накопленного JSONL-парсера. Если сам агент
+     * сообщил об ошибке в JSONL-потоке (isError), она приоритетнее exit-кода.
+     */
+    private function buildResult(Process $process, string $errorOutput): AgentResultVo
+    {
         if (!$process->isSuccessful()) {
             return AgentResultVo::createError(
                 $errorOutput !== '' ? $errorOutput : sprintf('pi exited with code %d.', $process->getExitCode() ?? 1),

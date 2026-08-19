@@ -48,8 +48,9 @@ final class PiAgentRunnerTest extends TestCase
 
         $this->fixtureFiles = [];
 
-        // Очистка env-переменной
+        // Очистка env-переменных
         putenv('CODEX_HTTP_PROXY');
+        putenv('AGENT_RUNNER_HARD_TIMEOUT_SEC');
     }
 
     // ──── getName / isAvailable ─────────────────────────────────────────
@@ -592,6 +593,48 @@ PHP);
 
         self::assertTrue($result->isError());
         self::assertSame('No API key for provider: openai-codex', $result->getErrorMessage());
+    }
+
+    #[Test]
+    public function runAppliesHttpProxyEnvironmentWithoutBridge(): void
+    {
+        // http://-схема: мост не запускается, но env подменяется
+        // (HTTPS_PROXY для процесса ← CODEX_HTTP_PROXY).
+        putenv('CODEX_HTTP_PROXY=http://proxy.example.com:8080');
+
+        $command = $this->createExecutableFixture('pi_proxy_env_', <<<'PHP'
+exit(getenv('HTTPS_PROXY') === 'http://proxy.example.com:8080' ? 0 : 7);
+PHP);
+
+        $result = $this->runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+        ));
+
+        // exit(7) — если env не применился, процесс сообщает об ошибке
+        self::assertFalse($result->isError());
+    }
+
+    #[Test]
+    public function runReturnsErrorOnHardCapTimeout(): void
+    {
+        putenv('AGENT_RUNNER_HARD_TIMEOUT_SEC=2');
+
+        $command = $this->createExecutableFixture('pi_timeout_', <<<'PHP'
+sleep(30);
+PHP);
+
+        $result = $this->runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+            timeout: 1,
+        ));
+
+        self::assertTrue($result->isError());
+        self::assertTrue($result->isTimedOut());
+        self::assertSame('Agent timed out after 2 seconds (hard cap).', $result->getErrorMessage());
     }
 
     private function createExecutableFixture(string $prefix, string $script): string
