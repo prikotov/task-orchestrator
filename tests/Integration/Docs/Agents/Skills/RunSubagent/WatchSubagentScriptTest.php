@@ -222,6 +222,25 @@ YAML);
     }
 
     #[Test]
+    public function piRunnerDoesNotTreatAgentEndInToolResultAsSuccessEvent(): void
+    {
+        $process = $this->runScript(
+            arguments: ['--runner', 'pi', '-o', 'text'],
+            env: [
+                'FAKE_RUNNER_EVENTS' => implode("\n", [
+                    '{"type":"tool_execution_end","result":{"content":[{"type":"text","text":"Read agent_end from a file."}]}}',
+                    '    {"type":"agent_end"}',
+                    '{"type":"message_end","message":{"role":"assistant","content":[{"type":"text","text":"Pi completed."}]}}',
+                    '{"type":"agent_end","messages":[]}',
+                ]) . "\n",
+            ],
+        );
+
+        self::assertSame(0, $process->getExitCode());
+        self::assertSame("Pi completed.\n", $process->getOutput());
+    }
+
+    #[Test]
     public function codexRunnerCompletesOnTurnCompletedAndExtractsItemText(): void
     {
         $process = $this->runScript(
