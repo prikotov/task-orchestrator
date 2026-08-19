@@ -56,7 +56,7 @@ status: done
 * **Out of Scope (Чего НЕ делаем):**
     * Миграция архивных задач `todo/done/`, `todo/backlog/`, `todo/cancelled/` на новый формат
     * Обновление остальных зависимостей (symfony/* и пр.)
-    * Рефакторинг длинных методов `run()` — отдельная задача техдолга `TASK-techdebt-phpmd-lengths`
+    * Рефакторинг длинных методов `run()` — отдельная задача техдолга (выполнена: [TASK-techdebt-phpmd-lengths](TASK-techdebt-phpmd-lengths.todo.md))
 
 ## 3. Требования, MoSCoW (Requirements)
 
