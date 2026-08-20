@@ -1,3 +1,6 @@
+includes:
+    - vendor/prikotov/coding-standard/phpstan-rules.neon
+
 parameters:
     level: 8
     paths:

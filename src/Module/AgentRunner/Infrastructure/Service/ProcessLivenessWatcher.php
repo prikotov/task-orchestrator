@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service;
 
 use Symfony\Component\Process\Process;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\{
-    Dto\ProcessLivenessActiveProbeResultDto,
-    Dto\ProcessLivenessUnknownProbeResultDto,
-    ProcessLivenessClockComponentInterface,
-    ProcessLivenessProbeComponentInterface,
-    ProcessLivenessSleeperComponentInterface,
-};
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessActiveProbeResultDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessUnknownProbeResultDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessClockComponentInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessProbeComponentInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessSleeperComponentInterface;
 
 /**
  * Политика liveness-adaptive ожидания процесса.
