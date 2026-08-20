@@ -10,7 +10,7 @@ author: Бэкендер Левша (codex-cli)
 assignee: Бэкендер Левша (codex-cli)
 branch: task/fix-host-subagent-profile
 pr: https://github.com/prikotov/task-orchestrator/pull/359
-status: review
+status: done
 ---
 
 # TASK-fix-host-subagent-profile: Загружать профиль роли из потребляющего проекта
@@ -87,3 +87,4 @@ make check
 | 2026-08-20 | Бэкендер Левша (codex-cli) | Создание задачи и начало реализации. |
 | 2026-08-20 | Бэкендер Левша (codex-cli) | Исправлено разрешение путей; `make check` успешно завершён. |
 | 2026-08-20 | Бэкендер Левша (codex-cli) | Создан Pull Request #359, задача передана на ревью. |
+| 2026-08-20 | Девопс Сэм (codex-cli) | Задача одобрена; подготовлена к слиянию. |
