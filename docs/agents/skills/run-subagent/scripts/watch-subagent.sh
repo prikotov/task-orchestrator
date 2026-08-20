@@ -94,9 +94,22 @@ REASONING_EXPLICIT=false
 [[ -n "$MODEL" ]] && MODEL_EXPLICIT=true
 [[ -n "$REASONING" ]] && REASONING_EXPLICIT=true
 
-# Определяем пути относительно расположения скрипта
+# Определяем пути относительно расположения скрипта. При установке Composer
+# скрипт находится в <проект>/vendor/prikotov/task-orchestrator/...: профили
+# ролей и .env.local принадлежат потребляющему проекту, а не пакету.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
+PACKAGE_ROOT="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
+VENDOR_DIR="$(cd "$PACKAGE_ROOT/../.." && pwd)"
+
+if [[ -f "$VENDOR_DIR/autoload.php" ]]; then
+    PROJECT_ROOT="$(cd "$VENDOR_DIR/.." && pwd)"
+    AUTOLOAD_FILE="$VENDOR_DIR/autoload.php"
+else
+    # Скрипт запущен из checkout пакета, а не из Composer-зависимости.
+    PROJECT_ROOT="$PACKAGE_ROOT"
+    AUTOLOAD_FILE="$PROJECT_ROOT/vendor/autoload.php"
+fi
+
 SYSTEM_PROMPT_FILE="$SCRIPT_DIR/subagent_system.txt"
 CHAINS_CONFIG="${CHAINS_CONFIG:-$PROJECT_ROOT/config/chains.yaml}"
 
@@ -183,7 +196,7 @@ load_role_profile() {
     [[ -f "$CHAINS_CONFIG" ]] || return 0
     command -v php >/dev/null 2>&1 || return 0
 
-    ROLE_PROFILE_PROJECT_ROOT="$PROJECT_ROOT" \
+    ROLE_PROFILE_AUTOLOAD="$AUTOLOAD_FILE" \
     ROLE_PROFILE_CONFIG="$CHAINS_CONFIG" \
     ROLE_PROFILE_NAME="$role_name" \
     php <<'PHP'
@@ -191,12 +204,11 @@ load_role_profile() {
 
 declare(strict_types=1);
 
-$projectRoot = getenv('ROLE_PROFILE_PROJECT_ROOT') ?: '';
+$autoload = getenv('ROLE_PROFILE_AUTOLOAD') ?: '';
 $configPath = getenv('ROLE_PROFILE_CONFIG') ?: '';
 $roleName = getenv('ROLE_PROFILE_NAME') ?: '';
-$autoload = $projectRoot . '/vendor/autoload.php';
 
-if ($projectRoot === '' || $configPath === '' || $roleName === '' || !is_file($autoload) || !is_file($configPath)) {
+if ($autoload === '' || $configPath === '' || $roleName === '' || !is_file($autoload) || !is_file($configPath)) {
     exit(0);
 }
 
