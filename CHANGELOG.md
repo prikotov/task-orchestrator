@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-08-20
+
+### Fixed
+
+- Anchored the `become-role` script invocation in `SKILL.md` with an explicit run-directory comment (run from the skill root, the directory containing `SKILL.md`) so agents that copy the command literally stop failing with "No such file or directory" in host installations (#362).
+
 ## [0.3.0] - 2026-08-20
 
 ### Added
