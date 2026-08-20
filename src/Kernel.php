@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common;
 
+use Composer\InstalledVersions;
 use Override;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+use TaskOrchestrator\Common\Component\CommandBus\DependencyInjection\UseCaseBusCompilerPass;
 use TaskOrchestrator\Common\Component\ModuleSystem\DependencyInjection\ModuleServiceRegistrar;
 use TaskOrchestrator\Common\Component\ModuleSystem\ModuleKernelTrait;
+use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStepServiceInterface;
 use TaskOrchestrator\Common\ValueObject\ReleaseVersionVo;
+use const PHP_OS_FAMILY;
 
 /**
  * Ядро приложения TaskOrchestrator (console-only).
@@ -66,7 +72,7 @@ class Kernel extends BaseKernel
         string $environment,
         bool $debug,
         private readonly ?string $projectRoot = null,
-        private readonly string $platformFamily = \PHP_OS_FAMILY,
+        private readonly string $platformFamily = PHP_OS_FAMILY,
     ) {
         parent::__construct($environment, $debug);
     }
@@ -181,6 +187,11 @@ class Kernel extends BaseKernel
         $this->registerAutoconfiguration($container);
         $this->registerModules($container, $this->getModules());
         $this->registerConsoleServices($container);
+
+        // Шины Use Case: пас добавляется ПОСЛЕ регистрационных пасов модулей,
+        // поэтому в process() видны все уже зарегистрированные хендлеры
+        // (и из module-local services.yaml, и из PHAR-safe регистратора).
+        $container->addCompilerPass(new UseCaseBusCompilerPass());
     }
 
     /**
@@ -199,15 +210,15 @@ class Kernel extends BaseKernel
         // _instanceof), поэтому применяются ко всем autoconfigured-сервисам
         // независимо от способа регистрации (explicit def или PHAR-safe регистратор).
         $container->registerForAutoconfiguration(
-            \TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface::class,
+            AgentRunnerInterface::class,
         )->addTag('agent.runner');
 
         $container->registerForAutoconfiguration(
-            \TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface::class,
+            ExecutionStrategyInterface::class,
         )->addTag('orchestrator.execution_strategy');
 
         $container->registerForAutoconfiguration(
-            \TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStepServiceInterface::class,
+            ExecuteStepServiceInterface::class,
         )->addTag('chain_execution.step_runner');
     }
 
@@ -354,12 +365,12 @@ class Kernel extends BaseKernel
      */
     private function readPackagePrettyVersion(): ?string
     {
-        if (!class_exists(\Composer\InstalledVersions::class)) {
+        if (!class_exists(InstalledVersions::class)) {
             return null;
         }
 
         /** @var string|null $prettyVersion */
-        $prettyVersion = \Composer\InstalledVersions::getPrettyVersion('prikotov/task-orchestrator');
+        $prettyVersion = InstalledVersions::getPrettyVersion('prikotov/task-orchestrator');
 
         return $prettyVersion;
     }
@@ -371,12 +382,12 @@ class Kernel extends BaseKernel
      */
     private function readRootPrettyVersion(): ?string
     {
-        if (!class_exists(\Composer\InstalledVersions::class)) {
+        if (!class_exists(InstalledVersions::class)) {
             return null;
         }
 
         /** @var array<string, mixed> $rootPackage */
-        $rootPackage = \Composer\InstalledVersions::getRootPackage();
+        $rootPackage = InstalledVersions::getRootPackage();
         $prettyVersion = $rootPackage['pretty_version'] ?? null;
 
         return is_string($prettyVersion) && $prettyVersion !== '' ? $prettyVersion : null;
