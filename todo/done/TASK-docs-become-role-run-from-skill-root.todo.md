@@ -4,7 +4,7 @@ type: docs
 created: 2026-08-20
 due:
 started:
-completed:
+completed: 2026-08-20 16:49:43 (1787244583)
 cancelled:
 value: V2
 complexity: C0
@@ -17,7 +17,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/become-role-run-from-skill-root
 pr: https://github.com/prikotov/task-orchestrator/pull/362
-status: review
+status: done
 ---
 
 # TASK-docs-become-role-run-from-skill-root: Якорь каталога запуска скрипта в SKILL.md become-role
