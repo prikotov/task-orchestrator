@@ -25,13 +25,38 @@ status: in_progress
 
 ### Варианты или путь решения (Solution Sketch)
 
-Вынести общий жизненный цикл в отдельный Infrastructure-компонент модуля AgentRunner (сервис по прецеденту `ProcessLivenessWatcher`), раннеры делегируют ему исполнение. Раннер-специфика (buildCommand, JSONL-парсер, обработка Pi `isError`) остаётся в раннерах.
+**DS Архитектора:** вынести общий жизненный цикл в Infrastructure-сервис
+`RunAgentProcessLifecycleService` с внутренним контрактом
+`RunAgentProcessLifecycleServiceInterface` в namespace
+`TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle`.
+Интерфейс размещается рядом с реализацией в Infrastructure, потому что компонент
+используется только инфраструктурными раннерами и задача запрещает трогать
+Domain/Application; это локальная техническая граница, не Domain port.
+
+Сервис владеет общей частью runtime-жизненного цикла: `Process` creation, hard-cap
+настройка, working dir, proxy env/`HttpsProxyBridge`, stdout JSONL buffering, stderr
+tail, ожидание через `ProcessLivenessWatcher`, idle/hard-cap/signal маппинг в
+`AgentResultVo`, гарантированный stop процесса и моста.
+
+Раннеры сохраняют свою специфику:
+- `buildCommand()` остаётся в `CodexAgentRunnerService` и `PiAgentRunnerService` и **не дедуплицируется**;
+- `buildResult()` остаётся runner-specific hook'ом: Codex строит success/error по своему parser result, Pi дополнительно обрабатывает `isError`/`errorMessage`;
+- имя раннера передаётся в lifecycle-сервис параметром `runnerName`, поэтому signal-сообщения остаются точными (`codex process ...` / `pi process ...`).
+
+Контракт с JSONL-парсерами — через callbacks/hooks, а не через новый общий
+parser-interface: сервису нужны только `reset()` и `feed(string $line)`, а `result()`
+имеет разные array-shape у Codex/Pi и интерпретируется в `buildResult()` раннера.
+Это не создаёт искусственный общий тип, не ломает текущие parser-тесты и сохраняет
+Pi-специфику `isError` в раннере.
+
+Публичные тестовые seam-методы `buildProcessEnv()` и `createBridgeIfNeeded()`
+переносятся из обоих раннеров в `RunAgentProcessLifecycleService`; тесты должны
+проверять их на новом сервисе. Обёртки в раннерах не оставлять: цель задачи — убрать
+дублируемые lifecycle-методы из обоих классов.
 
 **Почему не Helper и не trait** (конвенции, прецедент TASK-techdebt-extract-process-liveness-service):
 - `docs/conventions/core-patterns/helper.md`: helper — только статические pure-методы без I/O; здесь I/O (Symfony Process, `getenv`, старт/стоп моста).
 - `docs/conventions/core-patterns/trait.md`: trait не может использовать скрытые источники данных (`getenv`); жизненный цикл их читает.
-
-Точный дизайн (имя, контракт парсеров, границы hook'ов) фиксируется на этапе проектирования — Архитектор (RACI `refactor`: DS обязательно).
 
 ### Ожидаемый результат (Expected Result)
 
@@ -93,11 +118,108 @@ status: in_progress
 
 ## 4. План реализации (Implementation Plan)
 
-<!-- Заполняется на этапе проектирования (Архитектор) и уточняется исполнителем (Reverse Briefing). -->
+1. [ ] Создать внутренний Infrastructure-контракт и реализацию:
+   - `src/Module/AgentRunner/Infrastructure/Service/Lifecycle/RunAgentProcessLifecycleServiceInterface.php`;
+   - `src/Module/AgentRunner/Infrastructure/Service/Lifecycle/RunAgentProcessLifecycleService.php`.
 
-1. [ ] DS: Архитектор фиксирует дизайн (имя и границы сервиса, контракт парсеров, hook для Pi `isError`, судьба публичных `buildProcessEnv`/`createBridgeIfNeeded`).
-2. [ ] ...
-3. [ ] ...
+2. [ ] Зафиксировать публичный контракт `RunAgentProcessLifecycleServiceInterface`:
+   ```php
+   /**
+    * @param callable(AgentRunRequestVo): list<string> $buildCommand
+    * @param callable(): void $resetParser
+    * @param callable(string): void $feedParserLine
+    * @param callable(Process, string): AgentResultVo $buildResult
+    */
+   public function run(
+       AgentRunRequestVo $request,
+       string $runnerName,
+       callable $buildCommand,
+       callable $resetParser,
+       callable $feedParserLine,
+       callable $buildResult,
+   ): AgentResultVo;
+
+   /** @param array<string, string> $currentEnv @return array<string, string> */
+   public function buildProcessEnv(array $currentEnv): array;
+
+   public function createBridgeIfNeeded(): ?HttpsProxyBridge;
+
+   public function buildUserPrompt(AgentRunRequestVo $request): string;
+
+   public function resolveSystemPromptPath(AgentRunRequestVo $request): ?string;
+   ```
+   `Process` — `Symfony\Component\Process\Process`, `HttpsProxyBridge` остаётся существующим
+   `TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge`
+   (не перемещать в этой задаче, чтобы не расширять рефакторинг).
+
+3. [ ] Реализовать в `RunAgentProcessLifecycleService` единственную копию lifecycle-логики:
+   - private const `ERROR_OUTPUT_TAIL_BYTES = 65536`;
+   - private `createConfiguredProcess(AgentRunRequestVo $request, int $hardCap, callable $buildCommand): Process`;
+   - private `attachProxyEnvironment(Process $process): ?HttpsProxyBridge`;
+   - private `stopProcessAndBridge(Process $process, ?HttpsProxyBridge $bridge): void`;
+   - private `bufferStdoutChunk(string $chunk, string &$stdoutBuffer, callable $feedParserLine): void`;
+   - private `flushStdoutBuffer(string &$stdoutBuffer, callable $feedParserLine): void`;
+   - private `appendErrorOutputTail(string $currentOutput, string $chunk): string`.
+   Поведение перенести byte-for-byte, кроме параметризации `runnerName` в signal-сообщении:
+   `sprintf('%s process terminated by signal %d.', $runnerName, $signal)`.
+
+4. [ ] В `CodexAgentRunnerService` заменить lifecycle-декомпозицию делегированием:
+   - constructor: заменить `ProcessLivenessWatcher $livenessWatcher` на
+     `RunAgentProcessLifecycleServiceInterface $processLifecycle`;
+   - `run(AgentRunRequestVo $request)` сделать thin wrapper вокруг `$this->processLifecycle->run(...)`;
+   - передать callbacks: `buildCommand`, `parser->reset`, `parser->feed`, private `buildResult(Process $process, string $errorOutput)`;
+   - `buildCommand()` оставить Codex-specific, но заменить общие вызовы на
+     `$this->processLifecycle->buildUserPrompt($request)` и
+     `$this->processLifecycle->resolveSystemPromptPath($request)`;
+   - удалить из класса дублируемые методы/константу: `createConfiguredProcess`, `attachProxyEnvironment`,
+     `stopProcessAndBridge`, `buildProcessEnv`, `createBridgeIfNeeded`, `buildUserPrompt`,
+     `bufferStdoutChunk`, `flushStdoutBuffer`, `appendErrorOutputTail`, `resolveSystemPromptPath`,
+     `ERROR_OUTPUT_TAIL_BYTES`;
+   - оставить Codex-specific методы: `buildCommand`, `buildResult`, `resolvePromptSlots`,
+     `escapeTomlString`, `extractAppendFromRunnerArgs`, `getFilteredRunnerArgs`, `readFileOrValue`.
+
+5. [ ] В `PiAgentRunnerService` выполнить симметричную замену:
+   - constructor: заменить `ProcessLivenessWatcher $livenessWatcher` на
+     `RunAgentProcessLifecycleServiceInterface $processLifecycle`;
+   - `run()` делегирует в `$this->processLifecycle->run(...)` с `runnerName: 'pi'`;
+   - `buildCommand()` использует `$this->processLifecycle->buildUserPrompt($request)` и
+     `$this->processLifecycle->resolveSystemPromptPath($request)`;
+   - удалить тот же набор lifecycle-методов/константу, что и в Codex;
+   - оставить Pi-specific методы: `buildCommand`, `buildResult` с проверкой `isError`/`errorMessage`,
+     `resolvePromptMarkers`, `extractAppendPromptPath`, `resolveCommandFiles`.
+
+6. [ ] Не вводить общий интерфейс для `CodexJsonlParser`/`PiJsonlParser` на этом шаге.
+   Эквивалентный контракт lifecycle-сервиса — callbacks `resetParser`/`feedParserLine` +
+   `buildResult` hook. Это сохраняет текущий `result(): array` shape каждого parser-а и не
+   смешивает Pi error-семантику с Codex.
+
+7. [ ] Обновить DI в `src/Module/AgentRunner/Resource/config/services.yaml`:
+   ```yaml
+   TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\RunAgentProcessLifecycleServiceInterface:
+     alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\RunAgentProcessLifecycleService
+   ```
+   Явного definition для implementation не нужно: `ModuleServiceRegistrar` auto-discovers instantiable
+   классы модуля; alias нужен для autowire интерфейса в раннеры.
+
+8. [ ] Обновить тесты:
+   - добавить `tests/Unit/Infrastructure/Service/AgentRunner/Lifecycle/RunAgentProcessLifecycleServiceTest.php`
+     с покрытием `buildProcessEnv`, `createBridgeIfNeeded`, chunked stdout + flush last line, stderr-tail,
+     hard-cap timeout, idle timeout и signal-сообщения с `runnerName`;
+   - перенести duplicated proxy-тесты из `CodexAgentRunnerTest` и `PiAgentRunnerTest` на новый service;
+   - обновить setup direct-construction в runner-тестах: создавать `RunAgentProcessLifecycleService` с
+     тестовым `ProcessLivenessWatcher`;
+   - оставить в runner-тестах проверки `buildCommand()` и runner-specific результата (`Codex` success/error,
+     `Pi` success/error + JSONL `isError` при exit 0);
+   - обновить `AgentRunnerLivenessWatcherIntegrationTest`: проверять watcher через
+     `processLifecycle` (или assert same lifecycle-service в обоих раннерах), а не private `livenessWatcher`
+     внутри раннера;
+   - обновить `AgentRunnerProbeErrorCleanupIntegrationTest` и `CodexAgentRunnerLivenessIntegrationTest`
+     под новый constructor.
+
+9. [ ] Проверить, что после рефакторинга `rg "buildProcessEnv|createBridgeIfNeeded|ERROR_OUTPUT_TAIL_BYTES|bufferStdoutChunk|flushStdoutBuffer|appendErrorOutputTail" src/Module/AgentRunner/Infrastructure/Service/{Codex,Pi}`
+   не находит дубликатов в раннерах; разрешены только runner-specific prompt/command/result методы.
+
+10. [ ] Запустить проверки из раздела Verification: `make check` и `php vendor/bin/todo-md validate todo/TASK-techdebt-agent-runner-lifecycle-helper.todo.md`.
 
 ## 5. Критерии приёмки (Definition of Done)
 
@@ -139,3 +261,4 @@ php vendor/bin/todo-md validate todo/TASK-techdebt-agent-runner-lifecycle-helper
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-08-20 | Тимлид Алекс (pi) | Создание задачи (по подтверждению владельца, из ретро PR #356) |
+| 2026-08-20 | Архитектор Гэндальф | Зафиксировано DS: `RunAgentProcessLifecycleService`, callback-контракт parser lifecycle, перенос public proxy seam-методов в общий Infrastructure-сервис. |
