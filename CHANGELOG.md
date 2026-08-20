@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-08-20
+
+### Added
+
+- Added locale-aware role resolution for `become-role`, including `APP_LOCALE` support (#318, #319, #320).
+
+### Changed
+
+- Standardized release history in `main`; future releases are prepared and tagged from this branch (#360).
+
+### Fixed
+
+- Hardened Pi/Codex runner lifecycle and timeouts; `run-subagent` now uses the consumer project's role profile in Composer installations (#352, #354, #357, #359).
+
 ## [0.2.3] - 2026-07-17
 
 ### Changed
