@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/usecase-bus-dispatch
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/364
+status: review
 ---
 
 # TASK-refactor-usecase-bus-dispatch: Диспетчеризация Use Case через CommandBus/QueryBus
