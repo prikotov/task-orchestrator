@@ -10,7 +10,7 @@ author: Тимлид Алекс (codex-cli)
 assignee: Тимлид Алекс (codex-cli)
 branch: task/merge-release-0-2-back
 pr: https://github.com/prikotov/task-orchestrator/pull/360
-status: review
+status: done
 ---
 
 # TASK-chore-merge-release-0-2-back: Синхронизировать историю релизов 0.2 с main
@@ -60,7 +60,7 @@ status: review
 - [x] История релизов 0.2 доступна из `main`.
 - [x] Актуальная реализация `main` не заменена старой реализацией release-ветки.
 - [x] `make check` завершён успешно.
-- [ ] PR одобрен; задача переведена в `done` до merge.
+- [x] PR одобрен; задача переведена в `done` до merge.
 
 ## 6. Самопроверка (Verification)
 ```bash
@@ -87,3 +87,4 @@ git diff --check
 | 2026-08-20 | Тимлид Алекс (codex-cli) | Создание задачи и начало merge-back `release/0.2` в `main`. |
 | 2026-08-20 | Тимлид Алекс (codex-cli) | Релизные метаданные проверены; `make check` успешно завершён. |
 | 2026-08-20 | Тимлид Алекс (codex-cli) | Создан Pull Request #360, задача передана на ревью. |
+| 2026-08-20 | Тимлид Алекс (codex-cli) | PR одобрен; задача подготовлена к слиянию. |
