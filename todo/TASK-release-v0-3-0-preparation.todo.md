@@ -9,8 +9,8 @@ epic:
 author: Тимлид Алекс (codex-cli)
 assignee: Тимлид Алекс (codex-cli)
 branch: task/release-v0-3-0
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/361
+status: review
 ---
 
 # TASK-release-v0-3-0-preparation: Подготовить и выпустить релиз v0.3.0 из main
@@ -43,7 +43,7 @@ status: in_progress
 - [x] `CHANGELOG.md` и release plan описывают состав релиза.
 - [x] Политика релизов в `docs/releases/RELEASE-POLICY.md` фиксирует выпуск только из `main`.
 - [x] `make check` успешно завершён.
-- [ ] Создан PR в `main` с меткой `codex-cli`.
+- [x] Создан PR в `main` с меткой `codex-cli`.
 - [ ] После approval опубликованы tag `v0.3.0`, GitHub Release и PHAR-артефакт.
 
 ### ⚫ Не будем делать (Won't Have)
@@ -54,7 +54,7 @@ status: in_progress
 1. [x] Синхронизировать историю `release/0.2` с `main` через PR #360.
 2. [x] Сформировать changelog, release plan и обновить процесс релизов.
 3. [x] Запустить `make check`.
-4. [ ] Создать PR подготовки в `main` и передать на ревью.
+4. [x] Создать PR подготовки в `main` и передать на ревью.
 5. [ ] После approval перевести задачу в `done`, слить PR и опубликовать tag с GitHub Release.
 6. [ ] Обновить TasK до `^0.3.0` и выполнить `make check`.
 
@@ -94,3 +94,4 @@ gh run list --workflow='Release Phar' --limit=1
 | :--- | :--- | :--- |
 | 2026-08-20 | Тимлид Алекс (codex-cli) | Создание задачи и подготовка релиза `v0.3.0` из `main`. |
 | 2026-08-20 | Тимлид Алекс (codex-cli) | `make check` завершён успешно. |
+| 2026-08-20 | Тимлид Алекс (codex-cli) | Создан PR #361 с меткой `codex-cli`; задача передана на review. |
