@@ -16,8 +16,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/become-role-run-from-skill-root
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/362
+status: review
 ---
 
 # TASK-docs-become-role-run-from-skill-root: Якорь каталога запуска скрипта в SKILL.md become-role
