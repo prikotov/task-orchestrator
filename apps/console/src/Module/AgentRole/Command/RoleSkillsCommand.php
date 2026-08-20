@@ -14,9 +14,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TaskOrchestrator\Common\Module\AgentRole\Application\Dto\SkillDto;
+use TaskOrchestrator\Common\Component\QueryBus\QueryBusComponentInterface;
 use TaskOrchestrator\Common\Module\AgentRole\Application\Exception\ResolveRoleSkillsFailedException;
 use TaskOrchestrator\Common\Module\AgentRole\Application\UseCase\Query\ResolveRoleSkills\ResolveRoleSkillsQuery;
-use TaskOrchestrator\Common\Module\AgentRole\Application\UseCase\Query\ResolveRoleSkills\ResolveRoleSkillsQueryHandler;
 use TaskOrchestrator\Common\Module\AgentRole\Application\UseCase\Query\ResolveRoleSkills\ResolveRoleSkillsResultDto;
 
 
@@ -51,7 +51,7 @@ final class RoleSkillsCommand extends Command
     private const string FORMAT_JSON = 'json';
 
     public function __construct(
-        private readonly ResolveRoleSkillsQueryHandler $handler,
+        private readonly QueryBusComponentInterface $queryBus,
     ) {
         parent::__construct();
     }
@@ -92,7 +92,7 @@ final class RoleSkillsCommand extends Command
 
         try {
             /** @var ResolveRoleSkillsResultDto $result */
-            $result = ($this->handler)(new ResolveRoleSkillsQuery($roleName));
+            $result = $this->queryBus->query(new ResolveRoleSkillsQuery($roleName));
         } catch (ResolveRoleSkillsFailedException $e) {
             $io->error($e->getMessage());
 

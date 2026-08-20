@@ -10,8 +10,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use TaskOrchestrator\Common\Component\QueryBus\QueryBusComponentInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQuery;
-use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersQueryHandler;
 use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners\GetRunnersResultDto;
 
 #[AsCommand(
@@ -21,7 +21,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunn
 final class RunnersCommand extends Command
 {
     public function __construct(
-        private readonly GetRunnersQueryHandler $runnersHandler,
+        private readonly QueryBusComponentInterface $queryBus,
     ) {
         parent::__construct();
     }
@@ -31,7 +31,8 @@ final class RunnersCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $result = ($this->runnersHandler)(new GetRunnersQuery());
+        /** @var GetRunnersResultDto $result */
+        $result = $this->queryBus->query(new GetRunnersQuery());
 
         if (count($result->runners) === 0) {
             $io->warning('Нет зарегистрированных движков.');

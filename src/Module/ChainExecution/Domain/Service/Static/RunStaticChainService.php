@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Entity\StaticChainExecution;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Hook\HookExecutorInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveStepRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionBudgetVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFixIterationGroupVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRoleConfigVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStaticChainConfigVo;
@@ -172,7 +173,7 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
      */
     private function handlePostStep(
         StaticChainExecution $execution,
-        ?\TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionBudgetVo $budget,
+        ?ExecutionBudgetVo $budget,
         string $budgetRole,
         StaticStepResultVo $stepResult,
         ExecutionStepVo $step,

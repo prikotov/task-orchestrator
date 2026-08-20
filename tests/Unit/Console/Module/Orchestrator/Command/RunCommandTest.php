@@ -17,6 +17,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\PromptPr
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\RunCommand;
+use TaskOrchestrator\Tests\Double\Component\BusTestFactory;
 
 #[CoversClass(RunCommand::class)]
 #[CoversClass(RunAgentCommand::class)]
@@ -229,7 +230,7 @@ final class RunCommandTest extends TestCase
         $handler = new RunAgentCommandHandler($errorRunner, $promptProvider);
 
         $application = new Application();
-        $application->addCommand(new RunCommand($handler));
+        $application->addCommand(new RunCommand(BusTestFactory::commandBus($handler)));
         $command = $application->find('agent:run');
         $tester = new CommandTester($command);
 
@@ -249,7 +250,7 @@ final class RunCommandTest extends TestCase
         $handler = new RunAgentCommandHandler($this->agentRunner, $this->promptProvider);
 
         $application = new Application();
-        $application->addCommand(new RunCommand($handler));
+        $application->addCommand(new RunCommand(BusTestFactory::commandBus($handler)));
 
         return new CommandTester($application->find('agent:run'));
     }

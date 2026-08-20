@@ -13,9 +13,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use TaskOrchestrator\Common\Component\CommandBus\CommandBusComponentInterface;
 use TaskOrchestrator\Common\Module\GitIdentity\Application\Exception\ObtainTokenFailedException;
 use TaskOrchestrator\Common\Module\GitIdentity\Application\UseCase\Command\ObtainToken\ObtainTokenCommand;
-use TaskOrchestrator\Common\Module\GitIdentity\Application\UseCase\Command\ObtainToken\ObtainTokenCommandHandler;
 use TaskOrchestrator\Common\Module\GitIdentity\Application\UseCase\Command\ObtainToken\ObtainTokenResultDto;
 
 /**
@@ -60,7 +60,7 @@ final class AgentTokenCommand extends Command
     private const string TOKEN_SAFE_PATTERN = '/^[A-Za-z0-9_.-]+$/';
 
     public function __construct(
-        private readonly ObtainTokenCommandHandler $handler,
+        private readonly CommandBusComponentInterface $commandBus,
     ) {
         parent::__construct();
     }
@@ -101,7 +101,7 @@ final class AgentTokenCommand extends Command
 
         try {
             /** @var ObtainTokenResultDto $result */
-            $result = ($this->handler)(new ObtainTokenCommand($repoSlug));
+            $result = $this->commandBus->execute(new ObtainTokenCommand($repoSlug));
         } catch (ObtainTokenFailedException $e) {
             // Application-level boundary error; сообщение очищено от секретов (контракт C).
             $io->error($e->getMessage());

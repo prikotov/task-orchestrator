@@ -37,6 +37,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRes
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\ConditionalStepService;
 use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapperService;
+use TaskOrchestrator\Tests\Double\Component\BusTestFactory;
 
 /**
  * Integration-тест: conditional chain end-to-end.
@@ -91,7 +92,7 @@ final class ConditionalChainIntegrationTest extends TestCase
         $hookExecutor = $this->createMock(HookExecutorInterface::class);
         $hookExecutor->method('execute')->willReturn(HookResultVo::createSkipped());
 
-        $conditionalDefinitionMapper = new ChainExecutionDefinitionMapperService(new LoadRawChainQueryHandler($this->chainLoader));
+        $conditionalDefinitionMapper = new ChainExecutionDefinitionMapperService(BusTestFactory::queryBus(new LoadRawChainQueryHandler($this->chainLoader)));
         $conditionalStrategy = new ConditionalExecutionStrategyService(
             $conditionEvaluator,
             $stepExecutor,
@@ -119,7 +120,7 @@ final class ConditionalChainIntegrationTest extends TestCase
         $staticResolveStepRunnerService = new ResolveStepRunnerService([$staticAgentRunner, $staticGateRunner, $staticToolRunner]);
         $runStaticChainService = new RunStaticChainService($staticResolveStepRunnerService, $staticBudgetService, $hookExecutor);
         $staticChainExecutor = new ExecuteStaticChainService($runStaticChainService);
-        $definitionMapper = new ChainExecutionDefinitionMapperService(new LoadRawChainQueryHandler($this->chainLoader));
+        $definitionMapper = new ChainExecutionDefinitionMapperService(BusTestFactory::queryBus(new LoadRawChainQueryHandler($this->chainLoader)));
         $staticStrategy = new StaticExecutionStrategyService($staticChainExecutor, $definitionMapper);
 
         // --- Handler with both strategies ---

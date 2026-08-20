@@ -19,6 +19,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunReq
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\AgentDtoMapper;
 use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner\RunAgentService;
+use TaskOrchestrator\Tests\Double\Component\BusTestFactory;
 
 #[CoversClass(RunAgentService::class)]
 #[CoversClass(AgentDtoMapper::class)]
@@ -97,7 +98,7 @@ final class RunAgentServiceTest extends TestCase
 
         $handler = new RunAgentCommandHandler($registry, $retryFactory);
 
-        return new RunAgentService($handler, new AgentDtoMapper());
+        return new RunAgentService(BusTestFactory::commandBus($handler), new AgentDtoMapper());
     }
 }
 

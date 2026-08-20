@@ -11,8 +11,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use TaskOrchestrator\Common\Component\CommandBus\CommandBusComponentInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\RunAgent\RunAgentCommand;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\RunAgent\RunAgentResultDto;
 
 #[AsCommand(
@@ -32,7 +32,7 @@ final class RunCommand extends Command
     private const string OPT_CONTEXT = 'context';
 
     public function __construct(
-        private readonly RunAgentCommandHandler $agentHandler,
+        private readonly CommandBusComponentInterface $commandBus,
     ) {
         parent::__construct();
     }
@@ -85,7 +85,7 @@ final class RunCommand extends Command
 
         try {
             /** @var RunAgentResultDto $result */
-            $result = ($this->agentHandler)(new RunAgentCommand(
+            $result = $this->commandBus->execute(new RunAgentCommand(
                 role: $role,
                 task: $task,
                 runner: $runner !== null && $runner !== '' ? $runner : null,
