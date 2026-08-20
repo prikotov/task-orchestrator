@@ -6,15 +6,11 @@ namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi;
 
 use InvalidArgumentException;
 use Override;
-use RuntimeException;
-use Symfony\Component\Process\Exception\ProcessSignaledException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\PiAgentRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLivenessWatcher;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\RunAgentProcessLifecycleServiceInterface;
 
 /**
  * Реализация AgentRunnerInterface для pi CLI.
@@ -26,6 +22,11 @@ use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLiv
  * как абсолютные пути — Pi читает файлы самостоятельно через existsSync-эвристику.
  * Значения с префиксом @ разрешаются как пути к файлам (содержимое подставляется inline).
  *
+ * Runtime-жизненный цикл (создание Process, прокси-окружение, буферизация
+ * stdout, liveness-ожидание, остановка) делегирован общему
+ * {@see RunAgentProcessLifecycleServiceInterface}; здесь остаётся только
+ * Pi-специфика: buildCommand и buildResult с проверкой isError/errorMessage.
+ *
  * Поддержка HTTPS-прокси через HttpsProxyBridge (переиспользуется из Codex-раннера):
  * если CODEX_HTTP_PROXY содержит https:// схему, автоматически запускается
  * локальный HTTP-прокси-мост, пересылающий CONNECT-запросы через TLS.
@@ -34,12 +35,9 @@ use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLiv
  */
 final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterface
 {
-    /** @var int Максимальный stderr-tail для AgentResultVo ошибки процесса */
-    private const int ERROR_OUTPUT_TAIL_BYTES = 65536;
-
     public function __construct(
         private PiJsonlParser $parser,
-        private ProcessLivenessWatcher $livenessWatcher,
+        private RunAgentProcessLifecycleServiceInterface $processLifecycle,
     ) {
     }
 
@@ -127,7 +125,7 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
         }
 
         // User prompt: previous context + task
-        $prompt = $this->buildUserPrompt($request);
+        $prompt = $this->processLifecycle->buildUserPrompt($request);
         $command[] = $prompt;
 
         return $command;
@@ -136,141 +134,14 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
     #[Override]
     public function run(AgentRunRequestVo $request): AgentResultVo
     {
-        $hardCap = $this->livenessWatcher->resolveHardCap($request->getTimeout());
-        $process = $this->createConfiguredProcess($request, $hardCap);
-
-        // Ошибки подготовки прокси-окружения (запуск моста, env-настройка) не должны
-        // бросать исключение из run() — возвращаем AgentResultVo::createError()
-        // по контракту AgentRunnerInterface.
-        try {
-            $bridge = $this->attachProxyEnvironment($process);
-        } catch (\Throwable $e) {
-            return AgentResultVo::createError(
-                errorMessage: sprintf('Failed to prepare proxy environment: %s', $e->getMessage()),
-            );
-        }
-
-        $this->parser->reset();
-        $stdoutBuffer = '';
-        $errorOutput = '';
-
-        $outputHandler = function (string $type, string $chunk) use ($process, &$stdoutBuffer, &$errorOutput): void {
-            if ($type === Process::OUT) {
-                $this->bufferStdoutChunk($chunk, $stdoutBuffer);
-                $process->clearOutput();
-
-                return;
-            }
-
-            $errorOutput = self::appendErrorOutputTail($errorOutput, $chunk);
-            $process->clearErrorOutput();
-        };
-
-        try {
-            $process->start($outputHandler);
-            $completed = $this->livenessWatcher->waitFor($process);
-            $this->flushStdoutBuffer($stdoutBuffer);
-            if (!$completed) {
-                // Процесс простаивал (idle) — нет прогресса CPU/IO дольше порога.
-                // Возвращаем transient-error (timedOut) → retry подхватит.
-                return AgentResultVo::createError(
-                    errorMessage: sprintf(
-                        'Agent idle: no CPU/IO progress for %d seconds.',
-                        $this->livenessWatcher->getIdleThreshold(),
-                    ),
-                    timedOut: true,
-                );
-            }
-        } catch (ProcessTimedOutException) {
-            return AgentResultVo::createError(
-                errorMessage: sprintf('Agent timed out after %d seconds (hard cap).', $hardCap),
-                timedOut: true,
-            );
-        } catch (ProcessSignaledException $e) {
-            return AgentResultVo::createError(
-                errorMessage: sprintf('pi process terminated by signal %d.', $e->getSignal()),
-                exitCode: 128 + $e->getSignal(),
-            );
-        } finally {
-            $this->stopProcessAndBridge($process, $bridge);
-        }
-
-        return $this->buildResult($process, $errorOutput);
-    }
-
-    /**
-     * Создаёт Symfony Process с командой, hard-cap таймаутом и рабочей директорией.
-     *
-     * Liveness-adaptive timeout: Symfony setTimeout = абсолютный hard cap (fallback),
-     * poll-loop waitFor() убивает раньше при простое (idle). Активный процесс (модель
-     * рассуждает/стримит) дорабатывает до cap, не обрезаясь по жёсткому таймеру.
-     * Симметрично CodexAgentRunnerService (#297).
-     *
-     * @param AgentRunRequestVo $request запрос на запуск агента
-     * @param int $hardCap абсолютный hard cap в секундах (уже резолвнут через resolveHardCap)
-     */
-    private function createConfiguredProcess(AgentRunRequestVo $request, int $hardCap): Process
-    {
-        $process = new Process($this->buildCommand($request));
-        $process->setTimeout($hardCap);
-
-        if ($request->getWorkingDir() !== null) {
-            $process->setWorkingDirectory($request->getWorkingDir());
-        }
-
-        return $process;
-    }
-
-    /**
-     * Создаёт HTTPS-прокси-мост (если нужен) и настраивает env Symfony Process.
-     *
-     * HTTPS-прокси мост: если CODEX_HTTP_PROXY содержит https:// схему,
-     * запускается локальный HTTP-прокси-мост для пересылки через TLS.
-     *
-     * Передача HTTP-прокси через env-переменные:
-     * CODEX_HTTP_PROXY (приоритет) подменяет HTTPS_PROXY для pi-процесса.
-     * Если CODEX_HTTP_PROXY не задан — Process наследует env родителя (HTTPS_PROXY, HTTP_PROXY).
-     *
-     * @return HttpsProxyBridge|null мост или null, если прокси не требуется
-     *
-     * @throws RuntimeException при ошибке запуска моста; любые сбои подготовки
-     *                         прокси-окружения перехватываются в run()
-     */
-    private function attachProxyEnvironment(Process $process): ?HttpsProxyBridge
-    {
-        $bridge = $this->createBridgeIfNeeded();
-
-        $codexProxy = getenv('CODEX_HTTP_PROXY');
-        if ($codexProxy !== false && $codexProxy !== '') {
-            $processEnv = $this->buildProcessEnv(getenv());
-
-            // Если мост запущен — подменяем HTTPS_PROXY на локальный URL моста
-            if ($bridge !== null) {
-                $processEnv['HTTPS_PROXY'] = $bridge->getLocalProxyUrl();
-                $processEnv['HTTP_PROXY'] = $bridge->getLocalProxyUrl();
-            }
-
-            $process->setEnv($processEnv);
-        }
-
-        return $bridge;
-    }
-
-    /**
-     * Гарантированно останавливает agent-процесс и orphan-процесс моста.
-     *
-     * При fail-fast ошибке liveness-пробы не оставляем agent process
-     * жить до недетерминированного вызова Symfony destructor/GC.
-     */
-    private function stopProcessAndBridge(Process $process, ?HttpsProxyBridge $bridge): void
-    {
-        try {
-            if ($process->isRunning()) {
-                $process->stop(0);
-            }
-        } finally {
-            $bridge?->stop();
-        }
+        return $this->processLifecycle->run(
+            request: $request,
+            runnerName: 'pi',
+            buildCommand: fn (AgentRunRequestVo $request): array => $this->buildCommand($request),
+            resetParser: fn () => $this->parser->reset(),
+            feedParserLine: fn (string $line) => $this->parser->feed($line),
+            buildResult: fn (Process $process, string $errorOutput): AgentResultVo => $this->buildResult($process, $errorOutput),
+        );
     }
 
     /**
@@ -310,62 +181,6 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
     }
 
     /**
-     * Формирует env-переменные для Symfony Process с учётом HTTP-прокси.
-     *
-     * Приоритет HTTPS_PROXY для pi-процесса:
-     *   CODEX_HTTP_PROXY (если задан) → подменяет HTTPS_PROXY
-     *   HTTPS_PROXY из окружения      → унаследуется автоматически (если setEnv не вызван)
-     *   HTTP_PROXY из окружения       → унаследуется автоматически
-     *
-     * Для https://-схемы HTTPS_PROXY НЕ подменяется здесь — это сделает мост в run()
-     * (подставит свой локальный http:// URL).
-     *
-     * Метод принимает текущее окружение как параметр для тестируемости.
-     *
-     * @param array<string, string> $currentEnv текущее окружение (например, из getenv())
-     *
-     * @return array<string, string> окружение с подменённым HTTPS_PROXY
-     */
-    public function buildProcessEnv(array $currentEnv): array
-    {
-        $codexProxy = $currentEnv['CODEX_HTTP_PROXY'] ?? null;
-
-        if ($codexProxy !== null && $codexProxy !== '') {
-            // Для HTTPS-прокси НЕ подменяем HTTPS_PROXY здесь — мост это сделает в run()
-            if (!str_starts_with($codexProxy, 'https://')) {
-                $currentEnv['HTTPS_PROXY'] = $codexProxy;
-            }
-        }
-
-        return $currentEnv;
-    }
-
-    /**
-     * Создаёт HttpsProxyBridge если CODEX_HTTP_PROXY содержит https:// схему.
-     *
-     * Мост переиспользуется из Codex-раннера (общий механизм обхода Cloudflare
-     * IP-block для endpoint'ов OpenAI).
-     *
-     * @return HttpsProxyBridge|null мост или null если HTTPS-прокси не нужен
-     */
-    public function createBridgeIfNeeded(): ?HttpsProxyBridge
-    {
-        $codexProxy = getenv('CODEX_HTTP_PROXY');
-        if ($codexProxy === false || $codexProxy === '') {
-            return null;
-        }
-
-        if (!str_starts_with($codexProxy, 'https://')) {
-            return null;
-        }
-
-        $bridge = new HttpsProxyBridge($codexProxy);
-        $bridge->start();
-
-        return $bridge;
-    }
-
-    /**
      * Резолвит маркеры @system-prompt и @append-system-prompt в элементах command
      * в пути к prompt-файлам роли (pi читает файлы сам, как codex model_instructions_file).
      *
@@ -379,7 +194,7 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
      */
     private function resolvePromptMarkers(array $command, AgentRunRequestVo $request): array
     {
-        $systemPath = $this->resolveSystemPromptPath($request);
+        $systemPath = $this->processLifecycle->resolveSystemPromptPath($request);
         $appendPath = $this->extractAppendPromptPath($request->getRunnerArgs());
 
         $resolved = [];
@@ -396,25 +211,6 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
         }
 
         return $resolved;
-    }
-
-    /**
-     * Путь к system-prompt-файлу из request.systemPrompt.
-     * Если systemPrompt — путь к существующему файлу, возвращается как есть;
-     * иначе null (маркер останется literal).
-     */
-    private function resolveSystemPromptPath(AgentRunRequestVo $request): ?string
-    {
-        $systemPrompt = $request->getSystemPrompt();
-        if ($systemPrompt === null) {
-            return null;
-        }
-
-        if (file_exists($systemPrompt) && is_file($systemPrompt)) {
-            return $systemPrompt;
-        }
-
-        return null;
     }
 
     /**
@@ -473,60 +269,5 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
         }
 
         return $resolved;
-    }
-
-    /**
-     * Формирует user-промпт из контекста и задачи.
-     */
-    private function buildUserPrompt(AgentRunRequestVo $request): string
-    {
-        $parts = [];
-
-        if ($request->getPreviousContext() !== null) {
-            $parts[] = $request->getPreviousContext();
-        }
-
-        $parts[] = sprintf('[Задача]: %s', $request->getTask());
-
-        return implode("\n\n", $parts);
-    }
-
-    /**
-     * Буферизует stdout-чанк до переводов строк и отдаёт полные JSONL-строки в parser.
-     */
-    private function bufferStdoutChunk(string $chunk, string &$stdoutBuffer): void
-    {
-        $stdoutBuffer .= $chunk;
-        $newlinePosition = strpos($stdoutBuffer, "\n");
-
-        while ($newlinePosition !== false) {
-            $line = substr($stdoutBuffer, 0, $newlinePosition);
-            $stdoutBuffer = substr($stdoutBuffer, $newlinePosition + 1);
-            $this->parser->feed($line);
-            $newlinePosition = strpos($stdoutBuffer, "\n");
-        }
-    }
-
-    /**
-     * Отдаёт parser последнюю строку без завершающего перевода строки.
-     */
-    private function flushStdoutBuffer(string &$stdoutBuffer): void
-    {
-        if ($stdoutBuffer === '') {
-            return;
-        }
-
-        $this->parser->feed($stdoutBuffer);
-        $stdoutBuffer = '';
-    }
-
-    private static function appendErrorOutputTail(string $currentOutput, string $chunk): string
-    {
-        $currentOutput .= $chunk;
-        if (strlen($currentOutput) <= self::ERROR_OUTPUT_TAIL_BYTES) {
-            return $currentOutput;
-        }
-
-        return substr($currentOutput, -self::ERROR_OUTPUT_TAIL_BYTES);
     }
 }

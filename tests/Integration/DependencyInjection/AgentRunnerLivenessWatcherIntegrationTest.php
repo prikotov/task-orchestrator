@@ -11,11 +11,15 @@ use ReflectionProperty;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use TaskOrchestrator\Common\Kernel;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexAgentRunnerService;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\RunAgentProcessLifecycleServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunnerService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLivenessWatcher;
 
 /**
  * Интеграционная проверка общей DI-связки liveness watcher-а.
+ *
+ * Раннеры больше не держат watcher напрямую: он внедрён внутрь общего
+ * RunAgentProcessLifecycleService, который раннеры получают по интерфейсу.
  */
 #[CoversClass(ProcessLivenessWatcher::class)]
 final class AgentRunnerLivenessWatcherIntegrationTest extends KernelTestCase
@@ -74,8 +78,12 @@ final class AgentRunnerLivenessWatcherIntegrationTest extends KernelTestCase
 
     private function watcherFrom(CodexAgentRunnerService|PiAgentRunnerService $runner): ProcessLivenessWatcher
     {
-        $property = new ReflectionProperty($runner, 'livenessWatcher');
-        $watcher = $property->getValue($runner);
+        $lifecycleProperty = new ReflectionProperty($runner, 'processLifecycle');
+        $lifecycle = $lifecycleProperty->getValue($runner);
+        self::assertInstanceOf(RunAgentProcessLifecycleServiceInterface::class, $lifecycle);
+
+        $watcherProperty = new ReflectionProperty($lifecycle, 'livenessWatcher');
+        $watcher = $watcherProperty->getValue($lifecycle);
         self::assertInstanceOf(ProcessLivenessWatcher::class, $watcher);
 
         return $watcher;
