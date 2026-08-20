@@ -86,6 +86,76 @@ YAML);
     }
 
     #[Test]
+    public function usesConsumerProjectRoleProfileWhenInstalledThroughComposer(): void
+    {
+        $projectRoot = dirname(__DIR__, 6);
+        $consumerRoot = $this->tempDir . '/consumer';
+        $vendorDir = $consumerRoot . '/vendor';
+        $installedSkillDir = $vendorDir . '/prikotov/task-orchestrator/docs/agents/skills/run-subagent';
+        $consumerRoleFile = $consumerRoot . '/docs/agents/roles/team/backend_developer_levsha.ru.md';
+        $consumerConfig = $consumerRoot . '/config/chains.yaml';
+
+        mkdir($installedSkillDir . '/scripts', 0777, true);
+        mkdir(dirname($consumerRoleFile), 0777, true);
+        mkdir(dirname($consumerConfig), 0777, true);
+        copy(
+            $projectRoot . '/docs/agents/skills/run-subagent/scripts/watch-subagent.sh',
+            $installedSkillDir . '/scripts/watch-subagent.sh',
+        );
+        copy(
+            $projectRoot . '/docs/agents/skills/run-subagent/scripts/subagent_system.txt',
+            $installedSkillDir . '/scripts/subagent_system.txt',
+        );
+        chmod($installedSkillDir . '/scripts/watch-subagent.sh', 0755);
+        symlink($projectRoot . '/vendor/autoload.php', $vendorDir . '/autoload.php');
+
+        file_put_contents($consumerRoleFile, "# Consumer role\n");
+        file_put_contents($consumerConfig, <<<'YAML'
+roles:
+  backend_developer_levsha:
+    command:
+      - codex
+      - exec
+      - --json
+      - --model
+      - consumer-model
+      - -c
+      - 'model_reasoning_effort="medium"'
+YAML);
+
+        $process = new Process(
+            [
+                $installedSkillDir . '/scripts/watch-subagent.sh',
+                '-s',
+                '2',
+                '-t',
+                '2',
+                '-m',
+                '4',
+                '-r',
+                $consumerRoleFile,
+                'Consumer project profile',
+            ],
+            $consumerRoot,
+            [
+                'PATH' => $this->fakeBinDir . PATH_SEPARATOR . (getenv('PATH') ?: ''),
+                'RUNNER_CAPTURE_FILE' => $this->runnerCaptureFile,
+                'ARGS_CAPTURE_FILE' => $this->argsCaptureFile,
+                'STDIN_CAPTURE_FILE' => $this->stdinCaptureFile,
+            ],
+        );
+        $process->setTimeout(10);
+        $process->run();
+
+        self::assertTrue($process->isSuccessful(), $process->getErrorOutput() . $process->getOutput());
+        self::assertSame('codex', trim((string) file_get_contents($this->runnerCaptureFile)));
+
+        $args = (string) file_get_contents($this->argsCaptureFile);
+        self::assertStringContainsString('--model consumer-model', $args);
+        self::assertStringContainsString('model_reasoning_effort=medium', $args);
+    }
+
+    #[Test]
     public function explicitRunnerMatchingRoleCommandProfileUsesRoleModelAndReasoningDefaults(): void
     {
         $this->runScript(arguments: ['--runner', 'codex']);
