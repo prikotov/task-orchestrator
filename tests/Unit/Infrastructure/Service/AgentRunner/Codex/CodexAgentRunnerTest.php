@@ -4,27 +4,29 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\AgentRunner\Codex;
 
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Process;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\{
+    Dto\ProcessLivenessSnapshotDto,
     ProcessLivenessClockComponent,
+    ProcessLivenessProbeComponentInterface,
     ProcessLivenessProbeUnavailableComponent,
     ProcessLivenessSleeperComponent,
 };
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexAgentRunnerService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexJsonlParser;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\RunAgentProcessLifecycleService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLivenessWatcher;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge;
 
 #[CoversClass(CodexAgentRunnerService::class)]
 final class CodexAgentRunnerTest extends TestCase
 {
     private CodexAgentRunnerService $runner;
-
-    /** @var HttpsProxyBridge|null Мост для очистки в tearDown */
-    private ?HttpsProxyBridge $bridgeToCleanup = null;
 
     /** @var list<string> */
     private array $fixtureFiles = [];
@@ -32,15 +34,14 @@ final class CodexAgentRunnerTest extends TestCase
     protected function setUp(): void
     {
         putenv('CODEX_HTTP_PROXY');
-        $this->runner = new CodexAgentRunnerService(new CodexJsonlParser(), $this->createLivenessWatcher());
+        $this->runner = new CodexAgentRunnerService(
+            new CodexJsonlParser(),
+            new RunAgentProcessLifecycleService($this->createLivenessWatcher()),
+        );
     }
 
     protected function tearDown(): void
     {
-        // Очистка моста если тест его создал
-        $this->bridgeToCleanup?->stop();
-        $this->bridgeToCleanup = null;
-
         foreach ($this->fixtureFiles as $fixtureFile) {
             @unlink($fixtureFile);
         }
@@ -377,140 +378,7 @@ final class CodexAgentRunnerTest extends TestCase
         self::assertNotContains('--tools', $command);
     }
 
-    // ──── buildProcessEnv: proxy scenarios ───────────────────────────────
-
-    #[Test]
-    public function buildProcessEnvWithCodexProxySetsHttpsProxy(): void
-    {
-        $env = $this->runner->buildProcessEnv([
-            'PATH' => '/usr/bin',
-            'CODEX_HTTP_PROXY' => 'http://proxy.example.com:8080',
-        ]);
-
-        self::assertSame('http://proxy.example.com:8080', $env['HTTPS_PROXY']);
-        self::assertSame('/usr/bin', $env['PATH']);
-    }
-
-    #[Test]
-    public function buildProcessEnvWithoutCodexProxyReturnsEnvUnchanged(): void
-    {
-        $env = $this->runner->buildProcessEnv([
-            'PATH' => '/usr/bin',
-            'HOME' => '/home/user',
-        ]);
-
-        self::assertArrayNotHasKey('HTTPS_PROXY', $env);
-        self::assertSame('/usr/bin', $env['PATH']);
-        self::assertSame('/home/user', $env['HOME']);
-    }
-
-    #[Test]
-    public function buildProcessEnvCodexProxyOverridesExistingHttpsProxy(): void
-    {
-        $env = $this->runner->buildProcessEnv([
-            'PATH' => '/usr/bin',
-            'HTTPS_PROXY' => 'http://old-proxy:3128',
-            'CODEX_HTTP_PROXY' => 'http://new-proxy:8080',
-        ]);
-
-        self::assertSame('http://new-proxy:8080', $env['HTTPS_PROXY']);
-    }
-
-    #[Test]
-    public function buildProcessEnvEmptyCodexProxyDoesNotOverride(): void
-    {
-        $env = $this->runner->buildProcessEnv([
-            'HTTPS_PROXY' => 'http://existing-proxy:3128',
-            'CODEX_HTTP_PROXY' => '',
-        ]);
-
-        // Пустой CODEX_HTTP_PROXY не подменяет HTTPS_PROXY
-        self::assertSame('http://existing-proxy:3128', $env['HTTPS_PROXY']);
-    }
-
-    #[Test]
-    public function buildProcessEnvPreservesHttpProxy(): void
-    {
-        $env = $this->runner->buildProcessEnv([
-            'HTTP_PROXY' => 'http://http-proxy:3128',
-            'CODEX_HTTP_PROXY' => 'http://codex-proxy:8080',
-        ]);
-
-        // HTTP_PROXY не затрагивается — передаётся как есть
-        self::assertSame('http://http-proxy:3128', $env['HTTP_PROXY']);
-        self::assertSame('http://codex-proxy:8080', $env['HTTPS_PROXY']);
-    }
-
-    #[Test]
-    public function buildProcessEnvEmptyArrayReturnsEmpty(): void
-    {
-        $env = $this->runner->buildProcessEnv([]);
-
-        self::assertArrayNotHasKey('HTTPS_PROXY', $env);
-        self::assertSame([], $env);
-    }
-
-    // ──── buildProcessEnv: HTTPS-прокси не подменяет HTTPS_PROXY напрямую ─
-
-    #[Test]
-    public function buildProcessEnvDoesNotOverrideForHttpsProxy(): void
-    {
-        $env = $this->runner->buildProcessEnv([
-            'HTTPS_PROXY' => 'http://existing-proxy:3128',
-            'CODEX_HTTP_PROXY' => 'https://user:pass@proxy.example.com:8080',
-        ]);
-
-        // HTTPS-прокси: мост подменит HTTPS_PROXY в run(), здесь не трогаем
-        self::assertSame('http://existing-proxy:3128', $env['HTTPS_PROXY']);
-    }
-
-    #[Test]
-    public function buildProcessEnvStillOverridesForHttpProxy(): void
-    {
-        $env = $this->runner->buildProcessEnv([
-            'HTTPS_PROXY' => 'http://old-proxy:3128',
-            'CODEX_HTTP_PROXY' => 'http://new-proxy:8080',
-        ]);
-
-        // HTTP-прокси: подменяем как раньше
-        self::assertSame('http://new-proxy:8080', $env['HTTPS_PROXY']);
-    }
-
-    // ──── createBridgeIfNeeded: HTTPS-прокси активирует мост ────────────
-
-    #[Test]
-    public function createBridgeIfNeededReturnsBridgeForHttpsProxy(): void
-    {
-        putenv('CODEX_HTTP_PROXY=https://user:pass@proxy.example.com:8080');
-
-        $bridge = $this->runner->createBridgeIfNeeded();
-
-        self::assertInstanceOf(HttpsProxyBridge::class, $bridge);
-        self::assertTrue($bridge->isRunning());
-        self::assertMatchesRegularExpression('#^http://127\.0\.0\.1:\d+$#', $bridge->getLocalProxyUrl());
-
-        // Сохраняем для очистки в tearDown
-        $this->bridgeToCleanup = $bridge;
-    }
-
-    #[Test]
-    public function createBridgeIfNeededReturnsNullForHttpProxy(): void
-    {
-        putenv('CODEX_HTTP_PROXY=http://proxy.example.com:8080');
-
-        $bridge = $this->runner->createBridgeIfNeeded();
-
-        self::assertNull($bridge);
-    }
-
-    #[Test]
-    public function createBridgeIfNeededReturnsNullWhenEnvNotSet(): void
-    {
-        // CODEX_HTTP_PROXY не установлен (tearDown очистит если был)
-        $bridge = $this->runner->createBridgeIfNeeded();
-
-        self::assertNull($bridge);
-    }
+    // ──── run: chunked JSONL-стриминг ────────────────────────────────────
 
     #[Test]
     public function runStreamsChunkedJsonlAndFlushesLastLineWithoutNewline(): void
@@ -621,6 +489,52 @@ PHP);
         self::assertSame('Agent timed out after 2 seconds (hard cap).', $result->getErrorMessage());
     }
 
+    // ──── run: wiring — имя раннера в signal-сообщении ─────────────────
+
+    #[Test]
+    public function runSignalsRunnerNameInTerminatedBySignalMessage(): void
+    {
+        // Wiring: раннер передаёт своё имя в lifecycle-сервис — проверяем
+        // префикс 'codex' в signal-сообщении через fail-fast пробу watcher'а.
+        // Механика та же, что в RunAgentProcessLifecycleServiceTest::runSignaled():
+        // probe бросает ProcessSignaledException с реального SIGTERM-процесса,
+        // fixture-процесс без моста и JSONL-вывода.
+        $signaledProcess = new Process([PHP_BINARY, '-r', 'posix_kill(getmypid(), SIGTERM); usleep(100000);']);
+        $signaledProcess->setTimeout(5);
+        $signaledProcess->start();
+        try {
+            $signaledProcess->wait();
+        } catch (ProcessSignaledException) {
+            // Процесс завершён сигналом — требуемое состояние для исключения ниже.
+        }
+
+        $runner = new CodexAgentRunnerService(
+            new CodexJsonlParser(),
+            new RunAgentProcessLifecycleService(
+                new ProcessLivenessWatcher(
+                    probe: new ThrowingProbeStub(new ProcessSignaledException($signaledProcess)),
+                    clock: new ProcessLivenessClockComponent(),
+                    sleeper: new ProcessLivenessSleeperComponent(),
+                ),
+            ),
+        );
+
+        $command = $this->createExecutableFixture('codex_signal_', <<<'PHP'
+sleep(30);
+PHP);
+
+        $result = $runner->run(new AgentRunRequestVo(
+            role: 'test',
+            task: 'task',
+            command: [$command],
+            timeout: 30,
+        ));
+
+        self::assertTrue($result->isError());
+        self::assertSame('codex process terminated by signal 15.', $result->getErrorMessage());
+        self::assertSame(143, $result->getExitCode());
+    }
+
     private function createExecutableFixture(string $prefix, string $script): string
     {
         $fixtureFile = tempnam(sys_get_temp_dir(), $prefix);
@@ -642,5 +556,23 @@ PHP);
             clock: new ProcessLivenessClockComponent(),
             sleeper: new ProcessLivenessSleeperComponent(),
         );
+    }
+}
+
+/**
+ * Probe-стаб, бросающий заготовленный Throwable (fail-fast).
+ */
+final class ThrowingProbeStub implements ProcessLivenessProbeComponentInterface
+{
+    public function __construct(private readonly \Throwable $throwable)
+    {
+    }
+
+    #[Override]
+    public function probe(
+        int $processId,
+        ?ProcessLivenessSnapshotDto $previousSnapshot,
+    ): never {
+        throw $this->throwable;
     }
 }

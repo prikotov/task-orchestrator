@@ -18,6 +18,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessL
 };
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexAgentRunnerService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexJsonlParser;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\RunAgentProcessLifecycleService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLivenessWatcher;
 
 /**
@@ -105,10 +106,12 @@ PHP);
     {
         return new CodexAgentRunnerService(
             parser: new CodexJsonlParser(),
-            livenessWatcher: new ProcessLivenessWatcher(
-                probe: new ProcessLivenessProbeLinuxProcfsComponent(new ProcFilesystemComponent()),
-                clock: new ProcessLivenessClockComponent(),
-                sleeper: new ProcessLivenessSleeperComponent(),
+            processLifecycle: new RunAgentProcessLifecycleService(
+                livenessWatcher: new ProcessLivenessWatcher(
+                    probe: new ProcessLivenessProbeLinuxProcfsComponent(new ProcFilesystemComponent()),
+                    clock: new ProcessLivenessClockComponent(),
+                    sleeper: new ProcessLivenessSleeperComponent(),
+                ),
             ),
         );
     }

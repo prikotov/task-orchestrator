@@ -25,6 +25,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessL
 };
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexAgentRunnerService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\CodexJsonlParser;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\RunAgentProcessLifecycleService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiAgentRunnerService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Pi\PiJsonlParser;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\ProcessLivenessWatcher;
@@ -87,8 +88,8 @@ final class AgentRunnerProbeErrorCleanupIntegrationTest extends KernelTestCase
             sleeper: new ProcessLivenessSleeperComponent(),
         );
         $runner = $runnerName === 'pi'
-            ? new PiAgentRunnerService(new PiJsonlParser(), $watcher)
-            : new CodexAgentRunnerService(new CodexJsonlParser(), $watcher);
+            ? new PiAgentRunnerService(new PiJsonlParser(), new RunAgentProcessLifecycleService($watcher))
+            : new CodexAgentRunnerService(new CodexJsonlParser(), new RunAgentProcessLifecycleService($watcher));
         $command = $this->createExecutableFixture($runnerName);
 
         // Act + Assert
