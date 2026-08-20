@@ -10,7 +10,7 @@ author: Тимлид Алекс (codex-cli)
 assignee: Тимлид Алекс (codex-cli)
 branch: task/release-v0-3-0
 pr: https://github.com/prikotov/task-orchestrator/pull/361
-status: review
+status: done
 ---
 
 # TASK-release-v0-3-0-preparation: Подготовить и выпустить релиз v0.3.0 из main
@@ -44,7 +44,7 @@ status: review
 - [x] Политика релизов в `docs/releases/RELEASE-POLICY.md` фиксирует выпуск только из `main`.
 - [x] `make check` успешно завершён.
 - [x] Создан PR в `main` с меткой `codex-cli`.
-- [ ] После approval опубликованы tag `v0.3.0`, GitHub Release и PHAR-артефакт.
+- [ ] После merge опубликованы tag `v0.3.0`, GitHub Release и PHAR-артефакт.
 
 ### ⚫ Не будем делать (Won't Have)
 - [ ] Не включаем изменения, появившиеся в `main` после release preparation PR.
@@ -55,14 +55,17 @@ status: review
 2. [x] Сформировать changelog, release plan и обновить процесс релизов.
 3. [x] Запустить `make check`.
 4. [x] Создать PR подготовки в `main` и передать на ревью.
-5. [ ] После approval перевести задачу в `done`, слить PR и опубликовать tag с GitHub Release.
-6. [ ] Обновить TasK до `^0.3.0` и выполнить `make check`.
+5. [x] После approval задача переведена в `done` до merge.
+6. [ ] Слить PR, опубликовать tag с GitHub Release и обновить TasK до `^0.3.0`.
 
 ## 5. Критерии приёмки (Definition of Done)
 - [ ] `main` содержит релизные метаданные `v0.3.0`.
 - [ ] Tag `v0.3.0` и GitHub Release с PHAR опубликованы.
 - [ ] TasK обновлён до `prikotov/task-orchestrator:^0.3.0` без локальной обёртки.
 - [ ] `make check` успешно завершён в обоих проектах.
+
+### Подготовка к слиянию
+- [x] PR #361 одобрен, CI зелёный; задача переведена в `done` до merge.
 
 ## 6. Самопроверка (Verification)
 ```bash
@@ -95,3 +98,4 @@ gh run list --workflow='Release Phar' --limit=1
 | 2026-08-20 | Тимлид Алекс (codex-cli) | Создание задачи и подготовка релиза `v0.3.0` из `main`. |
 | 2026-08-20 | Тимлид Алекс (codex-cli) | `make check` завершён успешно. |
 | 2026-08-20 | Тимлид Алекс (codex-cli) | Создан PR #361 с меткой `codex-cli`; задача передана на review. |
+| 2026-08-20 | Тимлид Алекс (codex-cli) | PR #361 одобрен, CI успешно завершён; задача перенесена в `done` до merge. |
