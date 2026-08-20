@@ -4,13 +4,14 @@ created: 2026-08-20
 value: V3
 complexity: C1
 priority: P0
-depends_on:
+depends_on: TASK-docs-become-role-run-from-skill-root
 epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/release-v0-3-1
 pr: https://github.com/prikotov/task-orchestrator/pull/363
-status: review
+status: done
+completed: 2026-08-20 17:01:48 (1787245308)
 ---
 
 # TASK-release-v0-3-1-preparation: Подготовить и выпустить релиз v0.3.1 из main
