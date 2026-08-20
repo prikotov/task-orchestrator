@@ -41,6 +41,9 @@ services:
     arguments:
       $runners: !tagged_iterator agent.runner
 
+  TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\RunAgentProcessLifecycleServiceInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\RunAgentProcessLifecycleService
+
   TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessProbeComponentInterface:
     alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\ProcessLivenessProbeComponent
 
