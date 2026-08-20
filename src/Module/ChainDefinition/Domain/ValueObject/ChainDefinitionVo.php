@@ -7,11 +7,13 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject;
 use InvalidArgumentException;
 use LogicException;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Enum\ChainTypeEnum;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
-use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 
 /**
  * Value Object определения цепочки оркестрации.
+ *
+ * Внутреннее состояние сгруппировано в специализированные sub-VO
+ * (SharedChainDefinitionVo + PromptConfigurationVo) по ADR-008;
+ * публичный API фасада не изменился.
  *
  * @deprecated Используйте {@see \TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitionFactory}
  *     со специализированными sub-VO:
@@ -29,53 +31,29 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterati
 final readonly class ChainDefinitionVo
 {
     /**
-     * @param string $name имя цепочки
-     * @param string $description описание
-     * @param ChainTypeEnum $type тип цепочки (static/dynamic)
+     * @param SharedChainDefinitionVo $shared идентификация цепочки (name, description, type, budget, timeout, maxTime, roles)
      * @param list<ChainStepVo> $steps шаги для static-цепочки
      * @param list<FixIterationGroupVo> $fixIterations группы итераций фикса
      * @param string|null $facilitator роль фасилитатора (для dynamic)
      * @param list<string> $participants роли участников (для dynamic)
      * @param int $maxRounds лимит раундов (для dynamic)
-     * @param string|null $brainstormSystemPrompt базовый системный промпт (упрощённый Pi default) для --system-prompt
-     * @param string|null $facilitatorAppendPrompt промпт фасилитатора для --append-system-prompt (%s → participants)
-     * @param string|null $facilitatorStartPrompt промпт первого вызова фасилитатора (%s → topic)
-     * @param string|null $facilitatorContinuePrompt промпт продолжения фасилитатора (%s → topic, %s → journal, %s → history)
-     * @param string|null $facilitatorFinalizePrompt промпт финализации (%s → topic, %s → history)
-     * @param string|null $participantAppendPrompt промпт участника для --append-system-prompt (%s → role_file)
-     * @param string|null $participantUserPrompt пользовательский промпт участника (%s → topic, %s → history)
-     * @param array<string, RoleConfigVo> $roles per-role конфигурация (key = role name)
+     * @param PromptConfigurationVo|null $promptConfiguration конфигурация промптов (для dynamic)
      * @param ChainRetryPolicyVo|null $defaultRetryPolicy политика retry по умолчанию для шагов цепочки
-     * @param BudgetVo|null $budget бюджетные ограничения цепочки (null = безлимит)
-     * @param int|null $timeout таймаут цепочки в секундах (null = использовать CLI --timeout или default)
-     * @param int|null $maxTime максимальное суммарное время выполнения цепочки в секундах (null = безлимит)
      */
     private function __construct(
-        private string $name,
-        private string $description,
-        private ChainTypeEnum $type,
+        private SharedChainDefinitionVo $shared,
         private array $steps,
         private array $fixIterations,
         private ?string $facilitator,
         private array $participants,
         private int $maxRounds,
-        private ?string $brainstormSystemPrompt,
-        private ?string $facilitatorAppendPrompt,
-        private ?string $facilitatorStartPrompt,
-        private ?string $facilitatorContinuePrompt,
-        private ?string $facilitatorFinalizePrompt,
-        private ?string $participantAppendPrompt,
-        private ?string $participantUserPrompt,
-        private array $roles = [],
-        private ?ChainRetryPolicyVo $defaultRetryPolicy = null,
-        private ?BudgetVo $budget = null,
-        private ?int $timeout = null,
-        private ?int $maxTime = null,
+        private ?PromptConfigurationVo $promptConfiguration,
+        private ?ChainRetryPolicyVo $defaultRetryPolicy,
     ) {
         if (!$this->areFixIterationsReferencesValid($this->steps, $this->fixIterations)) {
             throw new InvalidArgumentException(sprintf(
                 'Chain "%s" has invalid fix-iterations references (unknown step or step in multiple groups).',
-                $this->name,
+                $this->shared->getName(),
             ));
         }
     }
@@ -193,8 +171,6 @@ final readonly class ChainDefinitionVo
      * Общая реализация создания static/conditional-цепочки с линейными шагами.
      *
      * Валидирует шаги и fix-итерации, затем создаёт VO с заданным типом цепочки.
-     * Используется как {@see createFromSteps()}, так и {@see createFromConditionalSteps()} —
-     * различие между ними только в типе цепочки.
      *
      * @param list<ChainStepVo> $steps
      * @param list<FixIterationGroupVo> $fixIterations
@@ -217,33 +193,27 @@ final readonly class ChainDefinitionVo
             );
         }
 
-        // Generic fail-fast guard ссылочной целостности fix-итераций выполняется в
-        // приватном конструкторе (areFixIterationsReferencesValid): это единая точка
-        // для всех статических фабрик. DomainVo не может зависеть от DomainSpecification
-        // (правило Deptrac), поэтому guard реализован inline, а detailed-валидация
-        // (сообщения с именами группы/шага) остаётся в ChainDefinitionFactory.
+        // Guard ссылочной целостности fix-итераций выполняется в приватном конструкторе
+        // (единая точка для всех фабрик): DomainVo не может зависеть от DomainSpecification
+        // (правило Deptrac); detailed-валидация остаётся в ChainDefinitionFactory.
 
         return new self(
-            name: $name,
-            description: $description,
-            type: $type,
+            shared: new SharedChainDefinitionVo(
+                name: $name,
+                description: $description,
+                type: $type,
+                budget: $budget,
+                timeout: $timeout,
+                maxTime: null,
+                roles: $roles,
+            ),
             steps: $steps,
             fixIterations: $fixIterations,
             facilitator: null,
             participants: [],
             maxRounds: 10,
-            brainstormSystemPrompt: null,
-            facilitatorAppendPrompt: null,
-            facilitatorStartPrompt: null,
-            facilitatorContinuePrompt: null,
-            facilitatorFinalizePrompt: null,
-            participantAppendPrompt: null,
-            participantUserPrompt: null,
-            roles: $roles,
+            promptConfiguration: null,
             defaultRetryPolicy: $defaultRetryPolicy,
-            budget: $budget,
-            timeout: $timeout,
-            maxTime: null,
         );
     }
 
@@ -299,26 +269,30 @@ final readonly class ChainDefinitionVo
         }
 
         return new self(
-            name: $name,
-            description: $description,
-            type: ChainTypeEnum::dynamicType,
+            shared: new SharedChainDefinitionVo(
+                name: $name,
+                description: $description,
+                type: ChainTypeEnum::dynamicType,
+                budget: $budget,
+                timeout: $timeout,
+                maxTime: $maxTime,
+                roles: $roles,
+            ),
             steps: [],
             fixIterations: [],
             facilitator: $facilitator,
             participants: $participants,
             maxRounds: $maxRounds,
-            brainstormSystemPrompt: $brainstormSystemPrompt,
-            facilitatorAppendPrompt: $facilitatorAppendPrompt,
-            facilitatorStartPrompt: $facilitatorStartPrompt,
-            facilitatorContinuePrompt: $facilitatorContinuePrompt,
-            facilitatorFinalizePrompt: $facilitatorFinalizePrompt,
-            participantAppendPrompt: $participantAppendPrompt,
-            participantUserPrompt: $participantUserPrompt,
-            roles: $roles,
+            promptConfiguration: new PromptConfigurationVo(
+                brainstormSystemPrompt: $brainstormSystemPrompt,
+                facilitatorAppendPrompt: $facilitatorAppendPrompt,
+                facilitatorStartPrompt: $facilitatorStartPrompt,
+                facilitatorContinuePrompt: $facilitatorContinuePrompt,
+                facilitatorFinalizePrompt: $facilitatorFinalizePrompt,
+                participantAppendPrompt: $participantAppendPrompt,
+                participantUserPrompt: $participantUserPrompt,
+            ),
             defaultRetryPolicy: $defaultRetryPolicy,
-            budget: $budget,
-            timeout: $timeout,
-            maxTime: $maxTime,
         );
     }
 
@@ -330,15 +304,7 @@ final readonly class ChainDefinitionVo
      */
     public function getSharedDefinition(): SharedChainDefinitionVo
     {
-        return new SharedChainDefinitionVo(
-            name: $this->name,
-            description: $this->description,
-            type: $this->type,
-            budget: $this->budget,
-            timeout: $this->timeout,
-            maxTime: $this->maxTime,
-            roles: $this->roles,
-        );
+        return $this->shared;
     }
 
     /**
@@ -346,7 +312,7 @@ final readonly class ChainDefinitionVo
      */
     public function getName(): string
     {
-        return $this->name;
+        return $this->shared->getName();
     }
 
     /**
@@ -356,7 +322,7 @@ final readonly class ChainDefinitionVo
      */
     public function getDescription(): string
     {
-        return $this->description;
+        return $this->shared->getDescription();
     }
 
     /**
@@ -366,7 +332,7 @@ final readonly class ChainDefinitionVo
      */
     public function getType(): ChainTypeEnum
     {
-        return $this->type;
+        return $this->shared->getType();
     }
 
     /**
@@ -410,28 +376,8 @@ final readonly class ChainDefinitionVo
      */
     public function getPromptConfiguration(): PromptConfigurationVo
     {
-        if (
-            $this->brainstormSystemPrompt === null
-            || $this->facilitatorAppendPrompt === null
-            || $this->facilitatorStartPrompt === null
-            || $this->facilitatorContinuePrompt === null
-            || $this->facilitatorFinalizePrompt === null
-            || $this->participantAppendPrompt === null
-            || $this->participantUserPrompt === null
-        ) {
-            throw new LogicException(
-                sprintf('Chain "%s" does not have prompt configuration.', $this->name),
-            );
-        }
-
-        return new PromptConfigurationVo(
-            brainstormSystemPrompt: $this->brainstormSystemPrompt,
-            facilitatorAppendPrompt: $this->facilitatorAppendPrompt,
-            facilitatorStartPrompt: $this->facilitatorStartPrompt,
-            facilitatorContinuePrompt: $this->facilitatorContinuePrompt,
-            facilitatorFinalizePrompt: $this->facilitatorFinalizePrompt,
-            participantAppendPrompt: $this->participantAppendPrompt,
-            participantUserPrompt: $this->participantUserPrompt,
+        return $this->promptConfiguration ?? throw new LogicException(
+            sprintf('Chain "%s" does not have prompt configuration.', $this->shared->getName()),
         );
     }
 
@@ -440,7 +386,7 @@ final readonly class ChainDefinitionVo
      */
     public function getBrainstormSystemPrompt(): ?string
     {
-        return $this->brainstormSystemPrompt;
+        return $this->promptConfiguration?->getBrainstormSystemPrompt();
     }
 
     /**
@@ -448,7 +394,7 @@ final readonly class ChainDefinitionVo
      */
     public function getFacilitatorAppendPrompt(): ?string
     {
-        return $this->facilitatorAppendPrompt;
+        return $this->promptConfiguration?->getFacilitatorAppendPrompt();
     }
 
     /**
@@ -456,7 +402,7 @@ final readonly class ChainDefinitionVo
      */
     public function getFacilitatorStartPrompt(): ?string
     {
-        return $this->facilitatorStartPrompt;
+        return $this->promptConfiguration?->getFacilitatorStartPrompt();
     }
 
     /**
@@ -464,7 +410,7 @@ final readonly class ChainDefinitionVo
      */
     public function getFacilitatorContinuePrompt(): ?string
     {
-        return $this->facilitatorContinuePrompt;
+        return $this->promptConfiguration?->getFacilitatorContinuePrompt();
     }
 
     /**
@@ -472,7 +418,7 @@ final readonly class ChainDefinitionVo
      */
     public function getFacilitatorFinalizePrompt(): ?string
     {
-        return $this->facilitatorFinalizePrompt;
+        return $this->promptConfiguration?->getFacilitatorFinalizePrompt();
     }
 
     /**
@@ -480,7 +426,7 @@ final readonly class ChainDefinitionVo
      */
     public function getParticipantAppendPrompt(): ?string
     {
-        return $this->participantAppendPrompt;
+        return $this->promptConfiguration?->getParticipantAppendPrompt();
     }
 
     /**
@@ -488,7 +434,7 @@ final readonly class ChainDefinitionVo
      */
     public function getParticipantUserPrompt(): ?string
     {
-        return $this->participantUserPrompt;
+        return $this->promptConfiguration?->getParticipantUserPrompt();
     }
 
     /**
@@ -498,7 +444,7 @@ final readonly class ChainDefinitionVo
      */
     public function getRoleConfig(string $role): ?RoleConfigVo
     {
-        return $this->roles[$role] ?? null;
+        return $this->shared->getRoleConfig($role);
     }
 
     /**
@@ -510,7 +456,7 @@ final readonly class ChainDefinitionVo
      */
     public function getRoles(): array
     {
-        return $this->roles;
+        return $this->shared->getRoles();
     }
 
     /**
@@ -520,7 +466,7 @@ final readonly class ChainDefinitionVo
      */
     public function isDynamic(): bool
     {
-        return $this->type === ChainTypeEnum::dynamicType;
+        return $this->shared->isDynamic();
     }
 
     /**
@@ -530,7 +476,7 @@ final readonly class ChainDefinitionVo
      */
     public function isConditional(): bool
     {
-        return $this->type === ChainTypeEnum::conditionalType;
+        return $this->shared->isConditional();
     }
 
     /**
@@ -540,7 +486,7 @@ final readonly class ChainDefinitionVo
      */
     public function getTimeout(): ?int
     {
-        return $this->timeout;
+        return $this->shared->getTimeout();
     }
 
     /**
@@ -558,7 +504,7 @@ final readonly class ChainDefinitionVo
      */
     public function getBudget(): ?BudgetVo
     {
-        return $this->budget;
+        return $this->shared->getBudget();
     }
 
     /**
@@ -568,7 +514,6 @@ final readonly class ChainDefinitionVo
      */
     public function getMaxTime(): ?int
     {
-        return $this->maxTime;
+        return $this->shared->getMaxTime();
     }
-
 }
