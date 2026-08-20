@@ -38,7 +38,7 @@
 
 - [ ] 🟡 **Уточнить резолв пути скрипта в `run-subagent/SKILL.md`** — добавить примечание «путь `scripts/watch-subagent.sh` резолвится от каталога этого SKILL» и/или полные пути в примерах. Статус: TODO (реестр: [RETRO-ROADMAP.md](RETRO-ROADMAP.md), `watch`).
 - [ ] 🟡 **Откалибровать таймауты в `task-via-subagents/SKILL.md`** — примечание к таблице: при требовании `make check` в промпте умножать табличный soft-timeout на ×2–3. Статус: TODO (реестр: `watch`).
-- [ ] 🟢 **Завести техдолг `TASK-techdebt-agent-runner-lifecycle-helper`** — общий Infrastructure-хелпер жизненного цикла раннеров (дублирование декомпозиции Codex/Pi, замечание №1 ревью). Статус: требует обсуждения — предложено владельцу в отчёте по PR #356, ожидает подтверждения.
+- [x] 🟢 **Завести техдолг `TASK-techdebt-agent-runner-lifecycle-helper`** — общий Infrastructure-хелпер жизненного цикла раннеров (дублирование декомпозиции Codex/Pi, замечание №1 ревью). Статус: выполнено — владелец подтвердил 2026-08-20, задача [TASK-techdebt-agent-runner-lifecycle-helper](../../../todo/done/TASK-techdebt-agent-runner-lifecycle-helper.todo.md) (PR #357): Infrastructure-сервис `RunAgentProcessLifecycleService`, дубликаты удалены из обоих раннеров, поведение идентично.
 
 ## Важные комментарии
 

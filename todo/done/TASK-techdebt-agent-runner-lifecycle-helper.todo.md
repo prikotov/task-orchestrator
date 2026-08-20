@@ -9,8 +9,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/agent-runner-lifecycle-helper
-pr:
-status: in_progress
+pr: 'https://github.com/prikotov/task-orchestrator/pull/357'
+status: done
 ---
 
 # TASK-techdebt-agent-runner-lifecycle-helper: Общий компонент жизненного цикла раннеров Codex/Pi
@@ -91,24 +91,24 @@ Pi-специфику `isError` в раннере.
 
 ### 🔴 Обязательно (Must Have)
 
-- [ ] Единая точка жизненного цикла процесса агента в Infrastructure модуля AgentRunner (Infrastructure-сервис; NOT Helper/Port/Adapter — конвенции и терминология AGENTS.md).
-- [ ] Оба раннера используют общий компонент; перечисленные в Цели дублируемые методы удалены из обоих раннеров.
-- [ ] Поведение идентично: контракты `AgentRunnerInterface`, сообщения об ошибках (включая имя раннера в signal-сообщении), env-переменные (`CODEX_HTTP_PROXY`, `AGENT_RUNNER_*`), idle/hard-cap семантика.
-- [ ] Pi-специфика `isError` сохранена: ошибка из JSONL приоритетнее exit-кода.
-- [ ] Общий контракт JSONL-парсеров (интерфейс `reset`/`feed`/`result`) или эквивалентное решение — фиксирует проектирование.
-- [ ] Публичные методы `buildProcessEnv()`/`createBridgeIfNeeded()` (используются тестами) сохранены или заменены эквивалентом с обновлёнными тестами.
-- [ ] DI-конфигурация обновлена (регистрация, автосвязка).
-- [ ] Unit-тесты на новый компонент (покрытие ≥80% нового кода), существующие тесты раннеров адаптированы.
-- [ ] Дизайн-решение зафиксировано Архитектором до реализации (RACI `refactor`: DS обязательный этап).
+- [x] Единая точка жизненного цикла процесса агента в Infrastructure модуля AgentRunner (Infrastructure-сервис; NOT Helper/Port/Adapter — конвенции и терминология AGENTS.md).
+- [x] Оба раннера используют общий компонент; перечисленные в Цели дублируемые методы удалены из обоих раннеров.
+- [x] Поведение идентично: контракты `AgentRunnerInterface`, сообщения об ошибках (включая имя раннера в signal-сообщении), env-переменные (`CODEX_HTTP_PROXY`, `AGENT_RUNNER_*`), idle/hard-cap семантика.
+- [x] Pi-специфика `isError` сохранена: ошибка из JSONL приоритетнее exit-кода.
+- [x] Общий контракт JSONL-парсеров (интерфейс `reset`/`feed`/`result`) или эквивалентное решение — фиксирует проектирование.
+- [x] Публичные методы `buildProcessEnv()`/`createBridgeIfNeeded()` (используются тестами) сохранены или заменены эквивалентом с обновлёнными тестами.
+- [x] DI-конфигурация обновлена (регистрация, автосвязка).
+- [x] Unit-тесты на новый компонент (покрытие ≥80% нового кода), существующие тесты раннеров адаптированы.
+- [x] Дизайн-решение зафиксировано Архитектором до реализации (RACI `refactor`: DS обязательный этап).
 
 ### 🟡 Желательно (Should Have)
 
-- [ ] Размер обоих раннер-классов заметно сокращается (цель: <400 строк каждый).
-- [ ] Дублируемые фрагменты идентифицированы и устранены поимённо (список в Цели — чеклист для ревью).
+- [x] Размер обоих раннер-классов заметно сокращается (цель: <400 строк каждый).
+- [x] Дублируемые фрагменты идентифицированы и устранены поимённо (список в Цели — чеклист для ревью).
 
 ### 🟢 Опционально (Could Have)
 
-- [ ] Документация компонента в PHPDoc с обоснованием design-решения (как в `ProcessLivenessWatcher`).
+- [x] Документация компонента в PHPDoc с обоснованием design-решения (как в `ProcessLivenessWatcher`).
 
 ### ⚫ Не будем делать (Won't Have)
 
@@ -118,11 +118,11 @@ Pi-специфику `isError` в раннере.
 
 ## 4. План реализации (Implementation Plan)
 
-1. [ ] Создать внутренний Infrastructure-контракт и реализацию:
+1. [x] Создать внутренний Infrastructure-контракт и реализацию:
    - `src/Module/AgentRunner/Infrastructure/Service/Lifecycle/RunAgentProcessLifecycleServiceInterface.php`;
    - `src/Module/AgentRunner/Infrastructure/Service/Lifecycle/RunAgentProcessLifecycleService.php`.
 
-2. [ ] Зафиксировать публичный контракт `RunAgentProcessLifecycleServiceInterface`:
+2. [x] Зафиксировать публичный контракт `RunAgentProcessLifecycleServiceInterface`:
    ```php
    /**
     * @param callable(AgentRunRequestVo): list<string> $buildCommand
@@ -152,7 +152,7 @@ Pi-специфику `isError` в раннере.
    `TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Codex\HttpsProxyBridge`
    (не перемещать в этой задаче, чтобы не расширять рефакторинг).
 
-3. [ ] Реализовать в `RunAgentProcessLifecycleService` единственную копию lifecycle-логики:
+3. [x] Реализовать в `RunAgentProcessLifecycleService` единственную копию lifecycle-логики:
    - private const `ERROR_OUTPUT_TAIL_BYTES = 65536`;
    - private `createConfiguredProcess(AgentRunRequestVo $request, int $hardCap, callable $buildCommand): Process`;
    - private `attachProxyEnvironment(Process $process): ?HttpsProxyBridge`;
@@ -163,7 +163,7 @@ Pi-специфику `isError` в раннере.
    Поведение перенести byte-for-byte, кроме параметризации `runnerName` в signal-сообщении:
    `sprintf('%s process terminated by signal %d.', $runnerName, $signal)`.
 
-4. [ ] В `CodexAgentRunnerService` заменить lifecycle-декомпозицию делегированием:
+4. [x] В `CodexAgentRunnerService` заменить lifecycle-декомпозицию делегированием:
    - constructor: заменить `ProcessLivenessWatcher $livenessWatcher` на
      `RunAgentProcessLifecycleServiceInterface $processLifecycle`;
    - `run(AgentRunRequestVo $request)` сделать thin wrapper вокруг `$this->processLifecycle->run(...)`;
@@ -178,7 +178,7 @@ Pi-специфику `isError` в раннере.
    - оставить Codex-specific методы: `buildCommand`, `buildResult`, `resolvePromptSlots`,
      `escapeTomlString`, `extractAppendFromRunnerArgs`, `getFilteredRunnerArgs`, `readFileOrValue`.
 
-5. [ ] В `PiAgentRunnerService` выполнить симметричную замену:
+5. [x] В `PiAgentRunnerService` выполнить симметричную замену:
    - constructor: заменить `ProcessLivenessWatcher $livenessWatcher` на
      `RunAgentProcessLifecycleServiceInterface $processLifecycle`;
    - `run()` делегирует в `$this->processLifecycle->run(...)` с `runnerName: 'pi'`;
@@ -188,12 +188,12 @@ Pi-специфику `isError` в раннере.
    - оставить Pi-specific методы: `buildCommand`, `buildResult` с проверкой `isError`/`errorMessage`,
      `resolvePromptMarkers`, `extractAppendPromptPath`, `resolveCommandFiles`.
 
-6. [ ] Не вводить общий интерфейс для `CodexJsonlParser`/`PiJsonlParser` на этом шаге.
+6. [x] Не вводить общий интерфейс для `CodexJsonlParser`/`PiJsonlParser` на этом шаге.
    Эквивалентный контракт lifecycle-сервиса — callbacks `resetParser`/`feedParserLine` +
    `buildResult` hook. Это сохраняет текущий `result(): array` shape каждого parser-а и не
    смешивает Pi error-семантику с Codex.
 
-7. [ ] Обновить DI в `src/Module/AgentRunner/Resource/config/services.yaml`:
+7. [x] Обновить DI в `src/Module/AgentRunner/Resource/config/services.yaml`:
    ```yaml
    TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\RunAgentProcessLifecycleServiceInterface:
      alias: TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\RunAgentProcessLifecycleService
@@ -201,7 +201,7 @@ Pi-специфику `isError` в раннере.
    Явного definition для implementation не нужно: `ModuleServiceRegistrar` auto-discovers instantiable
    классы модуля; alias нужен для autowire интерфейса в раннеры.
 
-8. [ ] Обновить тесты:
+8. [x] Обновить тесты:
    - добавить `tests/Unit/Infrastructure/Service/AgentRunner/Lifecycle/RunAgentProcessLifecycleServiceTest.php`
      с покрытием `buildProcessEnv`, `createBridgeIfNeeded`, chunked stdout + flush last line, stderr-tail,
      hard-cap timeout, idle timeout и signal-сообщения с `runnerName`;
@@ -216,18 +216,18 @@ Pi-специфику `isError` в раннере.
    - обновить `AgentRunnerProbeErrorCleanupIntegrationTest` и `CodexAgentRunnerLivenessIntegrationTest`
      под новый constructor.
 
-9. [ ] Проверить, что после рефакторинга `rg "buildProcessEnv|createBridgeIfNeeded|ERROR_OUTPUT_TAIL_BYTES|bufferStdoutChunk|flushStdoutBuffer|appendErrorOutputTail" src/Module/AgentRunner/Infrastructure/Service/{Codex,Pi}`
+9. [x] Проверить, что после рефакторинга `rg "buildProcessEnv|createBridgeIfNeeded|ERROR_OUTPUT_TAIL_BYTES|bufferStdoutChunk|flushStdoutBuffer|appendErrorOutputTail" src/Module/AgentRunner/Infrastructure/Service/{Codex,Pi}`
    не находит дубликатов в раннерах; разрешены только runner-specific prompt/command/result методы.
 
-10. [ ] Запустить проверки из раздела Verification: `make check` и `php vendor/bin/todo-md validate todo/TASK-techdebt-agent-runner-lifecycle-helper.todo.md`.
+10. [x] Запустить проверки из раздела Verification: `make check` и `php vendor/bin/todo-md validate todo/TASK-techdebt-agent-runner-lifecycle-helper.todo.md`.
 
 ## 5. Критерии приёмки (Definition of Done)
 
-- [ ] Дублируемые методы жизненного цикла удалены из обоих раннеров, существуют в одном экземпляре.
-- [ ] Поведение обоих раннеров не изменилось (никаких правок контрактов/сообщений/env).
-- [ ] Новые Unit-тесты на общий компонент; существующие тесты адаптированы и зелёные.
-- [ ] `make check` зелёный (PHPUnit, Psalm, PHPStan, Deptrac, phpmd, phpcs).
-- [ ] Нет регрессий в смежных модулях (ChainExecution, DynamicLoop используют раннеры).
+- [x] Дублируемые методы жизненного цикла удалены из обоих раннеров, существуют в одном экземпляре.
+- [x] Поведение обоих раннеров не изменилось (никаких правок контрактов/сообщений/env).
+- [x] Новые Unit-тесты на общий компонент; существующие тесты адаптированы и зелёные.
+- [x] `make check` зелёный (PHPUnit, Psalm, PHPStan, Deptrac, phpmd, phpcs).
+- [x] Нет регрессий в смежных модулях (ChainExecution, DynamicLoop используют раннеры).
 
 ## 6. Самопроверка (Verification)
 
@@ -244,12 +244,12 @@ php vendor/bin/todo-md validate todo/TASK-techdebt-agent-runner-lifecycle-helper
 
 ## 8. Источники (Sources)
 
-- [ ] [Ретроспектива 2026-08-20 (предложение техдолга, замечание №1)](../docs/agents/team-retro/2026-08-20_00-36-techdebt-phpmd-lengths.md)
-- [ ] [PR #356 — источник замечания ревью](https://github.com/prikotov/task-orchestrator/pull/356)
-- [ ] [Прецедент: TASK-techdebt-extract-process-liveness-service](done/TASK-techdebt-extract-process-liveness-service.todo.md)
-- [ ] [Конвенция Helper](../docs/conventions/core-patterns/helper.md)
-- [ ] [Конвенция Service](../docs/conventions/core-patterns/service.md)
-- [ ] [Матрица RACI — refactor](../docs/agents/raci-matrix.md)
+- [x] [Ретроспектива 2026-08-20 (предложение техдолга, замечание №1)](../../docs/agents/team-retro/2026-08-20_00-36-techdebt-phpmd-lengths.md)
+- [x] [PR #356 — источник замечания ревью](https://github.com/prikotov/task-orchestrator/pull/356)
+- [x] [Прецедент: TASK-techdebt-extract-process-liveness-service](TASK-techdebt-extract-process-liveness-service.todo.md)
+- [x] [Конвенция Helper](../../docs/conventions/core-patterns/helper.md)
+- [x] [Конвенция Service](../../docs/conventions/core-patterns/service.md)
+- [ ] [Матрица RACI — refactor](../../docs/agents/raci-matrix.md)
 
 ## 9. Комментарии (Comments)
 
@@ -262,3 +262,7 @@ php vendor/bin/todo-md validate todo/TASK-techdebt-agent-runner-lifecycle-helper
 | :--- | :--- | :--- |
 | 2026-08-20 | Тимлид Алекс (pi) | Создание задачи (по подтверждению владельца, из ретро PR #356) |
 | 2026-08-20 | Архитектор Гэндальф | Зафиксировано DS: `RunAgentProcessLifecycleService`, callback-контракт parser lifecycle, перенос public proxy seam-методов в общий Infrastructure-сервис. |
+| 2026-08-20 | Бэкендер Левша (pi) | Реализация по плану: `Lifecycle/RunAgentProcessLifecycleService` + Interface (291+76 строк) — единственная копия lifecycle-логики; делегирование обоих раннеров через callbacks (538→281 и 532→273 строк); DI-alias интерфейса; 29 unit-тестов lifecycle-сервиса (покрытие 100% строк/методов) с переносом proxy-тестов с раннеров; runner- и integration-тесты адаптированы под новый constructor. rg-проверка п.9 без дубликатов; `make check` зелёный (1503 теста, 4025 assertions). |
+| 2026-08-20 | Бэкендер Левша (pi) | Доработка по ревью Пуаро (одобрено с замечаниями: 3 minor + 1 nit): Minor-1 — убран `static` у `appendErrorOutputTail()` и вызов через `$this->` (конвенция Service: без статических методов); Minor-2 — артефакт `implode("\n", [])` в дефолтном buildResult-hook заменён на `''` с комментарием; Minor-3 — добавлены wiring-тесты `runSignalsRunnerNameInTerminatedBySignalMessage` в Codex/Pi runner-тесты (ThrowingProbeStub + SIGTERM-процесс → префикс `codex`/`pi` в signal-сообщении); Nit-4 — дубликат `runAppliesHttpProxyEnvironmentWithoutBridge` удалён из PiAgentRunnerTest (копия осталась в Codex + lifecycle-тест). `make check` зелёный (1504 теста, 4030 assertions). |
+| 2026-08-20 | Бэкендер Левша (pi) | Фикс gitleaks: фикстурные URL с кредитеншалами выровнены на allowlist-паттерн `user:pass@example.com` (4 строки lifecycle-теста). |
+| 2026-08-20 | Тимлид Алекс (pi) | Повторное ревью Пуаро — финальный апрув; независимый `make check` зелёный; PR #357; статус `done`, перенос в `todo/done/`. |
