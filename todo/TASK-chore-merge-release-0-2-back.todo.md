@@ -9,8 +9,8 @@ epic:
 author: Тимлид Алекс (codex-cli)
 assignee: Тимлид Алекс (codex-cli)
 branch: task/merge-release-0-2-back
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/360
+status: review
 ---
 
 # TASK-chore-merge-release-0-2-back: Синхронизировать историю релизов 0.2 с main
@@ -43,7 +43,7 @@ status: in_progress
 - [x] `CHANGELOG.md` содержит записи `0.2.0`–`0.2.3`.
 - [x] Release plans и завершённые задачи релизов 0.2 перенесены в `main`.
 - [x] `make check` успешно завершён.
-- [ ] Создан PR в `main` с меткой `codex-cli`.
+- [x] Создан PR в `main` с меткой `codex-cli`.
 
 ### ⚫ Не будем делать (Won't Have)
 - [ ] Не создаём tag и GitHub Release в этом PR.
@@ -54,7 +54,7 @@ status: in_progress
 2. [x] Выполнить merge-back в ветке `task/merge-release-0-2-back` с приоритетом актуального `main` в конфликтных файлах.
 3. [x] Проверить релизные метаданные и внутренние ссылки.
 4. [x] Запустить `make check`.
-5. [ ] Создать PR и передать его на ревью.
+5. [x] Создать PR и передать его на ревью.
 
 ## 5. Критерии приёмки (Definition of Done)
 - [x] История релизов 0.2 доступна из `main`.
@@ -86,3 +86,4 @@ git diff --check
 | :--- | :--- | :--- |
 | 2026-08-20 | Тимлид Алекс (codex-cli) | Создание задачи и начало merge-back `release/0.2` в `main`. |
 | 2026-08-20 | Тимлид Алекс (codex-cli) | Релизные метаданные проверены; `make check` успешно завершён. |
+| 2026-08-20 | Тимлид Алекс (codex-cli) | Создан Pull Request #360, задача передана на ревью. |
