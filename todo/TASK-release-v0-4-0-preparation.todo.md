@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/release-v0-4-0
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/366
+status: review
 ---
 
 # TASK-release-v0-4-0-preparation: Подготовить и выпустить релиз v0.4.0 из main
