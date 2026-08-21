@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-08-21
+
+### Added
+
+- Added Use Case command and query buses (`CommandBusComponentInterface` / `QueryBusComponentInterface`): handlers are wired automatically by a PHAR-safe compiler pass, and all 16 direct handler invocations in CLI commands and Integration services were migrated to bus dispatch (#364).
+
+### Changed
+
+- Updated `prikotov/coding-standard` to 0.30.0 with PHPStan rules now wired into the project (`coding-standard-verify` passes); expanded single `use` imports where the new sniffer disallows group use (#364).
+- Updated `prikotov/todo-md` to 0.0.11 (#364).
+
 ## [0.3.1] - 2026-08-20
 
 ### Fixed
