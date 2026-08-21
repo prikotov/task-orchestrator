@@ -13,19 +13,19 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
+use TaskOrchestrator\Common\Component\CommandBus\CommandBusComponentInterface;
+use TaskOrchestrator\Common\Component\QueryBus\QueryBusComponentInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Dto\ChainDefinitionDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadChain\LoadChainQuery;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadChain\LoadChainQueryHandler;
+use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadChain\LoadChainResult;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQuery;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigQueryHandler;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\ValidateChainConfig\ValidateChainConfigResult;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\ReportFormatEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQuery;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportResultDto;
 
 #[AsCommand(
     name: 'agent:orchestrate',
@@ -67,10 +67,8 @@ final class OrchestrateCommand extends Command
     public const string LOCK_RESOURCE = 'command:agent:orchestrate';
 
     public function __construct(
-        private readonly OrchestrateChainCommandHandler $orchestrateHandler,
-        private readonly GenerateReportQueryHandler $reportHandler,
-        private readonly LoadChainQueryHandler $loadChainHandler,
-        private readonly ValidateChainConfigQueryHandler $validateChainConfigHandler,
+        private readonly CommandBusComponentInterface $commandBus,
+        private readonly QueryBusComponentInterface $queryBus,
         private readonly LockFactory $lockFactory,
     ) {
         parent::__construct();
@@ -160,7 +158,7 @@ final class OrchestrateCommand extends Command
                 $io->section(sprintf('🔄 Resuming session: %s', $resumeDir));
 
                 /** @var OrchestrateChainResultDto $result */
-                $result = ($this->orchestrateHandler)(new OrchestrateChainCommand(
+                $result = $this->commandBus->execute(new OrchestrateChainCommand(
                     chainName: $chainName,
                     task: $task,
                     workingDir: $workingDir !== null && $workingDir !== '' ? $workingDir : null,
@@ -177,7 +175,8 @@ final class OrchestrateCommand extends Command
                 return $this->resolveExitCodeFromResult($result, true)->value;
             }
 
-            $loadResult = ($this->loadChainHandler)(new LoadChainQuery(
+            /** @var LoadChainResult $loadResult */
+            $loadResult = $this->queryBus->query(new LoadChainQuery(
                 chainName: $chainName,
                 configPath: $configPath !== '' ? $configPath : null,
             ));
@@ -193,7 +192,7 @@ final class OrchestrateCommand extends Command
             $io->section(sprintf('🚀 Orchestrating: %s (%s)', $chainName, $isDynamic ? 'dynamic' : 'static'));
 
             /** @var OrchestrateChainResultDto $result */
-            $result = ($this->orchestrateHandler)(new OrchestrateChainCommand(
+            $result = $this->commandBus->execute(new OrchestrateChainCommand(
                 chainName: $chainName,
                 task: $task,
                 workingDir: $workingDir !== null && $workingDir !== '' ? $workingDir : null,
@@ -217,7 +216,8 @@ final class OrchestrateCommand extends Command
             if ($reportFormat !== '' && $reportFormat !== 'none') {
                 $formatEnum = ReportFormatEnum::from($reportFormat);
 
-                $reportResult = ($this->reportHandler)(
+                /** @var GenerateReportResultDto $reportResult */
+                $reportResult = $this->queryBus->query(
                     new GenerateReportQuery($result, $chainName, $task, $formatEnum),
                 );
 
@@ -266,7 +266,8 @@ final class OrchestrateCommand extends Command
         }
 
         try {
-            $result = ($this->validateChainConfigHandler)(new ValidateChainConfigQuery(
+            /** @var ValidateChainConfigResult $result */
+            $result = $this->queryBus->query(new ValidateChainConfigQuery(
                 chainName: $chainName,
                 configPath: $configPath !== '' ? $configPath : null,
             ));

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\AgentRunner;
 
 use Override;
-use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentCommandHandler;
+use TaskOrchestrator\Common\Component\CommandBus\CommandBusComponentInterface;
+use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent\RunAgentResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Agent\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
@@ -20,7 +21,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRe
 final readonly class RunAgentService implements RunAgentServiceInterface
 {
     public function __construct(
-        private RunAgentCommandHandler $agentRunner,
+        private CommandBusComponentInterface $commandBus,
         private AgentDtoMapper $mapper,
     ) {
     }
@@ -29,7 +30,9 @@ final readonly class RunAgentService implements RunAgentServiceInterface
     public function run(ChainRunRequestVo $request, ?ExecutionRetryPolicyVo $retryPolicy = null): ChainRunResultVo
     {
         $command = $this->mapper->mapToRunAgentCommand($request, $retryPolicy);
-        $result = ($this->agentRunner)($command);
+
+        /** @var RunAgentResultDto $result */
+        $result = $this->commandBus->execute($command);
 
         return $this->mapper->mapFromRunAgentResultDto($result);
     }

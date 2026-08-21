@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness;
 
 use Override;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\{
-    ProcFilesystemDirectoryEntriesDto,
-};
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcFilesystemDirectoryEntriesDto;
 
 /**
  * Чтение procfs с нормализацией ожидаемых filesystem warning в null.

@@ -11,10 +11,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use TaskOrchestrator\Common\Component\CommandBus\CommandBusComponentInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\Enum\ConnectivityStatusEnum;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\ConnectivityRoleResultDto;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\RunRoleStartupCheckCommand as RunRoleStartupCheckUseCaseCommand;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\RunRoleStartupCheckCommandHandler;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Command\RunRoleStartupCheck\RunRoleStartupCheckResultDto;
 
 #[AsCommand(
@@ -29,7 +29,7 @@ final class ValidateConnectivityCommand extends Command
     private const string OPT_DRY_RUN = 'dry-run';
 
     public function __construct(
-        private readonly RunRoleStartupCheckCommandHandler $handler,
+        private readonly CommandBusComponentInterface $commandBus,
     ) {
         parent::__construct();
     }
@@ -50,7 +50,8 @@ final class ValidateConnectivityCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $result = ($this->handler)(new RunRoleStartupCheckUseCaseCommand(
+            /** @var RunRoleStartupCheckResultDto $result */
+            $result = $this->commandBus->execute(new RunRoleStartupCheckUseCaseCommand(
                 configPath: $this->normalizeOptionalString($input->getOption(self::OPT_CONFIG)),
                 roleName: $this->normalizeOptionalString($input->getOption(self::OPT_ROLE)),
                 timeout: $this->parsePositiveInt($input->getOption(self::OPT_TIMEOUT), '--timeout'),

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition;
 
 use Override;
+use TaskOrchestrator\Common\Component\QueryBus\QueryBusComponentInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQuery;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
@@ -29,14 +29,14 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRol
 final readonly class DynamicLoopDefinitionMapperService implements DynamicLoopConfigMapperInterface, DynamicLoopDefinitionMapperServiceInterface
 {
     public function __construct(
-        private LoadRawChainQueryHandler $loadRawChainHandler,
+        private QueryBusComponentInterface $queryBus,
     ) {
     }
 
     #[Override]
     public function loadDynamicChainConfig(string $chainName): DynamicLoopConfigVo
     {
-        $chain = ($this->loadRawChainHandler)(new LoadRawChainQuery($chainName));
+        $chain = $this->queryBus->query(new LoadRawChainQuery($chainName));
         assert($chain instanceof DynamicChainDefinitionVo);
 
         return $this->map($chain);

@@ -27,6 +27,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\OrchestrateEx
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\OrchestrateCommand;
+use TaskOrchestrator\Tests\Double\Component\BusTestFactory;
 
 /**
  * Приёмочный integration-тест задачи TASK-fix-fixiterations-config-error-dx.
@@ -204,10 +205,8 @@ YAML);
         $lockFactory = new LockFactory(new FlockStore());
 
         $command = new OrchestrateCommand(
-            $orchestrateHandler,
-            $reportHandler,
-            $loadChainHandler,
-            $validateHandler,
+            BusTestFactory::commandBus($orchestrateHandler),
+            BusTestFactory::queryBus($reportHandler, $loadChainHandler, $validateHandler),
             $lockFactory,
         );
 

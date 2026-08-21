@@ -32,6 +32,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveS
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteToolStepService;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition\ChainExecutionDefinitionMapperService;
+use TaskOrchestrator\Tests\Double\Component\BusTestFactory;
 
 /**
  * Integration-тест: static chain end-to-end.
@@ -95,7 +96,7 @@ final class StaticChainIntegrationTest extends TestCase
             $hookExecutor,
         );
         $staticChainExecutor = new ExecuteStaticChainService($runStaticChainService);
-        $definitionMapper = new ChainExecutionDefinitionMapperService(new LoadRawChainQueryHandler($this->chainLoader));
+        $definitionMapper = new ChainExecutionDefinitionMapperService(BusTestFactory::queryBus(new LoadRawChainQueryHandler($this->chainLoader)));
         $staticStrategy = new StaticExecutionStrategyService($staticChainExecutor, $definitionMapper);
 
         $this->handler = new OrchestrateChainCommandHandler(

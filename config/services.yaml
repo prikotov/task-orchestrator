@@ -23,6 +23,22 @@ services:
   Psr\Clock\ClockInterface:
     alias: TaskOrchestrator\Common\Component\Clock\SystemClock
 
+  # --- Use Case шины (CommandBus/QueryBus) ---
+  # PHAR-safe: явные определения (без resource:). Аргумент $handlers (PSR-11
+  # локатор «класс сообщения => сервис хендлера») проставляет UseCaseBusCompilerPass
+  # по факту зарегистрированных Use Case Handler-ов — ручная конфигурация не нужна.
+  TaskOrchestrator\Common\Component\CommandBus\CommandBus: ~
+
+  TaskOrchestrator\Common\Component\CommandBus\CommandBusComponentInterface:
+    alias: TaskOrchestrator\Common\Component\CommandBus\CommandBus
+    public: true
+
+  TaskOrchestrator\Common\Component\QueryBus\QueryBus: ~
+
+  TaskOrchestrator\Common\Component\QueryBus\QueryBusComponentInterface:
+    alias: TaskOrchestrator\Common\Component\QueryBus\QueryBus
+    public: true
+
   # --- agent:init: установка task-orchestrator в host-проекте ---
   # Команде нужны корневые параметры package_dir/base_path (аутовайринг строковых
   # аргументов требует явного binding). Filesystem резолвится через FrameworkBundle.

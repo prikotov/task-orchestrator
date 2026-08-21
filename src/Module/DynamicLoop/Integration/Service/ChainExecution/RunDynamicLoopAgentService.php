@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecution;
 
 use Override;
+use TaskOrchestrator\Common\Component\QueryBus\QueryBusComponentInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Agent\RunAgent\RunAgentQueryHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Prompt\GetPromptFilePath\GetPromptFilePathQuery;
-use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Prompt\GetPromptFilePath\GetPromptFilePathQueryHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRetryPolicyVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\FacilitatorResponseParserInterface;
@@ -34,7 +34,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         private RunAgentQueryHandler $agentRunner,
         private DynamicLoopSessionWriterInterface $sessionWriter,
         private FacilitatorResponseParserInterface $responseParser,
-        private GetPromptFilePathQueryHandler $getPromptFilePathHandler,
+        private QueryBusComponentInterface $queryBus,
         private DynamicLoopPromptFormatterInterface $formatter,
     ) {
     }
@@ -130,7 +130,9 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         ?string $promptFile = null,
         ?DynamicLoopRetryPolicyVo $retryPolicy = null,
     ): DynamicLoopTurnResultVo {
-        $roleFilePath = $promptFile ?? ($this->getPromptFilePathHandler)(new GetPromptFilePathQuery($role));
+        /** @var string $resolvedRoleFilePath */
+        $resolvedRoleFilePath = $this->queryBus->query(new GetPromptFilePathQuery($role));
+        $roleFilePath = $promptFile ?? $resolvedRoleFilePath;
         $appendPromptContent = sprintf($participantAppendPrompt, $roleFilePath);
 
         $userPrompt = $this->formatter->buildParticipantUserPrompt(

@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness;
 
 use Override;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\{
-    ProcessLivenessSnapshotDto,
-    ProcessLivenessUnknownProbeResultDto,
-};
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessSnapshotDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessUnknownProbeResultDto;
 
 /**
  * Безопасная UNKNOWN-проба для платформ без поддерживаемой телеметрии.

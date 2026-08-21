@@ -481,6 +481,8 @@ src/
 ├── Kernel.php                                       # Symfony Kernel: BaseKernel + MicroKernelTrait + ModuleKernelTrait
 ├── Component/
 │   ├── ModuleSystem/                                # ModuleInterface, ModuleServiceRegistrar, ModuleCompilerPass, ModuleKernelTrait
+│   ├── CommandBus/                                  # CommandBusComponentInterface, CommandBus, UseCaseBusCompilerPass
+│   ├── QueryBus/                                    # QueryBusComponentInterface, QueryBus
 │   └── Clock/                                        # SystemClock (PSR-20 Psr\Clock\ClockInterface)
 config/
 ├── bundles.php                                      # Реестр bundles (FrameworkBundle, TwigBundle, MonologBundle)
@@ -509,6 +511,14 @@ src/Module/<Name>/
 
 Auto-discovery классов модуля выполняется **не** оператором Symfony `resource:`/`exclude:`, а
 программно через `ModuleServiceRegistrar` (`src/Component/ModuleSystem/DependencyInjection/`).
+
+Use Case шины (диспетчеризация Command/Query Handler-ов по конвенции
+`docs/conventions/layers/application/use-case.md`) — компоненты `src/Component/CommandBus/` и
+`src/Component/QueryBus/`: `Kernel::build()` регистрирует `UseCaseBusCompilerPass`, который по
+рефлексии связывает каждый invokable-хендлер (`Application\UseCase\{Command,Query}\...Handler`)
+с классом его сообщения и подставляет PSR-11 ServiceLocator в шины. Ручная конфигурация
+не нужна: новый хендлер подхватывается автоматически; хендлеры вызываются только через
+`CommandBusComponentInterface::execute()` / `QueryBusComponentInterface::query()`.
 Причина: `GlobResource` (механизм `resource:`) возвращает 0 файлов по путям `phar://` и
 молча опустошал DI-контейнер собранного PHAR. Полное обоснование и рассмотренные альтернативы —
 в [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-автообнаружения-вариант-4).

@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness;
 
 use Override;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\{
-    ProcessLivenessActiveProbeResultDto,
-    ProcessLivenessInactiveProbeResultDto,
-    ProcessLivenessSnapshotDto,
-    ProcessLivenessUnknownProbeResultDto,
-};
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessActiveProbeResultDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessInactiveProbeResultDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessSnapshotDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessUnknownProbeResultDto;
 
 /**
  * Явный выбор платформенной liveness-пробы по внедрённому семейству ОС.

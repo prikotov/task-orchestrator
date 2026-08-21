@@ -11,6 +11,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Audit\Aud
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\StaticAuditServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticChainAuditVo;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepAuditVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
 
 /**
@@ -69,7 +70,7 @@ final readonly class StaticAuditService implements StaticAuditServiceInterface
             budgetExceeded: $audit->budgetExceeded,
             stepsCount: $audit->stepsCount,
             stepStatuses: array_map(
-                static fn(\TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepAuditVo $step): StepAuditStatusDto => new StepAuditStatusDto($step->isError),
+                static fn(StaticStepAuditVo $step): StepAuditStatusDto => new StepAuditStatusDto($step->isError),
                 $audit->stepStatuses,
             ),
         ));

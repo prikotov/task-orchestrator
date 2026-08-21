@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness;
 
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\{
-    ProcFilesystemDirectoryEntriesDto,
-};
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcFilesystemDirectoryEntriesDto;
 
 /**
  * Низкоуровневое чтение файлов Linux procfs.

@@ -16,6 +16,7 @@ use TaskOrchestrator\Common\Module\GitIdentity\Domain\ValueObject\InstallationId
 use TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\OpenSslSignJwtTokenService;
 use TaskOrchestrator\Console\Module\GitIdentity\Command\AgentTokenCommand;
 use TaskOrchestrator\Tests\Integration\Module\GitIdentity\Stub\FixedClockService;
+use TaskOrchestrator\Tests\Double\Component\BusTestFactory;
 use TaskOrchestrator\Tests\Integration\Module\GitIdentity\Stub\InMemoryTokenCache;
 use TaskOrchestrator\Tests\Integration\Module\GitIdentity\Stub\StubGitIdentityConfigLoader;
 use TaskOrchestrator\Tests\Integration\Module\GitIdentity\Stub\StubRequestInstallationTokenService;
@@ -72,7 +73,7 @@ final class AgentTokenCommandTest extends TestCase
 
     private function execute(array $input): CommandTester
     {
-        $command = new AgentTokenCommand($this->handler);
+        $command = new AgentTokenCommand(BusTestFactory::commandBus($this->handler));
         $tester = new CommandTester($command);
         $tester->execute($input);
 
@@ -85,7 +86,7 @@ final class AgentTokenCommandTest extends TestCase
         // --help is a global option handled by the Application, so route through ApplicationTester
         // (this also verifies the command registers in the console application).
         $application = new Application();
-        $application->addCommand(new AgentTokenCommand($this->handler));
+        $application->addCommand(new AgentTokenCommand(BusTestFactory::commandBus($this->handler)));
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
@@ -101,7 +102,7 @@ final class AgentTokenCommandTest extends TestCase
     #[Test]
     public function commandDeclaresRepoArgumentAndFormatOption(): void
     {
-        $command = new AgentTokenCommand($this->handler);
+        $command = new AgentTokenCommand(BusTestFactory::commandBus($this->handler));
 
         self::assertSame('agent:token', (string) $command->getName());
         self::assertNotNull($command->getDefinition()->getArgument('repo'));

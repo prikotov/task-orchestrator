@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness;
 
 use Override;
-use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\{
-    Dto\ProcessLivenessPidSnapshotDto,
-    Dto\ProcessLivenessActiveProbeResultDto,
-    Dto\ProcessLivenessInactiveProbeResultDto,
-    Dto\ProcessLivenessSnapshotDto,
-    Dto\ProcessLivenessUnknownProbeResultDto,
-};
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessActiveProbeResultDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessInactiveProbeResultDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessPidSnapshotDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessSnapshotDto;
+use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Component\ProcessLiveness\Dto\ProcessLivenessUnknownProbeResultDto;
 
 /**
  * Linux liveness-проба через procfs без внешних команд и расширения pcntl.

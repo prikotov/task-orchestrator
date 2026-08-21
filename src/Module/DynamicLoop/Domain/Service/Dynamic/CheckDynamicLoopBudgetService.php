@@ -6,6 +6,7 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic;
 
 use Override;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetServiceInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetCheckVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
@@ -13,7 +14,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBud
 /**
  * Проверка и контроль бюджета dynamic-цикла.
  */
-final readonly class CheckDynamicLoopBudgetService implements \TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic\CheckDynamicLoopBudgetServiceInterface
+final readonly class CheckDynamicLoopBudgetService implements CheckDynamicLoopBudgetServiceInterface
 {
     public function __construct(
         private \TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Budget\CheckDynamicLoopBudgetServiceInterface $budgetChecker,

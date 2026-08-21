@@ -36,6 +36,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\Y
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\OrchestrateCommand;
+use TaskOrchestrator\Tests\Double\Component\BusTestFactory;
 
 #[CoversClass(OrchestrateCommand::class)]
 final class OrchestrateCommandTest extends TestCase
@@ -85,10 +86,8 @@ final class OrchestrateCommandTest extends TestCase
 
         // Запускаем две команды параллельно через lock
         $command = new OrchestrateCommand(
-            $this->orchestrateHandler,
-            $this->reportHandler,
-            $this->loadChainHandler,
-            $this->validateChainConfigHandler,
+            BusTestFactory::commandBus($this->orchestrateHandler),
+            BusTestFactory::queryBus($this->reportHandler, $this->loadChainHandler, $this->validateChainConfigHandler),
             $this->lockFactory,
         );
 
@@ -497,10 +496,8 @@ YAML);
             $loadHandler = new LoadChainQueryHandler($chainLoader, $mapper);
 
             $command = new OrchestrateCommand(
-                $this->orchestrateHandler,
-                $this->reportHandler,
-                $loadHandler,
-                $this->validateChainConfigHandler,
+                BusTestFactory::commandBus($this->orchestrateHandler),
+                BusTestFactory::queryBus($this->reportHandler, $loadHandler, $this->validateChainConfigHandler),
                 $this->lockFactory,
             );
 
@@ -551,10 +548,8 @@ YAML);
             $validateHandler = new ValidateChainConfigQueryHandler($chainLoader, $chainValidator, $violationMapper, $collector);
 
             $command = new OrchestrateCommand(
-                $this->orchestrateHandler,
-                $this->reportHandler,
-                $this->loadChainHandler,
-                $validateHandler,
+                BusTestFactory::commandBus($this->orchestrateHandler),
+                BusTestFactory::queryBus($this->reportHandler, $this->loadChainHandler, $validateHandler),
                 $this->lockFactory,
             );
 
@@ -639,10 +634,8 @@ YAML);
     private function createCommandTester(): CommandTester
     {
         $command = new OrchestrateCommand(
-            $this->orchestrateHandler,
-            $this->reportHandler,
-            $this->loadChainHandler,
-            $this->validateChainConfigHandler,
+            BusTestFactory::commandBus($this->orchestrateHandler),
+            BusTestFactory::queryBus($this->reportHandler, $this->loadChainHandler, $this->validateChainConfigHandler),
             $this->lockFactory,
         );
 

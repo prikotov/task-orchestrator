@@ -27,6 +27,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRes
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSessionStateVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapperService;
+use TaskOrchestrator\Tests\Double\Component\BusTestFactory;
 
 /**
  * Integration-тест: resume dynamic chain end-to-end.
@@ -58,7 +59,7 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
         $this->stubSessionLogger = new ResumeStubSessionLogger();
 
         $contextBuilder = new BuildDynamicContextService();
-        $configMapper = new DynamicLoopDefinitionMapperService(new \TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler($chainLoader));
+        $configMapper = new DynamicLoopDefinitionMapperService(BusTestFactory::queryBus(new \TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler($chainLoader)));
         $auditFactory = $this->createMock(DynamicLoopAuditLoggerFactoryInterface::class);
         $sessionNotifier = $this->createMock(SessionCompletedNotifierInterface::class);
         $sessionNotifier->method('notifySessionCompleted');
@@ -72,7 +73,7 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
             sessionNotifier: $sessionNotifier,
         );
 
-        $chainDefinitionProvider = new ChainExecutionDefinitionMapperService(new \TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler($chainLoader));
+        $chainDefinitionProvider = new ChainExecutionDefinitionMapperService(BusTestFactory::queryBus(new \TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler($chainLoader)));
         $this->handler = new OrchestrateChainCommandHandler(
             $chainDefinitionProvider,
             new \ArrayIterator([$dynamicStrategy]),

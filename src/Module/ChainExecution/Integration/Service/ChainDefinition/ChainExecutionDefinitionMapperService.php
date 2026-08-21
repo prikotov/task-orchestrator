@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Common\Module\ChainExecution\Integration\Service\ChainDefinition;
 
 use Override;
+use TaskOrchestrator\Common\Component\QueryBus\QueryBusComponentInterface;
 use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQuery;
-use TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\BudgetVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainStepVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ConditionalChainDefinitionVo;
+use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\DynamicChainDefinitionVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FallbackConfigVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\FixIterationGroupVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
@@ -40,14 +42,19 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionSt
 final readonly class ChainExecutionDefinitionMapperService implements ChainExecutionDefinitionMapperServiceInterface, ChainConfigMapperInterface
 {
     public function __construct(
-        private LoadRawChainQueryHandler $loadRawChainHandler,
+        private QueryBusComponentInterface $queryBus,
     ) {
     }
 
     #[Override]
     public function loadChainInfo(string $chainName): ExecutionChainInfoVo
     {
-        $chain = ($this->loadRawChainHandler)(new LoadRawChainQuery($chainName));
+        $chain = $this->queryBus->query(new LoadRawChainQuery($chainName));
+        assert(
+            $chain instanceof StaticChainDefinitionVo
+            || $chain instanceof ConditionalChainDefinitionVo
+            || $chain instanceof DynamicChainDefinitionVo,
+        );
 
         $type = ChainExecutionTypeEnum::from($chain->getType()->value);
 
@@ -60,7 +67,7 @@ final readonly class ChainExecutionDefinitionMapperService implements ChainExecu
     #[Override]
     public function loadStaticChainConfig(string $chainName): ExecutionStaticChainConfigVo
     {
-        $chain = ($this->loadRawChainHandler)(new LoadRawChainQuery($chainName));
+        $chain = $this->queryBus->query(new LoadRawChainQuery($chainName));
         assert($chain instanceof StaticChainDefinitionVo);
 
         return $this->mapStaticChain($chain);
@@ -69,7 +76,7 @@ final readonly class ChainExecutionDefinitionMapperService implements ChainExecu
     #[Override]
     public function loadConditionalChainConfig(string $chainName): ExecutionConditionalChainConfigVo
     {
-        $chain = ($this->loadRawChainHandler)(new LoadRawChainQuery($chainName));
+        $chain = $this->queryBus->query(new LoadRawChainQuery($chainName));
         assert($chain instanceof ConditionalChainDefinitionVo);
 
         return $this->mapConditionalChain($chain);
@@ -194,7 +201,7 @@ final readonly class ChainExecutionDefinitionMapperService implements ChainExecu
         );
     }
 
-    private function mapRetryPolicy(?\TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetryPolicyVo $policy): ?ExecutionRetryPolicyVo
+    private function mapRetryPolicy(?ChainRetryPolicyVo $policy): ?ExecutionRetryPolicyVo
     {
         if ($policy === null) {
             return null;
