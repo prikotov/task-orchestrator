@@ -3,7 +3,7 @@ type: refactor
 created: 2026-08-20
 due:
 started: 2026-08-20
-completed:
+completed: 2026-08-21 03:20:56 (1787282456)
 cancelled:
 value: V2
 complexity: C3
@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/usecase-bus-dispatch
 pr: https://github.com/prikotov/task-orchestrator/pull/364
-status: review
+status: done
 ---
 
 # TASK-refactor-usecase-bus-dispatch: Диспетчеризация Use Case через CommandBus/QueryBus
@@ -80,8 +80,8 @@ vendor/bin/coding-standard-verify --offline
 - Ветка включает обновление prikotov/* (coding-standard 0.30.0, todo-md 0.0.11) — оно и вскрыло нарушения.
 
 ## 8. Источники (Sources)
-- [docs/conventions/layers/application/use-case.md](../docs/conventions/layers/application/use-case.md)
-- [docs/conventions/layers/application/command-handler.md](../docs/conventions/layers/application/command-handler.md)
+- [docs/conventions/layers/application/use-case.md](../../docs/conventions/layers/application/use-case.md)
+- [docs/conventions/layers/application/command-handler.md](../../docs/conventions/layers/application/command-handler.md)
 
 ## 9. Комментарии (Comments)
 - Вариант согласован с пользователем (выбор «2» из трёх вариантов обработки 16 нарушений).
