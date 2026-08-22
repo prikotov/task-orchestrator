@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-08-22
+
+### Changed
+
+- Синхронизация потребителя с upstream-каноном «done до запроса апрува»: корневой `AGENTS.md` (порядок перевода задачи в `done`, мини-чеклист), скиллы `epic-via-subagents` (фикс перехода ревью → мерж) и `task-via-subagents`, запись реестра ретро о снятии апрува done-коммитом переведена в `resolved` (#367).
+
+### Updated
+
+- `prikotov/git-workflow` 0.3.1 → 0.3.2: раздел «Подготовка PR» — задача переводится в `done` до запроса апрува, после апрува в PR-ветку не пушится ничего (#367).
+- `prikotov/todo-md` 0.0.11 → 0.0.12: модель `review`/`done` (done = «представлена к приёмке»), механика git-порядка вынесена из формата задач, front matter `package:` в распределяемых документах (#367).
+
 ## [0.4.0] - 2026-08-21
 
 ### Added
