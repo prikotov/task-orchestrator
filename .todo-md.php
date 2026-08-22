@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-// Project-level configuration for todo-md validate.
 // Lists canonical roles and agents for author/assignee validation.
 // Full reference: docs/todo-md/reference/CONFIG.md
 return [
     // Канонические роли проекта (текст перед скобками) — персоны команды,
-    // см. docs/agents/roles/team/.
+    // см. docs/agents/roles/team/. В author/assignee используются полные имена
+    // персон, чтобы различать исполнителей задач (Тимлид Алекс vs Архитектор Локи).
     'roles' => [
         'Тимлид Алекс',
         'Аналитик Шерлок',
@@ -22,8 +22,8 @@ return [
     ],
 
     // Канонические агенты (lowercase-идентификатор в скобках) — AI-харнесы,
-    // которыми выполняется работа. Персона роли указывается в 'roles', здесь —
-    // только инструмент: pi (Pi Coding Agent) и codex/codex-cli (Codex).
+    // которыми выполняется работа. Пакетный список из reference/AI_AGENTS.md
+    // расширен агентом `omp`, который используется в этом проекте.
     'agents' => ['pi', 'codex', 'codex-cli', 'omp', 'opencode'],
 
     // Считать нарушения author/assignee ошибками (аналог флага --strict).

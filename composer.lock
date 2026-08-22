@@ -6973,16 +6973,16 @@
         },
         {
             "name": "prikotov/git-workflow",
-            "version": "v0.3.1",
+            "version": "v0.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/git-workflow.git",
-                "reference": "37acb8970a16a210015d74e8dcbe25f643152206"
+                "reference": "dcccb6b30e772ca6086c86a9f4b7345217582c50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/37acb8970a16a210015d74e8dcbe25f643152206",
-                "reference": "37acb8970a16a210015d74e8dcbe25f643152206",
+                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/dcccb6b30e772ca6086c86a9f4b7345217582c50",
+                "reference": "dcccb6b30e772ca6086c86a9f4b7345217582c50",
                 "shasum": ""
             },
             "require": {
@@ -7019,23 +7019,23 @@
                 "workflow"
             ],
             "support": {
-                "source": "https://github.com/prikotov/git-workflow/tree/v0.3.1",
+                "source": "https://github.com/prikotov/git-workflow/tree/v0.3.2",
                 "issues": "https://github.com/prikotov/git-workflow/issues"
             },
-            "time": "2026-07-01T14:32:29+00:00"
+            "time": "2026-08-21T15:07:54+00:00"
         },
         {
             "name": "prikotov/todo-md",
-            "version": "v0.0.11",
+            "version": "v0.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/todo-md.git",
-                "reference": "d7b7cc872f6ef39c1749c1bdbe08ee495fb353b0"
+                "reference": "a4a38bf5fccdff7b142caee396b9191e8671cc7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/todo-md/zipball/d7b7cc872f6ef39c1749c1bdbe08ee495fb353b0",
-                "reference": "d7b7cc872f6ef39c1749c1bdbe08ee495fb353b0",
+                "url": "https://api.github.com/repos/prikotov/todo-md/zipball/a4a38bf5fccdff7b142caee396b9191e8671cc7f",
+                "reference": "a4a38bf5fccdff7b142caee396b9191e8671cc7f",
                 "shasum": ""
             },
             "require": {
@@ -7067,10 +7067,10 @@
                 "todo"
             ],
             "support": {
-                "source": "https://github.com/prikotov/todo-md/tree/v0.0.11",
+                "source": "https://github.com/prikotov/todo-md/tree/v0.0.12",
                 "issues": "https://github.com/prikotov/todo-md/issues"
             },
-            "time": "2026-08-20T03:51:52+00:00"
+            "time": "2026-08-22T03:40:07+00:00"
         },
         {
             "name": "psalm/plugin-symfony",
