@@ -3,7 +3,7 @@ type: docs
 created: 2026-08-22 11:36:46 (1787398606)
 due: 
 started: 2026-08-22 11:36:46 (1787398606)
-completed: 
+completed: 2026-08-22 12:02:41 (1787400161)
 cancelled: 
 value: V2
 complexity: C2
@@ -15,8 +15,8 @@ epic:
 author: Тимлид (pi)
 assignee: Технический писатель (pi)
 branch: task/docs-done-before-approval-sync
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/367
+status: done
 ---
 
 # TASK-docs-done-before-approval-sync: Синхронизация потребителя: done до запроса апрува (upstream v0.3.2 / v0.0.12)
@@ -104,9 +104,9 @@ php vendor/bin/todo-md validate
 
 ## 8. Источники (Sources)
 - `docs/git-workflow/pull-request.md` (v0.3.2) — раздел «Подготовка PR» (перегенерированный пакетный документ).
-- Ретро [2026-08-21](../docs/agents/team-retro/2026-08-21_10-26-done-commit-dismisses-approval.md) — исходная проблема.
-- [RETRO-ROADMAP.md](../docs/agents/team-retro/RETRO-ROADMAP.md) — запись «Обязательный done-коммит после апрува снимает одобрение».
-- Ретро [2026-08-18 19:21](../docs/agents/team-retro/2026-08-18_19-21-retro-registry-standard.md) — ретро-правила в `todo/AGENTS.md` (первоисточник для переноса в корневой `AGENTS.md`).
+- Ретро [2026-08-21](../../docs/agents/team-retro/2026-08-21_10-26-done-commit-dismisses-approval.md) — исходная проблема.
+- [RETRO-ROADMAP.md](../../docs/agents/team-retro/RETRO-ROADMAP.md) — запись «Обязательный done-коммит после апрува снимает одобрение».
+- Ретро [2026-08-18 19:21](../../docs/agents/team-retro/2026-08-18_19-21-retro-registry-standard.md) — ретро-правила в `todo/AGENTS.md` (первоисточник для переноса в корневой `AGENTS.md`).
 
 ## 9. Комментарии (Comments)
 - Исполнитель: Гермиона (pi), ветка `task/docs-done-before-approval-sync`.
