@@ -15,8 +15,8 @@ epic:
 author: Бэкендер Левша (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/fix-composer-host-role-loading
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/371
+status: review
 ---
 
 # TASK-fix-composer-host-role-loading: Исправить загрузку ролей в Composer-host после обновления пакета
