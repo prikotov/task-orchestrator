@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/persist-agent-session-metrics
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/369
+status: review
 ---
 
 # TASK-feat-persist-agent-sessions: Сохранять нативные сессии агентов для метрик
