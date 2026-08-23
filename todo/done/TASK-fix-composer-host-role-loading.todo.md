@@ -3,7 +3,7 @@ type: fix
 created: 2026-08-23 14:08:08 (1787494088)
 due: 
 started: 2026-08-23 14:09:19 (1787494159)
-completed: 
+completed: 2026-08-23 14:27:15 (1787495235)
 cancelled: 
 value: V3
 complexity: C3
@@ -16,7 +16,7 @@ author: Бэкендер Левша (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/fix-composer-host-role-loading
 pr: https://github.com/prikotov/task-orchestrator/pull/371
-status: review
+status: done
 ---
 
 # TASK-fix-composer-host-role-loading: Исправить загрузку ролей в Composer-host после обновления пакета
@@ -88,9 +88,9 @@ php vendor/bin/todo-md validate todo/TASK-fix-composer-host-role-loading.todo.md
 - Изменение cache path (пути кеша) может оставить старые файлы, но не должно удалять данные host-приложения.
 
 ## 8. Источники (Sources)
-- [`become-role` skill](../docs/agents/skills/become-role/SKILL.md)
-- [Архитектура dual-context](../docs/guide/architecture.md#di-infrastructure)
-- [Исходная задача механизма](done/TASK-feat-become-role-skills.todo.md)
+- [`become-role` skill](../../docs/agents/skills/become-role/SKILL.md)
+- [Архитектура dual-context](../../docs/guide/architecture.md#di-infrastructure)
+- [Исходная задача механизма](TASK-feat-become-role-skills.todo.md)
 
 ## 9. Комментарии (Comments)
 - Инцидент воспроизведён в `/home/dp/MyProjects/TasK/Sandbox/codexcli` на `prikotov/task-orchestrator v0.5.0`: запуск из skill root ищет роль в `vendor`, а прямой запуск из host-root падает на устаревшем DI-контейнере. С временным чистым `APP_CACHE_DIR` прямой запуск успешно загружает `team_lead_aragorn.en.md`.
