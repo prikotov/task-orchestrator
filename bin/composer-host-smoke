@@ -77,10 +77,28 @@ if [[ "${installed_physical}" == "${source_physical}" ]]; then
   exit 1
 fi
 
-if [[ -e "${HOST_DIR}/docs" ]]; then
-  echo 'ERROR: Composer host unexpectedly contains checkout-only docs/ resources.' >&2
-  exit 1
-fi
+HOST_ROLE='composer_host_lead'
+HOST_SKILL='host-role-check'
+mkdir -p \
+  "${HOST_DIR}/docs/agents/roles/team" \
+  "${HOST_DIR}/docs/agents/skills/${HOST_SKILL}"
+cat > "${HOST_DIR}/docs/agents/roles/team/${HOST_ROLE}.en.md" <<YAML
+---
+agent: ${HOST_ROLE}
+skills:
+  - ${HOST_SKILL}
+---
+
+# Composer host lead
+YAML
+cat > "${HOST_DIR}/docs/agents/skills/${HOST_SKILL}/SKILL.md" <<YAML
+---
+name: ${HOST_SKILL}
+description: Composer-host-only skill for distribution smoke testing
+---
+
+# Host role check
+YAML
 
 version_output="$(
   cd "${HOST_DIR}"
@@ -136,20 +154,38 @@ exit 127
 SH
 chmod +x "${FORBIDDEN_TOOL_DIR}/jq"
 
+# Имитируем legacy cache (устаревший кеш) предыдущей версии. Новый CLI не
+# должен читать или удалять общий кеш host-приложения.
+LEGACY_CACHE_MARKER="${HOST_DIR}/var/cache/prod/legacy-container.marker"
+mkdir -p "$(dirname "${LEGACY_CACHE_MARKER}")"
+printf 'stale-host-container\n' > "${LEGACY_CACHE_MARKER}"
+
 role_output="$(
-  cd "${HOST_DIR}"
+  cd "${SKILL_LINK}"
   PATH="${FORBIDDEN_TOOL_DIR}:${PATH}" \
-    .agents/skills/become-role/scripts/become-role.sh backend_developer_levsha
+    scripts/become-role.sh "${HOST_ROLE}"
 )"
 
 for fragment in \
-  'Роль: backend_developer_levsha' \
-  'vendor/prikotov/task-orchestrator/docs/agents/roles/team/backend_developer_levsha.ru.md'; do
+  "Роль: ${HOST_ROLE}" \
+  "Файл роли: docs/agents/roles/team/${HOST_ROLE}.en.md" \
+  "<name>${HOST_SKILL}</name>" \
+  "${HOST_DIR}/docs/agents/skills/${HOST_SKILL}/SKILL.md"; do
   if ! grep -Fq -- "${fragment}" <<< "${role_output}"; then
     echo "ERROR: installed become-role script output lacks: ${fragment}" >&2
     echo "${role_output}" >&2
     exit 1
   fi
 done
+
+if [[ "$(<"${LEGACY_CACHE_MARKER}")" != 'stale-host-container' ]]; then
+  echo 'ERROR: task-orchestrator changed the legacy host application cache.' >&2
+  exit 1
+fi
+
+if [[ ! -d "${HOST_DIR}/var/cache/task-orchestrator/0.2.1/prod" ]]; then
+  echo 'ERROR: versioned task-orchestrator cache was not created in the Composer host.' >&2
+  exit 1
+fi
 
 echo 'Composer host smoke: OK'

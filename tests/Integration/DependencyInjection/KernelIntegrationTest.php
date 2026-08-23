@@ -12,12 +12,13 @@ use TaskOrchestrator\Common\Kernel;
 /**
  * Интеграционная проверка сборки контейнера через Symfony Kernel.
  *
- * Покрывает три ключевых свойства ядра {@see Kernel}:
+ * Покрывает ключевые свойства ядра {@see Kernel}:
  *  - параметры task_orchestrator.* разрешаются в standalone-режиме (projectRoot =
  *    packageRoot);
  *  - dual-context: при передаче projectRoot хост-проекта base_path/roles_dir
  *    уходят в хост, а package_dir/kernel.project_dir остаются на пакете (config/,
  *    bundles.php, modules.php грузятся из пакета);
+ *  - кеш Composer-host изолирован от приложения и разделён по версии пакета;
  *  - Resource PHP-файлы (bridge модуля AgentRunner) исключены из auto-discovery
  *    сервисов (resource/exclude в config/services.yaml).
  *
@@ -204,6 +205,38 @@ final class KernelIntegrationTest extends TestCase
     private function createIsolatedCacheDir(): string
     {
         return sys_get_temp_dir() . '/to-kernel-cache-' . bin2hex(random_bytes(6));
+    }
+
+    #[Test]
+    public function composerHostCacheIsIsolatedAndChangesWithReleaseVersion(): void
+    {
+        // Arrange
+        $hostRoot = sys_get_temp_dir() . '/to-kernel-cache-host-' . bin2hex(random_bytes(6));
+        $restoreCacheDir = $this->isolateEnvVar('APP_CACHE_DIR', null);
+        $restoreReleaseVersion = $this->isolateEnvVar('APP_RELEASE_VERSION', '0.5.0');
+
+        try {
+            // Act
+            $firstCacheDir = (new Kernel('prod', false, $hostRoot))->getCacheDir();
+            $_SERVER['APP_RELEASE_VERSION'] = '0.5.1';
+            $_ENV['APP_RELEASE_VERSION'] = '0.5.1';
+            putenv('APP_RELEASE_VERSION=0.5.1');
+            $nextCacheDir = (new Kernel('prod', false, $hostRoot))->getCacheDir();
+
+            // Assert
+            self::assertSame(
+                $hostRoot . '/var/cache/task-orchestrator/0.5.0/prod',
+                $firstCacheDir,
+            );
+            self::assertSame(
+                $hostRoot . '/var/cache/task-orchestrator/0.5.1/prod',
+                $nextCacheDir,
+            );
+            self::assertNotSame($hostRoot . '/var/cache/prod', $firstCacheDir);
+        } finally {
+            $restoreReleaseVersion();
+            $restoreCacheDir();
+        }
     }
 
     #[Test]

@@ -539,6 +539,7 @@ Use Case шины (диспетчеризация Command/Query Handler-ов п�
 - **За пределами доменных модулей.** Тот же `ModuleServiceRegistrar` (generic: параметр `serviceDir`, опция `public`) применяется в `Kernel::registerConsoleServices()` для регистрации команд и подписчиков `apps/console/src/Module/*/Command|EventSubscriber/` (теги `console.command`/`kernel.event_subscriber` добавляются на уровне контейнера autoconfig Symfony).
 
 Параметры `task_orchestrator.*` задаются в `Kernel::getKernelParameters()` на самом раннем этапе.
+В Composer-host контейнер CLI кешируется отдельно от контейнера основного приложения: `<host>/var/cache/task-orchestrator/<release-version>/<env>`. Сегмент версии предотвращает повторное использование несовместимого DI-контейнера после обновления пакета. Явный `APP_CACHE_DIR` сохраняет приоритет и задаёт пользовательский корень кеша.
 Модульные файлы используют собственные параметры `module.<name>.*`, при необходимости ссылаясь на
 `task_orchestrator.*` как на источник. Параметр `base_path`/`roles_dir`/`chains_yaml` — с
 dual-context resolution (разрешение путей для двух контекстов: standalone и vendor-binary).

@@ -7,6 +7,7 @@
 - [Запускатель не найден](#запускатель-не-найден)
 - [Цепочка не найдена](#цепочка-не-найдена)
 - [Роль не найдена](#роль-не-найдена)
+- [`become-role` не видит роль Composer-host](#become-role-не-видит-роль-composer-host)
 - [Таймаут выполнения](#таймаут-выполнения)
 - [Ошибка парсинга JSONL](#ошибка-парсинга-jsonl)
 - [Circuit Breaker заблокировал вызов](#circuit-breaker-заблокировал-вызов)
@@ -92,6 +93,31 @@ Agent role "verifier" not found.
    ```
 
 4. Параметр `task_orchestrator.roles_dir` задаётся ядром `TaskOrchestrator\Common\Kernel` в `getKernelParameters()` (значение по умолчанию — `<project_root>/docs/agents/roles/team` с fallback на корень пакета). Независимой YAML-настройки этого параметра нет — путь определяется каталогами ядра.
+
+---
+
+## `become-role` не видит роль Composer-host
+
+**Симптом:** роль существует в `<host>/docs/agents/roles/team`, но запуск из `.agents/skills/become-role` сообщает `Role "<name>" file not found` с путём внутри `vendor/prikotov/task-orchestrator`. После обновления пакета прямой вызов `vendor/bin/task-orchestrator` также может завершиться `TypeError` при создании CLI-команды.
+
+**Причина в старых версиях:** каталог skill является симлинком в `vendor/`. После перехода в него физический рабочий каталог указывал на пакет, и CLI ошибочно принимал пакет за host-проект. Дополнительно контейнер CLI делил `<host>/var/cache/<env>` с приложением и предыдущими версиями пакета.
+
+**Решение:** обновите `prikotov/task-orchestrator` до версии с Composer-host fix (исправлением). `become-role.sh` восстанавливает host-root по логическому пути skill, а CLI использует отдельный версионированный кеш:
+
+```text
+<host>/var/cache/task-orchestrator/<version>/<env>
+```
+
+Для временного обхода на старой версии запускайте обёртку из корня host-проекта с изолированным кешем:
+
+```bash
+cache_dir="$(mktemp -d)"
+APP_CACHE_DIR="$cache_dir" \
+  .agents/skills/become-role/scripts/become-role.sh <role|file>
+rm -rf "$cache_dir"
+```
+
+Не удаляйте общий кеш host-приложения только ради `become-role`. Исправленный пакет не читает и не изменяет его.
 
 ---
 
