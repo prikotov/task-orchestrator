@@ -17,7 +17,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Lifecycle\
  *
  * Запускает pi через Symfony Process.
  * Если в AgentRunRequestVo задан command — используется он как базовая команда.
- * Иначе — стандартная: `pi --mode json -p --no-session`.
+ * Иначе — стандартная: `pi --mode json -p` с сохранением сессии.
  * Пути к файлам промптов (--system-prompt, --append-system-prompt) передаются
  * как абсолютные пути — Pi читает файлы самостоятельно через existsSync-эвристику.
  * Значения с префиксом @ разрешаются как пути к файлам (содержимое подставляется inline).
@@ -76,7 +76,7 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
         $command = $request->getCommand();
 
         if ($command === []) {
-            $command = ['pi', '--mode', 'json', '-p', '--no-session'];
+            $command = ['pi', '--mode', 'json', '-p'];
         } elseif ($command[0] !== 'pi' && !str_contains($command[0], 'pi')) {
             throw new InvalidArgumentException(sprintf(
                 'AgentRunRequestVo::$command must be either empty (runner default) or a full CLI command starting with an executable. '

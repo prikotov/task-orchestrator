@@ -375,7 +375,7 @@ RUNNER_CMD=()
 build_runner_command() {
     case "$RUNNER" in
         pi)
-            RUNNER_CMD=(pi --mode json -p --no-session --system-prompt "$SYSTEM_PROMPT_FILE")
+            RUNNER_CMD=(pi --mode json -p --system-prompt "$SYSTEM_PROMPT_FILE")
             [[ -n "$PROVIDER" ]] && RUNNER_CMD+=(--provider "$PROVIDER")
             [[ -n "$MODEL" ]] && RUNNER_CMD+=(--model "$MODEL")
             [[ -n "$REASONING" ]] && RUNNER_CMD+=(--thinking "$REASONING")

@@ -74,7 +74,7 @@ scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer_lev
 PROMPT
 ```
 
-Команда: `pi --mode json -p --no-session --system-prompt <file> [--provider <provider>] --append-system-prompt "Возьми на себя роль из файла: <role>"`
+Команда: `pi --mode json -p --system-prompt <file> [--provider <provider>] --append-system-prompt "Возьми на себя роль из файла: <role>"`; Pi сохраняет сессию в `~/.pi/agent/sessions`.
 
 #### codex
 

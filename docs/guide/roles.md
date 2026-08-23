@@ -14,7 +14,6 @@ roles:
       - --mode
       - json
       - -p
-      - --no-session
       - --model
       - glm-4.7
       - --system-prompt

@@ -80,7 +80,7 @@ final class PiAgentRunnerTest extends TestCase
         self::assertContains('--mode', $command);
         self::assertContains('json', $command);
         self::assertContains('-p', $command);
-        self::assertContains('--no-session', $command);
+        self::assertNotContains('--no-session', $command);
     }
 
     #[Test]
