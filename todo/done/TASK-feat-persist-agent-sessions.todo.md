@@ -3,7 +3,7 @@ type: feat
 created: 2026-08-23 02:17:38 (1787451458)
 due:
 started: 2026-08-23 02:18:15 (1787451495)
-completed:
+completed: 2026-08-23 02:51:03 (1787453463)
 cancelled:
 value: V2
 complexity: C2
@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/persist-agent-session-metrics
 pr: https://github.com/prikotov/task-orchestrator/pull/369
-status: review
+status: done
 ---
 
 # TASK-feat-persist-agent-sessions: Сохранять нативные сессии агентов для метрик
