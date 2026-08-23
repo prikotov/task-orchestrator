@@ -3,7 +3,7 @@ type: chore
 created: 2026-08-23 02:55:47 (1787453747)
 due:
 started: 2026-08-23 02:55:47 (1787453747)
-completed:
+completed: 2026-08-23 03:04:54 (1787454294)
 cancelled:
 value: V2
 complexity: C2
@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/release-v0-5-0
 pr: https://github.com/prikotov/task-orchestrator/pull/370
-status: review
+status: done
 ---
 
 # TASK-release-v0-5-0-preparation: Подготовить и выпустить релиз v0.5.0
