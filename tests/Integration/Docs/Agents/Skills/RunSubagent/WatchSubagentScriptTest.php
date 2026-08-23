@@ -55,7 +55,6 @@ roles:
       - --mode
       - json
       - -p
-      - --no-session
       - --provider
       - zai
       - --model
@@ -229,6 +228,15 @@ YAML);
         $this->runScript(prompt: 'Prompt sentinel 123');
 
         self::assertSame('Prompt sentinel 123', trim((string) file_get_contents($this->stdinCaptureFile)));
+    }
+
+    #[Test]
+    public function piRunnerPersistsSessionByDefault(): void
+    {
+        $this->runScript(roleFile: $this->piRoleFile);
+
+        $args = (string) file_get_contents($this->argsCaptureFile);
+        self::assertStringNotContainsString('--no-session', $args);
     }
 
     #[Test]

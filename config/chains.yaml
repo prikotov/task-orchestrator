@@ -1,20 +1,35 @@
 roles:
   team_lead_alex:
     prompt_file: docs/agents/roles/team/team_lead_alex.ru.md
-    command:
-      - pi
-      - --mode
-      - json
-      - -p
-      - --no-session
-      - --provider
-      - zai
+    command:                            # codex CLI
+      - codex
+      - exec
+      - --dangerously-bypass-approvals-and-sandbox
+      - --json
       - --model
-      - glm-5-turbo
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+      - gpt-5.6-terra
+      - -c
+      - 'model_reasoning_effort="high"'
+      - --skip-git-repo-check
+      - --ignore-rules
+      - -c
+      - 'model_instructions_file="@system-prompt"'
+      - -c
+      - 'developer_instructions="@append-system-prompt"'
+    # command:                            # pi + zai (default)
+    #   - pi
+    #   - --mode
+    #   - json
+    #   - -p
+    #   - --no-session
+    #   - --provider
+    #   - zai
+    #   - --model
+    #   - glm-5-turbo
+    #   - --system-prompt
+    #   - "@system-prompt"
+    #   - --append-system-prompt
+    #   - "@append-system-prompt"
 
   system_analyst_sherlock:
     prompt_file: docs/agents/roles/team/system_analyst_sherlock.ru.md
@@ -23,13 +38,12 @@ roles:
       - --mode
       - json
       - -p
-      - --no-session
       - --provider
       - openai-codex
       - --model
-      - gpt-5.5
+      - gpt-5.6-sol
       - --thinking
-      - high
+      - medium
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -57,11 +71,10 @@ roles:
       - --dangerously-bypass-approvals-and-sandbox
       - --json
       - --model
-      - gpt-5.5
+      - gpt-5.6-sol
       - -c
-      - 'model_reasoning_effort="xhigh"'
+      - 'model_reasoning_effort="medium"'
       - --skip-git-repo-check
-      - --ephemeral
       - --ignore-rules
       - -c
       - 'model_instructions_file="@system-prompt"'
@@ -90,7 +103,7 @@ roles:
     #   - --provider
     #   - openai-codex
     #   - --model
-    #   - gpt-5.5
+    #   - gpt-5.6-terra
     #   - --thinking
     #   - xhigh
     #   - --system-prompt
@@ -106,11 +119,10 @@ roles:
       - --dangerously-bypass-approvals-and-sandbox
       - --json
       - --model
-      - gpt-5.5
+      - gpt-5.6-terra
       - -c
       - 'model_reasoning_effort="xhigh"'
       - --skip-git-repo-check
-      - --ephemeral
       - --ignore-rules
       - -c
       - 'model_instructions_file="@system-prompt"'
@@ -139,7 +151,7 @@ roles:
     #   - --provider
     #   - openai-codex
     #   - --model
-    #   - gpt-5.5
+    #   - gpt-5.6-terra
     #   - --thinking
     #   - xhigh
     #   - --system-prompt
@@ -154,11 +166,10 @@ roles:
       - --mode
       - json
       - -p
-      - --no-session
       - --provider
       - zai
       - --model
-      - glm-5.1
+      - glm-5.3
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -166,20 +177,35 @@ roles:
 
   backend_developer_tony:
     prompt_file: docs/agents/roles/team/backend_developer_tony.ru.md
-    command:
-      - pi
-      - --mode
-      - json
-      - -p
-      - --no-session
-      - --provider
-      - zai
+    command:                            # codex CLI
+      - codex
+      - exec
+      - --dangerously-bypass-approvals-and-sandbox
+      - --json
       - --model
-      - glm-5-turbo
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+      - gpt-5.6-terra
+      - -c
+      - 'model_reasoning_effort="high"'
+      - --skip-git-repo-check
+      - --ignore-rules
+      - -c
+      - 'model_instructions_file="@system-prompt"'
+      - -c
+      - 'developer_instructions="@append-system-prompt"'
+    # command:                            # pi + zai (default)
+    #   - pi
+    #   - --mode
+    #   - json
+    #   - -p
+    #   - --no-session
+    #   - --provider
+    #   - zai
+    #   - --model
+    #   - glm-5-turbo
+    #   - --system-prompt
+    #   - "@system-prompt"
+    #   - --append-system-prompt
+    #   - "@append-system-prompt"
 
   code_reviewer_backend_puaro:
     prompt_file: docs/agents/roles/team/code_reviewer_backend_puaro.ru.md
@@ -188,11 +214,10 @@ roles:
       - --mode
       - json
       - -p
-      - --no-session
       - --provider
       - zai
       - --model
-      - glm-5.1
+      - glm-5.3
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -205,11 +230,10 @@ roles:
       - --mode
       - json
       - -p
-      - --no-session
       - --provider
       - zai
       - --model
-      - glm-5.1
+      - glm-5.3
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -222,11 +246,10 @@ roles:
       - --mode
       - json
       - -p
-      - --no-session
       - --provider
       - zai
       - --model
-      - glm-5.1
+      - glm-5.3
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -234,20 +257,35 @@ roles:
 
   technical_writer_ostap:
     prompt_file: docs/agents/roles/team/technical_writer_ostap.ru.md
-    command:
-      - pi
-      - --mode
-      - json
-      - -p
-      - --no-session
-      - --provider
-      - zai
+    command:                            # codex CLI
+      - codex
+      - exec
+      - --dangerously-bypass-approvals-and-sandbox
+      - --json
       - --model
-      - glm-5-turbo
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+      - gpt-5.6-terra
+      - -c
+      - 'model_reasoning_effort="high"'
+      - --skip-git-repo-check
+      - --ignore-rules
+      - -c
+      - 'model_instructions_file="@system-prompt"'
+      - -c
+      - 'developer_instructions="@append-system-prompt"'
+    # command:                            # pi + zai (default)
+    #   - pi
+    #   - --mode
+    #   - json
+    #   - -p
+    #   - --no-session
+    #   - --provider
+    #   - zai
+    #   - --model
+    #   - glm-5-turbo
+    #   - --system-prompt
+    #   - "@system-prompt"
+    #   - --append-system-prompt
+    #   - "@append-system-prompt"
 
   # ──────────────────────────────────────────────────────────────────────────────
   # HTTP-прокси для Codex CLI

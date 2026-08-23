@@ -573,7 +573,7 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     A["run(AgentRunRequestVo)"] --> B{"command задан?"}
-    B -->|Нет| C["Команда по умолчанию:<br/>pi --mode json -p --no-session"]
+    B -->|Нет| C["Команда по умолчанию:<br/>pi --mode json -p (сессия сохраняется)"]
     B -->|Да| D["Использовать command из RoleConfig"]
     C --> E["resolveCommandFiles()<br/>@path → содержимое файла"]
     D --> E

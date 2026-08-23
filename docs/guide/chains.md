@@ -359,7 +359,6 @@ roles:
       - --mode
       - json
       - -p
-      - --no-session
       - --model
       - glm-4.7              # ← другая модель для независимой проверки
       - --system-prompt
