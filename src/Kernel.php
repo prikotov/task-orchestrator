@@ -128,6 +128,15 @@ class Kernel extends BaseKernel
         return dirname(__DIR__);
     }
 
+    /**
+     * Изолирует контейнер CLI от кеша host-приложения и предыдущих релизов.
+     *
+     * Composer-host сохраняет writable-артефакты в своём проекте, но общий
+     * `<host>/var/cache/<env>` небезопасен: там может лежать контейнер другого
+     * Kernel или предыдущей версии task-orchestrator. Версия входит в путь,
+     * поэтому обновлённый пакет компилирует совместимый контейнер автоматически.
+     * Явный APP_CACHE_DIR остаётся полным пользовательским переопределением.
+     */
     #[Override]
     public function getCacheDir(): string
     {
@@ -136,7 +145,11 @@ class Kernel extends BaseKernel
             return $base . '/' . $this->environment;
         }
 
-        return $this->writableRoot() . '/var/cache/' . $this->environment;
+        return $this->writableRoot()
+            . '/var/cache/task-orchestrator/'
+            . $this->resolveVersion()
+            . '/'
+            . $this->environment;
     }
 
     #[Override]
