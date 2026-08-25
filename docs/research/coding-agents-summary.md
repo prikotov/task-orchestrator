@@ -1,7 +1,7 @@
 # Coding Agents — Сводная таблица сравнения (финальная версия)
 
 **Дата создания:** 2026-05-09
-**Дата обновления:** 2026-08-16 (22 исследования)
+**Дата обновления:** 2026-08-25 (23 исследования)
 **Эпик:** [EPIC-research-coding-agents-comparison](../../todo/done/EPIC-research-coding-agents-comparison.md)
 **Автор:** Аналитик (Шерлок)
 
@@ -33,18 +33,19 @@
 | 8 | **Goose** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | **24** | ⚠️ Частично (7/10) |
 | 9 | **Zeroclaw** | MIT/A-2.0 | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | **23** | ⚠️ Частично (6/10) |
 | 10 | **Codebuff** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **23** | ⚠️ Частично (6/10) |
-| 11 | **Gemini CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | **22** | ⚠️ Частично (6/10) |
-| 12 | **Kilo Code CLI** | MIT | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | **22** | ⚠️ Частично (6/10) |
-| 13 | **Nanocoder** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ❌ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | **22** | ⚠️ Частично (7/10) |
-| 14 | **Claude Code** | Пропр. | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ✅ | ✅ | ❌ | ⚠️ | ❌ | **21** | ⚠️ Частично (7/10) |
-| 15 | **OpenClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ✅ | ✅ | **21** | ❌ Не подходит (4/10) |
-| 16 | **NanoClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ❌ | ⚠️ | ✅ | ⚠️ | ✅ | **21** | ❌ Не подходит (4/10) |
-| 17 | **Warp AI (Oz)** | AGPL | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **20** | ⚠️ Частично (7/10) |
-| 18 | **Crush** | FSL | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | **20** | ⚠️ Частично (6/10) |
-| 19 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
-| 20 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
-| 21 | **ZCode (Z.AI)** | Пропр. | ❌ | ❌ | ⚠️ | ✅ | ❌ | ❌ | ⚠️ | ⚠️ | ✅ | ❌ | **17** | ❌ Не подходит (4/10) |
-| 22 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
+| 11 | **hax** | MIT | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ⚠️ | ✅ | ⚠️ | ✅ | **23** | ⚠️ Частично (6/10) |
+| 12 | **Gemini CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | **22** | ⚠️ Частично (6/10) |
+| 13 | **Kilo Code CLI** | MIT | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | **22** | ⚠️ Частично (6/10) |
+| 14 | **Nanocoder** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ❌ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | **22** | ⚠️ Частично (7/10) |
+| 15 | **Claude Code** | Пропр. | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ✅ | ✅ | ❌ | ⚠️ | ❌ | **21** | ⚠️ Частично (7/10) |
+| 16 | **OpenClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ✅ | ✅ | **21** | ❌ Не подходит (4/10) |
+| 17 | **NanoClaw** | MIT | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ❌ | ⚠️ | ✅ | ⚠️ | ✅ | **21** | ❌ Не подходит (4/10) |
+| 18 | **Warp AI (Oz)** | AGPL | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **20** | ⚠️ Частично (7/10) |
+| 19 | **Crush** | FSL | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | **20** | ⚠️ Частично (6/10) |
+| 20 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
+| 21 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
+| 22 | **ZCode (Z.AI)** | Пропр. | ❌ | ❌ | ⚠️ | ✅ | ❌ | ❌ | ⚠️ | ⚠️ | ✅ | ❌ | **17** | ❌ Не подходит (4/10) |
+| 23 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
 
 > **Примечание:** omp и Pi имеют одинаковую формальную сумму 30/30, но omp занимает первое место как надмножество Pi: сохраняет критичный JSON/headless surface (поверхность запуска без интерфейса) и добавляет Rust-core, LSP/DAP, native subagents, advisor, memory, ACP и 40+ провайдеров. Pi остаётся стабильным baseline (базовой точкой) и fallback (резервом).
 
@@ -56,7 +57,7 @@
 
 ## Часть 2. Детальная сводная таблица по 10 критериям
 
-### 2.1. Open Source агенты (18 из 22)
+### 2.1. Open Source агенты (19 из 23)
 
 #### Критерий 1. Системный промпт (замена / дополнение)
 
@@ -80,6 +81,7 @@
 | **Nanocoder** | ❌ Нет CLI-флагов | ❌ Нет CLI-флагов | `systemPrompt.file` в `agents.config.json` ⚠️ | `systemPrompt.mode: append` ⚠️ |
 | **DeepSeek Harness** | ⚠️ Нет флага у headless; persona/patch-слои `cordis.patch.yml`; SDK `DSH_SYSTEM_PROMPT` ✅ | ⚠️ Программно: `PromptSection`-реестр (плагины) | ⚠️ Persona-строка с `{{model}}`/`{{cwd}}` | ⚠️ `PromptContext` (durable user-role snapshot) |
 | **NanoClaw** | ❌ Нет CLI | ❌ Нет CLI | `instructions.prepend.md` (group) ⚠️ | `instructions.prepend.md` + `memory/` ⚠️ |
+| **hax** | `HAX_SYSTEM_PROMPT` env (`@path`, `(none)`) ⚠️ | `HAX_SYSTEM_PROMPT_APPEND` env ⚠️ | Пресет `system_prompt` ✅ | Пресет `system_prompt_append` ✅ |
 
 #### Критерий 2. Промпт агента / Роль
 
@@ -103,6 +105,7 @@
 | **Nanocoder** | Subagents `.nanocoder/agents/*.md` ⚠️ | ✅ Изолированный контекст, per-agent tools/model |
 | **DeepSeek Harness** | ⚠️ Persona-плагин + `!!js` env в patch-слое; SDK `DSH_SYSTEM_PROMPT` | ✅ Per-child persona + scope-слои (host/preset/child) |
 | **NanoClaw** | Multi-agent routing (agent groups) ⚠️ | ✅ Контейнерная изоляция |
+| **hax** | Пресеты-как-роли (`--preset`, `HAX_PRESET`) ⚠️ | ✅ Процессная (`hax -p` фоновые задачи) |
 
 #### Критерий 3. Скиллы
 
@@ -126,6 +129,7 @@
 | **Nanocoder** | ❌ Собственный формат `skill.yaml`, не `SKILL.md` | ❌ Нет CLI | ❌ Все глобальны |
 | **DeepSeek Harness** | ✅ `SKILL.md`-бандлы + flat `.md`; frontmatter `disable-model-invocation`/`user-invocable` | ❌ Нет CLI; конфиг `customSkillDirs` | ⚠️ Ранги/слои discovery (host + per-scope shadowing) |
 | **NanoClaw** | ⚠️ SKILL.md есть, но иной концепт (install workflows) | ❌ Нет CLI | ⚠️ DB-колонка `skills` per-group |
+| **hax** | ✅ `SKILL.md` из коробки | ⚠️ Нет `--skill`; `no_skills`/`--bare` (всё или ничего) | ❌ Все глобальны |
 
 #### Критерий 4. AGENTS.md (контекстные файлы)
 
@@ -149,6 +153,7 @@
 | **Nanocoder** | ✅ Авто-загрузка из CWD | ✅ Merge при `/init` | `AGENTS.md` (generated) | Нет (косвенно config) |
 | **DeepSeek Harness** | ✅ Walk-up до `.git`, бюджет 64 KiB | ✅ + `AGENTS.local.md`/`CLAUDE.local.md` | ✅ `$DSH_HOME/AGENTS.md` (user-global) | ✅ `maxBytes: false` |
 | **NanoClaw** | ❌ Нет автообнаружения | ⚠️ Генерируемый (read-only) | `instructions.prepend.md` | Нет |
+| **hax** | ✅ Глобальный + иерархия git-корень→cwd | — | `~/.config/hax/AGENTS.md` | ✅ `no_agents_md`/`--bare`/`--raw` |
 
 #### Критерий 5. `.agents/skills/` автосканирование
 
@@ -172,6 +177,7 @@
 | **Nanocoder** | ❌ | `.nanocoder/skills/`, `~/.config/nanocoder/skills/` | Конвертация в `.nanocoder/` |
 | **DeepSeek Harness** | ✅ (rank 200) | `.dsh/skills` (rank 100), `~/.agents/skills` (rank 500), `customSkillDirs` | Symlink или `customSkillDirs` |
 | **NanoClaw** | ⚠️ Только для Codex-provider | `.claude-shared/skills/`, `container/skills/` | Ручное копирование в группу |
+| **hax** | ✅ | `~/.config/hax/skills/` | Symlink |
 
 #### Критерий 6. Запуск как сабагент (JSON-режим)
 
@@ -195,6 +201,7 @@
 | **Nanocoder** | `--json` ⚠️ (финальный объект) + `--acp` | Нет | `maxTurns` (200) | ⚠️ `toolCalls[]` в финальном объекте |
 | **DeepSeek Harness** | ⚠️ CLI headless = plain text; JSON-RPC SDK (TS/Python) ✅; ACP-сервер (отд. композиция) | ⚠️ Fresh persisted session на запуск | ✅ `timeoutMs` per-tool + AbortSignal + guard | ⚠️ Полные события — в JSONL-логе сессии, не в stdout |
 | **NanoClaw** | ❌ Plain text / gateway | Нет | Host-sweep SLA | ❌ |
+| **hax** | ❌ Нет стрима; чистый stdout в `-p` | ✅ `--no-session` | `max_turns`, `bash.timeout`; внешний timeout | ❌ |
 
 #### Критерий 7. Токены и стоимость
 
@@ -218,6 +225,7 @@
 | **Nanocoder** | ❌ Нет в `--json` output | ❌ Не подтверждена | ❌ |
 | **DeepSeek Harness** | ✅ token-meter (usage anchors + эвристика) | ❌ Только токены | ✅ Positional nodes breakdown |
 | **NanoClaw** | ⚠️ `.jsonl` transcripts на диске | ❌ Нет CLI | ❌ |
+| **hax** | ⚠️ Stats-строка stderr (внутренний учёт полный) | ⚠️ `$` по каталогу models.dev (`~` = оценка) | ❌ |
 
 #### Критерий 8. Free tier / стоимость
 
@@ -241,6 +249,7 @@
 | **Nanocoder** | MIT | ✅ Бесплатный, no telemetry | ✅ BYOM | ✅ Ollama, LM Studio, llama.cpp, vLLM, MLX |
 | **DeepSeek Harness** | MIT | ✅ Бесплатный OSS-инструмент (BYOK) | ✅ | ✅ Custom provider (OpenAI-compatible: Ollama/vLLM/LM Studio) |
 | **NanoClaw** | MIT | ✅ | ✅ OneCLI vault | ✅ Ollama (LM Studio через OpenCode) |
+| **hax** | MIT | ✅ | ✅ Ключи в env | ✅ llama.cpp first-class, Ollama, compatible |
 
 #### Критерий 9. Провайдеры и модели
 
@@ -264,6 +273,7 @@
 | **Nanocoder** | 25+ | OpenRouter, Anthropic, Google, Copilot, 8 local runners | ✅ | ✅ Ollama, llama.cpp, LM Studio, vLLM, MLX |
 | **DeepSeek Harness** | 20+ (pi-ai каталог) + native DeepSeek | DeepSeek (v4-flash/pro), OpenAI, Anthropic, Google, xAI, ZAI, Bedrock/Vertex/Azure/Codex | ✅ Через custom route | ✅ OpenAI-compatible |
 | **NanoClaw** | 4 пути | Claude (default), OpenCode, Codex, Ollama | ❌ (через OpenCode) | ✅ Ollama |
+| **hax** | 10 + custom | OpenAI, Anthropic, Codex, OpenRouter, OpenCode Zen/Go, llama.cpp, Ollama | ✅ | ✅ llama.cpp/Ollama first-class |
 
 #### Критерий 10. Лицензия
 
@@ -287,8 +297,9 @@
 | **Nanocoder** | MIT | ✅ TypeScript | ✅ | ❌ Нет |
 | **DeepSeek Harness** | MIT | ✅ TypeScript + Python SDK | ✅ | ⚠️ DeepSeek-центричен, но pi-ai/custom нейтрализуют |
 | **NanoClaw** | MIT | ✅ TypeScript/Node.js | ✅ Независимая база | ⚠️ Anthropic-centric + OneCLI |
+| **hax** | MIT | ✅ Нативный C | ✅ Независимая база | ❌ Нет (caveat: молодой проект до v1.0) |
 
-### 2.2. Проприетарные агенты (4 из 22)
+### 2.2. Проприетарные агенты (4 из 23)
 
 | Агент | К1 Промпт | К2 Роль | К3 Скиллы | К4 AGENTS.md | К5 .agents/skills/ | К6 JSON-режим | К7 Токены | К8 Free tier | К9 Провайдеры | К10 Лицензия | Вердикт |
 |-------|-----------|---------|-----------|--------------|--------------------|---------------|-----------|--------------|---------------|-------------|---------|
@@ -421,15 +432,15 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 
 | Паттерн | Агенты | Частота |
 |---------|--------|---------|
-| **Agent Skills standard** | omp, Pi, Qwen, Deep Agents, OpenCode, Goose, Crush, Hermes, Warp, Kilo, Codex, Gemini, OpenClaw, Zeroclaw, Codebuff, ZCode, NanoClaw, DeepSeek Harness | 18/22 (82%) |
-| **AGENTS.md автосканирование** | omp, Pi, Qwen, Deep Agents, OpenCode, Hermes, Goose, Codex, Gemini, Kilo, Crush, Codebuff, ZCode, Nanocoder, DeepSeek Harness | 15/22 (68%) |
-| **`.agents/skills/` автосканирование** | omp, Pi, Qwen, Deep Agents, OpenCode, Hermes, Goose, Gemini, Kilo, Crush, OpenClaw, Warp, Codebuff, DeepSeek Harness | 14/22 (64%) |
-| **JSON/JSONL/RPC headless** | omp, Pi, Qwen, Deep Agents (ACP, не JSONL), Claude, OpenCode, Goose, Gemini, Kilo, Codex, Warp, Zeroclaw, Factory Droid, Nanocoder, DeepSeek Harness (SDK/ACP) | 15/22 (68%) |
-| **Ephemeral / no-session** | omp, Pi, Goose, Codex, Zeroclaw | 5/21 (24%) |
+| **Agent Skills standard** | omp, Pi, Qwen, Deep Agents, OpenCode, Goose, Crush, Hermes, Warp, Kilo, Codex, Gemini, OpenClaw, Zeroclaw, Codebuff, ZCode, NanoClaw, DeepSeek Harness, hax | 19/23 (83%) |
+| **AGENTS.md автосканирование** | omp, Pi, Qwen, Deep Agents, OpenCode, Hermes, Goose, Codex, Gemini, Kilo, Crush, Codebuff, ZCode, Nanocoder, DeepSeek Harness, hax | 16/23 (70%) |
+| **`.agents/skills/` автосканирование** | omp, Pi, Qwen, Deep Agents, OpenCode, Hermes, Goose, Gemini, Kilo, Crush, OpenClaw, Warp, Codebuff, DeepSeek Harness, hax | 15/23 (65%) |
+| **JSON/JSONL/RPC headless** | omp, Pi, Qwen, Deep Agents (ACP, не JSONL), Claude, OpenCode, Goose, Gemini, Kilo, Codex, Warp, Zeroclaw, Factory Droid, Nanocoder, DeepSeek Harness (SDK/ACP) | 15/23 (65%) |
+| **Ephemeral / no-session** | omp, Pi, Goose, Codex, Zeroclaw, hax | 6/22 (27%) |
 | **`--append-system-prompt`** | omp, Pi, Qwen, Claude | 4/21 (19%) |
 | **CLI-фильтрация/выбор скиллов** | omp, Pi, Deep Agents, Hermes, Warp | 5/21 (24%) |
 | **Стоимость в $ в CLI/JSON** | omp, Pi, Claude, OpenCode, Zeroclaw | 5/21 (24%) |
-| **Кастомные агенты / native subagents** | omp, Deep Agents, OpenCode, Kilo, Claude, Droid, Codebuff, Warp, Nanocoder, NanoClaw, DeepSeek Harness | 11/22 (50%) |
+| **Кастомные агенты / native subagents** | omp, Deep Agents, OpenCode, Kilo, Claude, Droid, Codebuff, Warp, Nanocoder, NanoClaw, DeepSeek Harness, hax | 12/23 (52%) |
 
 ### 5.2. Пробелы — что не покрывается единым стандартом
 
@@ -448,7 +459,7 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 3. **AGENTS.md стал cross-agent стандартом:** 15 из 22 агентов явно поддерживают или совместимы через импортеры.
 4. **Native/Rust hot path:** omp и ряд новых агентов выносят поиск/парсинг/инструменты в нативный слой ради скорости.
 5. **Subagents становятся first-class:** omp (`task`), Deep Agents (`subagents`), Codebuff (`spawn_agents`), Warp (inter-agent messaging) показывают тренд к внутренней оркестрации.
-6. **ACP/RPC растут как интеграционные протоколы:** 10 из 22 агентов (45%) имеют ACP/RPC или близкий editor/host protocol surface: omp, Deep Agents (`dcode --acp`), Nanocoder (`--acp`), Factory Droid (JSON-RPC), Goose, Kilo, Hermes, OpenClaw, Zeroclaw, DeepSeek Harness (ACP-сервер + JSON-RPC SDK). При этом ACP/RPC не равен готовому JSONL-контракту `watch-subagent`: нужен host/client adapter.
+6. **ACP/RPC растут как интеграционные протоколы:** 10 из 23 агентов (43%) имеют ACP/RPC или близкий editor/host protocol surface: omp, Deep Agents (`dcode --acp`), Nanocoder (`--acp`), Factory Droid (JSON-RPC), Goose, Kilo, Hermes, OpenClaw, Zeroclaw, DeepSeek Harness (ACP-сервер + JSON-RPC SDK). При этом ACP/RPC не равен готовому JSONL-контракту `watch-subagent`: нужен host/client adapter.
 7. **Memory и hindsight:** omp добавляет project-scoped memory, что сближает CLI-agent с долгоживущим knowledge base (базой знаний).
 
 ### 5.4. Рекомендации по дальнейшему развитию
@@ -492,12 +503,13 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 | 20 | NanoClaw | [nanoclaw-comparison.md](coding-agents/nanoclaw-comparison.md) | ❌ Не подходит (4/10) |
 | 21 | Deep Agents Code / SDK | [deepagents-comparison.md](coding-agents/deepagents-comparison.md) | ⚠️ Частично (7/10; SDK 9/10*) |
 | 22 | DeepSeek Harness | [deepseek-harness-comparison.md](coding-agents/deepseek-harness-comparison.md) | ⚠️ Частично (7/10; SDK 9/10*) |
+| 23 | hax | [hax-comparison.md](coding-agents/hax-comparison.md) | ⚠️ Частично (6/10) |
 
 ---
 
 ## Приложение. Сводка по группам
 
-### Open Source (18 из 22)
+### Open Source (19 из 23)
 
 | Агент | Язык | Лицензия | Провайдеры | Score / вердикт |
 |-------|------|----------|------------|-----------------|
@@ -517,10 +529,11 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 | Kilo Code CLI | TypeScript/Bun | MIT | 4 AI SDK + Cloud | 6/10 |
 | Crush | Go | FSL-1.1-MIT | 20+ | 6/10 |
 | Codebuff | TypeScript/Bun | Apache-2.0 | 5+ + OpenRouter | 6/10 |
+| hax | C | MIT | 10 + custom | 6/10 |
 | OpenClaw | TypeScript/Node.js | MIT | 40+ | 4/10 |
 | NanoClaw | TypeScript/Node.js | MIT | 4 пути | 4/10 |
 
-### Проприетарные (4 из 22)
+### Проприетарные (4 из 23)
 
 | Агент | Язык | Провайдеры | Цена | Score |
 |-------|------|------------|------|-------|
