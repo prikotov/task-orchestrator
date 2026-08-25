@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-08-25
 **Объект:** hax v0.4.0 (`OleksandrChekhovskyi/hax`, C, MIT, ~635★ GitHub; сайт [usehax.dev](https://usehax.dev/))
-**Задача:** [TASK-research-hax](../../../todo/TASK-research-hax.todo.md) · Эпик: [EPIC-research-coding-agents-comparison](../../../todo/done/EPIC-research-coding-agents-comparison.md) (завершён; исследование №23 по его методологии)
+**Задача:** [TASK-research-hax](../../../todo/done/TASK-research-hax.todo.md) · Эпик: [EPIC-research-coding-agents-comparison](../../../todo/done/EPIC-research-coding-agents-comparison.md) (завершён; исследование №23 по его методологии)
 
 ---
 
