@@ -3,7 +3,7 @@ type: docs
 created: 2026-08-27 22:27:00 (1787844420)
 due: 
 started: 2026-08-27 15:28:20 (1787844500)
-completed: 
+completed: 2026-08-27 16:00:06 (1787846406)
 cancelled: 
 value: V2
 complexity: C1
@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Технический писатель Гермиона (pi)
 branch: task/skill-creation-script-rules
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/374
+status: done
 ---
 
 # TASK-docs-skill-creation-script-rules: Правила скриптов и путей в SKILL-CREATION.md
@@ -102,9 +102,9 @@ php vendor/bin/todo-md validate todo/TASK-docs-skill-creation-script-rules.todo.
 - [Agent Skills Specification](https://agentskills.io/specification)
 - [Using scripts in skills](https://agentskills.io/skill-creation/using-scripts)
 - pi `dist/core/skills.js`, `@earendil-works/pi-agent-core/dist/harness/system-prompt.js` — инъекция правила резолва путей в системный промпт.
-- [`become-role/SKILL.md`](../docs/agents/skills/become-role/SKILL.md) — комментарий-якорь (PR #362).
-- [`become-role/scripts/become-role.sh`](../docs/agents/skills/become-role/scripts/become-role.sh) — самонастройка и восстановление host-root (PR #371).
-- [Реестр ретро](../docs/agents/team-retro/RETRO-ROADMAP.md) — запись про `watch-subagent.sh` → `exit 127`.
+- [`become-role/SKILL.md`](../../docs/agents/skills/become-role/SKILL.md) — комментарий-якорь (PR #362).
+- [`become-role/scripts/become-role.sh`](../../docs/agents/skills/become-role/scripts/become-role.sh) — самонастройка и восстановление host-root (PR #371).
+- [Реестр ретро](../../docs/agents/team-retro/RETRO-ROADMAP.md) — запись про `watch-subagent.sh` → `exit 127`.
 
 ## 9. Комментарии (Comments)
 - Инцидент-триггер: сессия в `stocks2` (v0.5.0) — двойной сбой запуска `become-role.sh` (модель нарушила контракт резолва + баг v0.5.0 из каталога навыка, исправлен в v0.5.1). Обновление stocks2 — отдельное действие владельца после напоминания.
