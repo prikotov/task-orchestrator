@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.2] - 2026-08-27
+
+### Changed
+
+- В правила создания навыков добавлен обязательный раздел «Скрипты и пути»: форма команды в `SKILL.md` — только стандартная относительная, резолв пути — контракт раннера, скрипты самонастраивающиеся, тесты покрывают оба контекста запуска (#374).
+
+### Added
+
+- Исследование CLI-агента кодинга hax в `docs/research` (#373).
+
 ## [0.5.1] - 2026-08-23
 
 ### Fixed
