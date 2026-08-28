@@ -3,7 +3,7 @@ type: chore
 created: 2026-08-27 23:05:00 (1787846700)
 due:
 started: 2026-08-27 23:05:00 (1787846700)
-completed:
+completed: 2026-08-28 02:46:19 (1787885179)
 cancelled:
 value: V2
 complexity: C1
@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/release-v0-5-2
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/375
+status: done
 ---
 
 # TASK-release-v0-5-2-preparation: Подготовить release PR для v0.5.2
@@ -93,9 +93,9 @@ PHAR_EXPECTED_VERSION=dev make phar-smoke && make composer-host-smoke
 - Публикация тега — только после слияния release PR и зелёных проверок.
 
 ## 8. Источники (Sources)
-- [Политика релизов](../docs/releases/RELEASE-POLICY.md)
-- [План релиза v0.5.1](../docs/releases/v0.5.1/release-plan.md) — образец.
-- [Релизы и CHANGELOG](../docs/git-workflow/release.md)
+- [Политика релизов](../../docs/releases/RELEASE-POLICY.md)
+- [План релиза v0.5.1](../../docs/releases/v0.5.1/release-plan.md) — образец.
+- [Релизы и CHANGELOG](../../docs/git-workflow/release.md)
 
 ## 9. Комментарии (Comments)
 - Владелец подтвердил релиз 2026-08-27 («смержи и релизни») после апрува и merge PR #374.
