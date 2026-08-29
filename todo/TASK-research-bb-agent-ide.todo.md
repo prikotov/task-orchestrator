@@ -11,8 +11,8 @@ epic:
 author: Аналитик Шерлок (pi)
 assignee: Аналитик Шерлок (pi)
 branch: task/research-bb-agent-ide
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/376
+status: review
 started: 2026-08-28 23:52:19 (1787961139)
 ---
 
