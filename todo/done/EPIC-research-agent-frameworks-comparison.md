@@ -9,7 +9,7 @@ author: Тимлид (Алекс)
 assignee:
 branch: task/research-agent-frameworks-comparison
 status: in_progress
-reopened: 2026-08-12
+reopened: 2026-08-29
 pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация), #340 (Herdr; замена #339)"
 ---
 
@@ -137,12 +137,16 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 - [x] [TASK-research-agent-lifecycle-kit](TASK-research-agent-lifecycle-kit.todo.md) — Agent Lifecycle Kit (`avksp/agent-lifecycle-kit` `v1.62.0`, Python 3.11–3.14, Apache-2.0; provider-neutral lifecycle/evidence controller — нейтральный контроллер жизненного цикла и доказательств — вокруг внешних coding agents: draft intake (черновой вход) → reviewed/frozen plan (проверенный/замороженный план) → bounded host-owned execution (ограниченное исполнение внешним хостом) → implementation audit (аудит реализации) → final proof (финальное доказательство); file-backed (файловые) workflow state/runner state/receipts, public JSON schemas, 12 adapter descriptors/capability manifests, Review Mesh, model-class routing, sandbox/proof integrity receipts). Классификация: `provider-neutral lifecycle controller / evidence layer`, не coding agent (не агент программирования) и не chain engine (не движок цепочек). Исследование завершено, прошло self-review (самопроверку) и независимое Approval (одобрение) Пуаро; PR #342 создан. Строка #35 добавлена как 33-й завершённый research-результат из 35 запланированных, при этом #32 (`qm`) и #33 (`omnigent`) остаются незавершёнными и не входят в completed-счётчик. Verdict (вердикт): 🟡 заимствовать frozen-plan/proof/adapter-support patterns (паттерны замороженного плана, доказательств и поддержки адаптеров); 🔴 не core dependency (не основная зависимость).
 
+### Этап 1o: Дополнительное исследование (2026-08-29)
+
+- [ ] [TASK-research-bb-agent-ide](../TASK-research-bb-agent-ide.todo.md) — bb (`get-bb/bb`, `bb-app` 0.40.0, snapshot `fc94f46c13b89f54e9c8ba53600352df64b81798`; `agentic IDE / programmable control surface + optional workflow engine` над внешними coding agents Claude Code, Codex, Cursor/ACP, Pi, OpenCode, Grok Build, omp и Hermes, а не самостоятельный coding agent). Исследованы threads, Git worktrees, plugins/self-customization, multi-provider orchestration, отключённый по умолчанию durable Workflows plugin, CLI/HTTP API/SDK, local-first модель, telemetry/security и применимость к `task-orchestrator`; `bb-comparison.md` и строка #36 в summary доводят готовый набор исследовательских артефактов до 36/36. Verdict: 🟡 provider/thread/durable-replay/worktree patterns / 🔴 не core dependency / 🟢 optional manual environment после проверки ownership/security. Чекбокс и TASK остаются `in_progress` до процессной приёмки; это не уменьшает готовый набор артефактов.
+
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
 - [x] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
 
 ## 6. Definition of Done (Критерии приёмки эпика)
-- [x] Все индивидуальные research-задачи выполнены
+- [ ] Все индивидуальные research-задачи выполнены — TASK-research-bb-agent-ide остаётся `in_progress` до процессной приёмки
 - [x] Каждый comparison-документ создан в `docs/research/`
 - [x] Сводная таблица в `docs/research/agent-frameworks-summary.md` создана
 - [x] По каждому фреймворку есть вердикт: заимствовать / dependency / не подходит
@@ -156,7 +160,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 - Многие продукты активно развиваются — информация может устареть
 - Проприетарные продукты (Claude Code, Copilot, Codex) — анализ только по документации
 - Разные языки/экосистемы (Python, TypeScript, Rust, Go) — нужна аккуратность при переносе паттернов в PHP
-- Номера #32 (`qm`) и #33 (`omnigent`) зарезервированы активными задачами и не должны учитываться как завершённые до появления отчётов.
+- TASK-research-bb-agent-ide и эпик остаются `in_progress` до процессной приёмки, несмотря на готовность всех 36 исследовательских артефактов.
 - ALK быстро развивается; выводы stage `1n` (стадии 1n) привязаны к release (выпуску) `v1.62.0` и main snapshot (снимку основной ветки) 2026-08-12, переносить можно только проверенные паттерны, не Python dependency (зависимость Python).
 
 ## 9. Sources (Источники)
@@ -195,3 +199,7 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-08-15 | Тимлид (Алекс) | Stage 1l: TASK-research-omnigent принята, переведена в `done`; ссылка обновлена на `TASK-research-omnigent.todo.md`, PR #346 готов к слиянию. |
 
 | 2026-08-15 | Тимлид (Алекс) | Stage 1k: TASK-research-qm принята, переведена в `done`; ссылка обновлена на `TASK-research-qm.todo.md`, PR #347 готов к слиянию. |
+| 2026-08-29 06:34:56 (1787960096) | Аналитик (Шерлок) | Эпик reopened стадией `1o`: создана постановка TASK-research-bb-agent-ide по `getbb.app`. bb предварительно классифицирован как `agentic IDE / control surface` над внешними coding agents, а не самостоятельный coding agent; ближайшие аналоги — Orca ADE, qm, omnigent и Herdr. Исследование и research-артефакты на этапе постановки не выполнялись. |
+| 2026-08-29 | Аналитик (Шерлок) | Stage `1o`: по `bb-app` 0.40.0 / snapshot `fc94f46c13b89f54e9c8ba53600352df64b81798` подготовлены `bb-comparison.md` и строка #36, поэтому набор исследовательских артефактов составляет 36/36. Классификация уточнена: core — provider-neutral agentic IDE/control surface, дополнительно поставляется отключённый по умолчанию durable QuickJS Workflows plugin. Verdict: 🟡 паттерны / 🔴 не core dependency / 🟢 optional manual environment после проверки ownership/security. TASK и чекбокс стадии оставлены `in_progress` до процессной приёмки; процессный статус не уменьшает готовый набор артефактов. |
+| 2026-08-29 | Аналитик (Шерлок) | Повторная самопроверка: критерий «Все индивидуальные research-задачи выполнены» возвращён в незавершённое состояние в соответствии с `status: in_progress` задачи bb; устаревший риск о незавершённых qm и omnigent заменён актуальной процессной зависимостью от приёмки bb. |
+| 2026-08-29 | Аналитик (Шерлок) | Stage `1o`: research-артефакты доработаны по замечаниям Ревьювера Бэка Пуаро; усилены доказательства Ajv и политики повторов, унифицирован формат отчёта и уточнены границы утверждений о поставщиках и MCP. |
