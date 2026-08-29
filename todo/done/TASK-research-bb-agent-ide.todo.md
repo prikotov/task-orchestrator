@@ -12,8 +12,9 @@ author: Аналитик Шерлок (pi)
 assignee: Аналитик Шерлок (pi)
 branch: task/research-bb-agent-ide
 pr: https://github.com/prikotov/task-orchestrator/pull/376
-status: review
+status: done
 started: 2026-08-28 23:52:19 (1787961139)
+completed: 2026-08-29 13:31:36 (1788010296)
 ---
 
 # TASK-research-bb-agent-ide: Исследовать bb как agentic IDE и control surface над внешними coding agents
@@ -52,8 +53,8 @@ started: 2026-08-28 23:52:19 (1787961139)
 
 * **Тип работ:** `research` (исследование) по RACI; в метаданных указан канонический `type: docs`, поскольку текущая схема `todo-md` не поддерживает значение `research`, а результат ограничен документацией.
 * **Объект:** bb с сайта [getbb.app](https://getbb.app/) — предварительно `agentic IDE / control surface` над внешними агентами Claude Code, Codex, Cursor, Pi, OpenCode, Grok, omp и Hermes, а не самостоятельный `coding agent` (агент программирования).
-* **Где делаем:** `docs/research/framework-comparisons/bb-comparison.md`, `docs/research/agent-frameworks-summary.md`, [EPIC-research-agent-frameworks-comparison](done/EPIC-research-agent-frameworks-comparison.md).
-* **Ближайшие аналоги:** [Orca ADE](done/TASK-research-onorca-ade.todo.md), [qm](done/TASK-research-qm.todo.md), [omnigent](done/TASK-research-omnigent.todo.md), [Herdr](done/TASK-research-herdr.todo.md).
+* **Где делаем:** `docs/research/framework-comparisons/bb-comparison.md`, `docs/research/agent-frameworks-summary.md`, [EPIC-research-agent-frameworks-comparison](EPIC-research-agent-frameworks-comparison.md).
+* **Ближайшие аналоги:** [Orca ADE](TASK-research-onorca-ade.todo.md), [qm](TASK-research-qm.todo.md), [omnigent](TASK-research-omnigent.todo.md), [Herdr](TASK-research-herdr.todo.md).
 * **Предварительный фокус:** threads (потоки работы), Git worktrees, plugins/self-customization (плагины и самонастройка), multi-provider orchestration (оркестрация нескольких поставщиков), CLI/HTTP API, local-first model (локальная модель), telemetry/security (телеметрия и безопасность), применимость паттернов к `task-orchestrator`.
 * **Текущее поведение:** сводка содержит результаты по соседним управляющим поверхностям, но не содержит отдельной строки и проверенного вердикта по bb.
 * **Границы (Out of Scope):** не выполнять исследование при постановке задачи; не создавать `bb-comparison.md`, не обновлять сводку фактическими выводами, не устанавливать и не запускать bb; не менять код, конфигурацию, цепочки, роли и зависимости проекта; не создавать отдельный research-отчёт Аналитика в `docs/agents/reports/` в рамках постановки.
@@ -129,7 +130,7 @@ started: 2026-08-28 23:52:19 (1787961139)
 test -f docs/research/framework-comparisons/bb-comparison.md
 grep -n "bb" docs/research/agent-frameworks-summary.md
 grep -n "TASK-research-bb-agent-ide" todo/done/EPIC-research-agent-frameworks-comparison.md
-php vendor/bin/todo-md validate todo/TASK-research-bb-agent-ide.todo.md
+php vendor/bin/todo-md validate todo/done/TASK-research-bb-agent-ide.todo.md
 php vendor/bin/todo-md validate
 ```
 
@@ -148,21 +149,21 @@ PHPUnit и Psalm можно не запускать: ожидаемые изме
 ## 8. Источники (Sources)
 
 - [x] [bb — официальный сайт](https://getbb.app/)
-- [x] [EPIC-research-agent-frameworks-comparison](done/EPIC-research-agent-frameworks-comparison.md)
-- [x] [Orca ADE — завершённая research-задача](done/TASK-research-onorca-ade.todo.md)
-- [x] [qm — завершённая research-задача](done/TASK-research-qm.todo.md)
-- [x] [omnigent — завершённая research-задача](done/TASK-research-omnigent.todo.md)
-- [x] [Herdr — завершённая research-задача](done/TASK-research-herdr.todo.md)
+- [x] [EPIC-research-agent-frameworks-comparison](EPIC-research-agent-frameworks-comparison.md)
+- [x] [Orca ADE — завершённая research-задача](TASK-research-onorca-ade.todo.md)
+- [x] [qm — завершённая research-задача](TASK-research-qm.todo.md)
+- [x] [omnigent — завершённая research-задача](TASK-research-omnigent.todo.md)
+- [x] [Herdr — завершённая research-задача](TASK-research-herdr.todo.md)
 
 ## 9. Результат выполнения (Execution Result)
 
-- Создан [bb-comparison.md](../docs/research/framework-comparisons/bb-comparison.md) по официальному сайту, документации и исходникам снимка `fc94f46c13b89f54e9c8ba53600352df64b81798` (`bb-app` 0.40.0).
+- Создан [bb-comparison.md](../../docs/research/framework-comparisons/bb-comparison.md) по официальному сайту, документации и исходникам снимка `fc94f46c13b89f54e9c8ba53600352df64b81798` (`bb-app` 0.40.0).
 - Подтверждено: bb не реализует собственный LLM/tool loop (цикл модели и инструментов), но поставляет отключённый по умолчанию durable Workflows plugin (устойчивый плагин процессов). Поэтому итоговая классификация уточнена до `agentic IDE / programmable control surface + optional workflow engine` (агентная среда разработки и программируемая управляющая поверхность с опциональным движком процессов).
 - Подтверждены интеграции Claude Code, Codex, Cursor/ACP, Pi, OpenCode, Grok Build, omp и Hermes; функции внешних агентов отделены от функций bb.
-- Все 36/36 исследовательских артефактов подготовлены и включены в сводку; пересчитаны только затронутые показатели и выводы. TASK bb сохраняет `status: in_progress` до процессной приёмки, что не уменьшает фактически готовый набор артефактов.
+- Все 36/36 исследовательских артефактов подготовлены, включены в сводку и приняты; пересчитаны только затронутые показатели и выводы. После процессной приёмки и зелёного CI TASK bb переведена в `done`.
 - Повторный пересчёт тренда `SKILL.md` по явно зафиксированному критерию дал 28/36: в сводке перечислены ровно 28 учтённых проектов; ранее в перечне были пропущены Claude Code (#11) и omnigent (#33). Таблица 17 уровней содержит ровно 36 уникальных позиций: пропусков и дублей нет; Odysseus (#27) добавлен, GitHub Copilot Cloud Agent приведён к каноническому названию.
 - Вердикт: 🟡 заимствовать provider/thread/durable-replay/worktree patterns (паттерны поставщиков, потоков, устойчивого воспроизведения и рабочих деревьев); 🔴 не core dependency (не основная зависимость); 🟢 допустим как optional manual environment (опциональная ручная среда) после отдельной проверки ownership/security (владения и безопасности).
-- Статус задачи намеренно оставлен `in_progress`: исследовательские артефакты готовы, но задача не переводится в `done` и не перемещается до отдельного решения пользователя.
+- Процессная приёмка завершена при зелёном CI; задача переведена в `done` и перемещена в `todo/done/`.
 - Проверки: валидатор этой задачи — 0 ошибок/0 предупреждений; `make validate-todo` для активных задач — успешно; `make md-links` — все внутренние ссылки корректны; 12 внешних ссылок отчёта вернули HTTP 200; `git diff --check` — успешно; `make validate-language` завершился успешно в warning mode (режиме предупреждений), зафиксировав 10 существующих превышений только в `docs/releases/*`.
 - Общий `php vendor/bin/todo-md validate` запущен и ожидаемо завершился ошибкой на legacy-базе (устаревшей базе): 953 ошибки и 401 предупреждение в существующих файлах; целевая задача при отдельной проверке чиста.
 - PHPUnit и Psalm не запускались: изменения ограничены Markdown-документацией и файлом задачи, код, конфигурация и скрипты не затронуты.
@@ -183,3 +184,4 @@ PHPUnit и Psalm можно не запускать: ожидаемые изме
 | 2026-08-29 | Аналитик (Шерлок) | Повторная самопроверка: критерий эпика синхронизирован с `in_progress`; устаревший риск по qm/omnigent актуализирован; в таблицу 17 уровней добавлен Odysseus (#27), название GitHub Copilot Cloud Agent исправлено. По явному критерию тренд `SKILL.md` пересчитан как 28/36 с полным нумерованным списком; проверено распределение 36 уникальных позиций без пропусков и дублей. |
 | 2026-08-29 | Аналитик (Шерлок) | Доработка по CR-1, CR-2, CR-3 и CR-5 Ревьювера Бэка Пуаро: добавлена доказательная детализация Ajv и политики повторов, шапка отчёта приведена к формату серии, перечень поставщиков привязан к `packages/bb-app/README.md`, формулировка MCP ограничена подтверждённой границей ядра bb, авторы новых записей истории унифицированы. CR-4 принят; README проекта не изменялся согласно границе CR-6. |
 | 2026-08-29 | Аналитик (Шерлок) | Устранён CR-7 Ревьювера Бэка Пуаро: канонический перечень поставщиков точно отнесён к `packages/bb-app/README.md`, на который отсылает корневой README. |
+| 2026-08-29 | Аналитик (Шерлок) | После процессной приёмки и зелёного CI приняты все 36/36 исследовательских артефактов; TASK-research-bb-agent-ide переведена в `done` и перемещена в `todo/done/`. |
