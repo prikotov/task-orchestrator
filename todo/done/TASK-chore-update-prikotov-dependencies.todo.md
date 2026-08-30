@@ -3,7 +3,7 @@ type: chore
 created: 2026-08-30 03:13:26 (1788059606)
 due: 
 started: 2026-08-30 03:14:07 (1788059647)
-completed: 
+completed: 2026-08-30 04:17:27 (1788063447)
 cancelled: 
 value: V2
 complexity: C1
@@ -16,7 +16,7 @@ author: Бэкендер Тони (codex)
 assignee: Бэкендер Тони (codex)
 branch: task/update-prikotov-dependencies
 pr: https://github.com/prikotov/task-orchestrator/pull/377
-status: review
+status: done
 ---
 
 # TASK-chore-update-prikotov-dependencies: Обновление прямых зависимостей prikotov
