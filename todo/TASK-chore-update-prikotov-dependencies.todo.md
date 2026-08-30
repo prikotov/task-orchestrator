@@ -15,8 +15,8 @@ epic:
 author: Бэкендер Тони (codex)
 assignee: Бэкендер Тони (codex)
 branch: task/update-prikotov-dependencies
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/377
+status: review
 ---
 
 # TASK-chore-update-prikotov-dependencies: Обновление прямых зависимостей prikotov
