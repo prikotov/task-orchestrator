@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "593bc8218786071c054f8eb05030beb3",
+    "content-hash": "796996a45b2b3f96914a7f7a2bfc81ac",
     "packages": [
         {
             "name": "monolog/monolog",
@@ -6846,16 +6846,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.30.0",
+            "version": "v0.31.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/coding-standard.git",
-                "reference": "08091459f66f2a994f66f170a680fc6eb586d735"
+                "reference": "f451a5eb32642beed68b665220f9e654f443bdb2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/08091459f66f2a994f66f170a680fc6eb586d735",
-                "reference": "08091459f66f2a994f66f170a680fc6eb586d735",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/f451a5eb32642beed68b665220f9e654f443bdb2",
+                "reference": "f451a5eb32642beed68b665220f9e654f443bdb2",
                 "shasum": ""
             },
             "require": {
@@ -6863,7 +6863,8 @@
                 "nikic/php-parser": "^5.8",
                 "php": "^8.4",
                 "slevomat/coding-standard": "^8.0",
-                "squizlabs/php_codesniffer": "^4.0"
+                "squizlabs/php_codesniffer": "^4.0",
+                "symfony/yaml": "^7.2|^8.0"
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
@@ -6884,6 +6885,7 @@
                 "bin/coding-standard-metrics",
                 "bin/coding-standard-metrics-compare",
                 "bin/coding-standard-metrics-review",
+                "bin/coding-standard-di-check",
                 "bin/coding-standard-verify",
                 "bin/metrics-collect",
                 "bin/metrics-scc",
@@ -6966,10 +6968,10 @@
                 "sniffs"
             ],
             "support": {
-                "source": "https://github.com/prikotov/coding-standard/tree/v0.30.0",
+                "source": "https://github.com/prikotov/coding-standard/tree/v0.31.0",
                 "issues": "https://github.com/prikotov/coding-standard/issues"
             },
-            "time": "2026-08-19T15:21:40+00:00"
+            "time": "2026-08-27T15:15:10+00:00"
         },
         {
             "name": "prikotov/git-workflow",
