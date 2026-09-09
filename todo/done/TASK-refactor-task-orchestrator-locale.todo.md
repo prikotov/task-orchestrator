@@ -3,7 +3,7 @@ type: refactor
 created: 2026-09-09 15:54:39 (1788969279)
 due: 
 started: 2026-09-09 15:57:40 (1788969460)
-completed: 
+completed: 2026-09-09 17:15:14 (1788974114)
 cancelled: 
 value: V3
 complexity: C3
@@ -15,8 +15,8 @@ epic:
 author: Аналитик Шерлок (codex)
 assignee: Бэкендер Левша (codex)
 branch: task/refactor-task-orchestrator-locale
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/380
+status: done
 ---
 
 # TASK-refactor-task-orchestrator-locale: Отделить локаль AI-ролей task-orchestrator от локали host-project
@@ -43,12 +43,12 @@ status: in_progress
 ## 2. Контекст и Границы (Context and Scope)
 
 * **Где делаем:**
-  * [`src/Kernel.php`](../src/Kernel.php) — получение и публикация `task_orchestrator.locale`, а также cache-sensitive (зависящее от кеша) поведение Kernel;
-  * [`src/Module/AgentRole/`](../src/Module/AgentRole/) — выбор локализованного role file и язык заголовков каталога skills;
-  * [`src/Module/ChainExecution/`](../src/Module/ChainExecution/) — выбор role file при построении prompt (запроса для AI);
-  * [`config/packages/translation.yaml`](../config/packages/translation.yaml) — независимая стандартная настройка `framework.default_locale` task-orchestrator;
-  * [`tests/`](../tests/) — модульные, интеграционные и Composer-host regression tests;
-  * публичная документация и примеры окружения: [`AGENTS.md`](../AGENTS.md), `README*.md`, [`docs/`](../docs/), [`.env.example`](../.env.example), существующий `.env.dist` при его наличии, [`CHANGELOG.md`](../CHANGELOG.md).
+  * [`src/Kernel.php`](../../src/Kernel.php) — получение и публикация `task_orchestrator.locale`, а также cache-sensitive (зависящее от кеша) поведение Kernel;
+  * [`src/Module/AgentRole/`](../../src/Module/AgentRole) — выбор локализованного role file и язык заголовков каталога skills;
+  * [`src/Module/ChainExecution/`](../../src/Module/ChainExecution) — выбор role file при построении prompt (запроса для AI);
+  * [`config/packages/translation.yaml`](../../config/packages/translation.yaml) — независимая стандартная настройка `framework.default_locale` task-orchestrator;
+  * [`tests/`](../../tests) — модульные, интеграционные и Composer-host regression tests;
+  * публичная документация и примеры окружения: [`AGENTS.md`](../../AGENTS.md), `README*.md`, [`docs/`](../../docs), [`.env.example`](../../.env.example), существующий `.env.dist` при его наличии, [`CHANGELOG.md`](../../CHANGELOG.md).
 * **Текущее поведение:** `Kernel::resolveLocale()` читает `APP_LOCALE` с default `en` и сохраняет результат в `task_orchestrator.locale`; этот параметр внедряется в `AgentRole` и `ChainExecution`. Одновременно `config/packages/translation.yaml` назначает `APP_LOCALE` в `framework.default_locale`. При повторном запуске Composer-host с тем же cache root (корнем кеша) скомпилированный контейнер может сохранить прежний `task_orchestrator.locale` и выбрать прежний role file.
 * **Целевой контракт:**
   * `TASK_ORCHESTRATOR_LOCALE` — единственный источник локали AI-ролей для `AgentRole` и `ChainExecution`;
@@ -75,9 +75,9 @@ status: in_progress
 - [x] Тестом подтвердить согласованность `AgentRole` и `ChainExecution`: при одной `TASK_ORCHESTRATOR_LOCALE` обе точки выбирают одну локализованную версию роли.
 - [x] Тестами подтвердить default `en`, нормализацию поддерживаемого значения локали и отсутствие влияния `APP_LOCALE` на локаль ролей.
 - [x] Явно оформить обратную совместимость как breaking configuration change (несовместимое изменение конфигурации): обновить migration note (указание по переходу) и запись в `CHANGELOG.md`, предписав заменить `APP_LOCALE` на `TASK_ORCHESTRATOR_LOCALE`; иной подход допустим только после отдельного согласования и с зафиксированным обоснованием в задаче.
-- [x] Выполнить фактический поиск по репозиторию и обновить активные упоминания контракта во всём коде, PHPDoc, комментариях, тестах, [`AGENTS.md`](../AGENTS.md), `README*.md`, [`docs/`](../docs/), [`.env.example`](../.env.example) и существующем `.env.dist`. Исторические упоминания допускаются только там, где они нужны для описания прежнего контракта или миграции и не выглядят как действующая инструкция.
+- [x] Выполнить фактический поиск по репозиторию и обновить активные упоминания контракта во всём коде, PHPDoc, комментариях, тестах, [`AGENTS.md`](../../AGENTS.md), `README*.md`, [`docs/`](../../docs), [`.env.example`](../../.env.example) и существующем `.env.dist`. Исторические упоминания допускаются только там, где они нужны для описания прежнего контракта или миграции и не выглядят как действующая инструкция.
 - [x] Обновить все затронутые примеры конфигурации: русское поведение задаётся `TASK_ORCHESTRATOR_LOCALE=ru`, а отсутствие переменной сохраняет английский default.
-- [x] Все изменения соответствуют [Конвенциям](../docs/conventions/index.md); модульные границы и существующие публичные контракты, не относящиеся к локали, не меняются.
+- [x] Все изменения соответствуют [Конвенциям](../../docs/conventions/index.md); модульные границы и существующие публичные контракты, не относящиеся к локали, не меняются.
 
 ### 🟡 Желательно (Should Have)
 - [x] Названия тестов и поясняющие комментарии явно различают Symfony locale (локаль Symfony) и agent-role locale (локаль AI-ролей), чтобы связь не появилась повторно.
@@ -140,13 +140,13 @@ php vendor/bin/todo-md validate todo/TASK-refactor-task-orchestrator-locale.todo
 
 ## 8. Источники (Sources)
 
-- [Kernel и текущий источник локали](../src/Kernel.php)
-- [Symfony translation configuration](../config/packages/translation.yaml)
-- [AgentRole service wiring](../src/Module/AgentRole/Resource/config/services.yaml)
-- [ChainExecution service wiring](../src/Module/ChainExecution/Resource/config/services.yaml)
-- [Текущие Kernel integration tests](../tests/Integration/DependencyInjection/KernelIntegrationTest.php)
-- [Публичные инструкции проекта](../AGENTS.md)
-- [Конвенции проекта](../docs/conventions/index.md)
+- [Kernel и текущий источник локали](../../src/Kernel.php)
+- [Symfony translation configuration](../../config/packages/translation.yaml)
+- [AgentRole service wiring](../../src/Module/AgentRole/Resource/config/services.yaml)
+- [ChainExecution service wiring](../../src/Module/ChainExecution/Resource/config/services.yaml)
+- [Текущие Kernel integration tests](../../tests/Integration/DependencyInjection/KernelIntegrationTest.php)
+- [Публичные инструкции проекта](../../AGENTS.md)
+- [Конвенции проекта](../../docs/conventions/index.md)
 
 ## 9. Комментарии (Comments)
 
