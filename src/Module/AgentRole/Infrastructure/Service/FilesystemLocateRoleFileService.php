@@ -19,8 +19,8 @@ use TaskOrchestrator\Common\Module\AgentRole\Domain\ValueObject\RoleNameVo;
  * Поиск файла роли в каталоге ролей (roles_dir) по имени роли.
  *
  * Учитывает локаль файла: предпочтение отдаётся `<role>.<locale>.md` (локаль
- * приложения из env APP_LOCALE), затем `<role>.md` (локаль-нейтральный), затем
- * любой `<role>.*.md` (первый найденный).
+ * AI-ролей из env TASK_ORCHESTRATOR_LOCALE), затем `<role>.md`
+ * (локаль-нейтральный), затем любой `<role>.*.md` (первый найденный).
  */
 final readonly class FilesystemLocateRoleFileService implements LocateRoleFileServiceInterface
 {

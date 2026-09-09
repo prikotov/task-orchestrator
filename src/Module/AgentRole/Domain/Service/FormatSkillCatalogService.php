@@ -19,7 +19,7 @@ use Override;
  * Значения экранируются (XML entities): & < > " '.
  *
  * Локаль header'а каталога управляется DI-параметром `task_orchestrator.locale`
- * (env APP_LOCALE). Неизвестная локаль → fallback на `en` (нейтральный default
+ * (env TASK_ORCHESTRATOR_LOCALE). Неизвестная локаль → fallback на `en` (нейтральный default
  * библиотеки; формат pi — англоязычный).
  */
 final readonly class FormatSkillCatalogService implements FormatSkillCatalogServiceInterface

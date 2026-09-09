@@ -188,7 +188,19 @@ class Kernel extends BaseKernel
         $parameters['task_orchestrator.skills_dir'] = $this->resolveSkillsDir($projectRoot, $packageDir);
         $parameters['task_orchestrator.chains_yaml'] = $this->resolveChainsYaml($projectRoot, $packageDir);
         $parameters['task_orchestrator.platform_family'] = $this->platformFamily;
-        $parameters['task_orchestrator.locale'] = $this->resolveLocale();
+
+        // Локаль AI-ролей (role files + каталог skills) задаётся runtime
+        // env-плейсхолдером: в скомпилированном контейнере параметр остаётся
+        // динамическим (Container::getEnv() при обращении), поэтому смена
+        // TASK_ORCHESTRATOR_LOCALE применяется при следующем запуске БЕЗ очистки
+        // кеша при том же корне кеша. Нормализация контракта (default `en` при
+        // незаданной/пустой переменной, trim, lower-case) — единая точка
+        // TaskOrchestratorLocaleEnvVarProcessor; fallback на APP_LOCALE
+        // отсутствует намеренно. Локаль Symfony-переводчика (framework.
+        // default_locale в config/packages/translation.yaml) независима от
+        // локали AI-ролей.
+        $parameters['task_orchestrator.locale'] = '%env(task_orchestrator_locale:TASK_ORCHESTRATOR_LOCALE)%';
+
         $parameters['app.version'] = $this->resolveVersion();
 
         return $parameters;
@@ -299,26 +311,6 @@ class Kernel extends BaseKernel
                 public: true,
             ))->register($container);
         }
-    }
-
-    /**
-     * Локаль приложения (i18n header'а skills и приоритет role-file).
-     *
-     * Единый источник локали — env APP_LOCALE (тот же, что и для Symfony
-     * translation в config/packages/translation.yaml). Default библиотеки — `en`
-     * (нейтральный default: task-orchestrator — библиотека/зависимость, а не
-     * русскоязычный проект). task-orchestrator как собственный проект ставит
-     * APP_LOCALE=ru в .env.local для своих .ru.md-ролей.
-     *
-     * Читается напрямую через $_SERVER/$_ENV (как APP_CACHE_DIR/APP_LOG_DIR/
-     * APP_RELEASE_VERSION): EnvVarProcessor на этапе getKernelParameters() ещё
-     * недоступен. lower-case, пустая строка → 'en'.
-     */
-    private function resolveLocale(): string
-    {
-        $locale = trim($_SERVER['APP_LOCALE'] ?? $_ENV['APP_LOCALE'] ?? 'en');
-
-        return $locale === '' ? 'en' : strtolower($locale);
     }
 
     /**

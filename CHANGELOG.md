@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **Несовместимое изменение конфигурации (breaking change):** локаль AI-ролей (выбор `role file`, язык заголовков каталога skills) управляется новой переменной окружения `TASK_ORCHESTRATOR_LOCALE` (значение по умолчанию `en`) вместо `APP_LOCALE`. `APP_LOCALE` больше не является контрактом task-orchestrator и не влияет на выбор роли и языка каталога; скрытый fallback (резервный переход) на `APP_LOCALE` отсутствует намеренно. Миграция: замените `APP_LOCALE=ru` на `TASK_ORCHESTRATOR_LOCALE=ru` в `.env.local` (или задайте переменную окружения иначе).
+- **Несовместимое изменение конфигурации (breaking change):** локаль Symfony-переводчика (`framework.default_locale`) собственного ядра task-orchestrator стала независимой стандартной настройкой Symfony (`en`): она больше не следует за `APP_LOCALE` и не связана с локалью AI-ролей. Меняется вместе с конфигурацией (см. `config/packages/translation.yaml`) при отдельной необходимости.
+- Исправлен баг устаревшего кеша (stale cache): значение локали больше не запекается в скомпилированный контейнер — смена `TASK_ORCHESTRATOR_LOCALE` (например, `en` → `ru`) применяется при следующем запуске без ручной очистки кеша при том же корне кеша. Поведение покрыто Composer-host regression-тестом (один host-проект, стабильный корень кеша, последовательные локали).
+
 ## [0.5.3] - 2026-09-03
 
 ### Changed

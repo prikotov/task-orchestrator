@@ -14,10 +14,11 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\RoleProm
  * Путь к директории — параметр конструктора (specific to the bundle).
  *
  * Локаль файла роли берётся из DI-параметра `task_orchestrator.locale` (env
- * APP_LOCALE). Резолвинг файла эквивалентен логике {@see \TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemLocateRoleFileService}
+ * TASK_ORCHESTRATOR_LOCALE). Резолвинг файла эквивалентен логике {@see \TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemLocateRoleFileService}
  * (модуль AgentRole) на fallback-цепочке `<role>.<locale>.md` → `<role>.md`
- * (нейтральный) → любой доступный перевод `<role>.*.md` — единый env APP_LOCALE
- * управляет выбором role-файла во всех точках приложения.
+ * (нейтральный) → любой доступный перевод `<role>.*.md` — единый env
+ * TASK_ORCHESTRATOR_LOCALE управляет выбором role-файла во всех точках
+ * приложения.
  *
  * ⚠️ Эквивалентность гарантируется для двухбуквенных строчных локалей;
  * формальное расхождение на шаге 3 — см. {@see selectFileForRole()} и
