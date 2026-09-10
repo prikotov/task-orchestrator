@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Domain\Service\Chain\Dynamic;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +23,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRol
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopPromptConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorResponseVo;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(FinalizeDynamicLoopService::class)]
 final class FinalizeDynamicLoopServiceTest extends TestCase
 {
@@ -33,10 +35,10 @@ final class FinalizeDynamicLoopServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->turnExecutor = $this->createMock(ExecuteDynamicTurnServiceInterface::class);
-        $this->journal = $this->createMock(FormatDynamicJournalServiceInterface::class);
+        $this->turnExecutor = $this->createStub(ExecuteDynamicTurnServiceInterface::class);
+        $this->journal = $this->createStub(FormatDynamicJournalServiceInterface::class);
         $this->sessionLogger = $this->createMock(DynamicLoopSessionLoggerInterface::class);
-        $this->facParser = $this->createMock(FacilitatorResponseParserInterface::class);
+        $this->facParser = $this->createStub(FacilitatorResponseParserInterface::class);
         $this->service = new FinalizeDynamicLoopService(
             $this->turnExecutor,
             $this->journal,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Application\Service\Chain;
 
 use LogicException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +20,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionSt
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticChainResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepResultVo;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(StaticExecutionStrategyService::class)]
 final class StaticExecutionStrategyTest extends TestCase
 {
@@ -28,7 +30,7 @@ final class StaticExecutionStrategyTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->staticChainExecutor = $this->createMock(ExecuteStaticChainServiceInterface::class);
+        $this->staticChainExecutor = $this->createStub(ExecuteStaticChainServiceInterface::class);
         $this->chainProvider = $this->createMock(ChainDefinitionProviderInterface::class);
         $this->strategy = new StaticExecutionStrategyService($this->staticChainExecutor, $this->chainProvider);
     }
@@ -59,7 +61,8 @@ final class StaticExecutionStrategyTest extends TestCase
         $chainInfo = new ExecutionChainInfoVo('static-test', ChainExecutionTypeEnum::staticType);
         $config = $this->createStaticConfig();
 
-        $this->chainProvider->method('loadStaticChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadStaticChainConfig')
             ->with('static-test')
             ->willReturn($config);
 
@@ -94,7 +97,8 @@ final class StaticExecutionStrategyTest extends TestCase
         // Arrange: chain.timeout=200, CLI timeout не передан (null).
         $chainInfo = new ExecutionChainInfoVo('static-test', ChainExecutionTypeEnum::staticType);
         $config = $this->createStaticConfigWithTimeout(200);
-        $this->chainProvider->method('loadStaticChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadStaticChainConfig')
             ->with('static-test')
             ->willReturn($config);
 
@@ -129,7 +133,8 @@ final class StaticExecutionStrategyTest extends TestCase
         // Arrange: chain.timeout=200, но CLI явно задаёт 100.
         $chainInfo = new ExecutionChainInfoVo('static-test', ChainExecutionTypeEnum::staticType);
         $config = $this->createStaticConfigWithTimeout(200);
-        $this->chainProvider->method('loadStaticChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadStaticChainConfig')
             ->with('static-test')
             ->willReturn($config);
 
@@ -165,7 +170,8 @@ final class StaticExecutionStrategyTest extends TestCase
         // Arrange: ни в chain, ни в CLI нет timeout.
         $chainInfo = new ExecutionChainInfoVo('static-test', ChainExecutionTypeEnum::staticType);
         $config = $this->createStaticConfig();
-        $this->chainProvider->method('loadStaticChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadStaticChainConfig')
             ->with('static-test')
             ->willReturn($config);
 

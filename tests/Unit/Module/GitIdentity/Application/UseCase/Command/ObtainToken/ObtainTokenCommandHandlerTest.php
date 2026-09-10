@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Module\GitIdentity\Application\UseCase\Command\ObtainToken;
 
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -28,6 +29,7 @@ use TaskOrchestrator\Common\Module\GitIdentity\Domain\ValueObject\InstallationTo
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\ValueObject\JwtTokenVo;
 use TaskOrchestrator\Common\Module\GitIdentity\Domain\ValueObject\PrivateKeyVo;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(ObtainTokenCommandHandler::class)]
 final class ObtainTokenCommandHandlerTest extends TestCase
 {
@@ -45,7 +47,7 @@ final class ObtainTokenCommandHandlerTest extends TestCase
 
     private InstallationTokenVo $freshToken;
 
-    private LoadGitIdentityConfigServiceInterface&MockObject $configLoader;
+    private LoadGitIdentityConfigServiceInterface $configLoader;
 
     private TokenCacheInterface&MockObject $cache;
 
@@ -55,7 +57,7 @@ final class ObtainTokenCommandHandlerTest extends TestCase
 
     private RequestInstallationTokenServiceInterface&MockObject $requester;
 
-    private ClockInterface&MockObject $clock;
+    private ClockInterface $clock;
 
     private ObtainTokenCommandHandler $handler;
 
@@ -91,7 +93,7 @@ final class ObtainTokenCommandHandlerTest extends TestCase
         $this->jwtSigner = $this->createMock(SignJwtTokenServiceInterface::class);
         $this->resolver = $this->createMock(ResolveInstallationIdServiceInterface::class);
         $this->requester = $this->createMock(RequestInstallationTokenServiceInterface::class);
-        $this->clock = $this->createMock(ClockInterface::class);
+        $this->clock = $this->createStub(ClockInterface::class);
 
         $this->clock->method('now')->willReturn($this->now);
         $this->configLoader->method('load')->willReturn($this->config);
@@ -287,7 +289,7 @@ final class ObtainTokenCommandHandlerTest extends TestCase
     #[Test]
     public function configLoaderFailurePropagates(): void
     {
-        $this->configLoader = $this->createMock(LoadGitIdentityConfigServiceInterface::class);
+        $this->configLoader = $this->createStub(LoadGitIdentityConfigServiceInterface::class);
         $this->configLoader
             ->method('load')
             ->willThrowException(new InvalidConfigurationException('GitHub App ID is not configured.'));

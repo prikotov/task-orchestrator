@@ -60,8 +60,8 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
 
         $contextBuilder = new BuildDynamicContextService();
         $configMapper = new DynamicLoopDefinitionMapperService(BusTestFactory::queryBus(new \TaskOrchestrator\Common\Module\ChainDefinition\Application\UseCase\Query\Chain\LoadRawChain\LoadRawChainQueryHandler($chainLoader)));
-        $auditFactory = $this->createMock(DynamicLoopAuditLoggerFactoryInterface::class);
-        $sessionNotifier = $this->createMock(SessionCompletedNotifierInterface::class);
+        $auditFactory = $this->createStub(DynamicLoopAuditLoggerFactoryInterface::class);
+        $sessionNotifier = $this->createStub(SessionCompletedNotifierInterface::class);
         $sessionNotifier->method('notifySessionCompleted');
 
         $dynamicStrategy = new DynamicExecutionStrategy(

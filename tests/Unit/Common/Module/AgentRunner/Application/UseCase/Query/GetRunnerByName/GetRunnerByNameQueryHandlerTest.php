@@ -29,11 +29,11 @@ final class GetRunnerByNameQueryHandlerTest extends TestCase
     #[Test]
     public function handleReturnsRunnerDtoWhenFoundByName(): void
     {
-        $runner = $this->createMock(AgentRunnerInterface::class);
+        $runner = $this->createStub(AgentRunnerInterface::class);
         $runner->method('getName')->willReturn('pi');
         $runner->method('isAvailable')->willReturn(true);
 
-        $this->registry->method('get')->with('pi')->willReturn($runner);
+        $this->registry->expects(self::once())->method('get')->with('pi')->willReturn($runner);
 
         $result = $this->handler->handle(new GetRunnerByNameQuery(name: 'pi'));
 
@@ -45,7 +45,7 @@ final class GetRunnerByNameQueryHandlerTest extends TestCase
     #[Test]
     public function handleReturnsNullWhenRunnerNotFound(): void
     {
-        $this->registry->method('get')->with('unknown')
+        $this->registry->expects(self::once())->method('get')->with('unknown')
             ->willThrowException(new RunnerNotFoundException('unknown'));
 
         $result = $this->handler->handle(new GetRunnerByNameQuery(name: 'unknown'));
@@ -56,11 +56,11 @@ final class GetRunnerByNameQueryHandlerTest extends TestCase
     #[Test]
     public function handleReturnsDefaultRunnerWhenNameIsNull(): void
     {
-        $runner = $this->createMock(AgentRunnerInterface::class);
+        $runner = $this->createStub(AgentRunnerInterface::class);
         $runner->method('getName')->willReturn('pi');
         $runner->method('isAvailable')->willReturn(true);
 
-        $this->registry->method('getDefault')->willReturn($runner);
+        $this->registry->expects(self::once())->method('getDefault')->willReturn($runner);
 
         $result = $this->handler->handle(new GetRunnerByNameQuery(name: null));
 
@@ -72,7 +72,7 @@ final class GetRunnerByNameQueryHandlerTest extends TestCase
     #[Test]
     public function handleReturnsNullWhenDefaultRunnerNotFound(): void
     {
-        $this->registry->method('getDefault')
+        $this->registry->expects(self::once())->method('getDefault')
             ->willThrowException(new RunnerNotFoundException('default'));
 
         $result = $this->handler->handle(new GetRunnerByNameQuery(name: null));
@@ -83,11 +83,11 @@ final class GetRunnerByNameQueryHandlerTest extends TestCase
     #[Test]
     public function invokeDelegatesToHandle(): void
     {
-        $runner = $this->createMock(AgentRunnerInterface::class);
+        $runner = $this->createStub(AgentRunnerInterface::class);
         $runner->method('getName')->willReturn('pi');
         $runner->method('isAvailable')->willReturn(false);
 
-        $this->registry->method('get')->with('pi')->willReturn($runner);
+        $this->registry->expects(self::once())->method('get')->with('pi')->willReturn($runner);
 
         $result = ($this->handler)(new GetRunnerByNameQuery(name: 'pi'));
 

@@ -11,6 +11,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunReques
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\CircuitBreakerStateVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Metrics\InMemoryMetricsCollectorService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\CircuitBreakerAgentRunnerService;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(CircuitBreakerAgentRunnerService::class)]
 final class CircuitBreakerAgentRunnerTest extends TestCase
 {
@@ -699,7 +701,7 @@ final class CircuitBreakerAgentRunnerTest extends TestCase
         );
 
         $successResult = AgentResultVo::createSuccess(outputText: 'Recovered');
-        $halfOpenRunner = $this->createMock(AgentRunnerInterface::class);
+        $halfOpenRunner = $this->createStub(AgentRunnerInterface::class);
         $halfOpenRunner->method('getName')->willReturn('pi');
         $halfOpenRunner->method('run')->willReturn($successResult);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Query\Chain\ValidateChainConfig;
 
 use Override;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -31,6 +32,7 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\StaticChai
  * Подход D′: при падении load() на domain-исключении конфигурации Handler достаивает
  * detailed-нарушения из carrier-исключения через коллектор (слепая зона №2).
  */
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(ValidateChainConfigQueryHandler::class)]
 final class ValidateChainConfigQueryHandlerTest extends TestCase
 {

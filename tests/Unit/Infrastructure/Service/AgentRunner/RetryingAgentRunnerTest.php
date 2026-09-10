@@ -11,6 +11,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunReques
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\Metrics\InMemoryMetricsCollectorService;
 use TaskOrchestrator\Common\Module\AgentRunner\Infrastructure\Service\RetryingAgentRunnerService;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(RetryingAgentRunnerService::class)]
 final class RetryingAgentRunnerTest extends TestCase
 {

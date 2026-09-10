@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Module\ChainDefinition\Infrastructure\Service\Chain\Hook;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -11,6 +12,7 @@ use Psr\Log\LoggerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Chain\Hook\ShellHookExecutorService;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(ShellHookExecutorService::class)]
 final class ShellHookExecutorTest extends TestCase
 {

@@ -66,12 +66,12 @@ final class StaticChainIntegrationTest extends TestCase
         $this->chainLoader = new YamlChainLoaderService(self::FIXTURES_DIR . '/test_chains.yaml', new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification()), new YamlChainStepMapper(new ChainStepFactory(), new YamlRetryPolicyMapper()), new YamlRetryPolicyMapper());
         $this->stubAgent = new StubRunAgentService();
 
-        $budgetService = $this->createMock(CheckStaticBudgetServiceInterface::class);
+        $budgetService = $this->createStub(CheckStaticBudgetServiceInterface::class);
         $budgetService->method('shouldBreakBeforeStep')->willReturn(false);
         $budgetService->method('shouldBreakAfterStep')->willReturn(false);
 
-        $runnerHelper = $this->createMock(ResolveChainRunnerServiceInterface::class);
-        $formatter = $this->createMock(FormatPromptServiceInterface::class);
+        $runnerHelper = $this->createStub(ResolveChainRunnerServiceInterface::class);
+        $formatter = $this->createStub(FormatPromptServiceInterface::class);
         $formatter->method('buildStaticContext')->willReturnCallback(
             static fn(string $role, string $previousOutput, string $task): string => $previousOutput,
         );
@@ -85,7 +85,7 @@ final class StaticChainIntegrationTest extends TestCase
         $toolStepRunner = new ExecuteToolStepService();
         $stepRunnerResolver = new ResolveStepRunnerService([$agentStepRunner, $gateStepRunner, $toolStepRunner]);
 
-        $hookExecutor = $this->createMock(HookExecutorInterface::class);
+        $hookExecutor = $this->createStub(HookExecutorInterface::class);
         $hookExecutor->method('execute')->willReturn(
             HookResultVo::createSkipped(),
         );

@@ -17,7 +17,7 @@ final class AgentRunnerRegistryServiceTest extends TestCase
     #[Test]
     public function constructBuildsMapFromIterable(): void
     {
-        $runner = $this->createMock(AgentRunnerInterface::class);
+        $runner = $this->createStub(AgentRunnerInterface::class);
         $runner->method('getName')->willReturn('pi');
 
         $service = new AgentRunnerRegistryService([$runner]);
@@ -39,7 +39,7 @@ final class AgentRunnerRegistryServiceTest extends TestCase
     #[Test]
     public function getDefaultReturnsFirstRunner(): void
     {
-        $runner1 = $this->createMock(AgentRunnerInterface::class);
+        $runner1 = $this->createStub(AgentRunnerInterface::class);
         $runner1->method('getName')->willReturn('pi');
 
         $service = new AgentRunnerRegistryService([$runner1]);
@@ -60,10 +60,10 @@ final class AgentRunnerRegistryServiceTest extends TestCase
     #[Test]
     public function listReturnsAllRunners(): void
     {
-        $runner1 = $this->createMock(AgentRunnerInterface::class);
+        $runner1 = $this->createStub(AgentRunnerInterface::class);
         $runner1->method('getName')->willReturn('pi');
 
-        $runner2 = $this->createMock(AgentRunnerInterface::class);
+        $runner2 = $this->createStub(AgentRunnerInterface::class);
         $runner2->method('getName')->willReturn('codex');
 
         $service = new AgentRunnerRegistryService([$runner1, $runner2]);

@@ -6,6 +6,7 @@ namespace TaskOrchestrator\Tests\Unit\Domain\Service\Chain\Dynamic;
 
 use FilesystemIterator;
 use LogicException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -34,6 +35,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnBreakVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnContinueVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(ExecuteDynamicTurnService::class)]
 final class ExecuteDynamicTurnServiceTest extends TestCase
 {
@@ -46,7 +48,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->agentRunner = $this->createMock(RunDynamicLoopAgentServiceInterface::class);
+        $this->agentRunner = $this->createStub(RunDynamicLoopAgentServiceInterface::class);
         $this->roundRecorder = $this->createMock(RecordDynamicRoundServiceInterface::class);
         $this->journal = $this->createMock(FormatDynamicJournalServiceInterface::class);
         $this->sessionLogger = $this->createMock(DynamicLoopSessionLoggerInterface::class);

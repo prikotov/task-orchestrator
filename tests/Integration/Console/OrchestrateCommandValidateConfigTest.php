@@ -199,9 +199,9 @@ YAML);
             $collector,
         );
 
-        $orchestrateHandler = $this->createMock(OrchestrateChainCommandHandler::class);
-        $reportHandler = $this->createMock(GenerateReportQueryHandler::class);
-        $loadChainHandler = $this->createMock(LoadChainQueryHandler::class);
+        $orchestrateHandler = $this->createStub(OrchestrateChainCommandHandler::class);
+        $reportHandler = $this->createStub(GenerateReportQueryHandler::class);
+        $loadChainHandler = $this->createStub(LoadChainQueryHandler::class);
         $lockFactory = new LockFactory(new FlockStore());
 
         $command = new OrchestrateCommand(

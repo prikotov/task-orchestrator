@@ -90,10 +90,10 @@ final class RunAgentServiceTest extends TestCase
         $runner = new StubAgentRunner($agentResult);
 
         $registry = $this->createMock(AgentRunnerRegistryServiceInterface::class);
-        $registry->method('get')->with('pi')->willReturn($runner);
+        $registry->expects(self::once())->method('get')->with('pi')->willReturn($runner);
         $registry->method('getDefault')->willReturn($runner);
 
-        $retryFactory = $this->createMock(RetryableRunnerFactoryInterface::class);
+        $retryFactory = $this->createStub(RetryableRunnerFactoryInterface::class);
         $retryFactory->method('createRetryableRunner')->willReturn($runner);
 
         $handler = new RunAgentCommandHandler($registry, $retryFactory);

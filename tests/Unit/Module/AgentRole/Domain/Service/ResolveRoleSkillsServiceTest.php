@@ -28,7 +28,7 @@ final class ResolveRoleSkillsServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->skillReader = $this->createMock(LoadSkillFrontmatterServiceInterface::class);
+        $this->skillReader = $this->createStub(LoadSkillFrontmatterServiceInterface::class);
         $this->skillReader
             ->method('read')
             ->willReturnCallback(fn (SkillNameVo $name): SkillMetadataVo => $this->buildSkillWithDeps($name));

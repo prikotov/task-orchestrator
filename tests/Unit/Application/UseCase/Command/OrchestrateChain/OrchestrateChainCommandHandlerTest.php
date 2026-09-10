@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Command\OrchestrateChain;
 
 use LogicException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +17,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionType
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ChainDefinition\ChainDefinitionProviderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionChainInfoVo;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(OrchestrateChainCommandHandler::class)]
 #[CoversClass(OrchestrateChainCommand::class)]
 final class OrchestrateChainCommandHandlerTest extends TestCase
@@ -28,8 +30,8 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->chainProvider = $this->createMock(ChainDefinitionProviderInterface::class);
-        $this->staticStrategy = $this->createMock(ExecutionStrategyInterface::class);
-        $this->dynamicStrategy = $this->createMock(ExecutionStrategyInterface::class);
+        $this->staticStrategy = $this->createStub(ExecutionStrategyInterface::class);
+        $this->dynamicStrategy = $this->createStub(ExecutionStrategyInterface::class);
 
         // Default supports(): static supports static, dynamic supports dynamic
         $this->staticStrategy->method('supports')
@@ -55,7 +57,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     {
         $chainInfo = new ExecutionChainInfoVo('test', ChainExecutionTypeEnum::staticType);
 
-        $this->chainProvider->method('loadChainInfo')->with('test')->willReturn($chainInfo);
+        $this->chainProvider->expects(self::once())->method('loadChainInfo')->with('test')->willReturn($chainInfo);
 
         $staticResult = new OrchestrateChainResultDto();
         $this->staticStrategy->method('execute')->willReturn($staticResult);
@@ -73,7 +75,7 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
     {
         $chainInfo = new ExecutionChainInfoVo('brainstorm', ChainExecutionTypeEnum::dynamicType);
 
-        $this->chainProvider->method('loadChainInfo')->with('brainstorm')->willReturn($chainInfo);
+        $this->chainProvider->expects(self::once())->method('loadChainInfo')->with('brainstorm')->willReturn($chainInfo);
 
         $dynamicResult = new OrchestrateChainResultDto(
             synthesis: 'Result',

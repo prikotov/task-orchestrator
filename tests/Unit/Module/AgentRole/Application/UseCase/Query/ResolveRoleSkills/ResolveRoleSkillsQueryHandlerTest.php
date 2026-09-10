@@ -32,10 +32,10 @@ final class ResolveRoleSkillsQueryHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->locator = $this->createMock(LocateRoleFileServiceInterface::class);
-        $this->roleReader = $this->createMock(LoadRoleFrontmatterServiceInterface::class);
-        $this->resolver = $this->createMock(ResolveRoleSkillsServiceInterface::class);
-        $this->formatter = $this->createMock(FormatSkillCatalogServiceInterface::class);
+        $this->locator = $this->createStub(LocateRoleFileServiceInterface::class);
+        $this->roleReader = $this->createStub(LoadRoleFrontmatterServiceInterface::class);
+        $this->resolver = $this->createStub(ResolveRoleSkillsServiceInterface::class);
+        $this->formatter = $this->createStub(FormatSkillCatalogServiceInterface::class);
 
         $this->handler = new ResolveRoleSkillsQueryHandler(
             $this->locator,

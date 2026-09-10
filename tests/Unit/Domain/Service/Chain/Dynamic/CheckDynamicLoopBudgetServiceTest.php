@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Domain\Service\Chain\Dynamic;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +15,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoo
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicBudgetCheckVo;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(CheckDynamicLoopBudgetService::class)]
 final class CheckDynamicLoopBudgetServiceTest extends TestCase
 {
