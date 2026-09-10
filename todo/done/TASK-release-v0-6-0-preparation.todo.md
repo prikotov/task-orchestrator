@@ -3,7 +3,7 @@ type: chore
 created: 2026-09-10 15:21:04 (1789053664)
 due: 
 started: 2026-09-10 15:21:04 (1789053664)
-completed: 
+completed: 2026-09-10 15:55:37 (1789055737)
 cancelled: 
 value: V2
 complexity: C1
@@ -16,7 +16,7 @@ author: Технический писатель Гермиона (pi)
 assignee: Технический писатель Гермиона (pi)
 branch: task/release-v0-6-0
 pr: https://github.com/prikotov/task-orchestrator/pull/383
-status: review
+status: done
 ---
 
 # TASK-release-v0-6-0-preparation: Подготовить release PR для v0.6.0
