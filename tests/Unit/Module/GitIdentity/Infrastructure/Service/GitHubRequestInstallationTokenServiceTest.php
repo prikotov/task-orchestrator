@@ -62,7 +62,7 @@ final class GitHubRequestInstallationTokenServiceTest extends TestCase
         $this->http
             ->expects(self::once())
             ->method('request')
-            ->with('POST', self::URL, $this->jwt->getValue(), self::isType('string'))
+            ->with('POST', self::URL, $this->jwt->getValue(), self::isString())
             ->willReturn($this->validResponseData());
 
         $service = new GitHubRequestInstallationTokenService($this->http);

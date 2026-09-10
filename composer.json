@@ -29,13 +29,13 @@
         "psr/clock": "^1.0"
     },
     "require-dev": {
-        "prikotov/coding-standard": "^0.32.0",
-        "phpunit/phpunit": "^10.5",
+        "prikotov/coding-standard": "^0.33.0",
+        "phpunit/phpunit": "^13.3",
         "prikotov/todo-md": "^0.0",
         "prikotov/git-workflow": "^0.3.0",
         "vimeo/psalm": "^6.16",
         "psalm/plugin-symfony": "^5.3",
-        "deptrac/deptrac": "^2.0",
+        "deptrac/deptrac": "^4.7",
         "phpmd/phpmd": "^3.0",
         "ramsey/conventional-commits": "^1.7",
         "phpstan/phpstan": "^2.1"
