@@ -3,7 +3,7 @@ type: refactor
 created: 2026-09-10 04:01:52 (1789012912)
 due: 
 started: 2026-09-10 04:01:52 (1789012912)
-completed: 
+completed: 2026-09-10 04:18:21 (1789013901)
 cancelled: 
 value: V2
 complexity: C2
@@ -16,7 +16,7 @@ author: Бэкендер Левша (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/update-all-dependencies
 pr: https://github.com/prikotov/task-orchestrator/pull/381
-status: review
+status: done
 ---
 
 # TASK-update-all-dependencies: Обновить все зависимости проекта
