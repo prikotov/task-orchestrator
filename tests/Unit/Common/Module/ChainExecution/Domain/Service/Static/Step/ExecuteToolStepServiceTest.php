@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Common\Module\ChainExecution\Domain\Service\Static\Step;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +17,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StaticStepR
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\StepContextVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ToolStepResultVo;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(ExecuteToolStepService::class)]
 final class ExecuteToolStepServiceTest extends TestCase
 {

@@ -10,7 +10,7 @@ fi
 
 printf 'node=%s\n' "$(node --version)"
 php "${ROOT_DIR}/vendor/bin/phpunit" \
-  --do-not-cache-result \
+  --do-not-record-test-run-history \
   --fail-on-skipped \
   --fail-on-incomplete \
   --fail-on-risky \
@@ -49,7 +49,7 @@ docker run --rm \
     echo "pcntl_fork=MISSING"
 
     php vendor/bin/phpunit \
-      --do-not-cache-result \
+      --do-not-record-test-run-history \
       --fail-on-skipped \
       --fail-on-incomplete \
       --fail-on-risky \

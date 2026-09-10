@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Application\Service\Chain;
 
 use LogicException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -26,6 +27,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRes
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSessionStateVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(DynamicExecutionStrategy::class)]
 final class DynamicExecutionStrategyTest extends TestCase
 {
@@ -39,11 +41,11 @@ final class DynamicExecutionStrategyTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dynamicLoopRunner = $this->createMock(RunDynamicLoopServiceInterface::class);
+        $this->dynamicLoopRunner = $this->createStub(RunDynamicLoopServiceInterface::class);
         $this->contextBuilder = new BuildDynamicContextService();
-        $this->sessionLogger = $this->createMock(DynamicLoopSessionLoggerInterface::class);
+        $this->sessionLogger = $this->createStub(DynamicLoopSessionLoggerInterface::class);
         $this->auditLoggerFactory = $this->createMock(DynamicLoopAuditLoggerFactoryInterface::class);
-        $this->sessionNotifier = $this->createMock(SessionCompletedNotifierInterface::class);
+        $this->sessionNotifier = $this->createStub(SessionCompletedNotifierInterface::class);
         $this->chainProvider = $this->createMock(ChainDefinitionProviderInterface::class);
 
         $this->sessionLogger->method('startSession')->willReturn('/tmp/test-session');
@@ -591,11 +593,12 @@ final class DynamicExecutionStrategyTest extends TestCase
     public function executeCreatesAuditLoggerFromSessionDir(): void
     {
         $sessionDir = '/tmp/test-session';
-        $auditLogger = $this->createMock(DynamicLoopAuditLoggerInterface::class);
+        $auditLogger = $this->createStub(DynamicLoopAuditLoggerInterface::class);
 
         $this->setUpDynamicConfig('audit-dynamic');
 
-        $this->auditLoggerFactory->method('create')
+        $this->auditLoggerFactory->expects(self::once())
+            ->method('create')
             ->with($sessionDir . '/audit.jsonl')
             ->willReturn($auditLogger);
 
@@ -1141,8 +1144,9 @@ final class DynamicExecutionStrategyTest extends TestCase
         $this->sessionLogger->method('resumeSession');
         $this->sessionLogger->method('getResumedState')->willReturn($state);
 
-        $auditLogger = $this->createMock(DynamicLoopAuditLoggerInterface::class);
-        $this->auditLoggerFactory->method('create')
+        $auditLogger = $this->createStub(DynamicLoopAuditLoggerInterface::class);
+        $this->auditLoggerFactory->expects(self::once())
+            ->method('create')
             ->with('/tmp/resume-dir/audit.jsonl')
             ->willReturn($auditLogger);
 
@@ -1215,7 +1219,8 @@ final class DynamicExecutionStrategyTest extends TestCase
             defaultRetryPolicy: null,
         );
 
-        $this->chainProvider->method('loadDynamicChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadDynamicChainConfig')
             ->with($name)
             ->willReturn($config);
     }

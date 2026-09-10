@@ -20,7 +20,7 @@ final class ResolveStepRunnerServiceTest extends TestCase
     #[Test]
     public function resolveReturnsAgentRunner(): void
     {
-        $agentRunner = $this->createMock(ExecuteStepServiceInterface::class);
+        $agentRunner = $this->createStub(ExecuteStepServiceInterface::class);
         $agentRunner->method('supports')->willReturnCallback(
             static fn(ChainStepTypeEnum $type): bool => $type === ChainStepTypeEnum::agent,
         );
@@ -34,17 +34,17 @@ final class ResolveStepRunnerServiceTest extends TestCase
     #[Test]
     public function resolveReturnsCorrectRunnerForType(): void
     {
-        $agentRunner = $this->createMock(ExecuteStepServiceInterface::class);
+        $agentRunner = $this->createStub(ExecuteStepServiceInterface::class);
         $agentRunner->method('supports')->willReturnCallback(
             static fn(ChainStepTypeEnum $type): bool => $type === ChainStepTypeEnum::agent,
         );
 
-        $gateRunner = $this->createMock(ExecuteStepServiceInterface::class);
+        $gateRunner = $this->createStub(ExecuteStepServiceInterface::class);
         $gateRunner->method('supports')->willReturnCallback(
             static fn(ChainStepTypeEnum $type): bool => $type === ChainStepTypeEnum::qualityGate,
         );
 
-        $toolRunner = $this->createMock(ExecuteStepServiceInterface::class);
+        $toolRunner = $this->createStub(ExecuteStepServiceInterface::class);
         $toolRunner->method('supports')->willReturnCallback(
             static fn(ChainStepTypeEnum $type): bool => $type === ChainStepTypeEnum::tool,
         );

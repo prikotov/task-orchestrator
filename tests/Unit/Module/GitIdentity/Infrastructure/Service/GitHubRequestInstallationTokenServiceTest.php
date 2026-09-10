@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Module\GitIdentity\Infrastructure\Service;
 
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -29,6 +30,7 @@ use TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\GitHubRequ
  *
  * Сверка с GitHub REST API: Create an installation access token for an app.
  */
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(GitHubRequestInstallationTokenService::class)]
 final class GitHubRequestInstallationTokenServiceTest extends TestCase
 {

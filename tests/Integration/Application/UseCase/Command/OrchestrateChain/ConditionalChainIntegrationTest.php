@@ -83,13 +83,13 @@ final class ConditionalChainIntegrationTest extends TestCase
 
         // --- Conditional strategy wiring ---
         $conditionEvaluator = new EvaluateConditionService();
-        $promptFormatter = $this->createMock(PromptFormatterInterface::class);
+        $promptFormatter = $this->createStub(PromptFormatterInterface::class);
         $promptFormatter->method('buildStaticContext')->willReturnCallback(
             static fn(string $role, string $previousOutput, string $task): string => $previousOutput,
         );
 
         $stepExecutor = new StubConditionalStepExecutor();
-        $hookExecutor = $this->createMock(HookExecutorInterface::class);
+        $hookExecutor = $this->createStub(HookExecutorInterface::class);
         $hookExecutor->method('execute')->willReturn(HookResultVo::createSkipped());
 
         $conditionalDefinitionMapper = new ChainExecutionDefinitionMapperService(BusTestFactory::queryBus(new LoadRawChainQueryHandler($this->chainLoader)));
@@ -102,11 +102,11 @@ final class ConditionalChainIntegrationTest extends TestCase
 
         // --- Static strategy wiring (for backwards compatibility test) ---
         $staticAgent = new StubRunAgentService();
-        $staticBudgetService = $this->createMock(CheckStaticBudgetServiceInterface::class);
+        $staticBudgetService = $this->createStub(CheckStaticBudgetServiceInterface::class);
         $staticBudgetService->method('shouldBreakBeforeStep')->willReturn(false);
         $staticBudgetService->method('shouldBreakAfterStep')->willReturn(false);
-        $staticRunnerHelper = $this->createMock(ResolveChainRunnerServiceInterface::class);
-        $staticFormatter = $this->createMock(FormatPromptServiceInterface::class);
+        $staticRunnerHelper = $this->createStub(ResolveChainRunnerServiceInterface::class);
+        $staticFormatter = $this->createStub(FormatPromptServiceInterface::class);
         $staticFormatter->method('buildStaticContext')->willReturnCallback(
             static fn(string $role, string $previousOutput, string $task): string => $previousOutput,
         );

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Module\GitIdentity\Infrastructure\Service;
 
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -28,6 +29,7 @@ use TaskOrchestrator\Common\Module\GitIdentity\Infrastructure\Service\GitHubReso
  * разбор ответа. Сверка с GitHub REST API: List installations for a repository
  * (installation lookup by repo).
  */
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(GitHubResolveInstallationIdService::class)]
 final class GitHubResolveInstallationIdServiceTest extends TestCase
 {

@@ -9,10 +9,12 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\Ru
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Agent\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\PromptProviderInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(RunAgentCommandHandler::class)]
 #[CoversClass(RunAgentCommand::class)]
 final class RunAgentCommandHandlerTest extends TestCase

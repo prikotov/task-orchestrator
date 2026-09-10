@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Common\Module\AgentRunner\Application\UseCase\Command\RunAgent;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -17,6 +18,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentResultVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\AgentRunRequestVo;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject\RetryPolicyVo;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(RunAgentCommandHandler::class)]
 final class RunAgentCommandHandlerTest extends TestCase
 {
@@ -115,7 +117,7 @@ final class RunAgentCommandHandlerTest extends TestCase
 
         $retryRunner = $this->createMock(AgentRunnerInterface::class);
 
-        $this->registry->method('get')->with('pi')->willReturn($this->runner);
+        $this->registry->expects(self::once())->method('get')->with('pi')->willReturn($this->runner);
         $this->retryFactory->expects(self::once())->method('createRetryableRunner')
             ->willReturnCallback(function (
                 AgentRunnerInterface $r,

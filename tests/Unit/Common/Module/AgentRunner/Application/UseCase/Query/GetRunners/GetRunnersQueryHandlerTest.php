@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Common\Module\AgentRunner\Application\UseCase\Query\GetRunners;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -13,6 +14,7 @@ use TaskOrchestrator\Common\Module\AgentRunner\Application\UseCase\Query\GetRunn
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerRegistryServiceInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(GetRunnersQueryHandler::class)]
 final class GetRunnersQueryHandlerTest extends TestCase
 {
@@ -28,11 +30,11 @@ final class GetRunnersQueryHandlerTest extends TestCase
     #[Test]
     public function handleReturnsAllRunners(): void
     {
-        $piRunner = $this->createMock(AgentRunnerInterface::class);
+        $piRunner = $this->createStub(AgentRunnerInterface::class);
         $piRunner->method('getName')->willReturn('pi');
         $piRunner->method('isAvailable')->willReturn(true);
 
-        $codexRunner = $this->createMock(AgentRunnerInterface::class);
+        $codexRunner = $this->createStub(AgentRunnerInterface::class);
         $codexRunner->method('getName')->willReturn('codex');
         $codexRunner->method('isAvailable')->willReturn(false);
 
@@ -53,7 +55,7 @@ final class GetRunnersQueryHandlerTest extends TestCase
     #[Test]
     public function invokeDelegatesToHandle(): void
     {
-        $piRunner = $this->createMock(AgentRunnerInterface::class);
+        $piRunner = $this->createStub(AgentRunnerInterface::class);
         $piRunner->method('getName')->willReturn('pi');
         $piRunner->method('isAvailable')->willReturn(true);
 
@@ -68,11 +70,11 @@ final class GetRunnersQueryHandlerTest extends TestCase
     #[Test]
     public function handleFiltersByName(): void
     {
-        $piRunner = $this->createMock(AgentRunnerInterface::class);
+        $piRunner = $this->createStub(AgentRunnerInterface::class);
         $piRunner->method('getName')->willReturn('pi');
         $piRunner->method('isAvailable')->willReturn(true);
 
-        $codexRunner = $this->createMock(AgentRunnerInterface::class);
+        $codexRunner = $this->createStub(AgentRunnerInterface::class);
         $codexRunner->method('getName')->willReturn('codex');
         $codexRunner->method('isAvailable')->willReturn(true);
 
@@ -100,7 +102,7 @@ final class GetRunnersQueryHandlerTest extends TestCase
     #[Test]
     public function handleFilterReturnsEmptyWhenNameNotFound(): void
     {
-        $piRunner = $this->createMock(AgentRunnerInterface::class);
+        $piRunner = $this->createStub(AgentRunnerInterface::class);
         $piRunner->method('getName')->willReturn('pi');
         $piRunner->method('isAvailable')->willReturn(true);
 

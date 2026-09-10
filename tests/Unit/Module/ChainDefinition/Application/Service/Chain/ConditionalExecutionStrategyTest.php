@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Module\ChainDefinition\Application\Service\Chain;
 
 use LogicException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -22,6 +23,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionCo
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionStepVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\HookResultVo;
 
+#[AllowMockObjectsWithoutExpectations]
 final class ConditionalExecutionStrategyTest extends TestCase
 {
     private EvaluateConditionServiceInterface&MockObject $conditionEvaluator;
@@ -95,7 +97,8 @@ final class ConditionalExecutionStrategyTest extends TestCase
             $this->createExecutionStep(role: 'developer', name: 'dev'),
             $this->createExecutionStep(role: 'reviewer', name: 'rev'),
         ]);
-        $this->chainProvider->method('loadConditionalChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadConditionalChainConfig')
             ->with('test-chain')
             ->willReturn($config);
 
@@ -144,7 +147,8 @@ final class ConditionalExecutionStrategyTest extends TestCase
             $this->createExecutionStep(role: 'linter', name: 'lint'),
             $this->createExecutionStep(role: 'developer', name: 'dev', when: $when),
         ]);
-        $this->chainProvider->method('loadConditionalChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadConditionalChainConfig')
             ->with('test-chain')
             ->willReturn($config);
 
@@ -189,7 +193,8 @@ final class ConditionalExecutionStrategyTest extends TestCase
             $this->createExecutionStep(role: 'linter', name: 'lint'),
             $this->createExecutionStep(role: 'developer', name: 'dev', when: $when),
         ]);
-        $this->chainProvider->method('loadConditionalChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadConditionalChainConfig')
             ->with('test-chain')
             ->willReturn($config);
 
@@ -242,7 +247,8 @@ final class ConditionalExecutionStrategyTest extends TestCase
             $this->createExecutionStep(role: null, name: 'tests', isAgent: false),
             $this->createExecutionStep(role: 'deployer', name: 'deploy', when: $whenDeploy),
         ]);
-        $this->chainProvider->method('loadConditionalChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadConditionalChainConfig')
             ->with('test-chain')
             ->willReturn($config);
 
@@ -297,7 +303,8 @@ final class ConditionalExecutionStrategyTest extends TestCase
             $this->createExecutionStep(role: 'linter', name: 'lint'),
             $this->createExecutionStep(role: 'developer', name: 'dev', when: $when),
         ]);
-        $this->chainProvider->method('loadConditionalChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadConditionalChainConfig')
             ->with('test-chain')
             ->willReturn($config);
 
@@ -346,7 +353,8 @@ final class ConditionalExecutionStrategyTest extends TestCase
             $this->createExecutionStep(role: 'linter', name: 'lint'),
             $this->createExecutionStep(role: null, name: 'deploy', isAgent: false, when: $when),
         ]);
-        $this->chainProvider->method('loadConditionalChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadConditionalChainConfig')
             ->with('test-chain')
             ->willReturn($config);
 
@@ -388,7 +396,8 @@ final class ConditionalExecutionStrategyTest extends TestCase
         $config = $this->createConfigFromSteps([
             $this->createExecutionStep(role: 'developer', name: 'dev'),
         ]);
-        $this->chainProvider->method('loadConditionalChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadConditionalChainConfig')
             ->with('test-chain')
             ->willReturn($config);
 
@@ -424,7 +433,8 @@ final class ConditionalExecutionStrategyTest extends TestCase
         $config = $this->createConfigFromSteps([
             $this->createExecutionStep(role: 'developer', name: 'dev'),
         ]);
-        $this->chainProvider->method('loadConditionalChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadConditionalChainConfig')
             ->with('test-chain')
             ->willReturn($config);
 
@@ -463,7 +473,8 @@ final class ConditionalExecutionStrategyTest extends TestCase
         $config = $this->createConfigFromSteps([
             $this->createExecutionStep(role: 'developer', name: 'dev'),
         ]);
-        $this->chainProvider->method('loadConditionalChainConfig')
+        $this->chainProvider->expects(self::once())
+            ->method('loadConditionalChainConfig')
             ->with('test-chain')
             ->willReturn($config);
 

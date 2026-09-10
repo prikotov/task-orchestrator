@@ -33,7 +33,7 @@ final class RunCommandTest extends TestCase
         $this->capturedRequest = null;
         $test = $this;
 
-        $this->agentRunner = $this->createMock(RunAgentServiceInterface::class);
+        $this->agentRunner = $this->createStub(RunAgentServiceInterface::class);
         $this->agentRunner
             ->method('run')
             ->willReturnCallback(function (ChainRunRequestVo $request) use ($test): ChainRunResultVo {
@@ -49,7 +49,7 @@ final class RunCommandTest extends TestCase
                 );
             });
 
-        $this->promptProvider = $this->createMock(PromptProviderInterface::class);
+        $this->promptProvider = $this->createStub(PromptProviderInterface::class);
         $this->promptProvider->method('getPrompt')->willReturn('You are a helpful agent.');
     }
 
@@ -220,11 +220,11 @@ final class RunCommandTest extends TestCase
     #[Test]
     public function executeHandlesAgentError(): void
     {
-        $errorRunner = $this->createMock(RunAgentServiceInterface::class);
+        $errorRunner = $this->createStub(RunAgentServiceInterface::class);
         $errorRunner->method('run')->willReturn(
             ChainRunResultVo::createError('Agent crashed', 1),
         );
-        $promptProvider = $this->createMock(PromptProviderInterface::class);
+        $promptProvider = $this->createStub(PromptProviderInterface::class);
         $promptProvider->method('getPrompt')->willReturn('prompt');
 
         $handler = new RunAgentCommandHandler($errorRunner, $promptProvider);
