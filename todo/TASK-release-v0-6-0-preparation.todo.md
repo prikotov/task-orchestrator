@@ -15,8 +15,8 @@ epic:
 author: Технический писатель Гермиона (pi)
 assignee: Технический писатель Гермиона (pi)
 branch: task/release-v0-6-0
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/383
+status: review
 ---
 
 # TASK-release-v0-6-0-preparation: Подготовить release PR для v0.6.0
