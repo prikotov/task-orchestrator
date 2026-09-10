@@ -441,6 +441,13 @@ roles:
 docs/agents/roles/team/data_engineer.ru.md
 ```
 
+Какая локализация роли выбирается, задаёт env `TASK_ORCHESTRATOR_LOCALE`
+(локаль AI-ролей; см. [AGENTS.md](../../AGENTS.md)). При заданном значении
+приоритет: `<role>.<locale>.md` → `<role>.md` → первый перевод `<role>.*.md`.
+Если переменная отсутствует или пуста: `<role>.md` → `<role>.en.md` →
+`<role>.ru.md` → `<role>.zh.md` → первый оставшийся `<role>.*.md`. Локаль
+Symfony-переводчика (`framework.default_locale`) на выбор role file не влияет.
+
 ### Шаг 2. Формат файла
 
 Файл — Markdown с описанием роли. Первая строка с `# ` используется как описание в CLI-выводе (`RolePromptBuilder::extractDescription`).

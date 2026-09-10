@@ -9,18 +9,13 @@ use TaskOrchestrator\Common\Module\AgentRole\Domain\Exception\RoleFileNotFoundEx
 use TaskOrchestrator\Common\Module\AgentRole\Domain\Service\LocateRoleFileServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRole\Domain\ValueObject\RoleNameVo;
 
-
-
-
-
-
-
 /**
  * Поиск файла роли в каталоге ролей (roles_dir) по имени роли.
  *
- * Учитывает локаль файла: предпочтение отдаётся `<role>.<locale>.md` (локаль
- * приложения из env APP_LOCALE), затем `<role>.md` (локаль-нейтральный), затем
- * любой `<role>.*.md` (первый найденный).
+ * При заданной локали предпочтение отдаётся `<role>.<locale>.md`, затем
+ * `<role>.md`, затем любому `<role>.*.md`. Без настроенной локали порядок:
+ * `<role>.md` → `<role>.en.md` → `<role>.ru.md` → `<role>.zh.md` → любой
+ * `<role>.*.md`.
  */
 final readonly class FilesystemLocateRoleFileService implements LocateRoleFileServiceInterface
 {
@@ -51,22 +46,29 @@ final readonly class FilesystemLocateRoleFileService implements LocateRoleFileSe
     }
 
     /**
-     * Кандидаты на файл роли в порядке приоритета:
-     *   1) `<role>.<locale>.md`  — текущая локаль приложения;
-     *   2) `<role>.md`           — локаль-нейтральный файл;
-     *   3) glob `<role>.*.md`    — любой доступный перевод (первый найденный).
-     *
      * @return list<string>
      */
     private function candidates(string $roleName): array
     {
-        $explicit = [
-            $this->rolesDir . '/' . $roleName . '.' . $this->locale . '.md',
-            $this->rolesDir . '/' . $roleName . '.md',
-        ];
+        $basePath = $this->rolesDir . '/' . $roleName;
+        $globbed = glob($basePath . '.*.md');
+        $translations = $globbed !== false ? $globbed : [];
 
-        $globbed = glob($this->rolesDir . '/' . $roleName . '.*.md');
+        if ($this->locale !== '') {
+            return array_values(array_unique(array_merge(
+                [$basePath . '.' . $this->locale . '.md', $basePath . '.md'],
+                $translations,
+            )));
+        }
 
-        return array_merge($explicit, $globbed !== false ? $globbed : []);
+        return array_values(array_unique(array_merge(
+            [
+                $basePath . '.md',
+                $basePath . '.en.md',
+                $basePath . '.ru.md',
+                $basePath . '.zh.md',
+            ],
+            $translations,
+        )));
     }
 }

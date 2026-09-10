@@ -14,14 +14,11 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Prompt\RoleProm
  * Путь к директории — параметр конструктора (specific to the bundle).
  *
  * Локаль файла роли берётся из DI-параметра `task_orchestrator.locale` (env
- * APP_LOCALE). Резолвинг файла эквивалентен логике {@see \TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemLocateRoleFileService}
- * (модуль AgentRole) на fallback-цепочке `<role>.<locale>.md` → `<role>.md`
- * (нейтральный) → любой доступный перевод `<role>.*.md` — единый env APP_LOCALE
- * управляет выбором role-файла во всех точках приложения.
- *
- * ⚠️ Эквивалентность гарантируется для двухбуквенных строчных локалей;
- * формальное расхождение на шаге 3 — см. {@see selectFileForRole()} и
- * {@see deriveFileLocale()}.
+ * TASK_ORCHESTRATOR_LOCALE). Резолвинг файла эквивалентен логике {@see \TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemLocateRoleFileService}
+ * (модуль AgentRole). При заданной локали цепочка имеет вид
+ * `<role>.<locale>.md` → `<role>.md` → любой перевод. Без настроенной локали:
+ * `<role>.md` → `<role>.en.md` → `<role>.ru.md` → `<role>.zh.md` → любой
+ * перевод.
  */
 final class RolePromptBuilderService implements RolePromptBuilderServiceInterface
 {
@@ -137,17 +134,40 @@ final class RolePromptBuilderService implements RolePromptBuilderServiceInterfac
     }
 
     /**
-     * Выбирает файл роли по fallback-цепочке, эквивалентной
-     * {@see \TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemLocateRoleFileService}
-     * в рамках проектной схемы именования локалей из двух строчных латинских букв
-     * (формальное расхождение на шаге 3 описано в PHPDoc класса):
-     *   1) `<role>.<locale>.md` — текущая локаль приложения;
-     *   2) `<role>.md` — локаль-нейтральный файл;
-     *   3) первый по glob-порядку `<role>.*.md` — любой доступный перевод.
-     *
      * @param list<array{path: string, locale: string|null}> $candidates
      */
     private function selectFileForRole(array $candidates, string $locale): string
+    {
+        if ($locale !== '') {
+            $localized = $this->findCandidateByLocale($candidates, $locale);
+            if ($localized !== null) {
+                return $localized;
+            }
+        }
+
+        $neutral = $this->findCandidateByLocale($candidates, null);
+        if ($neutral !== null) {
+            return $neutral;
+        }
+
+        if ($locale === '') {
+            foreach (['en', 'ru', 'zh'] as $fallbackLocale) {
+                $localized = $this->findCandidateByLocale($candidates, $fallbackLocale);
+                if ($localized !== null) {
+                    return $localized;
+                }
+            }
+        }
+
+        // Candidates непуст (получены из группировки по реально существующим
+        // файлам) — берём первый по glob-порядку.
+        return $candidates[0]['path'];
+    }
+
+    /**
+     * @param list<array{path: string, locale: string|null}> $candidates
+     */
+    private function findCandidateByLocale(array $candidates, ?string $locale): ?string
     {
         foreach ($candidates as $candidate) {
             if ($candidate['locale'] === $locale) {
@@ -155,15 +175,7 @@ final class RolePromptBuilderService implements RolePromptBuilderServiceInterfac
             }
         }
 
-        foreach ($candidates as $candidate) {
-            if ($candidate['locale'] === null) {
-                return $candidate['path'];
-            }
-        }
-
-        // Candidates непуст (получены из группировки по реально существующим
-        // файлам) — берём первый по glob-порядку.
-        return $candidates[0]['path'];
+        return null;
     }
 
     private function extractDescription(string $content): string

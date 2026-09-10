@@ -23,6 +23,17 @@ services:
   Psr\Clock\ClockInterface:
     alias: TaskOrchestrator\Common\Component\Clock\SystemClock
 
+  # --- Локаль AI-ролей (env TASK_ORCHESTRATOR_LOCALE) ---
+  # Env-процессор prefix `task_orchestrator_locale`: нормализует
+  # TASK_ORCHESTRATOR_LOCALE (default `en`, trim, lower-case) в runtime для
+  # динамического параметра task_orchestrator.locale (Kernel::getKernelParameters()).
+  # Потребители — модули AgentRole и ChainExecution; смена локали применяется
+  # без пересборки кеша контейнера. Тег только маркирует процессор: префикс
+  # объявляется в самом классе (getProvidedTypes()).
+  TaskOrchestrator\Common\Component\Locale\TaskOrchestratorLocaleEnvVarProcessor:
+    tags:
+      - { name: container.env_var_processor }
+
   # --- Use Case шины (CommandBus/QueryBus) ---
   # PHAR-safe: явные определения (без resource:). Аргумент $handlers (PSR-11
   # локатор «класс сообщения => сервис хендлера») проставляет UseCaseBusCompilerPass

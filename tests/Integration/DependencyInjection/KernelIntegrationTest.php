@@ -19,6 +19,11 @@ use TaskOrchestrator\Common\Kernel;
  *    уходят в хост, а package_dir/kernel.project_dir остаются на пакете (config/,
  *    bundles.php, modules.php грузятся из пакета);
  *  - кеш Composer-host изолирован от приложения и разделён по версии пакета;
+ *  - локаль AI-ролей (task_orchestrator.locale, env TASK_ORCHESTRATOR_LOCALE) —
+ *    runtime env-параметр: автоматический поиск при отсутствии значения,
+ *    независимость от APP_LOCALE и от локали Symfony-переводчика
+ *    (kernel.default_locale), смена локали без
+ *    очистки кеша при том же корне кеша;
  *  - Resource PHP-файлы (bridge модуля AgentRunner) исключены из auto-discovery
  *    сервисов (resource/exclude в config/services.yaml).
  *
@@ -111,25 +116,28 @@ final class KernelIntegrationTest extends TestCase
     }
 
     #[Test]
-    public function frameworkDefaultLocaleFallsBackToEnWhenAppLocaleUnset(): void
+    public function agentRoleLocaleUsesAutomaticSearchWhenTaskOrchestratorLocaleUnset(): void
     {
-        // Regression для '%env(default:en:APP_LOCALE)%': Symfony-процессор
-        // `default:fallback:VAR` трактует fallback как имя container-параметра, а не
-        // литерал, поэтому при чтении локали бросало "parameter 'en' not found".
-        // Фикс — idiomatic env-default: parameters.env(APP_LOCALE): en.
+        // Локаль AI-ролей (env TASK_ORCHESTRATOR_LOCALE) не задана →
+        // пустая локаль включает автоматический поиск доступного role file.
+        // Ранее regression для '%env(default:en:APP_LOCALE)%': Symfony-процессор
+        // `default:fallback:VAR` трактовал fallback как имя container-параметра,
+        // из-за чего чтение локали бросало "parameter 'en' not found". Нормализация
+        // default теперь в TaskOrchestratorLocaleEnvVarProcessor (заменил
+        // parameters.env(APP_LOCALE): en в translation.yaml).
         $cacheDir = $this->createIsolatedCacheDir();
         $_SERVER['APP_CACHE_DIR'] = $cacheDir;
-        $restore = $this->isolateEnvVar('APP_LOCALE', null);
+        $restore = $this->isolateEnvVar('TASK_ORCHESTRATOR_LOCALE', null);
 
         try {
             $kernel = new Kernel('test', false);
             $kernel->boot();
 
             $container = $kernel->getContainer();
-            // Не задано → дефолт 'en'.
+            // Локаль AI-ролей не задана → автоматический поиск.
+            self::assertSame('', $container->getParameter('task_orchestrator.locale'));
+            // Локаль Symfony-переводчика — независимая настройка (default `en`).
             self::assertSame('en', $container->getParameter('kernel.default_locale'));
-            // task_orchestrator.locale (Kernel, из $_SERVER напрямую) — тот же дефолт 'en'.
-            self::assertSame('en', $container->getParameter('task_orchestrator.locale'));
             // translator конструируется, читая локаль — раньше падал здесь.
             self::assertNotNull($container->get('translator'));
         } finally {
@@ -141,23 +149,92 @@ final class KernelIntegrationTest extends TestCase
     }
 
     #[Test]
-    public function frameworkDefaultLocaleFollowsAppLocaleEnv(): void
+    public function agentRoleLocaleFollowsTaskOrchestratorLocaleEnv(): void
     {
         $cacheDir = $this->createIsolatedCacheDir();
         $_SERVER['APP_CACHE_DIR'] = $cacheDir;
-        $restore = $this->isolateEnvVar('APP_LOCALE', 'ru');
+        $restore = $this->isolateEnvVar('TASK_ORCHESTRATOR_LOCALE', 'ru');
 
         try {
             $kernel = new Kernel('test', false);
             $kernel->boot();
 
-            self::assertSame('ru', $kernel->getContainer()->getParameter('kernel.default_locale'));
-            // task_orchestrator.locale следует APP_LOCALE (lower-case).
+            // Локаль AI-ролей следует TASK_ORCHESTRATOR_LOCALE (lower-case).
             self::assertSame('ru', $kernel->getContainer()->getParameter('task_orchestrator.locale'));
+            // Независимость: локаль Symfony-переводчика НЕ следует за локалью
+            // AI-ролей (framework.default_locale — отдельная настройка Symfony).
+            self::assertSame('en', $kernel->getContainer()->getParameter('kernel.default_locale'));
         } finally {
             $kernel->shutdown();
             unset($_SERVER['APP_CACHE_DIR']);
             $restore();
+            $this->removeDirectory($cacheDir);
+        }
+    }
+
+    #[Test]
+    public function appLocaleDoesNotAffectAgentRoleLocale(): void
+    {
+        // Regression скрытому fallback (резервному переходу) на APP_LOCALE:
+        // локаль host-проекта APP_LOCALE не является контрактом task-orchestrator
+        // и не влияет ни на локаль AI-ролей, ни на локаль Symfony-переводчика.
+        $cacheDir = $this->createIsolatedCacheDir();
+        $_SERVER['APP_CACHE_DIR'] = $cacheDir;
+        $restoreTaskLocale = $this->isolateEnvVar('TASK_ORCHESTRATOR_LOCALE', null);
+        $restoreAppLocale = $this->isolateEnvVar('APP_LOCALE', 'ru');
+
+        try {
+            $kernel = new Kernel('test', false);
+            $kernel->boot();
+
+            // Даже при APP_LOCALE=ru локаль AI-ролей остаётся в режиме автоматического поиска.
+            self::assertSame('', $kernel->getContainer()->getParameter('task_orchestrator.locale'));
+            // APP_LOCALE больше не влияет и на kernel.default_locale.
+            self::assertSame('en', $kernel->getContainer()->getParameter('kernel.default_locale'));
+        } finally {
+            $kernel->shutdown();
+            unset($_SERVER['APP_CACHE_DIR']);
+            $restoreAppLocale();
+            $restoreTaskLocale();
+            $this->removeDirectory($cacheDir);
+        }
+    }
+
+    #[Test]
+    public function agentRoleLocaleSwitchesOnNextBootWithoutCacheClearing(): void
+    {
+        // Stale-cache regression: task_orchestrator.locale — динамический
+        // env-параметр (%env()%), поэтому смена TASK_ORCHESTRATOR_LOCALE
+        // применяется при следующем запуске на ТОМ ЖЕ корне кеша — без ручной
+        // очистки скомпилированного контейнера (ранее значение запекалось в кеш
+        // и не менялось до удаления var/cache).
+        $cacheDir = $this->createIsolatedCacheDir();
+        $_SERVER['APP_CACHE_DIR'] = $cacheDir;
+
+        try {
+            // Первый запуск: компилирует и сохраняет контейнер с локалью en.
+            $restoreEn = $this->isolateEnvVar('TASK_ORCHESTRATOR_LOCALE', 'en');
+            $first = new Kernel('test', false);
+            $first->boot();
+            self::assertSame('en', $first->getContainer()->getParameter('task_orchestrator.locale'));
+            self::assertFileExists($cacheDir . '/test');
+            $first->shutdown();
+            $restoreEn();
+
+            // Кеш между запусками не удаляется.
+
+            // Второй запуск: тот же корень кеша, локаль ru — без очистки кеша.
+            $restoreRu = $this->isolateEnvVar('TASK_ORCHESTRATOR_LOCALE', 'ru');
+            try {
+                $second = new Kernel('test', false);
+                $second->boot();
+                self::assertSame('ru', $second->getContainer()->getParameter('task_orchestrator.locale'));
+                $second->shutdown();
+            } finally {
+                $restoreRu();
+            }
+        } finally {
+            unset($_SERVER['APP_CACHE_DIR']);
             $this->removeDirectory($cacheDir);
         }
     }

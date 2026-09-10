@@ -117,6 +117,31 @@ final class FilesystemLocateRoleFileServiceTest extends TestCase
     }
 
     #[Test]
+    public function emptyLocaleUsesDeterministicAutomaticSearchOrder(): void
+    {
+        // Arrange: неизвестный перевод `.de.md` сортируется раньше известных,
+        // но должен использоваться только после neutral/en/ru/zh.
+        $de = $this->writeRole('hero.de.md');
+        $en = $this->writeRole('hero.en.md');
+        $neutral = $this->writeRole('hero.md');
+        $ru = $this->writeRole('hero.ru.md');
+        $zh = $this->writeRole('hero.zh.md');
+        $locator = new FilesystemLocateRoleFileService($this->rolesDir, '');
+        $role = RoleNameVo::createFromName('hero');
+
+        // Act / Assert
+        self::assertSame($neutral, $locator->locate($role));
+        unlink($neutral);
+        self::assertSame($en, $locator->locate($role));
+        unlink($en);
+        self::assertSame($ru, $locator->locate($role));
+        unlink($ru);
+        self::assertSame($zh, $locator->locate($role));
+        unlink($zh);
+        self::assertSame($de, $locator->locate($role));
+    }
+
+    #[Test]
     public function locateThrowsWhenNoCandidateExists(): void
     {
         // Arrange

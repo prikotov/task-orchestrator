@@ -8,7 +8,7 @@
 
 `become-role.sh`:
 1. В Composer-host восстанавливает корень host-проекта по логическому пути установленного `.agents/skills/become-role`, даже если текущий каталог физически находится внутри `vendor/` после перехода по симлинку.
-2. Находит файл роли (`docs/agents/roles/team/<role>.ru.md` → `<role>.md` → любой `<role>.<locale>.md`) и выводит его **относительный путь** (от project root).
+2. Находит файл роли в `docs/agents/roles/team/`. Если env `TASK_ORCHESTRATOR_LOCALE` задана, приоритет: `<role>.<locale>.md` → `<role>.md` → любой доступный перевод. Если переменная отсутствует или пуста: `<role>.md` → `<role>.en.md` → `<role>.ru.md` → `<role>.zh.md` → первый оставшийся `<role>.*.md`. Выводит выбранный **относительный путь** (от project root).
 3. Вызывает `agent:role-skills`, который читает frontmatter роли (`skills:`), транзитивно разворачивает `depends_on` и формирует XML-блок `<available_skills>` (формат Agent Skills / pi): для каждого skill — `name`, `description`, абсолютный `location` его `SKILL.md`.
 
 Скрипт **не выводит содержимое роли** — только путь и XML-блок skills. Агент сам читает файл роли через `read` (получает личность: personality, экспертизу, стиль) и по описанию открывает нужный `SKILL.md` — только подходящий к задаче, не все сразу.

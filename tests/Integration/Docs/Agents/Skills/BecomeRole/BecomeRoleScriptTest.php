@@ -20,22 +20,26 @@ use Symfony\Component\Process\Process;
 #[CoversNothing]
 final class BecomeRoleScriptTest extends TestCase
 {
-    private function runScript(string $roleOrFile): Process
+    /**
+     * @param array<string, string> $env
+     */
+    private function runScript(string $roleOrFile, array $env = []): Process
     {
         $projectRoot = dirname(__DIR__, 6);
         $script = $projectRoot . '/docs/agents/skills/become-role/scripts/become-role.sh';
 
-        $process = new Process(['bash', $script, $roleOrFile], cwd: $projectRoot);
+        $process = new Process(['bash', $script, $roleOrFile], cwd: $projectRoot, env: $env);
         $process->run();
 
         return $process;
     }
 
     #[Test]
-    public function becomeRoleOutputsRolePathAndSkillsBlockForKnownRole(): void
+    public function withoutConfiguredLocaleFindsAvailableLocalizedRole(): void
     {
-        // Act
-        $process = $this->runScript('team_lead_alex');
+        // Act: пустая env эквивалентна отсутствующей настройке; роль существует
+        // только как локализованный `.ru.md` и всё равно должна быть найдена.
+        $process = $this->runScript('team_lead_alex', ['TASK_ORCHESTRATOR_LOCALE' => '']);
 
         // Assert
         self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
