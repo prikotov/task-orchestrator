@@ -15,8 +15,8 @@ epic:
 author: Бэкендер Левша (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/update-all-dependencies
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/381
+status: review
 ---
 
 # TASK-update-all-dependencies: Обновить все зависимости проекта
