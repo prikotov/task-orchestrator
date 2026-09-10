@@ -20,8 +20,9 @@ use TaskOrchestrator\Common\Kernel;
  *    bundles.php, modules.php грузятся из пакета);
  *  - кеш Composer-host изолирован от приложения и разделён по версии пакета;
  *  - локаль AI-ролей (task_orchestrator.locale, env TASK_ORCHESTRATOR_LOCALE) —
- *    runtime env-параметр: default `en`, независимость от APP_LOCALE и от
- *    локали Symfony-переводчика (kernel.default_locale), смена локали без
+ *    runtime env-параметр: автоматический поиск при отсутствии значения,
+ *    независимость от APP_LOCALE и от локали Symfony-переводчика
+ *    (kernel.default_locale), смена локали без
  *    очистки кеша при том же корне кеша;
  *  - Resource PHP-файлы (bridge модуля AgentRunner) исключены из auto-discovery
  *    сервисов (resource/exclude в config/services.yaml).
@@ -115,10 +116,10 @@ final class KernelIntegrationTest extends TestCase
     }
 
     #[Test]
-    public function agentRoleLocaleDefaultsToEnWhenTaskOrchestratorLocaleUnset(): void
+    public function agentRoleLocaleUsesAutomaticSearchWhenTaskOrchestratorLocaleUnset(): void
     {
         // Локаль AI-ролей (env TASK_ORCHESTRATOR_LOCALE) не задана →
-        // нейтральный default библиотеки `en` без чтения других env.
+        // пустая локаль включает автоматический поиск доступного role file.
         // Ранее regression для '%env(default:en:APP_LOCALE)%': Symfony-процессор
         // `default:fallback:VAR` трактовал fallback как имя container-параметра,
         // из-за чего чтение локали бросало "parameter 'en' not found". Нормализация
@@ -133,8 +134,8 @@ final class KernelIntegrationTest extends TestCase
             $kernel->boot();
 
             $container = $kernel->getContainer();
-            // Локаль AI-ролей: не задано → дефолт 'en'.
-            self::assertSame('en', $container->getParameter('task_orchestrator.locale'));
+            // Локаль AI-ролей не задана → автоматический поиск.
+            self::assertSame('', $container->getParameter('task_orchestrator.locale'));
             // Локаль Symfony-переводчика — независимая настройка (default `en`).
             self::assertSame('en', $container->getParameter('kernel.default_locale'));
             // translator конструируется, читая локаль — раньше падал здесь.
@@ -186,8 +187,8 @@ final class KernelIntegrationTest extends TestCase
             $kernel = new Kernel('test', false);
             $kernel->boot();
 
-            // Даже при APP_LOCALE=ru локаль AI-ролей остаётся нейтральным default `en`.
-            self::assertSame('en', $kernel->getContainer()->getParameter('task_orchestrator.locale'));
+            // Даже при APP_LOCALE=ru локаль AI-ролей остаётся в режиме автоматического поиска.
+            self::assertSame('', $kernel->getContainer()->getParameter('task_orchestrator.locale'));
             // APP_LOCALE больше не влияет и на kernel.default_locale.
             self::assertSame('en', $kernel->getContainer()->getParameter('kernel.default_locale'));
         } finally {

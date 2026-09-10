@@ -2,7 +2,7 @@
 type: refactor
 created: 2026-09-09 15:54:39 (1788969279)
 due: 
-started: 2026-09-10 01:17:43 (1789003063)
+started: 2026-09-10 02:07:50 (1789006070)
 completed: 2026-09-10 01:27:12 (1789003632)
 cancelled: 
 value: V3
@@ -16,7 +16,7 @@ author: Аналитик Шерлок (codex)
 assignee: Бэкендер Левша (codex)
 branch: task/refactor-task-orchestrator-locale
 pr: https://github.com/prikotov/task-orchestrator/pull/380
-status: done
+status: in_progress
 description: Заменить APP_LOCALE на отдельную переменную TASK_ORCHESTRATOR_LOCALE, независимую от framework.default_locale host-проекта; обеспечить runtime-переключение без очистки кеша и рабочий поиск существующего локализованного или нейтрального файла роли при отсутствующей настройке.
 ---
 
@@ -39,21 +39,21 @@ description: Заменить APP_LOCALE на отдельную перемен�
 > **Job Story:** Когда task-orchestrator установлен в host-project через Composer, я хочу задавать язык его AI-ролей отдельной переменной `TASK_ORCHESTRATOR_LOCALE`, чтобы локаль ролей не конфликтовала с локалью приложения и предсказуемо менялась без ручной очистки кеша.
 
 ### Цель по SMART (Goal)
-В рамках этой задачи заменить публичный контракт локали ролей с `APP_LOCALE` на `TASK_ORCHESTRATOR_LOCALE` во всех точках `AgentRole` и `ChainExecution`, сохранить default (значение по умолчанию) `en`, развязать его с `framework.default_locale`, устранить stale-cache (устаревший кеш) при смене локали и зафиксировать поведение модульными/интеграционными тестами, включая Composer-host regression test (регрессионный тест) `en` → `ru` при неизменном корне кеша.
+В рамках этой задачи заменить публичный контракт локали ролей с `APP_LOCALE` на `TASK_ORCHESTRATOR_LOCALE` во всех точках `AgentRole` и `ChainExecution`, в отсутствие настройки автоматически искать доступный файл роли (язык каталога навыков по умолчанию — `en`), развязать контракт с `framework.default_locale`, устранить stale-cache (устаревший кеш) при смене локали и зафиксировать поведение модульными/интеграционными тестами, включая Composer-host regression test (регрессионный тест) `en` → `ru` при неизменном корне кеша.
 
 ## 2. Контекст и Границы (Context and Scope)
 
 * **Где делаем:**
-  * [`src/Kernel.php`](../../src/Kernel.php) — получение и публикация `task_orchestrator.locale`, а также cache-sensitive (зависящее от кеша) поведение Kernel;
-  * [`src/Module/AgentRole/`](../../src/Module/AgentRole) — выбор локализованного role file и язык заголовков каталога skills;
-  * [`src/Module/ChainExecution/`](../../src/Module/ChainExecution) — выбор role file при построении prompt (запроса для AI);
-  * [`config/packages/translation.yaml`](../../config/packages/translation.yaml) — независимая стандартная настройка `framework.default_locale` task-orchestrator;
-  * [`tests/`](../../tests) — модульные, интеграционные и Composer-host regression tests;
-  * публичная документация и примеры окружения: [`AGENTS.md`](../../AGENTS.md), `README*.md`, [`docs/`](../../docs), [`.env.example`](../../.env.example), существующий `.env.dist` при его наличии, [`CHANGELOG.md`](../../CHANGELOG.md).
+  * [`src/Kernel.php`](../src/Kernel.php) — получение и публикация `task_orchestrator.locale`, а также cache-sensitive (зависящее от кеша) поведение Kernel;
+  * [`src/Module/AgentRole/`](../src/Module/AgentRole) — выбор локализованного role file и язык заголовков каталога skills;
+  * [`src/Module/ChainExecution/`](../src/Module/ChainExecution) — выбор role file при построении prompt (запроса для AI);
+  * [`config/packages/translation.yaml`](../config/packages/translation.yaml) — независимая стандартная настройка `framework.default_locale` task-orchestrator;
+  * [`tests/`](../tests) — модульные, интеграционные и Composer-host regression tests;
+  * публичная документация и примеры окружения: [`AGENTS.md`](../AGENTS.md), `README*.md`, [`docs/`](../docs), [`.env.example`](../.env.example), существующий `.env.dist` при его наличии, [`CHANGELOG.md`](../CHANGELOG.md).
 * **Текущее поведение:** `Kernel::resolveLocale()` читает `APP_LOCALE` с default `en` и сохраняет результат в `task_orchestrator.locale`; этот параметр внедряется в `AgentRole` и `ChainExecution`. Одновременно `config/packages/translation.yaml` назначает `APP_LOCALE` в `framework.default_locale`. При повторном запуске Composer-host с тем же cache root (корнем кеша) скомпилированный контейнер может сохранить прежний `task_orchestrator.locale` и выбрать прежний role file.
 * **Целевой контракт:**
   * `TASK_ORCHESTRATOR_LOCALE` — единственный источник локали AI-ролей для `AgentRole` и `ChainExecution`;
-  * незаданное или пустое значение даёт `en`, сохраняя текущую нормализацию регистра;
+  * незаданное или пустое значение включает автоматический поиск `<role>.md` → `<role>.en.md` → `<role>.ru.md` → `<role>.zh.md` → первый `<role>.*.md`; язык каталога навыков по умолчанию — `en`;
   * `APP_LOCALE` не является публичным контрактом task-orchestrator и не влияет на AI-роли;
   * `framework.default_locale` task-orchestrator настраивается независимо штатным механизмом Symfony и не подменяется локалью AI-ролей.
 * **Границы (Out of Scope):**
@@ -66,20 +66,20 @@ description: Заменить APP_LOCALE на отдельную перемен�
 ## 3. Требования, MoSCoW (Requirements)
 
 ### 🔴 Обязательно (Must Have)
-- [x] Ввести `TASK_ORCHESTRATOR_LOCALE` как документированный публичный параметр окружения с default `en` для языка role files и каталога skills.
-- [x] При отсутствующем или пустом `TASK_ORCHESTRATOR_LOCALE` не ограничивать поиск роли английским файлом: после приоритетных кандидатов находить существующий `.en.md`, `.ru.md`, `.zh.md`, другой локализованный файл или файл без суффикса; завершаться ошибкой только при полном отсутствии роли.
+- [x] Ввести `TASK_ORCHESTRATOR_LOCALE` как документированный публичный параметр окружения; язык каталога skills по умолчанию — `en`.
+- [x] При отсутствующем или пустом `TASK_ORCHESTRATOR_LOCALE` искать файл строго в порядке `<role>.md` → `<role>.en.md` → `<role>.ru.md` → `<role>.zh.md` → первый оставшийся `<role>.*.md`; завершаться ошибкой только при полном отсутствии роли.
 - [x] `task_orchestrator.locale`, `AgentRole` (включая выбор role file и форматирование каталога skills) и `ChainExecution` получают локаль из одного источника — `TASK_ORCHESTRATOR_LOCALE`.
 - [x] Удалить использование `APP_LOCALE` как контракта task-orchestrator: значение `APP_LOCALE` не должно влиять на `task_orchestrator.locale`, выбор role file или язык каталога skills.
-- [x] Не добавлять скрытый fallback (резервный переход) `TASK_ORCHESTRATOR_LOCALE` → `APP_LOCALE`. Отсутствующий или пустой `TASK_ORCHESTRATOR_LOCALE` приводит к `en`, даже если задан `APP_LOCALE`.
+- [x] Не добавлять скрытый fallback (резервный переход) `TASK_ORCHESTRATOR_LOCALE` → `APP_LOCALE`. Отсутствующий или пустой `TASK_ORCHESTRATOR_LOCALE` включает автоматический поиск, даже если задан `APP_LOCALE`.
 - [x] Оставить `framework.default_locale` собственного task-orchestrator независимой стандартной Symfony-настройкой; не направлять в неё `TASK_ORCHESTRATOR_LOCALE` и не описывать её как локаль AI-ролей.
 - [x] Исправить подтверждённый stale-cache баг: после запуска с `TASK_ORCHESTRATOR_LOCALE=en` следующий запуск с `TASK_ORCHESTRATOR_LOCALE=ru` выбирает `.ru.md` role file без ручной очистки кеша.
 - [x] Добавить Composer-host regression test, который использует один host-project и стабильный cache root, последовательно запускает task-orchestrator с локалями `en`, затем `ru`, и подтверждает смену реально выбранного role file/его содержимого на русскую версию.
 - [x] Тестом подтвердить согласованность `AgentRole` и `ChainExecution`: при одной `TASK_ORCHESTRATOR_LOCALE` обе точки выбирают одну локализованную версию роли.
-- [x] Тестами подтвердить default `en`, нормализацию поддерживаемого значения локали и отсутствие влияния `APP_LOCALE` на локаль ролей.
+- [x] Тестами подтвердить автоматический поиск при отсутствующей настройке, default `en` для каталога навыков, нормализацию заданной локали и отсутствие влияния `APP_LOCALE`.
 - [x] Явно оформить обратную совместимость как breaking configuration change (несовместимое изменение конфигурации): обновить migration note (указание по переходу) и запись в `CHANGELOG.md`, предписав заменить `APP_LOCALE` на `TASK_ORCHESTRATOR_LOCALE`; иной подход допустим только после отдельного согласования и с зафиксированным обоснованием в задаче.
-- [x] Выполнить фактический поиск по репозиторию и обновить активные упоминания контракта во всём коде, PHPDoc, комментариях, тестах, [`AGENTS.md`](../../AGENTS.md), `README*.md`, [`docs/`](../../docs), [`.env.example`](../../.env.example) и существующем `.env.dist`. Исторические упоминания допускаются только там, где они нужны для описания прежнего контракта или миграции и не выглядят как действующая инструкция.
-- [x] Обновить все затронутые примеры конфигурации: русское поведение задаётся `TASK_ORCHESTRATOR_LOCALE=ru`, а отсутствие переменной сохраняет английский default.
-- [x] Все изменения соответствуют [Конвенциям](../../docs/conventions/index.md); модульные границы и существующие публичные контракты, не относящиеся к локали, не меняются.
+- [x] Выполнить фактический поиск по репозиторию и обновить активные упоминания контракта во всём коде, PHPDoc, комментариях, тестах, [`AGENTS.md`](../AGENTS.md), `README*.md`, [`docs/`](../docs), [`.env.example`](../.env.example) и существующем `.env.dist`. Исторические упоминания допускаются только там, где они нужны для описания прежнего контракта или миграции и не выглядят как действующая инструкция.
+- [x] Обновить все затронутые примеры конфигурации: русское поведение задаётся `TASK_ORCHESTRATOR_LOCALE=ru`, а отсутствие переменной включает автоматический поиск и сохраняет английский язык каталога навыков.
+- [x] Все изменения соответствуют [Конвенциям](../docs/conventions/index.md); модульные границы и существующие публичные контракты, не относящиеся к локали, не меняются.
 
 ### 🟡 Желательно (Should Have)
 - [x] Названия тестов и поясняющие комментарии явно различают Symfony locale (локаль Symfony) и agent-role locale (локаль AI-ролей), чтобы связь не появилась повторно.
@@ -98,7 +98,7 @@ description: Заменить APP_LOCALE на отдельную перемен�
 ## 4. План реализации (Implementation Plan)
 
 1. [x] Выполнить `rg` по `APP_LOCALE`, `task_orchestrator.locale`, `framework.default_locale` и связанным описаниям локали; составить полный список затронутых точек до правок.
-2. [x] Обновить получение locale (локали) в собственном `Kernel`: `TASK_ORCHESTRATOR_LOCALE` с default `en`, без чтения `APP_LOCALE`; сохранить единый DI-параметр `task_orchestrator.locale` для `AgentRole` и `ChainExecution`.
+2. [x] Обновить получение locale (локали) в собственном `Kernel`: `TASK_ORCHESTRATOR_LOCALE` с автоматическим поиском при отсутствии значения, без чтения `APP_LOCALE`; сохранить единый DI-параметр `task_orchestrator.locale` для `AgentRole` и `ChainExecution`.
 3. [x] Развязать `config/packages/translation.yaml` и `framework.default_locale` с локалью AI-ролей, оставив штатную независимую Symfony-конфигурацию.
 4. [x] Устранить зависимость выбранной локали от stale compiled container (устаревшего скомпилированного контейнера) так, чтобы смена env при стабильном cache root применялась без ручной очистки; не ослаблять существующую изоляцию кеша Composer-host по версии пакета и окружению.
 5. [x] Обновить PHPDoc/комментарии и тесты `AgentRole`, `ChainExecution`, Kernel wiring (связывания Kernel), defaults (значений по умолчанию) и независимости от `APP_LOCALE`.
@@ -108,9 +108,9 @@ description: Заменить APP_LOCALE на отдельную перемен�
 
 ## 5. Критерии приёмки (Definition of Done)
 
-- [x] При незаданном `TASK_ORCHESTRATOR_LOCALE` обе подсистемы используют default `en`, но находят роль в другом переводе или без суффикса, если английского файла нет.
+- [x] При незаданном `TASK_ORCHESTRATOR_LOCALE` обе подсистемы выбирают первый существующий файл в порядке `<role>.md` → `<role>.en.md` → `<role>.ru.md` → `<role>.zh.md` → первый оставшийся `<role>.*.md`.
 - [x] При `TASK_ORCHESTRATOR_LOCALE=ru` `AgentRole` и `ChainExecution` выбирают соответствующий `<role>.ru.md`, а каталог skills использует русские локализованные заголовки.
-- [x] При заданном только `APP_LOCALE=ru` локаль AI-ролей остаётся `en`; скрытого fallback нет.
+- [x] При заданном только `APP_LOCALE=ru` локаль AI-ролей остаётся в режиме автоматического поиска; скрытого fallback нет.
 - [x] `TASK_ORCHESTRATOR_LOCALE` не изменяет `kernel.default_locale`, а стандартная Symfony-локаль не изменяет `task_orchestrator.locale` и выбор role file.
 - [x] Composer-host regression test воспроизводит два последовательных запуска `en` → `ru` с одинаковыми host root и cache root и проходит без удаления кеша между запусками.
 - [x] Тест проверяет наблюдаемый результат: после смены env выбран русский role file/русское уникальное содержимое, а не только новое значение параметра.
@@ -132,7 +132,7 @@ php vendor/bin/todo-md validate todo/TASK-refactor-task-orchestrator-locale.todo
 
 ## 7. Риски и зависимости (Risks and Dependencies)
 
-- **Breaking change:** host-project, который задавал `APP_LOCALE` ради русских AI-ролей, после обновления получит default `en`, пока не перейдёт на `TASK_ORCHESTRATOR_LOCALE=ru`. Это намеренное подтверждённое изменение; скрытая совместимость запрещена.
+- **Breaking change:** `APP_LOCALE` больше не выбирает русские AI-роли. Без `TASK_ORCHESTRATOR_LOCALE` применяется автоматический поиск файлов, а для гарантированного русского поведения требуется `TASK_ORCHESTRATOR_LOCALE=ru`. Это намеренное подтверждённое изменение; скрытая совместимость запрещена.
 - **Stale compiled container:** простая замена имени env в `Kernel::resolveLocale()` не гарантирует исправления, если значение по-прежнему запекается в кеш контейнера. Приёмка требует проверки второго запуска на том же кеше.
 - **Ложноположительный тест:** проверка только `task_orchestrator.locale` может пройти, не доказав смену role file. Нужна проверка пути или различимого содержимого выбранного файла через реальную точку Composer-host.
 - **Два потребителя локали:** `AgentRole` и `ChainExecution` имеют отдельную логику выбора файлов; изменение только одной подсистемы создаст расхождение между `become-role` и orchestration (оркестрацией).
@@ -142,13 +142,13 @@ php vendor/bin/todo-md validate todo/TASK-refactor-task-orchestrator-locale.todo
 
 ## 8. Источники (Sources)
 
-- [Kernel и текущий источник локали](../../src/Kernel.php)
-- [Symfony translation configuration](../../config/packages/translation.yaml)
-- [AgentRole service wiring](../../src/Module/AgentRole/Resource/config/services.yaml)
-- [ChainExecution service wiring](../../src/Module/ChainExecution/Resource/config/services.yaml)
-- [Текущие Kernel integration tests](../../tests/Integration/DependencyInjection/KernelIntegrationTest.php)
-- [Публичные инструкции проекта](../../AGENTS.md)
-- [Конвенции проекта](../../docs/conventions/index.md)
+- [Kernel и текущий источник локали](../src/Kernel.php)
+- [Symfony translation configuration](../config/packages/translation.yaml)
+- [AgentRole service wiring](../src/Module/AgentRole/Resource/config/services.yaml)
+- [ChainExecution service wiring](../src/Module/ChainExecution/Resource/config/services.yaml)
+- [Текущие Kernel integration tests](../tests/Integration/DependencyInjection/KernelIntegrationTest.php)
+- [Публичные инструкции проекта](../AGENTS.md)
+- [Конвенции проекта](../docs/conventions/index.md)
 
 ## 9. Комментарии (Comments)
 
@@ -161,6 +161,7 @@ php vendor/bin/todo-md validate todo/TASK-refactor-task-orchestrator-locale.todo
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-09-09 15:54:39 (1788969279) | Аналитик Шерлок (codex) | Создание и полная формулировка задачи по подтверждённому решению пользователя |
+| 2026-09-10 | Бэкендер Левша (codex) | Финальное уточнение автоматического поиска по указанию пользователя: при пустом `TASK_ORCHESTRATOR_LOCALE` порядок строго `<role>.md` → `<role>.en.md` → `<role>.ru.md` → `<role>.zh.md` → первый оставшийся `<role>.*.md`; пустое значение параметра отличает этот режим от явно заданного `en`; язык каталога навыков сохраняет fallback на `en`. Оба локатора покрыты тестами полного порядка. |
 | 2026-09-10 | Бэкендер Левша (codex) | Доработка по minor-замечаниям ревью: (1) `ComposerHostLocaleRegressionTest` — исправлены 14 новых PHPCS-ошибок в `isolateEnvVar` (вызовы глобальных функций `array_key_exists`/`getenv`/`putenv` без ведущего бэкслеша, автофикс PHPCBF), существующий долг вне diff не тронут; (2) `docs/agents/skills/become-role/README.md` — устаревший hardcoded-приоритет `<role>.ru.md` заменён на актуальный контракт: `<role>.<locale>.md` под локаль AI-ролей из env `TASK_ORCHESTRATOR_LOCALE` (default `en`) → локаль-нейтральный `<role>.md` → любой доступный перевод (соответствует `FilesystemLocateRoleFileService` и обновлённому `AGENTS.md`). Проверки: PHPCS по тесту чист; целевые тесты (`ComposerHostLocaleRegressionTest` + `KernelIntegrationTest` + `tests/Unit/Component/Locale/`) — OK (16 тестов, 64 assertions); полный `make check` зелёный (PHPUnit 1525 / 2 штатных skip, validate-language warning mode только в исторических release-планах). Постановка задачи не менялась. |
 | 2026-09-10 | Бэкендер Левша (codex) | Уточнение после обратной связи: удалено ошибочно добавленное определение локали из суффикса переданного пути; подтверждён исходный алгоритм поиска `<role>.<locale>.md` → `<role>.md` → любой `<role>.*.md`; интеграционный тест `become-role` теперь явно запускается с пустым `TASK_ORCHESTRATOR_LOCALE` и подтверждает успешную загрузку роли, доступной только как `.ru.md`. |
 | 2026-09-10 | Бэкендер Левша (codex) | Реализация: `TaskOrchestratorLocaleEnvVarProcessor` (env `TASK_ORCHESTRATOR_LOCALE`, default `en`, trim + lower-case, без fallback на `APP_LOCALE`) как сквозной компонент `src/Component/Locale/`; `Kernel::getKernelParameters()` задаёт `task_orchestrator.locale` runtime-env-плейсхолдером `%env(task_orchestrator_locale:TASK_ORCHESTRATOR_LOCALE)%` (значение не запекается в скомпилированный контейнер); `Kernel::resolveLocale()` удалён; `config/packages/translation.yaml` — независимый `framework.default_locale: en` без env; PHPDoc/комментарии `AgentRole`/`ChainExecution` обновлены. Тесты: `TaskOrchestratorLocaleEnvVarProcessorTest` (unit, контракт нормализации), `KernelIntegrationTest` (default/follow/независимость от `APP_LOCALE`/смена без очистки кеша), `ComposerHostLocaleRegressionTest` (один host root + стабильный cache root, два последовательных запуска `en`→`ru`, наблюдаемый role file обеих подсистем + язык каталога skills + уникальные маркеры содержимого). Документация: `AGENTS.md`, `.env.example`, `docs/guide/extension.md` (шаг «Добавление новой роли»), `CHANGELOG.md` (два breaking change + stale-cache фикс + migration note). Опциональный отдельный тест «`framework.default_locale` не меняет role file» не потребовался: независимость в обоих направлениях уже доказана комбинацией `agentRoleLocaleFollowsTaskOrchestratorLocaleEnv` (при `kernel.default_locale=en` и `TASK_ORCHESTRATOR_LOCALE=ru` локаль ролей `ru`) и Composer-host regression (наблюдаемый файл). Проверки: `make check` зелёный (PHPStan, Deptrac, Psalm, PHPMD, PHPCS, md-links, validate-todo, validate-roles, validate-language — warning mode только в исторических release-планах, PHPUnit 1525 тестов / 2 штатных skip PharSmokeScriptTest при локальном Box); ручная верификация runtime: скомпилированный prod-контейнер содержит `'task_orchestrator.locale' => $container->getEnv('task_orchestrator_locale:TASK_ORCHESTRATOR_LOCALE')` (не литерал); изолированный host в env `prod`/debug=false — смена `en`→`ru` на том же корне кеша меняет параметр и выбранный файл обеих подсистем; физический Composer-host (`vendor/bin/task-orchestrator`, path repository без symlink) — то же через CLI `agent:role-skills`; `bin/composer-host-smoke` — OK. Остаточные `APP_LOCALE`: только миграционные/исторические (CHANGELOG [Unreleased] миграция, [0.3.0] история; `docs/releases/v0.3.0`; текст самой задачи; `todo/done/*` архив; отрицательные regression-упоминания в тестах/PHPDoc) — действующих инструкций нет. `.env.dist` в репозитории отсутствует. |

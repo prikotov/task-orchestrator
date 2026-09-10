@@ -193,8 +193,8 @@ class Kernel extends BaseKernel
         // env-плейсхолдером: в скомпилированном контейнере параметр остаётся
         // динамическим (Container::getEnv() при обращении), поэтому смена
         // TASK_ORCHESTRATOR_LOCALE применяется при следующем запуске БЕЗ очистки
-        // кеша при том же корне кеша. Нормализация контракта (default `en` при
-        // незаданной/пустой переменной, trim, lower-case) — единая точка
+        // кеша при том же корне кеша. Нормализация контракта (пустая auto-локаль
+        // при незаданной/пустой переменной, trim, lower-case) — единая точка
         // TaskOrchestratorLocaleEnvVarProcessor; fallback на APP_LOCALE
         // отсутствует намеренно. Локаль Symfony-переводчика (framework.
         // default_locale в config/packages/translation.yaml) независима от

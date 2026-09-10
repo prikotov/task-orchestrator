@@ -13,8 +13,9 @@ use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
  *
  * Единая точка контракта env TASK_ORCHESTRATOR_LOCALE — локали AI-ролей
  * (role files, каталог skills):
- *  - переменная не задана или пустая → default `en` (нейтральный default
- *    библиотеки). Скрытый fallback (резервный переход) на APP_LOCALE отсутствует
+ *  - переменная не задана или пустая → пустая строка (автоматический поиск
+ *    доступного role file). Язык каталога skills при этом использует default
+ *    `en`. Скрытый fallback (резервный переход) на APP_LOCALE отсутствует
  *    намеренно: APP_LOCALE не является контрактом task-orchestrator;
  *  - любое другое значение → trim + lower-case (нормализация регистра локали).
  *
@@ -31,20 +32,18 @@ final class TaskOrchestratorLocaleEnvVarProcessor implements EnvVarProcessorInte
     /** Имя переменной окружения — публичный контракт локали AI-ролей. */
     public const string ENV_NAME = 'TASK_ORCHESTRATOR_LOCALE';
 
-    private const string DEFAULT_LOCALE = 'en';
-
     #[Override]
     public function getEnv(string $prefix, string $name, \Closure $getEnv): mixed
     {
         try {
             $raw = $getEnv($name);
         } catch (EnvNotFoundException) {
-            return self::DEFAULT_LOCALE;
+            return '';
         }
 
         $locale = is_string($raw) ? trim($raw) : '';
 
-        return $locale === '' ? self::DEFAULT_LOCALE : strtolower($locale);
+        return strtolower($locale);
     }
 
     /**

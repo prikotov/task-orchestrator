@@ -137,6 +137,33 @@ final class RolePromptBuilderServiceTest extends TestCase
     }
 
     #[Test]
+    public function emptyLocaleUsesDeterministicAutomaticSearchOrder(): void
+    {
+        // Arrange: каждая роль проверяет следующий шаг цепочки
+        // neutral → en → ru → zh → первый иной перевод.
+        $this->writeRole('neutral.de.md', "# Neutral DE\n\nde");
+        $this->writeRole('neutral.en.md', "# Neutral EN\n\nen");
+        $this->writeRole('neutral.md', "# Neutral\n\nneutral");
+        $this->writeRole('english.de.md', "# English DE\n\nde");
+        $this->writeRole('english.en.md', "# English EN\n\nen");
+        $this->writeRole('english.ru.md', "# English RU\n\nru");
+        $this->writeRole('russian.de.md', "# Russian DE\n\nde");
+        $this->writeRole('russian.ru.md', "# Russian RU\n\nru");
+        $this->writeRole('russian.zh.md', "# Russian ZH\n\nzh");
+        $this->writeRole('chinese.de.md', "# Chinese DE\n\nde");
+        $this->writeRole('chinese.zh.md', "# Chinese ZH\n\nzh");
+        $this->writeRole('other.de.md', "# Other DE\n\nde");
+        $builder = new RolePromptBuilderService($this->rolesDir, $this->basePath, '');
+
+        // Act / Assert
+        self::assertStringEndsWith('neutral.md', $builder->getPromptFilePath('neutral'));
+        self::assertStringEndsWith('english.en.md', $builder->getPromptFilePath('english'));
+        self::assertStringEndsWith('russian.ru.md', $builder->getPromptFilePath('russian'));
+        self::assertStringEndsWith('chinese.zh.md', $builder->getPromptFilePath('chinese'));
+        self::assertStringEndsWith('other.de.md', $builder->getPromptFilePath('other'));
+    }
+
+    #[Test]
     public function localeIsNormalizedToLowerCase(): void
     {
         // Arrange: локаль 'RU' нормализуется → находит .ru.md.

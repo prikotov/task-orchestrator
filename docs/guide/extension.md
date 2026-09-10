@@ -442,10 +442,11 @@ docs/agents/roles/team/data_engineer.ru.md
 ```
 
 Какая локализация роли выбирается, задаёт env `TASK_ORCHESTRATOR_LOCALE`
-(локаль AI-ролей, default `en`; см. [AGENTS.md](../../AGENTS.md)). Приоритет:
-`<role>.<locale>.md` → `<role>.md` (локаль-нейтральный) → первый найденный
-перевод `<role>.*.md`. Локаль Symfony-переводчика (`framework.default_locale`)
-на выбор role file не влияет.
+(локаль AI-ролей; см. [AGENTS.md](../../AGENTS.md)). При заданном значении
+приоритет: `<role>.<locale>.md` → `<role>.md` → первый перевод `<role>.*.md`.
+Если переменная отсутствует или пуста: `<role>.md` → `<role>.en.md` →
+`<role>.ru.md` → `<role>.zh.md` → первый оставшийся `<role>.*.md`. Локаль
+Symfony-переводчика (`framework.default_locale`) на выбор role file не влияет.
 
 ### Шаг 2. Формат файла
 

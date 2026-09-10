@@ -14,8 +14,8 @@ use TaskOrchestrator\Common\Component\Locale\TaskOrchestratorLocaleEnvVarProcess
  * Unit-тест контракта env TASK_ORCHESTRATOR_LOCALE (нормализация локали
  * AI-ролей) в {@see TaskOrchestratorLocaleEnvVarProcessor}.
  *
- * Покрывает default `en` при незаданной/пустой переменной, trim и нормализацию
- * регистра. Отдельный regression-контракт: процессор НЕ читает APP_LOCALE —
+ * Покрывает пустую auto-локаль при незаданной/пустой переменной, trim и
+ * нормализацию регистра. Отдельный regression-контракт: процессор НЕ читает APP_LOCALE —
  * fallback на локаль host-проекта отсутствует по дизайну.
  */
 #[CoversClass(TaskOrchestratorLocaleEnvVarProcessor::class)]
@@ -30,11 +30,11 @@ final class TaskOrchestratorLocaleEnvVarProcessorTest extends TestCase
     }
 
     #[Test]
-    public function missingEnvYieldsNeutralDefaultEn(): void
+    public function missingEnvYieldsEmptyAutoLocale(): void
     {
-        // Переменная не задана → нейтральный default библиотеки `en`.
+        // Переменная не задана → автоматический поиск доступного файла роли.
         self::assertSame(
-            'en',
+            '',
             $this->processor->getEnv(
                 TaskOrchestratorLocaleEnvVarProcessor::ENV_PREFIX,
                 TaskOrchestratorLocaleEnvVarProcessor::ENV_NAME,
@@ -44,11 +44,11 @@ final class TaskOrchestratorLocaleEnvVarProcessorTest extends TestCase
     }
 
     #[Test]
-    public function blankEnvYieldsNeutralDefaultEn(): void
+    public function blankEnvYieldsEmptyAutoLocale(): void
     {
         // Пустая строка и строка из пробелов эквивалентны незаданной переменной.
-        self::assertSame('en', $this->resolveRaw(''));
-        self::assertSame('en', $this->resolveRaw('   '));
+        self::assertSame('', $this->resolveRaw(''));
+        self::assertSame('', $this->resolveRaw('   '));
     }
 
     #[Test]
@@ -61,12 +61,12 @@ final class TaskOrchestratorLocaleEnvVarProcessorTest extends TestCase
     }
 
     #[Test]
-    public function nonStringValueYieldsNeutralDefaultEn(): void
+    public function nonStringValueYieldsEmptyAutoLocale(): void
     {
-        // Строгость к неожидаемому типу: локаль ролей — всегда строка `en`
-        // вместо неявного приведения типов.
-        self::assertSame('en', $this->resolveRaw(null));
-        self::assertSame('en', $this->resolveRaw(true));
+        // Строгость к неожиданному типу: автоматический поиск вместо неявного
+        // приведения типов.
+        self::assertSame('', $this->resolveRaw(null));
+        self::assertSame('', $this->resolveRaw(true));
     }
 
     #[Test]
