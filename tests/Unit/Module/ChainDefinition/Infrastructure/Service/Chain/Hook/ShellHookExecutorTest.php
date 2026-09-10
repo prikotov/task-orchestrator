@@ -201,7 +201,7 @@ final class ShellHookExecutorTest extends TestCase
         $this->logger->expects($this->atLeastOnce())
             ->method('warning')
             ->with(
-                $this->isType('string'),
+                self::isString(),
                 $this->callback(fn(array $ctx) => isset($ctx['exitCode']) && $ctx['exitCode'] === 1),
             );
 
