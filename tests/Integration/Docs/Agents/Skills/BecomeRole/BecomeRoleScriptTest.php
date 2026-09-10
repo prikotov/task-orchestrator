@@ -20,12 +20,15 @@ use Symfony\Component\Process\Process;
 #[CoversNothing]
 final class BecomeRoleScriptTest extends TestCase
 {
-    private function runScript(string $roleOrFile): Process
+    /**
+     * @param array<string, string> $env
+     */
+    private function runScript(string $roleOrFile, array $env = []): Process
     {
         $projectRoot = dirname(__DIR__, 6);
         $script = $projectRoot . '/docs/agents/skills/become-role/scripts/become-role.sh';
 
-        $process = new Process(['bash', $script, $roleOrFile], cwd: $projectRoot);
+        $process = new Process(['bash', $script, $roleOrFile], cwd: $projectRoot, env: $env);
         $process->run();
 
         return $process;
@@ -67,6 +70,25 @@ final class BecomeRoleScriptTest extends TestCase
 
         self::assertStringContainsString('Роль: team_lead_alex', $output);
         self::assertStringContainsString('<available_skills>', $output);
+    }
+
+    #[Test]
+    public function localizedRoleFileDefinesLocaleWhenEnvironmentIsEmpty(): void
+    {
+        // Arrange: пустая env эквивалентна отсутствующей настройке. Суффикс
+        // явного role-file должен управлять и выбором файла, и языком каталога.
+        $roleFile = 'docs/agents/roles/team/team_lead_alex.ru.md';
+
+        // Act
+        $process = $this->runScript($roleFile, ['TASK_ORCHESTRATOR_LOCALE' => '']);
+
+        // Assert: явный локализованный файл служит подсказкой локали ru.
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        self::assertStringContainsString('Файл роли: ' . $roleFile, $process->getOutput());
+        self::assertStringContainsString(
+            'Следующие skills предоставляют специализированные инструкции',
+            $process->getOutput(),
+        );
     }
 
     #[Test]

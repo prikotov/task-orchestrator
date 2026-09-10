@@ -12,7 +12,9 @@
 #
 # Поиск role-file делегирован в PHP (bin/task-orchestrator agent:role-skills):
 # это работает и в самом task-orchestrator, и в host-проекте — локатор корректно
-# резолвит host-роли через Kernel.
+# резолвит host-роли через Kernel. Если передан локализованный файл роли, а env
+# TASK_ORCHESTRATOR_LOCALE не задан, суффикс файла используется как подсказка
+# локали (`role.ru.md` → `ru`).
 #
 # Exit: 0 — успех; 1 — роль не найдена или ошибка получения skills.
 
@@ -50,25 +52,52 @@ role_name_from_file() {
     echo "$name"
 }
 
+role_locale_from_file() {
+    local name
+    name="$(basename "$1")"
+
+    if [[ "$name" =~ \.([a-z][a-z])\.md$ ]]; then
+        echo "${BASH_REMATCH[1]}"
+    fi
+}
+
+ROLE_FILE=""
 if [[ -f "$ARG" ]]; then
-    ROLE_NAME="$(role_name_from_file "$ARG")"
+    ROLE_FILE="$ARG"
 elif [[ -n "$PROJECT_ROOT" && -f "$PROJECT_ROOT/$ARG" ]]; then
-    ROLE_NAME="$(role_name_from_file "$PROJECT_ROOT/$ARG")"
-else
-    ROLE_NAME="$ARG"
+    ROLE_FILE="$PROJECT_ROOT/$ARG"
 fi
 
-run_role_skills() {
-    if [[ -n "$PROJECT_ROOT" ]]; then
-        (
-            cd "$PROJECT_ROOT"
+if [[ -n "$ROLE_FILE" ]]; then
+    ROLE_NAME="$(role_name_from_file "$ROLE_FILE")"
+    ROLE_FILE_LOCALE="$(role_locale_from_file "$ROLE_FILE")"
+else
+    ROLE_NAME="$ARG"
+    ROLE_FILE_LOCALE=""
+fi
+
+run_role_skills_command() {
+    if [[ -z "${TASK_ORCHESTRATOR_LOCALE:-}" && -n "$ROLE_FILE_LOCALE" ]]; then
+        TASK_ORCHESTRATOR_LOCALE="$ROLE_FILE_LOCALE" \
             "$TASK_ORCH_BIN" agent:role-skills "$ROLE_NAME" --format=json
-        )
 
         return
     fi
 
     "$TASK_ORCH_BIN" agent:role-skills "$ROLE_NAME" --format=json
+}
+
+run_role_skills() {
+    if [[ -n "$PROJECT_ROOT" ]]; then
+        (
+            cd "$PROJECT_ROOT"
+            run_role_skills_command
+        )
+
+        return
+    fi
+
+    run_role_skills_command
 }
 
 # agent:role-skills через bin/task-orchestrator (host-aware). --format=json:
