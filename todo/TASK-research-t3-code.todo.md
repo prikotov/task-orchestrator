@@ -15,8 +15,8 @@ epic: EPIC-research-orchestration-articles
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-t3-code
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/385
+status: review
 ---
 
 # TASK-research-t3-code: T3 Code (pingdotgg): кейс оркестрации агент-харнесов (BYO harness, branch-per-thread, one-button PR)

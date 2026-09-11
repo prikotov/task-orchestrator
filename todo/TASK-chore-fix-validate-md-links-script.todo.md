@@ -15,8 +15,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Бэкендер (Тони)
 branch: task/research-t3-code
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/385
+status: review
 ---
 
 # TASK-chore-fix-validate-md-links-script: Починить битый composer-скрипт validate-md-links (CR-4 из ревью TASK-research-t3-code)
