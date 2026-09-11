@@ -97,6 +97,7 @@ flowchart LR
 ### Этап 1: Индивидуальные исследования (параллельные)
 
 - [x] [TASK-research-orchestrator-tax](done/TASK-research-orchestrator-tax.todo.md) — Martin Fowler «Orchestrator Tax» (https://martinfowler.com/articles/orchestrator-tax.html). Overhead от централизованной оркестрации, альтернативы (choreography), когда стоит платить цену.
+- [ ] [TASK-research-t3-code](TASK-research-t3-code.todo.md) — T3 Code (pingdotgg) «agent harness control surface» (https://t3.codes, https://github.com/pingdotgg/t3code). Кейс оркестрации агент-харнесов: BYO harness, branch-per-thread, one-button PR, switch mid-thread, remote control.
 
 ### Этап 2: Сводный анализ (после завершения серии исследований)
 
@@ -130,3 +131,4 @@ flowchart LR
 | :--- | :--- | :--- |
 | 2026-07-29 | Тимлид (Алекс) | Создание эпика. Четвёртый ресерч-трек: статьи по оркестрации (patterns, anti-patterns). Первая задача — TASK-research-orchestrator-tax. |
 | 2026-08-16 | Бэкендер Левша (pi) | Миграция на формат todo-md 0.0.10: файл переименован в `EPIC-*.todo.md`, статус `pending` → `todo`, добавлены разделы Human Brief и поле `pr`, формат author/assignee приведён к виду «Роль (агент)». |
+| 2026-09-11 | Тимлид (Алекс) | Добавлена задача TASK-research-t3-code (предложена пользователем): T3 Code — оркестратор агент-харнесов (BYO harness, branch-per-thread, one-button PR, remote control). Продукт/репозиторий как первоисточник паттернов — прецедент TASK-research-agents-crew. |
