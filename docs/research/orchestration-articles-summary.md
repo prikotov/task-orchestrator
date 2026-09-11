@@ -1,9 +1,7 @@
 # Orchestration Articles — сводная таблица исследований
 
-*Исследование T3 Code (2026-09-11) перенесено в продуктовый трек [EPIC-research-agent-frameworks-comparison](../../todo/EPIC-research-agent-frameworks-comparison.todo.md) — продукт, а не статья.*
-
 **Дата создания:** 2026-07-29  
-**Дата обновления:** 2026-07-29 (1 исследование)<br>
+**Дата обновления:** 2026-07-29 (1 исследование)  
 **Эпик:** [EPIC-research-orchestration-articles](../../todo/EPIC-research-orchestration-articles.todo.md)  
 **Автор:** Аналитик (Шерлок)
 
