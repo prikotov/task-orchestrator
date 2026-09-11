@@ -3,7 +3,7 @@ type: docs
 created: 2026-09-11 14:20:00 (1789136400)
 due: 
 started: 2026-09-11 14:25:00 (1789136700)
-completed: 
+completed: 2026-09-11 23:43:06 (1789170186)
 cancelled: 
 value: V2
 complexity: C1
@@ -16,7 +16,7 @@ author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/epic-frameworks-evergreen
 pr: https://github.com/prikotov/task-orchestrator/pull/386
-status: review
+status: done
 ---
 
 # TASK-docs-frameworks-epic-evergreen: Закрепить evergreen-режим эпика EPIC-research-agent-frameworks-comparison
