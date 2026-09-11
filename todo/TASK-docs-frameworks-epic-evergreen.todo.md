@@ -15,8 +15,8 @@ epic:
 author: Тимлид (Алекс)
 assignee: Технический писатель (Гермиона)
 branch: task/epic-frameworks-evergreen
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/386
+status: review
 ---
 
 # TASK-docs-frameworks-epic-evergreen: Закрепить evergreen-режим эпика EPIC-research-agent-frameworks-comparison
