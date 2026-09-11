@@ -7,13 +7,24 @@ complexity: C4
 priority: P2
 author: Тимлид (Алекс)
 assignee:
-branch: task/research-agent-frameworks-comparison
-status: done
-reopened: 2026-08-29
+branch: task/research-t3-code
+status: in_progress
+reopened: 2026-09-11
 pr: "#51 (исследование), #52 (ревью и исправления), #97 (Paperclip AI + AgentCraft, финализация), #340 (Herdr; замена #339)"
 ---
 
 # EPIC-research-agent-frameworks-comparison: Исследование AI-agent фреймворков и оркестраторов
+
+## 0. Простое описание (Human Brief)
+
+### Проблема простыми словами (Problem)
+Архитектурные решения task-orchestrator требуют систематического сравнения с существующими AI-agent фреймворками и оркестраторами.
+
+### Варианты или путь решения (Solution Sketch)
+Исследовать продукты по единой методологии, подготовить отдельные comparison-отчёты и свести применимые паттерны в общую таблицу.
+
+### Ожидаемый результат (Expected Result)
+Для каждого исследованного продукта зафиксированы архитектурные характеристики, применимость и вердикт для task-orchestrator.
 
 ## 1. Concept and Goal (Концепция и цель)
 ### Story (Job Story)
@@ -69,81 +80,82 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 
 ### Этап 1: Индивидуальные исследования (параллельные)
 
-- [x] [TASK-research-charmbracelet-crush](TASK-research-charmbracelet-crush.todo.md) — Charmbracelet Crush (Go, CLI-agent)
-- [x] [TASK-research-pi-agent-rust](TASK-research-pi-agent-rust.todo.md) — pi_agent_rust (Rust)
-- [x] [TASK-research-crewai-langgraph-autogen](TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
-- [x] [TASK-research-openhands-sdk](TASK-research-openhands-sdk.todo.md) — OpenHands SDK (Python, SDK-подход)
-- [x] [TASK-research-archon-ai-planner](TASK-research-archon-ai-planner.todo.md) — Archon (Python, мета-оркестрация)
-- [x] [TASK-research-metagpt-openclaw](TASK-research-metagpt-openclaw.todo.md) — MetaGPT, OpenClaw (Python, SOP/роли)
-- [x] [TASK-research-mastra-ai](TASK-research-mastra-ai.todo.md) — Mastra AI (TypeScript, workflows)
-- [x] [TASK-research-claude-code](TASK-research-claude-code.todo.md) — Claude Code (проприетарный, agent loop)
-- [x] [TASK-research-copilot-agent-hq](TASK-research-copilot-agent-hq.todo.md) — GitHub Copilot Agent HQ (проприетарный, cloud)
-- [x] [TASK-research-docker-agent-codex](TASK-research-docker-agent-codex.todo.md) — Docker Agent, OpenAI Codex (проприетарный, sandboxing)
-- [x] [TASK-research-agno](TASK-research-agno.todo.md) — Agno / бывший Phi (Python, multi-agent teams)
+- [x] [TASK-research-charmbracelet-crush](done/TASK-research-charmbracelet-crush.todo.md) — Charmbracelet Crush (Go, CLI-agent)
+- [x] [TASK-research-pi-agent-rust](done/TASK-research-pi-agent-rust.todo.md) — pi_agent_rust (Rust)
+- [x] [TASK-research-crewai-langgraph-autogen](done/TASK-research-crewai-langgraph-autogen.todo.md) — CrewAI, LangGraph, AutoGen (Python multi-agent)
+- [x] [TASK-research-openhands-sdk](done/TASK-research-openhands-sdk.todo.md) — OpenHands SDK (Python, SDK-подход)
+- [x] [TASK-research-archon-ai-planner](done/TASK-research-archon-ai-planner.todo.md) — Archon (Python, мета-оркестрация)
+- [x] [TASK-research-metagpt-openclaw](done/TASK-research-metagpt-openclaw.todo.md) — MetaGPT, OpenClaw (Python, SOP/роли)
+- [x] [TASK-research-mastra-ai](done/TASK-research-mastra-ai.todo.md) — Mastra AI (TypeScript, workflows)
+- [x] [TASK-research-claude-code](done/TASK-research-claude-code.todo.md) — Claude Code (проприетарный, agent loop)
+- [x] [TASK-research-copilot-agent-hq](done/TASK-research-copilot-agent-hq.todo.md) — GitHub Copilot Agent HQ (проприетарный, cloud)
+- [x] [TASK-research-docker-agent-codex](done/TASK-research-docker-agent-codex.todo.md) — Docker Agent, OpenAI Codex (проприетарный, sandboxing)
+- [x] [TASK-research-agno](done/TASK-research-agno.todo.md) — Agno / бывший Phi (Python, multi-agent teams)
 
 ### Этап 1b: Дополнительные исследования (2026-04-28)
 
-- [x] [TASK-research-paperclip-ai](TASK-research-paperclip-ai.todo.md) — Paperclip AI
-- [x] [TASK-research-agentcraft](TASK-research-agentcraft.todo.md) — AgentCraft
+- [x] [TASK-research-paperclip-ai](done/TASK-research-paperclip-ai.todo.md) — Paperclip AI
+- [x] [TASK-research-agentcraft](done/TASK-research-agentcraft.todo.md) — AgentCraft
 
 ### Этап 1c: Дополнительные исследования (2026-05-04)
 
-- [ ] [TASK-research-sandcastle](TASK-research-sandcastle.todo.md) — Sandcastle (Matt Pocock)
-- [ ] [TASK-research-hermes-agent](TASK-research-hermes-agent.todo.md) — Hermes Agent (Nous Research)
-- [x] [TASK-research-oh-my-openagent](../done/TASK-research-oh-my-openagent.todo.md) — Oh My OpenAgent (форк OpenCode, TypeScript + паттерны оркестрации)
+- [ ] [TASK-research-sandcastle](done/TASK-research-sandcastle.todo.md) — Sandcastle (Matt Pocock)
+- [ ] [TASK-research-hermes-agent](done/TASK-research-hermes-agent.todo.md) — Hermes Agent (Nous Research)
+- [x] [TASK-research-oh-my-openagent](done/TASK-research-oh-my-openagent.todo.md) — Oh My OpenAgent (форк OpenCode, TypeScript + паттерны оркестрации)
 
 ### Этап 1d: Дополнительные исследования (2026-05-13)
 
-- [ ] [TASK-research-duet](TASK-research-duet.todo.md) — Duet (Aomni, cloud/SaaS, team AI-агент)
-- [ ] [TASK-research-multica](TASK-research-multica.todo.md) — Multica (open-source, project management для human + agent teams)
+- [ ] [TASK-research-duet](done/TASK-research-duet.todo.md) — Duet (Aomni, cloud/SaaS, team AI-агент)
+- [ ] [TASK-research-multica](done/TASK-research-multica.todo.md) — Multica (open-source, project management для human + agent teams)
 
 ### Этап 1e: Дополнительные исследования (2026-05-20)
 
-- [x] [TASK-research-zeroclaw](TASK-research-zeroclaw.todo.md) — Zeroclaw (zeroclaw-labs, AI-agent orchestration)
+- [x] [TASK-research-zeroclaw](done/TASK-research-zeroclaw.todo.md) — Zeroclaw (zeroclaw-labs, AI-agent orchestration)
 
 ### Этап 1f: Дополнительные исследования (2026-06-12)
 
-- [x] [TASK-research-odysseus-ai-workspace](TASK-research-odysseus-ai-workspace.todo.md) — Odysseus (PewDiePie archdaemon, self-hosted AI workspace)
+- [x] [TASK-research-odysseus-ai-workspace](done/TASK-research-odysseus-ai-workspace.todo.md) — Odysseus (PewDiePie archdaemon, self-hosted AI workspace)
 
 ### Этап 1g: Дополнительные исследования (2026-06-13)
 
-- [x] [TASK-research-agent-skills](TASK-research-agent-skills.todo.md) — Agent Skills (Addy Osmani, production-grade engineering skills for AI coding agents) *(PR #258)*
+- [x] [TASK-research-agent-skills](done/TASK-research-agent-skills.todo.md) — Agent Skills (Addy Osmani, production-grade engineering skills for AI coding agents) *(PR #258)*
 
 ### Этап 1h: Дополнительные исследования (2026-06-18)
 
-- [x] [TASK-research-swarm-forge](TASK-research-swarm-forge.todo.md) — SwarmForge (unclebob / Robert C. Martin, tmux-based swarm orchestration: git worktrees per role, layered constitution, handoff-протокол, config-driven topology) *(PR #272)*
+- [x] [TASK-research-swarm-forge](done/TASK-research-swarm-forge.todo.md) — SwarmForge (unclebob / Robert C. Martin, tmux-based swarm orchestration: git worktrees per role, layered constitution, handoff-протокол, config-driven topology) *(PR #272)*
 
 ### Этап 1i: Дополнительные исследования (2026-07-10)
 
-- [x] [TASK-research-onorca-ade](TASK-research-onorca-ade.todo.md) — Orca ADE (stablyai/orca, MIT, TypeScript/Electron + mobile; «AI Orchestrator» — параллельная ручная оркестрация coding-агентов в изолированных git worktrees: fan-out prompt → N agents → merge winner; BYO subscription; Ghostty-class terminal IDE; mobile companion; Orca Tasks/Automations; `orca.yaml`) *(verdict 🟡 паттерны / 🔴 не dependency; code review Approval)*
+- [x] [TASK-research-onorca-ade](done/TASK-research-onorca-ade.todo.md) — Orca ADE (stablyai/orca, MIT, TypeScript/Electron + mobile; «AI Orchestrator» — параллельная ручная оркестрация coding-агентов в изолированных git worktrees: fan-out prompt → N agents → merge winner; BYO subscription; Ghostty-class terminal IDE; mobile companion; Orca Tasks/Automations; `orca.yaml`) *(verdict 🟡 паттерны / 🔴 не dependency; code review Approval)*
 
 ### Этап 1j: Дополнительные исследования (2026-07-26)
 
-- [x] [TASK-research-bx-dev-skill](TASK-research-bx-dev-skill.todo.md) — bx-dev (`bish-x/bx-dev-skill`, Codex-skill/manual workflow harness; session branch from `origin/dev`, state `.bx-dev/<session-id>/`, single-shot Codex subagents: Dev → review → conventional commit → optional post-commit QA → Merger; strict flags `--solo`/`--careful`/`--no-review`/`--plan-approve`/`--no-sop`; MERGE-PROTOCOL; 105 support skills / 9 categories) *(verdict 🟡 паттерны / 🔴 не dependency; code review Approval — 1 CR устранён)*
+- [x] [TASK-research-bx-dev-skill](done/TASK-research-bx-dev-skill.todo.md) — bx-dev (`bish-x/bx-dev-skill`, Codex-skill/manual workflow harness; session branch from `origin/dev`, state `.bx-dev/<session-id>/`, single-shot Codex subagents: Dev → review → conventional commit → optional post-commit QA → Merger; strict flags `--solo`/`--careful`/`--no-review`/`--plan-approve`/`--no-sop`; MERGE-PROTOCOL; 105 support skills / 9 categories) *(verdict 🟡 паттерны / 🔴 не dependency; code review Approval — 1 CR устранён)*
 
 ### Этап 1k: Дополнительные исследования (2026-08-03)
 
-- [x] [TASK-research-qm](TASK-research-qm.todo.md) — qm (`yc-software/qm`, TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: per-employee scopes, Slack+web, per-scope durable sandbox, shared skills с org-governance, security postures Strict/Auto/Dangerous + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты; потребляет `SKILL.md`/`.claude/skills`/`.codex/skills`/`AGENTS.md`). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. Статус: done, PR #347.
+- [x] [TASK-research-qm](done/TASK-research-qm.todo.md) — qm (`yc-software/qm`, TypeScript/Node, MIT, ≈8.8k★; multiplayer/multi-tenant agent-платформа-оркестратор над внешними харнесами Pi/OpenCode/Codex/Claude Code: per-employee scopes, Slack+web, per-scope durable sandbox, shared skills с org-governance, security postures Strict/Auto/Dangerous + command policy, deployment-directory контракт + `qm` CLI, interface-backed субстраты; потребляет `SKILL.md`/`.claude/skills`/`.codex/skills`/`AGENTS.md`). Классификация: multiplayer/multi-tenant platform-оркестратор / harness-over-external-agents, ближайший аналог Orca ADE (#30), по прецеденту OmO (#23)/bx-dev (#31). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. Статус: done, PR #347.
 
 ### Этап 1l: Дополнительные исследования (2026-08-03)
 
-- [x] [TASK-research-omnigent](TASK-research-omnigent.todo.md) — omnigent (`omnigent-ai/omnigent`, Python, Apache-2.0, ≈8k★, **alpha**; open-source meta-harness над внешними coding-агентами Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML-агенты: multi-device surfaces (terminal/browser/phone/desktop), cloud sandboxes (Modal/E2B/K8s/…), OS-sandboxing (bwrap/seatbelt/Job Objects + L7 egress), policies (approval/spend/tool-limits), multi-agent supervision, collaboration; потребляет `.claude/skills`/`AGENTS.md`). Классификация: open-source meta-harness / orchestration platform over external agents, ближайший аналог qm (#32), по прецеденту Orca ADE (#30)/OmO (#23). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. Статус: done, PR #346.
+- [x] [TASK-research-omnigent](done/TASK-research-omnigent.todo.md) — omnigent (`omnigent-ai/omnigent`, Python, Apache-2.0, ≈8k★, **alpha**; open-source meta-harness над внешними coding-агентами Claude Code/Codex/Cursor/OpenCode/Hermes/Pi + custom YAML-агенты: multi-device surfaces (terminal/browser/phone/desktop), cloud sandboxes (Modal/E2B/K8s/…), OS-sandboxing (bwrap/seatbelt/Job Objects + L7 egress), policies (approval/spend/tool-limits), multi-agent supervision, collaboration; потребляет `.claude/skills`/`AGENTS.md`). Классификация: open-source meta-harness / orchestration platform over external agents, ближайший аналог qm (#32), по прецеденту Orca ADE (#30)/OmO (#23). Предварительный verdict: 🟡 паттерны / 🔴 не dependency. Статус: done, PR #346.
 
 ### Этап 1m: Дополнительное исследование (2026-08-11)
 
-- [x] [TASK-research-herdr](TASK-research-herdr.todo.md) — Herdr (`herdrdev/herdr` `v0.8.0`, Rust, Apache-2.0; постоянный фоновый server (сервер) реальных PTY-терминалов для 19+ внешних coding agents (агентов программирования), состояния `idle/working/blocked/done/unknown`, 90-method CLI/socket API, события, Git worktrees, native resume, experimental live handoff, executable plugins и release-matched `SKILL.md`). Классификация: `terminal agent runtime / control surface` (терминальная среда выполнения и управляющая поверхность), не coding agent и не chain engine. Исследование выполнено; строка #34 добавлена как 32-й завершённый результат из 34 запланированных на момент stage `1m`. После stage `1n` общий прогресс указан ниже в новой строке ALK. Verdict: 🟡 паттерны / 🔴 не core dependency / 🟢 опциональная ручная среда.
+- [x] [TASK-research-herdr](done/TASK-research-herdr.todo.md) — Herdr (`herdrdev/herdr` `v0.8.0`, Rust, Apache-2.0; постоянный фоновый server (сервер) реальных PTY-терминалов для 19+ внешних coding agents (агентов программирования), состояния `idle/working/blocked/done/unknown`, 90-method CLI/socket API, события, Git worktrees, native resume, experimental live handoff, executable plugins и release-matched `SKILL.md`). Классификация: `terminal agent runtime / control surface` (терминальная среда выполнения и управляющая поверхность), не coding agent и не chain engine. Исследование выполнено; строка #34 добавлена как 32-й завершённый результат из 34 запланированных на момент stage `1m`. После stage `1n` общий прогресс указан ниже в новой строке ALK. Verdict: 🟡 паттерны / 🔴 не core dependency / 🟢 опциональная ручная среда.
 
 ### Этап 1n: Дополнительное исследование (2026-08-12)
 
-- [x] [TASK-research-agent-lifecycle-kit](TASK-research-agent-lifecycle-kit.todo.md) — Agent Lifecycle Kit (`avksp/agent-lifecycle-kit` `v1.62.0`, Python 3.11–3.14, Apache-2.0; provider-neutral lifecycle/evidence controller — нейтральный контроллер жизненного цикла и доказательств — вокруг внешних coding agents: draft intake (черновой вход) → reviewed/frozen plan (проверенный/замороженный план) → bounded host-owned execution (ограниченное исполнение внешним хостом) → implementation audit (аудит реализации) → final proof (финальное доказательство); file-backed (файловые) workflow state/runner state/receipts, public JSON schemas, 12 adapter descriptors/capability manifests, Review Mesh, model-class routing, sandbox/proof integrity receipts). Классификация: `provider-neutral lifecycle controller / evidence layer`, не coding agent (не агент программирования) и не chain engine (не движок цепочек). Исследование завершено, прошло self-review (самопроверку) и независимое Approval (одобрение) Пуаро; PR #342 создан. Строка #35 добавлена как 33-й завершённый research-результат из 35 запланированных, при этом #32 (`qm`) и #33 (`omnigent`) остаются незавершёнными и не входят в completed-счётчик. Verdict (вердикт): 🟡 заимствовать frozen-plan/proof/adapter-support patterns (паттерны замороженного плана, доказательств и поддержки адаптеров); 🔴 не core dependency (не основная зависимость).
+- [x] [TASK-research-agent-lifecycle-kit](done/TASK-research-agent-lifecycle-kit.todo.md) — Agent Lifecycle Kit (`avksp/agent-lifecycle-kit` `v1.62.0`, Python 3.11–3.14, Apache-2.0; provider-neutral lifecycle/evidence controller — нейтральный контроллер жизненного цикла и доказательств — вокруг внешних coding agents: draft intake (черновой вход) → reviewed/frozen plan (проверенный/замороженный план) → bounded host-owned execution (ограниченное исполнение внешним хостом) → implementation audit (аудит реализации) → final proof (финальное доказательство); file-backed (файловые) workflow state/runner state/receipts, public JSON schemas, 12 adapter descriptors/capability manifests, Review Mesh, model-class routing, sandbox/proof integrity receipts). Классификация: `provider-neutral lifecycle controller / evidence layer`, не coding agent (не агент программирования) и не chain engine (не движок цепочек). Исследование завершено, прошло self-review (самопроверку) и независимое Approval (одобрение) Пуаро; PR #342 создан. Строка #35 добавлена как 33-й завершённый research-результат из 35 запланированных, при этом #32 (`qm`) и #33 (`omnigent`) остаются незавершёнными и не входят в completed-счётчик. Verdict (вердикт): 🟡 заимствовать frozen-plan/proof/adapter-support patterns (паттерны замороженного плана, доказательств и поддержки адаптеров); 🔴 не core dependency (не основная зависимость).
 
 ### Этап 1o: Дополнительное исследование (2026-08-29)
 
-- [x] [TASK-research-bb-agent-ide](TASK-research-bb-agent-ide.todo.md) — bb (`get-bb/bb`, `bb-app` 0.40.0, snapshot `fc94f46c13b89f54e9c8ba53600352df64b81798`; `agentic IDE / programmable control surface + optional workflow engine` над внешними coding agents Claude Code, Codex, Cursor/ACP, Pi, OpenCode, Grok Build, omp и Hermes, а не самостоятельный coding agent). Исследованы threads, Git worktrees, plugins/self-customization, multi-provider orchestration, отключённый по умолчанию durable Workflows plugin, CLI/HTTP API/SDK, local-first модель, telemetry/security и применимость к `task-orchestrator`; `bb-comparison.md` и строка #36 в summary доводят готовый набор исследовательских артефактов до 36/36. Verdict: 🟡 provider/thread/durable-replay/worktree patterns / 🔴 не core dependency / 🟢 optional manual environment после проверки ownership/security.
+- [x] [TASK-research-bb-agent-ide](done/TASK-research-bb-agent-ide.todo.md) — bb (`get-bb/bb`, `bb-app` 0.40.0, snapshot `fc94f46c13b89f54e9c8ba53600352df64b81798`; `agentic IDE / programmable control surface + optional workflow engine` над внешними coding agents Claude Code, Codex, Cursor/ACP, Pi, OpenCode, Grok Build, omp и Hermes, а не самостоятельный coding agent). Исследованы threads, Git worktrees, plugins/self-customization, multi-provider orchestration, отключённый по умолчанию durable Workflows plugin, CLI/HTTP API/SDK, local-first модель, telemetry/security и применимость к `task-orchestrator`; `bb-comparison.md` и строка #36 в summary доводят готовый набор исследовательских артефактов до 36/36. Verdict: 🟡 provider/thread/durable-replay/worktree patterns / 🔴 не core dependency / 🟢 optional manual environment после проверки ownership/security.
+- [x] [TASK-research-t3-code](done/TASK-research-t3-code.todo.md) — T3 Code (pingdotgg) «agent harness control surface» (https://t3.codes). Категория: GUI-orchestrator / meta-orchestration (один класс с AgentCraft #16). Вердикт: apply — capability-контракт раннера и BYO subscription; study — worktree, durable threads, совместимость продолжения, remote, permissions; skip — one-button PR.
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
-- [x] [TASK-research-agent-frameworks-summary](TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
+- [x] [TASK-research-agent-frameworks-summary](done/TASK-research-agent-frameworks-summary.todo.md) — Сводная таблица и итоговые рекомендации
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все индивидуальные research-задачи выполнены
@@ -204,3 +216,4 @@ pr: "#51 (исследование), #52 (ревью и исправления),
 | 2026-08-29 | Аналитик (Шерлок) | Повторная самопроверка: критерий «Все индивидуальные research-задачи выполнены» возвращён в незавершённое состояние в соответствии с `status: in_progress` задачи bb; устаревший риск о незавершённых qm и omnigent заменён актуальной процессной зависимостью от приёмки bb. |
 | 2026-08-29 | Аналитик (Шерлок) | Stage `1o`: research-артефакты доработаны по замечаниям Ревьювера Бэка Пуаро; усилены доказательства Ajv и политики повторов, унифицирован формат отчёта и уточнены границы утверждений о поставщиках и MCP. |
 | 2026-08-29 | Аналитик (Шерлок) | Stage `1o`: после процессной приёмки TASK-research-bb-agent-ide и зелёного CI задача переведена в `done`; завершены все индивидуальные research-задачи и 36/36 исследовательских артефактов, эпик возвращён в `done`. |
+| 2026-09-11 | Тимлид (Алекс) | Эпик переоткрыт: в трек перенесено исследование TASK-research-t3-code (T3 Code) из EPIC-research-orchestration-articles по решению владельца — T3 Code является продуктом-оркестратором, а не статьёй. |

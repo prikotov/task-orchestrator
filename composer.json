@@ -65,7 +65,7 @@
             "@php bin/create-symlink.php"
         ],
         "validate-docs": "php vendor/prikotov/coding-standard/bin/validate-docs.php",
-        "validate-md-links": "php vendor/prikotov/coding-standard/bin/validate-md-links.php",
+        "validate-md-links": "php vendor/prikotov/coding-standard/bin/validate-md-links",
         "check": [
             "@test",
             "@validate-md-links",
