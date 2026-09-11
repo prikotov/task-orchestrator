@@ -97,7 +97,6 @@ flowchart LR
 ### Этап 1: Индивидуальные исследования (параллельные)
 
 - [x] [TASK-research-orchestrator-tax](done/TASK-research-orchestrator-tax.todo.md) — Martin Fowler «Orchestrator Tax» (https://martinfowler.com/articles/orchestrator-tax.html). Overhead от централизованной оркестрации, альтернативы (choreography), когда стоит платить цену.
-- [x] [TASK-research-t3-code](done/TASK-research-t3-code.todo.md) — T3 Code (pingdotgg) «agent harness control surface» (https://t3.codes, https://github.com/pingdotgg/t3code). Кейс оркестрации агент-харнесов: BYO harness, branch-per-thread, one-button PR, switch mid-thread, remote control. Вердикт: 18/18, apply — capability-контракт раннера и BYO subscription, study — worktree/потоки/совместимость/remote/permissions, skip — one-button PR.
 
 ### Этап 2: Сводный анализ (после завершения серии исследований)
 
@@ -133,3 +132,4 @@ flowchart LR
 | 2026-08-16 | Бэкендер Левша (pi) | Миграция на формат todo-md 0.0.10: файл переименован в `EPIC-*.todo.md`, статус `pending` → `todo`, добавлены разделы Human Brief и поле `pr`, формат author/assignee приведён к виду «Роль (агент)». |
 | 2026-09-11 | Тимлид (Алекс) | Добавлена задача TASK-research-t3-code (предложена пользователем): T3 Code — оркестратор агент-харнесов (BYO harness, branch-per-thread, one-button PR, remote control). Продукт/репозиторий как первоисточник паттернов — прецедент TASK-research-agents-crew. |
 | 2026-09-11 | Тимлид (Алекс) | Stage 1: TASK-research-t3-code выполнена (PR #385) — оценка 18/18, apply (capability-контракт, BYO subscription) / study (worktree, durable threads, совместимость продолжения, remote, permissions) / skip (one-button PR). Гипотезы: 4 подтверждены, 1 частично, 1 частично опровергнута. Файл задачи перенесён в `todo/done/`. Эпик остаётся в работе (Этап 2 — сводный анализ — после накопления источников). |
+| 2026-09-11 | Тимлид (Алекс) | Задача TASK-research-t3-code исключена из эпика и перенесена в продуктовый трек EPIC-research-agent-frameworks-comparison (переоткрыт) по решению владельца: T3 Code — продукт, а не статья. |

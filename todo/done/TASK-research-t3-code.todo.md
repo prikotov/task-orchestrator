@@ -11,7 +11,7 @@ priority: P2
 cost_plan: 
 cost_fact: 85000
 depends_on: 
-epic: EPIC-research-orchestration-articles
+epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-t3-code
@@ -143,3 +143,4 @@ T3 Code позиционируется как «agent harness control surface»:
 | :--- | :--- | :--- |
 | 2026-09-11 03:50:15 (1789098615) | Тимлид (Алекс) | Создание задачи |
 | 2026-09-11 | Аналитик (Шерлок) | Исследован T3 Code на commit `0a37240a87bb2fed8f48cf20dc8312ee3b94eba6`: подготовлен отчёт по 6 критериям и 8 паттернам, проверены 6 гипотез, обновлены сводка и аналитический отчёт; `cost_fact` зафиксирован по доступной оценке контекста сессии. |
+| 2026-09-11 | Тимлид (Алекс) | Задача перенесена в эпик EPIC-research-agent-frameworks-comparison по решению владельца: T3 Code — продукт (оркестратор харнесов), а не статья. Отчёт перемещён в docs/research/framework-comparisons/t3-code-comparison.md. |

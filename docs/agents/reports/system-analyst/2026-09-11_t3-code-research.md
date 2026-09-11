@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)  
 **Дата:** 2026-09-11  
 **Объект:** `pingdotgg/t3code`, ветка `main`, commit `0a37240a87bb2fed8f48cf20dc8312ee3b94eba6`, release `v0.0.40`  
-**Задача:** [TASK-research-t3-code](../../../../todo/TASK-research-t3-code.todo.md), эпик [EPIC-research-orchestration-articles](../../../../todo/EPIC-research-orchestration-articles.todo.md)
+**Задача:** [TASK-research-t3-code](../../../../todo/done/TASK-research-t3-code.todo.md), эпик [EPIC-research-agent-frameworks-comparison](../../../../todo/EPIC-research-agent-frameworks-comparison.todo.md)
 
 ---
 
@@ -58,6 +58,7 @@ T3 Code — контрольная поверхность над Claude Code, Co
 - `docs/research/orchestration-articles-summary.md` — строка #2 в обеих таблицах, счётчик 2 / N и предварительные тренды.
 - `docs/agents/reports/system-analyst/2026-09-11_t3-code-research.md` — данный самодостаточный аналитический отчёт.
 - `todo/TASK-research-t3-code.todo.md` — прогресс, фактическая стоимость и история изменений.
+- 2026-09-11 исследование перенесено из статейного эпика в продуктовый трек `EPIC-research-agent-frameworks-comparison`; основной отчёт перемещён в `docs/research/framework-comparisons/t3-code-comparison.md`.
 
 ## Проверки
 

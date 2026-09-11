@@ -3,11 +3,13 @@
 **Объект:** [`pingdotgg/t3code`](https://github.com/pingdotgg/t3code) — открытая контрольная поверхность (control surface) над Claude Code, Codex, Cursor, Grok Build, OpenCode и Google Antigravity  
 **Дата исследования:** 2026-09-11  
 **Состояние первоисточника:** ветка `main`, commit `0a37240a87bb2fed8f48cf20dc8312ee3b94eba6` от 2026-09-11 03:13:23 UTC; последний опубликованный release (выпуск) `v0.0.40` от 2026-09-08; `apps/server/package.json`, `apps/web/package.json` и `apps/desktop/package.json` содержат версию `0.0.40`; 22 354 звезды GitHub; лицензия MIT  
-**Эпик:** [EPIC-research-orchestration-articles](../../../todo/EPIC-research-orchestration-articles.todo.md)  
-**Задача:** [TASK-research-t3-code](../../../todo/TASK-research-t3-code.todo.md)  
+**Эпик:** [EPIC-research-agent-frameworks-comparison](../../../todo/EPIC-research-agent-frameworks-comparison.todo.md)<br>
+**Задача:** [TASK-research-t3-code](../../../todo/done/TASK-research-t3-code.todo.md)<br>
 **Аналитик:** Аналитик (Шерлок)
 
 ---
+
+> **Перенос трека (2026-09-11):** исследование выполнено по методологии 6 критериев эпика EPIC-research-orchestration-articles и перенесено в продуктовый трек EPIC-research-agent-frameworks-comparison по решению владельца: T3 Code — продукт (оркестратор агент-харнесов), а не статья. Содержание сохранено без изменений.
 
 ## 0. Ограничения исследования
 
@@ -236,7 +238,7 @@ T3 Code подтверждает полезность связи «поток �
 
 ## 11. T3 Code и налог оркестратора
 
-T3 Code платит тот же налог централизованной оркестрации, который описан в [предыдущем исследовании](orchestrator-tax-research.md): он владеет нормализацией шести харнесов, совместимостью сохранённых событий, несколькими клиентами, reconnect (переподключением), Git и безопасностью.
+T3 Code платит тот же налог централизованной оркестрации, который описан в [предыдущем исследовании](../orchestration-articles/orchestrator-tax-research.md): он владеет нормализацией шести харнесов, совместимостью сохранённых событий, несколькими клиентами, reconnect (переподключением), Git и безопасностью.
 
 Как продукт уменьшает налог:
 
