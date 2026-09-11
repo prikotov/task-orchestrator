@@ -3,7 +3,7 @@ type: chore
 created: 2026-09-11 12:05:00 (1789128300)
 due: 
 started: 2026-09-11 12:06:00 (1789128360)
-completed: 
+completed: 2026-09-11 15:01:23 (1789138883)
 cancelled: 
 value: V2
 complexity: C1
@@ -16,7 +16,7 @@ author: Тимлид (Алекс)
 assignee: Бэкендер (Тони)
 branch: task/research-t3-code
 pr: https://github.com/prikotov/task-orchestrator/pull/385
-status: review
+status: done
 ---
 
 # TASK-chore-fix-validate-md-links-script: Починить битый composer-скрипт validate-md-links (CR-4 из ревью TASK-research-t3-code)

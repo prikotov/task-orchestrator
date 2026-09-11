@@ -3,7 +3,7 @@ type: docs
 created: 2026-09-11 03:50:15 (1789098615)
 due: 
 started: 2026-09-11 03:52:32 (1789098752)
-completed: 
+completed: 2026-09-11 15:01:23 (1789138883)
 cancelled: 
 value: V3
 complexity: C3
@@ -16,7 +16,7 @@ author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 branch: task/research-t3-code
 pr: https://github.com/prikotov/task-orchestrator/pull/385
-status: review
+status: done
 ---
 
 # TASK-research-t3-code: T3 Code (pingdotgg): кейс оркестрации агент-харнесов (BYO harness, branch-per-thread, one-button PR)
