@@ -5,13 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.6.0] - 2026-09-10
 
 ### Changed
 
-- **Несовместимое изменение конфигурации (breaking change):** локаль AI-ролей (выбор `role file`, язык заголовков каталога skills) управляется новой переменной окружения `TASK_ORCHESTRATOR_LOCALE` вместо `APP_LOCALE`. При отсутствующем значении файл роли ищется в порядке `<role>.md` → `<role>.en.md` → `<role>.ru.md` → `<role>.zh.md` → первый `<role>.*.md`, а язык заголовков каталога по умолчанию — `en`. `APP_LOCALE` больше не является контрактом task-orchestrator и не влияет на выбор роли и языка каталога; скрытый fallback (резервный переход) на `APP_LOCALE` отсутствует намеренно. Миграция: замените `APP_LOCALE=ru` на `TASK_ORCHESTRATOR_LOCALE=ru` в `.env.local` (или задайте переменную окружения иначе).
-- **Несовместимое изменение конфигурации (breaking change):** локаль Symfony-переводчика (`framework.default_locale`) собственного ядра task-orchestrator стала независимой стандартной настройкой Symfony (`en`): она больше не следует за `APP_LOCALE` и не связана с локалью AI-ролей. Меняется вместе с конфигурацией (см. `config/packages/translation.yaml`) при отдельной необходимости.
-- Исправлен баг устаревшего кеша (stale cache): значение локали больше не запекается в скомпилированный контейнер — смена `TASK_ORCHESTRATOR_LOCALE` (например, `en` → `ru`) применяется при следующем запуске без ручной очистки кеша при том же корне кеша. Поведение покрыто Composer-host regression-тестом (один host-проект, стабильный корень кеша, последовательные локали).
+- **Несовместимое изменение конфигурации (breaking change):** локаль AI-ролей (выбор `role file`, язык заголовков каталога skills) управляется переменной окружения `TASK_ORCHESTRATOR_LOCALE`; `APP_LOCALE` больше не является контрактом task-orchestrator и не читается им. Безопасная миграция для Composer host: добавьте `TASK_ORCHESTRATOR_LOCALE=ru` в окружение host-проекта (`.env.local`); `APP_LOCALE` сохраните, если его использует само host-приложение, — удаляйте только при отсутствии других потребителей. Порядок поиска role file без локали, поведение локали Symfony-переводчика и кеша — в [`docs/releases/v0.6.0/release-plan.md`](docs/releases/v0.6.0/release-plan.md) (#380).
+- Полное обновление зависимостей до устойчивых линий: runtime `symfony/*` выровнен на линию 8.1.x, dev-инструментарий — `prikotov/coding-standard` 0.33, `phpunit/phpunit` 13.3, `deptrac/deptrac` 4.7, PHPStan 2.2 (#381).
+- Тестовые двойники (test doubles) PHPUnit модернизированы под PHPUnit 13: набор тестов проходит без notices и deprecations PHPUnit, в `phpunit.xml.dist` включены защитные fail-флаги (#382).
 
 ## [0.5.3] - 2026-09-03
 
