@@ -15,6 +15,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
+          tools: box
 
       - uses: actions/setup-node@v4
         with:
@@ -26,6 +27,12 @@ jobs:
         run: make liveness-smoke
 
       - run: vendor/bin/phpunit
+
+      # Обязательный gate: расширенный E2E-контракт PHAR-дистрибутива (полная
+      # матрица agent:init, become-role.sh, перемещение A → B на дефолтном
+      # кеше). PHAR_E2E_REQUIRED=1 не даёт тесту ложно позеленеть без Box.
+      - name: Phar distribution E2E (Box build + agent:init contract)
+        run: make phar-e2e
 
   phar-smoke:
     name: PHP 8.4.1 production install & Phar smoke

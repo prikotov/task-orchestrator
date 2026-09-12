@@ -105,14 +105,14 @@ php vendor/bin/todo-md validate todo/backlog/TASK-fix-watch-subagent-sigpipe-exi
 - Функциональных зависимостей нет; задача может выполняться независимо.
 - Большой поток нужен для надёжного превышения буфера канала, но тест не должен становиться медленным или зависеть от планировщика ОС.
 - Завершающая диагностика выполняется под `set -euo pipefail`; любое новое исправление должно сохранять исходный код успешного запуска и при этом не скрывать реальные ошибки раннера.
-- Текущая задача [`TASK-feat-phar-full-become-role-install`](../done/TASK-feat-phar-full-become-role-install.todo.md) является только источником наблюдения и follow-up (последующей работы), а не dependency (функциональной зависимостью).
+- Текущая задача [`TASK-feat-phar-full-become-role-install`](../TASK-feat-phar-full-become-role-install.todo.md) является только источником наблюдения и follow-up (последующей работы), а не dependency (функциональной зависимостью).
 
 ## 8. Источники (Sources)
 
 - [`watch-subagent.sh`](../../docs/agents/skills/run-subagent/scripts/watch-subagent.sh), функции `emit_run_summary()` и `cleanup()`.
 - [`WatchSubagentScriptTest.php`](../../tests/Integration/Docs/Agents/Skills/RunSubagent/WatchSubagentScriptTest.php).
 - [Реестр повторяющихся проблем](../../docs/agents/team-retro/RETRO-ROADMAP.md).
-- [Источник наблюдения: `TASK-feat-phar-full-become-role-install`](../done/TASK-feat-phar-full-become-role-install.todo.md).
+- [Источник наблюдения: `TASK-feat-phar-full-become-role-install`](../TASK-feat-phar-full-become-role-install.todo.md).
 - [Конвенция тестирования](../../docs/conventions/testing/index.md).
 
 ## 9. Комментарии (Comments)

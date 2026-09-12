@@ -6,14 +6,17 @@
 # Как работает:
 #   1. Проверяет Composer-host distribution smoke
 #   2. Запускает liveness smoke с Node worker и exact php:8.4.1-cli без procps/pcntl
-#   3. Запускает официальный контейнер PHP 8.4.1 и проверяет PHP_VERSION_ID
-#   4. composer install (без dev-зависимостей)
-#   5. composer check-platform-reqs --no-dev
-#   6. PHAR_SMOKE_KEEP_ARTIFACT=1 make phar-smoke:
+#   3. Выполняет расширенный PHAR E2E-контракт на теговом коммите
+#   4. Запускает официальный контейнер PHP 8.4.1 и проверяет PHP_VERSION_ID
+#   5. composer install (без dev-зависимостей)
+#   6. composer check-platform-reqs --no-dev
+#   7. PHAR_SMOKE_KEEP_ARTIFACT=1 make phar-smoke:
 #      - box compile --config=box.json.dist → task-orchestrator.phar
-#      - version/commands/agent:init smoke в изолированном временном state
+#      - точная проверка --version и регистрация команд из checkout/чужого CWD
+#        в изолированном временном state (production-safe, без PHPUnit);
+#        расширенный контракт agent:init отдельно проверен шагом make phar-e2e
 #      - успешно проверенный task-orchestrator.phar сохраняется для upload
-#   7. Загрузка task-orchestrator.phar в assets релиза
+#   8. Загрузка task-orchestrator.phar в assets релиза
 #
 # Ошибка проверки платформы, сборки или smoke-теста блокирует публикацию Phar asset.
 # Box установлен как standalone tool через setup-php (не через Composer,
@@ -58,6 +61,9 @@ jobs:
 
       - name: Linux liveness smoke with Node worker and exact PHP 8.4.1
         run: make liveness-smoke
+
+      - name: Phar distribution E2E (Box build + agent:init contract)
+        run: make phar-e2e
 
       - name: Verify production contract and smoke-test Phar on exact PHP 8.4.1
         shell: bash

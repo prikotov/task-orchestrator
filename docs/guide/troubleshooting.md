@@ -448,7 +448,7 @@ cd /tmp && php /path/to/task-orchestrator.phar list \
   | grep -E 'agent:init|agent:role-skills|agent:token|agent:run|validate:connectivity'
 ```
 
-Если пусто — контейнер пуст. Проверьте, что `bin/phar-smoke` (усиленный) зелёный из рабочего каталога распространяемой версии: он специально ловит этот случай (`--version` ложнозелёный и проходит даже при hollow). См. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-автообнаружения-вариант-4).
+Если пусто — контейнер пуст. Проверьте, что production-safe проверка `bin/phar-smoke` зелёная из рабочего каталога распространяемой версии: она проверяет регистрацию команд и специально ловит этот случай (`--version` ложнозелёный и проходит даже при hollow). См. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-автообнаружения-вариант-4).
 
 ---
 

@@ -94,10 +94,16 @@ validate-language: ## Валидация англицизмов в русско�
 	@vendor/bin/validate-language
 
 .PHONY: phar-smoke
-phar-smoke: ## Собрать Phar и проверить версию, команды и полный контракт agent:init
+phar-smoke: ## Собрать Phar и проверить точную версию и регистрацию команд (production-safe, без PHPUnit)
 	@echo
 	@echo "Phar smoke:"
 	@bin/phar-smoke
+
+.PHONY: phar-e2e
+phar-e2e: ## Запустить E2E-тест Phar-дистрибутива: сборка Box + полный контракт agent:init (требует Box)
+	@echo
+	@echo "Phar E2E:"
+	@out=$$(PHAR_E2E_REQUIRED=1 vendor/bin/phpunit --no-progress --no-coverage --colors=never apps/console/tests/E2E/ 2>&1); ec=$$?; echo "$$out" | grep -vE '^(PHPUnit |Runtime:|Configuration:|Time:|[[:space:]]*$$)'; exit $$ec
 
 .PHONY: liveness-smoke
 liveness-smoke: ## Проверить Linux liveness с Node worker и в точном php:8.4.1-cli без procps/pcntl
