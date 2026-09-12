@@ -10,9 +10,9 @@ author: Тимлид Алекс (codex-cli)
 assignee: Бэкендер Левша (codex-cli)
 branch: task/phar-full-become-role-install
 pr: https://github.com/prikotov/task-orchestrator/pull/387
-status: review
+status: done
 started: 2026-09-12 00:38:23 (1789173503)
-completed: 2026-09-12 14:06:59 (1789222019)
+completed: 2026-09-12 14:57:02 (1789225022)
 ---
 
 # TASK-feat-phar-full-become-role-install: Полная поддержка `agent:init`/`become-role` в PHAR
@@ -45,13 +45,13 @@ completed: 2026-09-12 14:06:59 (1789222019)
 
 ### Где делаем
 
-- `apps/console/src/Module/Orchestrator/Command/InitCommand.php` — `InitCommand` ([консольная команда Presentation](../docs/conventions/layers/presentation/console-command.md));
+- `apps/console/src/Module/Orchestrator/Command/InitCommand.php` — `InitCommand` ([консольная команда Presentation](../../docs/conventions/layers/presentation/console-command.md));
 - специализированный Presentation-сервис установки в `apps/console/src/Module/Orchestrator/`, без переноса файловой логики в консольную команду и без обобщения на другие ресурсы;
 - `src/Kernel.php` и `config/services.yaml` — только если для PHAR-сценария потребуется передать сервису физический путь текущего PHAR через явный параметр контейнера;
 - `bin/task-orchestrator` — определение PHAR-контекста (`Phar::running(false)`) и host-project CWD semantics: в PHAR, как и в vendor-контексте, projectRoot (= `base_path` для `.agents/`, ролей, цепочек и `.env.local`) берётся из текущего каталога запуска команды, а не из расположения PHAR-файла; package-ресурсы (`config/`) остаются внутри архива — поэтому `agent:init` из PHAR устанавливает `become-role` в host-проект, из каталога которого запущена команда;
 - `box.json.dist` — включение полного каталога `docs/agents/skills/become-role` в PHAR;
 - `docs/agents/skills/become-role/scripts/become-role.sh` — разрешение CLI пакета как из source/Composer, так и через созданную PHAR-установкой runtime-привязку;
-- тесты `InitCommand` и smoke-тесты дистрибутива согласно [конвенции тестирования](../docs/conventions/testing/index.md);
+- тесты `InitCommand` и smoke-тесты дистрибутива согласно [конвенции тестирования](../../docs/conventions/testing/index.md);
 - `bin/phar-smoke` и связанная конфигурация проверок;
 - пользовательская документация, найденная поиском по `agent:init`, `become-role.sh`, `PHAR` и `Phar`, включая `README.md`, `README.en.md`, `README.zh.md`, `docs/guide/cli.md`, `docs/guide/troubleshooting.md`, документацию затронутых skills и релизные документы.
 
@@ -163,15 +163,15 @@ git diff --check
 - Box может не сохранить ожидаемые права файла; запуск через `bash` обязателен в smoke-тесте, а необходимость прямого executable-bit должна быть явно проверена до обещания такого контракта.
 - Изменение документации не должно противоречить действующему RFC: full support относится только к `agent:init`/`become-role`, PHAR в целом остаётся secondary/best-effort.
 - Полный PHAR smoke зависит от доступности Box в локальном или CI-окружении.
-- Follow-up (последующая работа): заморозка `roles_dir`/других runtime layout-путей в скомпилированном контейнере и накопление кеш-корней после перемещения PHAR вынесены в отдельную backlog-задачу [`TASK-fix-phar-runtime-layout-cache`](backlog/TASK-fix-phar-runtime-layout-cache.todo.md). Эти наблюдения не изменяют выполненные критерии и scope текущей задачи.
-- Follow-up (последующая работа): ложный внешний код `141` и оборванная сводка после успешных запусков сабагентов, наблюдавшиеся при выполнении этой задачи, вынесены в [`TASK-fix-watch-subagent-sigpipe-exit-141`](backlog/TASK-fix-watch-subagent-sigpipe-exit-141.todo.md). Это связь с источником наблюдения, а не функциональная зависимость; scope и критерии текущей задачи не изменяются.
+- Follow-up (последующая работа): заморозка `roles_dir`/других runtime layout-путей в скомпилированном контейнере и накопление кеш-корней после перемещения PHAR вынесены в отдельную backlog-задачу [`TASK-fix-phar-runtime-layout-cache`](../backlog/TASK-fix-phar-runtime-layout-cache.todo.md). Эти наблюдения не изменяют выполненные критерии и scope текущей задачи.
+- Follow-up (последующая работа): ложный внешний код `141` и оборванная сводка после успешных запусков сабагентов, наблюдавшиеся при выполнении этой задачи, вынесены в [`TASK-fix-watch-subagent-sigpipe-exit-141`](../backlog/TASK-fix-watch-subagent-sigpipe-exit-141.todo.md). Это связь с источником наблюдения, а не функциональная зависимость; scope и критерии текущей задачи не изменяются.
 
 ## 8. Источники (Sources)
 
-- [Зависимость: контракт `agent:init` для Composer и PHAR](done/TASK-fix-v0-2-0-phar-become-role-distribution.todo.md).
-- [RFC: дистрибуция task-orchestrator как CLI-утилиты](../docs/research/rfc/cli-distribution-rfc.md).
-- [Конвенция консольных команд](../docs/conventions/layers/presentation/console-command.md).
-- [Конвенция тестирования](../docs/conventions/testing/index.md).
+- [Зависимость: контракт `agent:init` для Composer и PHAR](TASK-fix-v0-2-0-phar-become-role-distribution.todo.md).
+- [RFC: дистрибуция task-orchestrator как CLI-утилиты](../../docs/research/rfc/cli-distribution-rfc.md).
+- [Конвенция консольных команд](../../docs/conventions/layers/presentation/console-command.md).
+- [Конвенция тестирования](../../docs/conventions/testing/index.md).
 - `apps/console/src/Module/Orchestrator/Command/InitCommand.php`.
 - `box.json.dist`.
 - `bin/phar-smoke`.
@@ -180,7 +180,7 @@ git diff --check
 
 Архитектурное ограничение задачи: управляемая копия допустима только как специализированный PHAR-механизм установки встроенного `become-role`. Обобщение этого механизма на другие ресурсы требует отдельного решения и отдельной задачи. Ожидаемое дерево PHAR-установки состоит из полного встроенного дерева skill и одной служебной runtime-привязки внутри exact target; никаких файлов рядом с target или в других каталогах host-проекта установщик не создаёт.
 
-QA-3 и FR-2/FR-4 отслеживаются отдельно в [`TASK-fix-phar-runtime-layout-cache`](backlog/TASK-fix-phar-runtime-layout-cache.todo.md): новая задача отвечает за актуализацию runtime layout и жизненный цикл устаревших PHAR-кешей, не расширяя текущую реализацию `agent:init`/`become-role`.
+QA-3 и FR-2/FR-4 отслеживаются отдельно в [`TASK-fix-phar-runtime-layout-cache`](../backlog/TASK-fix-phar-runtime-layout-cache.todo.md): новая задача отвечает за актуализацию runtime layout и жизненный цикл устаревших PHAR-кешей, не расширяя текущую реализацию `agent:init`/`become-role`.
 
 ## История изменений (Change History)
 
