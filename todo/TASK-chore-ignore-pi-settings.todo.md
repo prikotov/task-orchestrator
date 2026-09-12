@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/gitignore-pi-local-settings
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/389
+status: review
 ---
 
 # TASK-chore-ignore-pi-settings: Игнорировать локальные настройки pi-агента в Git
