@@ -735,12 +735,23 @@ emit_run_summary() {
         agent_end_count=$(grep -cE '^\{"type":"agent_end"(,|\})' "$OUTFILE" 2>/dev/null || true)
         last_type=$(tail -1 "$OUTFILE" 2>/dev/null | jq -r '.type // "?"' 2>/dev/null || echo "?")
         log_run "events_total=$total agent_end_count=$agent_end_count last_event_type=$last_type"
-        log_run "events_by_type: $(jq -r '.type' "$OUTFILE" 2>/dev/null | sort | uniq -c | sort -rn | head -8 | tr '\n' '|' | sed 's/|$//')"
+        # head -8 в конвейере — early-closing consumer: на потоке с большим числом
+        # уникальных типов uniq -c раздувает вывод за буфер канала, head закрывается
+        # раньше sort, sort ловит SIGPIPE и под pipefail обрывает EXIT-trap успешного
+        # запуска кодом 141 (TASK-fix-watch-subagent-sigpipe-exit-141). awk читает
+        # весь ввод до EOF и не закрывает канал раньше времени.
+        log_run "events_by_type: $(jq -r '.type' "$OUTFILE" 2>/dev/null | sort | uniq -c | sort -rn | awk 'NR <= 8' | tr '\n' '|' | sed 's/|$//')"
     fi
     if [[ -f "${GAPS_FILE:-}" ]]; then
         local max_gap gaps_count avg_gap
         gaps_count=$(wc -l < "$GAPS_FILE" 2>/dev/null || echo 0)
-        max_gap=$(awk -F'\t' '{print $2}' "$GAPS_FILE" 2>/dev/null | sort -rn | head -1)
+        # Максимум одним проходом awk: `awk | sort -rn | head -1` — early-closing
+        # consumer, на больших gaps.tsv (>64KB — буфер канала) head закрывает канал
+        # после первой строки, sort ловит SIGPIPE, pipefail превращает присваивание
+        # в 141 и errexit обрывает EXIT-trap успешного запуска
+        # (TASK-fix-watch-subagent-sigpipe-exit-141). Семантика прежняя: пустой
+        # файл → пустая строка (${max_gap:-0}), нулевые гэпы → 0.
+        max_gap=$(awk -F'\t' '{ gap = $2 + 0; if (gap > max) max = gap } END { if (NR > 0) print max }' "$GAPS_FILE" 2>/dev/null)
         avg_gap=$(awk -F'\t' '{s+=$2; n++} END {if(n>0) printf "%d", s/n; else print 0}' "$GAPS_FILE" 2>/dev/null)
         log_run "gaps_recorded=$gaps_count max_gap=${max_gap:-0}s avg_gap=${avg_gap:-0}s"
     fi
