@@ -11,26 +11,22 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
-
-
-
-
-
+use Symfony\Component\Lock\LockFactory;
+use TaskOrchestrator\Console\Module\Orchestrator\Skill\BecomeRoleInstallOutcomeEnum;
+use TaskOrchestrator\Console\Module\Orchestrator\Skill\InstallBecomeRoleServiceInterface;
 
 /**
- * Установка task-orchestrator в host-проекте.
+ * Установка task-orchestrator в host-проекте (команда `agent:init`).
  *
- * Создаёт симлинк общего skill `become-role` в `<project>/.agents/skills/`, чтобы
- * он был виден AI-инструментам (pi, codex и др.) как нативный skill через
- * кросс-клиентскую конвенцию `.agents/skills/`. Сам skill живёт в пакете
- * task-orchestrator; симлинк делает его доступным без копирования.
- *
- * В PHAR команда намеренно завершается до файловых операций: этот вторичный
- * канал дистрибуции не содержит установщик внешних skill-ресурсов.
- *
- * Idempotent: повторный запуск безопасен. Некорректный существующий симлинк
+ * Транспортная граница: разбирает --force, блокирует конкурентный запуск,
+ * делегирует файловую установку skill `become-role` специализированному
+ * Presentation-сервису {@see InstallBecomeRoleServiceInterface} и отображает
+ * его результат ({@see \TaskOrchestrator\Console\Module\Orchestrator\Skill\BecomeRoleInstallResultDto}),
+ * мапя исход {@see BecomeRoleInstallOutcomeEnum} в способ вывода и код
+ * завершения. Механизм установки зависит от режима дистрибуции:
+ * source/Composer — относительный симлинк на skill пакета, PHAR — управляемая
+ * копия с runtime-привязкой к физическому пути PHAR (детали и гарантии — в
+ * сервисе). Повторный запуск идемпотентен; отличающийся целевой объект
  * заменяется только с --force.
  */
 #[AsCommand(
@@ -41,15 +37,11 @@ final class InitCommand extends Command
 {
     private const string OPT_FORCE = 'force';
 
-    private const string SKILL_RELATIVE_PATH = 'docs/agents/skills/become-role';
-
-    private const string TARGET_RELATIVE_PATH = '.agents/skills/become-role';
+    public const string LOCK_RESOURCE = 'command:agent:init';
 
     public function __construct(
-        private readonly string $packageDir,
-        private readonly string $basePath,
-        private readonly bool $isPhar,
-        private readonly Filesystem $filesystem,
+        private readonly InstallBecomeRoleServiceInterface $installer,
+        private readonly LockFactory $lockFactory,
     ) {
         parent::__construct();
     }
@@ -61,7 +53,7 @@ final class InitCommand extends Command
             self::OPT_FORCE,
             'f',
             InputOption::VALUE_NONE,
-            'Пересоздать симлинк, даже если он уже существует и некорректен',
+            'Заменить существующую установку become-role, если она отличается от ожидаемой',
         );
     }
 
@@ -70,71 +62,50 @@ final class InitCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        // Утверждённый контракт PHAR: завершиться до любых операций с файловой
-        // системой host-проекта и направить пользователя в Composer-канал.
-        if ($this->isPhar) {
-            $io->error('agent:init недоступен в PHAR. Используйте Composer.');
-            $output->writeln('php vendor/bin/task-orchestrator agent:init');
-
-            return Command::FAILURE;
-        }
-
         $force = (bool) $input->getOption(self::OPT_FORCE);
 
-        $source = Path::canonicalize($this->packageDir . '/' . self::SKILL_RELATIVE_PATH);
-        $targetDir = Path::canonicalize($this->basePath . '/.agents/skills');
-        $target = Path::canonicalize($targetDir . '/' . basename(self::TARGET_RELATIVE_PATH));
+        $lock = $this->lockFactory->createLock(self::LOCK_RESOURCE);
 
-        if (!is_dir($source) || !is_file($source . '/SKILL.md')) {
-            $io->error(sprintf('Skill become-role не найден в пакете: %s', $source));
-
-            return Command::FAILURE;
-        }
-
-        if ($this->isCorrectSymlink($target, $source)) {
-            $io->success(sprintf('become-role уже установлен: %s -> %s', $target, $source));
+        if (!$lock->acquire()) {
+            $io->warning(sprintf('Команда "%s" уже выполняется. Пропускаем.', $this->getName() ?? static::class));
 
             return Command::SUCCESS;
         }
 
-        if ((is_link($target) || file_exists($target)) && !$force) {
-            $io->warning(sprintf(
-                'Путь существует и не является корректным симлинком become-role: %s. Используйте --force для замены.',
-                $target,
-            ));
-
-            return Command::FAILURE;
+        try {
+            $result = $this->installer->install($force);
+        } finally {
+            $lock->release();
         }
 
-        $this->filesystem->mkdir($targetDir);
+        return match ($result->outcome) {
+            BecomeRoleInstallOutcomeEnum::installed,
+            BecomeRoleInstallOutcomeEnum::alreadyInstalled => $this->renderSuccess($io, $result->message),
+            BecomeRoleInstallOutcomeEnum::conflict => $this->renderWarning($io, $result->message),
+            BecomeRoleInstallOutcomeEnum::sourceMissing,
+            BecomeRoleInstallOutcomeEnum::sourceInvalid,
+            BecomeRoleInstallOutcomeEnum::error => $this->renderError($io, $result->message),
+        };
+    }
 
-        if (is_link($target) || file_exists($target)) {
-            $this->filesystem->remove($target);
-        }
-
-        // Относительный путь от каталога симлинка к источнику — переносим при
-        // перемещении проекта целиком.
-        $relativeSource = Path::makeRelative($source, $targetDir);
-        $this->filesystem->symlink($relativeSource, $target);
-
-        $io->success(sprintf('become-role установлен: %s -> %s', $target, $source));
+    private function renderSuccess(SymfonyStyle $io, string $message): int
+    {
+        $io->success($message);
 
         return Command::SUCCESS;
     }
 
-    private function isCorrectSymlink(string $target, string $expectedSource): bool
+    private function renderWarning(SymfonyStyle $io, string $message): int
     {
-        if (!is_link($target)) {
-            return false;
-        }
+        $io->warning($message);
 
-        $linkTarget = readlink($target);
-        if ($linkTarget === false) {
-            return false;
-        }
+        return Command::FAILURE;
+    }
 
-        $resolved = Path::canonicalize(dirname($target) . '/' . $linkTarget);
+    private function renderError(SymfonyStyle $io, string $message): int
+    {
+        $io->error($message);
 
-        return $resolved === Path::canonicalize($expectedSource);
+        return Command::FAILURE;
     }
 }

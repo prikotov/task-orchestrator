@@ -193,48 +193,277 @@ check_commands() {
   return "${missing}"
 }
 
-check_init_fail_fast() {
-  local label="$1"
-  local cwd="$2"
-  shift 2
+run_phar_init() {
+  local cwd="$1"
+  shift
 
-  local output
-  local status
-
-  set +e
-  output="$(
+  (
     cd "${cwd}" || exit 125
-    APP_CACHE_DIR="${TMP_CWD}/cache/${label}" \
-      APP_LOG_DIR="${TMP_CWD}/log/${label}" \
+    APP_CACHE_DIR="${TMP_CWD}/cache/init" \
+      APP_LOG_DIR="${TMP_CWD}/log/init" \
       php "${PHAR_PATH}" agent:init "$@" 2>&1
-  )"
-  status=$?
-  set -e
+  )
+}
 
-  if [[ "${status}" -ne 1 ]]; then
-    echo "ERROR: agent:init [${label}] завершился с кодом ${status}, ожидался 1" >&2
-    echo "${output}" >&2
+# agent:init в PHAR — полный контракт установки become-role: управляемая копия
+# с runtime-привязкой вместо симлинка на phar://. Проверяется в изолированном
+# host-каталоге; созданные каталоги удаляются trap-очисткой TMP_CWD (включая
+# аварийное завершение).
+check_init_install() {
+  local host_dir="$1"
+  local skill_dir="${host_dir}/.agents/skills/become-role"
+  local init_output
+  local repeat_output
+  local force_output
+
+  # 1) Первая установка: exit 0, обычный каталог (не симлинк), полное дерево + привязка.
+  if ! init_output="$(run_phar_init "${host_dir}")"; then
+    echo "ERROR: agent:init [install] завершился с ошибкой из ${host_dir}" >&2
+    echo "${init_output}" >&2
+    return 1
+  fi
+  if ! grep -Fq -- 'установлен' <<< "${init_output}"; then
+    echo "ERROR: agent:init [install] без сообщения об установке" >&2
+    echo "${init_output}" >&2
+    return 1
+  fi
+  if [[ ! -d "${skill_dir}" || -L "${skill_dir}" ]]; then
+    echo "ERROR: agent:init [install] не создал обычный каталог ${skill_dir}" >&2
+    return 1
+  fi
+  local required_file
+  for required_file in 'SKILL.md' 'README.md' 'scripts/become-role.sh' '.phar-binding'; do
+    if [[ ! -f "${skill_dir}/${required_file}" ]]; then
+      echo "ERROR: agent:init [install]: отсутствует ${skill_dir}/${required_file}" >&2
+      return 1
+    fi
+  done
+  local binding="$(<"${skill_dir}/.phar-binding")"
+  if [[ "${binding}" != "${PHAR_PATH}" ]]; then
+    echo "ERROR: runtime-привязка указывает на '${binding}', ожидался '${PHAR_PATH}'" >&2
     return 1
   fi
 
-  for fragment in \
-    'agent:init недоступен в PHAR' \
-    'Composer' \
-    'php vendor/bin/task-orchestrator agent:init'; do
+  local skill_md5_before="$(md5sum "${skill_dir}/SKILL.md" | awk '{print $1}')"
+
+  # 2) Идемпотентный повтор: exit 0, сообщение «уже установлен», inode файла не сменился.
+  local inode_before="$(php -r 'echo fileinode($argv[1]);' "${skill_dir}/SKILL.md")"
+  if ! repeat_output="$(run_phar_init "${host_dir}")"; then
+    echo "ERROR: повторный agent:init завершился с ошибкой" >&2
+    echo "${repeat_output}" >&2
+    return 1
+  fi
+  if ! grep -Fq -- 'уже установлен' <<< "${repeat_output}"; then
+    echo "ERROR: повторный agent:init не распознал актуальную копию" >&2
+    echo "${repeat_output}" >&2
+    return 1
+  fi
+  local inode_after="$(php -r 'echo fileinode($argv[1]);' "${skill_dir}/SKILL.md")"
+  if [[ "${inode_before}" != "${inode_after}" ]]; then
+    echo 'ERROR: повторный agent:init переписал совпадающую установленную копию' >&2
+    return 1
+  fi
+
+  # 3) Конфликт: повреждённая копия без --force — exit 1, диагностика без phar://, без изменений.
+  printf 'tampered\n' > "${skill_dir}/SKILL.md"
+  local conflict_output
+  local conflict_status
+  set +e
+  conflict_output="$(run_phar_init "${host_dir}")"
+  conflict_status=$?
+  set -e
+  if [[ "${conflict_status}" -ne 1 ]]; then
+    echo "ERROR: agent:init [conflict] завершился с кодом ${conflict_status}, ожидался 1" >&2
+    echo "${conflict_output}" >&2
+    return 1
+  fi
+  if ! grep -Fq -- '--force' <<< "${conflict_output}"; then
+    echo "ERROR: диагностика конфликта не предлагает --force" >&2
+    echo "${conflict_output}" >&2
+    return 1
+  fi
+  if grep -Fq -- 'phar://' <<< "${conflict_output}"; then
+    echo "ERROR: agent:init [conflict] раскрыл внутренний phar:// путь" >&2
+    echo "${conflict_output}" >&2
+    return 1
+  fi
+  if [[ "$(cat "${skill_dir}/SKILL.md")" != 'tampered' ]]; then
+    echo 'ERROR: конфликтный запуск без --force изменил целевой объект' >&2
+    return 1
+  fi
+
+  # 4) Замена через --force: exit 0, дерево восстановлено из того же PHAR.
+  if ! force_output="$(run_phar_init "${host_dir}" --force)"; then
+    echo "ERROR: agent:init --force завершился с ошибкой" >&2
+    echo "${force_output}" >&2
+    return 1
+  fi
+  local skill_md5_after="$(md5sum "${skill_dir}/SKILL.md" | awk '{print $1}')"
+  if [[ "${skill_md5_before}" != "${skill_md5_after}" ]]; then
+    echo 'ERROR: agent:init --force не восстановил повреждённый файл из PHAR' >&2
+    return 1
+  fi
+  if [[ "$(<"${skill_dir}/.phar-binding")" != "${PHAR_PATH}" ]]; then
+    echo 'ERROR: agent:init --force потерял runtime-привязку' >&2
+    return 1
+  fi
+
+  # 5) Временные артефакты staging/backup отсутствуют рядом с target.
+  if find "${host_dir}/.agents/skills" -maxdepth 1 -name '.become-role.*' -print -quit | grep -q .; then
+    echo 'ERROR: agent:init оставил staging/backup артефакты в .agents/skills' >&2
+    return 1
+  fi
+
+  # 6) Установленный скрипт разрешает тестовую роль через привязанный PHAR
+  # (запуск bash — публичный контракт; executable-bit Box не гарантирует).
+  # Тестовая роль backend_developer_levsha декларирует без skills — для полного
+  # блока <available_skills> понадобились бы skills, не упакованные в PHAR
+  # (в архиве только become-role); их упаковка — вне этой задачи.
+  local role_output
+  local role_status
+  set +e
+  role_output="$(
+    cd "${host_dir}" || exit 125
+    APP_CACHE_DIR="${TMP_CWD}/cache/role" \
+      APP_LOG_DIR="${TMP_CWD}/log/role" \
+      bash "${skill_dir}/scripts/become-role.sh" backend_developer_levsha 2>&1
+  )"
+  role_status=$?
+  set -e
+  if [[ "${role_status}" -ne 0 ]]; then
+    echo "ERROR: установленный become-role.sh завершился с кодом ${role_status}" >&2
+    echo "${role_output}" >&2
+    return 1
+  fi
+  for fragment in 'Роль: backend_developer_levsha' 'Файл роли:'; do
+    if ! grep -Fq -- "${fragment}" <<< "${role_output}"; then
+      echo "ERROR: вывод become-role.sh не содержит фрагмент: ${fragment}" >&2
+      echo "${role_output}" >&2
+      return 1
+    fi
+  done
+
+  echo '  ✓ agent:init: установка, идемпотентность, конфликт, --force, become-role.sh'
+}
+
+# Regression (QA-1): перемещение PHAR без ручной чистки дефолтного кеша.
+#
+# Дефолтный кеш контейнера (БЕЗ APP_CACHE_DIR) изолируется по физическому пути
+# архива: запуск из A компилирует контейнер с phar://A; после перемещения архива
+# в B повторная установка --force из B обязана работать на свежем кеше B — без
+# недокументированной чистки системного временного каталога. Раньше кеш был
+# общим для всех расположений одного архива: замороженные package_dir/phar_path
+# продолжали ссылаться на мёртвый phar://A, а --force из B падал с ложной
+# диагностикой «skill не найден в PHAR». Отдельный APP_CACHE_DIR между A/B
+# запрещён — он маскировал бы дефект: TMPDIR лишь переносит sys_get_temp_dir() в
+# песочницу, чтобы smoke не оставлял кеш в /tmp.
+check_phar_move_reinstall() {
+  local tools_a="${TMP_CWD}/tools-a"
+  local tools_b="${TMP_CWD}/tools-b"
+  local phar_a="${tools_a}/task-orchestrator.phar"
+  local phar_b="${tools_b}/task-orchestrator.phar"
+  local host_dir="${TMP_CWD}/move-host"
+  local skill_dir="${host_dir}/.agents/skills/become-role"
+  local sandbox_tmp="${TMP_CWD}/tmpdir"
+  local output
+  local status
+
+  mkdir -p "${tools_a}" "${tools_b}" "${host_dir}" "${sandbox_tmp}"
+  cp "${PHAR_PATH}" "${phar_a}"
+
+  # 1) Первая установка из A на ДЕФОЛТНОМ кеше (APP_CACHE_DIR не задаётся).
+  set +e
+  output="$(
+    cd "${host_dir}" || exit 125
+    TMPDIR="${sandbox_tmp}" php "${phar_a}" agent:init 2>&1
+  )"
+  status=$?
+  set -e
+  if [[ "${status}" -ne 0 ]]; then
+    echo "ERROR: agent:init [move] из расположения A завершился с кодом ${status}" >&2
+    echo "${output}" >&2
+    return 1
+  fi
+  if [[ "$(<"${skill_dir}/.phar-binding")" != "${phar_a}" ]]; then
+    echo "ERROR: agent:init [move]: привязка после установки из A не указывает на ${phar_a}" >&2
+    return 1
+  fi
+
+  # 2) Перемещение архива A → B; кеш между запусками НЕ чистится.
+  mv "${phar_a}" "${phar_b}"
+
+  # 3) Запуск из B без --force — честный конфликт: привязка указывает на A.
+  set +e
+  output="$(
+    cd "${host_dir}" || exit 125
+    TMPDIR="${sandbox_tmp}" php "${phar_b}" agent:init 2>&1
+  )"
+  status=$?
+  set -e
+  if [[ "${status}" -ne 1 ]]; then
+    echo "ERROR: agent:init [move] из B без --force ожидал конфликт (1), получен ${status}" >&2
+    echo "${output}" >&2
+    return 1
+  fi
+  if ! grep -Fq -- '--force' <<< "${output}"; then
+    echo "ERROR: agent:init [move]: диагностика конфликта из B не предлагает --force" >&2
+    echo "${output}" >&2
+    return 1
+  fi
+  if [[ "$(<"${skill_dir}/.phar-binding")" != "${phar_a}" ]]; then
+    echo "ERROR: agent:init [move]: конфликтный запуск изменил привязку" >&2
+    return 1
+  fi
+
+  # 4) agent:init --force из B — обновлённая привязка на дефолтном кеше B.
+  set +e
+  output="$(
+    cd "${host_dir}" || exit 125
+    TMPDIR="${sandbox_tmp}" php "${phar_b}" agent:init --force 2>&1
+  )"
+  status=$?
+  set -e
+  if [[ "${status}" -ne 0 ]]; then
+    echo "ERROR: agent:init --force [move] из B завершился с кодом ${status} (устаревший кеш A?)" >&2
+    echo "${output}" >&2
+    return 1
+  fi
+  if [[ "$(<"${skill_dir}/.phar-binding")" != "${phar_b}" ]]; then
+    echo "ERROR: agent:init --force [move]: привязка не обновлена на ${phar_b}" >&2
+    return 1
+  fi
+
+  # 5) Установленный become-role.sh работает через B (CLI по обновлённой привязке).
+  set +e
+  output="$(
+    cd "${host_dir}" || exit 125
+    TMPDIR="${sandbox_tmp}" bash "${skill_dir}/scripts/become-role.sh" backend_developer_levsha 2>&1
+  )"
+  status=$?
+  set -e
+  if [[ "${status}" -ne 0 ]]; then
+    echo "ERROR: become-role.sh [move] после переустановки из B завершился с кодом ${status}" >&2
+    echo "${output}" >&2
+    return 1
+  fi
+  for fragment in 'Роль: backend_developer_levsha' 'Файл роли:'; do
     if ! grep -Fq -- "${fragment}" <<< "${output}"; then
-      echo "ERROR: agent:init [${label}] не содержит диагностику: ${fragment}" >&2
+      echo "ERROR: become-role.sh [move]: вывод не содержит фрагмент: ${fragment}" >&2
       echo "${output}" >&2
       return 1
     fi
   done
 
-  if grep -Fq -- 'phar://' <<< "${output}"; then
-    echo "ERROR: agent:init [${label}] раскрыл внутренний phar:// путь" >&2
-    echo "${output}" >&2
+  # 6) Прямое доказательство изоляции: для A и B материализованы РАЗНЫЕ корни
+  # дефолтного кеша (контейнер A не переиспользуется запуском из B).
+  local cache_roots
+  cache_roots="$(find "${sandbox_tmp}/task-orchestrator" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)"
+  if [[ "${cache_roots}" -lt 2 ]]; then
+    echo "ERROR: дефолтный кеш PHAR не изолирован по физическому пути: найдено корней — ${cache_roots} (ожидалось ≥ 2 для A и B)" >&2
     return 1
   fi
 
-  echo "  ✓ agent:init [${label}] fail-fast с exit 1"
+  echo '  ✓ agent:init: перемещение PHAR A → B без чистки кеша, --force из B, become-role.sh'
 }
 
 # 1) Из checkout CWD (контекст CI).
@@ -245,31 +474,15 @@ DISTRIBUTABLE_CWD="${TMP_CWD}/distributable"
 mkdir -p "${DISTRIBUTABLE_CWD}"
 check_commands 'distributable' "${DISTRIBUTABLE_CWD}"
 
-# agent:init в PHAR — намеренно неподдерживаемый контракт. Проверяем реальный
-# запуск, устойчивую диагностику и отсутствие записей как без --force, так и с
-# ним при уже существующем sentinel-файле host-проекта.
-NO_WRITE_CWD="${TMP_CWD}/no-write"
-SENTINEL_CWD="${TMP_CWD}/sentinel"
-mkdir -p "${NO_WRITE_CWD}" "${SENTINEL_CWD}/.agents"
-printf 'keep\n' > "${SENTINEL_CWD}/.agents/sentinel.txt"
+# 3) Полный контракт agent:init в изолированном host-каталоге из произвольного
+# временного CWD (сценарий распространяемого PHAR).
+INIT_HOST="${TMP_CWD}/init-host"
+mkdir -p "${INIT_HOST}"
+check_init_install "${INIT_HOST}"
 
-check_init_fail_fast 'default' "${NO_WRITE_CWD}"
-if [[ -e "${NO_WRITE_CWD}/.agents" ]]; then
-  echo 'ERROR: agent:init создал .agents при запуске PHAR' >&2
-  exit 1
-fi
-
-check_init_fail_fast 'force' "${SENTINEL_CWD}" --force
-if [[ "$(cat "${SENTINEL_CWD}/.agents/sentinel.txt")" != 'keep' ]]; then
-  echo 'ERROR: agent:init --force изменил sentinel в .agents при запуске PHAR' >&2
-  exit 1
-fi
-
-if find "${SENTINEL_CWD}/.agents" -mindepth 1 ! -path "${SENTINEL_CWD}/.agents/sentinel.txt" -print -quit \
-  | grep -q .; then
-  echo 'ERROR: agent:init --force создал лишние .agents-артефакты при запуске PHAR' >&2
-  exit 1
-fi
+# 4) Regression (QA-1): перемещение реального PHAR между каталогами без чистки
+# дефолтного кеша и повторная установка --force из нового расположения.
+check_phar_move_reinstall
 
 if [[ "${KEEP_PHAR_ARTIFACT}" == '1' ]]; then
   echo "Phar release artifact preserved: ${PHAR_PATH}"

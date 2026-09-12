@@ -94,7 +94,7 @@ validate-language: ## Валидация англицизмов в русско�
 	@vendor/bin/validate-language
 
 .PHONY: phar-smoke
-phar-smoke: ## Собрать Phar и проверить команды и fail-fast agent:init
+phar-smoke: ## Собрать Phar и проверить версию, команды и полный контракт agent:init
 	@echo
 	@echo "Phar smoke:"
 	@bin/phar-smoke

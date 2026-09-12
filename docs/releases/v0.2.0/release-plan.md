@@ -13,7 +13,7 @@
 - Релиз включает изменения после `v0.1.24`, в том числе поддержку GitHub App identity, универсальную загрузку role skills, PHAR-safe module registration, потоковую обработку JSONL, liveness-adaptive timeouts и исправления static-chain system prompt.
 - Финальная стабилизация релизного контракта выполнена в PR #306, #307 и #308.
 - Runtime contract: PHP >= 8.4.1, `ext-openssl` и `ext-zlib`.
-- Вне состава релиза: полная установка `become-role` из PHAR; продолжение вынесено в [`TASK-feat-phar-full-become-role-install`](../../../todo/backlog/TASK-feat-phar-full-become-role-install.todo.md).
+- Вне состава релиза: полная установка `become-role` из PHAR; продолжение вынесено в [`TASK-feat-phar-full-become-role-install`](../../../todo/TASK-feat-phar-full-become-role-install.todo.md).
 
 ## Риски
 

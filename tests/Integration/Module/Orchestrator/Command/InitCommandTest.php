@@ -10,20 +10,30 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\FlockStore;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\InitCommand;
+use TaskOrchestrator\Console\Module\Orchestrator\Skill\Service\InstallBecomeRoleService;
 
 use function is_link;
 use function readlink;
 use function sys_get_temp_dir;
 
 /**
- * Integration-тест команды agent:init.
+ * Integration-тест команды agent:init: source/Composer-контракт.
  *
- * Проверяет создание симлинка become-role в «host-проекте» (temp dir),
- * идемпотентность и поведение --force.
+ * Регрессия публичного поведения source/Composer-ветки: относительный симлинк
+ * become-role в host-проекте (temp dir), идемпотентность и --force. PHAR-ветка
+ * (управляемая копия) покрыта в
+ * {@see \TaskOrchestrator\Tests\Integration\Module\Orchestrator\Skill\InstallBecomeRoleServiceTest}.
+ *
+ * CoversClass сервиса добавлен рядом с командой: symlink-ветка установки
+ * выполняется именно в InstallBecomeRoleService, и без него отчёт покрытия
+ * по фильтру не видит эти строки (QA- замечание об измеримости).
  */
 #[Group('integration')]
 #[CoversClass(InitCommand::class)]
+#[CoversClass(InstallBecomeRoleService::class)]
 final class InitCommandTest extends TestCase
 {
     private string $packageDir;
@@ -41,11 +51,17 @@ final class InitCommandTest extends TestCase
         $this->filesystem = new Filesystem();
         $this->filesystem->mkdir($this->basePath);
 
-        $this->command = new InitCommand(
+        $installer = new InstallBecomeRoleService(
             packageDir: $this->packageDir,
             basePath: $this->basePath,
             isPhar: false,
+            pharPath: null,
             filesystem: $this->filesystem,
+        );
+
+        $this->command = new InitCommand(
+            installer: $installer,
+            lockFactory: new LockFactory(new FlockStore()),
         );
     }
 

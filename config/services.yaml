@@ -51,10 +51,20 @@ services:
     public: true
 
   # --- agent:init: установка task-orchestrator в host-проекте ---
-  # Команде нужны корневые параметры package_dir/base_path (аутовайринг строковых
-  # аргументов требует явного binding). Filesystem резолвится через FrameworkBundle.
-  TaskOrchestrator\Console\Module\Orchestrator\Command\InitCommand:
+  # Специализированный Presentation-сервис установки общего skill become-role
+  # (см. TaskOrchestrator\Console\Module\Orchestrator\Skill). source/Composer —
+  # относительный симлинк; PHAR — управляемая копия с runtime-привязкой
+  # .phar-binding к физическому пути запущенного PHAR. Параметры ядра
+  # (package_dir/base_path/is_phar/phar_path) — единственный источник путей;
+  # Filesystem резолвится через FrameworkBundle. Сама команда InitCommand
+  # регистрируется PHAR-safe регистратором Kernel::registerConsoleServices()
+  # и получает сервис через явный alias ниже (autowire).
+  TaskOrchestrator\Console\Module\Orchestrator\Skill\Service\InstallBecomeRoleService:
     arguments:
       $packageDir: '%task_orchestrator.package_dir%'
       $basePath: '%task_orchestrator.base_path%'
       $isPhar: '%task_orchestrator.is_phar%'
+      $pharPath: '%task_orchestrator.phar_path%'
+
+  TaskOrchestrator\Console\Module\Orchestrator\Skill\InstallBecomeRoleServiceInterface:
+    alias: TaskOrchestrator\Console\Module\Orchestrator\Skill\Service\InstallBecomeRoleService

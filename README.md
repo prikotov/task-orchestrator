@@ -155,23 +155,24 @@ TasK-orchestrator — CLI-инструмент. Минимальные треб�
 composer require prikotov/task-orchestrator
 ```
 
-После установки один раз выполните `agent:init` — он создаёт симлинк общего skill `become-role` в `<проект>/.agents/skills/`, чтобы ваш AI-агент (pi/codex) видел его как нативный skill (через кросс-клиентскую конвенцию `.agents/skills/`):
+После установки один раз выполните `agent:init` — он устанавливает общий skill `become-role` в `<проект>/.agents/skills/`, чтобы ваш AI-агент (pi/codex) видел его как нативный skill (через кросс-клиентскую конвенцию `.agents/skills/`):
 
 ```bash
 php vendor/bin/task-orchestrator agent:init
 ```
 
+Source/Composer создаёт относительный симлинк на skill внутри пакета. PHAR устанавливает управляемую копию skill и записывает внутри неё runtime-привязку — служебный файл `.phar-binding` с физическим путём PHAR-архива.
+
 ### Матрица возможностей дистрибутивов
 
 | Возможность | Source/Composer | PHAR |
 |---|---|---|
-| `agent:init` и установка `become-role` | Поддерживаются полностью | Не поддерживаются: команда завершается с кодом `1` до любых записей в файловую систему и рекомендует Composer |
-| Запуск установленного `become-role` | `.agents/skills/become-role/scripts/become-role.sh <role\|file>` | Недоступен, поскольку PHAR не устанавливает skill |
+| `agent:init` и установка `become-role` | Поддерживаются полностью | Поддерживаются полностью: управляемая копия в `.agents/skills/` |
+| Запуск установленного `become-role` | `bash .agents/skills/become-role/scripts/become-role.sh <role\|file>` | Та же команда через `bash` |
 
-Composer — основной канал дистрибуции. PHAR остаётся secondary/best-effort каналом; `--force` не снимает ограничение `agent:init`.
+Полная поддержка относится только к `agent:init`/`become-role` и не меняет общий статус каналов: Composer — основной дистрибутив, PHAR остаётся secondary/best-effort каналом (публикация по мере возможностей, без self-update и иных общих гарантий).
 
-> Полный `agent:init`/`become-role` для PHAR находится в очереди:  
-> [TASK-feat-phar-full-become-role-install](todo/backlog/TASK-feat-phar-full-become-role-install.todo.md).
+Ограничение PHAR-установки: архив должен оставаться по физическому пути, зафиксированному в `.phar-binding` на момент установки. После перемещения или удаления PHAR повторите установку из нового расположения: `php task-orchestrator.phar agent:init --force`. Ручная чистка кеша не нужна: кеш контейнера PHAR изолируется по физическому пути архива.
 
 Минимальный `config/chains.yaml` — две роли и цепочка из двух шагов:
 

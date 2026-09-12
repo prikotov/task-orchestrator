@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 /**
@@ -82,5 +83,39 @@ final class BecomeRoleScriptTest extends TestCase
         // Assert
         self::assertNotSame(0, $process->getExitCode());
         self::assertNotEmpty($process->getErrorOutput());
+    }
+
+    #[Test]
+    public function becomeRoleReportsExplicitErrorOnEmptyPharBinding(): void
+    {
+        // Regression (QA-2): пустая runtime-привязка .phar-binding — не fallback
+        // на host bin/task-orchestrator, которого в managed-копии нет: явная
+        // диагностика с подсказкой agent:init --force, до любого обращения к CLI.
+        // Управляемая копия воспроизводится во временном каталоге (source-копия
+        // skill в пакете привязки не имеет — файл создаёт только PHAR-установка).
+        $temp = sys_get_temp_dir() . '/become-role-binding-' . bin2hex(random_bytes(6));
+        $skillScripts = $temp . '/.agents/skills/become-role/scripts';
+        mkdir($skillScripts, 0777, true);
+        copy(dirname(__DIR__, 6) . '/docs/agents/skills/become-role/scripts/become-role.sh', $skillScripts . '/become-role.sh');
+        // Пустая привязка: файл существует, физического пути нет.
+        file_put_contents($temp . '/.agents/skills/become-role/.phar-binding', '');
+
+        try {
+            $process = new Process(
+                ['bash', $skillScripts . '/become-role.sh', 'backend_developer_levsha'],
+                cwd: $temp,
+            );
+            $process->run();
+
+            // Assert
+            self::assertSame(1, $process->getExitCode());
+            $error = $process->getErrorOutput();
+            self::assertStringContainsString('runtime-привязка PHAR пуста или повреждена', $error);
+            self::assertStringContainsString('agent:init --force', $error);
+            // Не ушло в fallback-попытку запуска host bin/task-orchestrator.
+            self::assertStringNotContainsString('Нет такого файла или каталога', $error);
+        } finally {
+            (new Filesystem())->remove($temp);
+        }
     }
 }

@@ -52,7 +52,8 @@ use const PHP_OS_FAMILY;
  * getPackageDir()/getProjectDir().
  *
  * Phar: package root доступен только для чтения, поэтому cache/log при работе
- * из Phar уходят в системный временный каталог, разделённый по host-проекту.
+ * из Phar уходят в системный временный каталог, изолированный по паре
+ * (host-проект, физический путь PHAR) — см. writableRoot().
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
@@ -135,7 +136,10 @@ class Kernel extends BaseKernel
      * `<host>/var/cache/<env>` небезопасен: там может лежать контейнер другого
      * Kernel или предыдущей версии task-orchestrator. Версия входит в путь,
      * поэтому обновлённый пакет компилирует совместимый контейнер автоматически.
-     * Явный APP_CACHE_DIR остаётся полным пользовательским переопределением.
+     * В Phar к корню добавляется изоляция по физическому пути архива
+     * ({@see writableRoot()}): замороженные в кеш package_dir/phar_path не
+     * переживают перемещения PHAR. Явный APP_CACHE_DIR остаётся полным
+     * пользовательским переопределением.
      */
     #[Override]
     public function getCacheDir(): string
@@ -183,6 +187,7 @@ class Kernel extends BaseKernel
         $parameters['task_orchestrator.package_dir'] = $packageDir;
         $parameters['task_orchestrator.base_path'] = $projectRoot;
         $parameters['task_orchestrator.is_phar'] = $this->isPhar();
+        $parameters['task_orchestrator.phar_path'] = $this->resolvePharPath();
         $parameters['task_orchestrator.chains_session_dir'] = $projectRoot . '/var/sessions';
         $parameters['task_orchestrator.roles_dir'] = $this->resolveRolesDir($projectRoot, $packageDir);
         $parameters['task_orchestrator.skills_dir'] = $this->resolveSkillsDir($projectRoot, $packageDir);
@@ -402,25 +407,58 @@ class Kernel extends BaseKernel
      * Корень для writable-артефактов (cache/log).
      *
      * Из Phar package root доступен только для чтения — используем системный
-     * временный каталог, разделённый по host-проекту (чтобы избежать коллизий
-     * и устаревших параметров между разными проектами). В обычном режиме —
-     * host-проект (projectRoot), что даёт изоляцию кеша по CWD и согласовано с
-     * другими writable-путями (var/sessions, var/cache/git-identity).
+     * временный каталог, изолированный по паре (host-проект, физический путь
+     * PHAR). Физический путь архива обязан входить в ключ изоляции: параметры
+     * task_orchestrator.package_dir/phar_path (и производные от package_dir)
+     * вычисляются при компиляции и замораживаются в персистентном кеше
+     * контейнера, поэтому кеш, общий для двух расположений одного архива,
+     * продолжал бы ссылаться на мёртвый phar://<старый путь> после перемещения
+     * PHAR. Изоляция по паре даёт свежую компиляцию после перемещения архива
+     * без ручной чистки кеша (контракт повторной установки agent:init --force
+     * из нового расположения). В обычном режиме — host-проект (projectRoot),
+     * что даёт изоляцию кеша по CWD и согласовано с другими writable-путями
+     * (var/sessions, var/cache/git-identity).
      */
     private function writableRoot(): string
     {
-        if ($this->isPhar()) {
-            return rtrim(sys_get_temp_dir(), '/\\')
-                . '/task-orchestrator/'
-                . hash('xxh64', $this->getProjectRoot());
+        $pharPath = $this->resolvePharPath();
+
+        if ($pharPath === null) {
+            return $this->getProjectRoot();
         }
 
-        return $this->getProjectRoot();
+        return rtrim(sys_get_temp_dir(), '/\\')
+            . '/task-orchestrator/'
+            . hash('xxh64', $this->getProjectRoot() . "\0" . $pharPath);
     }
 
     private function isPhar(): bool
     {
         return str_starts_with(__FILE__, 'phar://');
+    }
+
+    /**
+     * Физический путь запущенного PHAR или null вне PHAR.
+     *
+     * Единственный штатный источник физического пути архива — Phar::running(false):
+     * разбор строки `phar://` недопустим (слэши/чувствительность к регистру хоста).
+     * Используется сервисом установки become-role (agent:init в PHAR) для
+     * runtime-привязки управляемой копии skill к конкретному файлу PHAR и ключом
+     * изоляции writable-корня ({@see writableRoot()}).
+     *
+     * Protected — проверяемый шов для инъекции физического пути PHAR в тестах
+     * ядра вне реального архива (по образцу renamePath() в
+     * InstallBecomeRoleService).
+     */
+    protected function resolvePharPath(): ?string
+    {
+        if (!class_exists(\Phar::class)) {
+            return null;
+        }
+
+        $running = \Phar::running(false);
+
+        return $running === '' ? null : $running;
     }
 
     /**

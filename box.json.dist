@@ -15,6 +15,7 @@
         "config/prompts",
         "config/packages",
         "docs/agents/roles",
+        "docs/agents/skills/become-role",
         "src/Module/GitIdentity/Resource/config",
         "templates"
     ],

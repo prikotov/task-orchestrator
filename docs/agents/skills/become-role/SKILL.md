@@ -24,7 +24,7 @@ RACI-матрице. При сомнении бери `team_lead_alex` (дефо
 
 ```bash
 # Запускай из каталога скилла (каталог с этим SKILL.md).
-scripts/become-role.sh <role|file>
+bash scripts/become-role.sh <role|file>
 ```
 
 Пример вывода (`become-role.sh team_lead_alex`):

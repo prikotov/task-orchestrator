@@ -43,17 +43,17 @@ mv task-orchestrator.phar /usr/local/bin/task-orchestrator
 task-orchestrator --version
 ```
 
-> **Примечание:** PHAR публикуется по мере возможности. Для полной поддержки, включая установку `become-role`, используйте Composer.
+> **Примечание:** PHAR публикуется по мере возможности. Для основной поддержки дистрибутива используйте Composer; `agent:init`/`become-role` из PHAR поддерживаются полностью.
 
-## Матрица возможностей `v0.2.0`
+## Матрица возможностей
 
 | Возможность | Исходники/Composer | PHAR |
 |---|---|---|
 | Основные CLI-команды | Полная поддержка | Вторичная поддержка по мере возможности |
-| `agent:init` и установка `become-role` | Поддерживаются полностью | Не поддерживаются: команда зарегистрирована, но завершается с кодом `1` до любых записей в файловую систему |
-| Запуск установленного `become-role` | `.agents/skills/become-role/scripts/become-role.sh <role\|file>` | Недоступен |
+| `agent:init` и установка `become-role` | Поддерживаются полностью: относительный симлинк на skill пакета | Поддерживаются полностью: управляемая копия в `.agents/skills/` + runtime-привязка `.phar-binding` |
+| Запуск установленного `become-role` | `bash .agents/skills/become-role/scripts/become-role.sh <role\|file>` | Та же команда через `bash`; CLI запускается по пути из `.phar-binding` |
 
-`--force` не снимает ограничение PHAR. При попытке `agent:init` команда рекомендует Composer и не создаёт `.agents`.
+PHAR-установка фиксирует физический путь архива в `.phar-binding`: после перемещения или удаления PHAR повторите `php task-orchestrator.phar agent:init --force` из нового расположения (ручная чистка кеша не нужна — кеш контейнера изолируется по физическому пути архива).
 
 ## Подключение `become-role`
 
@@ -61,10 +61,14 @@ task-orchestrator --version
 
 ```bash
 php vendor/bin/task-orchestrator agent:init
-.agents/skills/become-role/scripts/become-role.sh <role|file>
+bash .agents/skills/become-role/scripts/become-role.sh <role|file>
 ```
 
-В локальной копии исходников используйте `bin/console agent:init`, затем тот же установленный путь `.agents/skills/become-role/scripts/become-role.sh`. PHAR не устанавливает этот навык в `v0.2.0`.
+В локальной копии исходников используйте `bin/console agent:init`. Из PHAR — `php task-orchestrator.phar agent:init` из корня host-проекта (архив должен оставаться по исходному физическому пути; после перемещения — `agent:init --force`). Запуск установленного навыка одинаков для всех дистрибутивов:
+
+```bash
+bash .agents/skills/become-role/scripts/become-role.sh <role|file>
+```
 
 ## Первый запуск
 
@@ -108,5 +112,5 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml 
 | Composer сообщает об отсутствии `ext-zlib` | Установить и включить расширение PHP Zlib |
 | `composer: command not found` | Установить Composer: [getcomposer.org](https://getcomposer.org) |
 | `task-orchestrator: command not found` | Добавить `~/.composer/vendor/bin` в `$PATH` или использовать полный путь |
-| `Could not find package` | Проверьте имя и доступность пакета на Packagist; PHAR подходит только для возможностей с вторичной поддержкой из матрицы выше |
+| `Could not find package` | Проверьте имя и доступность пакета на Packagist; из PHAR полностью поддерживаются `agent:init`/`become-role`, остальные возможности — вторичная поддержка из матрицы выше |
 | `Chain not found` | Проверьте путь к `chains.yaml` в конфигурации |
