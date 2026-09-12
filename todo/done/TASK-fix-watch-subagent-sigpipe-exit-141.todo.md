@@ -11,9 +11,10 @@ epic:
 author: Аналитик Шерлок (codex-cli)
 assignee: Бэкендер Левша (pi)
 branch: task/fix-watch-subagent-sigpipe
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/390
+status: done
 started: 2026-09-12 15:56:48 (1789228608)
+completed: 2026-09-12 16:46:53 (1789231613)
 ---
 
 # TASK-fix-watch-subagent-sigpipe-exit-141: Устранить ложный код 141 после успешного запуска сабагента
@@ -44,7 +45,7 @@ started: 2026-09-12 15:56:48 (1789228608)
 
 ## 2. Контекст и Границы (Context and Scope)
 
-- **Где делаем:** `docs/agents/skills/run-subagent/scripts/watch-subagent.sh`, прежде всего `emit_run_summary()` и вызывающие его `EXIT`/cleanup-пути; регрессионные сценарии в `tests/Integration/Docs/Agents/Skills/RunSubagent/WatchSubagentScriptTest.php` согласно [конвенции тестирования](../docs/conventions/testing/index.md).
+- **Где делаем:** `docs/agents/skills/run-subagent/scripts/watch-subagent.sh`, прежде всего `emit_run_summary()` и вызывающие его `EXIT`/cleanup-пути; регрессионные сценарии в `tests/Integration/Docs/Agents/Skills/RunSubagent/WatchSubagentScriptTest.php` согласно [конвенции тестирования](../../docs/conventions/testing/index.md).
 - **Текущее поведение:** скрипт работает с `set -euo pipefail`. После успешного `agent_end` журнал успевает зафиксировать `exit_code=0 reason=success_agent_end`, но вычисление `max_gap` через `awk ... | sort -rn | head -1` на большом `gaps.tsv` закрывает канал раньше времени. `sort` получает `SIGPIPE`, присваивание завершается кодом `141`, обработчик `EXIT` обрывается и внешний код успешного запуска подменяется на `141`. В 12 из 12 исследованных успешных запусков `pi` с большим числом событий сводка была оборвана; успешные запуски `codex` с меньшим потоком имели полный маркер завершения.
 - **Границы (Out of Scope):** не менять soft/hard/stall-таймауты, определение успешного завершения `pi`/`codex`, форматы событий и общую семантику успеха раннеров; не выполнять общий рефакторинг watcher; не подключать настоящие раннеры или внешние сервисы.
 
@@ -106,15 +107,15 @@ php vendor/bin/todo-md validate todo/backlog/TASK-fix-watch-subagent-sigpipe-exi
 - Функциональных зависимостей нет; задача может выполняться независимо.
 - Большой поток нужен для надёжного превышения буфера канала, но тест не должен становиться медленным или зависеть от планировщика ОС.
 - Завершающая диагностика выполняется под `set -euo pipefail`; любое новое исправление должно сохранять исходный код успешного запуска и при этом не скрывать реальные ошибки раннера.
-- Текущая задача [`TASK-feat-phar-full-become-role-install`](done/TASK-feat-phar-full-become-role-install.todo.md) является только источником наблюдения и follow-up (последующей работы), а не dependency (функциональной зависимостью).
+- Текущая задача [`TASK-feat-phar-full-become-role-install`](TASK-feat-phar-full-become-role-install.todo.md) является только источником наблюдения и follow-up (последующей работы), а не dependency (функциональной зависимостью).
 
 ## 8. Источники (Sources)
 
-- [`watch-subagent.sh`](../docs/agents/skills/run-subagent/scripts/watch-subagent.sh), функции `emit_run_summary()` и `cleanup()`.
-- [`WatchSubagentScriptTest.php`](../tests/Integration/Docs/Agents/Skills/RunSubagent/WatchSubagentScriptTest.php).
-- [Реестр повторяющихся проблем](../docs/agents/team-retro/RETRO-ROADMAP.md).
-- [Источник наблюдения: `TASK-feat-phar-full-become-role-install`](done/TASK-feat-phar-full-become-role-install.todo.md).
-- [Конвенция тестирования](../docs/conventions/testing/index.md).
+- [`watch-subagent.sh`](../../docs/agents/skills/run-subagent/scripts/watch-subagent.sh), функции `emit_run_summary()` и `cleanup()`.
+- [`WatchSubagentScriptTest.php`](../../tests/Integration/Docs/Agents/Skills/RunSubagent/WatchSubagentScriptTest.php).
+- [Реестр повторяющихся проблем](../../docs/agents/team-retro/RETRO-ROADMAP.md).
+- [Источник наблюдения: `TASK-feat-phar-full-become-role-install`](TASK-feat-phar-full-become-role-install.todo.md).
+- [Конвенция тестирования](../../docs/conventions/testing/index.md).
 
 ## 9. Комментарии (Comments)
 
