@@ -9,10 +9,11 @@ cost_fact:
 depends_on:
 epic:
 author: Аналитик Шерлок (codex-cli)
-assignee: Бэкендер Левша (codex-cli)
-branch:
+assignee: Бэкендер Левша (pi)
+branch: task/fix-watch-subagent-sigpipe
 pr:
-status: todo
+status: in_progress
+started: 2026-09-12 15:56:48 (1789228608)
 ---
 
 # TASK-fix-watch-subagent-sigpipe-exit-141: Устранить ложный код 141 после успешного запуска сабагента
