@@ -28,5 +28,8 @@
 # Local AI-agent skill setup (created per-environment via `agent:init`)
 /.agents/
 
+# Local AI-agent settings (pi: model/thinking defaults per project)
+/.pi/
+
 # Local scratch (PR bodies, temporary artifacts)
 /tmp/
