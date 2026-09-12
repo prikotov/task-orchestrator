@@ -128,7 +128,7 @@ git diff --check
 
 ## 7. Риски и зависимости (Risks and Dependencies)
 
-- Зависимость: [`TASK-feat-phar-full-become-role-install`](../TASK-feat-phar-full-become-role-install.todo.md) вводит текущую cache isolation (изоляцию кеша) по паре `(host project, physical PHAR path)` и подтверждает наблюдения QA-3/FR-4. Эта задача является отдельным follow-up (последующей работой) и не расширяет scope зависимости.
+- Зависимость: [`TASK-feat-phar-full-become-role-install`](../done/TASK-feat-phar-full-become-role-install.todo.md) вводит текущую cache isolation (изоляцию кеша) по паре `(host project, physical PHAR path)` и подтверждает наблюдения QA-3/FR-4. Эта задача является отдельным follow-up (последующей работой) и не расширяет scope зависимости.
 - Runtime env placeholder (динамический плейсхолдер окружения) Symfony подходит для строковых значений, но выбор первого существующего host/package ресурса требует явной модели; механическое перенесение текущей проверки существования в env processor (обработчик переменной окружения) может смешать конфигурацию и файловую политику.
 - Автоматическое удаление кешей опасно при параллельном запуске старого и нового PHAR. Без надёжного признака владения и активности каталог должен считаться неоднозначным и сохраняться.
 - Нельзя считать системный temp автоматически безопасным: злоумышленник или другой процесс может создать совпадающий путь/симлинк. Нужны проверки владельца, типа узлов и границ удаления.
@@ -141,7 +141,7 @@ git diff --check
 - [QA: QA-3 — заморозка `roles_dir`](../../docs/agents/reports/qa-backend/2026-09-12_09-25_phar-become-role-qa.md).
 - [Follow-up code review: FR-2/FR-4](../../docs/agents/reports/code-reviewer-backend/2026-09-12_10-03_phar-become-role-followup-review.md).
 - [QA retest: остаточные кеш-корни](../../docs/agents/reports/qa-backend/2026-09-12_10-10_phar-become-role-qa-retest.md).
-- [Зависимая задача](../TASK-feat-phar-full-become-role-install.todo.md).
+- [Зависимая задача](../done/TASK-feat-phar-full-become-role-install.todo.md).
 - [Конвенция Symfony-конфигурации](../../docs/conventions/configuration/configuration.md).
 - [Конвенция тестирования](../../docs/conventions/testing/index.md).
 - `src/Kernel.php`.
