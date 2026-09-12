@@ -3,7 +3,7 @@ type: chore
 created: 2026-09-12 15:38:47 (1789227527)
 due: 
 started: 2026-09-12 15:39:27 (1789227567)
-completed: 
+completed: 2026-09-12 15:46:16 (1789227976)
 cancelled: 
 value: V1
 complexity: C0
@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/gitignore-pi-local-settings
 pr: https://github.com/prikotov/task-orchestrator/pull/389
-status: review
+status: done
 ---
 
 # TASK-chore-ignore-pi-settings: Игнорировать локальные настройки pi-агента в Git
@@ -61,7 +61,7 @@ status: review
 ## 5. Критерии приёмки (Definition of Done)
 - [x] Правило `/.pi/` присутствует в `.gitignore`.
 - [x] `git check-ignore` подтверждает игнорирование; `git status` не показывает `.pi/`.
-- [ ] Проверки `make check` пройдены (изменение не затрагивает код; секция обновится после прогона).
+- [x] Проверки `make check` пройдены (изменение не затрагивает код; секция обновится после прогона).
 
 ## 6. Самопроверка (Verification)
 ```bash
