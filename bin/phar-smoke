@@ -203,8 +203,9 @@ check_commands 'distributable' "${DISTRIBUTABLE_CWD}"
 
 # Расширенный E2E-контракт дистрибутива (полная матрица agent:init, запуск
 # become-role.sh, перемещение PHAR A → B на дефолтном кеше) живёт в PHP-тесте
-# apps/console/tests/E2E/Phar/PharDistributionTest.php (цель `make phar-e2e`): PHPUnit и
-# dev-зависимости недоступны в production-install окружении этого smoke.
+# apps/console/tests/E2E/Phar/PharDistributionTest.php (локальная пред-PR цель
+# `make phar-e2e`): PHPUnit и dev-зависимости недоступны в production-install
+# окружении этого smoke.
 
 if [[ "${KEEP_PHAR_ARTIFACT}" == '1' ]]; then
   echo "Phar release artifact preserved: ${PHAR_PATH}"

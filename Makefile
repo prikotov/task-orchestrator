@@ -100,7 +100,7 @@ phar-smoke: ## Собрать Phar и проверить точную верси
 	@bin/phar-smoke
 
 .PHONY: phar-e2e
-phar-e2e: ## Запустить E2E-тест Phar-дистрибутива: сборка Box + полный контракт agent:init (требует Box)
+phar-e2e: ## Локально перед PR проверить Phar E2E: сборка Box + полный контракт agent:init (требует Box)
 	@echo
 	@echo "Phar E2E:"
 	@out=$$(PHAR_E2E_REQUIRED=1 vendor/bin/phpunit --no-progress --no-coverage --colors=never apps/console/tests/E2E/ 2>&1); ec=$$?; echo "$$out" | grep -vE '^(PHPUnit |Runtime:|Configuration:|Time:|[[:space:]]*$$)'; exit $$ec

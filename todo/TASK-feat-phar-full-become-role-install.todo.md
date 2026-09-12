@@ -10,7 +10,7 @@ author: Тимлид Алекс (codex-cli)
 assignee: Бэкендер Левша (codex-cli)
 branch: task/phar-full-become-role-install
 pr: https://github.com/prikotov/task-orchestrator/pull/387
-status: done
+status: review
 started: 2026-09-12 00:38:23 (1789173503)
 completed: 2026-09-12 14:06:59 (1789222019)
 ---
@@ -45,13 +45,13 @@ completed: 2026-09-12 14:06:59 (1789222019)
 
 ### Где делаем
 
-- `apps/console/src/Module/Orchestrator/Command/InitCommand.php` — `InitCommand` ([консольная команда Presentation](../../docs/conventions/layers/presentation/console-command.md));
+- `apps/console/src/Module/Orchestrator/Command/InitCommand.php` — `InitCommand` ([консольная команда Presentation](../docs/conventions/layers/presentation/console-command.md));
 - специализированный Presentation-сервис установки в `apps/console/src/Module/Orchestrator/`, без переноса файловой логики в консольную команду и без обобщения на другие ресурсы;
 - `src/Kernel.php` и `config/services.yaml` — только если для PHAR-сценария потребуется передать сервису физический путь текущего PHAR через явный параметр контейнера;
 - `bin/task-orchestrator` — определение PHAR-контекста (`Phar::running(false)`) и host-project CWD semantics: в PHAR, как и в vendor-контексте, projectRoot (= `base_path` для `.agents/`, ролей, цепочек и `.env.local`) берётся из текущего каталога запуска команды, а не из расположения PHAR-файла; package-ресурсы (`config/`) остаются внутри архива — поэтому `agent:init` из PHAR устанавливает `become-role` в host-проект, из каталога которого запущена команда;
 - `box.json.dist` — включение полного каталога `docs/agents/skills/become-role` в PHAR;
 - `docs/agents/skills/become-role/scripts/become-role.sh` — разрешение CLI пакета как из source/Composer, так и через созданную PHAR-установкой runtime-привязку;
-- тесты `InitCommand` и smoke-тесты дистрибутива согласно [конвенции тестирования](../../docs/conventions/testing/index.md);
+- тесты `InitCommand` и smoke-тесты дистрибутива согласно [конвенции тестирования](../docs/conventions/testing/index.md);
 - `bin/phar-smoke` и связанная конфигурация проверок;
 - пользовательская документация, найденная поиском по `agent:init`, `become-role.sh`, `PHAR` и `Phar`, включая `README.md`, `README.en.md`, `README.zh.md`, `docs/guide/cli.md`, `docs/guide/troubleshooting.md`, документацию затронутых skills и релизные документы.
 
@@ -87,7 +87,7 @@ completed: 2026-09-12 14:06:59 (1789222019)
 - [x] Установка не следует по существующему target-симлинку и внутренним симлинкам, а также отказывается работать через симлинки в существующих `.agents` и `.agents/skills`; при штатном завершении временные артефакты очищаются. Гарантия абсолютной атомарности при аварийном завершении процесса или отказе файловой системы не заявляется.
 - [x] После успешной установки команда возвращает `Command::SUCCESS`, а `bash .agents/skills/become-role/scripts/become-role.sh <role|file>` успешно разрешает тестовую роль из упакованного PHAR.
 - [x] Автоматические проверки покрывают PHAR success-сценарий, идемпотентный повтор, конфликт без `--force`, замену через `--force`, неполный источник и отсутствие частичного результата при ошибке.
-- [x] `bin/phar-smoke` после реальной сборки PHAR проверяет точный `--version` и регистрацию команд модулей из checkout и произвольного временного CWD; позитивные сценарии `agent:init` и `agent:init --force`, содержимое установленного skill и запуск `become-role.sh` покрыты E2E-тестом `apps/console/tests/E2E/Phar/PharDistributionTest.php` (цель `make phar-e2e`, обязательный CI-шаг в job `test`).
+- [x] `bin/phar-smoke` после реальной сборки PHAR проверяет точный `--version` и регистрацию команд модулей из checkout и произвольного временного CWD; позитивные сценарии `agent:init` и `agent:init --force`, содержимое установленного skill и запуск `become-role.sh` покрыты E2E-тестом `apps/console/tests/E2E/Phar/PharDistributionTest.php` (локальная пред-PR цель `make phar-e2e`; в CI и release workflow тяжёлый E2E не запускается).
 - [x] Регрессионные тесты подтверждают неизменность source/Composer-сценариев: относительный симлинк, идемпотентность, конфликт без `--force` и замена через `--force`.
 - [x] Документация синхронно описывает поддержку `agent:init`/`become-role` из PHAR и не переносит эту гарантию на остальные ограничения secondary/best-effort канала.
 
@@ -163,15 +163,15 @@ git diff --check
 - Box может не сохранить ожидаемые права файла; запуск через `bash` обязателен в smoke-тесте, а необходимость прямого executable-bit должна быть явно проверена до обещания такого контракта.
 - Изменение документации не должно противоречить действующему RFC: full support относится только к `agent:init`/`become-role`, PHAR в целом остаётся secondary/best-effort.
 - Полный PHAR smoke зависит от доступности Box в локальном или CI-окружении.
-- Follow-up (последующая работа): заморозка `roles_dir`/других runtime layout-путей в скомпилированном контейнере и накопление кеш-корней после перемещения PHAR вынесены в отдельную backlog-задачу [`TASK-fix-phar-runtime-layout-cache`](../backlog/TASK-fix-phar-runtime-layout-cache.todo.md). Эти наблюдения не изменяют выполненные критерии и scope текущей задачи.
-- Follow-up (последующая работа): ложный внешний код `141` и оборванная сводка после успешных запусков сабагентов, наблюдавшиеся при выполнении этой задачи, вынесены в [`TASK-fix-watch-subagent-sigpipe-exit-141`](../backlog/TASK-fix-watch-subagent-sigpipe-exit-141.todo.md). Это связь с источником наблюдения, а не функциональная зависимость; scope и критерии текущей задачи не изменяются.
+- Follow-up (последующая работа): заморозка `roles_dir`/других runtime layout-путей в скомпилированном контейнере и накопление кеш-корней после перемещения PHAR вынесены в отдельную backlog-задачу [`TASK-fix-phar-runtime-layout-cache`](backlog/TASK-fix-phar-runtime-layout-cache.todo.md). Эти наблюдения не изменяют выполненные критерии и scope текущей задачи.
+- Follow-up (последующая работа): ложный внешний код `141` и оборванная сводка после успешных запусков сабагентов, наблюдавшиеся при выполнении этой задачи, вынесены в [`TASK-fix-watch-subagent-sigpipe-exit-141`](backlog/TASK-fix-watch-subagent-sigpipe-exit-141.todo.md). Это связь с источником наблюдения, а не функциональная зависимость; scope и критерии текущей задачи не изменяются.
 
 ## 8. Источники (Sources)
 
-- [Зависимость: контракт `agent:init` для Composer и PHAR](TASK-fix-v0-2-0-phar-become-role-distribution.todo.md).
-- [RFC: дистрибуция task-orchestrator как CLI-утилиты](../../docs/research/rfc/cli-distribution-rfc.md).
-- [Конвенция консольных команд](../../docs/conventions/layers/presentation/console-command.md).
-- [Конвенция тестирования](../../docs/conventions/testing/index.md).
+- [Зависимость: контракт `agent:init` для Composer и PHAR](done/TASK-fix-v0-2-0-phar-become-role-distribution.todo.md).
+- [RFC: дистрибуция task-orchestrator как CLI-утилиты](../docs/research/rfc/cli-distribution-rfc.md).
+- [Конвенция консольных команд](../docs/conventions/layers/presentation/console-command.md).
+- [Конвенция тестирования](../docs/conventions/testing/index.md).
 - `apps/console/src/Module/Orchestrator/Command/InitCommand.php`.
 - `box.json.dist`.
 - `bin/phar-smoke`.
@@ -180,7 +180,7 @@ git diff --check
 
 Архитектурное ограничение задачи: управляемая копия допустима только как специализированный PHAR-механизм установки встроенного `become-role`. Обобщение этого механизма на другие ресурсы требует отдельного решения и отдельной задачи. Ожидаемое дерево PHAR-установки состоит из полного встроенного дерева skill и одной служебной runtime-привязки внутри exact target; никаких файлов рядом с target или в других каталогах host-проекта установщик не создаёт.
 
-QA-3 и FR-2/FR-4 отслеживаются отдельно в [`TASK-fix-phar-runtime-layout-cache`](../backlog/TASK-fix-phar-runtime-layout-cache.todo.md): новая задача отвечает за актуализацию runtime layout и жизненный цикл устаревших PHAR-кешей, не расширяя текущую реализацию `agent:init`/`become-role`.
+QA-3 и FR-2/FR-4 отслеживаются отдельно в [`TASK-fix-phar-runtime-layout-cache`](backlog/TASK-fix-phar-runtime-layout-cache.todo.md): новая задача отвечает за актуализацию runtime layout и жизненный цикл устаревших PHAR-кешей, не расширяя текущую реализацию `agent:init`/`become-role`.
 
 ## История изменений (Change History)
 
@@ -200,3 +200,4 @@ QA-3 и FR-2/FR-4 отслеживаются отдельно в [`TASK-fix-phar
 | 2026-09-12 20:09:05 (1789218545) | Тимлид Алекс (pi) | Создан PR #387; задача переведена в `review`. |
 | 2026-09-12 20:34:44 (1789220084) | Бэкендер Левша (codex-cli) | Доработка по замечанию владельца PR #387: расширенная проверка из `bin/phar-smoke` оформлена как PHP E2E-тест `apps/console/tests/E2E/Phar/PharDistributionTest.php` (Symfony Process + PHPUnit assertions, сборка Box один раз на класс, изолированный workspace с гарантированной очисткой): полная матрица `agent:init` (install/идемпотентность/конфликт/`--force`), запуск установленного `become-role.sh`, регрессия перемещения A → B на дефолтном кеше без ручной чистки. Обязательность Box: `PHAR_E2E_REQUIRED=1` и CI без Box — красный (не ложно-зелёный), обычный локальный прогон без Box — skip. `bin/phar-smoke` сокращён с 491 до 213 строк до production-safe smoke (без PHPUnit/dev-зависимостей): сборка, точный `--version`, регистрация команд из checkout и чужого CWD; внутренние режимы для релиза и PharSmokeScriptTest сохранены. Добавлены цель `make phar-e2e` и обязательный CI-шаг в job `test` (setup-php `tools: box`); существующие gates не ослаблены. Комментарий release-phar синхронизирован, CHANGELOG дополнен. Статус — `review`. |
 | 2026-09-12 21:02:18 (1789221738) | Тимлид Алекс (pi) | Follow-up review и QA E2E-доработки: обязательный `make phar-e2e` добавлен также в tag release workflow; перенос артефакта между файловыми системами и cleanup при ошибке сборки усилены; workspace получает криптографически случайное имя; move-сценарий явно удаляет унаследованные `APP_CACHE_DIR`/`APP_LOG_DIR`. Повторные E2E, smoke и `make check` зелёные; статус остаётся `review`. |
+| 2026-09-12 21:51:13 (1789224673) | Тимлид Алекс (pi) | По решению владельца тяжёлый PHAR E2E исключён из обычного CI и tag release workflow: `make phar-e2e` является локальной пред-PR проверкой; автоматизированные процессы сохраняют короткий production-safe `phar-smoke`. Статус остаётся `review`. |

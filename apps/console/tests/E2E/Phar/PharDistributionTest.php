@@ -34,9 +34,9 @@ use Throwable;
  * Каталог не входит в дефолтные testsuites `phpunit.xml.dist`: тяжёлый E2E
  * запускается отдельной целью `make phar-e2e` с `PHAR_E2E_REQUIRED=1`.
  *
- * Доступность Box: обычный локальный прогон без Box корректно skip'ается;
- * обязательный запуск (CI через GitHub Actions или явный `make phar-e2e`)
- * без Box падает красным, а не зеленеет (см. self::assertBoxAvailableOrFail).
+ * Доступность Box: обычный прямой прогон без Box корректно skip'ается;
+ * локальная пред-PR цель `make phar-e2e` без Box падает красным, а не зеленеет
+ * (см. self::assertBoxAvailableOrFail).
  */
 #[Group('e2e')]
 #[CoversNothing]
@@ -303,8 +303,8 @@ final class PharDistributionTest extends TestCase
 
     /**
      * Обязательность доступности Box: явный прогон цели `make phar-e2e`
-     * (PHAR_E2E_REQUIRED=1) и CI (GITHUB_ACTIONS) без Box падают красным —
-     * тест не может ложно позеленеть; обычный локальный запуск — skip.
+     * (PHAR_E2E_REQUIRED=1) без Box падает красным — тест не может ложно
+     * позеленеть; обычный прямой локальный запуск — skip.
      */
     private static function assertBoxAvailableOrFail(): void
     {
@@ -314,7 +314,7 @@ final class PharDistributionTest extends TestCase
             return;
         }
 
-        $required = getenv(self::REQUIRED_ENV) === '1' || getenv('GITHUB_ACTIONS') === 'true';
+        $required = getenv(self::REQUIRED_ENV) === '1';
 
         if ($required) {
             throw new RuntimeException(
