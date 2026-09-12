@@ -193,50 +193,6 @@ check_commands() {
   return "${missing}"
 }
 
-check_init_fail_fast() {
-  local label="$1"
-  local cwd="$2"
-  shift 2
-
-  local output
-  local status
-
-  set +e
-  output="$(
-    cd "${cwd}" || exit 125
-    APP_CACHE_DIR="${TMP_CWD}/cache/${label}" \
-      APP_LOG_DIR="${TMP_CWD}/log/${label}" \
-      php "${PHAR_PATH}" agent:init "$@" 2>&1
-  )"
-  status=$?
-  set -e
-
-  if [[ "${status}" -ne 1 ]]; then
-    echo "ERROR: agent:init [${label}] завершился с кодом ${status}, ожидался 1" >&2
-    echo "${output}" >&2
-    return 1
-  fi
-
-  for fragment in \
-    'agent:init недоступен в PHAR' \
-    'Composer' \
-    'php vendor/bin/task-orchestrator agent:init'; do
-    if ! grep -Fq -- "${fragment}" <<< "${output}"; then
-      echo "ERROR: agent:init [${label}] не содержит диагностику: ${fragment}" >&2
-      echo "${output}" >&2
-      return 1
-    fi
-  done
-
-  if grep -Fq -- 'phar://' <<< "${output}"; then
-    echo "ERROR: agent:init [${label}] раскрыл внутренний phar:// путь" >&2
-    echo "${output}" >&2
-    return 1
-  fi
-
-  echo "  ✓ agent:init [${label}] fail-fast с exit 1"
-}
-
 # 1) Из checkout CWD (контекст CI).
 check_commands 'checkout' "${ROOT_DIR}"
 
@@ -245,31 +201,11 @@ DISTRIBUTABLE_CWD="${TMP_CWD}/distributable"
 mkdir -p "${DISTRIBUTABLE_CWD}"
 check_commands 'distributable' "${DISTRIBUTABLE_CWD}"
 
-# agent:init в PHAR — намеренно неподдерживаемый контракт. Проверяем реальный
-# запуск, устойчивую диагностику и отсутствие записей как без --force, так и с
-# ним при уже существующем sentinel-файле host-проекта.
-NO_WRITE_CWD="${TMP_CWD}/no-write"
-SENTINEL_CWD="${TMP_CWD}/sentinel"
-mkdir -p "${NO_WRITE_CWD}" "${SENTINEL_CWD}/.agents"
-printf 'keep\n' > "${SENTINEL_CWD}/.agents/sentinel.txt"
-
-check_init_fail_fast 'default' "${NO_WRITE_CWD}"
-if [[ -e "${NO_WRITE_CWD}/.agents" ]]; then
-  echo 'ERROR: agent:init создал .agents при запуске PHAR' >&2
-  exit 1
-fi
-
-check_init_fail_fast 'force' "${SENTINEL_CWD}" --force
-if [[ "$(cat "${SENTINEL_CWD}/.agents/sentinel.txt")" != 'keep' ]]; then
-  echo 'ERROR: agent:init --force изменил sentinel в .agents при запуске PHAR' >&2
-  exit 1
-fi
-
-if find "${SENTINEL_CWD}/.agents" -mindepth 1 ! -path "${SENTINEL_CWD}/.agents/sentinel.txt" -print -quit \
-  | grep -q .; then
-  echo 'ERROR: agent:init --force создал лишние .agents-артефакты при запуске PHAR' >&2
-  exit 1
-fi
+# Расширенный E2E-контракт дистрибутива (полная матрица agent:init, запуск
+# become-role.sh, перемещение PHAR A → B на дефолтном кеше) живёт в PHP-тесте
+# apps/console/tests/E2E/Phar/PharDistributionTest.php (локальная пред-PR цель
+# `make phar-e2e`): PHPUnit и dev-зависимости недоступны в production-install
+# окружении этого smoke.
 
 if [[ "${KEEP_PHAR_ARTIFACT}" == '1' ]]; then
   echo "Phar release artifact preserved: ${PHAR_PATH}"

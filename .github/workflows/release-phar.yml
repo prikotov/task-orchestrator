@@ -11,7 +11,8 @@
 #   5. composer check-platform-reqs --no-dev
 #   6. PHAR_SMOKE_KEEP_ARTIFACT=1 make phar-smoke:
 #      - box compile --config=box.json.dist → task-orchestrator.phar
-#      - version/commands/agent:init smoke в изолированном временном state
+#      - точная проверка --version и регистрация команд из checkout/чужого CWD
+#        в изолированном временном state (production-safe, без PHPUnit)
 #      - успешно проверенный task-orchestrator.phar сохраняется для upload
 #   7. Загрузка task-orchestrator.phar в assets релиза
 #

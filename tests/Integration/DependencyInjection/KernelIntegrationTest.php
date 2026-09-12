@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Kernel;
+use TaskOrchestrator\Console\Module\Orchestrator\Command\InitCommand;
 
 /**
  * Интеграционная проверка сборки контейнера через Symfony Kernel.
@@ -19,6 +20,9 @@ use TaskOrchestrator\Common\Kernel;
  *    уходят в хост, а package_dir/kernel.project_dir остаются на пакете (config/,
  *    bundles.php, modules.php грузятся из пакета);
  *  - кеш Composer-host изолирован от приложения и разделён по версии пакета;
+ *  - кеш/log PHAR изолированы по паре (host-проект, физический путь архива):
+ *    замороженные в персистентный кеш package_dir/phar_path не переживают
+ *    перемещения PHAR (QA-1);
  *  - локаль AI-ролей (task_orchestrator.locale, env TASK_ORCHESTRATOR_LOCALE) —
  *    runtime env-параметр: автоматический поиск при отсутствии значения,
  *    независимость от APP_LOCALE и от локали Symfony-переводчика
@@ -53,6 +57,7 @@ final class KernelIntegrationTest extends TestCase
             self::assertSame($this->packageRoot, $container->getParameter('task_orchestrator.package_dir'));
             self::assertSame($this->packageRoot, $container->getParameter('task_orchestrator.base_path'));
             self::assertFalse($container->getParameter('task_orchestrator.is_phar'));
+            self::assertNull($container->getParameter('task_orchestrator.phar_path'));
             self::assertSame($this->packageRoot, $container->getParameter('kernel.project_dir'));
             self::assertSame(
                 $this->packageRoot . '/docs/agents/roles/team',
@@ -62,6 +67,29 @@ final class KernelIntegrationTest extends TestCase
                 $this->packageRoot . '/var/sessions',
                 $container->getParameter('task_orchestrator.chains_session_dir'),
             );
+        } finally {
+            $kernel->shutdown();
+        }
+    }
+
+    #[Test]
+    public function initCommandWiresInstallBecomeRoleService(): void
+    {
+        // agent:init — тонкая команда: файловую установку выполняет
+        // специализированный сервис, получаемый через явный alias. Проверяем,
+        // что контейнер собирает проводку аргументов (kernel-параметры путей +
+        // Filesystem) и команда конструируется без ошибок автозайринга.
+        $kernel = new Kernel('test', false);
+        $kernel->boot();
+
+        try {
+            $container = $kernel->getContainer();
+
+            /** @var InitCommand $command */
+            $command = $container->get(InitCommand::class);
+
+            self::assertInstanceOf(InitCommand::class, $command);
+            self::assertSame('agent:init', $command->getName());
         } finally {
             $kernel->shutdown();
         }
@@ -314,6 +342,60 @@ final class KernelIntegrationTest extends TestCase
             $restoreReleaseVersion();
             $restoreCacheDir();
         }
+    }
+
+    #[Test]
+    public function pharWritableRootIsIsolatedByHostProjectAndPhysicalPharPath(): void
+    {
+        // Regression (QA-1): параметры task_orchestrator.package_dir/phar_path
+        // вычисляются при компиляции и замораживаются в персистентном кеше
+        // контейнера. Корень кеша PHAR обязан изолироваться по физическому
+        // пути архива: после перемещения PHAR (mv A → B) без ручной чистки кеша
+        // контейнер компилируется заново, а не подхватывает кеш со ссылкой на
+        // мёртвый phar://<старый путь>. Физический путь инъектируется через
+        // protected-шов resolvePharPath() (в реальном PHAR — Phar::running(false)).
+        $hostRoot = sys_get_temp_dir() . '/to-kernel-phar-host-' . bin2hex(random_bytes(6));
+
+        $atTools = $this->createPharContextKernel($hostRoot, '/tools/task-orchestrator.phar');
+        $atToolsAgain = $this->createPharContextKernel($hostRoot, '/tools/task-orchestrator.phar');
+        $atTools2 = $this->createPharContextKernel($hostRoot, '/tools2/task-orchestrator.phar');
+        $otherHost = $this->createPharContextKernel($hostRoot . '-other', '/tools/task-orchestrator.phar');
+
+        // Тот же (host, PHAR) — тот же корень кеша (стабильность между запусками).
+        self::assertSame($atTools->getCacheDir(), $atToolsAgain->getCacheDir());
+
+        // Перемещение PHAR и другой host-проект — другой корень кеша.
+        self::assertNotSame($atTools->getCacheDir(), $atTools2->getCacheDir());
+        self::assertNotSame($atTools->getCacheDir(), $otherHost->getCacheDir());
+
+        // Log-корень изолирован тем же ключом writable-изоляции.
+        self::assertNotSame($atTools->getLogDir(), $atTools2->getLogDir());
+
+        // Структура пути сохранена: системный временный каталог + сегменты
+        // var/cache/task-orchestrator/<version>/<env>; версионная изоляция не
+        // демонтирована. Физический путь PHAR в путь не протекает (только хеш).
+        $cacheDir = $atTools->getCacheDir();
+        self::assertMatchesRegularExpression(
+            '#^' . preg_quote(rtrim(sys_get_temp_dir(), '/\\'), '#') . '/task-orchestrator/[^/]+/var/cache/task-orchestrator/[^/]+/prod$#',
+            $cacheDir,
+        );
+        self::assertStringNotContainsString('/tools/', $cacheDir);
+    }
+
+    private function createPharContextKernel(string $projectRoot, string $pharPath): Kernel
+    {
+        return new class ('prod', false, $projectRoot, $pharPath) extends Kernel {
+            public function __construct(string $environment, bool $debug, string $projectRoot, private readonly string $injectedPharPath)
+            {
+                parent::__construct($environment, $debug, $projectRoot);
+            }
+
+            #[\Override]
+            protected function resolvePharPath(): ?string
+            {
+                return $this->injectedPharPath;
+            }
+        };
     }
 
     #[Test]

@@ -13,6 +13,9 @@ declare(strict_types=1);
  *    — host-project resources (roles, chains, base_path, .env.local) resolve
  *    relative to the host project (CWD); package resources (config/, bundles,
  *    modules) stay pinned to the package root.
+ * 3. PHAR: the distributed archive runs inside a host project (CWD) — same
+ *    host-first semantics as the vendor binary; built-in resources are the
+ *    fallback (например, agent:init устанавливает become-role в CWD-проект).
  *
  * Разделение путей реализовано в {@see \TaskOrchestrator\Common\Kernel}: getProjectDir()
  * (package root) используется для config/ — bundles.php, modules.php, packages/*,
@@ -42,8 +45,14 @@ if (file_exists($vendorAutoload)) {
 // Package root: directory containing this package's composer.json (config/, src/).
 $packageRoot = dirname(__DIR__);
 
-// Project root: host project in vendor context (CWD), package root standalone.
-$projectRoot = $isVendor ? getcwd() : $packageRoot;
+// Project root: host project (CWD) in vendor и PHAR контекстах; package root —
+// в standalone. PHAR всегда выполняется в host-проекте: встроенные роли/цепочки
+// остаются fallback (как у vendor binary), а установочные операции agent:init
+// адресуют CWD-проект. Phar::running(false) — штатное определение PHAR-контекста
+// (возвращает пустую строку вне PHAR).
+$isPhar = \Phar::running(false) !== '';
+$cwd = getcwd();
+$projectRoot = ($isVendor || $isPhar) && $cwd !== false ? $cwd : $packageRoot;
 
 // .env.local: host first (CODEX_HTTP_PROXY, AGENT_*), then package fallback.
 // Загружается ПЕРЕД ядром, чтобы APP_ENV/APP_DEBUG и proxy-переменные были видны.

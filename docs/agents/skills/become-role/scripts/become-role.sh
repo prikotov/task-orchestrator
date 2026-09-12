@@ -41,6 +41,36 @@ if [[ "$SCRIPT_DIR_LOGICAL" == *"$HOST_SKILL_SUFFIX" ]]; then
     PROJECT_ROOT="${SCRIPT_DIR_LOGICAL%"$HOST_SKILL_SUFFIX"}"
 fi
 
+# Runtime-привязка PHAR: `agent:init` из PHAR-дистрибутива создаёт управляемую
+# копию skill (она не принадлежит package tree и сама путь к архиву не найдёт)
+# и записывает рядом с корнем skill физический путь task-orchestrator.phar.
+# source/Composer-установка файла не создаёт и использует штатный
+# bin/task-orchestrator пакета.
+PHAR_BINDING_FILE="$SCRIPT_DIR/../.phar-binding"
+PHAR_PATH=""
+
+if [[ -f "$PHAR_BINDING_FILE" ]]; then
+    PHAR_PATH="$(<"$PHAR_BINDING_FILE")"
+
+    # Пустая или повреждённая привязка (файл есть, физического пути нет) —
+    # не fallback на отсутствующий host bin/task-orchestrator: управляемая
+    # копия без рабочей привязки неработоспособна, источник один — повторная
+    # установка из актуального расположения PHAR.
+    if [[ -z "${PHAR_PATH//[[:space:]]/}" ]]; then
+        echo "Ошибка: runtime-привязка PHAR пуста или повреждена: ${PHAR_BINDING_FILE}." >&2
+        echo "Выполните повторную установку из актуального расположения PHAR: agent:init --force." >&2
+        exit 1
+    fi
+fi
+
+# PHAR перемещён или удалён после установки: привязка устарела, обновить её
+# может только повторная установка из нового расположения (agent:init --force).
+if [[ -n "$PHAR_PATH" && ! -f "$PHAR_PATH" ]]; then
+    echo "Ошибка: PHAR из runtime-привязки не найден: ${PHAR_PATH}." >&2
+    echo "Выполните повторную установку из нового расположения PHAR: agent:init --force." >&2
+    exit 1
+fi
+
 # Имя роли из basename файла роли: team_lead_alex.ru.md → team_lead_alex.
 role_name_from_file() {
     local name
@@ -58,22 +88,33 @@ else
     ROLE_NAME="$ARG"
 fi
 
+# CLI-запуск agent:role-skills: в управляемой PHAR-копии — через привязанный
+# архив (php <phar-path>), иначе штатный bin/task-orchestrator пакета.
+run_cli() {
+    if [[ -n "$PHAR_PATH" ]]; then
+        php "$PHAR_PATH" "$@"
+    else
+        "$TASK_ORCH_BIN" "$@"
+    fi
+}
+
 run_role_skills() {
     if [[ -n "$PROJECT_ROOT" ]]; then
         (
             cd "$PROJECT_ROOT"
-            "$TASK_ORCH_BIN" agent:role-skills "$ROLE_NAME" --format=json
+            run_cli agent:role-skills "$ROLE_NAME" --format=json
         )
 
         return
     fi
 
-    "$TASK_ORCH_BIN" agent:role-skills "$ROLE_NAME" --format=json
+    run_cli agent:role-skills "$ROLE_NAME" --format=json
 }
 
-# agent:role-skills через bin/task-orchestrator (host-aware). --format=json:
-# {role, role_file, skills, catalog}. bin/task-orchestrator делает fail-fast
-# при ошибках (роль/skill не найдены, цикл depends_on) — ненулевой exit.
+# agent:role-skills через CLI пакета (host-aware): bin/task-orchestrator в
+# source/Composer либо привязанный PHAR в управляемой копии. --format=json:
+# {role, role_file, skills, catalog}. CLI делает fail-fast при ошибках
+# (роль/skill не найдены, цикл depends_on) — ненулевой exit.
 if ! OUTPUT="$(run_role_skills)"; then
     echo "Ошибка: не удалось получить данные роли \"${ROLE_NAME}\"." >&2
     exit 1

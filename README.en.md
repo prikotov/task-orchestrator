@@ -155,23 +155,24 @@ Installation:
 composer require prikotov/task-orchestrator
 ```
 
-After installation, run `agent:init` once — it creates a symlink for the shared `become-role` skill in `<project>/.agents/skills/` so your AI agent (pi/codex) sees it as a native skill (via the cross-client `.agents/skills/` convention):
+After installation, run `agent:init` once — it installs the shared `become-role` skill into `<project>/.agents/skills/` so your AI agent (pi/codex) sees it as a native skill (via the cross-client `.agents/skills/` convention):
 
 ```bash
 php vendor/bin/task-orchestrator agent:init
 ```
 
+Source/Composer creates a relative symlink to the skill inside the package. PHAR installs a managed copy of the skill and writes a runtime binding inside it — the auxiliary file `.phar-binding` holding the physical path of the PHAR archive.
+
 ### Distribution feature matrix
 
 | Capability | Source/Composer | PHAR |
 |---|---|---|
-| `agent:init` and `become-role` installation | Fully supported | Not supported: the command is registered, but exits with code `1` before any filesystem write and recommends Composer |
-| Running the installed `become-role` skill | `.agents/skills/become-role/scripts/become-role.sh <role\|file>` | Unavailable because PHAR does not install the skill |
+| `agent:init` and `become-role` installation | Fully supported | Fully supported: managed copy in `.agents/skills/` |
+| Running the installed `become-role` skill | `bash .agents/skills/become-role/scripts/become-role.sh <role\|file>` | The same command via `bash` |
 
-Composer is the primary distribution channel. PHAR remains a secondary, best-effort channel; `--force` does not bypass the `agent:init` limitation.
+Full support applies only to `agent:init`/`become-role` and does not change the overall channel status: Composer is the primary distribution channel, while PHAR remains a secondary, best-effort channel (published as feasible, without self-update or other general guarantees).
 
-> Full `agent:init`/`become-role` support for PHAR is planned in backlog:  
-> [TASK-feat-phar-full-become-role-install](todo/backlog/TASK-feat-phar-full-become-role-install.todo.md).
+PHAR installation limitation: the archive must stay at the physical path recorded in `.phar-binding` at installation time. After moving or deleting the PHAR, repeat the installation from the new location: `php task-orchestrator.phar agent:init --force`. No manual cache cleanup is needed: the PHAR container cache is isolated by the archive's physical path.
 
 Minimal `config/chains.yaml` — two roles and a two-step chain:
 

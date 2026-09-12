@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Расширенные E2E-гарантии PHAR-дистрибутива вынесены из shell-smoke в PHPUnit E2E-тест `apps/console/tests/E2E/Phar/PharDistributionTest.php` (локальная пред-PR цель `make phar-e2e`): сборка настоящего PHAR через Box один раз на класс, полная матрица `agent:init` (установка, идемпотентность, конфликт без `--force`, замена через `--force`), запуск установленного `become-role.sh` через runtime-привязку и регрессия перемещения PHAR A → B на дефолтном кеше без ручной чистки. `bin/phar-smoke` сокращён до короткой production-safe smoke-проверки (без PHPUnit и dev-зависимостей): сборка PHAR, точный `--version` и регистрация команд модулей из checkout и чужого CWD.
+- Полная поддержка `agent:init`/`become-role` в PHAR-дистрибутиве: `php task-orchestrator.phar agent:init` устанавливает управляемую копию skill в `.agents/skills/become-role` (вместо недопустимого симлинка на `phar://`) со служебной runtime-привязкой `.phar-binding` — физическим путём PHAR-архива. Повторный запуск идемпотентен, отличающаяся установка заменяется только с `--force`, установленный скрипт запускается публично через `bash`. PHAR должен оставаться по исходному физическому пути: после перемещения или удаления архива требуется `agent:init --force` из нового расположения. Общий статус PHAR как secondary/best-effort канала не меняется.
+
 ## [0.6.0] - 2026-09-10
 
 ### Changed

@@ -16,7 +16,7 @@
 - [Проверка качества не пройдена](#проверка-качества-не-пройдена)
 - [Ошибки конфигурации](#ошибки-конфигурации)
 - [Отладочные команды](#отладочные-команды)
-- [`agent:init` недоступен в PHAR](#agentinit-недоступен-в-phar)
+- [`agent:init` и `become-role` в PHAR](#agentinit-и-become-role-в-phar)
 - [PHAR собирается, но команды модулей недоступны (пустой контейнер)](#phar-собирается-но-команды-модулей-недоступны-пустой-контейнер)
 - [Таблица исключений](#таблица-исключений)
 
@@ -113,7 +113,7 @@ Agent role "verifier" not found.
 ```bash
 cache_dir="$(mktemp -d)"
 APP_CACHE_DIR="$cache_dir" \
-  .agents/skills/become-role/scripts/become-role.sh <role|file>
+  bash .agents/skills/become-role/scripts/become-role.sh <role|file>
 rm -rf "$cache_dir"
 ```
 
@@ -382,23 +382,52 @@ cat var/log/agent_audit.jsonl | python3 -m json.tool
 
 ---
 
-## `agent:init` недоступен в PHAR
+## `agent:init` и `become-role` в PHAR
 
-**Симптом:** `php task-orchestrator.phar agent:init` или вариант с `--force` завершается с кодом `1` и предлагает использовать Composer.
+### Старая PHAR-сборка завершается с кодом `1`
 
-**Причина:** в `v0.2.0` Composer/Packagist — основной канал с полной поддержкой, а PHAR — secondary/best-effort. Команда `agent:init` зарегистрирована в PHAR, но установка `become-role` из виртуальной файловой системы `phar://` не поддерживается.
+**Симптом:** `php task-orchestrator.phar agent:init` (или с `--force`) завершается с кодом `1` и предлагает использовать Composer.
 
-Это безопасный fail-fast: команда завершается до любых файловых записей, не создаёт `.agents` и не изменяет существующие файлы. `--force` не снимает ограничение.
+**Причина:** PHAR-сборки, выпущенные до введения полной поддержки установки (`v0.6.0` и более ранние), используют безопасный fail-fast контракт: команда завершается до любых файловых записей, не создаёт `.agents` и не изменяет существующие файлы.
 
-**Решение:** установите пакет через Composer в проект-потребитель и повторите инициализацию:
+**Решение:** скачайте свежий `task-orchestrator.phar` из [релизов GitHub](https://github.com/prikotov/task-orchestrator/releases) и повторите установку:
 
 ```bash
-composer require prikotov/task-orchestrator
-php vendor/bin/task-orchestrator agent:init
-.agents/skills/become-role/scripts/become-role.sh <role|file>
+php task-orchestrator.phar agent:init
+bash .agents/skills/become-role/scripts/become-role.sh <role|file>
 ```
 
-Для локальную копию исходников используйте `bin/console agent:init`. Полный контракт и матрица возможностей приведены в разделе [`agent:init`](cli.md#agentinit).
+### PHAR перемещён или удалён после установки
+
+**Симптом:** `bash .agents/skills/become-role/scripts/become-role.sh <role|file>` завершается ошибкой `PHAR из runtime-привязки не найден`.
+
+**Причина:** PHAR-установка создаёт управляемую копию skill и фиксирует в служебном файле `.agents/skills/become-role/.phar-binding` физический путь PHAR-архива. После перемещения или удаления архива привязка устаревает.
+
+**Решение:** верните PHAR на исходный путь либо выполните повторную установку из нового расположения:
+
+```bash
+php /новый/путь/task-orchestrator.phar agent:init --force
+```
+
+Ручная чистка кеша не требуется: кеш контейнера PHAR изолируется по паре (host-проект, физический путь архива), поэтому запуск из нового расположения компилирует свежий контейнер вместо устаревшего кеша прежнего пути.
+
+Если `.phar-binding` существует, но пуст или содержит только пробелы, `become-role.sh` завершается с явной диагностикой `runtime-привязка PHAR пуста или повреждена` и той же подсказкой `agent:init --force` (скрипт не пытается запускать отсутствующий host-бинарник).
+
+### Конфликт установки без `--force`
+
+**Симптом:** повторный `php task-orchestrator.phar agent:init` завершается с кодом `1` и предлагает `--force`.
+
+**Причина:** `.agents/skills/become-role` существует, но отличается от ожидаемой установки из PHAR: изменённые, лишние или отсутствующие файлы либо симлинк вместо каталога. Без `--force` существующий объект не изменяется.
+
+**Решение:** если локальные изменения не нужны, замените установку:
+
+```bash
+php task-orchestrator.phar agent:init --force
+```
+
+Отдельный отказ с диагностикой возникает, если `.agents` или `.agents/skills` — симлинк или не каталог: замените их обычными каталогами и повторите запуск.
+
+Полный контракт и матрица возможностей приведены в разделе [`agent:init`](cli.md#agentinit).
 
 ---
 
@@ -419,7 +448,7 @@ cd /tmp && php /path/to/task-orchestrator.phar list \
   | grep -E 'agent:init|agent:role-skills|agent:token|agent:run|validate:connectivity'
 ```
 
-Если пусто — контейнер пуст. Проверьте, что `bin/phar-smoke` (усиленный) зелёный из рабочего каталога распространяемой версии: он специально ловит этот случай (`--version` ложнозелёный и проходит даже при hollow). См. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-автообнаружения-вариант-4).
+Если пусто — контейнер пуст. Проверьте, что production-safe проверка `bin/phar-smoke` зелёная из рабочего каталога распространяемой версии: она проверяет регистрацию команд и специально ловит этот случай (`--version` ложнозелёный и проходит даже при hollow). См. [ADR-012, раздел PHAR-переносимость](../adr/012-module-configuration-convention.md#phar-переносимость-эволюция-автообнаружения-вариант-4).
 
 ---
 

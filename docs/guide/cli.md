@@ -181,41 +181,57 @@ php vendor/bin/task-orchestrator agent:runners
 
 ### `agent:init`
 
-Устанавливает общий skill `become-role` в host-проект: создаёт симлинк в `<project>/.agents/skills/`, чтобы AI-инструменты (pi, codex и др.) видели его как нативный skill через кросс-клиентскую конвенцию `.agents/skills/`. Сам skill остаётся внутри пакета task-orchestrator.
+Устанавливает общий skill `become-role` в host-проект в `<project>/.agents/skills/`, чтобы AI-инструменты (pi, codex и др.) видели его как нативный skill через кросс-клиентскую конвенцию `.agents/skills/`.
 
-Команда идемпотентна: повторный запуск безопасен. Для локальной копии исходников используйте:
+Механизм установки зависит от дистрибутива:
 
-```bash
-bin/console agent:init [--force]
-```
+- **Source/Composer** — относительный симлинк `.agents/skills/become-role` на skill внутри пакета task-orchestrator (сам skill остаётся в пакете);
+- **PHAR** — управляемая копия skill в `.agents/skills/become-role` с runtime-привязкой: служебный файл `.phar-binding` в корне копии хранит физический путь PHAR-архива, по которому `become-role.sh` вызывает CLI.
 
-В Composer host-проекте запускайте после `composer install`:
-
-```bash
-php vendor/bin/task-orchestrator agent:init [--force]
-```
-
-После успешной установки вызывайте навык только по установленному пути:
+Команда идемпотентна: повторный запуск безопасен и ничего не изменяет, если установленное состояние актуально.
 
 ```bash
-.agents/skills/become-role/scripts/become-role.sh <role|file>
+bin/console agent:init [--force]                       # source checkout (локальная копия исходников)
+php vendor/bin/task-orchestrator agent:init [--force]  # Composer host
+php task-orchestrator.phar agent:init [--force]        # PHAR
 ```
 
-#### Матрица возможностей `v0.2.0`
+PHAR-архив может лежать в любом каталоге, но `agent:init` устанавливает skill в текущий каталог — запускайте из корня host-проекта:
+
+```bash
+cd ~/projects/my-app
+php ~/tools/task-orchestrator.phar agent:init
+```
+
+После успешной установки вызывайте навык только по установленному пути и через `bash` (прямой executable-bit не гарантируется, в том числе в копии из PHAR):
+
+```bash
+bash .agents/skills/become-role/scripts/become-role.sh <role|file>
+```
+
+#### Матрица возможностей дистрибутивов
 
 | Возможность | Исходники/Composer | PHAR |
 |---|---|---|
 | Регистрация команды `agent:init` | Да | Да |
-| Установка `become-role` | Поддерживается полностью | Не поддерживается: fail-fast с кодом `1` до любых файловых записей |
-| Запуск установленного `become-role` | `.agents/skills/become-role/scripts/become-role.sh <role\|file>` | Недоступен |
+| Установка `become-role` | Относительный симлинк на skill пакета | Управляемая копия + runtime-привязка `.phar-binding` |
+| Запуск установленного `become-role` | `bash .agents/skills/become-role/scripts/become-role.sh <role\|file>` | Та же команда через `bash`; CLI запускается по пути из `.phar-binding` |
 
-PHAR остаётся secondary/best-effort каналом. В PHAR `agent:init` и `agent:init --force` не создают и не изменяют `.agents`, завершаются с кодом `1` и рекомендуют Composer с рабочей командой `php vendor/bin/task-orchestrator agent:init`.
+Полная поддержка `agent:init`/`become-role` не меняет общий статус каналов: Composer — основной дистрибутив, PHAR остаётся secondary/best-effort каналом (публикация по мере возможностей, без self-update и иных общих гарантий).
+
+Runtime-привязка фиксирует физический путь PHAR на момент установки. После перемещения или удаления архива повторите установку из нового расположения — иначе `become-role.sh` завершится ошибкой с подсказкой:
+
+```bash
+php task-orchestrator.phar agent:init --force
+```
+
+Ручная чистка кеша не нужна: кеш контейнера PHAR изолируется по паре (host-проект, физический путь архива), поэтому запуск из нового расположения компилирует свежий контейнер. Пустая или повреждённая привязка `.phar-binding` даёт в `become-role.sh` явную диагностику с той же подсказкой `agent:init --force`.
 
 | Опция | Описание |
 |---|---|
-| `--force`, `-f` | Пересоздать симлинк, если он существует и некорректен |
+| `--force`, `-f` | Заменить существующую установку, если она отличается от ожидаемой (Source/Composer: пересоздать симлинк; PHAR: заменить управляемую копию) |
 
-**Коды завершения:** `0` — успех (или уже установлен); `1` — PHAR не поддерживает установку, skill не найден в пакете либо обнаружен конфликт без `--force`.
+**Коды завершения:** `0` — успех (или уже установлен); `1` — skill не найден в пакете/PHAR, `.agents` или `.agents/skills` не являются обычными каталогами либо обнаружен конфликт без `--force`.
 
 ---
 

@@ -4,12 +4,13 @@
 
 ## Как это работает
 
-`.agents/skills/become-role/scripts/become-role.sh <role|file>` — установленная обёртка над CLI-командой `agent:role-skills`. Аргумент — имя роли или путь к файлу роли (скрипт сам разбирает).
+`bash .agents/skills/become-role/scripts/become-role.sh <role|file>` — установленная обёртка над CLI-командой `agent:role-skills`. Аргумент — имя роли или путь к файлу роли (скрипт сам разбирает).
 
 `become-role.sh`:
 1. В Composer-host восстанавливает корень host-проекта по логическому пути установленного `.agents/skills/become-role`, даже если текущий каталог физически находится внутри `vendor/` после перехода по симлинку.
-2. Находит файл роли в `docs/agents/roles/team/`. Если env `TASK_ORCHESTRATOR_LOCALE` задана, приоритет: `<role>.<locale>.md` → `<role>.md` → любой доступный перевод. Если переменная отсутствует или пуста: `<role>.md` → `<role>.en.md` → `<role>.ru.md` → `<role>.zh.md` → первый оставшийся `<role>.*.md`. Выводит выбранный **относительный путь** (от project root).
-3. Вызывает `agent:role-skills`, который читает frontmatter роли (`skills:`), транзитивно разворачивает `depends_on` и формирует XML-блок `<available_skills>` (формат Agent Skills / pi): для каждого skill — `name`, `description`, абсолютный `location` его `SKILL.md`.
+2. В PHAR-установке (управляемая копия skill) вызывает CLI по физическому пути PHAR-архива, прочитанному из служебного файла `.phar-binding` в корне копии; если архив перемещён или удалён либо привязка пуста/повреждена — завершается явной ошибкой с подсказкой повторить `agent:init --force` (без попытки запустить отсутствующий host-бинарник).
+3. Находит файл роли в `docs/agents/roles/team/`. Если env `TASK_ORCHESTRATOR_LOCALE` задана, приоритет: `<role>.<locale>.md` → `<role>.md` → любой доступный перевод. Если переменная отсутствует или пуста: `<role>.md` → `<role>.en.md` → `<role>.ru.md` → `<role>.zh.md` → первый оставшийся `<role>.*.md`. Выводит выбранный **относительный путь** (от project root).
+4. Вызывает `agent:role-skills`, который читает frontmatter роли (`skills:`), транзитивно разворачивает `depends_on` и формирует XML-блок `<available_skills>` (формат Agent Skills / pi): для каждого skill — `name`, `description`, абсолютный `location` его `SKILL.md`.
 
 Скрипт **не выводит содержимое роли** — только путь и XML-блок skills. Агент сам читает файл роли через `read` (получает личность: personality, экспертизу, стиль) и по описанию открывает нужный `SKILL.md` — только подходящий к задаче, не все сразу.
 
@@ -31,16 +32,24 @@ bin/console agent:init
 php vendor/bin/task-orchestrator agent:init
 ```
 
-Команда создаёт относительный симлинк `.agents/skills/become-role` на skill внутри пакета. Она идемпотентна; `--force` заменяет некорректный симлинк. После установки запускай скрипт из корня skill, как требует `SKILL.md`:
+Из PHAR-дистрибутива (из корня host-проекта):
+
+```bash
+php task-orchestrator.phar agent:init
+```
+
+Source/Composer создаёт относительный симлинк `.agents/skills/become-role` на skill внутри пакета. PHAR устанавливает управляемую копию skill и записывает в её корне runtime-привязку `.phar-binding` — физический путь PHAR, по которому `become-role.sh` вызывает CLI. Команда идемпотентна; `--force` заменяет отличающуюся установку.
+
+После установки запускай скрипт из корня skill через `bash` (прямой executable-bit не гарантируется, в том числе в копии из PHAR), как требует `SKILL.md`:
 
 ```bash
 cd .agents/skills/become-role
-scripts/become-role.sh <role|file>
+bash scripts/become-role.sh <role|file>
 ```
 
 Обёртка сохраняет корень host-проекта и передаёт его CLI неявно через рабочий каталог. Контейнер CLI хранится отдельно от кеша host-приложения: `<host>/var/cache/task-orchestrator/<version>/<env>`. Поэтому обновление пакета не требует ручной очистки общего `<host>/var/cache/<env>`.
 
-В `v0.2.0` установка поддерживается только для Source/Composer. PHAR — secondary/best-effort канал: `agent:init` зарегистрирован, но завершается с кодом `1` до записи файлов и рекомендует Composer; `--force` не меняет это поведение и не создаёт `.agents`. Подробная матрица возможностей приведена в [CLI guide](../../../guide/cli.md#agentinit).
+Ограничения PHAR-установки: архив должен оставаться по физическому пути, зафиксированному в `.phar-binding`; после перемещения или удаления PHAR повтори `php task-orchestrator.phar agent:init --force` из нового расположения (ручная чистка кеша не нужна: кеш контейнера изолируется по физическому пути архива). Если `.agents` или `.agents/skills` — симлинк или не каталог, установка завершается ошибкой с подсказкой. Полная поддержка `agent:init`/`become-role` не повышает общий статус PHAR-канала (secondary/best-effort); подробная матрица возможностей приведена в [CLI guide](../../../guide/cli.md#agentinit).
 
 ## Альтернативный вызов (без скрипта)
 
