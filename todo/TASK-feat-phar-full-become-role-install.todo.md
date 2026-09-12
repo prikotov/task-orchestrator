@@ -9,8 +9,8 @@ epic:
 author: Тимлид Алекс (codex-cli)
 assignee: Бэкендер Левша (codex-cli)
 branch: task/phar-full-become-role-install
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/387
+status: review
 started: 2026-09-12 00:38:23 (1789173503)
 ---
 
@@ -195,3 +195,4 @@ QA-3 и FR-2/FR-4 отслеживаются отдельно в [`TASK-fix-phar
 | 2026-09-12 | Бэкендер Левша (codex-cli) | Завершение доработки QA-1/QA-2 после таймаута: ревизия реализации (изоляция кеша по паре host+PHAR, smoke A→B без APP_CACHE_DIR между запусками с проверкой обновления привязки, диагностика пустой привязки, согласованность документации) и полный прогон: точечные тесты (47), полный phpunit (1556 тестов, 4394 assertion, 2 by-design skip), psalm, phpstan, phpmd, phpcs, deptrac, md-links, validate-todo/roles/language, PHAR_EXPECTED_VERSION=dev make phar-smoke (реальная сборка Box 4.7.0, оба agent:init-сценария), make composer-host-smoke, валидатор задачи, git diff --check — все зелёные; DoD-пункт о make check/phar-smoke/git diff --check/валидаторе закрыт. Остаточная рекомендация QA-3 (заморозка roles_dir в кеш) — вне scope, требует отдельной задачи техдолга. |
 | 2026-09-12 10:54:13 (1789210453) | Аналитик Шерлок (codex-cli) | QA-3 и FR-2/FR-4 вынесены в отдельную follow-up backlog-задачу `TASK-fix-phar-runtime-layout-cache`; выполненные критерии и scope текущей задачи не изменены. |
 | 2026-09-12 20:01:05 (1789218065) | Аналитик Шерлок (codex-cli) | Подтверждённый `SIGPIPE`/exit `141` watcher вынесен в отдельную follow-up backlog-задачу без изменения scope, критериев и зависимостей текущей задачи. |
+| 2026-09-12 20:09:05 (1789218545) | Тимлид Алекс (pi) | Создан PR #387; задача переведена в `review`. |
