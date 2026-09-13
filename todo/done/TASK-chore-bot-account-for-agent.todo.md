@@ -6,7 +6,7 @@ status_updated: 2026-06-19
 value: V2
 complexity: C2
 priority: P2
-depends_on: []
+depends_on:
 epic:
 author: prikotov
 assignee: team_lead_alex

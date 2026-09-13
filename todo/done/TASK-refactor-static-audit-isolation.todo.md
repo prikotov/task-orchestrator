@@ -10,7 +10,7 @@ author: system_analyst_sherlock (Шерлок)
 assignee: Бэкендер Левша
 branch: task/refactor-static-audit-isolation
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-refactor-static-audit-isolation: Audit isolation в StaticExecution

@@ -4,7 +4,7 @@ created: 2026-06-13
 value: V2
 complexity: C0
 priority: P1
-depends_on: []
+depends_on:
 epic:
 author: codex-cli
 assignee: codex-cli

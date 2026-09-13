@@ -8,12 +8,23 @@ priority: P2
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
 status: in_progress
-reopened: 2026-08-16
+reopened: 2026-09-13
 pr: "#171"
 branch: epic/research-coding-agents-comparison
 ---
 
 # EPIC-research-coding-agents-comparison: Сравнительное исследование CLI-агентов кодинга
+
+## 0. Простое описание (Human Brief)
+
+### Проблема простыми словами (Problem)
+Подключение AI-агентов как сабагентов к ролям команды (docs/agents/roles/team/) требует выбора CLI-агентов кодинга, но выбор шел бессистемно: нет единой методологии сравнения, вердиктов «подходит / частично / не подходит» и сводной базы по кандидатам.
+
+### Варианты или путь решения (Solution Sketch)
+Серия исследовательских задач по единой методологии из 10 критериев: каждый CLI-агент изучается отдельной задачей, по нему пишется comparison-отчёт с вердиктом; результаты сводятся в таблицу `docs/research/coding-agents-summary.md` с ранжированием и рекомендациями по интеграции.
+
+### Ожидаемый результат (Expected Result)
+Обоснованный выбор кандидатов для интеграции в систему ролей, скиллов и системных промптов task-orchestrator: по каждому CLI-агенту есть вердикт с оценкой по критериям, сводная таблица актуальна, новые агенты пополняют трек в evergreen-режиме.
 
 ## 1. Concept and Goal (Концепция и цель)
 ### Story (Job Story)
@@ -21,6 +32,9 @@ branch: epic/research-coding-agents-comparison
 
 ### Goal (Цель по SMART)
 Исследовать 21 CLI-агент кодинга по единой методологии из 10 критериев (системный промпт, роль, скиллы, AGENTS.md, запуск как сабагент, токены, free tier, провайдеры, лицензия). По каждому — вердикт: подходит / частично подходит / не подходит. Сводная таблица в `docs/research/coding-agents-summary.md`. Срок: до конца Q2 2026.
+
+### Режим ведения трека (evergreen)
+Трек ведётся в evergreen-режиме (вечнозелёный): появление нового CLI-агента кодинга → новая задача Этапа 1 + строка в сводной таблице. Фиксированный дедлайн Goal не применяется, текст Goal сохраняется как исторический.
 
 ## 2. Context and Scope (Контекст и границы)
 *   **In Scope (Что делаем):**
@@ -91,56 +105,56 @@ flowchart LR
 
 ### Этап 1: Индивидуальные исследования (параллельные)
 
-- [x] [TASK-research-pi-coding-agent](TASK-research-pi-coding-agent.todo.md) — Pi Coding Agent (Node.js/TypeScript, @earendil-works/pi-coding-agent)
-- [x] [TASK-research-codex-cli](TASK-research-codex-cli.todo.md) — Codex CLI (OpenAI, Rust) ✅ Частично подходит (6/10)
-- [x] [TASK-research-opencode-cli](TASK-research-opencode-cli.todo.md) — OpenCode (Go)
-- [x] [TASK-research-kilocode-cli](TASK-research-kilocode-cli.todo.md) — Kilo Code CLI (TypeScript)
-- [x] [TASK-research-gemini-cli](TASK-research-gemini-cli.todo.md) — Gemini CLI (Google, TypeScript)
-- [x] [TASK-research-claude-code-agent](TASK-research-claude-code-agent.todo.md) — Claude Code (Anthropic, проприетарный)
-- [x] [TASK-research-qwen-cli](TASK-research-qwen-cli.todo.md) — Qwen CLI (Alibaba/Qwen, Python)
-- [x] [TASK-research-goose-agent](TASK-research-goose-agent.todo.md) — Goose (Block/Square, Go)
-- [x] [TASK-research-droid-agent](TASK-research-droid-agent.todo.md) — Droid
-- [x] [TASK-research-warp-agent](TASK-research-warp-agent.todo.md) — Warp (Warp AI, Rust-терминал)
-- [x] [TASK-research-crush-agent](TASK-research-crush-agent.todo.md) — Crush (Charmbracelet, Go)
-- [x] [TASK-research-openclaw-agent](TASK-research-openclaw-agent.todo.md) — OpenClaw (Python)
-- [x] [TASK-research-copilot-cli](TASK-research-copilot-cli.todo.md) — GitHub Copilot CLI (проприетарный)
-- [x] [TASK-research-hermes-agent](TASK-research-hermes-agent.todo.md) — Hermes (Nous Research)
+- [x] [TASK-research-pi-coding-agent](done/TASK-research-pi-coding-agent.todo.md) — Pi Coding Agent (Node.js/TypeScript, @earendil-works/pi-coding-agent)
+- [x] [TASK-research-codex-cli](done/TASK-research-codex-cli.todo.md) — Codex CLI (OpenAI, Rust) ✅ Частично подходит (6/10)
+- [x] [TASK-research-opencode-cli](done/TASK-research-opencode-cli.todo.md) — OpenCode (Go)
+- [x] [TASK-research-kilocode-cli](done/TASK-research-kilocode-cli.todo.md) — Kilo Code CLI (TypeScript)
+- [x] [TASK-research-gemini-cli](done/TASK-research-gemini-cli.todo.md) — Gemini CLI (Google, TypeScript)
+- [x] [TASK-research-claude-code-agent](done/TASK-research-claude-code-agent.todo.md) — Claude Code (Anthropic, проприетарный)
+- [x] [TASK-research-qwen-cli](done/TASK-research-qwen-cli.todo.md) — Qwen CLI (Alibaba/Qwen, Python)
+- [x] [TASK-research-goose-agent](done/TASK-research-goose-agent.todo.md) — Goose (Block/Square, Go)
+- [x] [TASK-research-droid-agent](done/TASK-research-droid-agent.todo.md) — Droid
+- [x] [TASK-research-warp-agent](done/TASK-research-warp-agent.todo.md) — Warp (Warp AI, Rust-терминал)
+- [x] [TASK-research-crush-agent](done/TASK-research-crush-agent.todo.md) — Crush (Charmbracelet, Go)
+- [x] [TASK-research-openclaw-agent](done/TASK-research-openclaw-agent.todo.md) — OpenClaw (Python)
+- [x] [TASK-research-copilot-cli](done/TASK-research-copilot-cli.todo.md) — GitHub Copilot CLI (проприетарный)
+- [x] [TASK-research-hermes-agent](done/TASK-research-hermes-agent.todo.md) — Hermes (Nous Research)
 
 
 ### Этап 1i: Дополнительные исследования (2026-07-24)
 
-- [x] [TASK-research-omp-coding-agent](TASK-research-omp-coding-agent.todo.md) — omp / Oh My Pi (`@oh-my-pi/pi-coding-agent`, MIT, TypeScript+Bun+Rust), форк Pi от can1357. Вердикт ✅ Подходит (10/10): новый кандидат #1, Pi остаётся fallback/baseline.
+- [x] [TASK-research-omp-coding-agent](done/TASK-research-omp-coding-agent.todo.md) — omp / Oh My Pi (`@oh-my-pi/pi-coding-agent`, MIT, TypeScript+Bun+Rust), форк Pi от can1357. Вердикт ✅ Подходит (10/10): новый кандидат #1, Pi остаётся fallback/baseline.
 
 ### Этап 2: Сводный анализ (после завершения Этапа 1)
 
-- [x] [TASK-research-coding-agents-summary](TASK-research-coding-agents-summary.todo.md) — Сводная таблица и итоговые рекомендации
+- [x] [TASK-research-coding-agents-summary](done/TASK-research-coding-agents-summary.todo.md) — Сводная таблица и итоговые рекомендации
 
 ### Этап 1d: Дополнительные исследования (2026-05-13)
 
-- [x] [TASK-research-codebuff](TASK-research-codebuff.todo.md) — Codebuff (TypeScript, Apache-2.0, мультиагентный)
+- [x] [TASK-research-codebuff](done/TASK-research-codebuff.todo.md) — Codebuff (TypeScript, Apache-2.0, мультиагентный)
 
 ### Этап 1e: Дополнительные исследования (2026-05-20)
 
-- [x] [TASK-research-zeroclaw-agent](TASK-research-zeroclaw-agent.todo.md) — Zeroclaw (zeroclaw-labs, Rust, agent runtime)
+- [x] [TASK-research-zeroclaw-agent](done/TASK-research-zeroclaw-agent.todo.md) — Zeroclaw (zeroclaw-labs, Rust, agent runtime)
 
 - [x] ~~TASK-research-oh-my-openagent~~ → перенесён в EPIC-research-agent-frameworks-comparison (OmO — система оркестрации, не кодинг-агент)
 
 ### Этап 1h: Дополнительные исследования (2026-06-17)
 
-- [x] [TASK-research-zcode-coding-agent](TASK-research-zcode-coding-agent.todo.md) — ZCode (Z.AI / Zhipu, desktop GUI-агент, GLM-5.2) *(PR #269, merge подтверждён пользователем)*
+- [x] [TASK-research-zcode-coding-agent](done/TASK-research-zcode-coding-agent.todo.md) — ZCode (Z.AI / Zhipu, desktop GUI-агент, GLM-5.2) *(PR #269, merge подтверждён пользователем)*
 
 ### Этап 1j: Дополнительные исследования (2026-07-28)
 
-- [x] [TASK-research-nanoclaw](TASK-research-nanoclaw.todo.md) — NanoClaw (`nanocoai/nanoclaw`, security-first alternative to OpenClaw, Anthropic Agents SDK). **❌ Не подходит (4/10, 21/30)** — К6-блокер сохранён (архитектурно ≡ OpenClaw, Docker-only). Канонический репозиторий — `nanocoai/nanoclaw` (`gavrielc/nanoclaw` — раннее зеркало).
-- [x] [TASK-research-nanocoder](TASK-research-nanocoder.todo.md) — Nanocoder (`Nano-Collective/nanocoder`, `@nanocollective/nanocoder`, local-first, MIT). **⚠️ Частично (7/10, 22/30)** — К6 (CLI JSON) закрыт (`--json` + `--acp`), BYOM (Ollama/OpenRouter/OpenAI-compatible).
+- [x] [TASK-research-nanoclaw](done/TASK-research-nanoclaw.todo.md) — NanoClaw (`nanocoai/nanoclaw`, security-first alternative to OpenClaw, Anthropic Agents SDK). **❌ Не подходит (4/10, 21/30)** — К6-блокер сохранён (архитектурно ≡ OpenClaw, Docker-only). Канонический репозиторий — `nanocoai/nanoclaw` (`gavrielc/nanoclaw` — раннее зеркало).
+- [x] [TASK-research-nanocoder](done/TASK-research-nanocoder.todo.md) — Nanocoder (`Nano-Collective/nanocoder`, `@nanocollective/nanocoder`, local-first, MIT). **⚠️ Частично (7/10, 22/30)** — К6 (CLI JSON) закрыт (`--json` + `--acp`), BYOM (Ollama/OpenRouter/OpenAI-compatible).
 
 ### Этап 1k: Дополнительные исследования (2026-08-03)
 
-- [x] [TASK-research-deepagents](TASK-research-deepagents.todo.md) — Deep Agents (`langchain-ai/deepagents`, Python, MIT, ≈27.3k★; agent-харнес на LangGraph + CLI-продукт **Deep Agents Code** «similar to Claude Code or Cursor», «Inspired by Claude Code»; sub-agents, filesystem, context management, HITL, skills-on-demand, tools/MCP, BYO LLM/model-agnostic). Перенесён из `EPIC-research-agent-frameworks-comparison` (зеркальный прецедент строки 125: OmO ушли отсюда в frameworks; deepagents возвращён как coding-агент). Статус: done, PR #345; вердикт CLI: ⚠️ Частично подходит (7/10, 27/30); SDK: ✅ Подходит для отдельной программной интеграции (9/10).
+- [x] [TASK-research-deepagents](done/TASK-research-deepagents.todo.md) — Deep Agents (`langchain-ai/deepagents`, Python, MIT, ≈27.3k★; agent-харнес на LangGraph + CLI-продукт **Deep Agents Code** «similar to Claude Code or Cursor», «Inspired by Claude Code»; sub-agents, filesystem, context management, HITL, skills-on-demand, tools/MCP, BYO LLM/model-agnostic). Перенесён из `EPIC-research-agent-frameworks-comparison` (зеркальный прецедент строки 125: OmO ушли отсюда в frameworks; deepagents возвращён как coding-агент). Статус: done, PR #345; вердикт CLI: ⚠️ Частично подходит (7/10, 27/30); SDK: ✅ Подходит для отдельной программной интеграции (9/10).
 
 ### Этап 1l: Дополнительные исследования (2026-08-16)
 
-- [x] [TASK-research-deepseek-harness](TASK-research-deepseek-harness.todo.md) — DeepSeek Harness (`deepseek-ai/deepseek-harness`, `dsh`, TypeScript, MIT, ≈116.8k★; агентный харнес «Everything is a Plugin» на Cordis + продуктовые поверхности Web UI / headless CLI / JSON-RPC SDK TS+Python / ACP; эталонные AGENTS.md и `.agents/skills`; субагент-провайдеры codex/claude-code/acp/dsh-sdk; LLM-каталог pi-ai как у Pi). Вердикт: ⚠️ Частично (7/10, 26/30; SDK ✅ 9/10) — developer preview без релизов, CLI без JSONL stdout.
+- [x] [TASK-research-deepseek-harness](done/TASK-research-deepseek-harness.todo.md) — DeepSeek Harness (`deepseek-ai/deepseek-harness`, `dsh`, TypeScript, MIT, ≈116.8k★; агентный харнес «Everything is a Plugin» на Cordis + продуктовые поверхности Web UI / headless CLI / JSON-RPC SDK TS+Python / ACP; эталонные AGENTS.md и `.agents/skills`; субагент-провайдеры codex/claude-code/acp/dsh-sdk; LLM-каталог pi-ai как у Pi). Вердикт: ⚠️ Частично (7/10, 26/30; SDK ✅ 9/10) — developer preview без релизов, CLI без JSONL stdout.
 
 ## 6. Definition of Done (Критерии приёмки эпика)
 - [x] Все 21 индивидуальное research-исследование выполнено
@@ -148,6 +162,7 @@ flowchart LR
 - [x] Сводная таблица `docs/research/coding-agents-summary.md` создана и заполнена
 - [x] По каждому агенту есть вердикт: подходит / частично подходит / не подходит
 - [x] Финальная задача с ранжированием и рекомендациями выполнена
+- [ ] Evergreen-режим (решение владельца 2026-09-13): эпик закрывается ТОЛЬКО явным решением владельца, а не автоматически по исчерпанию задач. Пока эпик открыт — сводная таблица `docs/research/coding-agents-summary.md` остаётся актуальной: comparison-артефакт и строка на каждый исследованный агент.
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
 Не требуется — эпик содержит только исследовательские задачи (docs).
@@ -181,3 +196,4 @@ flowchart LR
 | 2026-08-15 | Тимлид (Алекс) | Stage 1k: TASK-research-deepagents принята, переведена в `done`; ссылка обновлена на `TASK-research-deepagents.todo.md`, PR #345 готов к слиянию. |
 | 2026-08-16 | Аналитик (Шерлок) | Stage 1l: добавлена постановка TASK-research-deepseek-harness — `deepseek-ai/deepseek-harness` по явной классификации пользователя («агент, не фреймворк»; прецедент deepagents). Исследование выполнено: вердикт ⚠️ Частично (7/10, 26/30; SDK ✅ 9/10) — developer preview (без релизов, ломающие изменения задекларированы), CLI headless печатает plain text без JSONL-событий; при этом К3–К5/К8–К10 ✅ (эталонные AGENTS.md + `.agents/skills`, MIT, pi-ai-каталог провайдеров, токен-метр без $). Сводная таблица обновлена до 22 исследований (dsh #6 по сумме 26, после OpenCode при равной сумме из-за preview-статуса). |
 | 2026-08-16 | Тимлид (Алекс) | Stage 1l: PR #349 апрувнут, задача переведена в `done` (ссылки актуализированы на `done/…`), PR готов к слиянию. |
+| 2026-09-13 | Тимлид Алекс (pi) | По решению владельца эпик возвращён из архива (`todo/done/` → `todo/`, статус `in_progress`, `reopened: 2026-09-13`) и переведён в evergreen-режим: новые CLI-агенты кодинга пополняют трек задачами Этапа 1; закрытие — только явным решением владельца. Предыдущее закрытие (PR #171) сохраняется в истории. |

@@ -10,7 +10,7 @@ author: system_analyst_sherlock (Шерлок)
 assignee: Бэкендер Левша
 branch: task/feat-conditional-execution-strategy
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-feat-conditional-execution-strategy: ConditionalExecutionStrategy

@@ -4,7 +4,7 @@ created: 2026-05-02
 value: V3
 complexity: C5
 priority: P4
-depends_on: []
+depends_on:
 epic:
 author:
 assignee:

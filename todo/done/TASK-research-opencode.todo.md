@@ -4,13 +4,13 @@ created: 2026-05-08
 value: V3
 complexity: C3
 priority: P2
-depends_on: []
+depends_on:
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик Шерлок
 branch: task/research-opencode
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-opencode: Исследовать OpenCode (anomalyco/opencode) для сравнения с task-orchestrator

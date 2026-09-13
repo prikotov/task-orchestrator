@@ -4,7 +4,7 @@ created: 2026-06-12
 value: V3
 complexity: C2
 priority: P2
-depends_on: []
+depends_on:
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)

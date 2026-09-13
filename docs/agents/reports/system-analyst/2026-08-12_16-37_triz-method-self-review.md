@@ -23,7 +23,7 @@
   - `ChainStepTypeEnum` (`agent`, `quality_gate`, `tool`);
   - `ConditionalExecutionStrategyService` и `when:`-выражения;
   - `DynamicExecutionStrategy` / `DynamicLoop`;
-  - `todo/done/EPIC-sprint-8-conditional-branching.md`.
+  - `todo/done/EPIC-sprint-8-conditional-branching.todo.md`.
 
 ## Результат проверки Must/Should/DoD
 

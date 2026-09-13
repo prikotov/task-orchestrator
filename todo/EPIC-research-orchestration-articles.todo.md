@@ -32,6 +32,9 @@ pr:
 ### Goal (Цель по SMART)
 Исследовать серию статей по оркестрации по единой методологии из 6 критериев. По каждой статье — research-отчёт в `docs/research/orchestration-articles/` с маппингом на нашу архитектуру (chain execution, retry, circuit breaker, dynamic loops) и вердиктом: apply (применить) / study (изучить детально) / skip (пропустить). Сводная таблица с классификацией и рекомендациями в `docs/research/orchestration-articles-summary.md`.
 
+### Режим ведения трека (evergreen)
+Трек ведётся в evergreen-режиме (вечнозелёный): появление новой значимой статьи об оркестрации AI-агентов → новая задача Этапа 1 + строка в сводной таблице. Фиксированный дедлайн Goal не применяется, текст Goal сохраняется как исторический. Закрытие — только явным решением владельца.
+
 ## 2. Context and Scope (Контекст и границы)
 * **In Scope (Что делаем):**
   * Исследование каждой статьи по единой методологии (6 критериев)
@@ -108,6 +111,7 @@ flowchart LR
 - [ ] Сводная таблица `docs/research/orchestration-articles-summary.md` создана и заполнена
 - [ ] По каждой статье есть вердикт: apply / study / skip
 - [ ] Финальная задача с ранжированием и рекомендациями выполнена
+- [ ] Evergreen-режим (решение владельца 2026-09-13): эпик закрывается ТОЛЬКО явным решением владельца, а не автоматически по исчерпанию задач. Пока эпик открыт — сводная таблица `docs/research/orchestration-articles-summary.md` остаётся актуальной: comparison-артефакт и строка на каждую исследованную статью.
 
 ## 7. Release Notes and Deployment (Инструкция по релизу)
 Не требуется — эпик содержит только исследовательские задачи (docs).
@@ -118,7 +122,7 @@ flowchart LR
 - Некоторые статьи могут быть устаревшими — учитывать дату публикации
 
 ## 9. Sources (Источники)
-- Прецеденты: `todo/EPIC-research-approaches-comparison.todo.md`, `todo/done/EPIC-research-coding-agents-comparison.md`, `todo/done/EPIC-research-agent-frameworks-comparison.md`
+- Прецеденты: `todo/EPIC-research-approaches-comparison.todo.md`, `todo/EPIC-research-coding-agents-comparison.todo.md`, `todo/done/EPIC-research-agent-frameworks-comparison.md`
 - Существующие research-документы: `docs/research/`
 - Первоисточники: Martin Fowler, blogposts, conference talks
 
@@ -133,3 +137,4 @@ flowchart LR
 | 2026-09-11 | Тимлид (Алекс) | Добавлена задача TASK-research-t3-code (предложена пользователем): T3 Code — оркестратор агент-харнесов (BYO harness, branch-per-thread, one-button PR, remote control). Продукт/репозиторий как первоисточник паттернов — прецедент TASK-research-agents-crew. |
 | 2026-09-11 | Тимлид (Алекс) | Stage 1: TASK-research-t3-code выполнена (PR #385) — оценка 18/18, apply (capability-контракт, BYO subscription) / study (worktree, durable threads, совместимость продолжения, remote, permissions) / skip (one-button PR). Гипотезы: 4 подтверждены, 1 частично, 1 частично опровергнута. Файл задачи перенесён в `todo/done/`. Эпик остаётся в работе (Этап 2 — сводный анализ — после накопления источников). |
 | 2026-09-11 | Тимлид (Алекс) | Задача TASK-research-t3-code исключена из эпика и перенесена в продуктовый трек EPIC-research-agent-frameworks-comparison (переоткрыт) по решению владельца: T3 Code — продукт, а не статья. |
+| 2026-09-13 | Тимлид Алекс (pi) | По решению владельца за эпиком закреплён evergreen-режим: новые значимые статьи об оркестрации пополняют трек задачами Этапа 1; закрытие — только явным решением владельца, а не автоматически по исчерпанию задач. |

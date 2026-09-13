@@ -11,7 +11,7 @@ author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-copilot-cli
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-copilot-cli: GitHub Copilot CLI
