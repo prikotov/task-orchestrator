@@ -2,7 +2,7 @@
 
 **Роль:** Аналитик (Шерлок)  
 **Дата:** 2026-08-14  
-**Объект:** `docs/research/coding-agents/deepagents-comparison.md`, `docs/research/coding-agents-summary.md`, `todo/done/TASK-research-deepagents.todo.md`, `todo/done/EPIC-research-coding-agents-comparison.md`
+**Объект:** `docs/research/coding-agents/deepagents-comparison.md`, `docs/research/coding-agents-summary.md`, `todo/done/TASK-research-deepagents.todo.md`, `todo/done/EPIC-research-coding-agents-comparison.todo.md`
 **Задача:** `todo/done/TASK-research-deepagents.todo.md`
 
 ---

@@ -4,7 +4,7 @@ created: 2026-06-16
 value: V2
 complexity: C3
 priority: P3
-depends_on: []
+depends_on:
 epic:
 author: Тимлид (Алекс)
 assignee:

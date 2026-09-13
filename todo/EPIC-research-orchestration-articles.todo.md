@@ -118,7 +118,7 @@ flowchart LR
 - Некоторые статьи могут быть устаревшими — учитывать дату публикации
 
 ## 9. Sources (Источники)
-- Прецеденты: `todo/EPIC-research-approaches-comparison.todo.md`, `todo/done/EPIC-research-coding-agents-comparison.md`, `todo/done/EPIC-research-agent-frameworks-comparison.md`
+- Прецеденты: `todo/EPIC-research-approaches-comparison.todo.md`, `todo/done/EPIC-research-coding-agents-comparison.todo.md`, `todo/done/EPIC-research-agent-frameworks-comparison.md`
 - Существующие research-документы: `docs/research/`
 - Первоисточники: Martin Fowler, blogposts, conference talks
 

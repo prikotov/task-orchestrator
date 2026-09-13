@@ -301,7 +301,7 @@ Prerequisites:
 
 Prerequisites:
 
-- условное ветвление из `EPIC-sprint-8-conditional-branching` уже закрыто в [`todo/done/EPIC-sprint-8-conditional-branching.md`](../../../todo/done/EPIC-sprint-8-conditional-branching.md), но его текущая гранулярность — шаговые `when:`-условия;
+- условное ветвление из `EPIC-sprint-8-conditional-branching` уже закрыто в [`todo/done/EPIC-sprint-8-conditional-branching.todo.md`](../../../todo/done/EPIC-sprint-8-conditional-branching.todo.md), но его текущая гранулярность — шаговые `when:`-условия;
 - зрелость `DynamicLoop` для управляемой фасилитации;
 - решение о способе композиции static/conditional и dynamic частей;
 - если нужна строгая фазность внутри `DynamicLoop`, нужна отдельная feat-доработка `phase`/`round_goal`; иначе фазность остаётся в static/conditional chain и prompts;

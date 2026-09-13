@@ -11,7 +11,7 @@ author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-qwen-cli
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-qwen-cli: Qwen CLI

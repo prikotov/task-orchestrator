@@ -11,7 +11,7 @@ author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-openclaw-agent
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-openclaw-agent: OpenClaw

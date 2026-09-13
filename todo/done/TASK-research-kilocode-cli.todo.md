@@ -11,7 +11,7 @@ author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-kilocode-cli
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-research-kilocode-cli: Kilo Code CLI

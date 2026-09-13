@@ -2,7 +2,7 @@
 
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-07-24
-**Объект:** `docs/research/coding-agents/omp-comparison.md`, `docs/research/coding-agents-summary.md`, `todo/done/EPIC-research-coding-agents-comparison.md`, `todo/done/TASK-research-omp-coding-agent.todo.md`
+**Объект:** `docs/research/coding-agents/omp-comparison.md`, `docs/research/coding-agents-summary.md`, `todo/done/EPIC-research-coding-agents-comparison.todo.md`, `todo/done/TASK-research-omp-coding-agent.todo.md`
 **Задача:** `todo/done/TASK-research-omp-coding-agent.todo.md`
 
 ---
@@ -16,7 +16,7 @@
   - Pi сохранён как #2 baseline/fallback;
   - Top-3 обновлён: omp → Pi → Qwen Code.
 - Задача перенесена в `todo/done/TASK-research-omp-coding-agent.todo.md` для соответствия ссылке в отчёте.
-- Эпик `todo/done/EPIC-research-coding-agents-comparison.md` обновлён Stage 1i и счётчиками 18 исследований.
+- Эпик `todo/done/EPIC-research-coding-agents-comparison.todo.md` обновлён Stage 1i и счётчиками 18 исследований.
 
 ## Проверенные источники
 

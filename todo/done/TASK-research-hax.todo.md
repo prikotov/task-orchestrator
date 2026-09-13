@@ -21,7 +21,7 @@ status: done
 
 # TASK-research-hax: hax — CLI-агент кодинга на C (исследование для интеграции как сабагент)
 
-> Эпик: [EPIC-research-coding-agents-comparison](EPIC-research-coding-agents-comparison.md) (завершён; это дополнительное исследование №23 по его методологии — поле `epic` в front matter оставлено пустым, потому что валидатор не принимает ссылку на эпик из `done/`).
+> Эпик: [EPIC-research-coding-agents-comparison](EPIC-research-coding-agents-comparison.todo.md) (завершён; это дополнительное исследование №23 по его методологии — поле `epic` в front matter оставлено пустым, потому что валидатор не принимает ссылку на эпик из `done/`).
 
 ## 0. Простое описание (Human Brief)
 

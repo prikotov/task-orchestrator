@@ -121,7 +121,7 @@ flowchart LR
 - Риск «натягивания» чужого подхода на наш процесс — вердикт adopt/adapt/reject давать строго с обоснованием и оценкой усилий
 
 ## 9. Sources (Источники)
-- Прецеденты: `todo/done/EPIC-research-coding-agents-comparison.md`, `todo/done/EPIC-research-agent-frameworks-comparison.md`
+- Прецеденты: `todo/done/EPIC-research-coding-agents-comparison.todo.md`, `todo/done/EPIC-research-agent-frameworks-comparison.md`
 - Существующие comparison-документы: `docs/research/`
 - Ссылки на первоисточники — в индивидуальных задачах
 
