@@ -580,6 +580,103 @@ YAML);
         self::assertStringContainsString('reason=stall', $log, 'with gate disabled, active process must be killed by stall');
     }
 
+    #[Test]
+    public function largeSuccessfulEventStreamKeepsExitZeroFullSummaryAndFilteredOutput(): void
+    {
+        // Регрессия TASK-fix-watch-subagent-sigpipe-exit-141: на большом gaps.tsv
+        // вычисление max_gap через `awk | sort -rn | head -1` — early-closing
+        // consumer: head закрывает канал, sort ловит SIGPIPE, pipefail превращает
+        // присваивание в код 141 и errexit обрывает EXIT-trap УСПЕШНОГО запуска.
+        // 50 000 событий без пауз дают >64KB вывода awk (gap-строки) и большой
+        // детерминированный поток без ожидания реальных интервалов.
+        $logDir = $this->tempDir . '/logs';
+        $streamCount = 50000;
+
+        $process = $this->runScript(
+            arguments: ['--runner', 'pi', '-o', 'text,files'],
+            env: [
+                'FAKE_RUNNER_STREAM_COUNT' => (string) $streamCount,
+                'FAKE_RUNNER_EVENTS' => implode("\n", [
+                    '{"type":"message_end","message":{"role":"assistant","content":[{"type":"text","text":"Large stream answer."}]}}',
+                    '{"type":"tool_execution_start","toolName":"write","args":{"path":"large.txt","content":"data"}}',
+                    '{"type":"agent_end","messages":[]}',
+                ]) . "\n",
+                'WATCH_LOG_DIR' => $logDir,
+            ],
+            roleFile: $this->piRoleFile,
+            softTimeout: 60,
+            hardTimeout: 120,
+            stallTimeout: 10,
+            processTimeout: 120.0,
+        );
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+
+        $output = $process->getOutput();
+        self::assertStringContainsString('Large stream answer.', $output);
+        self::assertStringContainsString('"toolName":"write"', $output);
+
+        $runLog = $this->findLatestRunLog($logDir);
+        self::assertNotNull($runLog, 'run.log not found in ' . $logDir);
+        $log = (string) file_get_contents($runLog);
+
+        self::assertStringContainsString('exit_code=0 reason=success_agent_end', $log);
+        $expectedEvents = $streamCount + 3;
+        self::assertStringContainsString(sprintf('events_total=%d', $expectedEvents), $log);
+        self::assertStringContainsString(sprintf('gaps_recorded=%d', $expectedEvents), $log);
+        self::assertStringContainsString('max_gap=', $log);
+        self::assertStringContainsString('events_by_type:', $log);
+
+        $gapsPosition = strpos($log, 'gaps_recorded=');
+        $endPosition = strpos($log, '=== END SUMMARY ===');
+        self::assertNotFalse($gapsPosition);
+        self::assertNotFalse($endPosition, 'summary must reach the END marker, not get truncated');
+        self::assertGreaterThan($gapsPosition, $endPosition, 'END marker must follow gaps diagnostics');
+    }
+
+    #[Test]
+    public function largeDistinctEventTypeStreamKeepsRunSummaryComplete(): void
+    {
+        // Диагностический конвейер events_by_type (`... | sort -rn | head -8 | ...`)
+        // — тот же класс early-closing consumer: на потоке с 10 000 уникальных
+        // типов uniq -c раздувает вывод за буфер канала, head -8 закрывается
+        // раньше sort, и EXIT-trap успешного запуска умирает с SIGPIPE (141).
+        $logDir = $this->tempDir . '/logs';
+        $uniqueTypes = 10000;
+
+        $process = $this->runScript(
+            arguments: ['--runner', 'pi', '-o', 'text'],
+            env: [
+                'FAKE_RUNNER_UNIQUE_TYPES' => (string) $uniqueTypes,
+                'FAKE_RUNNER_EVENTS' => implode("\n", [
+                    '{"type":"message_end","message":{"role":"assistant","content":[{"type":"text","text":"Distinct types answer."}]}}',
+                    '{"type":"agent_end","messages":[]}',
+                ]) . "\n",
+                'WATCH_LOG_DIR' => $logDir,
+            ],
+            roleFile: $this->piRoleFile,
+            softTimeout: 60,
+            hardTimeout: 120,
+            stallTimeout: 10,
+            processTimeout: 60.0,
+        );
+
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+
+        $runLog = $this->findLatestRunLog($logDir);
+        self::assertNotNull($runLog, 'run.log not found in ' . $logDir);
+        $log = (string) file_get_contents($runLog);
+
+        self::assertStringContainsString('exit_code=0 reason=success_agent_end', $log);
+        self::assertStringContainsString('events_by_type:', $log);
+
+        $byTypePosition = strpos($log, 'events_by_type:');
+        $endPosition = strpos($log, '=== END SUMMARY ===');
+        self::assertNotFalse($byTypePosition);
+        self::assertNotFalse($endPosition, 'summary must reach the END marker, not get truncated');
+        self::assertGreaterThan($byTypePosition, $endPosition, 'END marker must follow events_by_type diagnostics');
+    }
+
     /**
      * @param list<string> $arguments
      * @param array<string, string> $env
@@ -591,19 +688,32 @@ YAML);
         string $prompt = 'Test prompt',
         bool $expectSuccess = true,
         ?int $stallTimeout = 2,
+        ?int $softTimeout = 2,
+        ?int $hardTimeout = 4,
+        float $processTimeout = 10.0,
     ): Process {
         $projectRoot = dirname(__DIR__, 6);
         $script = $projectRoot . '/docs/agents/skills/run-subagent/scripts/watch-subagent.sh';
         $path = $this->fakeBinDir . PATH_SEPARATOR . (getenv('PATH') ?: '');
 
+        $command = [$script];
+        if ($softTimeout !== null) {
+            $command[] = '-s';
+            $command[] = (string) $softTimeout;
+        }
+        if ($stallTimeout !== null) {
+            $command[] = '-t';
+            $command[] = (string) $stallTimeout;
+        }
+        if ($hardTimeout !== null) {
+            $command[] = '-m';
+            $command[] = (string) $hardTimeout;
+        }
+        $command[] = '-r';
+        $command[] = $roleFile ?? $this->roleFile;
+
         $process = new Process(
-            array_merge(
-                [$script, '-s', '2'],
-                $stallTimeout === null ? [] : ['-t', (string) $stallTimeout],
-                ['-m', '4', '-r', $roleFile ?? $this->roleFile],
-                $arguments,
-                [$prompt],
-            ),
+            array_merge($command, $arguments, [$prompt]),
             $projectRoot,
             array_merge(
                 [
@@ -616,7 +726,7 @@ YAML);
                 $env,
             ),
         );
-        $process->setTimeout(10);
+        $process->setTimeout($processTimeout);
         $process->run();
 
         if ($expectSuccess) {
@@ -656,6 +766,20 @@ if [[ "${FAKE_RUNNER_HANG_ACTIVE:-0}" == "1" ]]; then
 fi
 if [[ -n "${FAKE_RUNNER_STDERR:-}" ]]; then
     printf '%s\n' "$FAKE_RUNNER_STDERR" >&2
+fi
+if [[ -n "${FAKE_RUNNER_STREAM_COUNT:-}" ]]; then
+    # Большой детерминированный поток событий без пауз: каждое событие даёт
+    # строку в gaps.tsv watcher'а (TASK-fix-watch-subagent-sigpipe-exit-141).
+    for ((i = 0; i < FAKE_RUNNER_STREAM_COUNT; i++)); do
+        printf '{"type":"noise","seq":%d}\n' "$i"
+    done
+fi
+if [[ -n "${FAKE_RUNNER_UNIQUE_TYPES:-}" ]]; then
+    # Поток с большим числом РАЗЛИЧНЫХ типов: раздувает uniq -c в events_by_type
+    # сводки — раннее закрытие head -8 ловит SIGPIPE (141) под pipefail.
+    for ((i = 0; i < FAKE_RUNNER_UNIQUE_TYPES; i++)); do
+        printf '{"type":"noise_%06d","seq":%d}\n' "$i" "$i"
+    done
 fi
 if [[ -n "${FAKE_RUNNER_EVENTS:-}" ]]; then
     printf '%s' "$FAKE_RUNNER_EVENTS"

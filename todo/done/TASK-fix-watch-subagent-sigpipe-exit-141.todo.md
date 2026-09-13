@@ -4,15 +4,17 @@ created: 2026-09-12
 value: V3
 complexity: C2
 priority: P1
-cost_plan:
-cost_fact:
+cost_plan: 90000
+cost_fact: 3026280
 depends_on:
 epic:
 author: Аналитик Шерлок (codex-cli)
-assignee: Бэкендер Левша (codex-cli)
-branch:
-pr:
-status: todo
+assignee: Бэкендер Левша (pi)
+branch: task/fix-watch-subagent-sigpipe
+pr: https://github.com/prikotov/task-orchestrator/pull/390
+status: done
+started: 2026-09-12 15:56:48 (1789228608)
+completed: 2026-09-12 16:46:53 (1789231613)
 ---
 
 # TASK-fix-watch-subagent-sigpipe-exit-141: Устранить ложный код 141 после успешного запуска сабагента
@@ -43,7 +45,7 @@ status: todo
 
 ## 2. Контекст и Границы (Context and Scope)
 
-- **Где делаем:** `docs/agents/skills/run-subagent/scripts/watch-subagent.sh`, прежде всего `emit_run_summary()` и вызывающие его `EXIT`/cleanup-пути; регрессионные сценарии в `tests/Integration/Docs/Agents/Skills/RunSubagent/WatchSubagentScriptTest.php` согласно [конвенции тестирования](../docs/conventions/testing/index.md).
+- **Где делаем:** `docs/agents/skills/run-subagent/scripts/watch-subagent.sh`, прежде всего `emit_run_summary()` и вызывающие его `EXIT`/cleanup-пути; регрессионные сценарии в `tests/Integration/Docs/Agents/Skills/RunSubagent/WatchSubagentScriptTest.php` согласно [конвенции тестирования](../../docs/conventions/testing/index.md).
 - **Текущее поведение:** скрипт работает с `set -euo pipefail`. После успешного `agent_end` журнал успевает зафиксировать `exit_code=0 reason=success_agent_end`, но вычисление `max_gap` через `awk ... | sort -rn | head -1` на большом `gaps.tsv` закрывает канал раньше времени. `sort` получает `SIGPIPE`, присваивание завершается кодом `141`, обработчик `EXIT` обрывается и внешний код успешного запуска подменяется на `141`. В 12 из 12 исследованных успешных запусков `pi` с большим числом событий сводка была оборвана; успешные запуски `codex` с меньшим потоком имели полный маркер завершения.
 - **Границы (Out of Scope):** не менять soft/hard/stall-таймауты, определение успешного завершения `pi`/`codex`, форматы событий и общую семантику успеха раннеров; не выполнять общий рефакторинг watcher; не подключать настоящие раннеры или внешние сервисы.
 
@@ -75,21 +77,21 @@ status: todo
 
 ## 4. План реализации (Implementation Plan)
 
-1. [ ] Зафиксировать красный регрессионный сценарий в `WatchSubagentScriptTest`: поддельный раннер выдаёт большой успешный поток с результатами для `text,files`, а тест проверяет внешний код и полный `run.log`.
-2. [ ] Заменить `awk | sort | head` при вычислении `max_gap` на однопроходное вычисление одним `awk` или эквивалент без досрочного закрытия канала.
-3. [ ] Просмотреть диагностические команды, исполняемые из `emit_run_summary()`, `archive_events()` и `cleanup()`, и воспроизвести риск у похожих early-closing pipelines; править только подтверждённо опасные места и покрыть их тестом.
-4. [ ] Запустить точечный тест, полный набор проектных проверок и проверить отсутствие изменений таймаутов/контракта успешного завершения.
+1. [x] Зафиксировать красный регрессионный сценарий в `WatchSubagentScriptTest`: поддельный раннер выдаёт большой успешный поток с результатами для `text,files`, а тест проверяет внешний код и полный `run.log`.
+2. [x] Заменить `awk | sort | head` при вычислении `max_gap` на однопроходное вычисление одним `awk` или эквивалент без досрочного закрытия канала.
+3. [x] Просмотреть диагностические команды, исполняемые из `emit_run_summary()`, `archive_events()` и `cleanup()`, и воспроизвести риск у похожих early-closing pipelines; править только подтверждённо опасные места и покрыть их тестом.
+4. [x] Запустить точечный тест, полный набор проектных проверок и проверить отсутствие изменений таймаутов/контракта успешного завершения.
 
 ## 5. Критерии приёмки (Definition of Done)
 
-- [ ] Регрессионный тест с большим числом событий создаёт большой `gaps.tsv`, фиксирует штатное внутреннее завершение (`agent_end`/`success_agent_end`) и проходит без настоящего раннера.
-- [ ] В регрессионном сценарии внешний процесс завершается кодом `0`, а не `141`.
-- [ ] `run.log` содержит `exit_code=0 reason=success_agent_end` и завершающий маркер `=== END SUMMARY ===`.
-- [ ] При запуске с `-o text,files` ожидаемые текстовый и файловый результаты сохранены в выходе и не теряются из-за завершающей диагностики.
-- [ ] Вычисление максимального интервала не содержит `sort ... | head` или другого early-closing pipeline (конвейера с ранним закрытием), способного породить `SIGPIPE` под `pipefail`.
-- [ ] Остальные завершающие диагностические конвейеры либо подтверждены безопасными, либо точечно исправлены вместе с отдельной проверкой; несвязанный код watcher не изменён.
-- [ ] Таймауты и семантика успешного/неуспешного завершения `pi` и `codex` не изменены.
-- [ ] Точечный integration-тест, `make check` и `git diff --check` проходят успешно.
+- [x] Регрессионный тест с большим числом событий создаёт большой `gaps.tsv`, фиксирует штатное внутреннее завершение (`agent_end`/`success_agent_end`) и проходит без настоящего раннера.
+- [x] В регрессионном сценарии внешний процесс завершается кодом `0`, а не `141`.
+- [x] `run.log` содержит `exit_code=0 reason=success_agent_end` и завершающий маркер `=== END SUMMARY ===`.
+- [x] При запуске с `-o text,files` ожидаемые текстовый и файловый результаты сохранены в выходе и не теряются из-за завершающей диагностики.
+- [x] Вычисление максимального интервала не содержит `sort ... | head` или другого early-closing pipeline (конвейера с ранним закрытием), способного породить `SIGPIPE` под `pipefail`.
+- [x] Остальные завершающие диагностические конвейеры либо подтверждены безопасными, либо точечно исправлены вместе с отдельной проверкой; несвязанный код watcher не изменён.
+- [x] Таймауты и семантика успешного/неуспешного завершения `pi` и `codex` не изменены.
+- [x] Точечный integration-тест, `make check` и `git diff --check` проходят успешно.
 
 ## 6. Самопроверка (Verification)
 
@@ -105,15 +107,15 @@ php vendor/bin/todo-md validate todo/backlog/TASK-fix-watch-subagent-sigpipe-exi
 - Функциональных зависимостей нет; задача может выполняться независимо.
 - Большой поток нужен для надёжного превышения буфера канала, но тест не должен становиться медленным или зависеть от планировщика ОС.
 - Завершающая диагностика выполняется под `set -euo pipefail`; любое новое исправление должно сохранять исходный код успешного запуска и при этом не скрывать реальные ошибки раннера.
-- Текущая задача [`TASK-feat-phar-full-become-role-install`](done/TASK-feat-phar-full-become-role-install.todo.md) является только источником наблюдения и follow-up (последующей работы), а не dependency (функциональной зависимостью).
+- Текущая задача [`TASK-feat-phar-full-become-role-install`](TASK-feat-phar-full-become-role-install.todo.md) является только источником наблюдения и follow-up (последующей работы), а не dependency (функциональной зависимостью).
 
 ## 8. Источники (Sources)
 
-- [`watch-subagent.sh`](../docs/agents/skills/run-subagent/scripts/watch-subagent.sh), функции `emit_run_summary()` и `cleanup()`.
-- [`WatchSubagentScriptTest.php`](../tests/Integration/Docs/Agents/Skills/RunSubagent/WatchSubagentScriptTest.php).
-- [Реестр повторяющихся проблем](../docs/agents/team-retro/RETRO-ROADMAP.md).
-- [Источник наблюдения: `TASK-feat-phar-full-become-role-install`](done/TASK-feat-phar-full-become-role-install.todo.md).
-- [Конвенция тестирования](../docs/conventions/testing/index.md).
+- [`watch-subagent.sh`](../../docs/agents/skills/run-subagent/scripts/watch-subagent.sh), функции `emit_run_summary()` и `cleanup()`.
+- [`WatchSubagentScriptTest.php`](../../tests/Integration/Docs/Agents/Skills/RunSubagent/WatchSubagentScriptTest.php).
+- [Реестр повторяющихся проблем](../../docs/agents/team-retro/RETRO-ROADMAP.md).
+- [Источник наблюдения: `TASK-feat-phar-full-become-role-install`](TASK-feat-phar-full-become-role-install.todo.md).
+- [Конвенция тестирования](../../docs/conventions/testing/index.md).
 
 ## 9. Комментарии (Comments)
 
@@ -124,3 +126,4 @@ php vendor/bin/todo-md validate todo/backlog/TASK-fix-watch-subagent-sigpipe-exi
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-09-12 20:01:05 (1789218065) | Аналитик Шерлок (codex-cli) | Создана backlog-задача по подтверждённому `SIGPIPE`/exit `141`; зафиксированы границы, предпочтительное решение и регрессионные критерии. |
+| 2026-09-13 10:09:28 (1789268968) | Тимлид Алекс (pi) | Поля стоимости приведены к регламенту COST.md: прикидка исполнителя `90000` перенесена в `cost_plan`; `cost_fact` заполнен измеренным значением `3026280` из usage-журналов сессий сабагентов (6 запусков конвейера, сумма `totalTokens` по вызовам API, включая cache read и убитые по таймауту запуски). |
