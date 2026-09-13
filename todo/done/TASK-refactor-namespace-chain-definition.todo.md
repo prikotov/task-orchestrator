@@ -10,7 +10,7 @@ author: Аналитик (Шерлок)
 assignee: Бэкендер (Левша)
 branch: task/refactor-namespace-chain-definition
 pr:
-status: in_progress
+status: done
 ---
 
 # TASK-refactor-namespace-chain-definition: Механический rename Orchestrator → ChainDefinition

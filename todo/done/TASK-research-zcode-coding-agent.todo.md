@@ -75,7 +75,7 @@ status: done
 ```bash
 ls docs/research/coding-agents/zcode-coding-agent-comparison.md
 grep -i "ZCode" docs/research/coding-agents-summary.md
-grep -i "zcode-coding-agent" todo/done/EPIC-research-coding-agents-comparison.md
+grep -i "zcode-coding-agent" todo/done/EPIC-research-coding-agents-comparison.todo.md
 ```
 
 ## 7. Risks and Dependencies (Риски и зависимости)

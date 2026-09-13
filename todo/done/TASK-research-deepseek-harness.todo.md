@@ -42,7 +42,7 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 *   **Объект:** `deepseek-ai/deepseek-harness` (`dsh`) — агентный харнес «everything is a plugin» на vendored Cordis; поверхности: Web UI, headless CLI, JSON-RPC SDK (TS/Python), ACP. Субагент-провайдеры codex/claude-code/acp/dsh-sdk; LLM-адаптеры `dsh-llm-deepseek` (native) и `dsh-llm-pi-ai` (`@earendil-works/pi-ai` — каталог провайдеров как у Pi).
-*   **Где делаем:** `docs/research/coding-agents/deepseek-harness-comparison.md`, `docs/research/coding-agents-summary.md`, `todo/done/EPIC-research-coding-agents-comparison.md`, agent-report в `docs/agents/reports/system-analyst/`.
+*   **Где делаем:** `docs/research/coding-agents/deepseek-harness-comparison.md`, `docs/research/coding-agents-summary.md`, `todo/done/EPIC-research-coding-agents-comparison.todo.md`, agent-report в `docs/agents/reports/system-analyst/`.
 *   **Текущее поведение:** в эпике 21 исследование; ближайшие аналоги — omp/Pi (pi-ai), Deep Agents (зеркальный CLI/SDK-вердикт), OpenCode.
 *   **Границы (Out of Scope):** код интеграции, бенчмарки, глубокий code review TS-исходников; сам фреймворк Cordis отдельно не исследуется.
 
@@ -82,7 +82,7 @@ status: done
 ```bash
 ls docs/research/coding-agents/deepseek-harness-comparison.md
 grep -c "DeepSeek Harness" docs/research/coding-agents-summary.md
-grep -n "1l" todo/done/EPIC-research-coding-agents-comparison.md
+grep -n "1l" todo/done/EPIC-research-coding-agents-comparison.todo.md
 make md-links
 make validate-todo
 ```

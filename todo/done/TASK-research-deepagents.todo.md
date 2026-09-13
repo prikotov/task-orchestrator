@@ -41,7 +41,7 @@ status: done
 
 ## 2. Context and Scope (Контекст и Границы)
 *   **Объект:** `langchain-ai/deepagents` — Python-библиотека, batteries-included agent harness поверх LangGraph/LangChain `create_agent` (sub-agents, filesystem, context management, persistent memory, human-in-the-loop, skills-on-demand, tools/MCP). CLI-продукт **Deep Agents Code** — готовый coding-агент для терминала (install `curl -LsSf https://langch.in/dcode | bash`), BYO LLM. Лицензия MIT, ≈27.3k★/≈3.8k forks. JS/TS-порт: `langchain-ai/deepagentsjs`.
-*   **Где делаем:** `docs/research/coding-agents/deepagents-comparison.md`, `docs/research/coding-agents-summary.md`, `todo/done/EPIC-research-coding-agents-comparison.md`, agent-report в `docs/agents/reports/system-analyst/`.
+*   **Где делаем:** `docs/research/coding-agents/deepagents-comparison.md`, `docs/research/coding-agents-summary.md`, `todo/done/EPIC-research-coding-agents-comparison.todo.md`, agent-report в `docs/agents/reports/system-analyst/`.
 *   **Текущее поведение:** В эпике исследовано 20 CLI-агентов кодинга. Ближайшие аналоги: Claude Code (аналог по декларации «Inspired by Claude Code»), omp (BYO LLM, MIT), Codex CLI, OpenCode. Pi/omp — текущие сабагенты; deepagents — кандидат.
 *   **Границы (Out of Scope):** написание кода интеграции, глубокий code review Python-исходников, бенчмарки. JS/TS-порт `deepagentsjs` упоминается, но не исследуется отдельно.
 
@@ -90,7 +90,7 @@ status: done
 ```bash
 ls docs/research/coding-agents/deepagents-comparison.md
 grep "deepagents" docs/research/coding-agents-summary.md
-grep -n "1k" todo/done/EPIC-research-coding-agents-comparison.md
+grep -n "1k" todo/done/EPIC-research-coding-agents-comparison.todo.md
 make md-links
 make validate-todo
 ```

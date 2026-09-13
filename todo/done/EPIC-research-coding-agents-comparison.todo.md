@@ -7,7 +7,7 @@ complexity: C4
 priority: P2
 author: Тимлид (Алекс)
 assignee: Аналитик (Шерлок)
-status: in_progress
+status: done
 reopened: 2026-08-16
 pr: "#171"
 branch: epic/research-coding-agents-comparison

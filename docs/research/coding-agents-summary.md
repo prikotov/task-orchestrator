@@ -2,7 +2,7 @@
 
 **Дата создания:** 2026-05-09
 **Дата обновления:** 2026-08-25 (23 исследования)
-**Эпик:** [EPIC-research-coding-agents-comparison](../../todo/done/EPIC-research-coding-agents-comparison.md)
+**Эпик:** [EPIC-research-coding-agents-comparison](../../todo/done/EPIC-research-coding-agents-comparison.todo.md)
 **Автор:** Аналитик (Шерлок)
 
 ---

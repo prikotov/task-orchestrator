@@ -4,7 +4,7 @@ created: 2026-05-02
 value: V2
 complexity: C2
 priority: P2
-depends_on: []
+depends_on:
 epic: done/EPIC-research-agent-frameworks-comparison.md
 author:
 assignee: Аналитик Шерлок
