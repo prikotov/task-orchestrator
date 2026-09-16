@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/fix-become-role-launch-ux
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/393
+status: review
 ---
 
 # TASK-fix-become-role-launch-ux: Починить запуск become-role в host-проектах: резолвинг пути роли и диагностика
