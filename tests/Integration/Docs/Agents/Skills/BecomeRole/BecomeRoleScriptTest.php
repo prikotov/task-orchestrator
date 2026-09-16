@@ -75,6 +75,63 @@ final class BecomeRoleScriptTest extends TestCase
     }
 
     #[Test]
+    public function becomeRoleAcceptsAbsoluteRoleFilePath(): void
+    {
+        // Act — абсолютный путь к файлу роли (cwd агента не важен).
+        $projectRoot = dirname(__DIR__, 6);
+        $process = $this->runScript(
+            $projectRoot . '/docs/agents/roles/team/team_lead_alex.ru.md',
+        );
+
+        // Assert
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        self::assertStringContainsString('Роль: team_lead_alex', $process->getOutput());
+    }
+
+    #[Test]
+    public function becomeRoleResolvesRelativeRolePathFromSkillDirThroughSymlink(): void
+    {
+        // Regression: агент делает `cd .agents/skills/become-role` (симлинк на
+        // docs/agents/skills/become-role) и передаёт относительный путь к файлу
+        // роли с «../», отсчитанный от ЛОГИЧЕСКОГО PWD. Физический cwd при этом
+        // указывает внутрь docs/agents/skills/…, и резолв от getcwd мажет:
+        // скрипт обязан проверять также логический PWD (семантика cd -L).
+        $projectRoot = dirname(__DIR__, 6);
+        $skillDir = $projectRoot . '/.agents/skills/become-role';
+
+        $process = new Process(
+            ['bash', 'scripts/become-role.sh', '../../../docs/agents/roles/team/team_lead_alex.ru.md'],
+            cwd: $skillDir,
+            // Логический PWD, как после `cd` по симлинку в интерактивном шелле.
+            env: ['PWD' => $skillDir],
+        );
+        $process->run();
+
+        // Assert
+        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        self::assertStringContainsString('Роль: team_lead_alex', $process->getOutput());
+    }
+
+    #[Test]
+    public function becomeRoleReportsExplicitErrorOnMissingRoleFile(): void
+    {
+        // Regression: аргумент похож на путь, но файла нет — раньше путь целиком
+        // уходил в CLI как «имя роли» и агент получал бессвязную диагностику
+        // (usage CLI + «не удалось получить данные роли»). Теперь — явная
+        // ошибка «файл роли не найден» с подсказкой передать имя роли.
+        $process = $this->runScript('docs/agents/roles/team/ghost_role_xyz.ru.md');
+
+        // Assert
+        self::assertSame(1, $process->getExitCode());
+        $error = $process->getErrorOutput();
+        self::assertStringContainsString('файл роли не найден', $error);
+        self::assertStringContainsString('имя роли', $error);
+        // Старый симптом: usage-подсказка CLI вместо диагностики скрипта.
+        self::assertStringNotContainsString('agent:role-skills [--format', $error);
+        self::assertStringNotContainsString('не удалось получить данные роли', $error);
+    }
+
+    #[Test]
     public function becomeRoleFailsOnUnknownRole(): void
     {
         // Act

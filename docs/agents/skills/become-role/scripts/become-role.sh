@@ -80,10 +80,65 @@ role_name_from_file() {
     echo "$name"
 }
 
-if [[ -f "$ARG" ]]; then
+# Аргумент похож на путь к файлу роли, а не на имя роли (snake_case)?
+arg_looks_like_path() {
+    [[ "$1" == */* || "$1" == *.md ]]
+}
+
+# Резолвинг файла роли по аргументу-пути. Агент может передать путь,
+# отсчитанный от любого из базисов, поэтому проверяем по очереди:
+#   1) сам ARG — от физического cwd процесса (getcwd);
+#   2) "$PWD/$ARG" — от логического PWD bash: после `cd` в каталог скилла по
+#      симлинку физический cwd указывает внутрь vendor/, а агент строит путь
+#      от логического `.agents/skills/become-role`;
+#   3) "$PROJECT_ROOT/$ARG" — от корня host-проекта (включая нормализацию `..`).
+# Возвращает абсолютный путь первого существующего файла либо пустую строку.
+resolve_role_file() {
+    local arg="$1" base dir name phys
+    local -a bases=()
+
+    # Абсолютный путь проверяем как есть; относительный — от каждого базиса.
+    if [[ "$arg" == /* ]]; then
+        bases=("$arg")
+    else
+        bases=("$arg" "${PWD:-}/$arg" "${PROJECT_ROOT:-}/$arg")
+    fi
+
+    for base in "${bases[@]}"; do
+        # Резолв через логическую семантику `cd` (как cd -L): bash сворачивает
+        # `..` лексически от логического PWD, не раскрывая симлинк-компоненты
+        # физически — иначе путь от `.agents/skills/become-role` (симлинк в
+        # vendor/) после `cd` в каталог скилла не находится.
+        dir="$(dirname "$base")"
+        name="$(basename "$base")"
+        if ! phys="$(cd "$dir" 2>/dev/null && pwd -P)"; then
+            continue
+        fi
+
+        [[ -f "$phys/$name" ]] || continue
+        printf '%s/%s' "$phys" "$name"
+        return 0
+    done
+
+    return 1
+}
+
+if arg_looks_like_path "$ARG"; then
+    ROLE_FILE="$(resolve_role_file "$ARG" || true)"
+
+    if [[ -z "$ROLE_FILE" ]]; then
+        echo "Ошибка: файл роли не найден: ${ARG}." >&2
+        echo "Искал от текущего каталога, логического PWD (${PWD:-?})" \
+            "и корня проекта (${PROJECT_ROOT:-<не определён>})." >&2
+        echo "Передайте имя роли (snake_case, например team_lead_alex) или существующий" >&2
+        echo "путь к файлу роли — абсолютный или от корня проекта." >&2
+        exit 1
+    fi
+
+    ROLE_NAME="$(role_name_from_file "$ROLE_FILE")"
+elif [[ -f "$ARG" ]]; then
+    # Редкий случай: basename файла роли в текущем каталоге без «/» в пути.
     ROLE_NAME="$(role_name_from_file "$ARG")"
-elif [[ -n "$PROJECT_ROOT" && -f "$PROJECT_ROOT/$ARG" ]]; then
-    ROLE_NAME="$(role_name_from_file "$PROJECT_ROOT/$ARG")"
 else
     ROLE_NAME="$ARG"
 fi
