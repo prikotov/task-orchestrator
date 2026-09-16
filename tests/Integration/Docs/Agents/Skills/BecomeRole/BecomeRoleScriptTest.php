@@ -35,6 +35,48 @@ final class BecomeRoleScriptTest extends TestCase
         return $process;
     }
 
+    /**
+     * Временный «host-проект»: docs/agents/{roles,skills} из репозитория,
+     * плюс симлинки bin и vendor (CLI-бинарь вычисляется скриптом от
+     * физического расположения — PACKAGE_ROOT/bin/task-orchestrator),
+     * чтобы CLI-резолвинг работал из произвольного каталога.
+     */
+    private function createTempHost(): string
+    {
+        $projectRoot = dirname(__DIR__, 6);
+        $temp = sys_get_temp_dir() . '/become-role-host-' . bin2hex(random_bytes(6));
+        $fs = new Filesystem();
+        $fs->mkdir($temp . '/docs/agents');
+        $fs->mkdir($temp . '/.agents/skills');
+        $fs->mirror($projectRoot . '/docs/agents/roles', $temp . '/docs/agents/roles');
+        $fs->mirror($projectRoot . '/docs/agents/skills', $temp . '/docs/agents/skills');
+        symlink($projectRoot . '/bin', $temp . '/bin');
+        symlink($projectRoot . '/vendor', $temp . '/vendor');
+
+        return $temp;
+    }
+
+    /**
+     * Управляемая копия скилла (модель PHAR-установки): реальный каталог
+     * .agents/skills/become-role без симлинка. $pharBinding === null — файл
+     * привязки не создаётся (source/Composer-модель), иначе — записывается
+     * переданное содержимое (пустая строка или путь к PHAR).
+     */
+    private function createManagedCopy(string $temp, ?string $pharBinding = null): string
+    {
+        $projectRoot = dirname(__DIR__, 6);
+        $skillTarget = $temp . '/.agents/skills/become-role';
+        (new Filesystem())->mirror(
+            $projectRoot . '/docs/agents/skills/become-role',
+            $skillTarget,
+        );
+        if ($pharBinding !== null) {
+            file_put_contents($skillTarget . '/.phar-binding', $pharBinding);
+        }
+
+        return $skillTarget;
+    }
+
     #[Test]
     public function withoutConfiguredLocaleFindsAvailableLocalizedRole(): void
     {
@@ -99,21 +141,8 @@ final class BecomeRoleScriptTest extends TestCase
         // Окружение воспроизводится во временном каталоге (без зависимости от
         // локальной установки `.agents/` через agent:init, которой нет в CI).
         $projectRoot = dirname(__DIR__, 6);
-        $temp = sys_get_temp_dir() . '/become-role-symlink-' . bin2hex(random_bytes(6));
-        $skillSource = $projectRoot . '/docs/agents/skills/become-role';
-
-        mkdir($temp . '/.agents/skills', 0777, true);
-        mkdir($temp . '/docs/agents', 0777, true);
-        symlink($skillSource, $temp . '/.agents/skills/become-role');
-        // Роли и skills для CLI-резолвинга из временного «host-проекта».
-        (new Filesystem())->mirror(
-            $projectRoot . '/docs/agents/roles',
-            $temp . '/docs/agents/roles',
-        );
-        (new Filesystem())->mirror(
-            $projectRoot . '/docs/agents/skills',
-            $temp . '/docs/agents/skills',
-        );
+        $temp = $this->createTempHost();
+        symlink($projectRoot . '/docs/agents/skills/become-role', $temp . '/.agents/skills/become-role');
 
         $skillDir = $temp . '/.agents/skills/become-role';
 
@@ -162,6 +191,99 @@ final class BecomeRoleScriptTest extends TestCase
         // Assert
         self::assertNotSame(0, $process->getExitCode());
         self::assertNotEmpty($process->getErrorOutput());
+    }
+
+    #[Test]
+    public function failsWithUsageWhenNoArgumentGiven(): void
+    {
+        // Матрица «аргументы»: вызов без аргумента — usage и ненулевой exit,
+        // без попыток резолвинга и без обращения к CLI.
+        $projectRoot = dirname(__DIR__, 6);
+        $script = $projectRoot . '/docs/agents/skills/become-role/scripts/become-role.sh';
+
+        $process = new Process(['bash', $script], cwd: $projectRoot);
+        $process->run();
+
+        // Assert
+        self::assertSame(1, $process->getExitCode());
+        self::assertStringContainsString('Использование:', $process->getErrorOutput());
+    }
+
+    #[Test]
+    public function acceptsRoleFileBasenameInCwdWithoutSlash(): void
+    {
+        // Матрица «аргументы»: basename файла роли в cwd без «/» — имя роли
+        // извлекается из файла, а не уходит в CLI как есть.
+        $temp = $this->createTempHost();
+        copy(
+            $temp . '/docs/agents/roles/team/team_lead_alex.ru.md',
+            $temp . '/team_lead_alex.ru.md',
+        );
+        $script = $temp . '/docs/agents/skills/become-role/scripts/become-role.sh';
+
+        try {
+            $process = new Process(['bash', $script, 'team_lead_alex.ru.md'], cwd: $temp);
+            $process->run();
+
+            // Assert
+            self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+            self::assertStringContainsString('Роль: team_lead_alex', $process->getOutput());
+        } finally {
+            (new Filesystem())->remove($temp);
+        }
+    }
+
+    #[Test]
+    public function resolvesRoleNameFromArbitraryCwdOfTempHost(): void
+    {
+        // Матрица «cwd»: произвольный каталог host-проекта (не корень репо и не
+        // каталог скилла) + абсолютный путь к скрипту. PROJECT_ROOT не
+        // определяется (суффикс .agents/... в SCRIPT_DIR отсутствует) — CLI
+        // резолвит роли от cwd и обязан найти их в temp-host.
+        $temp = $this->createTempHost();
+        mkdir($temp . '/some/nested/dir', 0777, true);
+        $script = $temp . '/docs/agents/skills/become-role/scripts/become-role.sh';
+
+        try {
+            $process = new Process(['bash', $script, 'team_lead_alex'], cwd: $temp . '/some/nested/dir');
+            $process->run();
+
+            // Assert
+            self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+            self::assertStringContainsString('Роль: team_lead_alex', $process->getOutput());
+        } finally {
+            (new Filesystem())->remove($temp);
+        }
+    }
+
+    #[Test]
+    public function managedCopyReportsExplicitErrorOnStalePharBinding(): void
+    {
+        // Матрица «PHAR-привязка»: файл привязки указывает на перемещённый/
+        // удалённый PHAR — явная диагностика с подсказкой agent:init --force
+        // до любого обращения к CLI (без fallback на host bin/task-orchestrator).
+        $temp = $this->createTempHost();
+        $skillDir = $this->createManagedCopy(
+            $temp,
+            $temp . '/definitely-missing/task-orchestrator.phar',
+        );
+
+        try {
+            $process = new Process(
+                ['bash', 'scripts/become-role.sh', 'team_lead_alex'],
+                cwd: $skillDir,
+            );
+            $process->run();
+
+            // Assert
+            self::assertSame(1, $process->getExitCode());
+            $error = $process->getErrorOutput();
+            self::assertStringContainsString('PHAR из runtime-привязки не найден', $error);
+            self::assertStringContainsString('agent:init --force', $error);
+            self::assertStringNotContainsString('Нет такого файла или каталога', $error);
+        } finally {
+            (new Filesystem())->remove($temp);
+        }
     }
 
     #[Test]
