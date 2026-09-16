@@ -3,7 +3,7 @@ type: docs
 created: 2026-09-16 14:01:30 (1789567290)
 due: 
 started: 2026-09-16 14:01:44 (1789567304)
-completed: 
+completed: 2026-09-16 14:06:03 (1789567563)
 cancelled: 
 value: V2
 complexity: C2
@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/docs-become-role-launch-retro
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/394
+status: done
 ---
 
 # TASK-docs-become-role-launch-retro: Ретро: запуск become-role и матрица контекстов
