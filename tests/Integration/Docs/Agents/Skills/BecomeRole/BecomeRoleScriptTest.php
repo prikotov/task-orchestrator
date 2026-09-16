@@ -96,20 +96,42 @@ final class BecomeRoleScriptTest extends TestCase
         // роли с «../», отсчитанный от ЛОГИЧЕСКОГО PWD. Физический cwd при этом
         // указывает внутрь docs/agents/skills/…, и резолв от getcwd мажет:
         // скрипт обязан проверять также логический PWD (семантика cd -L).
+        // Окружение воспроизводится во временном каталоге (без зависимости от
+        // локальной установки `.agents/` через agent:init, которой нет в CI).
         $projectRoot = dirname(__DIR__, 6);
-        $skillDir = $projectRoot . '/.agents/skills/become-role';
+        $temp = sys_get_temp_dir() . '/become-role-symlink-' . bin2hex(random_bytes(6));
+        $skillSource = $projectRoot . '/docs/agents/skills/become-role';
 
-        $process = new Process(
-            ['bash', 'scripts/become-role.sh', '../../../docs/agents/roles/team/team_lead_alex.ru.md'],
-            cwd: $skillDir,
-            // Логический PWD, как после `cd` по симлинку в интерактивном шелле.
-            env: ['PWD' => $skillDir],
+        mkdir($temp . '/.agents/skills', 0777, true);
+        mkdir($temp . '/docs/agents', 0777, true);
+        symlink($skillSource, $temp . '/.agents/skills/become-role');
+        // Роли и skills для CLI-резолвинга из временного «host-проекта».
+        (new Filesystem())->mirror(
+            $projectRoot . '/docs/agents/roles',
+            $temp . '/docs/agents/roles',
         );
-        $process->run();
+        (new Filesystem())->mirror(
+            $projectRoot . '/docs/agents/skills',
+            $temp . '/docs/agents/skills',
+        );
 
-        // Assert
-        self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
-        self::assertStringContainsString('Роль: team_lead_alex', $process->getOutput());
+        $skillDir = $temp . '/.agents/skills/become-role';
+
+        try {
+            $process = new Process(
+                ['bash', 'scripts/become-role.sh', '../../../docs/agents/roles/team/team_lead_alex.ru.md'],
+                cwd: $skillDir,
+                // Логический PWD, как после `cd` по симлинку в интерактивном шелле.
+                env: ['PWD' => $skillDir],
+            );
+            $process->run();
+
+            // Assert
+            self::assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+            self::assertStringContainsString('Роль: team_lead_alex', $process->getOutput());
+        } finally {
+            (new Filesystem())->remove($temp);
+        }
     }
 
     #[Test]
