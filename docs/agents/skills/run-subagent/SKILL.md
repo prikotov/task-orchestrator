@@ -13,8 +13,10 @@ description: Запуск сабагента через pi/codex для авто
 
 ## Как использовать
 
+`<skill-dir>` — каталог этого `SKILL.md` (из `<location>`); подставь его в команду.
+
 ```bash
-scripts/watch-subagent.sh -s <soft-timeout> [options] <<'PROMPT'
+<skill-dir>/scripts/watch-subagent.sh -s <soft-timeout> [options] <<'PROMPT'
 <prompt>
 PROMPT
 ```
@@ -69,7 +71,7 @@ PROMPT
 #### pi (default или профиль роли)
 
 ```bash
-scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
+<skill-dir>/scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
 <prompt>
 PROMPT
 ```
@@ -79,7 +81,7 @@ PROMPT
 #### codex
 
 ```bash
-scripts/watch-subagent.sh --runner codex -s 600 -r docs/agents/roles/team/system_architect_gandalf.ru.md <<'PROMPT'
+<skill-dir>/scripts/watch-subagent.sh --runner codex -s 600 -r docs/agents/roles/team/system_architect_gandalf.ru.md <<'PROMPT'
 <prompt>
 PROMPT
 ```
@@ -163,7 +165,7 @@ Env `WATCH_STALL_RESPECT_LIVENESS=0` — отключить liveness-gate для
 
 ```bash
 # Делегирование Бэкендеру (runner/model/reasoning берутся из config/chains.yaml, default runner = pi)
-scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
+<skill-dir>/scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
 Выполни задачу: todo/TASK-feat-example.todo.md.
 Следуй инструкциям из секции 'Инструкции для сабагента' в файле задачи и AGENTS.md.
 PROMPT
@@ -172,14 +174,14 @@ PROMPT
 ```bash
 # Делегирование Архитектору через профиль роли: если roles.system_architect_gandalf.command начинается с codex,
 # явный --runner не нужен.
-scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/system_architect_gandalf.ru.md <<'PROMPT'
+<skill-dir>/scripts/watch-subagent.sh -s 600 -r docs/agents/roles/team/system_architect_gandalf.ru.md <<'PROMPT'
 Выполни задачу: todo/TASK-feat-example.todo.md.
 PROMPT
 ```
 
 ```bash
 # Явный override (переопределение) сильнее профиля роли
-RUNNER=codex MODEL=o3 scripts/watch-subagent.sh --runner pi --model gpt-4o-mini -s 600 \
+RUNNER=codex MODEL=o3 <skill-dir>/scripts/watch-subagent.sh --runner pi --model gpt-4o-mini -s 600 \
     -r docs/agents/roles/team/system_architect_gandalf.ru.md <<'PROMPT'
 Проверь реализацию без изменения файлов.
 PROMPT
@@ -188,14 +190,14 @@ PROMPT
 Примеры с reasoning:
 ```bash
 # pi с thinking level
-scripts/watch-subagent.sh --reasoning high -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
+<skill-dir>/scripts/watch-subagent.sh --reasoning high -s 600 -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
 <prompt>
 PROMPT
 ```
 
 ```bash
 # codex с указанием модели и reasoning
-scripts/watch-subagent.sh --runner codex --model o3 --reasoning high -s 600 \
+<skill-dir>/scripts/watch-subagent.sh --runner codex --model o3 --reasoning high -s 600 \
     -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
 Проанализируй структуру src/Domain/ и предложи рефакторинг.
 PROMPT
@@ -203,7 +205,7 @@ PROMPT
 
 ```bash
 # Через env-переменные
-RUNNER=codex MODEL=o3 scripts/watch-subagent.sh -s 600 \
+RUNNER=codex MODEL=o3 <skill-dir>/scripts/watch-subagent.sh -s 600 \
     -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
 Реализуй фичу X.
 PROMPT
@@ -211,7 +213,7 @@ PROMPT
 
 ```bash
 # Ответ + какие файлы менялись (pi)
-scripts/watch-subagent.sh -s 600 -o text,files -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
+<skill-dir>/scripts/watch-subagent.sh -s 600 -o text,files -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
 Реализуй фичу X в src/Domain/...
 PROMPT
 ```
