@@ -109,6 +109,9 @@ php vendor/bin/task-orchestrator agent:orchestrate \
 |---|---|
 | [`become-role`](docs/agents/skills/become-role/SKILL.md) | 進入角色：將角色的 skills 揭露至代理上下文（Agent Skills 格式） |
 | [`run-subagent`](docs/agents/skills/run-subagent/SKILL.md) | 啟動從屬代理：角色 + 任務指派 + 上下文。超時控制、停滞偵測、輸出過濾 |
+| [`task-definition`](docs/agents/skills/task-definition/SKILL.md) | 依接收專案的 RACI 準備任務定義：上下文 → 草稿 → 諮詢 → 驗證 → 接受 |
+| [`epic-definition`](docs/agents/skills/epic-definition/SKILL.md) | 準備史詩概念：問題、目標、邊界、需求；若原始請求包含分解，則以 epic-decomposition 技能在同一請求中繼續 |
+| [`epic-decomposition`](docs/agents/skills/epic-decomposition/SKILL.md) | 將已接受的史詩概念拆解為任務：需求 → 任務 → 檢查，無循環的依賴圖 |
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | 從規劃到 merge 執行任務：實作 → self-review → code review → 返工 → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | 透過子代理執行包含多個任務的史詩任務（epic） |
 | [`brainstorm`](docs/agents/skills/brainstorm/SKILL.md) | 腦力激盪：引導者主持討論，參與者辯論，產出含決策的紀錄 |

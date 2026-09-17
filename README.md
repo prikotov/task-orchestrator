@@ -109,6 +109,9 @@ php vendor/bin/task-orchestrator agent:orchestrate \
 |---|---|
 | [`become-role`](docs/agents/skills/become-role/SKILL.md) | Вход в роль: прописывает skills роли в контекст агента (формат Agent Skills) |
 | [`run-subagent`](docs/agents/skills/run-subagent/SKILL.md) | Запускает подчинённого агента: роль + поручение + контекст. Контроль таймаутов, stall-детекция, фильтрация вывода |
+| [`task-definition`](docs/agents/skills/task-definition/SKILL.md) | Готовит постановку задачи по RACI принимающего проекта: контекст → черновик → консультации → проверка → принятие |
+| [`epic-definition`](docs/agents/skills/epic-definition/SKILL.md) | Готовит концепцию эпика: проблема, цель, границы, требования; декомпозиция — навыком epic-decomposition в том же запросе, если входила в него |
+| [`epic-decomposition`](docs/agents/skills/epic-decomposition/SKILL.md) | Раскладывает принятую концепцию эпика на задачи: требование → задача → проверка, зависимости без циклов |
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | Проводит задачу от постановки до merge: реализация → self-review → code review → доработка → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | Проводит эпик из нескольких задач через сабагентов |
 | [`brainstorm`](docs/agents/skills/brainstorm/SKILL.md) | Мозговой штурм: фасилитатор ведёт дискуссию, участники спорят, итог — протокол с решениями |
