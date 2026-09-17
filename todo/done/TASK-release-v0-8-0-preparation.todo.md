@@ -3,7 +3,7 @@ type: chore
 created: 2026-09-17 01:33:30 (1789608810)
 due: 
 started: 2026-09-17 01:34:05 (1789608845)
-completed: 
+completed: 2026-09-17 01:39:53 (1789609193)
 cancelled: 
 value: V2
 complexity: C2
@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/release-v0-8-0
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/395
+status: done
 ---
 
 # TASK-release-v0-8-0-preparation: Подготовка релиза v0.8.0
@@ -54,10 +54,10 @@ status: in_progress
 
 ## 4. План реализации (Implementation Plan)
 1. [x] CHANGELOG + release-plan.
-2. [ ] PR → merge → тег → workflow Release Phar → проверка публикации.
+2. [x] PR #395 → merge (поручение «релизни») → тег → workflow Release Phar → проверка публикации.
 
 ## 5. Критерии приёмки (Definition of Done)
-- [ ] Проверки после публикации из release-plan выполнены.
+- [ ] Проверки после публикации из release-plan выполнены (выполняются после тега).
 
 ## 6. Самопроверка (Verification)
 ```bash
