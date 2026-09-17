@@ -3,7 +3,7 @@ type: fix
 created: 2026-09-16 08:32:05 (1789547525)
 due: 
 started: 2026-09-16 08:33:21 (1789547601)
-completed: 2026-09-16 13:05:04 (1789563904)
+completed: 2026-09-17 00:38:26 (1789605506)
 cancelled: 
 value: V2
 complexity: C2
@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/fix-become-role-launch-ux
 pr: https://github.com/prikotov/task-orchestrator/pull/393
-status: review
+status: done
 ---
 
 # TASK-fix-become-role-launch-ux: Починить запуск become-role в host-проектах: резолвинг пути роли и диагностика
