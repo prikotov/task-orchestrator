@@ -3,7 +3,7 @@ type: fix
 created: 2026-09-17 13:07:16 (1789650436)
 due: 
 started: 2026-09-17 13:07:40 (1789650460)
-completed: 
+completed: 2026-09-17 13:08:13 (1789650493)
 cancelled: 
 value: V2
 complexity: C2
@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/fix-run-subagent-placeholder
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/398
+status: done
 ---
 
 # TASK-fix-run-subagent-placeholder: Плейсхолдер-форма команд в run-subagent/SKILL.md
