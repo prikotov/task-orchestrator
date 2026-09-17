@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/fix-skill-command-placeholder
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/396
+status: review
 ---
 
 # TASK-fix-skill-command-placeholder: Плейсхолдер-форма команды скилла: защита от слепого копирования scripts/…
