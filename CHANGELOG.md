@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-09-17
+
+### Fixed
+
+- `run-subagent/SKILL.md`: все 10 блоков команд запуска переведены на плейсхолдер-форму `<skill-dir>/scripts/watch-subagent.sh` (защита от слепого копирования относительной команды — тот же класс `exit 127`, что закрыт для `become-role` в 0.8.1); упоминания в тексте остаются относительными (#398).
+
 ## [0.8.1] - 2026-09-17
 
 ### Fixed
