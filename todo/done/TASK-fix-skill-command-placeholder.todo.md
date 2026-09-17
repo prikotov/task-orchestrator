@@ -3,7 +3,7 @@ type: fix
 created: 2026-09-17 04:03:12 (1789617792)
 due: 
 started: 2026-09-17 04:04:39 (1789617879)
-completed: 
+completed: 2026-09-17 04:09:04 (1789618144)
 cancelled: 
 value: V2
 complexity: C2
@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/fix-skill-command-placeholder
 pr: https://github.com/prikotov/task-orchestrator/pull/396
-status: review
+status: done
 ---
 
 # TASK-fix-skill-command-placeholder: Плейсхолдер-форма команды скилла: защита от слепого копирования scripts/…
