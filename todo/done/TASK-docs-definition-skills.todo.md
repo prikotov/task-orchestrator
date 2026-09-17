@@ -3,7 +3,7 @@ type: docs
 created: 2026-09-17 15:13:17 (1789657997)
 due: 
 started: 
-completed: 
+completed: 2026-09-17 15:20:00 (1789658400)
 cancelled: 
 value: V3
 complexity: C2
@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Технический писатель Гермиона (pi)
 branch: task/definition-skills
-pr: 
-status: review
+pr: https://github.com/prikotov/task-orchestrator/pull/400
+status: done
 ---
 
 # TASK-docs-definition-skills: Навыки постановки и цикл проектирования процессов команды
@@ -43,7 +43,7 @@ status: review
 > **Как** Тимлид, **я хочу** переносимые навыки постановки задач и эпиков и закреплённый цикл проектирования процессов взаимодействия команды, **чтобы** постановки в принимающих проектах готовились однородно по матрице RACI, а изменения регламентов и навыков согласовывались явно до публикации.
 
 ### Цель по SMART (Goal)
-- **S:** Оформить три навыка постановки (`task-definition`, `epic-definition`, `epic-decomposition`) с общим протоколом, специализированный цикл `PM1`–`PM5` в [матрице RACI](../docs/agents/raci-matrix.md), обновления ролей тимлида и технических писателей, README (ru/en/zh) и отчёт статической сверки.
+- **S:** Оформить три навыка постановки (`task-definition`, `epic-definition`, `epic-decomposition`) с общим протоколом, специализированный цикл `PM1`–`PM5` в [матрице RACI](../../docs/agents/raci-matrix.md), обновления ролей тимлида и технических писателей, README (ru/en/zh) и отчёт статической сверки.
 - **M:** `todo-md validate` и `make md-links` зелёные; `make validate-roles` и `make validate-language` зелёные; статическая сверка с внешней матрицей TasK зафиксирована отчётом; остались CI в PR и создание PR.
 - **A:** Только документация в существующих каталогах (`docs/agents/`), без кода и конфигураций; опирается на справочники и шаблоны пакета todo-md.
 - **R:** Переносимая продуктовая ценность для принимающих проектов (навыки постановки) и процессная основа команды (цикл проектирования процессов).
@@ -51,12 +51,12 @@ status: review
 
 ## 2. Контекст и Границы (Context and Scope)
 *   **Где делаем:**
-    * [`docs/agents/skills/task-definition/`](../docs/agents/skills/task-definition/SKILL.md) (SKILL.md + `references/definition-protocol.md` — общий протокол постановок);
-    * [`docs/agents/skills/epic-definition/SKILL.md`](../docs/agents/skills/epic-definition/SKILL.md), [`docs/agents/skills/epic-decomposition/SKILL.md`](../docs/agents/skills/epic-decomposition/SKILL.md);
-    * [`docs/agents/raci-matrix.md`](../docs/agents/raci-matrix.md) — легенда условного участия (строчные `raci`), правила 7–8, примечание к разделу 4, раздел 6 «Специализированный цикл: проектирование процессов взаимодействия команды»;
-    * роли: [`team_lead_alex.ru.md`](../docs/agents/roles/team/team_lead_alex.ru.md), [`technical_writer_hermione.ru.md`](../docs/agents/roles/team/technical_writer_hermione.ru.md), [`technical_writer_ostap.ru.md`](../docs/agents/roles/team/technical_writer_ostap.ru.md);
+    * [`docs/agents/skills/task-definition/`](../../docs/agents/skills/task-definition/SKILL.md) (SKILL.md + `references/definition-protocol.md` — общий протокол постановок);
+    * [`docs/agents/skills/epic-definition/SKILL.md`](../../docs/agents/skills/epic-definition/SKILL.md), [`docs/agents/skills/epic-decomposition/SKILL.md`](../../docs/agents/skills/epic-decomposition/SKILL.md);
+    * [`docs/agents/raci-matrix.md`](../../docs/agents/raci-matrix.md) — легенда условного участия (строчные `raci`), правила 7–8, примечание к разделу 4, раздел 6 «Специализированный цикл: проектирование процессов взаимодействия команды»;
+    * роли: [`team_lead_alex.ru.md`](../../docs/agents/roles/team/team_lead_alex.ru.md), [`technical_writer_hermione.ru.md`](../../docs/agents/roles/team/technical_writer_hermione.ru.md), [`technical_writer_ostap.ru.md`](../../docs/agents/roles/team/technical_writer_ostap.ru.md);
     * `README.md`, `README.en.md`, `README.zh.md` — строки трёх навыков в таблице навыков;
-    * [`docs/agents/reports/team-lead/2026-09-17_21-38_team-interaction-process-model-verification.md`](../docs/agents/reports/team-lead/2026-09-17_21-38_team-interaction-process-model-verification.md) — отчёт статической проверки модели.
+    * [`docs/agents/reports/team-lead/2026-09-17_21-38_team-interaction-process-model-verification.md`](../../docs/agents/reports/team-lead/2026-09-17_21-38_team-interaction-process-model-verification.md) — отчёт статической проверки модели.
 *   **Текущее поведение (до ветки):** навыков постановки нет; изменения регламентов и навыков не имели выделенного цикла; в ролях тимлида единственным личным исключением была ретроспектива.
 *   **Границы (Out of Scope):** код, тесты и конфигурации не затрагиваются (docs-only); поведенческие (сквозные) прогоны навыков не выполнялись и не входят в задачу — будущая отдельная проверка; другие задачи и эпики не создаются и не изменяются.
 
@@ -91,17 +91,17 @@ status: review
 5. [x] `PM4`: README (ru/en/zh).
 6. [x] `PM5`: сверка оформления TL с моделью, отчёт статической проверки (включая сверку с матрицей TasK) в `docs/agents/reports/team-lead/`.
 7. [x] Проверки документации: `todo-md validate`, `make md-links`, `make validate-roles`, `make validate-language`.
-8. [ ] CI в PR зелёный; PR создан, ссылка внесена в `pr`.
+8. [x] CI в PR зелёный; PR создан, ссылка внесена в `pr`.
 
 ## 5. Критерии приёмки (Definition of Done)
 - [x] `php vendor/bin/todo-md validate` — зелёный (включая эту задачу).
 - [x] `make md-links` — зелёный: внутренних битых ссылок в Markdown нет.
 - [x] `make validate-roles` — зелёный: файлы ролей валидны.
-- [x] `make validate-language` — зелёный: англицизмы в русскоязычной документации в норме.
+- [x] `make validate-language` — выполнен успешно в режиме предупреждений: новых предупреждений нет, 12 существующих вне изменений.
 - [x] Статическая сверка модели с внешней матрицей TasK зафиксирована отчётом (`PM2` AN пройдено, `PM3` принятие TL, `PM5` сверка оформления).
 - [x] Обновлена техническая документация: RACI, роли, README (ru/en/zh), навыки.
-- [ ] CI в PR зелёный.
-- [ ] PR создан и ссылка заполнена в поле `pr`.
+- [x] CI в PR зелёный (первый прогон всех четырёх проверок).
+- [x] PR создан и ссылка заполнена в поле `pr`.
 - Сценарное тестирование не требуется: изменения docs-only, код и тесты не затронуты.
 
 ## 6. Самопроверка (Verification)
@@ -114,14 +114,14 @@ make md-links
 ## 7. Риски и зависимости (Risks and Dependencies)
 - Поведенческие прогоны навыков не выполнялись: работоспособность инструкций подтверждена только статической сверкой; реальное поведение — предмет будущей проверки.
 - Раунд установления цикла: первичная проверка и консультации шли по черновику модели до принятия — зафиксировано честной маркировкой в отчёте, штатный порядок `PM1` → `PM5` действует для последующих изменений.
-- Остаются CI и PR: до их завершения задача не переводится в `done`.
+- PR #400 создан; первый прогон CI зелёный. После публикации учётного завершения проверяется повторный прогон.
 
 ## 8. Источники (Sources)
-- [x] [Матрица RACI](../docs/agents/raci-matrix.md)
-- [x] [task-definition](../docs/agents/skills/task-definition/SKILL.md) · [definition-protocol](../docs/agents/skills/task-definition/references/definition-protocol.md)
-- [x] [epic-definition](../docs/agents/skills/epic-definition/SKILL.md) · [epic-decomposition](../docs/agents/skills/epic-decomposition/SKILL.md)
-- [x] [Отчёт статической проверки модели](../docs/agents/reports/team-lead/2026-09-17_21-38_team-interaction-process-model-verification.md)
-- [x] [Правила работы с задачами (todo/AGENTS.md)](AGENTS.md) · [Руководство по созданию задач](../docs/todo-md/AGENTS_TASK_WRITING_GUIDE.md)
+- [x] [Матрица RACI](../../docs/agents/raci-matrix.md)
+- [x] [task-definition](../../docs/agents/skills/task-definition/SKILL.md) · [definition-protocol](../../docs/agents/skills/task-definition/references/definition-protocol.md)
+- [x] [epic-definition](../../docs/agents/skills/epic-definition/SKILL.md) · [epic-decomposition](../../docs/agents/skills/epic-decomposition/SKILL.md)
+- [x] [Отчёт статической проверки модели](../../docs/agents/reports/team-lead/2026-09-17_21-38_team-interaction-process-model-verification.md)
+- [x] [Правила работы с задачами (todo/AGENTS.md)](../AGENTS.md) · [Руководство по созданию задач](../../docs/todo-md/AGENTS_TASK_WRITING_GUIDE.md)
 
 ## 9. Комментарии (Comments)
 - **Учётная постановка.** Задача оформлена после реализации, по запросу пользователя на подготовку PR; она фиксирует фактически выполненную работу ветки `task/definition-skills` и не имитирует предварительную постановку: постановки до начала работы не существовало, чекбоксы `Must`/`Should`/плана отмечены по факту.
