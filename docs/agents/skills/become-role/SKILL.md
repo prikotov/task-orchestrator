@@ -20,11 +20,11 @@ description: "Войти в роль и объявить её skills в конт
 **Шаг 1.** Определи роль — по описаниям ролей в `AGENTS.md` (раздел «Роль») или
 RACI-матрице. При сомнении бери `team_lead_alex` (дефолт проекта).
 
-**Шаг 2.** Вызови скрипт, передав имя роли или путь к файлу роли:
+**Шаг 2.** Вызови скрипт скилла, передав имя роли (snake_case, например `team_lead_alex`):
 
 ```bash
 # Запускай из каталога скилла (каталог с этим SKILL.md).
-bash scripts/become-role.sh <role|file>
+bash scripts/become-role.sh <имя-роли>
 ```
 
 Пример вывода (`become-role.sh team_lead_alex`):

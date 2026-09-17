@@ -15,6 +15,7 @@ use TaskOrchestrator\Common\Module\AgentRole\Domain\Service\FormatSkillCatalogSe
 use TaskOrchestrator\Common\Module\AgentRole\Domain\Service\ResolveRoleSkillsService;
 use TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Component\Frontmatter\FrontmatterYamlParser;
 use TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemLocateRoleFileService;
+use TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemResolveRoleArgumentService;
 use TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\YamlLoadRoleFrontmatterService;
 use TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\YamlLoadSkillFrontmatterService;
 
@@ -46,7 +47,9 @@ final class ResolveRoleSkillsStackIntegrationTest extends TestCase
         $parser = new FrontmatterYamlParser();
 
         $this->handler = new ResolveRoleSkillsQueryHandler(
-            roleFileLocator: new FilesystemLocateRoleFileService($this->rolesDir, 'ru'),
+            roleArgumentResolver: new FilesystemResolveRoleArgumentService(
+                new FilesystemLocateRoleFileService($this->rolesDir, 'ru'),
+            ),
             roleFrontmatterReader: new YamlLoadRoleFrontmatterService($parser),
             roleSkillsResolver: new ResolveRoleSkillsService(new YamlLoadSkillFrontmatterService($this->skillsDir, $parser)),
             skillCatalogFormatter: new FormatSkillCatalogService('ru'),

@@ -240,13 +240,14 @@ php task-orchestrator.phar agent:init --force
 Резолвит skills (навыки) роли и выводит их каталог для включения в system prompt агента. Используется мета-скиллом `become-role` для динамического объявления skills роли в контексте (универсально для pi и codex).
 
 ```bash
-php vendor/bin/task-orchestrator agent:role-skills <role> [--format=block|list|json]
+php vendor/bin/task-orchestrator agent:role-skills <role|file> [--format=block|list|json] [--logical-pwd=DIR]
 ```
 
 | Аргумент/опция | Описание | По умолчанию |
 |---|---|---|
-| `role` (аргумент) | Имя роли (snake_case), как в `config/chains.yaml` `roles.<role>` и имя файла роли без локали | — (обязательный) |
+| `role` (аргумент) | Имя роли (snake_case), как в `config/chains.yaml` `roles.<role>`, ИЛИ путь к файлу роли: абсолютный либо относительный от одного из базисов (cwd процесса, `--logical-pwd`) | — (обязательный) |
 | `--format` | Формат вывода: `block` (XML-каталог `<available_skills>`), `list`, `json` | `block` |
+| `--logical-pwd` | Логический PWD вызывающего (семантика `cd -L`): базис для относительных путей — актуально после `cd` в каталог скилла по симлинку, где физический cwd указывает в `vendor/` | не задан |
 
 Каталог разворачивает транзитивные зависимости skills (`depends_on` в frontmatter `SKILL.md`): зависимости помещаются перед зависящими от них skills, дубликаты исключаются. Если роль не декларирует skills — выводится пустая строка (по стандарту Agent Skills пустой блок не выводится).
 
@@ -268,5 +269,5 @@ php vendor/bin/task-orchestrator agent:role-skills team_lead_alex --format=json
 | Код | Значение |
 |------|---------|
 | `0` | Успех |
-| `1` | Роль или её skill не найдены, цикл `depends_on` (fail-fast) |
+| `1` | Роль или файл роли не найдены (в т.ч. путь не резолвится ни от одного базиса), skill не найден, цикл `depends_on` (fail-fast) |
 | `2` | Неверное значение `--format` |
