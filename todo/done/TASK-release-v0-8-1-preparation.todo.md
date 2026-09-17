@@ -3,7 +3,7 @@ type: chore
 created: 2026-09-17 06:50:53 (1789627853)
 due: 
 started: 2026-09-17 06:51:24 (1789627884)
-completed: 
+completed: 2026-09-17 06:52:20 (1789627940)
 cancelled: 
 value: V2
 complexity: C2
@@ -15,8 +15,8 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/release-v0-8-1
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/397
+status: done
 ---
 
 # TASK-release-v0-8-1-preparation: Подготовка релиза v0.8.1
