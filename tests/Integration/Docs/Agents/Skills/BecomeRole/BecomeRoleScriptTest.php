@@ -168,18 +168,18 @@ final class BecomeRoleScriptTest extends TestCase
     {
         // Regression: аргумент похож на путь, но файла нет — раньше путь целиком
         // уходил в CLI как «имя роли» и агент получал бессвязную диагностику
-        // (usage CLI + «не удалось получить данные роли»). Теперь — явная
-        // ошибка «файл роли не найден» с подсказкой передать имя роли.
+        // (usage CLI). Теперь резолвинг и диагностика — в CLI (модуль AgentRole):
+        // «Файл роли не найден» с перечнем базисов и подсказкой; скрипт
+        // прокидывает её в stderr и добавляет общий заголовок.
         $process = $this->runScript('docs/agents/roles/team/ghost_role_xyz.ru.md');
 
         // Assert
         self::assertSame(1, $process->getExitCode());
         $error = $process->getErrorOutput();
-        self::assertStringContainsString('файл роли не найден', $error);
-        self::assertStringContainsString('имя роли', $error);
-        // Старый симптом: usage-подсказка CLI вместо диагностики скрипта.
+        self::assertStringContainsString('Файл роли не найден', $error);
+        self::assertStringContainsString('имя роли (snake_case', $error);
+        // Старый симптом: usage-подсказка CLI вместо диагностики резолвинга.
         self::assertStringNotContainsString('agent:role-skills [--format', $error);
-        self::assertStringNotContainsString('не удалось получить данные роли', $error);
     }
 
     #[Test]

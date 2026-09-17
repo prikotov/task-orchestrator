@@ -71,77 +71,13 @@ if [[ -n "$PHAR_PATH" && ! -f "$PHAR_PATH" ]]; then
     exit 1
 fi
 
-# Имя роли из basename файла роли: team_lead_alex.ru.md → team_lead_alex.
-role_name_from_file() {
-    local name
-    name="$(basename "$1")"          # team_lead_alex.ru.md
-    name="${name%.md}"               # team_lead_alex.ru
-    name="${name%.[a-z][a-z]}"       # team_lead_alex (убрать суффикс локали)
-    echo "$name"
-}
-
-# Аргумент похож на путь к файлу роли, а не на имя роли (snake_case)?
-arg_looks_like_path() {
-    [[ "$1" == */* || "$1" == *.md ]]
-}
-
-# Резолвинг файла роли по аргументу-пути. Агент может передать путь,
-# отсчитанный от любого из базисов, поэтому проверяем по очереди:
-#   1) сам ARG — от физического cwd процесса (getcwd);
-#   2) "$PWD/$ARG" — от логического PWD bash: после `cd` в каталог скилла по
-#      симлинку физический cwd указывает внутрь vendor/, а агент строит путь
-#      от логического `.agents/skills/become-role`;
-#   3) "$PROJECT_ROOT/$ARG" — от корня host-проекта (включая нормализацию `..`).
-# Возвращает абсолютный путь первого существующего файла либо пустую строку.
-resolve_role_file() {
-    local arg="$1" base dir name phys
-    local -a bases=()
-
-    # Абсолютный путь проверяем как есть; относительный — от каждого базиса.
-    if [[ "$arg" == /* ]]; then
-        bases=("$arg")
-    else
-        bases=("$arg" "${PWD:-}/$arg" "${PROJECT_ROOT:-}/$arg")
-    fi
-
-    for base in "${bases[@]}"; do
-        # Резолв через логическую семантику `cd` (как cd -L): bash сворачивает
-        # `..` лексически от логического PWD, не раскрывая симлинк-компоненты
-        # физически — иначе путь от `.agents/skills/become-role` (симлинк в
-        # vendor/) после `cd` в каталог скилла не находится.
-        dir="$(dirname "$base")"
-        name="$(basename "$base")"
-        if ! phys="$(cd "$dir" 2>/dev/null && pwd -P)"; then
-            continue
-        fi
-
-        [[ -f "$phys/$name" ]] || continue
-        printf '%s/%s' "$phys" "$name"
-        return 0
-    done
-
-    return 1
-}
-
-if arg_looks_like_path "$ARG"; then
-    ROLE_FILE="$(resolve_role_file "$ARG" || true)"
-
-    if [[ -z "$ROLE_FILE" ]]; then
-        echo "Ошибка: файл роли не найден: ${ARG}." >&2
-        echo "Искал от текущего каталога, логического PWD (${PWD:-?})" \
-            "и корня проекта (${PROJECT_ROOT:-<не определён>})." >&2
-        echo "Передайте имя роли (snake_case, например team_lead_alex) или существующий" >&2
-        echo "путь к файлу роли — абсолютный или от корня проекта." >&2
-        exit 1
-    fi
-
-    ROLE_NAME="$(role_name_from_file "$ROLE_FILE")"
-elif [[ -f "$ARG" ]]; then
-    # Редкий случай: basename файла роли в текущем каталоге без «/» в пути.
-    ROLE_NAME="$(role_name_from_file "$ARG")"
-else
-    ROLE_NAME="$ARG"
-fi
+# Резолвинг аргумента (имя роли ИЛИ путь к файлу роли) делегирован в PHP:
+# CLI agent:role-skills (модуль AgentRole) резолвит имя локатором ролей, а
+# путь — по базисам: cwd CLI-процесса и логический PWD вызывающего (передаётся
+# опцией --logical-pwd; семантика cd -L для путей с «../» от каталога скилла
+# по симлинку, где физический cwd указывает внутрь vendor/).
+# Скрипт — только bootstrap: определить способ вызова CLI и корень host-проекта.
+CALLER_LOGICAL_PWD="${PWD:-}"
 
 # CLI-запуск agent:role-skills: в управляемой PHAR-копии — через привязанный
 # архив (php <phar-path>), иначе штатный bin/task-orchestrator пакета.
@@ -154,16 +90,23 @@ run_cli() {
 }
 
 run_role_skills() {
+    local -a cmd=(agent:role-skills "$ARG" --format=json)
+
+    # Логический PWD вызывающего — базис для относительных путей к файлу роли.
+    if [[ -n "$CALLER_LOGICAL_PWD" ]]; then
+        cmd+=(--logical-pwd="$CALLER_LOGICAL_PWD")
+    fi
+
     if [[ -n "$PROJECT_ROOT" ]]; then
         (
             cd "$PROJECT_ROOT"
-            run_cli agent:role-skills "$ROLE_NAME" --format=json
+            run_cli "${cmd[@]}"
         )
 
         return
     fi
 
-    run_cli agent:role-skills "$ROLE_NAME" --format=json
+    run_cli "${cmd[@]}"
 }
 
 # agent:role-skills через CLI пакета (host-aware): bin/task-orchestrator в
@@ -171,7 +114,8 @@ run_role_skills() {
 # {role, role_file, skills, catalog}. CLI делает fail-fast при ошибках
 # (роль/skill не найдены, цикл depends_on) — ненулевой exit.
 if ! OUTPUT="$(run_role_skills)"; then
-    echo "Ошибка: не удалось получить данные роли \"${ROLE_NAME}\"." >&2
+    printf '%s\n' "$OUTPUT" >&2
+    echo "Ошибка: не удалось получить данные роли \"${ARG}\"." >&2
     exit 1
 fi
 
@@ -181,22 +125,22 @@ try {
 
     if (
         !is_array($payload)
-        || !isset($payload["role_file"], $payload["catalog"])
+        || !isset($payload["role"], $payload["role_file"], $payload["catalog"])
+        || !is_string($payload["role"])
         || !is_string($payload["role_file"])
         || !is_string($payload["catalog"])
     ) {
         throw new UnexpectedValueException("Unexpected agent:role-skills payload.");
     }
 
-    printf("Файл роли: %s\n\n%s", $payload["role_file"], $payload["catalog"]);
+    printf("Роль: %s\nФайл роли: %s\n\n%s", $payload["role"], $payload["role_file"], $payload["catalog"]);
 } catch (Throwable) {
     fwrite(STDERR, "Ошибка: некорректный JSON от agent:role-skills.\n");
     exit(1);
 }
 ' <<< "$OUTPUT")"; then
-    echo "Ошибка: не удалось обработать данные роли \"${ROLE_NAME}\"." >&2
+    echo "Ошибка: не удалось обработать данные роли \"${ARG}\"." >&2
     exit 1
 fi
 
-echo "Роль: ${ROLE_NAME}"
 printf '%s\n' "$RENDERED"

@@ -22,6 +22,8 @@ services:
   # Domain Service aliases (Interface → Implementation)
   TaskOrchestrator\Common\Module\AgentRole\Domain\Service\LocateRoleFileServiceInterface:
     alias: TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemLocateRoleFileService
+  TaskOrchestrator\Common\Module\AgentRole\Domain\Service\ResolveRoleArgumentServiceInterface:
+    alias: TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\FilesystemResolveRoleArgumentService
   TaskOrchestrator\Common\Module\AgentRole\Domain\Service\LoadRoleFrontmatterServiceInterface:
     alias: TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\YamlLoadRoleFrontmatterService
   TaskOrchestrator\Common\Module\AgentRole\Domain\Service\LoadSkillFrontmatterServiceInterface:

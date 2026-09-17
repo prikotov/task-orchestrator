@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/fix-become-role-launch-ux
 pr: https://github.com/prikotov/task-orchestrator/pull/393
-status: done
+status: review
 ---
 
 # TASK-fix-become-role-launch-ux: Починить запуск become-role в host-проектах: резолвинг пути роли и диагностика
@@ -64,7 +64,11 @@ status: done
 - Правки в host-проектах (фикс подхватится после обновления зависимости).
 
 ## 4. План реализации (Implementation Plan)
-1. [x] `become-role.sh`: функции `arg_looks_like_path` / `resolve_role_file` (три базиса, логическая семантика `cd`), явная диагностика при ненахождении файла.
+1. [x] ~~`become-role.sh`: резолвинг в bash~~ — по ревью владельца перенос в PHP:
+1a. [x] Domain: `ResolveRoleArgumentServiceInterface` + `RoleArgumentNotFoundException` (явная диагностика с базисами).
+1b. [x] Infrastructure: `FilesystemResolveRoleArgumentService` — имя → локатор ролей; путь → базисы (cwd, логический PWD) с лексическим сворачиванием «..» (семантика `cd -L`, без физического раскрытия симлинков).
+1c. [x] Application: `ResolveRoleSkillsQuery` (role + pathBases), Handler, ResultDto (+roleName).
+1d. [x] CLI `agent:role-skills`: аргумент `<role|file>`, опция `--logical-pwd`; скрипт — только bootstrap (определение CLI, PHAR-привязка, передача аргумента и `--logical-pwd`).
 2. [x] `SKILL.md`: относительная форма команды + якорь; текстовые правила вызова.
 3. [x] `README.md` скилла: обе формы запуска (штатная для агента, установленная для документов host-проекта), описание резолвинга аргумента.
 4. [x] Тесты: +3 кейса в `BecomeRoleScriptTest`.
@@ -90,6 +94,7 @@ php vendor/bin/todo-md validate
 
 ## 9. Комментарии (Comments)
 - Реализовано тимлидом лично (прямой bugfix-запрос пользователя, без делегирования в сабагент) — зафиксировано как осознанное отклонение от роли.
+- Ревью владельца в PR: «не переусложнён ли bash? часть логики — в PHP» → резолвинг аргумента перенесён из скрипта в модуль AgentRole; bash сокращён до glue (~55 строк удалено).
 
 ## История изменений (Change History)
 | Дата | Автор (роль) | Изменение |

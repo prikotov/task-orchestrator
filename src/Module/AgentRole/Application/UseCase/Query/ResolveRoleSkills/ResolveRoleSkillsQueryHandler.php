@@ -10,21 +10,19 @@ use TaskOrchestrator\Common\Module\AgentRole\Application\Exception\ResolveRoleSk
 use TaskOrchestrator\Common\Module\AgentRole\Domain\Exception\AgentRoleException;
 use TaskOrchestrator\Common\Module\AgentRole\Domain\Service\FormatSkillCatalogServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRole\Domain\Service\LoadRoleFrontmatterServiceInterface;
-use TaskOrchestrator\Common\Module\AgentRole\Domain\Service\LocateRoleFileServiceInterface;
+use TaskOrchestrator\Common\Module\AgentRole\Domain\Service\ResolveRoleArgumentServiceInterface;
 use TaskOrchestrator\Common\Module\AgentRole\Domain\Service\ResolveRoleSkillsServiceInterface;
-use TaskOrchestrator\Common\Module\AgentRole\Domain\ValueObject\RoleNameVo;
 use TaskOrchestrator\Common\Module\AgentRole\Domain\ValueObject\SkillMetadataVo;
 
 /**
  * Оркестрация резолвинга skills роли.
  *
  * Контракт:
- *   1. вычислить имя роли (RoleNameVo);
- *   2. найти файл роли (locator);
- *   3. прочитать frontmatter роли → декларация skills (reader);
- *   4. развернуть skills с зависимостями (resolver);
- *   5. отформатировать каталог (formatter);
- *   6. вернуть DTO (skills + готовый блок каталога).
+ *   1. резолвить аргумент роли (имя/путь) в файл роли (argument resolver);
+ *   2. прочитать frontmatter роли → декларация skills (reader);
+ *   3. развернуть skills с зависимостями (resolver);
+ *   4. отформатировать каталог (formatter);
+ *   5. вернуть DTO (имя роли, skills + готовый блок каталога).
  *
  * Boundary: доменные {@see AgentRoleException} оборачиваются в
  * {@see ResolveRoleSkillsFailedException}, чтобы Presentation не зависел от Domain.
@@ -32,7 +30,7 @@ use TaskOrchestrator\Common\Module\AgentRole\Domain\ValueObject\SkillMetadataVo;
 final readonly class ResolveRoleSkillsQueryHandler
 {
     public function __construct(
-        private LocateRoleFileServiceInterface $roleFileLocator,
+        private ResolveRoleArgumentServiceInterface $roleArgumentResolver,
         private LoadRoleFrontmatterServiceInterface $roleFrontmatterReader,
         private ResolveRoleSkillsServiceInterface $roleSkillsResolver,
         private FormatSkillCatalogServiceInterface $skillCatalogFormatter,
@@ -55,8 +53,7 @@ final readonly class ResolveRoleSkillsQueryHandler
 
     private function handle(ResolveRoleSkillsQuery $query): ResolveRoleSkillsResultDto
     {
-        $roleName = RoleNameVo::createFromName($query->roleName);
-        $roleFile = $this->roleFileLocator->locate($roleName);
+        $roleFile = $this->roleArgumentResolver->resolve($query->role, $query->pathBases);
         $roleMetadata = $this->roleFrontmatterReader->read($roleFile);
         $skills = $this->roleSkillsResolver->resolve($roleMetadata);
         $catalogBlock = $this->skillCatalogFormatter->format($skills);
@@ -64,8 +61,20 @@ final readonly class ResolveRoleSkillsQueryHandler
         return new ResolveRoleSkillsResultDto(
             skills: $this->toSkillDtos($skills),
             catalogBlock: $catalogBlock,
+            roleName: $this->roleNameFromFilePath($roleFile),
             roleFilePath: $this->relativeRoleFilePath($roleFile),
         );
+    }
+
+    /**
+     * Имя роли из basename файла роли: team_lead_alex.ru.md → team_lead_alex.
+     */
+    private function roleNameFromFilePath(string $roleFile): string
+    {
+        $name = basename($roleFile);
+        $name = preg_replace('/\.md$/', '', $name) ?? $name;
+
+        return preg_replace('/\.[a-z]{2}$/', '', $name) ?? $name;
     }
 
     /**

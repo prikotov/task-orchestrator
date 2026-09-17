@@ -44,6 +44,8 @@ final class RoleSkillsCommand extends Command
 
     private const string OPT_FORMAT = 'format';
 
+    private const string OPT_LOGICAL_PWD = 'logical-pwd';
+
     private const string FORMAT_BLOCK = 'block';
 
     private const string FORMAT_LIST = 'list';
@@ -63,7 +65,8 @@ final class RoleSkillsCommand extends Command
             ->addArgument(
                 self::ARG_ROLE,
                 InputArgument::REQUIRED,
-                'Имя роли (snake_case, как в config/chains.yaml roles.<role>)',
+                'Имя роли (snake_case, как в config/chains.yaml roles.<role>) или путь к файлу роли '
+                . '(абсолютный или относительный от cwd/логического PWD)',
             )
             ->addOption(
                 self::OPT_FORMAT,
@@ -71,6 +74,13 @@ final class RoleSkillsCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Формат вывода: block (XML-каталог), list, json',
                 self::FORMAT_BLOCK,
+            )
+            ->addOption(
+                self::OPT_LOGICAL_PWD,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Логический PWD вызывающего (семантика cd -L): базис для относительных путей к файлу роли, '
+                . 'например после `cd` в каталог скилла по симлинку',
             );
     }
 
@@ -92,7 +102,7 @@ final class RoleSkillsCommand extends Command
 
         try {
             /** @var ResolveRoleSkillsResultDto $result */
-            $result = $this->queryBus->query(new ResolveRoleSkillsQuery($roleName));
+            $result = $this->queryBus->query(new ResolveRoleSkillsQuery($roleName, $this->pathBases($input)));
         } catch (ResolveRoleSkillsFailedException $e) {
             $io->error($e->getMessage());
 
@@ -104,6 +114,33 @@ final class RoleSkillsCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * Базисы резолвинга относительных путей к файлу роли: cwd процесса CLI
+     * (при запуске через become-role.sh — корень host-проекта после `cd`) и
+     * логический PWD вызывающего, если передан.
+     *
+     * @return list<string>
+     */
+    private function pathBases(InputInterface $input): array
+    {
+        /** @var string|null $logicalPwd */
+        $logicalPwd = $input->getOption(self::OPT_LOGICAL_PWD);
+
+        $bases = [];
+        $cwd = getcwd();
+
+        if ($cwd !== false) {
+            $bases[] = $cwd;
+        }
+
+        if (\is_string($logicalPwd) && $logicalPwd !== '') {
+            $bases[] = $logicalPwd;
+        }
+
+        // Дубликаты (cwd совпал с логическим PWD) не размножают диагностику.
+        return array_values(array_unique($bases));
+    }
+
     private function render(
         OutputInterface $output,
         string $format,
@@ -112,7 +149,7 @@ final class RoleSkillsCommand extends Command
     ): void {
         switch ($format) {
             case self::FORMAT_JSON:
-                $output->writeln($this->renderJson($roleName, $result));
+                $output->writeln($this->renderJson($result));
                 break;
             case self::FORMAT_LIST:
                 $this->renderList($output, $result);
@@ -138,12 +175,12 @@ final class RoleSkillsCommand extends Command
         }
     }
 
-    private function renderJson(string $roleName, ResolveRoleSkillsResultDto $result): string
+    private function renderJson(ResolveRoleSkillsResultDto $result): string
     {
         try {
             return json_encode(
                 [
-                    'role' => $roleName,
+                    'role' => $result->roleName,
                     'role_file' => $result->roleFilePath,
                     'skills' => array_map(
                         static fn (SkillDto $skill): array => [
