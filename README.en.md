@@ -112,8 +112,8 @@ Available skills:
 | [`become-role`](docs/agents/skills/become-role/SKILL.md) | Enter a role and expose its skills to the agent context (Agent Skills format) |
 | [`run-subagent`](docs/agents/skills/run-subagent/SKILL.md) | Launches a subordinate agent: role + assignment + context. Timeout control, stall detection, output filtering |
 | [`task-definition`](docs/agents/skills/task-definition/SKILL.md) | Prepares a task definition via the receiving project's RACI: context → draft → consultations → verification → acceptance |
-| [`epic-definition`](docs/agents/skills/epic-definition/SKILL.md) | Prepares an epic concept: problem, goal, scope, requirements; decomposition follows via the epic-decomposition skill in the same request when requested |
-| [`epic-decomposition`](docs/agents/skills/epic-decomposition/SKILL.md) | Breaks an accepted epic concept into tasks: requirement → task → check, dependency graph without cycles |
+| [`epic-definition`](docs/agents/skills/epic-definition/SKILL.md) | Prepares an epic specification: problem, goal, scope, requirements; decomposition follows via the epic-decomposition skill in the same request when requested |
+| [`epic-decomposition`](docs/agents/skills/epic-decomposition/SKILL.md) | Breaks an accepted epic specification into tasks: requirement → task → check, dependency graph without cycles |
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | Drives a task from setup to merge: implementation → self-review → code review → revision → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | Drives an epic of multiple tasks via subagents |
 | [`brainstorm`](docs/agents/skills/brainstorm/SKILL.md) | Brainstorm: facilitator leads the discussion, participants debate, the result is a decision protocol |

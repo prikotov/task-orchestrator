@@ -47,7 +47,7 @@ description: "Организатор работы команды от идеи �
 Скиллы:
 
 * [run-subagent](../../skills/run-subagent/SKILL.md) — запуск сабагента для делегирования задачи роли.
-* [epic-definition](../../skills/epic-definition/SKILL.md) — подготовка и уточнение концепции эпика.
+* [epic-definition](../../skills/epic-definition/SKILL.md) — подготовка и уточнение постановки эпика.
 * [epic-decomposition](../../skills/epic-decomposition/SKILL.md) — декомпозиция эпика на задачи и актуализация плана работ.
 * [epic-via-subagents](../../skills/epic-via-subagents/SKILL.md) — оркестрация эпика через сабагентов. Использовать при начале работы над эпиком для планирования и последовательного запуска задач.
 * [task-definition](../../skills/task-definition/SKILL.md) — подготовка и уточнение постановки задачи.
