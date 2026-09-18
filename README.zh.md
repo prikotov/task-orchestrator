@@ -25,6 +25,8 @@ TasK-orchestrator 透過模擬真實團隊的運作來解決這些問題，其�
 
 ---
 
+[SDLC — 軟體開發生命週期](docs/agents/workflow/sdlc.md) 定義不依賴特定專案或工具的團隊協作流程。團隊負責人遵循並維護此文件。文件隨 Composer 套件與 PHAR 發行版提供，無需另行安裝或建立專案副本。
+
 ## 角色（Roles）
 
 角色是模型作為系統指令接收的 Markdown 檔案。Front matter 透過多個行為模型（DISC、Big Five、Adizes、Belbin、Jungian 原型）描述個性、專業知識和綁定的技能。檔案主體展開 front matter 中定義的個性：角色描述、個人特質、工作風格、行為原則和規則。

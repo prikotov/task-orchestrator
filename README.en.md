@@ -25,6 +25,8 @@ Orchestration operates in two modes. In the first, the process is defined by a Y
 
 ---
 
+The [SDLC — software development life cycle](docs/agents/workflow/sdlc.md) defines the shared team process independently of projects and tools. The team lead follows and maintains it. The document ships with both Composer and PHAR distributions; no separate installation or project copy is required.
+
 ## Roles
 
 A role is a Markdown file that the model receives as a system instruction. The front matter describes the personality through several behavioral models (DISC, Big Five, Adizes, Belbin, Jungian archetypes), expertise, and attached skills. The body of the file elaborates on the personality defined in the front matter: role description, personal traits, working style, principles, and behavioral rules.
