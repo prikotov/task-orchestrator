@@ -14,7 +14,9 @@ depends_on:
 - Согласованный эпик нужно разбить на задачи.
 - Требуется актуализировать существующий план эпика.
 
-Для создания или уточнения эпика используй `epic-definition`, для подготовки отдельной задачи — `task-definition`, для реализации эпика — `epic-via-subagents`.
+- Создание или уточнение эпика — навык [`epic-definition`](../epic-definition/SKILL.md).
+- Подготовка отдельной задачи — навык [`task-definition`](../task-definition/SKILL.md).
+- Реализация эпика — навык [`epic-via-subagents`](../epic-via-subagents/SKILL.md).
 
 ## Как использовать
 
