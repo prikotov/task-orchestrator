@@ -117,7 +117,7 @@ php vendor/bin/task-orchestrator agent:orchestrate \
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | Проводит задачу от постановки до merge: реализация → self-review → code review → доработка → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | Проводит эпик из нескольких задач через сабагентов |
 | [`brainstorm`](docs/agents/skills/brainstorm/SKILL.md) | Мозговой штурм: фасилитатор ведёт дискуссию, участники спорят, итог — протокол с решениями |
-| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | Ретроспектива после эпика: анализ качества процесса, предложения по улучшению |
+| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | Ретроспектива после приёмки задачи или эпика: успешные практики, проблемы и обоснованные улучшения |
 | [`agent-report`](docs/agents/skills/agent-report/SKILL.md) | Сохраняет отчёт агента в файл для прослеживаемости |
 
 Пользователь может создавать новые скиллы как каталог с `SKILL.md` и скриптами — по аналогии с существующими. Рекомендации: [SKILL-CREATION.md](docs/agents/skills/SKILL-CREATION.md). Примеры: [`docs/agents/skills/`](docs/agents/skills/).

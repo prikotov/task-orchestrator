@@ -117,7 +117,7 @@ php vendor/bin/task-orchestrator agent:orchestrate \
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | 從規劃到 merge 執行任務：實作 → self-review → code review → 返工 → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | 透過子代理執行包含多個任務的史詩任務（epic） |
 | [`brainstorm`](docs/agents/skills/brainstorm/SKILL.md) | 腦力激盪：引導者主持討論，參與者辯論，產出含決策的紀錄 |
-| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | 史詩任務（epic）後的回顧：分析流程品質，提出改進建議 |
+| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | 任務或史詩任務（epic）驗收後的回顧：記錄成功實踐、問題及有依據的改進 |
 | [`agent-report`](docs/agents/skills/agent-report/SKILL.md) | 將代理報告儲存至檔案以便追溯 |
 
 使用者可以建立新技能，作為包含 `SKILL.md` 和腳本的目錄——比照現有技能的方式。建議：[SKILL-CREATION.md](docs/agents/skills/SKILL-CREATION.md)。範例：[`docs/agents/skills/`](docs/agents/skills/)。

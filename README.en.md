@@ -117,7 +117,7 @@ Available skills:
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | Drives a task from setup to merge: implementation → self-review → code review → revision → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | Drives an epic of multiple tasks via subagents |
 | [`brainstorm`](docs/agents/skills/brainstorm/SKILL.md) | Brainstorm: facilitator leads the discussion, participants debate, the result is a decision protocol |
-| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | Retrospective after an epic: process quality analysis, improvement proposals |
+| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | Retrospective after task or epic acceptance: successful practices, problems, and justified improvements |
 | [`agent-report`](docs/agents/skills/agent-report/SKILL.md) | Saves agent report to a file for traceability |
 
 Users can create new skills as directories with `SKILL.md` and scripts — following the pattern of existing ones. Guidelines: [SKILL-CREATION.md](docs/agents/skills/SKILL-CREATION.md). Examples: [`docs/agents/skills/`](docs/agents/skills/).
