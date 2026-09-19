@@ -25,6 +25,8 @@ TasK-orchestrator решает эти проблемы через имитаци
 
 ---
 
+[SDLC — жизненный цикл разработки](docs/agents/workflow/sdlc.md) задаёт общий процесс взаимодействия команды независимо от проекта и инструментов. Тимлид руководствуется документом и поддерживает его актуальность. SDLC поставляется вместе с пакетом Composer и PHAR; отдельная установка или проектная копия не требуется.
+
 ## Роли
 
 Роль — Markdown-файл, который модель получает как системную инструкцию. В front matter описывается личность через несколько поведенческих моделей (DISC, Big Five, Адизес, Белбин, юнгианские архетипы), экспертиза и привязанные скиллы. Тело файла раскрывает личность, заданную во front matter: описание роли, личные особенности, стиль работы, принципы и правила поведения.
@@ -109,10 +111,13 @@ php vendor/bin/task-orchestrator agent:orchestrate \
 |---|---|
 | [`become-role`](docs/agents/skills/become-role/SKILL.md) | Вход в роль: прописывает skills роли в контекст агента (формат Agent Skills) |
 | [`run-subagent`](docs/agents/skills/run-subagent/SKILL.md) | Запускает подчинённого агента: роль + поручение + контекст. Контроль таймаутов, stall-детекция, фильтрация вывода |
+| [`task-definition`](docs/agents/skills/task-definition/SKILL.md) | Готовит постановку задачи по RACI принимающего проекта: контекст → черновик → консультации → проверка → принятие |
+| [`epic-definition`](docs/agents/skills/epic-definition/SKILL.md) | Готовит постановку эпика: проблема, цель, границы, требования; декомпозиция — навыком epic-decomposition в том же запросе, если входила в него |
+| [`epic-decomposition`](docs/agents/skills/epic-decomposition/SKILL.md) | Раскладывает принятую постановку эпика на задачи: требование → задача → проверка, зависимости без циклов |
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | Проводит задачу от постановки до merge: реализация → self-review → code review → доработка → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | Проводит эпик из нескольких задач через сабагентов |
 | [`brainstorm`](docs/agents/skills/brainstorm/SKILL.md) | Мозговой штурм: фасилитатор ведёт дискуссию, участники спорят, итог — протокол с решениями |
-| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | Ретроспектива после эпика: анализ качества процесса, предложения по улучшению |
+| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | Ретроспектива после приёмки задачи или эпика: успешные практики, проблемы и обоснованные улучшения |
 | [`agent-report`](docs/agents/skills/agent-report/SKILL.md) | Сохраняет отчёт агента в файл для прослеживаемости |
 
 Пользователь может создавать новые скиллы как каталог с `SKILL.md` и скриптами — по аналогии с существующими. Рекомендации: [SKILL-CREATION.md](docs/agents/skills/SKILL-CREATION.md). Примеры: [`docs/agents/skills/`](docs/agents/skills/).

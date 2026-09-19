@@ -118,6 +118,19 @@ final class PharDistributionTest extends TestCase
     }
 
     #[Test]
+    public function testDistributionContainsTeamProcessDocuments(): void
+    {
+        foreach (['workflow/sdlc.md', 'raci-matrix.md'] as $relativePath) {
+            $packagePath = '/docs/agents/' . $relativePath;
+
+            self::assertSame(
+                file_get_contents(self::$projectRoot . $packagePath),
+                file_get_contents('phar://' . self::$pharPath . $packagePath),
+            );
+        }
+    }
+
+    #[Test]
     public function testAgentInitFromForeignCwdInstallsManagedCopyBoundToPhar(): void
     {
         // Arrange: host-проект во временном workspace, запуск из его каталога.
