@@ -3,7 +3,7 @@ type: chore
 created: 2026-09-21 22:50:00 (1790005800)
 due: 
 started: 2026-09-21 22:50:30 (1790005830)
-completed: 
+completed: 2026-09-21 16:03:40 (1790006620)
 cancelled: 
 value: V2
 complexity: C1
@@ -16,7 +16,7 @@ author: Бэкендер Тони (pi)
 assignee: Бэкендер Тони (pi)
 branch: task/update-prikotov-packages
 pr: https://github.com/prikotov/task-orchestrator/pull/404
-status: review
+status: done
 ---
 
 # TASK-chore-update-prikotov-packages: Обновление пакетов prikotov/* до последних версий
@@ -62,14 +62,14 @@ status: review
 2. [x] Бампнуть ограничение `git-workflow` до `^0.4.0`, выполнить `composer update prikotov/git-workflow prikotov/todo-md`.
 3. [x] Пересинхронизировать `docs/git-workflow/` (`git-workflow-init --force`) и `docs/todo-md/` (по vendor).
 4. [x] Прогнать проверки, устранить несовместимости.
-5. [ ] Оформить PR по регламенту.
+5. [x] Оформить PR по регламенту.
 
 ## 5. Критерии приёмки (Definition of Done)
 - [x] `composer.json`: `prikotov/git-workflow: ^0.4.0`; lock содержит `v0.4.0` и `v0.0.14`.
 - [x] `composer validate` проходит; `symfony/yaml` и прочие посторонние зависимости не обновлены.
 - [x] `docs/git-workflow/` и `docs/todo-md/` соответствуют вендору новых версий.
 - [x] `make check` завершается успешно.
-- [ ] Задача переведена в `done`, PR создан по регламенту.
+- [x] Задача переведена в `done`, PR создан по регламенту.
 
 ## 6. Самопроверка (Verification)
 ```bash
@@ -96,3 +96,4 @@ make check
 | 2026-09-21 22:50:00 (1790005800) | Бэкендер Тони (pi) | Создание задачи |
 | 2026-09-21 22:51:00 (1790005860) | Бэкендер Тони (pi) | Старт задачи, заполнение постановки |
 | 2026-09-21 23:00:00 (1790006400) | Бэкендер Тони (pi) | Пакеты обновлены (git-workflow v0.4.0, todo-md v0.0.14), доки пересинхронизированы, локальный pre-commit хук обновлён; `make check` зелёный |
+| 2026-09-21 23:10:00 (1790007000) | Бэкендер Тони (pi) | PR #404 создан, CI зелёный, задача закрыта |
