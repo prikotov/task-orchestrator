@@ -15,8 +15,8 @@ epic:
 author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-codehamr-agent
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/403
+status: review
 ---
 
 # TASK-research-codehamr: codehamr — минимальный локальный CLI-агент (исследование для интеграции как сабагент)
