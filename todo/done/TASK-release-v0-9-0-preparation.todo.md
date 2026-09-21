@@ -3,7 +3,7 @@ type: docs
 created: 2026-09-21 03:48:21 (1789962501)
 due:
 started: 2026-09-21 03:50:57 (1789962657)
-completed:
+completed: 2026-09-21 04:17:11 (1789964231)
 cancelled:
 value: V2
 complexity: C1
@@ -15,8 +15,8 @@ epic:
 author: Технический писатель Остап (codex)
 assignee: Технический писатель Остап (codex)
 branch: task/release-v0-9-0
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/402
+status: done
 ---
 
 # TASK-release-v0-9-0-preparation: Подготовка релиза v0.9.0
@@ -42,7 +42,7 @@ status: in_progress
 
 ## 2. Контекст и Границы (Context and Scope)
 
-- **Где делаем:** `CHANGELOG.md`, `docs/releases/v0.9.0/release-plan.md`, `todo/TASK-release-v0-9-0-preparation.todo.md`.
+- **Где делаем:** `CHANGELOG.md`, `docs/releases/v0.9.0/release-plan.md`, `todo/done/TASK-release-v0-9-0-preparation.todo.md`.
 - **Текущее поведение:** `main` на `97c4facbbdffd1d7f985bd6d422fa61180c55e1b` содержит только #400 (`314de39a`) и #401 (`97c4facb`) после `v0.8.2`; документация выпуска ещё не подготовлена.
 - **Границы (Out of Scope):** выпуск, тег, создание GitHub Release, слияние подготовительного Pull Request, новая ветка `release/0.9`, код, упаковка, README, роли, навыки, конфигурация, зависимости и будущий релиз todo-md.
 
@@ -69,13 +69,13 @@ status: in_progress
 - [x] `todo-md` остаётся на `^0.0`; в релиз не включены его будущие поля и версия.
 - [x] Успешны `composer validate --strict`, `make md-links`, точечный `todo-md validate` и `git diff --check`.
 - [x] `make check` и `make phar-e2e` не выполнены сейчас и записаны обязательными перед тегированием на точном принятом `main`.
-- [x] Не заявлены состоявшимися CI, пользовательская приёмка, слияние, тег или публикация.
+- [x] CI, пользовательская приёмка, слияние, тег и публикация не заявляются состоявшимися без соответствующих подтверждений.
 
 ## 6. Самопроверка (Verification)
 ```bash
 composer validate --strict
 make md-links
-php vendor/bin/todo-md validate todo/TASK-release-v0-9-0-preparation.todo.md
+php vendor/bin/todo-md validate todo/done/TASK-release-v0-9-0-preparation.todo.md
 git diff --check
 ```
 
@@ -86,9 +86,9 @@ git diff --check
 
 ## 8. Источники (Sources)
 
-- [Политика релизов](../docs/releases/RELEASE-POLICY.md).
-- [Общее руководство по релизам](../docs/git-workflow/release.md).
-- [Задача #400](done/TASK-docs-definition-skills.todo.md) и [задача #401](done/TASK-docs-approved-scope-retrospective.todo.md).
+- [Политика релизов](../../docs/releases/RELEASE-POLICY.md).
+- [Общее руководство по релизам](../../docs/git-workflow/release.md).
+- [Задача #400](TASK-docs-definition-skills.todo.md) и [задача #401](TASK-docs-approved-scope-retrospective.todo.md).
 - Коммиты [`314de39a`](https://github.com/prikotov/task-orchestrator/commit/314de39a728d298f17c4553a21f2fc81d02e345d) и [`97c4facb`](https://github.com/prikotov/task-orchestrator/commit/97c4facbbdffd1d7f985bd6d422fa61180c55e1b).
 ## 9. Комментарии (Comments)
 
@@ -97,6 +97,8 @@ git diff --check
 - Авторская самопроверка подтвердила состав из трёх разрешённых файлов и отсутствие запрещённых действий. Документные проверки успешны: `composer validate --strict`, `make md-links`, точечный `todo-md validate` и `git diff --check`.
 - Независимое ревью Пуаро: пять замечаний закрыты, повторное ревью подтвердило отсутствие регресса. Состав PHAR проверен по `box.json.dist`, а не по первоначальному предположению тимлида.
 - Проверки тимлида: `composer validate --strict`, ссылки в 433 документах, валидатор задачи и `git diff --check` успешны. Языковая проверка завершилась успешно с 12 предупреждениями. PHPUnit и Psalm локально пропущены: подготовка изменяет только документацию.
+
+- Создан [PR №402](https://github.com/prikotov/task-orchestrator/pull/402) от GitHub App с меткой `pi`. На `720d51c9` успешны [CI](https://github.com/prikotov/task-orchestrator/actions/runs/35560157205) — 1572 теста, 4452 утверждения и обе проверки установки — и проверка текста PR на секреты. После этого задача переведена из `review` в `done` 2026-09-21 04:17:11 UTC. Статус означает готовность документов, не пользовательскую приёмку, слияние или выпуск; полные проверки на будущем коммите тега остаются обязательными.
 
 ## История изменений (Change History)
 | Дата | Автор (роль) | Изменение |
