@@ -1,7 +1,7 @@
 # Coding Agents — Сводная таблица сравнения (финальная версия)
 
 **Дата создания:** 2026-05-09
-**Дата обновления:** 2026-08-25 (23 исследования)
+**Дата обновления:** 2026-09-21 (24 исследования)
 **Эпик:** [EPIC-research-coding-agents-comparison](../../todo/EPIC-research-coding-agents-comparison.todo.md)
 **Автор:** Аналитик (Шерлок)
 
@@ -45,7 +45,8 @@
 | 20 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
 | 21 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
 | 22 | **ZCode (Z.AI)** | Пропр. | ❌ | ❌ | ⚠️ | ✅ | ❌ | ❌ | ⚠️ | ⚠️ | ✅ | ❌ | **17** | ❌ Не подходит (4/10) |
-| 23 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
+| 23 | **codehamr** | MIT | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ⚠️ | ✅ | ⚠️ | ✅ | **16** | ❌ Не подходит (4/10) |
+| 24 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
 
 > **Примечание:** omp и Pi имеют одинаковую формальную сумму 30/30, но omp занимает первое место как надмножество Pi: сохраняет критичный JSON/headless surface (поверхность запуска без интерфейса) и добавляет Rust-core, LSP/DAP, native subagents, advisor, memory, ACP и 40+ провайдеров. Pi остаётся стабильным baseline (базовой точкой) и fallback (резервом).
 
@@ -57,7 +58,7 @@
 
 ## Часть 2. Детальная сводная таблица по 10 критериям
 
-### 2.1. Open Source агенты (19 из 23)
+### 2.1. Open Source агенты (20 из 24)
 
 #### Критерий 1. Системный промпт (замена / дополнение)
 
@@ -82,6 +83,7 @@
 | **DeepSeek Harness** | ⚠️ Нет флага у headless; persona/patch-слои `cordis.patch.yml`; SDK `DSH_SYSTEM_PROMPT` ✅ | ⚠️ Программно: `PromptSection`-реестр (плагины) | ⚠️ Persona-строка с `{{model}}`/`{{cwd}}` | ⚠️ `PromptContext` (durable user-role snapshot) |
 | **NanoClaw** | ❌ Нет CLI | ❌ Нет CLI | `instructions.prepend.md` (group) ⚠️ | `instructions.prepend.md` + `memory/` ⚠️ |
 | **hax** | `HAX_SYSTEM_PROMPT` env (`@path`, `(none)`) ⚠️ | `HAX_SYSTEM_PROMPT_APPEND` env ⚠️ | Пресет `system_prompt` ✅ | Пресет `system_prompt_append` ✅ |
+| **codehamr** | ❌ Нет — промпт зашит в бинарник (`go:embed`) | ❌ Нет | ❌ Нет | ❌ Нет |
 
 #### Критерий 2. Промпт агента / Роль
 
@@ -106,6 +108,7 @@
 | **DeepSeek Harness** | ⚠️ Persona-плагин + `!!js` env в patch-слое; SDK `DSH_SYSTEM_PROMPT` | ✅ Per-child persona + scope-слои (host/preset/child) |
 | **NanoClaw** | Multi-agent routing (agent groups) ⚠️ | ✅ Контейнерная изоляция |
 | **hax** | Пресеты-как-роли (`--preset`, `HAX_PRESET`) ⚠️ | ✅ Процессная (`hax -p` фоновые задачи) |
+| **codehamr** | ❌ Нет ролей/сабагентов («no sub-agents») | — |
 
 #### Критерий 3. Скиллы
 
@@ -130,6 +133,7 @@
 | **DeepSeek Harness** | ✅ `SKILL.md`-бандлы + flat `.md`; frontmatter `disable-model-invocation`/`user-invocable` | ❌ Нет CLI; конфиг `customSkillDirs` | ⚠️ Ранги/слои discovery (host + per-scope shadowing) |
 | **NanoClaw** | ⚠️ SKILL.md есть, но иной концепт (install workflows) | ❌ Нет CLI | ⚠️ DB-колонка `skills` per-group |
 | **hax** | ✅ `SKILL.md` из коробки | ⚠️ Нет `--skill`; `no_skills`/`--bare` (всё или ничего) | ❌ Все глобальны |
+| **codehamr** | ❌ Нет системы скиллов («no skill system») | — | — |
 
 #### Критерий 4. AGENTS.md (контекстные файлы)
 
@@ -154,6 +158,7 @@
 | **DeepSeek Harness** | ✅ Walk-up до `.git`, бюджет 64 KiB | ✅ + `AGENTS.local.md`/`CLAUDE.local.md` | ✅ `$DSH_HOME/AGENTS.md` (user-global) | ✅ `maxBytes: false` |
 | **NanoClaw** | ❌ Нет автообнаружения | ⚠️ Генерируемый (read-only) | `instructions.prepend.md` | Нет |
 | **hax** | ✅ Глобальный + иерархия git-корень→cwd | — | `~/.config/hax/AGENTS.md` | ✅ `no_agents_md`/`--bare`/`--raw` |
+| **codehamr** | ❌ Правила проекта — в чат | — | — | — (нечего отключать) |
 
 #### Критерий 5. `.agents/skills/` автосканирование
 
@@ -178,6 +183,7 @@
 | **DeepSeek Harness** | ✅ (rank 200) | `.dsh/skills` (rank 100), `~/.agents/skills` (rank 500), `customSkillDirs` | Symlink или `customSkillDirs` |
 | **NanoClaw** | ⚠️ Только для Codex-provider | `.claude-shared/skills/`, `container/skills/` | Ручное копирование в группу |
 | **hax** | ✅ | `~/.config/hax/skills/` | Symlink |
+| **codehamr** | ❌ | — | ❌ Не поддерживается |
 
 #### Критерий 6. Запуск как сабагент (JSON-режим)
 
@@ -202,6 +208,7 @@
 | **DeepSeek Harness** | ⚠️ CLI headless = plain text; JSON-RPC SDK (TS/Python) ✅; ACP-сервер (отд. композиция) | ⚠️ Fresh persisted session на запуск | ✅ `timeoutMs` per-tool + AbortSignal + guard | ⚠️ Полные события — в JSONL-логе сессии, не в stdout |
 | **NanoClaw** | ❌ Plain text / gateway | Нет | Host-sweep SLA | ❌ |
 | **hax** | ❌ Нет стрима; чистый stdout в `-p` | ✅ `--no-session` | `max_turns`, `bash.timeout`; внешний timeout | ❌ |
+| **codehamr** | ❌ Только интерактивный TUI (`-p`/JSON нет) | — Сессий нет вовсе, но headless нет | ⚠️ bash-таймаут задаёт модель (кап 3600s) | ❌ |
 
 #### Критерий 7. Токены и стоимость
 
@@ -226,6 +233,7 @@
 | **DeepSeek Harness** | ✅ token-meter (usage anchors + эвристика) | ❌ Только токены | ✅ Positional nodes breakdown |
 | **NanoClaw** | ⚠️ `.jsonl` transcripts на диске | ❌ Нет CLI | ❌ |
 | **hax** | ⚠️ Stats-строка stderr (внутренний учёт полный) | ⚠️ `$` по каталогу models.dev (`~` = оценка) | ❌ |
+| **codehamr** | ⚠️ Статус-бар TUI (`usage`/`PromptTokens`, живая оценка) | ❌ Нет `$`; только % бюджета HamrPass (`X-Budget-Remaining`) | ❌ |
 
 #### Критерий 8. Free tier / стоимость
 
@@ -250,6 +258,7 @@
 | **DeepSeek Harness** | MIT | ✅ Бесплатный OSS-инструмент (BYOK) | ✅ | ✅ Custom provider (OpenAI-compatible: Ollama/vLLM/LM Studio) |
 | **NanoClaw** | MIT | ✅ | ✅ OneCLI vault | ✅ Ollama (LM Studio через OpenCode) |
 | **hax** | MIT | ✅ | ✅ Ключи в env | ✅ llama.cpp first-class, Ollama, compatible |
+| **codehamr** | MIT | ✅ | ✅ Ключ в config.yaml (`${VAR}`-ссылки) | ✅ Ollama, vLLM, LM Studio first-class (Responses API) |
 
 #### Критерий 9. Провайдеры и модели
 
@@ -274,6 +283,7 @@
 | **DeepSeek Harness** | 20+ (pi-ai каталог) + native DeepSeek | DeepSeek (v4-flash/pro), OpenAI, Anthropic, Google, xAI, ZAI, Bedrock/Vertex/Azure/Codex | ✅ Через custom route | ✅ OpenAI-compatible |
 | **NanoClaw** | 4 пути | Claude (default), OpenCode, Codex, Ollama | ❌ (через OpenCode) | ✅ Ollama |
 | **hax** | 10 + custom | OpenAI, Anthropic, Codex, OpenRouter, OpenCode Zen/Go, llama.cpp, Ollama | ✅ | ✅ llama.cpp/Ollama first-class |
+| **codehamr** | 1 протокол (OpenAI Responses API) | Ollama, vLLM, LM Studio, OpenAI, HamrPass | ⚠️ Через Responses-совместимый профиль | ✅ First-class |
 
 #### Критерий 10. Лицензия
 
@@ -298,8 +308,9 @@
 | **DeepSeek Harness** | MIT | ✅ TypeScript + Python SDK | ✅ | ⚠️ DeepSeek-центричен, но pi-ai/custom нейтрализуют |
 | **NanoClaw** | MIT | ✅ TypeScript/Node.js | ✅ Независимая база | ⚠️ Anthropic-centric + OneCLI |
 | **hax** | MIT | ✅ Нативный C | ✅ Независимая база | ❌ Нет (caveat: молодой проект до v1.0) |
+| **codehamr** | MIT | ✅ Go | ✅ Независимая база | ❌ Нет (caveat: молодой проект без semver; автообновление на старте, отключается env) |
 
-### 2.2. Проприетарные агенты (4 из 23)
+### 2.2. Проприетарные агенты (4 из 24)
 
 | Агент | К1 Промпт | К2 Роль | К3 Скиллы | К4 AGENTS.md | К5 .agents/skills/ | К6 JSON-режим | К7 Токены | К8 Free tier | К9 Провайдеры | К10 Лицензия | Вердикт |
 |-------|-----------|---------|-----------|--------------|--------------------|---------------|-----------|--------------|---------------|-------------|---------|
@@ -432,15 +443,15 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 
 | Паттерн | Агенты | Частота |
 |---------|--------|---------|
-| **Agent Skills standard** | omp, Pi, Qwen, Deep Agents, OpenCode, Goose, Crush, Hermes, Warp, Kilo, Codex, Gemini, OpenClaw, Zeroclaw, Codebuff, ZCode, NanoClaw, DeepSeek Harness, hax | 19/23 (83%) |
-| **AGENTS.md автосканирование** | omp, Pi, Qwen, Deep Agents, OpenCode, Hermes, Goose, Codex, Gemini, Kilo, Crush, Codebuff, ZCode, Nanocoder, DeepSeek Harness, hax | 16/23 (70%) |
-| **`.agents/skills/` автосканирование** | omp, Pi, Qwen, Deep Agents, OpenCode, Hermes, Goose, Gemini, Kilo, Crush, OpenClaw, Warp, Codebuff, DeepSeek Harness, hax | 15/23 (65%) |
-| **JSON/JSONL/RPC headless** | omp, Pi, Qwen, Deep Agents (ACP, не JSONL), Claude, OpenCode, Goose, Gemini, Kilo, Codex, Warp, Zeroclaw, Factory Droid, Nanocoder, DeepSeek Harness (SDK/ACP) | 15/23 (65%) |
-| **Ephemeral / no-session** | omp, Pi, Goose, Codex, Zeroclaw, hax | 6/22 (27%) |
-| **`--append-system-prompt`** | omp, Pi, Qwen, Claude | 4/21 (19%) |
-| **CLI-фильтрация/выбор скиллов** | omp, Pi, Deep Agents, Hermes, Warp | 5/21 (24%) |
-| **Стоимость в $ в CLI/JSON** | omp, Pi, Claude, OpenCode, Zeroclaw | 5/21 (24%) |
-| **Кастомные агенты / native subagents** | omp, Deep Agents, OpenCode, Kilo, Claude, Droid, Codebuff, Warp, Nanocoder, NanoClaw, DeepSeek Harness, hax | 12/23 (52%) |
+| **Agent Skills standard** | omp, Pi, Qwen, Deep Agents, OpenCode, Goose, Crush, Hermes, Warp, Kilo, Codex, Gemini, OpenClaw, Zeroclaw, Codebuff, ZCode, NanoClaw, DeepSeek Harness, hax | 19/24 (79%) |
+| **AGENTS.md автосканирование** | omp, Pi, Qwen, Deep Agents, OpenCode, Hermes, Goose, Codex, Gemini, Kilo, Crush, Codebuff, ZCode, Nanocoder, DeepSeek Harness, hax | 16/24 (67%) |
+| **`.agents/skills/` автосканирование** | omp, Pi, Qwen, Deep Agents, OpenCode, Hermes, Goose, Gemini, Kilo, Crush, OpenClaw, Warp, Codebuff, DeepSeek Harness, hax | 15/24 (63%) |
+| **JSON/JSONL/RPC headless** | omp, Pi, Qwen, Deep Agents (ACP, не JSONL), Claude, OpenCode, Goose, Gemini, Kilo, Codex, Warp, Zeroclaw, Factory Droid, Nanocoder, DeepSeek Harness (SDK/ACP) | 15/24 (63%) |
+| **Ephemeral / no-session** | omp, Pi, Goose, Codex, Zeroclaw, hax | 6/23 (26%) |
+| **`--append-system-prompt`** | omp, Pi, Qwen, Claude | 4/22 (18%) |
+| **CLI-фильтрация/выбор скиллов** | omp, Pi, Deep Agents, Hermes, Warp | 5/22 (23%) |
+| **Стоимость в $ в CLI/JSON** | omp, Pi, Claude, OpenCode, Zeroclaw | 5/22 (23%) |
+| **Кастомные агенты / native subagents** | omp, Deep Agents, OpenCode, Kilo, Claude, Droid, Codebuff, Warp, Nanocoder, NanoClaw, DeepSeek Harness, hax | 12/24 (50%) |
 
 ### 5.2. Пробелы — что не покрывается единым стандартом
 
@@ -455,11 +466,11 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 ### 5.3. Экосистемные тренды
 
 1. **omp меняет baseline:** Pi больше не вершина по возможностям, а стабильное подмножество omp.
-2. **Agent Skills standard закрепился:** формат `SKILL.md` поддерживает 82% исследованных агентов.
-3. **AGENTS.md стал cross-agent стандартом:** 15 из 22 агентов явно поддерживают или совместимы через импортеры.
+2. **Agent Skills standard закрепился:** формат `SKILL.md` поддерживает 79% исследованных агентов.
+3. **AGENTS.md стал cross-agent стандартом:** 16 из 24 агентов явно поддерживают или совместимы через импортеры.
 4. **Native/Rust hot path:** omp и ряд новых агентов выносят поиск/парсинг/инструменты в нативный слой ради скорости.
 5. **Subagents становятся first-class:** omp (`task`), Deep Agents (`subagents`), Codebuff (`spawn_agents`), Warp (inter-agent messaging) показывают тренд к внутренней оркестрации.
-6. **ACP/RPC растут как интеграционные протоколы:** 10 из 23 агентов (43%) имеют ACP/RPC или близкий editor/host protocol surface: omp, Deep Agents (`dcode --acp`), Nanocoder (`--acp`), Factory Droid (JSON-RPC), Goose, Kilo, Hermes, OpenClaw, Zeroclaw, DeepSeek Harness (ACP-сервер + JSON-RPC SDK). При этом ACP/RPC не равен готовому JSONL-контракту `watch-subagent`: нужен host/client adapter.
+6. **ACP/RPC растут как интеграционные протоколы:** 10 из 24 агентов (42%) имеют ACP/RPC или близкий editor/host protocol surface: omp, Deep Agents (`dcode --acp`), Nanocoder (`--acp`), Factory Droid (JSON-RPC), Goose, Kilo, Hermes, OpenClaw, Zeroclaw, DeepSeek Harness (ACP-сервер + JSON-RPC SDK). При этом ACP/RPC не равен готовому JSONL-контракту `watch-subagent`: нужен host/client adapter.
 7. **Memory и hindsight:** omp добавляет project-scoped memory, что сближает CLI-agent с долгоживущим knowledge base (базой знаний).
 
 ### 5.4. Рекомендации по дальнейшему развитию
@@ -504,12 +515,13 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 | 21 | Deep Agents Code / SDK | [deepagents-comparison.md](coding-agents/deepagents-comparison.md) | ⚠️ Частично (7/10; SDK 9/10*) |
 | 22 | DeepSeek Harness | [deepseek-harness-comparison.md](coding-agents/deepseek-harness-comparison.md) | ⚠️ Частично (7/10; SDK 9/10*) |
 | 23 | hax | [hax-comparison.md](coding-agents/hax-comparison.md) | ⚠️ Частично (6/10) |
+| 24 | codehamr | [codehamr-comparison.md](coding-agents/codehamr-comparison.md) | ❌ Не подходит (4/10) |
 
 ---
 
 ## Приложение. Сводка по группам
 
-### Open Source (19 из 23)
+### Open Source (20 из 24)
 
 | Агент | Язык | Лицензия | Провайдеры | Score / вердикт |
 |-------|------|----------|------------|-----------------|
@@ -532,8 +544,9 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 | hax | C | MIT | 10 + custom | 6/10 |
 | OpenClaw | TypeScript/Node.js | MIT | 40+ | 4/10 |
 | NanoClaw | TypeScript/Node.js | MIT | 4 пути | 4/10 |
+| codehamr | Go | MIT | 1 протокол (OpenAI Responses API) | 4/10 |
 
-### Проприетарные (4 из 23)
+### Проприетарные (4 из 24)
 
 | Агент | Язык | Провайдеры | Цена | Score |
 |-------|------|------------|------|-------|
