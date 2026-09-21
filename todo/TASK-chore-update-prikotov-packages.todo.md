@@ -15,8 +15,8 @@ epic:
 author: Бэкендер Тони (pi)
 assignee: Бэкендер Тони (pi)
 branch: task/update-prikotov-packages
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/404
+status: review
 ---
 
 # TASK-chore-update-prikotov-packages: Обновление пакетов prikotov/* до последних версий
