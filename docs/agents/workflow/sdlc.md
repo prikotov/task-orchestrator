@@ -15,54 +15,54 @@ SDLC определяет последовательность и условия
 ```mermaid
 sequenceDiagram
     autonumber
-    participant PO as Владелец продукта
-    participant AN as Анализ
-    participant DS as Проектирование
-    participant TL as Тимлид
-    participant DEV as Реализация
-    participant REV as Ревью
-    participant QA as Проверка качества
-    participant OPS as Выпуск
-    participant TW as Документация
+    participant ProductOwner as Владелец продукта
+    participant Analysis as Анализ
+    participant Design as Проектирование
+    participant TeamLead as Тимлид
+    participant Implementation as Реализация
+    participant Review as Ревью
+    participant QualityAssurance as Проверка качества
+    participant Release as Выпуск
+    participant Documentation as Документация
 
-    PO->>AN: Идея, цель и ограничения
-    AN->>DS: Требования и вопросы проектирования
-    DS-->>AN: Решение и ограничения
-    AN->>QA: Критерии приёмки и сценарии проверки
-    QA-->>AN: Замечания к проверяемости
-    AN->>TL: Постановка готова к проверке
-    TL->>TL: Проверка готовности к исполнению
-    TL->>DEV: Согласованная задача из очереди
-    DEV->>DEV: Реализация и самопроверка
-    DEV->>REV: Результат и доказательства проверок
-    REV-->>DEV: Замечания или заключение
-    DEV->>QA: Проверенный результат
-    QA-->>DEV: Дефекты или подтверждение критериев
-    QA->>TL: Заключение о готовности
-    TL->>PO: Техническая готовность
-    PO->>PO: Решение о принятии результата
+    ProductOwner->>Analysis: Идея, цель и ограничения
+    Analysis->>Design: Требования и вопросы проектирования
+    Design-->>Analysis: Решение и ограничения
+    Analysis->>QualityAssurance: Критерии приёмки и сценарии проверки
+    QualityAssurance-->>Analysis: Замечания к проверяемости
+    Analysis->>TeamLead: Постановка готова к проверке
+    TeamLead->>TeamLead: Проверка готовности к исполнению
+    TeamLead->>Implementation: Согласованная задача из очереди
+    Implementation->>Implementation: Реализация и самопроверка
+    Implementation->>Review: Результат и доказательства проверок
+    Review-->>Implementation: Замечания или заключение
+    Implementation->>QualityAssurance: Проверенный результат
+    QualityAssurance-->>Implementation: Дефекты или подтверждение критериев
+    QualityAssurance->>TeamLead: Заключение о готовности
+    TeamLead->>ProductOwner: Техническая готовность
+    ProductOwner->>ProductOwner: Решение о принятии результата
     opt Результат явно принят пользователем
-        TL->>TL: Ретроспектива принятого результата
+        TeamLead->>TeamLead: Ретроспектива принятого результата
     end
 
     opt Требуется выпуск
-        TL->>OPS: Подготовка и стабилизация выпуска
-        OPS->>QA: Кандидат на выпуск
-        QA-->>TL: Результат проверки кандидата
-        TL->>PO: Готовность к выпуску
-        PO->>OPS: Разрешение на выпуск
-        OPS->>OPS: Выпуск проверенной версии
+        TeamLead->>Release: Подготовка и стабилизация выпуска
+        Release->>QualityAssurance: Кандидат на выпуск
+        QualityAssurance-->>TeamLead: Результат проверки кандидата
+        TeamLead->>ProductOwner: Готовность к выпуску
+        ProductOwner->>Release: Разрешение на выпуск
+        Release->>Release: Выпуск проверенной версии
     end
 
     par Документирование
-        DEV->>TW: Изменения и технические сведения
-        PO->>TW: Ценность для пользователя
-        TW->>TW: Актуализация документации
+        Implementation->>Documentation: Изменения и технические сведения
+        ProductOwner->>Documentation: Ценность для пользователя
+        Documentation->>Documentation: Актуализация документации
     and Коммуникация изменений
-        PO->>PO: Информирование пользователей при необходимости
+        ProductOwner->>ProductOwner: Информирование пользователей при необходимости
     end
 
-    TL->>TL: Проверка завершённости
+    TeamLead->>TeamLead: Проверка завершённости
 ```
 
 Замечания возвращают работу на затронутый этап. Повторное ревью и проверки продолжаются до устранения блокирующих замечаний. Документация может готовиться параллельно; необходимая для использования результата документация должна быть готова к его передаче пользователю.
