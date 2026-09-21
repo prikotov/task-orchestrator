@@ -25,6 +25,8 @@ TasK-orchestrator 透過模擬真實團隊的運作來解決這些問題，其�
 
 ---
 
+[SDLC — 軟體開發生命週期](docs/agents/workflow/sdlc.md) 定義不依賴特定專案或工具的團隊協作流程。團隊負責人遵循並維護此文件。文件隨 Composer 套件與 PHAR 發行版提供，無需另行安裝或建立專案副本。
+
 ## 角色（Roles）
 
 角色是模型作為系統指令接收的 Markdown 檔案。Front matter 透過多個行為模型（DISC、Big Five、Adizes、Belbin、Jungian 原型）描述個性、專業知識和綁定的技能。檔案主體展開 front matter 中定義的個性：角色描述、個人特質、工作風格、行為原則和規則。
@@ -109,10 +111,13 @@ php vendor/bin/task-orchestrator agent:orchestrate \
 |---|---|
 | [`become-role`](docs/agents/skills/become-role/SKILL.md) | 進入角色：將角色的 skills 揭露至代理上下文（Agent Skills 格式） |
 | [`run-subagent`](docs/agents/skills/run-subagent/SKILL.md) | 啟動從屬代理：角色 + 任務指派 + 上下文。超時控制、停滞偵測、輸出過濾 |
+| [`task-definition`](docs/agents/skills/task-definition/SKILL.md) | 依接收專案的 RACI 準備任務定義：上下文 → 草稿 → 諮詢 → 驗證 → 接受 |
+| [`epic-definition`](docs/agents/skills/epic-definition/SKILL.md) | 準備史詩規格：問題、目標、邊界、需求；若原始請求包含分解，則以 epic-decomposition 技能在同一請求中繼續 |
+| [`epic-decomposition`](docs/agents/skills/epic-decomposition/SKILL.md) | 將已接受的史詩規格拆解為任務：需求 → 任務 → 檢查，無循環的依賴圖 |
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | 從規劃到 merge 執行任務：實作 → self-review → code review → 返工 → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | 透過子代理執行包含多個任務的史詩任務（epic） |
 | [`brainstorm`](docs/agents/skills/brainstorm/SKILL.md) | 腦力激盪：引導者主持討論，參與者辯論，產出含決策的紀錄 |
-| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | 史詩任務（epic）後的回顧：分析流程品質，提出改進建議 |
+| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | 任務或史詩任務（epic）驗收後的回顧：記錄成功實踐、問題及有依據的改進 |
 | [`agent-report`](docs/agents/skills/agent-report/SKILL.md) | 將代理報告儲存至檔案以便追溯 |
 
 使用者可以建立新技能，作為包含 `SKILL.md` 和腳本的目錄——比照現有技能的方式。建議：[SKILL-CREATION.md](docs/agents/skills/SKILL-CREATION.md)。範例：[`docs/agents/skills/`](docs/agents/skills/)。

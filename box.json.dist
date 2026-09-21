@@ -6,7 +6,8 @@
         "config/console_services.yaml",
         "config/chains.yaml",
         "config/modules.php",
-        "config/bundles.php"
+        "config/bundles.php",
+        "docs/agents/raci-matrix.md"
     ],
     "directories": [
         "src",
@@ -15,6 +16,7 @@
         "config/prompts",
         "config/packages",
         "docs/agents/roles",
+        "docs/agents/workflow",
         "docs/agents/skills/become-role",
         "src/Module/GitIdentity/Resource/config",
         "templates"

@@ -25,6 +25,8 @@ Orchestration operates in two modes. In the first, the process is defined by a Y
 
 ---
 
+The [SDLC — software development life cycle](docs/agents/workflow/sdlc.md) defines the shared team process independently of projects and tools. The team lead follows and maintains it. The document ships with both Composer and PHAR distributions; no separate installation or project copy is required.
+
 ## Roles
 
 A role is a Markdown file that the model receives as a system instruction. The front matter describes the personality through several behavioral models (DISC, Big Five, Adizes, Belbin, Jungian archetypes), expertise, and attached skills. The body of the file elaborates on the personality defined in the front matter: role description, personal traits, working style, principles, and behavioral rules.
@@ -109,10 +111,13 @@ Available skills:
 |---|---|
 | [`become-role`](docs/agents/skills/become-role/SKILL.md) | Enter a role and expose its skills to the agent context (Agent Skills format) |
 | [`run-subagent`](docs/agents/skills/run-subagent/SKILL.md) | Launches a subordinate agent: role + assignment + context. Timeout control, stall detection, output filtering |
+| [`task-definition`](docs/agents/skills/task-definition/SKILL.md) | Prepares a task definition via the receiving project's RACI: context → draft → consultations → verification → acceptance |
+| [`epic-definition`](docs/agents/skills/epic-definition/SKILL.md) | Prepares an epic specification: problem, goal, scope, requirements; decomposition follows via the epic-decomposition skill in the same request when requested |
+| [`epic-decomposition`](docs/agents/skills/epic-decomposition/SKILL.md) | Breaks an accepted epic specification into tasks: requirement → task → check, dependency graph without cycles |
 | [`task-via-subagents`](docs/agents/skills/task-via-subagents/SKILL.md) | Drives a task from setup to merge: implementation → self-review → code review → revision → PR |
 | [`epic-via-subagents`](docs/agents/skills/epic-via-subagents/SKILL.md) | Drives an epic of multiple tasks via subagents |
 | [`brainstorm`](docs/agents/skills/brainstorm/SKILL.md) | Brainstorm: facilitator leads the discussion, participants debate, the result is a decision protocol |
-| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | Retrospective after an epic: process quality analysis, improvement proposals |
+| [`retrospective`](docs/agents/skills/retrospective/SKILL.md) | Retrospective after task or epic acceptance: successful practices, problems, and justified improvements |
 | [`agent-report`](docs/agents/skills/agent-report/SKILL.md) | Saves agent report to a file for traceability |
 
 Users can create new skills as directories with `SKILL.md` and scripts — following the pattern of existing ones. Guidelines: [SKILL-CREATION.md](docs/agents/skills/SKILL-CREATION.md). Examples: [`docs/agents/skills/`](docs/agents/skills/).
