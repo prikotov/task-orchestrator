@@ -3,7 +3,7 @@ type: docs
 created: 2026-09-21 03:09:25 (1789960165)
 due:
 started: 2026-09-21 03:13:50 (1789960430)
-completed:
+completed: 2026-09-21 03:36:06 (1789961766)
 cancelled:
 value: V2
 complexity: C1
@@ -15,8 +15,8 @@ epic:
 author: Аналитик Шерлок (pi)
 assignee: Технический писатель Остап (pi)
 branch: task/definition-skills-retrospective
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/401
+status: done
 ---
 
 # TASK-docs-approved-scope-retrospective: Согласованный объём ретроспективы и доработки SDLC
@@ -42,7 +42,7 @@ status: in_progress
 
 ## 2. Контекст и Границы (Context and Scope)
 
-* **Где делаем:** только `docs/agents/workflow/sdlc.md`, `docs/agents/team-retro/2026-09-21_09-59-definition-skills.md`, `docs/agents/team-retro/RETRO-ROADMAP.md` и `todo/TASK-docs-approved-scope-retrospective.todo.md`.
+* **Где делаем:** только `docs/agents/workflow/sdlc.md`, `docs/agents/team-retro/2026-09-21_09-59-definition-skills.md`, `docs/agents/team-retro/RETRO-ROADMAP.md` и `todo/done/TASK-docs-approved-scope-retrospective.todo.md`.
 * **Текущее поведение:** SDLC требует сверять цель, критерии приёмки, ограничения и план, но явно не требует согласовывать отклонение с владельцем исходного решения и сопоставлять весь фактический результат с исходным поручением и сценарием. В ретроспективе №400 и реестре соответствующая проблема пока остаётся под наблюдением.
 * **Границы (Out of Scope):** роли, `docs/agents/raci-matrix.md`, другие навыки и документы, Git-регламенты, зависимости, конфигурация и код. Упоминание TasK остаётся в задаче и запросе на слияние, а не переносится в общий SDLC. Изменения являются `docs-only` (только документация).
 
@@ -80,7 +80,7 @@ status: in_progress
 
 ## 6. Самопроверка (Verification)
 ```bash
-php vendor/bin/todo-md validate todo/TASK-docs-approved-scope-retrospective.todo.md
+php vendor/bin/todo-md validate todo/done/TASK-docs-approved-scope-retrospective.todo.md
 make md-links
 ```
 
@@ -91,9 +91,9 @@ make md-links
 
 ## 8. Источники (Sources)
 - [TasK PR №2931](https://github.com/prikotov/TasK/pull/2931), исходная версия `c4e5bd7ff1bfee2df37292f995b0a73788153e14`.
-- [Ретроспектива запроса на слияние №400](../docs/agents/team-retro/2026-09-21_09-59-definition-skills.md).
-- [SDLC — жизненный цикл разработки](../docs/agents/workflow/sdlc.md).
-- [Специализированный цикл проектирования процессов](../docs/agents/raci-matrix.md#6-специализированный-цикл-проектирование-процессов-взаимодействия-команды).
+- [Ретроспектива запроса на слияние №400](../../docs/agents/team-retro/2026-09-21_09-59-definition-skills.md).
+- [SDLC — жизненный цикл разработки](../../docs/agents/workflow/sdlc.md).
+- [Специализированный цикл проектирования процессов](../../docs/agents/raci-matrix.md#6-специализированный-цикл-проектирование-процессов-взаимодействия-команды).
 
 ## 9. Комментарии (Comments)
 - Пользователь прямо поручил сделать один запрос на слияние для уже подготовленной ретроспективы №400 и согласованной адаптации доработок из TasK; это не новый несогласованный проект и не разрешение на слияние.
@@ -114,3 +114,4 @@ make md-links
 | 2026-09-21 03:09:25 (1789960165) | Аналитик Шерлок (pi) | Создание задачи по модели, прошедшей PM2 |
 | 2026-09-21 03:13:16 (1789960396) | Технический писатель Остап (pi) | Подтверждено понимание объёма PM4; зафиксировано принятие модели на PM3. |
 | 2026-09-21 03:13:50 (1789960430) | Технический писатель Остап (pi) | PM4: оформлены два принципа SDLC и выполнена самопроверка шести сценариев. |
+| 2026-09-21 03:36:06 (1789961766) | Тимлид Алекс (pi) | Создан PR №401 от приложения с меткой `pi`, задача прошла `review` и переведена в `done` после зелёных проверок на `0a25c660`. [CI](https://github.com/prikotov/task-orchestrator/actions/runs/35557862837): PHPUnit — 1572 теста, 4452 утверждения, обе проверки установки успешны; проверка содержимого PR на секреты также успешна. Ссылки актуализированы после переноса; пользовательская приёмка и слияние не выполнялись. |
