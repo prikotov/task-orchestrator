@@ -3,7 +3,7 @@ type: docs
 created: 2026-09-21 15:20:22 (1790004022)
 due: 
 started: 2026-09-21 15:20:22 (1790004022)
-completed: 
+completed: 2026-09-21 15:36:46 (1790005006)
 cancelled: 
 value: V2
 complexity: C2
@@ -16,12 +16,12 @@ author: Аналитик (Шерлок)
 assignee: Аналитик (Шерлок)
 branch: task/research-codehamr-agent
 pr: https://github.com/prikotov/task-orchestrator/pull/403
-status: review
+status: done
 ---
 
 # TASK-research-codehamr: codehamr — минимальный локальный CLI-агент (исследование для интеграции как сабагент)
 
-> Эпик: [EPIC-research-coding-agents-comparison](EPIC-research-coding-agents-comparison.todo.md) (завершён; это дополнительное исследование №24 по его методологии — поле `epic` в front matter оставлено пустым, потому что валидатор не принимает ссылку на эпик из `done/`). Аналог прецедента [TASK-research-hax](done/TASK-research-hax.todo.md) (№23).
+> Эпик: [EPIC-research-coding-agents-comparison](../EPIC-research-coding-agents-comparison.todo.md) (завершён; это дополнительное исследование №24 по его методологии — поле `epic` в front matter оставлено пустым, потому что валидатор не принимает ссылку на эпик из `done/`). Аналог прецедента [TASK-research-hax](TASK-research-hax.todo.md) (№23).
 
 ## 0. Простое описание (Human Brief)
 

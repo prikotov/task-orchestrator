@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-09-21
 **Объект:** codehamr, релиз от 2026-09-19 (`codehamr/codehamr`, Go, MIT, ~219★ GitHub; сайт [codehamr.com](https://codehamr.com/))
-**Задача:** [TASK-research-codehamr](../../../todo/TASK-research-codehamr.todo.md) · Эпик: [EPIC-research-coding-agents-comparison](../../../todo/EPIC-research-coding-agents-comparison.todo.md) (завершён; исследование №24 по его методологии)
+**Задача:** [TASK-research-codehamr](../../../todo/done/TASK-research-codehamr.todo.md) · Эпик: [EPIC-research-coding-agents-comparison](../../../todo/EPIC-research-coding-agents-comparison.todo.md) (завершён; исследование №24 по его методологии)
 
 ---
 
