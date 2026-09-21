@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-21
+
+[Сравнение v0.8.2...v0.9.0](https://github.com/prikotov/task-orchestrator/compare/v0.8.2...v0.9.0)
+
+### Added
+
+- В Composer-пакет добавлены навыки `task-definition`, `epic-definition`, `epic-decomposition` и общий протокол; SDLC и RACI дополнены в Composer-пакете и PHAR, а ретроспективы и контроль согласованного объёма уточнены (#400, #401).
+
 ## [0.8.2] - 2026-09-17
 
 ### Fixed
