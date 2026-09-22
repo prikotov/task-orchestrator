@@ -7181,16 +7181,16 @@
         },
         {
             "name": "prikotov/git-workflow",
-            "version": "v0.4.0",
+            "version": "v0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/git-workflow.git",
-                "reference": "af28159e6cd3b1274c484c403f43350e8500a92e"
+                "reference": "e7712f2c24e39ac1ec61bb6af61247effbcc1da8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/af28159e6cd3b1274c484c403f43350e8500a92e",
-                "reference": "af28159e6cd3b1274c484c403f43350e8500a92e",
+                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/e7712f2c24e39ac1ec61bb6af61247effbcc1da8",
+                "reference": "e7712f2c24e39ac1ec61bb6af61247effbcc1da8",
                 "shasum": ""
             },
             "require": {
@@ -7227,10 +7227,10 @@
                 "workflow"
             ],
             "support": {
-                "source": "https://github.com/prikotov/git-workflow/tree/v0.4.0",
+                "source": "https://github.com/prikotov/git-workflow/tree/v0.4.1",
                 "issues": "https://github.com/prikotov/git-workflow/issues"
             },
-            "time": "2026-09-16T03:43:14+00:00"
+            "time": "2026-09-22T01:30:01+00:00"
         },
         {
             "name": "prikotov/todo-md",
