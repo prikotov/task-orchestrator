@@ -15,8 +15,8 @@ epic:
 author: Бэкендер Тони (pi)
 assignee: Бэкендер Тони (pi)
 branch: task/update-git-workflow-0-4-1
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/405
+status: review
 ---
 
 # TASK-chore-update-git-workflow-0-4-1: Подтяжка prikotov/git-workflow v0.4.1 и честная проверка локальных доков
