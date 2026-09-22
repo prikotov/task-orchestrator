@@ -15,7 +15,7 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
 assignee: 
 branch: task/research-pragmatic-orchestration
-pr: 
+pr: https://github.com/prikotov/task-orchestrator/pull/406
 status: todo
 ---
 
