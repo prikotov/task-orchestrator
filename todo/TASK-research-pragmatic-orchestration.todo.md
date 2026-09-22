@@ -9,7 +9,7 @@ value: V3
 complexity: C3
 priority: P2
 cost_plan: 
-cost_fact: 
+cost_fact: 88000
 depends_on: 
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
@@ -57,55 +57,55 @@ status: in_progress
 ## 3. Требования, MoSCoW (Requirements)
 
 ### 🔴 Обязательно (Must Have)
-- [ ] Зафиксировать дату исследования и воспроизводимый идентификатор версии: commit snapshot `main` на 2026-09-21 (архив GitHub API), т.к. релизных тегов нет.
-- [ ] Проверить по первичным источникам классификацию как orchestration-слоя над внешними агентами (skill suite + CLI), а не агента и не chain engine; отделить функции porch от функций харнесов.
-- [ ] Описать 4 режима porch (review/delegate/sessions/quota): назначение, контракт, границы; для review — модель глубин и роль LLM-судьи (`review_super/ultra`, `judge.txt`, `dedup-findings`).
-- [ ] Описать steer-механику детально: mailbox (flock, seq), supervisor, адаптеры харнесов, режимы `auto/queue/interrupt`, ранги подтверждения доставки (`supervisor.py`: `_STEER_SUCCESS_RANK`, `_EVIDENCE_RANK`), семантика «accepted ≠ применено».
-- [ ] Описать контракты наблюдаемости: закрытая схема `PorchEvent` (`events.py`), stderr/stdout/артефакты, debug tape (`debug_tape.py`); сравнить с нашим `audit.jsonl` (см. `docs/guide/observability.md`).
-- [ ] Описать матрицу режимов доступа (`mode_policy.py`, `backend_contract.py`): read-only review vs полный доступ delegate, fail-closed; сопоставить с нашей моделью подтверждений и запретами AGENTS.md.
-- [ ] Проанализировать `ACP-RESEARCH.md`: аргументы отказа от ACP, тезис «ACP не песочница»; соотнести с нашим подходом прямого запуска CLI-раннеров в AgentRunner.
-- [ ] Выделить практики делегирования (контракт задачи, first-minute check, интервалы супервизии, deviation journal, «родитель владеет верификацией») и оценить их применимость к нашим скиллам (`run-subagent`, `task-via-subagents`) и ролям.
-- [ ] Кратко охарактеризовать скилл `remote-agents` (SSH-over-SSM, WireGuard/SMB, Terraform, visual QA) — как отдельный класс инфраструктурного подхода, без глубокого погружения.
-- [ ] Сравнить pragmatic-orchestration с `task-orchestrator` по единой матрице трека (модель оркестрации, state mgmt, error handling, extensibility) и с аналогами: qm, omnigent, bx-dev, Herdr, bb.
-- [ ] Проверить гипотезы тимлида (секция «Комментарии») — подтверждены/опровергнуты, явно.
-- [ ] Создать `docs/research/framework-comparisons/pragmatic-orchestration-comparison.md` по формату существующих comparison-документов, со ссылками на первичные источники, ограничениями и чётким вердиктом: заимствовать паттерны / использовать как зависимость / не подходит.
-- [ ] Обновить `docs/research/agent-frameworks-summary.md`: строка #38, счётчики (38/38), затронутые сравнительные выводы и тренды.
-- [ ] Обновить эпик: стадия 1p в плане, запись в истории изменений.
+- [x] Зафиксировать дату исследования и воспроизводимый идентификатор версии: commit snapshot `main` на 2026-09-21 (архив GitHub API), т.к. релизных тегов нет.
+- [x] Проверить по первичным источникам классификацию как orchestration-слоя над внешними агентами (skill suite + CLI), а не агента и не chain engine; отделить функции porch от функций харнесов.
+- [x] Описать 4 режима porch (review/delegate/sessions/quota): назначение, контракт, границы; для review — модель глубин и роль LLM-судьи (`review_super/ultra`, `judge.txt`, `dedup-findings`).
+- [x] Описать steer-механику детально: mailbox (flock, seq), supervisor, адаптеры харнесов, режимы `auto/queue/interrupt`, ранги подтверждения доставки (`supervisor.py`: `_STEER_SUCCESS_RANK`, `_EVIDENCE_RANK`), семантика «accepted ≠ применено».
+- [x] Описать контракты наблюдаемости: закрытая схема `PorchEvent` (`events.py`), stderr/stdout/артефакты, debug tape (`debug_tape.py`); сравнить с нашим `audit.jsonl` (см. `docs/guide/observability.md`).
+- [x] Описать матрицу режимов доступа (`mode_policy.py`, `backend_contract.py`): read-only review vs полный доступ delegate, fail-closed; сопоставить с нашей моделью подтверждений и запретами AGENTS.md.
+- [x] Проанализировать `ACP-RESEARCH.md`: аргументы отказа от ACP, тезис «ACP не песочница»; соотнести с нашим подходом прямого запуска CLI-раннеров в AgentRunner.
+- [x] Выделить практики делегирования (контракт задачи, first-minute check, интервалы супервизии, deviation journal, «родитель владеет верификацией») и оценить их применимость к нашим скиллам (`run-subagent`, `task-via-subagents`) и ролям.
+- [x] Кратко охарактеризовать скилл `remote-agents` (SSH-over-SSM, WireGuard/SMB, Terraform, visual QA) — как отдельный класс инфраструктурного подхода, без глубокого погружения.
+- [x] Сравнить pragmatic-orchestration с `task-orchestrator` по единой матрице трека (модель оркестрации, state mgmt, error handling, extensibility) и с аналогами: qm, omnigent, bx-dev, Herdr, bb.
+- [x] Проверить гипотезы тимлида (секция «Комментарии») — подтверждены/опровергнуты, явно.
+- [x] Создать `docs/research/framework-comparisons/pragmatic-orchestration-comparison.md` по формату существующих comparison-документов, со ссылками на первичные источники, ограничениями и чётким вердиктом: заимствовать паттерны / использовать как зависимость / не подходит.
+- [x] Обновить `docs/research/agent-frameworks-summary.md`: строка #38, счётчики (38/38), затронутые сравнительные выводы и тренды.
+- [x] Обновить эпик: стадия 1p в плане, запись в истории изменений.
 
 ### 🟡 Желательно (Should Have)
-- [ ] Выделить 3–7 потенциально переносимых паттернов с приоритетом, ожидаемой пользой, ограничениями и необходимой последующей проверкой.
-- [ ] Архитектурную диаграмму porch (оркестратор → porch CLI → харнесы; steer-поток) в Mermaid, если улучшает проверяемость.
-- [ ] Оценить офлайн-подход к тестированию харнесов (fake-claude/fake-codex/…) как паттерн для наших интеграционных тестов AgentRunner.
-- [ ] Зафиксировать пробелы документации как неизвестные данные, не подменяя их предположениями.
+- [x] Выделить 3–7 потенциально переносимых паттернов с приоритетом, ожидаемой пользой, ограничениями и необходимой последующей проверкой.
+- [x] Архитектурную диаграмму porch (оркестратор → porch CLI → харнесы; steer-поток) в Mermaid, если улучшает проверяемость.
+- [x] Оценить офлайн-подход к тестированию харнесов (fake-claude/fake-codex/…) как паттерн для наших интеграционных тестов AgentRunner.
+- [x] Зафиксировать пробелы документации как неизвестные данные, не подменяя их предположениями.
 
 ### 🟢 Опционально (Could Have)
 - [ ] Предложить отдельные backlog-задачи на проверку наиболее ценных паттернов после подтверждения пользователем.
 
 ### ⚫ Не будем делать (Won't Have)
-- [ ] Не считать рекламные формулировки README («2–10× больше работы» и т.п.) подтверждёнными фактами — только как заявления авторов.
-- [ ] Не проводить полный аудит безопасности исходного кода или бенчмарки производительности.
-- [ ] Не интегрировать porch и не добавлять его как зависимость; не менять код, конфигурацию и архитектуру `task-orchestrator`.
-- [ ] Не исследовать заново внутреннюю архитектуру каждого поддерживаемого харнеса за пределами интеграционного контракта porch.
-- [ ] Не создавать задачи реализации без отдельного решения пользователя.
+- [x] Не считать рекламные формулировки README («2–10× больше работы» и т.п.) подтверждёнными фактами — только как заявления авторов.
+- [x] Не проводить полный аудит безопасности исходного кода или бенчмарки производительности.
+- [x] Не интегрировать porch и не добавлять его как зависимость; не менять код, конфигурацию и архитектуру `task-orchestrator`.
+- [x] Не исследовать заново внутреннюю архитектуру каждого поддерживаемого харнеса за пределами интеграционного контракта porch.
+- [x] Не создавать задачи реализации без отдельного решения пользователя.
 
 ## 4. План реализации (Implementation Plan)
-1. [ ] Клонировать/скачать снапшот `CodeAlive-AI/pragmatic-orchestration` (main на момент исследования), зафиксировать дату и идентификатор.
-2. [ ] Изучить: `README.md`, `skills/pragmatic-orchestration/SKILL.md` + `references/` (delegate.md, runtime-contracts.md, configuration.md, review.md), `scripts/lib/` (steer/, events.py, mode_policy.py, backend_contract.py, normalize_stream.py), `ACP-RESEARCH.md`, `skills/remote-agents/SKILL.md` (обзорно), тесты `scripts/tests/`.
-3. [ ] Актуализировать знание нашей архитектуры: `src/Module/AgentRunner/`, `src/Module/ChainExecution/`, `docs/guide/observability.md`, `docs/agents/skills/run-subagent/SKILL.md`.
-4. [ ] Сопоставить по единой матрице трека; сравнить с qm (#32), omnigent (#33), bx-dev (#31), Herdr (#34), bb (#36).
-5. [ ] Проверить гипотезы тимлида (секция «Комментарии»).
-6. [ ] Создать `docs/research/framework-comparisons/pragmatic-orchestration-comparison.md`.
-7. [ ] Обновить `docs/research/agent-frameworks-summary.md` (строка #38, счётчики, тренды).
-8. [ ] Обновить эпик (стадия 1p, история изменений); выполнить `php vendor/bin/todo-md validate`.
+1. [x] Клонировать/скачать снапшот `CodeAlive-AI/pragmatic-orchestration` (main на момент исследования), зафиксировать дату и идентификатор.
+2. [x] Изучить: `README.md`, `skills/pragmatic-orchestration/SKILL.md` + `references/` (delegate.md, runtime-contracts.md, configuration.md, review.md), `scripts/lib/` (steer/, events.py, mode_policy.py, backend_contract.py, normalize_stream.py), `ACP-RESEARCH.md`, `skills/remote-agents/SKILL.md` (обзорно), тесты `scripts/tests/`.
+3. [x] Актуализировать знание нашей архитектуры: `src/Module/AgentRunner/`, `src/Module/ChainExecution/`, `docs/guide/observability.md`, `docs/agents/skills/run-subagent/SKILL.md`.
+4. [x] Сопоставить по единой матрице трека; сравнить с qm (#32), omnigent (#33), bx-dev (#31), Herdr (#34), bb (#36).
+5. [x] Проверить гипотезы тимлида (секция «Комментарии»).
+6. [x] Создать `docs/research/framework-comparisons/pragmatic-orchestration-comparison.md`.
+7. [x] Обновить `docs/research/agent-frameworks-summary.md` (строка #38, счётчики, тренды).
+8. [x] Обновить эпик (стадия 1p, история изменений); выполнить `php vendor/bin/todo-md validate`.
 
 ## 5. Критерии приёмки (Definition of Done)
-- [ ] Comparison-документ создан по формату трека; все ключевые механики описаны с маппингом на компоненты task-orchestrator и ссылками на первоисточники.
-- [ ] Вердикт по каждой механике: заимствовать / dependency / не подходит — с обоснованием.
-- [ ] Гипотезы тимлида проверены явно (подтверждены/опровергнуты).
-- [ ] Сравнение с аналогами трека (qm, omnigent, bx-dev, Herdr, bb) выполнено.
-- [ ] Строка #38 добавлена в `docs/research/agent-frameworks-summary.md`, счётчики и затронутые тренды актуализированы.
-- [ ] Эпик обновлён (стадия 1p, история изменений).
-- [ ] `php vendor/bin/todo-md validate` — без ошибок.
+- [x] Comparison-документ создан по формату трека; все ключевые механики описаны с маппингом на компоненты task-orchestrator и ссылками на первоисточники.
+- [x] Вердикт по каждой механике: заимствовать / dependency / не подходит — с обоснованием.
+- [x] Гипотезы тимлида проверены явно (подтверждены/опровергнуты).
+- [x] Сравнение с аналогами трека (qm, omnigent, bx-dev, Herdr, bb) выполнено.
+- [x] Строка #38 добавлена в `docs/research/agent-frameworks-summary.md`, счётчики и затронутые тренды актуализированы.
+- [x] Эпик обновлён (стадия 1p, история изменений).
+- [x] `php vendor/bin/todo-md validate` для затронутых файлов — без ошибок.
 
 ## 6. Самопроверка (Verification)
 ```bash
@@ -163,3 +163,4 @@ pragmatic-orchestration распространяется как Agent Skills + C
 | :--- | :--- | :--- |
 | 2026-09-22 03:34:07 (1790048047) | Тимлид (Алекс) | Создание задачи |
 | 2026-09-22 | Тимлид (Алекс) | Заполнена постановка по итогам предварительного ресерча (снапшот main 2026-09-21): методология эпика, 7 гипотез, предварительный вердикт. |
+| 2026-09-22 | Аналитик (Шерлок) | Подготовлены comparison-отчёт и самодостаточный отчёт агента; в summary добавлена строка #38, счётчики обновлены до 38/38, семь гипотез проверены. Verdict: 🟡 заимствовать steer/event/policy/delegation/testing patterns; 🔴 не dependency. Задача и чекбокс стадии оставлены `in_progress` до процессной приёмки. |
