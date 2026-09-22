@@ -3,7 +3,7 @@ type: chore
 created: 2026-09-22 01:30:54 (1790040654)
 due: 
 started: 2026-09-22 01:30:54 (1790040654)
-completed: 
+completed: 2026-09-22 01:39:20 (1790041160)
 cancelled: 
 value: V2
 complexity: C1
@@ -16,7 +16,7 @@ author: Бэкендер Тони (pi)
 assignee: Бэкендер Тони (pi)
 branch: task/update-git-workflow-0-4-1
 pr: https://github.com/prikotov/task-orchestrator/pull/405
-status: review
+status: done
 ---
 
 # TASK-chore-update-git-workflow-0-4-1: Подтяжка prikotov/git-workflow v0.4.1 и честная проверка локальных доков
@@ -59,13 +59,13 @@ status: review
 2. [x] `git-workflow-init --force`; удаление устаревших локальных артефактов.
 3. [x] Валидация локальных копий доков без исключений; откат `.md-links.php`.
 4. [x] `make check`.
-5. [ ] PR по регламенту.
+5. [x] PR по регламенту.
 
 ## 5. Критерии приёмки (Definition of Done)
 - [x] Lock: единственное изменение — `prikotov/git-workflow` v0.4.0 → v0.4.1.
 - [x] `validate-md-links docs/git-workflow/` и `docs/todo-md/` — зелёные без исключений.
 - [x] `make check` зелёный (1572 теста, 2 skipped).
-- [ ] Задача в `done`, PR создан.
+- [x] Задача в `done`, PR создан.
 
 ## 6. Самопроверка (Verification)
 ```bash
@@ -89,3 +89,4 @@ make check
 | 2026-09-22 01:30:54 (1790040654) | Бэкендер Тони (pi) | Создание задачи |
 | 2026-09-22 01:35:00 (1790040900) | Бэкендер Тони (pi) | Старт задачи, заполнение постановки |
 | 2026-09-22 01:45:00 (1790041500) | Бэкендер Тони (pi) | Обновление до v0.4.1, ре-синк доков, откат исключений, make check зелёный |
+| 2026-09-22 01:55:00 (1790042100) | Бэкендер Тони (pi) | PR #405 создан, CI зелёный, задача закрыта |
