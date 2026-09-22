@@ -2,7 +2,7 @@
 type: docs
 created: 2026-09-22 03:34:07 (1790048047)
 due: 
-started: 
+started: 2026-09-22 03:44:29 (1790048669)
 completed: 
 cancelled: 
 value: V3
@@ -13,10 +13,10 @@ cost_fact:
 depends_on: 
 epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид (Алекс)
-assignee: 
+assignee: Аналитик (Шерлок)
 branch: task/research-pragmatic-orchestration
 pr: https://github.com/prikotov/task-orchestrator/pull/406
-status: todo
+status: in_progress
 ---
 
 # TASK-research-pragmatic-orchestration: pragmatic-orchestration (CodeAlive-AI): porch CLI + cross-agent skills над внешними CLI-агентами
