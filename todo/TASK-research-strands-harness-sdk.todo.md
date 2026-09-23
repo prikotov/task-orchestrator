@@ -57,49 +57,49 @@ status: in_progress
 ## 3. Требования, MoSCoW (Requirements)
 
 ### 🔴 Обязательно (Must Have)
-- [ ] Зафиксировать дату исследования и воспроизводимый идентификатор версии: снапшот main `fec042766488cfb2627f1998897b1cc0fc238d3f` от 2026-09-22 (клон в `/tmp/research/strands-harness-sdk`) с указанием релизных тегов (`python/v1.57.0`, `harness-python/v0.1.2` и др.).
-- [ ] Проверить по первичным источникам классификацию как SDK/agent-framework: двухуровневая модель «harness с дефолтами (create_harness) + SDK с полным контролем цикла»; отделить SDK от тонкой CLI-поверхности.
-- [ ] Описать lifecycle-контроли agent loop (turn limits, token budgets, cancellation, stop reasons) по коду `strands-py/src/strands/agent/`, `event_loop/`; сравнить с нашим retry/budget/fix_iterations.
-- [ ] Описать hooks/interventions (перехват итерации: log/validate/redirect, steering) и guardrails (валидация tool-вызовов до исполнения); сопоставить с нашими quality gates и отсутствием валидации команд.
-- [ ] Описать state management: sessions, memory, context management (compaction); сопоставить с нашим DynamicLoop resume и payload-контекстом.
-- [ ] Описать multi-agent паттерны (`multiagent/graph.py`, `swarm.py`, `a2a/`); сопоставить с нашими цепочками и сабагентами.
-- [ ] Кратко охарактеризовать evals SDK (detectors/evaluators/red-teaming/simulators из docs `user-guide/evals-sdk/`) как отдельный класс контроля качества; модель portability (Bedrock/Anthropic/OpenAI/Gemini, custom providers); observability (tracing/streaming).
-- [ ] Сравнить Strands с `task-orchestrator` по единой матрице трека (модель оркестрации, state mgmt, error handling, extensibility) и с аналогами: OpenHands SDK (#6), Mastra (#10), Agno (#14), omnigent (#33).
-- [ ] Проверить гипотезы тимлида (секция «Комментарии») — подтверждены/опровергнуты, явно.
-- [ ] Создать `docs/research/framework-comparisons/strands-harness-sdk-comparison.md` по формату существующих comparison-документов, со ссылками на первичные источники, ограничениями и чётким вердиктом: заимствовать паттерны / использовать как зависимость / не подходит.
-- [ ] Обновить `docs/research/agent-frameworks-summary.md`: строка #39, счётчики (39/39), затронутые сравнительные выводы и тренды.
-- [ ] Обновить эпик: стадия 1q в плане, запись в истории изменений.
+- [x] Зафиксировать дату исследования и воспроизводимый идентификатор версии: снапшот main `fec042766488cfb2627f1998897b1cc0fc238d3f` от 2026-09-22 (клон в `/tmp/research/strands-harness-sdk`) с указанием релизных тегов (`python/v1.57.0`, `harness-python/v0.1.2` и др.).
+- [x] Проверить по первичным источникам классификацию как SDK/agent-framework: двухуровневая модель «harness с дефолтами (create_harness) + SDK с полным контролем цикла»; отделить SDK от тонкой CLI-поверхности.
+- [x] Описать lifecycle-контроли agent loop (turn limits, token budgets, cancellation, stop reasons) по коду `strands-py/src/strands/agent/`, `event_loop/`; сравнить с нашим retry/budget/fix_iterations.
+- [x] Описать hooks/interventions (перехват итерации: log/validate/redirect, steering) и guardrails (валидация tool-вызовов до исполнения); сопоставить с нашими quality gates и отсутствием валидации команд.
+- [x] Описать state management: sessions, memory, context management (compaction); сопоставить с нашим DynamicLoop resume и payload-контекстом.
+- [x] Описать multi-agent паттерны (`multiagent/graph.py`, `swarm.py`, `a2a/`); сопоставить с нашими цепочками и сабагентами.
+- [x] Кратко охарактеризовать evals SDK (detectors/evaluators/red-teaming/simulators из docs `user-guide/evals-sdk/`) как отдельный класс контроля качества; модель portability (Bedrock/Anthropic/OpenAI/Gemini, custom providers); observability (tracing/streaming).
+- [x] Сравнить Strands с `task-orchestrator` по единой матрице трека (модель оркестрации, state mgmt, error handling, extensibility) и с аналогами: OpenHands SDK (#6), Mastra (#10), Agno (#14), omnigent (#33).
+- [x] Проверить гипотезы тимлида (секция «Комментарии») — подтверждены/опровергнуты, явно.
+- [x] Создать `docs/research/framework-comparisons/strands-harness-sdk-comparison.md` по формату существующих comparison-документов, со ссылками на первичные источники, ограничениями и чётким вердиктом: заимствовать паттерны / использовать как зависимость / не подходит.
+- [x] Обновить `docs/research/agent-frameworks-summary.md`: строка #39, счётчики (39/39), затронутые сравнительные выводы и тренды.
+- [x] Обновить эпик: стадия 1q в плане, запись в истории изменений.
 
 ### 🟡 Желательно (Should Have)
-- [ ] Выделить 3–7 потенциально переносимых паттернов с приоритетом, ожидаемой пользой, ограничениями и необходимой последующей проверкой.
-- [ ] Архитектурную диаграмму (harness → SDK-слои; agent loop с hooks/guardrails) в Mermaid, если улучшает проверяемость.
-- [ ] Оценить формат «harness configuration reference» (каждый дефолт переопределяем и документирован) как паттерн для наших YAML-профилей и конфигурации цепочек.
-- [ ] Зафиксировать пробелы документации как неизвестные данные, не подменяя их предположениями.
+- [x] Выделить 3–7 потенциально переносимых паттернов с приоритетом, ожидаемой пользой, ограничениями и необходимой последующей проверкой.
+- [x] Архитектурную диаграмму (harness → SDK-слои; agent loop с hooks/guardrails) в Mermaid, если улучшает проверяемость.
+- [x] Оценить формат «harness configuration reference» (каждый дефолт переопределяем и документирован) как паттерн для наших YAML-профилей и конфигурации цепочек.
+- [x] Зафиксировать пробелы документации как неизвестные данные, не подменяя их предположениями.
 
 ### ⚫ Не будем делать (Won't Have)
-- [ ] Не считать маркетинговые заявления («production-ready», benchmarks) подтверждёнными фактами — только как заявления авторов.
-- [ ] Не проводить полный аудит безопасности исходного кода или бенчмарки производительности.
-- [ ] Не интегрировать strands и не добавлять его как зависимость; не менять код, конфигурацию и архитектуру `task-orchestrator`.
-- [ ] Не исследовать заново весь docs-сайт (280 страниц) — только разделы, релевантные методологии трека.
-- [ ] Не создавать задачи реализации без отдельного решения пользователя.
+- [x] Не считать маркетинговые заявления («production-ready», benchmarks) подтверждёнными фактами — только как заявления авторов.
+- [x] Не проводить полный аудит безопасности исходного кода или бенчмарки производительности.
+- [x] Не интегрировать strands и не добавлять его как зависимость; не менять код, конфигурацию и архитектуру `task-orchestrator`.
+- [x] Не исследовать заново весь docs-сайт (280 страниц) — только разделы, релевантные методологии трека.
+- [x] Не создавать задачи реализации без отдельного решения пользователя.
 
 ## 4. План реализации (Implementation Plan)
-1. [ ] Изучить снапшот `/tmp/research/strands-harness-sdk` (main `fec0427` от 2026-09-22): `README.md`, `harness-py/src/strands_harness/`, `strands-py/src/strands/` (agent, event_loop, hooks, interventions, multiagent, session, memory), `strands-cli/`, docs `site/src/content/docs/user-guide/` (harness/, sdk/, evals-sdk/), `team/` (обзорно).
-2. [ ] Актуализировать знание нашей архитектуры: `src/Module/AgentRunner/`, `src/Module/ChainExecution/`, `src/Module/DynamicLoop/`, `docs/guide/observability.md`.
-3. [ ] Сопоставить по единой матрице трека; сравнить с OpenHands SDK (#6), Mastra (#10), Agno (#14), omnigent (#33).
-4. [ ] Проверить гипотезы тимлида (секция «Комментарии»).
-5. [ ] Создать `docs/research/framework-comparisons/strands-harness-sdk-comparison.md`.
-6. [ ] Обновить `docs/research/agent-frameworks-summary.md` (строка #39, счётчики, тренды).
-7. [ ] Обновить эпик (стадия 1q, история изменений); выполнить `php vendor/bin/todo-md validate`.
+1. [x] Изучить снапшот `/tmp/research/strands-harness-sdk` (main `fec0427` от 2026-09-22): `README.md`, `harness-py/src/strands_harness/`, `strands-py/src/strands/` (agent, event_loop, hooks, interventions, multiagent, session, memory), `strands-cli/`, docs `site/src/content/docs/user-guide/` (harness/, sdk/, evals-sdk/), `team/` (обзорно).
+2. [x] Актуализировать знание нашей архитектуры: `src/Module/AgentRunner/`, `src/Module/ChainExecution/`, `src/Module/DynamicLoop/`, `docs/guide/observability.md`.
+3. [x] Сопоставить по единой матрице трека; сравнить с OpenHands SDK (#6), Mastra (#10), Agno (#14), omnigent (#33).
+4. [x] Проверить гипотезы тимлида (секция «Комментарии»).
+5. [x] Создать `docs/research/framework-comparisons/strands-harness-sdk-comparison.md`.
+6. [x] Обновить `docs/research/agent-frameworks-summary.md` (строка #39, счётчики, тренды).
+7. [x] Обновить эпик (стадия 1q, история изменений); выполнить `php vendor/bin/todo-md validate`.
 
 ## 5. Критерии приёмки (Definition of Done)
-- [ ] Comparison-документ создан по формату трека; все ключевые механики описаны с маппингом на компоненты task-orchestrator и ссылками на первичные источники.
-- [ ] Вердикт по каждой механике: заимствовать / dependency / не подходит — с обоснованием.
-- [ ] Гипотезы тимлида проверены явно (подтверждены/опровергнуты).
-- [ ] Сравнение с аналогами трека (OpenHands SDK, Mastra, Agno, omnigent) выполнено.
-- [ ] Строка #39 добавлена в `docs/research/agent-frameworks-summary.md`, счётчики и затронутые тренды актуализированы.
-- [ ] Эпик обновлён (стадия 1q, история изменений).
-- [ ] `php vendor/bin/todo-md validate` для затронутых файлов — без ошибок.
+- [x] Comparison-документ создан по формату трека; все ключевые механики описаны с маппингом на компоненты task-orchestrator и ссылками на первичные источники.
+- [x] Вердикт по каждой механике: заимствовать / dependency / не подходит — с обоснованием.
+- [x] Гипотезы тимлида проверены явно (подтверждены/опровергнуты).
+- [x] Сравнение с аналогами трека (OpenHands SDK, Mastra, Agno, omnigent) выполнено.
+- [x] Строка #39 добавлена в `docs/research/agent-frameworks-summary.md`, счётчики и затронутые тренды актуализированы.
+- [x] Эпик обновлён (стадия 1q, история изменений).
+- [x] `php vendor/bin/todo-md validate` для затронутых файлов — без ошибок.
 
 ## 6. Самопроверка (Verification)
 ```bash
@@ -157,3 +157,4 @@ Strands Agents — SDK-фреймворк от AWS (Copyright Amazon.com): «Cho
 | :--- | :--- | :--- |
 | 2026-09-23 02:37:48 (1790131068) | Тимлид (Алекс) | Создание задачи |
 | 2026-09-23 | Тимлид (Алекс) | Заполнена постановка по итогам предварительного ресерча (снапшот main `fec0427` от 2026-09-22): методология эпика, 7 гипотез, предварительный вердикт. |
+| 2026-09-23 | Аналитик (Шерлок) | Подготовлены comparison-отчёт, строка #39 и обновление сводки до 39/39; семь гипотез проверены по первичным источникам, эпик дополнен стадией `1q`. Статус сохранён `in_progress` до процессной приёмки. |
