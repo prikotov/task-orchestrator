@@ -3,7 +3,7 @@ type: chore
 created: 2026-09-23 14:44:13 (1790174653)
 due: 
 started: 2026-09-23 14:44:13 (1790174653)
-completed: 
+completed: 2026-09-23 14:49:12 (1790174952)
 cancelled: 
 value: V2
 complexity: C1
@@ -15,8 +15,8 @@ epic:
 author: Бэкендер Тони (pi)
 assignee: Бэкендер Тони (pi)
 branch: task/codex-gpt6-profiles
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/408
+status: done
 ---
 
 # TASK-chore-codex-gpt6-profiles: Переход пяти активных профилей Codex CLI на GPT-6
@@ -99,3 +99,4 @@ vendor/bin/psalm
 | 2026-09-23 14:44:13 (1790174653) | Бэкендер Тони (pi) | Создание задачи |
 | 2026-09-23 14:45:00 (1790174700) | Бэкендер Тони (pi) | Старт задачи, заполнение постановки |
 | 2026-09-23 21:50:00 (1790175000) | Бэкендер Тони (pi) | Замена пяти профилей на GPT‑6, phpunit+psalm зелёные |
+| 2026-09-23 22:05:00 (1790175900) | Бэкендер Тони (pi) | PR #408 создан, CI зелёный, задача закрыта |
