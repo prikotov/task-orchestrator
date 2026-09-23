@@ -3,7 +3,7 @@ type: docs
 created: 2026-09-23 02:37:48 (1790131068)
 due: 
 started: 2026-09-23 02:40:36 (1790131236)
-completed: 
+completed: 2026-09-23 03:30:50 (1790134250)
 cancelled: 
 value: V3
 complexity: C3
@@ -15,8 +15,8 @@ epic: EPIC-research-agent-frameworks-comparison
 author: Тимлид Алекс (pi)
 assignee: Аналитик Шерлок (pi)
 branch: task/research-strands-harness-sdk
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/407
+status: done
 ---
 
 # TASK-research-strands-harness-sdk: Research: Strands Agents harness-sdk (AWS) — SDK для построения agent-харнесов
