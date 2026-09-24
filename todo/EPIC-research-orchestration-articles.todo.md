@@ -100,6 +100,7 @@ flowchart LR
 ### Этап 1: Индивидуальные исследования (параллельные)
 
 - [x] [TASK-research-orchestrator-tax](done/TASK-research-orchestrator-tax.todo.md) — Martin Fowler «Orchestrator Tax» (https://martinfowler.com/articles/orchestrator-tax.html). Overhead от централизованной оркестрации, альтернативы (choreography), когда стоит платить цену.
+- [ ] [TASK-research-omega-reliable-frameworks](TASK-research-omega-reliable-frameworks.todo.md) — книга Ω «Инженерия надёжных фреймворков на AI-агентах» (первоисточник без внешнего URL — локальная копия в репозитории: `docs/research/orchestration-articles/sources/omega-reliable-ai-agent-frameworks.html`). Роли, спецификация, workflow как state machine, hooks/permissions, многоуровневая верификация, recovery, экономика, параллелизм и delivery control plane.
 
 ### Этап 2: Сводный анализ (после завершения серии исследований)
 
@@ -138,3 +139,4 @@ flowchart LR
 | 2026-09-11 | Тимлид (Алекс) | Stage 1: TASK-research-t3-code выполнена (PR #385) — оценка 18/18, apply (capability-контракт, BYO subscription) / study (worktree, durable threads, совместимость продолжения, remote, permissions) / skip (one-button PR). Гипотезы: 4 подтверждены, 1 частично, 1 частично опровергнута. Файл задачи перенесён в `todo/done/`. Эпик остаётся в работе (Этап 2 — сводный анализ — после накопления источников). |
 | 2026-09-11 | Тимлид (Алекс) | Задача TASK-research-t3-code исключена из эпика и перенесена в продуктовый трек EPIC-research-agent-frameworks-comparison (переоткрыт) по решению владельца: T3 Code — продукт, а не статья. |
 | 2026-09-13 | Тимлид Алекс (pi) | По решению владельца за эпиком закреплён evergreen-режим: новые значимые статьи об оркестрации пополняют трек задачами Этапа 1; закрытие — только явным решением владельца, а не автоматически по исчерпанию задач. |
+| 2026-09-24 | Тимлид Алекс (pi) | Добавлена задача TASK-research-omega-reliable-frameworks (предложена владельцем): книга Ω «Инженерия надёжных фреймворков на AI-агентах» — 12 глав о надёжности AI-agent фреймворков. Прецедент хранения первоисточника: локальная копия без внешнего URL размещена в `docs/research/orchestration-articles/sources/`. |
