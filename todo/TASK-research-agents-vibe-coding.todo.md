@@ -15,7 +15,7 @@ epic: EPIC-research-orchestration-articles
 author: Тимлид Алекс (pi)
 assignee: Аналитик Шерлок (pi)
 branch: task/research-agents-vibe-coding
-pr: 
+pr: https://github.com/prikotov/task-orchestrator/pull/413
 status: todo
 ---
 
