@@ -170,6 +170,8 @@ roles:
       - zai
       - --model
       - glm-5.3
+      - --thinking
+      - high
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -218,6 +220,8 @@ roles:
       - zai
       - --model
       - glm-5.3
+      - --thinking
+      - high
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -234,6 +238,8 @@ roles:
       - zai
       - --model
       - glm-5.3
+      - --thinking
+      - medium
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -249,7 +255,9 @@ roles:
       - --provider
       - zai
       - --model
-      - glm-5.3
+      - glm-5.3-flash
+      - --thinking
+      - medium
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
