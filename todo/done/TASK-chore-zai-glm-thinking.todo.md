@@ -3,7 +3,7 @@ type: chore
 created: 2026-09-24 01:32:10 (1790213530)
 due: 
 started: 2026-09-24 01:32:11 (1790213531)
-completed: 
+completed: 2026-09-24 01:32:48 (1790213568)
 cancelled: 
 value: V2
 complexity: C1
@@ -16,7 +16,7 @@ author: Бэкендер Тони (pi)
 assignee: Бэкендер Тони (pi)
 branch: task/codex-gpt6-profiles
 pr: https://github.com/prikotov/task-orchestrator/pull/408
-status: in_progress
+status: done
 ---
 
 # TASK-chore-zai-glm-thinking: Уровни рассуждения для профилей zai glm и flash для Гермионы
@@ -96,3 +96,4 @@ vendor/bin/psalm
 | 2026-09-24 01:32:10 (1790213530) | Бэкендер Тони (pi) | Создание задачи |
 | 2026-09-24 01:33:00 (1790213580) | Бэкендер Тони (pi) | Старт задачи, заполнение постановки |
 | 2026-09-24 01:40:00 (1790214000) | Бэкендер Тони (pi) | Правка четырёх профилей, phpunit+psalm зелёные |
+| 2026-09-24 01:45:00 (1790214300) | Бэкендер Тони (pi) | Изменения в PR #408, CI ожидается, задача закрыта |
