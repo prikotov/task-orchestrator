@@ -101,6 +101,7 @@ flowchart LR
 
 - [x] [TASK-research-orchestrator-tax](done/TASK-research-orchestrator-tax.todo.md) — Martin Fowler «Orchestrator Tax» (https://martinfowler.com/articles/orchestrator-tax.html). Overhead от централизованной оркестрации, альтернативы (choreography), когда стоит платить цену.
 - [ ] [TASK-research-omega-reliable-frameworks](TASK-research-omega-reliable-frameworks.todo.md) — книга Ω «Инженерия надёжных фреймворков на AI-агентах» (первоисточник без внешнего URL — локальная копия в репозитории: `docs/research/orchestration-articles/sources/omega-reliable-ai-agent-frameworks.html`). Роли, спецификация, workflow как state machine, hooks/permissions, многоуровневая верификация, recovery, экономика, параллелизм и delivery control plane.
+- [ ] [TASK-research-agentic-design-patterns](TASK-research-agentic-design-patterns.todo.md) — каталог «Agentic Design Patterns» (Кирилл Мокевнин, https://mokevnin.github.io/agentic-coding-design-patterns/ru/). ~40 паттернов агентного программирования: постановка задачи, контекст, верификация, организация + антипаттерны.
 
 ### Этап 2: Сводный анализ (после завершения серии исследований)
 
@@ -140,3 +141,4 @@ flowchart LR
 | 2026-09-11 | Тимлид (Алекс) | Задача TASK-research-t3-code исключена из эпика и перенесена в продуктовый трек EPIC-research-agent-frameworks-comparison (переоткрыт) по решению владельца: T3 Code — продукт, а не статья. |
 | 2026-09-13 | Тимлид Алекс (pi) | По решению владельца за эпиком закреплён evergreen-режим: новые значимые статьи об оркестрации пополняют трек задачами Этапа 1; закрытие — только явным решением владельца, а не автоматически по исчерпанию задач. |
 | 2026-09-24 | Тимлид Алекс (pi) | Добавлена задача TASK-research-omega-reliable-frameworks (предложена владельцем): книга Ω «Инженерия надёжных фреймворков на AI-агентах» — 12 глав о надёжности AI-agent фреймворков. Прецедент хранения первоисточника: локальная копия без внешнего URL размещена в `docs/research/orchestration-articles/sources/`. |
+| 2026-09-24 | Тимлид Алекс (pi) | Добавлена задача TASK-research-agentic-design-patterns (предложена владельцем): каталог «Agentic Design Patterns» Кирилла Мокевнина (~40 паттернов, публичный URL). |
