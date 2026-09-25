@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)  
 **Дата:** 2026-09-22  
 **Объект:** `CodeAlive-AI/pragmatic-orchestration`, ветка `main`, commit `a72695dded7e2f28c185c3a2d770b26eb45528fa` от 2026-09-21  
-**Задача:** [TASK-research-pragmatic-orchestration](../../../../todo/TASK-research-pragmatic-orchestration.todo.md), эпик [EPIC-research-agent-frameworks-comparison](../../../../todo/EPIC-research-agent-frameworks-comparison.todo.md)
+**Задача:** [TASK-research-pragmatic-orchestration](../../../../todo/done/TASK-research-pragmatic-orchestration.todo.md), эпик [EPIC-research-agent-frameworks-comparison](../../../../todo/EPIC-research-agent-frameworks-comparison.todo.md)
 
 ---
 
