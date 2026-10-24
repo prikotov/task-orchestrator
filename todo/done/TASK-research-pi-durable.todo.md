@@ -10,7 +10,7 @@ epic: EPIC-research-orchestration-articles
 author: Аналитик Шерлок (pi)
 assignee: Аналитик Шерлок (pi)
 branch: task/research-pi-durable
-pr:
+pr: '#426'
 status: done
 ---
 
