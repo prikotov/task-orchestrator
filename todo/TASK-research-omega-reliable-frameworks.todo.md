@@ -2,7 +2,7 @@
 type: docs
 created: 2026-09-24 01:55:07 (1790214907)
 due: 
-started: 
+started: 2026-10-24 04:51:57 (1792817517)
 completed: 
 cancelled: 
 value: V3
@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Аналитик Шерлок (pi)
 branch: task/research-omega-frameworks
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-research-omega-reliable-frameworks: Книга Ω «Инженерия надёжных фреймворков на AI-агентах»
@@ -58,16 +58,16 @@ status: todo
 - Код/конфиги, изменение архитектуры, бенчмарки
 
 ## 4. План реализации (Implementation Plan)
-1. [ ] Изучить первоисточник: `docs/research/orchestration-articles/sources/omega-reliable-ai-agent-frameworks.html`
-2. [ ] Актуализировать знание нашей архитектуры: `src/Module/AgentRunner/`, `src/Module/ChainExecution/`, `src/Module/DynamicLoop/`, `src/Module/ChainDefinition/`, `src/Module/GitIdentity/`, `docs/guide/architecture.md`
-3. [ ] Оценить 6 критериев; по каждой главе — маппинг + вердикт apply/study/skip
-4. [ ] Создать отчёт в `docs/research/orchestration-articles/omega-reliable-frameworks-research.md`
-5. [ ] Добавить строку в сводную таблицу `docs/research/orchestration-articles-summary.md`
+1. [x] Изучить первоисточник: `docs/research/orchestration-articles/sources/omega-reliable-ai-agent-frameworks.html`
+2. [x] Актуализировать знание нашей архитектуры: `src/Module/AgentRunner/`, `src/Module/ChainExecution/`, `src/Module/DynamicLoop/`, `src/Module/ChainDefinition/`, `src/Module/GitIdentity/`, `docs/guide/architecture.md`
+3. [x] Оценить 6 критериев; по каждой главе — маппинг + вердикт apply/study/skip
+4. [x] Создать отчёт в `docs/research/orchestration-articles/omega-reliable-frameworks-research.md`
+5. [x] Добавить строку в сводную таблицу `docs/research/orchestration-articles-summary.md`
 
 ## 5. Критерии приёмки (Definition of Done)
-- [ ] Отчёт создан, все 6 критериев оценены, все 12 глав покрыты маппингом
-- [ ] Вердикт apply/study/skip по каждому ключевому паттерну с обоснованием и усилиями
-- [ ] Строка добавлена в сводную таблицу `docs/research/orchestration-articles-summary.md`
+- [x] Отчёт создан, все 6 критериев оценены, все 12 глав покрыты маппингом
+- [x] Вердикт apply/study/skip по каждому ключевому паттерну с обоснованием и усилиями
+- [x] Строка добавлена в сводную таблицу `docs/research/orchestration-articles-summary.md`
 
 ## 6. Самопроверка (Verification)
 ```bash
@@ -110,3 +110,4 @@ php vendor/bin/todo-md validate todo/TASK-research-omega-reliable-frameworks.tod
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-09-24 01:55:07 (1790214907) | Тимлид Алекс (pi) | Создание задачи (предложена владельцем). Первоисточник — книга Ω — сохранён в репозиторий: `docs/research/orchestration-articles/sources/omega-reliable-ai-agent-frameworks.html` |
+| 2026-10-24 | Аналитик Шерлок (pi) | Выполнение: отчёт `docs/research/orchestration-articles/omega-reliable-frameworks-research.md` — оценка 18/18, все 12 глав покрыты маппингом. Вердикты: `apply` (валидация архитектуры: компоненты ядра книги = наши модули; fix-итерации = bounded rework; бюджеты; портфель моделей; принцип «инцидент → детерминированное изменение») / `study` (enforcement-хуки и write boundary — главный gap, словарь классов отказов, dispatch-бюджеты, parking, baseline provenance, adversarial-верификация, production eval) / `skip` (ночная автономность, waves, founder-интерфейс, числа конвейера Ω). Самооценка: L2 «Verified pipeline» с элементами L3. Сводная таблица дополнена строкой #3, backlog-рекомендациями 13–22 и трендами 6–8. |
