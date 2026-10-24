@@ -3,7 +3,7 @@ type: docs
 created: 2026-09-24 01:55:07 (1790214907)
 due: 
 started: 2026-10-24 04:51:57 (1792817517)
-completed: 
+completed: 2026-10-24 09:45:31 (1792835131)
 cancelled: 
 value: V3
 complexity: C3
@@ -15,8 +15,8 @@ epic: EPIC-research-orchestration-articles
 author: Тимлид Алекс (pi)
 assignee: Аналитик Шерлок (pi)
 branch: task/research-omega-frameworks
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/427
+status: done
 ---
 
 # TASK-research-omega-reliable-frameworks: Книга Ω «Инженерия надёжных фреймворков на AI-агентах»
