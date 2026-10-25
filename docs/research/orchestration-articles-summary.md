@@ -1,7 +1,7 @@
 # Orchestration Articles — сводная таблица исследований
 
 **Дата создания:** 2026-07-29  
-**Дата обновления:** 2026-10-24 (4 исследования)  
+**Дата обновления:** 2026-10-24 (4 исследования); 2026-10-25 — RAG-верификация курса «Агенты и вайб-кодинг» (строка #4, см. §14 отчёта)  
 **Эпик:** [EPIC-research-orchestration-articles](../../todo/EPIC-research-orchestration-articles.todo.md)  
 **Автор:** Аналитик (Шерлок)
 
@@ -24,7 +24,7 @@
 | 1 | [The Orchestrator's Tax](orchestration-articles/orchestrator-tax-research.md) | AI-agent orchestration / context engineering (управление контекстом) | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | **17** | **apply** — закрепить правила защиты working memory (рабочей памяти), `study` для метрик |
 | 2 | [Pi Durable](orchestration-articles/pi-durable-research.md) | AI-agent orchestration / durable execution (долговечное исполнение) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **18** | **study** — проектировать durable-журнал с resume, saga-компенсацию, компакцию; **apply** — replay-классификация шагов, `failFast`-контракт |
 | 3 | [Книга Ω](orchestration-articles/omega-reliable-frameworks-research.md) | AI-agent orchestration / reliability engineering (инженерия надёжности) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **18** | **apply** — принципы и валидация текущей архитектуры; **study** — enforcement-хуки, словарь отказов, dispatch-бюджеты, parking; **skip** — ночная автономность, waves |
-| 4 | [Агенты и вайб-кодинг](orchestration-articles/agents-and-vibe-coding-research.md) | AI-agent practice (практика работы с агентами) / process engineering (инженерия процесса) | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | **17** | **apply** — процессные правила (критерии готовности, шлюзы, чистая сессия ревью, профили моделей/усилий); **study** — blocking-gates, эвалы, хуки-принуждение, scheduled-прогон, схлопывание; **skip** — рои, «дом», радикальный антипроцесс |
+| 4 | [Агенты и вайб-кодинг](orchestration-articles/agents-and-vibe-coding-research.md) | AI-agent practice (практика работы с агентами) / process engineering (инженерия процесса) | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | **17** | **apply** — процессные правила (критерии готовности, шлюзы, чистая сессия ревью, профили моделей/усилий); **study** — blocking-gates, эвалы, хуки-принуждение, scheduled-прогон, схлопывание; **skip** — рои, «дом», радикальный антипроцесс. RAG-верификация 2026-10-25 (§14 отчёта): цитаты и метрики подтверждены, одно расхождение исправлено, вердикты не изменены |
 
 ## Часть 2. Детальная сводная таблица
 
