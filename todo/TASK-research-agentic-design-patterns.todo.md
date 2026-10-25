@@ -2,7 +2,7 @@
 type: docs
 created: 2026-09-24 02:05:20 (1790215520)
 due: 
-started: 
+started: 2026-10-25 16:32:49 (1792945969)
 completed: 
 cancelled: 
 value: V3
@@ -14,9 +14,9 @@ depends_on:
 epic: EPIC-research-orchestration-articles
 author: Тимлид Алекс (pi)
 assignee: Аналитик Шерлок (pi)
-branch: task/research-orchestration-batch
+branch: task/research-agentic-design-patterns
 pr: https://github.com/prikotov/task-orchestrator/pull/414
-status: todo
+status: in_progress
 ---
 
 # TASK-research-agentic-design-patterns: Каталог «Agentic Design Patterns» (Кирилл Мокевнин)
