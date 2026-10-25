@@ -4,7 +4,7 @@
 **Дата первоисточника:** сборка и авторская рецензия 05.08.2026 (корпус переписки — июль–август 2026)  
 **Дата анализа:** 2026-10-24  
 **Эпик:** [EPIC-research-orchestration-articles](../../../todo/EPIC-research-orchestration-articles.todo.md)  
-**Задача:** [TASK-research-omega-reliable-frameworks](../../../todo/TASK-research-omega-reliable-frameworks.todo.md)  
+**Задача:** [TASK-research-omega-reliable-frameworks](../../../todo/done/TASK-research-omega-reliable-frameworks.todo.md)  
 **Аналитик:** Аналитик (Шерлок)
 
 ---

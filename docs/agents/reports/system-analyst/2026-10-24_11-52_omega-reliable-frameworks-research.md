@@ -3,7 +3,7 @@
 **Роль:** Аналитик (Шерлок)
 **Дата:** 2026-10-24
 **Объект:** книга Ω «Инженерия надёжных фреймворков на AI-агентах» (синтез корпуса переписки, 12 глав, рецензия автора 05.08.2026; внешний URL отсутствует — локальная копия `docs/research/orchestration-articles/sources/omega-reliable-ai-agent-frameworks.html`); маппинг на модули task-orchestrator
-**Задача:** [TASK-research-omega-reliable-frameworks](../../../../todo/TASK-research-omega-reliable-frameworks.todo.md) (эпик [EPIC-research-orchestration-articles](../../../../todo/EPIC-research-orchestration-articles.todo.md), evergreen)
+**Задача:** [TASK-research-omega-reliable-frameworks](../../../../todo/done/TASK-research-omega-reliable-frameworks.todo.md) (эпик [EPIC-research-orchestration-articles](../../../../todo/EPIC-research-orchestration-articles.todo.md), evergreen)
 
 ---
 

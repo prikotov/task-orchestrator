@@ -1,163 +1,55 @@
 roles:
+  # ──────────────────────────────────────────────────────────────────────────
+  # Профили делегирования (2026-10-24): провайдер openai-codex заблокировал
+  # доступ — codex-конфиги отключены. Роли переведены на zai:
+  #   * glm-5.3-flash — быстрая vision-модель (подходит для ролей дизайнеров,
+  #     если появятся);
+  #   * glm-5.3 — старшая модель для архитектуры;
+  #   * ollama qwen3.8:27b-pi-100k (nserv) — ревью кода.
+  # ──────────────────────────────────────────────────────────────────────────
   team_lead_alex:
     prompt_file: docs/agents/roles/team/team_lead_alex.ru.md
-    command:                            # codex CLI
-      - codex
-      - exec
-      - --dangerously-bypass-approvals-and-sandbox
-      - --json
-      - --model
-      - gpt-6-sol
-      - -c
-      - 'model_reasoning_effort="medium"'
-      - --skip-git-repo-check
-      - --ignore-rules
-      - -c
-      - 'model_instructions_file="@system-prompt"'
-      - -c
-      - 'developer_instructions="@append-system-prompt"'
-    # command:                            # pi + zai (default)
-    #   - pi
-    #   - --mode
-    #   - json
-    #   - -p
-    #   - --no-session
-    #   - --provider
-    #   - zai
-    #   - --model
-    #   - glm-5-turbo
-    #   - --system-prompt
-    #   - "@system-prompt"
-    #   - --append-system-prompt
-    #   - "@append-system-prompt"
-
-  system_analyst_sherlock:
-    prompt_file: docs/agents/roles/team/system_analyst_sherlock.ru.md
-    command:                            # pi + openai-codex (ChatGPT Plus subscription)
+    command: &pi_glm_flash_max          # pi + zai (glm-5.3-flash, vision)
       - pi
       - --mode
       - json
       - -p
       - --provider
-      - openai-codex
+      - zai
       - --model
-      - gpt-5.6-sol
+      - glm-5.3-flash
       - --thinking
-      - medium
+      - max
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
       - "@append-system-prompt"
-    # command:                            # pi + zai (default)
-    #   - pi
-    #   - --mode
-    #   - json
-    #   - -p
-    #   - --no-session
-    #   - --provider
-    #   - zai
-    #   - --model
-    #   - glm-5.1
-    #   - --system-prompt
-    #   - "@system-prompt"
-    #   - --append-system-prompt
-    #   - "@append-system-prompt"
+
+  system_analyst_sherlock:
+    prompt_file: docs/agents/roles/team/system_analyst_sherlock.ru.md
+    command: *pi_glm_flash_max
 
   system_architect_gandalf:
     prompt_file: docs/agents/roles/team/system_architect_gandalf.ru.md
-    command:                            # codex CLI
-      - codex
-      - exec
-      - --dangerously-bypass-approvals-and-sandbox
-      - --json
+    command: &pi_glm_max               # pi + zai (glm-5.3 — старшая модель)
+      - pi
+      - --mode
+      - json
+      - -p
+      - --provider
+      - zai
       - --model
-      - gpt-6-astra
-      - -c
-      - 'model_reasoning_effort="high"'
-      - --skip-git-repo-check
-      - --ignore-rules
-      - -c
-      - 'model_instructions_file="@system-prompt"'
-      - -c
-      - 'developer_instructions="@append-system-prompt"'
-    # command:                            # pi + zai (default)
-    #   - pi
-    #   - --mode
-    #   - json
-    #   - -p
-    #   - --no-session
-    #   - --provider
-    #   - zai
-    #   - --model
-    #   - glm-5.1
-    #   - --system-prompt
-    #   - "@system-prompt"
-    #   - --append-system-prompt
-    #   - "@append-system-prompt"
-    # command:                            # pi + openai-codex (ChatGPT Plus subscription, needs HTTPS_PROXY)
-    #   - pi
-    #   - --mode
-    #   - json
-    #   - -p
-    #   - --no-session
-    #   - --provider
-    #   - openai-codex
-    #   - --model
-    #   - gpt-5.6-terra
-    #   - --thinking
-    #   - xhigh
-    #   - --system-prompt
-    #   - "@system-prompt"
-    #   - --append-system-prompt
-    #   - "@append-system-prompt"
+      - glm-5.3
+      - --thinking
+      - max
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
 
   system_architect_loki:
     prompt_file: docs/agents/roles/team/system_architect_loki.ru.md
-    command:                            # codex CLI
-      - codex
-      - exec
-      - --dangerously-bypass-approvals-and-sandbox
-      - --json
-      - --model
-      - gpt-6-sol
-      - -c
-      - 'model_reasoning_effort="medium"'
-      - --skip-git-repo-check
-      - --ignore-rules
-      - -c
-      - 'model_instructions_file="@system-prompt"'
-      - -c
-      - 'developer_instructions="@append-system-prompt"'
-    # command:                            # pi + zai (default)
-    #   - pi
-    #   - --mode
-    #   - json
-    #   - -p
-    #   - --no-session
-    #   - --provider
-    #   - zai
-    #   - --model
-    #   - glm-5.1
-    #   - --system-prompt
-    #   - "@system-prompt"
-    #   - --append-system-prompt
-    #   - "@append-system-prompt"
-    # command:                            # pi + openai-codex (ChatGPT Plus subscription, needs HTTPS_PROXY)
-    #   - pi
-    #   - --mode
-    #   - json
-    #   - -p
-    #   - --no-session
-    #   - --provider
-    #   - openai-codex
-    #   - --model
-    #   - gpt-5.6-terra
-    #   - --thinking
-    #   - xhigh
-    #   - --system-prompt
-    #   - "@system-prompt"
-    #   - --append-system-prompt
-    #   - "@append-system-prompt"
+    command: *pi_glm_flash_max
 
   backend_developer_levsha:
     prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
@@ -179,49 +71,21 @@ roles:
 
   backend_developer_tony:
     prompt_file: docs/agents/roles/team/backend_developer_tony.ru.md
-    command:                            # codex CLI
-      - codex
-      - exec
-      - --dangerously-bypass-approvals-and-sandbox
-      - --json
-      - --model
-      - gpt-6-sol
-      - -c
-      - 'model_reasoning_effort="medium"'
-      - --skip-git-repo-check
-      - --ignore-rules
-      - -c
-      - 'model_instructions_file="@system-prompt"'
-      - -c
-      - 'developer_instructions="@append-system-prompt"'
-    # command:                            # pi + zai (default)
-    #   - pi
-    #   - --mode
-    #   - json
-    #   - -p
-    #   - --no-session
-    #   - --provider
-    #   - zai
-    #   - --model
-    #   - glm-5-turbo
-    #   - --system-prompt
-    #   - "@system-prompt"
-    #   - --append-system-prompt
-    #   - "@append-system-prompt"
+    command: *pi_glm_flash_max
 
   code_reviewer_backend_puaro:
     prompt_file: docs/agents/roles/team/code_reviewer_backend_puaro.ru.md
-    command:
+    command: &pi_ollama_qwen_max        # pi + ollama (qwen3.8 на nserv) — ревью кода
       - pi
       - --mode
       - json
       - -p
       - --provider
-      - zai
+      - ollama
       - --model
-      - glm-5.3
+      - qwen3.8:27b-pi-100k
       - --thinking
-      - high
+      - max
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -265,35 +129,7 @@ roles:
 
   technical_writer_ostap:
     prompt_file: docs/agents/roles/team/technical_writer_ostap.ru.md
-    command:                            # codex CLI
-      - codex
-      - exec
-      - --dangerously-bypass-approvals-and-sandbox
-      - --json
-      - --model
-      - gpt-6-luna
-      - -c
-      - 'model_reasoning_effort="high"'
-      - --skip-git-repo-check
-      - --ignore-rules
-      - -c
-      - 'model_instructions_file="@system-prompt"'
-      - -c
-      - 'developer_instructions="@append-system-prompt"'
-    # command:                            # pi + zai (default)
-    #   - pi
-    #   - --mode
-    #   - json
-    #   - -p
-    #   - --no-session
-    #   - --provider
-    #   - zai
-    #   - --model
-    #   - glm-5-turbo
-    #   - --system-prompt
-    #   - "@system-prompt"
-    #   - --append-system-prompt
-    #   - "@append-system-prompt"
+    command: *pi_glm_flash_max
 
   # ──────────────────────────────────────────────────────────────────────────────
   # HTTP-прокси для Codex CLI
