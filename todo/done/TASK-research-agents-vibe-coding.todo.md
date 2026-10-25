@@ -3,7 +3,7 @@ type: docs
 created: 2026-09-24 02:54:03 (1790218443)
 due: 
 started: 2026-10-24 14:39:20 (1792852760)
-completed: 2026-10-24 16:21:09 (1792858869)
+completed: 2026-10-25 15:56:54 (1792943814)
 cancelled: 
 value: V3
 complexity: C4
@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Аналитик Шерлок (pi)
 branch: task/research-agents-vibe-coding
 pr: https://github.com/prikotov/task-orchestrator/pull/428
-status: review
+status: done
 ---
 
 # TASK-research-agents-vibe-coding: Курс «Агенты и вайб-кодинг» (сборка по переписке практиков)
