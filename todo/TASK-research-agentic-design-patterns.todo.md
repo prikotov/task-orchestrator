@@ -49,28 +49,28 @@ status: in_progress
 
 ## 3. Требования, MoSCoW (Requirements)
 ### 🔴 Обязательно (Must Have)
-- [ ] **Критерии 1–6** — по единой методологии эпика (тезис/проблема, паттерн/концепция, domain, failure handling, маппинг на нашу архитектуру, применяемость)
-- [ ] Маппинг групп паттернов (постановка, контекст, верификация, организация, антипаттерны) на компоненты task-orchestrator (AgentRunner, ChainExecution, DynamicLoop, GitIdentity, ChainDefinition) — со ссылками
-- [ ] Вердикт по каждому ключевому паттерну: apply / study / skip — с обоснованием и оценкой усилий
-- [ ] Отдельно разобрать раздел антипаттернов: каких из них касается task-orchestrator
-- [ ] Строка в сводной таблице `docs/research/orchestration-articles-summary.md`
+- [x] **Критерии 1–6** — по единой методологии эпика (тезис/проблема, паттерн/концепция, domain, failure handling, маппинг на нашу архитектуру, применяемость)
+- [x] Маппинг групп паттернов (постановка, контекст, верификация, организация, антипаттерны) на компоненты task-orchestrator (AgentRunner, ChainExecution, DynamicLoop, GitIdentity, ChainDefinition) — со ссылками
+- [x] Вердикт по каждому ключевому паттерну: apply / study / skip — с обоснованием и оценкой усилий
+- [x] Отдельно разобрать раздел антипаттернов: каких из них касается task-orchestrator
+- [x] Строка в сводной таблице `docs/research/orchestration-articles-summary.md`
 
 ### ⚫ Won't Have (Не будем делать)
 - Код/конфиги, изменение архитектуры, бенчмарки
 
 ## 4. План реализации (Implementation Plan)
-1. [ ] Изучить первоисточник: https://mokevnin.github.io/agentic-coding-design-patterns/ru/ (оглавление, «Как читать книгу», все группы паттернов и антипаттерны)
-2. [ ] Актуализировать знание нашей архитектуры: `src/Module/AgentRunner/`, `src/Module/ChainExecution/`, `src/Module/DynamicLoop/`, `src/Module/ChainDefinition/`, `src/Module/GitIdentity/`, `docs/guide/architecture.md`, `docs/agents/skills/`
-3. [ ] Оценить 6 критериев; по группам паттернов — маппинг + вердикт apply/study/skip; антипаттерны — отдельным блоком
-4. [ ] Проверить гипотезу: каталог ориентирован на взаимодействие «разработчик ↔ один агент»; task-orchestrator — оркестрация цепочек ролей. Какие паттерны переносятся, какие дублируются нашими механизмами (skills, chains, todo-md, become-role)?
-5. [ ] Создать отчёт в `docs/research/orchestration-articles/agentic-design-patterns-research.md`
-6. [ ] Добавить строку в сводную таблицу `docs/research/orchestration-articles-summary.md`
+1. [x] Изучить первоисточник: https://mokevnin.github.io/agentic-coding-design-patterns/ru/ (оглавление, «Как читать книгу», все группы паттернов и антипаттерны)
+2. [x] Актуализировать знание нашей архитектуры: `src/Module/AgentRunner/`, `src/Module/ChainExecution/`, `src/Module/DynamicLoop/`, `src/Module/ChainDefinition/`, `src/Module/GitIdentity/`, `docs/guide/architecture.md`, `docs/agents/skills/`
+3. [x] Оценить 6 критериев; по группам паттернов — маппинг + вердикт apply/study/skip; антипаттерны — отдельным блоком
+4. [x] Проверить гипотезу: каталог ориентирован на взаимодействие «разработчик ↔ один агент»; task-orchestrator — оркестрация цепочек ролей. Какие паттерны переносятся, какие дублируются нашими механизмами (skills, chains, todo-md, become-role)?
+5. [x] Создать отчёт в `docs/research/orchestration-articles/agentic-design-patterns-research.md`
+6. [x] Добавить строку в сводную таблицу `docs/research/orchestration-articles-summary.md`
 
 ## 5. Критерии приёмки (Definition of Done)
-- [ ] Отчёт создан, все 6 критериев оценены, все группы паттернов и антипаттерны покрыты маппингом
-- [ ] Вердикт apply/study/skip по каждому ключевому паттерну с обоснованием и усилиями
-- [ ] Гипотеза «одиночный агент vs оркестрация цепочек» проверена
-- [ ] Строка добавлена в сводную таблицу `docs/research/orchestration-articles-summary.md`
+- [x] Отчёт создан, все 6 критериев оценены, все группы паттернов и антипаттерны покрыты маппингом
+- [x] Вердикт apply/study/skip по каждому ключевому паттерну с обоснованием и усилиями
+- [x] Гипотеза «одиночный агент vs оркестрация цепочек» проверена
+- [x] Строка добавлена в сводную таблицу `docs/research/orchestration-articles-summary.md`
 
 ## 6. Самопроверка (Verification)
 ```bash
@@ -111,3 +111,4 @@ php vendor/bin/todo-md validate todo/TASK-research-agentic-design-patterns.todo.
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-09-24 02:05:20 (1790215520) | Тимлид Алекс (pi) | Создание задачи (предложена владельцем). Первоисточник — публичный каталог https://mokevnin.github.io/agentic-coding-design-patterns/ru/ |
+| 2026-10-26 | Аналитик Шерлок (pi) | Доработка отчёта и сводной по протоколу самопроверки (docs/agents/reports/system-analyst/2026-10-26_00-16_self-check-agentic-design-patterns.md): исправлены битые ссылки в шапке отчёта, арифметика состава каталога (28 паттернов + 5 антипаттернов + 3 обзора + 6 служебных страниц = 42), имена классов (`DynamicLoopSessionStateVo`, `RolePromptBuilderService`), пути backlog-задач; `agent/*` помечен как предлагаемое соглашение; счётчик сводной 4 → 5; сняты кавычки со сжатых пересказов. |
