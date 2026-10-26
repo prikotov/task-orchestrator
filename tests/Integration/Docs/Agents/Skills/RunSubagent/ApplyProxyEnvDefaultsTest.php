@@ -24,14 +24,16 @@ final class ApplyProxyEnvDefaultsTest extends TestCase
     private const SCRIPT_PATH = __DIR__ . '/../../../../../../docs/agents/skills/run-subagent/scripts/watch-subagent.sh';
 
     /**
-     * @param array<string, string> $env
+     * @param array<string, string> $caseEnv переменные окружения тестового случая
      *
      * @return array<string, string> экспортированное окружение после вызова функции
      */
-    private function callFunction(array $env): array
+    private function callFunction(array $caseEnv): array
     {
         $script = (string) file_get_contents(self::SCRIPT_PATH);
 
+        // Допущение вырезки: тело apply_proxy_env_defaults плоское — без
+        // вложенных фигурных скобок; при нарушении тест падает явно (safe-fail).
         $start = strpos($script, 'apply_proxy_env_defaults() {');
         self::assertNotFalse($start, 'функция apply_proxy_env_defaults не найдена в скрипте');
 
@@ -40,10 +42,25 @@ final class ApplyProxyEnvDefaultsTest extends TestCase
 
         $functionBody = substr($script, $start, $end - $start + 3);
 
+        // Герметичность: Symfony Process сливает окружение родителя с переданным
+        // $env, а зелёность не должна зависеть от прокси-переменных машины
+        // (включая CI). Поэтому все релевантные переменные сначала снимаются
+        // unset'ом, затем переменные случая экспортируются внутри самого скрипта —
+        // утечка родительского окружения становится безразличной.
+        $prologue = 'unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy NO_PROXY no_proxy ALL_PROXY all_proxy CODEX_HTTP_PROXY';
+        $caseExports = '';
+        foreach ($caseEnv as $name => $value) {
+            $caseExports .= sprintf("export %s=%s\n", $name, escapeshellarg($value));
+        }
+
+        $bashScript = $prologue . "\n" . $caseExports . "\n" . $functionBody
+            . "\napply_proxy_env_defaults\n"
+            . "env | grep -E '^(HTTP_PROXY|HTTPS_PROXY|http_proxy|https_proxy|NO_PROXY|no_proxy)=' | sort";
+
         $process = new Process(
-            ['bash', '-c', $functionBody . "\napply_proxy_env_defaults\nenv | grep -E '^(HTTP_PROXY|HTTPS_PROXY|http_proxy|https_proxy|NO_PROXY|no_proxy)=' | sort"],
+            ['bash', '-c', $bashScript],
             null,
-            $env,
+            ['PATH' => '/usr/bin:/bin'],
         );
         $process->setTimeout(30);
         $process->run();
