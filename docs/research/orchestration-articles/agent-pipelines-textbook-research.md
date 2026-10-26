@@ -3,7 +3,7 @@
 **Дата исследования:** 2026-10-26
 **Автор:** Тимлид Алекс (pi) — по прямому поручению владельца
 **Эпик:** [EPIC-research-orchestration-articles](../../../todo/EPIC-research-orchestration-articles.todo.md)
-**Задача:** [TASK-research-agent-pipelines-textbook](../../../todo/TASK-research-agent-pipelines-textbook.todo.md)
+**Задача:** [TASK-research-agent-pipelines-textbook](../../../todo/done/TASK-research-agent-pipelines-textbook.todo.md)
 **Первоисточник:** «Агентные пайплайны. Контроль, верификация и надёжность разработки. Роли / Хуки / Проверки / Конечные автоматы» — практический учебник, издание 1, 12.09.2026, 34 стр., 7 глав + приложение. Исходный авторский текст — Антон; комментарии, пояснения, учебные примеры и заключительный разбор — ИИ-ассистент Астра. Локальная копия в репозитории: [`sources/agent-pipelines-textbook.pdf`](sources/agent-pipelines-textbook.pdf) (внешний URL отсутствует; цитируем по главам и страницам локальной копии).
 
 ---
