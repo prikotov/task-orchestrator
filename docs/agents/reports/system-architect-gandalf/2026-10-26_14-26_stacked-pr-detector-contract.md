@@ -3,7 +3,7 @@
 **Роль:** Архитектор Гэндальф (`system_architect_gandalf`)
 **Дата:** 2026-10-26
 **Объект:** контракт CI-детектора запрета стековых PR: признак стека, исходы, события запуска, актуализация статуса, лимиты, безопасность, точки внедрения, матрица тестовых сценариев.
-**Задача:** [todo/TASK-ci-stacked-pr-detector.todo.md](../../../../todo/TASK-ci-stacked-pr-detector.todo.md), фаза DS (проектирование). Основание — [консультация при декомпозиции эпика](2026-09-29_21-07_retro-epic-decomposition-consultation.md), раздел 2.
+**Задача:** [todo/TASK-ci-stacked-pr-detector.todo.md](../../../../todo/done/TASK-ci-stacked-pr-detector.todo.md), фаза DS (проектирование). Основание — [консультация при декомпозиции эпика](2026-09-29_21-07_retro-epic-decomposition-consultation.md), раздел 2.
 
 ---
 
