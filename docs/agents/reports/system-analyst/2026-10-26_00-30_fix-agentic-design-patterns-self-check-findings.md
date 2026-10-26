@@ -6,7 +6,7 @@
 `docs/research/orchestration-articles/agentic-design-patterns-research.md`,
 `docs/research/orchestration-articles-summary.md`,
 `todo/TASK-research-agentic-design-patterns.todo.md`.
-**Задача:** [todo/TASK-research-agentic-design-patterns.todo.md](../../../../todo/TASK-research-agentic-design-patterns.todo.md) — устранение всех находок протокола самопроверки [docs/agents/reports/system-analyst/2026-10-26_00-16_self-check-agentic-design-patterns.md](2026-10-26_00-16_self-check-agentic-design-patterns.md). Коммит не выполнялся (по указанию владельца).
+**Задача:** [todo/done/TASK-research-agentic-design-patterns.todo.md](../../../../todo/done/TASK-research-agentic-design-patterns.todo.md) — устранение всех находок протокола самопроверки [docs/agents/reports/system-analyst/2026-10-26_00-16_self-check-agentic-design-patterns.md](2026-10-26_00-16_self-check-agentic-design-patterns.md). Коммит не выполнялся (по указанию владельца).
 
 ---
 

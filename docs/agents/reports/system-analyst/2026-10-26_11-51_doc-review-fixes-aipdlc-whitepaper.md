@@ -3,7 +3,7 @@
 **Роль:** Аналитик Шерлок (system_analyst)
 **Дата:** 2026-10-26
 **Объект:** `docs/research/orchestration-articles/aipdlc-whitepaper-research.md`, `docs/research/orchestration-articles-summary.md`
-**Задача:** [TASK-research-aipdlc-whitepaper](../../../../../todo/TASK-research-aipdlc-whitepaper.todo.md) — доработка по ревью Технического писателя Гермионы (одобрено с замечаниями, все косметические; замечания 1–5)
+**Задача:** [TASK-research-aipdlc-whitepaper](../../../../todo/done/TASK-research-aipdlc-whitepaper.todo.md) — доработка по ревью Технического писателя Гермионы (одобрено с замечаниями, все косметические; замечания 1–5)
 
 ---
 

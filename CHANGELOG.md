@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- CI-workflow `stacked-pr-detector` — пилот «проверка вместо прозы»: автоматическая проверка запрета стековых PR (stacked pull requests — ветка поверх несмерженной ветки другого PR) из `AGENTS.md` в информирующем режиме. Нарушение (общая неслитая история с другим открытым PR в ту же цель) доносится PR-комментарием со ссылкой на правило, не крася job; красный статус проверки — только при исходе «невозможно проверить» (ошибки GitHub API, неполные данные, гонки). Тесты детектора — `make tests-detector` (в составе `make check` и CI); перевод в блокирующий режим (required status check) — отдельное решение владельца (#433).
+
 ## [0.9.1] - 2026-09-25
 
 [Сравнение v0.9.0...v0.9.1](https://github.com/prikotov/task-orchestrator/compare/v0.9.0...v0.9.1)
