@@ -15,7 +15,7 @@ epic: EPIC-docs-retro-skill-improvements
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/fix-run-subagent-local-proxy
-pr: 
+pr: https://github.com/prikotov/task-orchestrator/pull/434
 status: in_progress
 ---
 
