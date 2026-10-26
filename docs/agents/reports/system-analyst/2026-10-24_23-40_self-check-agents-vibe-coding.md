@@ -3,7 +3,7 @@
 **Роль:** Аналитик Шерлок (system_analyst_sherlock)
 **Дата:** 2026-10-24
 **Объект:** ветка `task/research-agents-vibe-coding` — `docs/research/orchestration-articles/agents-and-vibe-coding-research.md` (новый, 324 строки) и правки `docs/research/orchestration-articles-summary.md` (строка #4, Часть 3, backlog 23–26, тренд 9)
-**Задача:** [todo/TASK-research-agents-vibe-coding.todo.md](../../../../todo/TASK-research-agents-vibe-coding.todo.md)
+**Задача:** [todo/done/TASK-research-agents-vibe-coding.todo.md](../../../../todo/done/TASK-research-agents-vibe-coding.todo.md)
 
 ---
 

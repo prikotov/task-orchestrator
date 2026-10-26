@@ -4,7 +4,7 @@
 **Дата среза каталога:** 2026-10-25 (все страницы загружены и сверены 2026-10-25; каталог живой, GitHub Pages)  
 **Дата анализа:** 2026-10-25  
 **Эпик:** [EPIC-research-orchestration-articles](../../../todo/EPIC-research-orchestration-articles.todo.md)  
-**Задача:** [TASK-research-agentic-design-patterns](../../../todo/TASK-research-agentic-design-patterns.todo.md)  
+**Задача:** [TASK-research-agentic-design-patterns](../../../todo/done/TASK-research-agentic-design-patterns.todo.md)  
 **Аналитик:** Аналитик (Шерлок)
 
 ---
