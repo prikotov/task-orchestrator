@@ -6,7 +6,7 @@
 `docs/research/orchestration-articles/agentic-design-patterns-research.md` (новый, 296 строк),
 `docs/research/orchestration-articles-summary.md` (+18/-2),
 `todo/TASK-research-agentic-design-patterns.todo.md` (чекбоксы).
-**Задача:** [todo/TASK-research-agentic-design-patterns.todo.md](../../../../todo/TASK-research-agentic-design-patterns.todo.md) — самопроверка по 9 пунктам чек-листа владельца. Правки не вносились — только протокол замечаний.
+**Задача:** [todo/done/TASK-research-agentic-design-patterns.todo.md](../../../../todo/done/TASK-research-agentic-design-patterns.todo.md) — самопроверка по 9 пунктам чек-листа владельца. Правки не вносились — только протокол замечаний.
 
 ---
 

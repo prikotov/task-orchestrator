@@ -1,0 +1,30 @@
+{
+  "checked_pr": {
+    "number": 100,
+    "head_sha": "p1",
+    "source_branch": "task/feat-a",
+    "target_branch": "main",
+    "is_draft": false,
+    "same_repository": true
+  },
+  "target_tip": "m1",
+  "open_prs": [
+    {
+      "number": 101,
+      "head_sha": "f1",
+      "source_branch": "main",
+      "target_branch": "main",
+      "is_draft": false,
+      "same_repository": false
+    }
+  ],
+  "commits": {
+    "100": [
+      "p1"
+    ],
+    "101": [
+      "f1"
+    ]
+  },
+  "truncated": []
+}

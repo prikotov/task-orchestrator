@@ -4,7 +4,7 @@
 **Дата первоисточника:** сборка 2026-08-10  
 **Дата анализа:** 2026-10-24 (проход 1: прямое чтение), 2026-10-25 (проход 2: RAG-верификация, см. §14)  
 **Эпик:** [EPIC-research-orchestration-articles](../../../todo/EPIC-research-orchestration-articles.todo.md)  
-**Задача:** [TASK-research-agents-vibe-coding](../../../todo/TASK-research-agents-vibe-coding.todo.md)  
+**Задача:** [TASK-research-agents-vibe-coding](../../../todo/done/TASK-research-agents-vibe-coding.todo.md)  
 **Аналитик:** Аналитик (Шерлок)
 
 ---

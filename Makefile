@@ -52,6 +52,12 @@ tests: ## Запустить все тесты
 	@echo "PHPUnit (all):"
 	@out=$$(vendor/bin/phpunit --no-progress --no-coverage --colors=never 2>&1); ec=$$?; echo "$$out" | grep -vE '^(PHPUnit |Runtime:|Configuration:|Time:|[[:space:]]*$$)'; exit $$ec
 
+.PHONY: tests-detector
+tests-detector: ## Запустить тесты детектора стековых PR (python3 stdlib, без сети)
+	@echo
+	@echo "Stacked PR Detector tests (python3 unittest):"
+	@python3 -m unittest discover -s tests/Detector -p 'test_*.py'
+
 ############
 # Проверки  #
 ############
@@ -118,7 +124,7 @@ composer-host-smoke: ## Проверить agent:init в физической Co
 	@bin/composer-host-smoke
 
 .PHONY: check
-check: ## Запустить все проверки (phpstan + deptrac + psalm + phpmd + phpcs + md-links + validate-todo + validate-roles + validate-language + tests)
-	@${MAKE} --no-print-directory phpstan deptrac psalm phpmd phpcs md-links validate-todo validate-roles validate-language tests && \
+check: ## Запустить все проверки (phpstan + deptrac + psalm + phpmd + phpcs + md-links + validate-todo + validate-roles + validate-language + tests + tests-detector)
+	@${MAKE} --no-print-directory phpstan deptrac psalm phpmd phpcs md-links validate-todo validate-roles validate-language tests tests-detector && \
 		{ echo; echo "✅ Все проверки завершены успешно."; } || \
 		{ echo; echo "❌ Проверки завершены с ошибками."; exit 1; }
