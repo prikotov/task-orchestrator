@@ -2,7 +2,7 @@
 type: docs
 created: 2026-09-24 02:37:48 (1790217468)
 due: 
-started: 
+started: 2026-10-26 03:01:11 (1792983671)
 completed: 
 cancelled: 
 value: V3
@@ -13,10 +13,10 @@ cost_fact:
 depends_on: 
 epic: EPIC-research-orchestration-articles
 author: Тимлид Алекс (pi)
-assignee: Аналитик Шерлок (pi)
-branch: task/research-orchestration-batch
+assignee: Тимлид Алекс (pi)
+branch: task/research-agent-pipelines-textbook
 pr: https://github.com/prikotov/task-orchestrator/pull/414
-status: todo
+status: in_progress
 ---
 
 # TASK-research-agent-pipelines-textbook: Учебник «Агентные пайплайны: контроль, верификация и надёжность разработки»
