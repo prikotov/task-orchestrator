@@ -3,7 +3,7 @@
 **Статус:** PM1–PM3 пройдены; модель принята 2026-10-26. PM4 — оформление выполнено (Гермиона); **PM5 — сверка пройдена тимлидом 2026-10-26**: решения разделов 2–6 сохранены в оформлении. Не является разрешением на слияние: дальше — ревью и этапы DC/AC задачи.
 **Роль:** Тимлид Алекс — автор модели (PM1), принимающий (PM3), сверяющий (PM5)
 **Дата:** 2026-10-26
-**Задача:** [TASK-docs-retro-session-mode](../../../../todo/done/TASK-docs-retro-session-mode.todo.md) (эпик [EPIC-docs-retro-skill-improvements](../../../../todo/EPIC-docs-retro-skill-improvements.todo.md))
+**Задача:** [TASK-docs-retro-session-mode](../../../../todo/done/TASK-docs-retro-session-mode.todo.md) (эпик [EPIC-docs-retro-skill-improvements](../../../../todo/done/EPIC-docs-retro-skill-improvements.todo.md))
 **Основание:** [исследование `/retro`](../../../research/framework-comparisons/mattpocock-retro-skill-comparison.md) (заимствование №4), [консультация архитектора](../system-architect-gandalf/2026-09-29_21-07_retro-epic-decomposition-consultation.md) (раздел 3.3), [модель переработки навыка](2026-10-26_13-09-retro-skill-redesign-model.md) (уже принята и оформлена — база этой модели)
 
 ---

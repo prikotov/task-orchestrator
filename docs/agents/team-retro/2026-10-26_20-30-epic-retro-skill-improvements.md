@@ -1,7 +1,7 @@
 # Ретроспектива: эпик EPIC-docs-retro-skill-improvements
 
 **Дата:** 2026-10-26
-**Объект:** эпик [EPIC-docs-retro-skill-improvements](../../../todo/EPIC-docs-retro-skill-improvements.todo.md) — улучшение цикла самоулучшения по итогам сравнения с `/retro` (Matt Pocock Skills)
+**Объект:** эпик [EPIC-docs-retro-skill-improvements](../../../todo/done/EPIC-docs-retro-skill-improvements.todo.md) — улучшение цикла самоулучшения по итогам сравнения с `/retro` (Matt Pocock Skills)
 **Объём:** 4 задачи (3 плановых + 1 добавленная поручением владельца), 5 запросов на слияние (#432–#436, все влиты в ветку эпика), финальный PR #435
 **Что делали:** переработка аналитических шагов навыка `retrospective` (цикл PM1–PM5), CI-детектор запрета стековых PR (DS→IM→QA→RV→DC), фикс NO_PROXY в `watch-subagent`, сессионный режим мини-ретро (цикл PM1–PM5), первая практическая мини-ретро
 
