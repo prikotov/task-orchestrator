@@ -33,7 +33,6 @@ REASON_COMMITS_LIMIT = "commits_limit_exceeded"
 REASON_API_ERROR = "api_error"
 REASON_STATE_CHANGED = "state_changed_during_collection"
 REASON_PR_NOT_OPEN = "pr_not_open"
-REASON_GH_UNAVAILABLE = "gh_unavailable"
 
 # --- Виды информационных заметок ---
 NOTE_TARGETS_OTHER_OPEN_BRANCH = "targets_other_open_branch"
@@ -107,6 +106,16 @@ def _require_str(value: object, field_name: str) -> str:
     return value
 
 
+def _int_key(value: object, field_name: str) -> int:
+    """Номер PR из ключа/элемента снимка; нечисловое значение — SnapshotError."""
+    try:
+        return int(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError) as error:
+        raise SnapshotError(
+            f"{field_name}: ожидается целочисленный номер PR, получено {value!r}"
+        ) from error
+
+
 def _pr_info_from_dict(data: object) -> PrInfo:
     if not isinstance(data, dict):
         raise SnapshotError(f"PR: ожидается объект, получено {data!r}")
@@ -157,7 +166,7 @@ def snapshot_from_dict(data: object) -> Snapshot:
         raise SnapshotError("commits: ожидается объект {номер PR: [sha, ...]}")
     commits: dict[int, tuple[str, ...]] = {}
     for key, shas in commits_raw.items():
-        number = int(key)
+        number = _int_key(key, f"commits[{key!r}]")
         if not isinstance(shas, list):
             raise SnapshotError(f"commits[{key}]: ожидается список")
         commits[number] = tuple(_require_str(sha, f"commits[{key}]") for sha in shas)
@@ -170,7 +179,7 @@ def snapshot_from_dict(data: object) -> Snapshot:
     truncated_raw = data.get("truncated", [])
     if not isinstance(truncated_raw, list):
         raise SnapshotError("truncated: ожидается список номеров PR")
-    truncated = frozenset(int(number) for number in truncated_raw)
+    truncated = frozenset(_int_key(number, "truncated") for number in truncated_raw)
     if not truncated <= set(commits):
         raise SnapshotError(f"truncated содержит номера вне снимка: {sorted(truncated - set(commits))}")
 

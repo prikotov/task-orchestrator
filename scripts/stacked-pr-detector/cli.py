@@ -41,7 +41,6 @@ REASON_HUMAN = {
     pure.REASON_API_ERROR: "ошибка или недоступность GitHub API",
     pure.REASON_STATE_CHANGED: "состояние изменилось во время проверки",
     pure.REASON_PR_NOT_OPEN: "проверяемый PR не открыт",
-    pure.REASON_GH_UNAVAILABLE: "недоступен CLI gh",
     "invalid_repo": "некорректный репозиторий",
     "invalid_branch": "некорректное имя ветки",
     "invalid_pr_number": "некорректный номер PR",

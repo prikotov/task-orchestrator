@@ -162,8 +162,16 @@ def _fetch_open_prs(api: ApiClient, repo: str) -> list[dict]:
         if not isinstance(data, list):
             raise PermanentCollectError("invalid_api_response", "список PR: ожидается массив")
         items.extend(data)
-        if len(data) < PER_PAGE or page >= MAX_PAGES_SAFETY:
+        if len(data) < PER_PAGE:
             return items
+        if page >= MAX_PAGES_SAFETY:
+            # Молчаливое усечение запрещено контрактом: неполный список открытых
+            # PR дал бы ложно-чистый вердикт — завершаем сбор с ошибкой.
+            raise PermanentCollectError(
+                pure.REASON_API_ERROR,
+                f"список открытых PR превысил предел {MAX_PAGES_SAFETY} страниц "
+                f"(по {PER_PAGE} PR на страницу) — сбор остановлен",
+            )
         page += 1
 
 

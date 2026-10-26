@@ -51,10 +51,13 @@ jobs:
           DETECTOR_MODE: inform
         run: |
           set -uo pipefail
-          # Без set -e: даже при «красном» коде возврата (enforce-нарушение 3,
-          # inconclusive 2) шаг обязан записать outputs — иначе job comment не
-          # увидит вердикт (контракт, раздел 8: нарушение → PR-комментарий
-          # в обоих режимах).
+          # GitHub запускает run: через `bash -eo pipefail` — errexit включён
+          # изначально, и `set -uo pipefail` его не снимает. Детектор возвращает
+          # ненулевой код и при штатных исходах (inconclusive 2,
+          # enforce-нарушение 3), поэтому errexit отключаем явно: шаг обязан
+          # записать outputs до exit — иначе job comment не увидит вердикт
+          # (контракт, раздел 8: нарушение → PR-комментарий в обоих режимах).
+          set +e
           code=0
           bin/stacked-pr-detector detect \
             --repo "$REPO" \

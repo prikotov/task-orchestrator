@@ -308,6 +308,18 @@ class PureValidationTests(unittest.TestCase):
         with self.assertRaises(pure.SnapshotError):
             pure.snapshot_from_dict(snapshot)
 
+    def test_non_numeric_commit_key_rejected_as_snapshot_error(self):
+        snapshot = load_snapshot("snapshot-s04.json")
+        snapshot["commits"]["abc"] = snapshot["commits"].pop("101")
+        with self.assertRaises(pure.SnapshotError):
+            pure.snapshot_from_dict(snapshot)
+
+    def test_non_numeric_truncated_entry_rejected_as_snapshot_error(self):
+        snapshot = load_snapshot("snapshot-s01.json")
+        snapshot["truncated"] = ["many"]
+        with self.assertRaises(pure.SnapshotError):
+            pure.snapshot_from_dict(snapshot)
+
 
 class CollectTests(unittest.TestCase):
     """Слой Collect на заглушке API: пагинация, усечение, повторы, гонки."""
@@ -390,6 +402,27 @@ class CollectTests(unittest.TestCase):
         # Монотонность усечения: проверяемый усечён без пересечений → inconclusive.
         verdict = pure.evaluate(snapshot)
         self.assertEqual(verdict.outcome, pure.OUTCOME_INCONCLUSIVE)
+
+    def test_open_prs_page_limit_is_permanent_error(self):
+        """Переполненный список страниц PR — ошибка сбора, а не молчаливое усечение."""
+        api = ScriptedApi()
+        api.given(f"repos/{self.REPO}/pulls/30", self._api_pr(30, "p", "task/feat", "main"))
+        api.given(f"repos/{self.REPO}/branches/main", {"commit": {"sha": "m1"}})
+        for page in range(1, collect.MAX_PAGES_SAFETY + 1):
+            full_page = [
+                self._api_pr(page * collect.PER_PAGE + i, f"p{page}-{i}", f"task/{page}-{i}", "main")
+                for i in range(collect.PER_PAGE)
+            ]
+            api.given(
+                f"repos/{self.REPO}/pulls?state=open&per_page={collect.PER_PAGE}&page={page}",
+                full_page,
+            )
+
+        with self.assertRaises(collect.PermanentCollectError) as ctx:
+            collect.collect_snapshot(self.REPO, 30, api, sleep=lambda _: None)
+
+        self.assertEqual(ctx.exception.reason, pure.REASON_API_ERROR)
+        self.assertIn("страниц", str(ctx.exception))
 
     def test_s17_api_error_exhausts_retries_inconclusive(self):
         api = ScriptedApi()
