@@ -2,7 +2,7 @@
 type: docs
 created: 2026-09-29 13:59:11 (1790690351)
 due: 
-started: 
+started: 2026-10-26 06:08:14 (1792994894)
 completed: 
 cancelled: 
 value: V2
@@ -13,10 +13,10 @@ cost_fact:
 depends_on: 
 epic: EPIC-docs-retro-skill-improvements
 author: Тимлид Алекс (pi)
-assignee: 
-branch: 
+assignee: Тимлид Алекс (pi)
+branch: task/docs-retro-skill-redesign
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-docs-retro-skill-redesign: Переработка аналитических шагов навыка retrospective: классификация фиксов, аудит guardrails, no-ops, первоисточники сессии
@@ -112,6 +112,36 @@ rg -n "ретроспектив|retrospective|RETRO-ROADMAP" AGENTS.md README*.m
 ## 9. Комментарии (Comments)
 - Задача закрывает заимствования №1 (check over prose), №2 (аудит guardrails), №3 (no-ops/стиринг), №5 (трассировка к моментам сессии) из раздела 4.1 исследования; заимствование №4 (сессионный режим) — отдельная задача
 - Проверки `audit.jsonl` — формат журнала наблюдаемости описан в [`docs/guide/observability.md`](../docs/guide/observability.md)
+
+## Инструкции для сабагента
+
+Задача идёт через цикл PM1–PM5 ([RACI, раздел 6](../docs/agents/raci-matrix.md#6-специализированный-цикл-проектирование-процессов-взаимодействия-команды)). Оркестратор цикла — Тимлид Алекс.
+
+**Ветка:** task/docs-retro-skill-redesign (уже создана и активна)
+**PR:** draft из task/docs-retro-skill-redesign → task/epic-docs-retro-skill-improvements (см. поле `pr`)
+
+**Модель процесса:** [docs/agents/reports/team-lead/2026-10-26_13-09-retro-skill-redesign-model.md](../docs/agents/reports/team-lead/2026-10-26_13-09-retro-skill-redesign-model.md) — вход для PM2 и PM4.
+
+### Порядок действий (фазы цикла)
+
+1. **PM1 (тимлид):** модель спроектирована и закоммичена (см. ссылку выше). Консультации аналитика и архитектора — отдельными запусками.
+2. **PM2 (аналитик A/R; тестировщик — сценарии отказов):** проверка модели по критериям раздела 8 модели; замечания — в ответе сабагента, правки модели вносит тимлид.
+3. **PM3 (тимлид):** принятие модели, фиксация в разделе «Статус» модели.
+4. **PM4 (Технический писатель Гермиона):** оформление принятой модели в `docs/agents/skills/retrospective/SKILL.md`, `assets/retrospective-template.md` и новых файлах `assets/evidence-contract.md`, `assets/fix-classification.md`, `assets/process-analysis-reference.md` строго по решениям разделов 2–6 модели. Пробелы — обратно тимлиду, не проектировать самому. После оформления:
+   1. Убедись, что активна ветка `task/docs-retro-skill-redesign`.
+   2. Согласуй смежные документы поиском: `rg -n "ретроспектив|retrospective|RETRO-ROADMAP" AGENTS.md README*.md docs/ --glob '!docs/agents/team-retro/*' --glob '!docs/agents/reports/*'` — устаревшие описания процесса приведи к модели.
+   3. Запусти проверки раздела «Самопроверка» задачи (`todo-md validate`, `make validate-language`); PHPUnit/Psalm не запускаются — изменения строго документационные.
+   4. Закоммить изменения (Conventional Commits) и запушь ветку (для pi-сабагента: обычный `git push` запрещён — попроси оркестратора; в текущей сессии пуш выполняет оркестратор).
+5. **PM5 (тимлид):** сверка оформления с моделью.
+6. **Ревью:** self-review Гермионы → ревью Техписателя Остапа → автор задачи (тимлид) последним.
+
+### Порядок действий (кратко, для исполнителя PM4)
+1. Переключись в ветку `task/docs-retro-skill-redesign`: `git checkout task/docs-retro-skill-redesign`
+2. Прочитай модель процесса (ссылка выше) и задачу целиком.
+3. Оформи изменения строго по модели; следуй [Конвенциям](../docs/conventions/index.md).
+4. Делай промежуточные коммиты после каждого логического этапа.
+5. После реализации запусти проверки раздела «Самопроверка» задачи.
+6. Сообщи оркестратору о готовности к пушу и PM5.
 
 ## История изменений (Change History)
 | Дата | Автор (роль) | Изменение |
