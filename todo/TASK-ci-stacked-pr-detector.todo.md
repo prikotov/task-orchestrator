@@ -15,7 +15,7 @@ epic: EPIC-docs-retro-skill-improvements
 author: Тимлид Алекс (pi)
 assignee: Архитектор Гэндальф (pi)
 branch: task/ci-stacked-pr-detector
-pr: 
+pr: https://github.com/prikotov/task-orchestrator/pull/433
 status: in_progress
 ---
 
