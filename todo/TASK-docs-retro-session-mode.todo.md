@@ -2,7 +2,7 @@
 type: docs
 created: 2026-09-29 13:59:16 (1790690356)
 due: 
-started: 
+started: 2026-10-26 12:13:03 (1793016783)
 completed: 
 cancelled: 
 value: V2
@@ -13,10 +13,10 @@ cost_fact:
 depends_on: TASK-docs-retro-skill-redesign
 epic: EPIC-docs-retro-skill-improvements
 author: Тимлид Алекс (pi)
-assignee: 
-branch: 
+assignee: Тимлид Алекс (pi)
+branch: task/docs-retro-session-mode
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-docs-retro-session-mode: Сессионный режим мини-ретроспективы: лёгкий вход после тяжёлой сессии без завершённой задачи
@@ -109,6 +109,29 @@ rg -n "сессионн|мини-ретро|мини-ретроспектив|se
 ## 9. Комментарии (Comments)
 - Мини-ретро не отменяет правило «обещания, данные пользователю, записывай в ретроспективу» — оно получает лёгкий штатный вход
 - Ручной вызов (как `disable-model-invocation: true` у Matt Pocock) в нашей модели не нужен: режим запускается запросом пользователя или с подтверждением
+
+## Инструкции для сабагента
+
+Задача идёт через цикл PM1–PM5 (RACI раздел 6). Оркестратор — Тимлид Алекс.
+
+**Ветка:** task/docs-retro-session-mode (уже создана и активна, база — ветка эпика)
+**PR:** draft из task/docs-retro-session-mode → task/epic-docs-retro-skill-improvements (см. поле `pr`)
+
+**Модель процесса:** docs/agents/reports/team-lead/2026-10-26_19-30-retro-session-mode-model.md — вход для PM2 и PM4.
+
+**База:** обновлённый навык (задача TASK-docs-retro-skill-redesign уже в ветке эпика): справочники assets/evidence-contract.md, assets/fix-classification.md, assets/process-analysis-reference.md — переиспользовать, не изобретать заново.
+
+### Порядок действий (фазы)
+
+1. **PM1 (тимлид):** модель спроектирована и закоммичена. Консультации аналитика и архитектора — отдельными запусками.
+2. **PM2 (аналитик A/R; тестировщик — сценарии отказов):** проверка модели по критериям раздела 8 модели.
+3. **PM3 (тимлид):** принятие модели.
+4. **PM4 (Техписатель Гермиона):** оформление в docs/agents/skills/retrospective/SKILL.md строго по модели. После оформления:
+   1. Согласуй смежные документы поиском: `rg -n "сессионн|мини-ретро|мини-ретроспектив|session" AGENTS.md README*.md docs/ --glob '!docs/agents/team-retro/*' --glob '!docs/agents/reports/*' --glob '!docs/research/*' --glob '!docs/releases/*'`
+   2. Проверки: php vendor/bin/todo-md validate todo/TASK-docs-retro-session-mode.todo.md; make validate-language. PHPUnit/Psalm не запускаются — изменения строго документационные.
+   3. Коммить (Conventional Commits). Пуш — за оркестратором.
+5. **PM5 (тимлид):** сверка оформления с моделью.
+6. **Ревью:** self-review Гермионы → Остап → автор (тимлид) последним.
 
 ## История изменений (Change History)
 | Дата | Автор (роль) | Изменение |
