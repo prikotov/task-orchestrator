@@ -43,7 +43,7 @@ status: done
 ## 2. Контекст и Границы (Context and Scope)
 *   **Где делаем:** `docs/agents/skills/retrospective/SKILL.md`, `docs/agents/skills/retrospective/assets/retrospective-template.md`; смежные документы, упоминающие процесс ретроспективы (проверка поиском по ключевым словам: «ретроспектив», «retrospective», «RETRO-ROADMAP»)
 *   **Текущее поведение:** Шаг 1 собирает контекст из артефактов задачи; Шаг 3 анализирует 5 направлений без аудита guardrails; Шаг 5 формирует до трёх предложений без классификации типа фикса
-*   **Границы (Out of Scope):** сессионный режим мини-ретро (отдельная задача [TASK-docs-retro-session-mode](../TASK-docs-retro-session-mode.todo.md)); реестр `RETRO-ROADMAP.md` и его пороги; автоматическое внедрение предложений; PHP-код
+*   **Границы (Out of Scope):** сессионный режим мини-ретро (отдельная задача [TASK-docs-retro-session-mode](TASK-docs-retro-session-mode.todo.md)); реестр `RETRO-ROADMAP.md` и его пороги; автоматическое внедрение предложений; PHP-код
 
 ## 3. Требования, MoSCoW (Requirements)
 ### 🔴 Обязательно (Must Have)
