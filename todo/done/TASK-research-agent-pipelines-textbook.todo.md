@@ -2,8 +2,8 @@
 type: docs
 created: 2026-09-24 02:37:48 (1790217468)
 due: 
-started: 
-completed: 
+started: 2026-10-26 03:01:11 (1792983671)
+completed: 2026-10-26 03:01:56 (1792983716)
 cancelled: 
 value: V3
 complexity: C3
@@ -13,10 +13,10 @@ cost_fact:
 depends_on: 
 epic: EPIC-research-orchestration-articles
 author: Тимлид Алекс (pi)
-assignee: Аналитик Шерлок (pi)
-branch: task/research-orchestration-batch
-pr: https://github.com/prikotov/task-orchestrator/pull/414
-status: todo
+assignee: Тимлид Алекс (pi)
+branch: task/research-agent-pipelines-textbook
+pr: https://github.com/prikotov/task-orchestrator/pull/430
+status: done
 ---
 
 # TASK-research-agent-pipelines-textbook: Учебник «Агентные пайплайны: контроль, верификация и надёжность разработки»
@@ -49,11 +49,11 @@ status: todo
 
 ## 3. Требования, MoSCoW (Requirements)
 ### 🔴 Обязательно (Must Have)
-- [ ] **Критерии 1–6** — по единой методологии эпика (тезис/проблема, паттерн/концепция, domain, failure handling, маппинг на нашу архитектуру, применяемость)
-- [ ] Маппинг паттернов КАЖДОЙ из 7 глав на компоненты task-orchestrator (AgentRunner, ChainExecution, DynamicLoop, GitIdentity, ChainDefinition) — со ссылками
-- [ ] Вердикт по каждому ключевому паттерну: apply / study / skip — с обоснованием и оценкой усилий
-- [ ] Отдельно проверить соответствие основного цикла учебника (бриф → воркеры → верификаторы → loop) нашим цепочкам `config/chains.yaml` (implement → self-review → review → quality gate)
-- [ ] Строка в сводной таблице `docs/research/orchestration-articles-summary.md`
+- [x] **Критерии 1–6** — по единой методологии эпика (тезис/проблема, паттерн/концепция, domain, failure handling, маппинг на нашу архитектуру, применяемость)
+- [x] Маппинг паттернов КАЖДОЙ из 7 глав на компоненты task-orchestrator (AgentRunner, ChainExecution, DynamicLoop, GitIdentity, ChainDefinition) — со ссылками
+- [x] Вердикт по каждому ключевому паттерну: apply / study / skip — с обоснованием и оценкой усилий
+- [x] Отдельно проверить соответствие основного цикла учебника (бриф → воркеры → верификаторы → loop) нашим цепочкам `config/chains.yaml` (implement → self-review → review → quality gate)
+- [x] Строка в сводной таблице `docs/research/orchestration-articles-summary.md`
 
 ### ⚫ Won't Have (Не будем делать)
 - Код/конфиги, изменение архитектуры, бенчмарки
@@ -67,10 +67,10 @@ status: todo
 6. [ ] Добавить строку в сводную таблицу `docs/research/orchestration-articles-summary.md`
 
 ## 5. Критерии приёмки (Definition of Done)
-- [ ] Отчёт создан, все 6 критериев оценены, все 7 глав покрыты маппингом
-- [ ] Вердикт apply/study/skip по каждому ключевому паттерну с обоснованием и усилиями
-- [ ] Соответствие цикла учебника нашим цепочкам проверено, гипотезы закрыты
-- [ ] Строка добавлена в сводную таблицу `docs/research/orchestration-articles-summary.md`
+- [x] Отчёт создан, все 6 критериев оценены, все 7 глав покрыты маппингом
+- [x] Вердикт apply/study/skip по каждому ключевому паттерну с обоснованием и усилиями
+- [x] Соответствие цикла учебника нашим цепочкам проверено, гипотезы закрыты
+- [x] Строка добавлена в сводную таблицу `docs/research/orchestration-articles-summary.md`
 
 ## 6. Самопроверка (Verification)
 ```bash
