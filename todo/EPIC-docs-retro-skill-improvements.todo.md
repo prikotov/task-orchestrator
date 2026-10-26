@@ -97,9 +97,10 @@ flowchart LR
 
 ## 5. План реализации (Implementation Plan)
 
-- [ ] [TASK-docs-retro-skill-redesign](done/TASK-docs-retro-skill-redesign.todo.md) — переработка аналитических шагов навыка `retrospective`: классификация фиксов (Шаг 5), аудит guardrails (Шаг 3), направление «Инструкции» (Шаг 3), первоисточники сессии (Шаг 1). Цикл PM1–PM5.
+- [x] [TASK-docs-retro-skill-redesign](done/TASK-docs-retro-skill-redesign.todo.md) — переработка аналитических шагов навыка `retrospective`: классификация фиксов (Шаг 5), аудит guardrails (Шаг 3), направление «Инструкции» (Шаг 3), первоисточники сессии (Шаг 1). Цикл PM1–PM5.
 - [ ] [TASK-docs-retro-session-mode](TASK-docs-retro-session-mode.todo.md) — сессионный режим мини-ретро: лёгкий вход после тяжёлой сессии без завершённой задачи. Цикл PM1–PM5. Зависит от переработки навыка.
-- [ ] [TASK-ci-stacked-pr-detector](done/TASK-ci-stacked-pr-detector.todo.md) — пилот «проверка вместо прозы»: CI-проверка запрета стековых PR (с допуском hotfix-веток). Независима от задач документации, может выполняться параллельно.
+- [x] [TASK-ci-stacked-pr-detector](done/TASK-ci-stacked-pr-detector.todo.md) — пилот «проверка вместо прозы»: CI-проверка запрета стековых PR (с допуском hotfix-веток). Независима от задач документации, может выполняться параллельно.
+- [x] [TASK-fix-run-subagent-local-proxy](done/TASK-fix-run-subagent-local-proxy.todo.md) — добавлено по прямому поручению владельца 2026-10-26 в ходе эпика: дефолтный NO_PROXY в watch-subagent (прокси из CODEX_HTTP_PROXY ломал локальный ollama/nserv — профиль ревьювера Пуаро).
 
 ## 6. Критерии приёмки эпика (Definition of Done)
 - [ ] Все требования Must Have выполнены и подтверждены критериями соответствующих задач
