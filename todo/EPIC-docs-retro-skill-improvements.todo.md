@@ -14,6 +14,7 @@ author: Тимлид Алекс (pi)
 assignee: 
 status: todo
 pr: 
+branch: task/epic-docs-retro-skill-improvements
 ---
 
 # EPIC-docs-retro-skill-improvements: Улучшение цикла самоулучшения: ретроспектива по итогам сравнения с /retro (Matt Pocock Skills)
