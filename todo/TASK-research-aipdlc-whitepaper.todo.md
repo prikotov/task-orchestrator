@@ -2,7 +2,7 @@
 type: docs
 created: 2026-09-24 02:30:26 (1790217026)
 due: 
-started: 
+started: 2026-10-26 03:42:01 (1792986121)
 completed: 
 cancelled: 
 value: V3
@@ -14,9 +14,9 @@ depends_on:
 epic: EPIC-research-orchestration-articles
 author: Тимлид Алекс (pi)
 assignee: Аналитик Шерлок (pi)
-branch: task/research-orchestration-batch
+branch: task/research-aipdlc-whitepaper
 pr: https://github.com/prikotov/task-orchestrator/pull/414
-status: todo
+status: in_progress
 ---
 
 # TASK-research-aipdlc-whitepaper: Белая книга «AI-Disrupt PDLC» (aipdlc.ru)
