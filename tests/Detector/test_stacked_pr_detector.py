@@ -19,8 +19,9 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts" / "stacked-pr-detector"))
@@ -253,6 +254,39 @@ class PureScenarioTests(unittest.TestCase):
         self.assertEqual(verdict.matches[0].direction, pure.DIRECTION_STACKED_ON)
 
 
+class PureBoundaryTests(unittest.TestCase):
+    """Граничные случаи вне матрицы (расширение матрицы допустимо, раздел 17)."""
+
+    def test_no_other_open_prs_is_clean(self):
+        """Единственный открытый PR в репозитории: пустой список открытых PR
+        даёт clean без заметок — базовый случай детектора."""
+        snapshot = load_snapshot("snapshot-s01.json")
+        snapshot["open_prs"] = []
+        snapshot["commits"] = {"100": snapshot["commits"]["100"]}
+        snapshot["truncated"] = []
+
+        verdict = pure.evaluate(pure.snapshot_from_dict(snapshot))
+
+        self.assertEqual(verdict.outcome, pure.OUTCOME_CLEAN)
+        self.assertEqual(verdict.matches, ())
+        self.assertEqual(verdict.notes, ())
+
+    def test_ready_for_review_same_verdict_as_draft(self):
+        """Снятие draft не меняет вердикт: is_draft не участвует в признаке
+        (S20 проверяет drafts наравне; инвариант — поле не влияет и на clean).
+        """
+        snapshot = load_snapshot("snapshot-s20.json")
+        self.assertTrue(snapshot["checked_pr"]["is_draft"])
+        for pr in [snapshot["checked_pr"], *snapshot["open_prs"]]:
+            pr["is_draft"] = False
+
+        verdict = pure.evaluate(pure.snapshot_from_dict(snapshot))
+
+        self.assertEqual(verdict.outcome, pure.OUTCOME_VIOLATION)
+        self.assertEqual(verdict.matches[0].other_number, 101)
+        self.assertEqual(verdict.matches[0].direction, pure.DIRECTION_STACKED_ON)
+
+
 class PureValidationTests(unittest.TestCase):
     """Схема снимка: строгая валидация ловит битые данные."""
 
@@ -299,7 +333,8 @@ class CollectTests(unittest.TestCase):
         api.given(f"repos/{self.REPO}/branches/main", {"name": "main", "commit": {"sha": "m9"}})
         api.given(
             f"repos/{self.REPO}/pulls?state=open&per_page=100&page=1",
-            [self._api_pr(7, "p2", "task/feat", "main")] + [self._api_pr(101 + i, f"b{i}", f"task/b{i}", "main") for i in range(99)],
+            [self._api_pr(7, "p2", "task/feat", "main")]
+            + [self._api_pr(101 + i, f"b{i}", f"task/b{i}", "main", draft=(i == 0)) for i in range(99)],
         )
         api.given(
             f"repos/{self.REPO}/pulls?state=open&per_page=100&page=2",
@@ -328,6 +363,9 @@ class CollectTests(unittest.TestCase):
         self.assertEqual(snapshot.target_tip, "m9")
         self.assertEqual(len(snapshot.open_prs), 100)
         self.assertEqual(snapshot.commits[7], ("p1", "p2"))
+        self.assertFalse(snapshot.checked_pr.is_draft)
+        draft_pr = next(pr for pr in snapshot.open_prs if pr.number == 101)
+        self.assertTrue(draft_pr.is_draft)
         fork_pr = next(pr for pr in snapshot.open_prs if pr.number == 201)
         self.assertFalse(fork_pr.same_repository)
         self.assertEqual(fork_pr.source_branch, "task/z")
@@ -388,6 +426,61 @@ class CollectTests(unittest.TestCase):
 
         self.assertEqual(ctx.exception.reason, pure.REASON_STATE_CHANGED)
         self.assertEqual(api.calls.count(f"repos/{self.REPO}/branches/main"), 6)
+
+    def test_s18_base_edited_during_collection_state_changed(self):
+        """Смена базы PR между сбором и контрольной точкой (событие edited,
+        гонка снимка): каждая попытка видит расхождение target_branch →
+        после трёх попыток inconclusive, а не снимок со смешанной базой."""
+        api = ScriptedApi()
+        main_base = self._api_pr(20, "p1", "task/feat", "main")
+        release_base = self._api_pr(20, "p1", "task/feat", "release/1.0")
+        api.given(
+            f"repos/{self.REPO}/pulls/20",
+            main_base, release_base, main_base, release_base, main_base, release_base,
+        )
+        api.given(f"repos/{self.REPO}/branches/main", {"commit": {"sha": "m1"}})
+        api.given(f"repos/{self.REPO}/branches/release/1.0", {"commit": {"sha": "r1"}})
+        api.given(f"repos/{self.REPO}/pulls?state=open&per_page=100&page=1", [])
+        api.given(f"repos/{self.REPO}/pulls/20/commits?per_page=100&page=1", [{"sha": "p1"}])
+
+        with self.assertRaises(collect.PermanentCollectError) as ctx:
+            collect.collect_snapshot(self.REPO, 20, api, sleep=lambda _: None)
+
+        self.assertEqual(ctx.exception.reason, pure.REASON_STATE_CHANGED)
+        self.assertEqual(
+            api.calls.count(f"repos/{self.REPO}/pulls/20"),
+            collect.MAX_ATTEMPTS * 2,
+            "каждая попытка: запрос PR на сбор и запрос на контрольную точку",
+        )
+
+    def test_s18_open_prs_set_changed_during_collection(self):
+        """Чужой PR открылся/закрылся между сбором и контрольной точкой:
+        контрольные точки пар (number, head_sha) открытых PR расходятся →
+        повторы исчерпаны → inconclusive."""
+        api = ScriptedApi()
+        api.given(f"repos/{self.REPO}/pulls/30", self._api_pr(30, "p1", "task/feat", "main"))
+        api.given(f"repos/{self.REPO}/branches/main", {"commit": {"sha": "m1"}})
+        only_101 = [self._api_pr(101, "a1", "task/a", "main")]
+        with_102 = [
+            self._api_pr(101, "a1", "task/a", "main"),
+            self._api_pr(102, "b1", "task/b", "main"),
+        ]
+        api.given(
+            f"repos/{self.REPO}/pulls?state=open&per_page=100&page=1",
+            only_101, with_102, only_101, with_102, only_101, with_102,
+        )
+        api.given(f"repos/{self.REPO}/pulls/30/commits?per_page=100&page=1", [{"sha": "p1"}])
+        api.given(f"repos/{self.REPO}/pulls/101/commits?per_page=100&page=1", [{"sha": "a1"}])
+        api.given(f"repos/{self.REPO}/pulls/102/commits?per_page=100&page=1", [{"sha": "b1"}])
+
+        with self.assertRaises(collect.PermanentCollectError) as ctx:
+            collect.collect_snapshot(self.REPO, 30, api, sleep=lambda _: None)
+
+        self.assertEqual(ctx.exception.reason, pure.REASON_STATE_CHANGED)
+        self.assertEqual(
+            api.calls.count(f"repos/{self.REPO}/pulls?state=open&per_page=100&page=1"),
+            collect.MAX_ATTEMPTS * 2,
+        )
 
     def test_closed_pr_is_permanent_error(self):
         api = ScriptedApi()
@@ -538,6 +631,46 @@ class CliTests(unittest.TestCase):
             del os.environ["DETECTOR_MODE"]
             Path(path).unlink(missing_ok=True)
         self.assertEqual(code, cli.EXIT_VIOLATION_ENFORCE)
+
+    def test_s17_api_error_during_collection_is_not_green(self):
+        """S17 на уровне CLI: ошибка сбора → вердикт inconclusive и код
+        возврата 2 — «невозможно проверить» не зелёный (Must, раздел 8),
+        включая построение сообщения без снимка."""
+        error = collect.PermanentCollectError(pure.REASON_API_ERROR, "503 Service Unavailable")
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as output:
+            output_path = output.name
+        buffer = io.StringIO()
+        try:
+            with mock.patch.object(collect, "collect_snapshot", side_effect=error):
+                with redirect_stdout(buffer):
+                    code = cli.main(
+                        ["detect", "--repo", "example/repo", "--pr", "7", "--output", output_path]
+                    )
+            with open(output_path, encoding="utf-8") as handle:
+                report = json.load(handle)
+        finally:
+            Path(output_path).unlink(missing_ok=True)
+
+        self.assertEqual(code, cli.EXIT_INCONCLUSIVE)
+        self.assertEqual(report["verdict"]["outcome"], pure.OUTCOME_INCONCLUSIVE)
+        self.assertEqual(report["verdict"]["reason"], pure.REASON_API_ERROR)
+        self.assertIn("недоступность", buffer.getvalue())
+        body = cli.build_pr_comment(report, rule_link="AGENTS.md")
+        self.assertIn("проверка не выполнена", body)
+        self.assertNotIn("нарушений не найдено", body)
+
+    def test_invalid_mode_from_environment_rejected(self):
+        """Опечатка в DETECTOR_MODE — громкая ошибка использования (код 1),
+        а не молчаливый запуск в неизвестном режиме."""
+        import os
+
+        os.environ["DETECTOR_MODE"] = "silent"
+        try:
+            with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                code = cli.main(["detect", "--snapshot", "unused"])
+        finally:
+            del os.environ["DETECTOR_MODE"]
+        self.assertEqual(code, cli.EXIT_USAGE)
 
     def test_bin_entrypoint_requires_repo_and_pr(self):
         proc = subprocess.run(
