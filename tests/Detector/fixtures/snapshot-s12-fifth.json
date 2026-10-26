@@ -1,0 +1,73 @@
+{
+  "checked_pr": {
+    "number": 905,
+    "head_sha": "c5",
+    "source_branch": "task/research-e",
+    "target_branch": "main",
+    "is_draft": false,
+    "same_repository": true
+  },
+  "target_tip": "m0",
+  "open_prs": [
+    {
+      "number": 901,
+      "head_sha": "c1",
+      "source_branch": "task/research-a",
+      "target_branch": "main",
+      "is_draft": false,
+      "same_repository": true
+    },
+    {
+      "number": 902,
+      "head_sha": "c2",
+      "source_branch": "task/research-b",
+      "target_branch": "main",
+      "is_draft": false,
+      "same_repository": true
+    },
+    {
+      "number": 903,
+      "head_sha": "c3",
+      "source_branch": "task/research-c",
+      "target_branch": "main",
+      "is_draft": false,
+      "same_repository": true
+    },
+    {
+      "number": 904,
+      "head_sha": "c4",
+      "source_branch": "task/research-d",
+      "target_branch": "main",
+      "is_draft": false,
+      "same_repository": true
+    }
+  ],
+  "commits": {
+    "901": [
+      "c1"
+    ],
+    "902": [
+      "c1",
+      "c2"
+    ],
+    "903": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "904": [
+      "c1",
+      "c2",
+      "c3",
+      "c4"
+    ],
+    "905": [
+      "c1",
+      "c2",
+      "c3",
+      "c4",
+      "c5"
+    ]
+  },
+  "truncated": []
+}

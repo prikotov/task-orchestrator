@@ -1,0 +1,30 @@
+{
+  "checked_pr": {
+    "number": 100,
+    "head_sha": "h1",
+    "source_branch": "hotfix/1.2.3-fix",
+    "target_branch": "release/1.2.3",
+    "is_draft": false,
+    "same_repository": true
+  },
+  "target_tip": "r0",
+  "open_prs": [
+    {
+      "number": 101,
+      "head_sha": "b1",
+      "source_branch": "task/feat-b",
+      "target_branch": "main",
+      "is_draft": false,
+      "same_repository": true
+    }
+  ],
+  "commits": {
+    "100": [
+      "h1"
+    ],
+    "101": [
+      "b1"
+    ]
+  },
+  "truncated": []
+}

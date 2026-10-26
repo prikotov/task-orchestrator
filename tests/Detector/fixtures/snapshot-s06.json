@@ -1,0 +1,33 @@
+{
+  "checked_pr": {
+    "number": 100,
+    "head_sha": "h1",
+    "source_branch": "hotfix/1.2.3-bad",
+    "target_branch": "main",
+    "is_draft": false,
+    "same_repository": true
+  },
+  "target_tip": "m1",
+  "open_prs": [
+    {
+      "number": 101,
+      "head_sha": "q2",
+      "source_branch": "task/feat-base",
+      "target_branch": "main",
+      "is_draft": false,
+      "same_repository": true
+    }
+  ],
+  "commits": {
+    "100": [
+      "q1",
+      "q2",
+      "h1"
+    ],
+    "101": [
+      "q1",
+      "q2"
+    ]
+  },
+  "truncated": []
+}

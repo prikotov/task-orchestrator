@@ -1,0 +1,33 @@
+{
+  "checked_pr": {
+    "number": 100,
+    "head_sha": "p2",
+    "source_branch": "task/TASK-ci",
+    "target_branch": "task/epic-retro",
+    "is_draft": false,
+    "same_repository": true
+  },
+  "target_tip": "e3",
+  "open_prs": [
+    {
+      "number": 101,
+      "head_sha": "e3",
+      "source_branch": "task/epic-retro",
+      "target_branch": "main",
+      "is_draft": false,
+      "same_repository": true
+    }
+  ],
+  "commits": {
+    "100": [
+      "p1",
+      "p2"
+    ],
+    "101": [
+      "e1",
+      "e2",
+      "e3"
+    ]
+  },
+  "truncated": []
+}
