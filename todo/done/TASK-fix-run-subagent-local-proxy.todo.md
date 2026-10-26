@@ -3,7 +3,7 @@ type: fix
 created: 2026-10-26 11:44:04 (1793015044)
 due: 
 started: 2026-10-26 11:44:04 (1793015044)
-completed: 
+completed: 2026-10-26 11:58:16 (1793015896)
 cancelled: 
 value: V2
 complexity: C1
@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/fix-run-subagent-local-proxy
 pr: https://github.com/prikotov/task-orchestrator/pull/434
-status: in_progress
+status: done
 ---
 
 # TASK-fix-run-subagent-local-proxy: NO_PROXY для локальных адресов в watch-subagent: прокси из CODEX_HTTP_PROXY ломает ollama/nserv
