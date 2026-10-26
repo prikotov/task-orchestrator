@@ -15,7 +15,7 @@ epic: EPIC-docs-retro-skill-improvements
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/docs-retro-session-mode
-pr: 
+pr: https://github.com/prikotov/task-orchestrator/pull/436
 status: in_progress
 ---
 
