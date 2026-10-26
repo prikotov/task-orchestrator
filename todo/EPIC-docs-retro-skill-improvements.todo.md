@@ -13,7 +13,7 @@ cost_fact:
 author: Тимлид Алекс (pi)
 assignee: 
 status: todo
-pr: 
+pr: https://github.com/prikotov/task-orchestrator/pull/435
 branch: task/epic-docs-retro-skill-improvements
 ---
 
