@@ -11,7 +11,7 @@ priority: P2
 cost_plan: 
 cost_fact: 
 author: Тимлид Алекс (pi)
-assignee: 
+assignee: Тимлид Алекс (pi)
 status: done
 pr: https://github.com/prikotov/task-orchestrator/pull/435
 branch: task/epic-docs-retro-skill-improvements
