@@ -34,9 +34,6 @@
 # Local scratch (PR bodies, temporary artifacts)
 /tmp/
 
-# Python bytecode (stacked-pr-detector tests и локальные запуски)
-__pycache__/
-*.pyc
 
 # TasK API access for knowledge-extraction skill (token — secret, cache — session-local)
 /.task_token.json
