@@ -15,7 +15,7 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/docs-retro-subagent-mode
-pr: 
+pr: https://github.com/prikotov/task-orchestrator/pull/437
 status: in_progress
 ---
 
