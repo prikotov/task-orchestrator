@@ -407,6 +407,15 @@ apply_proxy_env_defaults() {
     export HTTPS_PROXY="${HTTPS_PROXY:-$proxy}"
     export http_proxy="${http_proxy:-$proxy}"
     export https_proxy="${https_proxy:-$proxy}"
+
+    # Loopback не должен уходить во внешний прокси — бесспорный дефолт.
+    # Прочие локальные хосты и сети (например, внутрисетевой ollama) — настройка
+    # проекта-потребителя: переменные NO_PROXY/no_proxy в окружении или .env.local
+    # (загружается выше с экспортом); значение окружения имеет приоритет над
+    # дефолтом. Скрипт публикуемый — приватных хостов в дефолте быть не должно.
+    local default_no_proxy="localhost,127.0.0.1,::1"
+    export NO_PROXY="${NO_PROXY:-$default_no_proxy}"
+    export no_proxy="${no_proxy:-$default_no_proxy}"
 }
 
 # ============================================================================

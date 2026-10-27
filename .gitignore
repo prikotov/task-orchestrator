@@ -34,6 +34,7 @@
 # Local scratch (PR bodies, temporary artifacts)
 /tmp/
 
+
 # TasK API access for knowledge-extraction skill (token — secret, cache — session-local)
 /.task_token.json
 /.task_config.json

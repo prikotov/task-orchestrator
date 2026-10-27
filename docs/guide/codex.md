@@ -10,7 +10,7 @@ Codex CLI требует HTTPS-прокси: без него — `403 Forbidden`
 
 ## Через watch-subagent.sh (автоматически)
 
-`watch-subagent.sh` source-ит `.env.local` и выставляет `HTTPS_PROXY`/`HTTP_PROXY` из `CODEX_HTTP_PROXY` для codex-раннера. Ручных действий не требуется.
+`watch-subagent.sh` source-ит `.env.local` и выставляет `HTTPS_PROXY`/`HTTP_PROXY` из `CODEX_HTTP_PROXY` для codex-раннера. Вместе с прокси выставляется дефолтный `NO_PROXY` для loopback (`localhost`, `127.0.0.1`, `::1`). Прочие локальные хосты и сети (например, внутрисетевой ollama) задаются в этом же `.env.local` переменными `NO_PROXY`/`no_proxy` — значение окружения имеет приоритет над дефолтом; без него запросы к локальным сервисам уходят во внешний прокси и падают.
 
 ## Прямой запуск codex
 

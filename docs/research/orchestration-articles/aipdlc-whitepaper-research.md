@@ -3,7 +3,7 @@
 **Дата исследования:** 2026-10-26 (дата сверки с первоисточником — та же)
 **Автор:** Аналитик Шерлок (pi)
 **Эпик:** [EPIC-research-orchestration-articles](../../../todo/EPIC-research-orchestration-articles.todo.md)
-**Задача:** [TASK-research-aipdlc-whitepaper](../../../todo/TASK-research-aipdlc-whitepaper.todo.md)
+**Задача:** [TASK-research-aipdlc-whitepaper](../../../todo/done/TASK-research-aipdlc-whitepaper.todo.md)
 **Первоисточник:** «AI-Disrupt PDLC. ИИ-нативная трансформация разработки ПО для зрелого корпоративного контура. Практическое руководство», **версия 2.0, июнь 2026**, 175 стр., 8 частей. URL: https://aipdlc.ru/documents/ru/whitepaper_full_ru.pdf (титул упоминает Сбер; автор книги — Альвианский Алексей). Локальной копии нет — цитируем по фрагментам RAG-индекса (нумерация фрагментов сохранена для прослеживаемости).
 
 ---

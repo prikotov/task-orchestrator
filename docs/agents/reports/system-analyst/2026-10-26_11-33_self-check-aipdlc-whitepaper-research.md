@@ -5,7 +5,7 @@
 **Объект:** незакоммиченные изменения ветки `task/research-aipdlc-whitepaper`:
 `docs/research/orchestration-articles/aipdlc-whitepaper-research.md` (новый, 313 строк),
 `docs/research/orchestration-articles-summary.md` (+15/-2).
-**Задача:** [todo/TASK-research-aipdlc-whitepaper.todo.md](../../../../todo/TASK-research-aipdlc-whitepaper.todo.md) — самопроверка по 10 пунктам чек-листа владельца (критерии приёмки — раздел 5 задачи). Исправления внесены в ходе самопроверки; коммит и push не выполнялись.
+**Задача:** [todo/done/TASK-research-aipdlc-whitepaper.todo.md](../../../../todo/done/TASK-research-aipdlc-whitepaper.todo.md) — самопроверка по 10 пунктам чек-листа владельца (критерии приёмки — раздел 5 задачи). Исправления внесены в ходе самопроверки; коммит и push не выполнялись.
 
 ---
 

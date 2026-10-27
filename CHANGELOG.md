@@ -7,11 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.9.1] - 2026-09-25
-
-[Сравнение v0.9.0...v0.9.1](https://github.com/prikotov/task-orchestrator/compare/v0.9.0...v0.9.1)
-
-### Changed
+### Added
 
 - Навык `epic-via-subagents`, Шаг 4 (таймаут): оркестратор не коммитит чужую незавершённую работу сабагента — незакоммиченный diff остаётся точкой продолжения для перезапуска.
 - Навыки `epic-via-subagents` и `task-via-subagents`: при перезапуске после таймаута soft-таймаут увеличивается относительно предыдущего запуска, а не повторяется.
