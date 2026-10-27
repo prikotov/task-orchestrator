@@ -408,11 +408,12 @@ apply_proxy_env_defaults() {
     export http_proxy="${http_proxy:-$proxy}"
     export https_proxy="${https_proxy:-$proxy}"
 
-    # Локальные адреса не должны уходить во внешний прокси: без NO_PROXY
-    # запросы к локальным сервисам (например, ollama на nserv:11434 — профили
-    # ролей в config/chains.yaml) падают с «Connection error». Дефолт не
-    # перекрывает значение, заданное пользователем в окружении.
-    local default_no_proxy="localhost,127.0.0.1,::1,.local,nserv,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12"
+    # Loopback не должен уходить во внешний прокси — бесспорный дефолт.
+    # Прочие локальные хосты и сети (например, внутрисетевой ollama) — настройка
+    # проекта-потребителя: переменные NO_PROXY/no_proxy в окружении или .env.local
+    # (загружается выше с экспортом); значение окружения имеет приоритет над
+    # дефолтом. Скрипт публикуемый — приватных хостов в дефолте быть не должно.
+    local default_no_proxy="localhost,127.0.0.1,::1"
     export NO_PROXY="${NO_PROXY:-$default_no_proxy}"
     export no_proxy="${no_proxy:-$default_no_proxy}"
 }

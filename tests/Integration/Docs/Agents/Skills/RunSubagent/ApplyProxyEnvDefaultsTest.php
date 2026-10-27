@@ -15,8 +15,10 @@ use Symfony\Component\Process\Process;
  * Функция вырезается из скрипта текстово и исполняется в чистом bash
  * с контролируемым окружением; проверяются экспортированные переменные.
  * Регрессия TASK-fix-run-subagent-local-proxy: без NO_PROXY запросы к
- * локальному ollama (nserv:11434) уходили во внешний прокси из
- * CODEX_HTTP_PROXY и падали с «Connection error».
+ * локальным сервисам (например, ollama) уходили во внешний прокси из
+ * CODEX_HTTP_PROXY и падали с «Connection error». Дефолт — только loopback:
+ * скрипт публикуемый, приватные хосты проектов в нём недопустимы
+ * (настраиваются через NO_PROXY/no_proxy в окружении или .env.local).
  */
 #[CoversNothing]
 final class ApplyProxyEnvDefaultsTest extends TestCase
@@ -110,9 +112,12 @@ final class ApplyProxyEnvDefaultsTest extends TestCase
         self::assertNotSame('', $defaultNoProxy, 'дефолтный NO_PROXY обязан проставляться вместе с прокси');
         self::assertSame($defaultNoProxy, $env['no_proxy'] ?? null, 'no_proxy (нижний регистр) должен совпадать с NO_PROXY');
 
-        foreach (['localhost', '127.0.0.1', 'nserv'] as $host) {
-            self::assertContains($host, explode(',', $defaultNoProxy), "NO_PROXY должен содержать {$host}");
+        foreach (['localhost', '127.0.0.1', '::1'] as $host) {
+            self::assertContains($host, explode(',', $defaultNoProxy), "дефолтный NO_PROXY должен содержать {$host}");
         }
+
+        // Публикуемый скрипт: приватные хосты и сети проектов в дефолте недопустимы.
+        self::assertSame(['localhost', '127.0.0.1', '::1'], explode(',', $defaultNoProxy), 'дефолт — только loopback, без приватных хостов и подсетей');
     }
 
     #[Test]
