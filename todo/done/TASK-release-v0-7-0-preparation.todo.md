@@ -105,7 +105,7 @@ git diff --check
 - `CHANGELOG.md`
 - PR [#387](https://github.com/prikotov/task-orchestrator/pull/387)
 - PR [#390](https://github.com/prikotov/task-orchestrator/pull/390)
-- `todo/backlog/TASK-fix-phar-runtime-layout-cache.todo.md`
+- `todo/TASK-fix-phar-runtime-layout-cache.todo.md`
 
 ## 9. Комментарии (Comments)
 
