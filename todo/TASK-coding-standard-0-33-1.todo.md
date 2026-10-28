@@ -19,8 +19,8 @@ reviewer:
 approver:
 informed: []
 branch: task/coding-standard-0-33-1
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/438
+status: review
 ---
 
 # TASK-coding-standard-0-33-1: обновить prikotov/coding-standard до актуального релиза
