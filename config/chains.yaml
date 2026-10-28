@@ -6,10 +6,20 @@ roles:
   #     если появятся);
   #   * glm-5.3 — старшая модель для архитектуры;
   #   * ollama qwen3.8:27b-pi-100k (nserv) — ревью кода.
+  #
+  # Flash-first и режимы размышлений (2026-10-28, решение владельца, по образцу
+  # stocks2 PR #405 и TasK PR #3144): подписочные квоты Z.AI/MiMo расходуются
+  # быстрее нормы, поэтому thinking max остаётся только там, где глубокое
+  # рассуждение окупается — реализация (Левша) и контраргументы (Локи); лёгкие
+  # проверяемые роли (координация, аналитика, QA, техписы) работают на high.
+  # Старшая модель glm-5.3 остаётся у архитектора (Гэндальф) — роль «умной
+  # модели»; thinking снижен до high (для знаниевых консультаций глубокое
+  # max-рассуждение не требуется). Учтите: thinkingLevelMap GLM поддерживает
+  # только low/high/max — режим medium клампуется, поэтому указан явный high.
   # ──────────────────────────────────────────────────────────────────────────
   team_lead_alex:
     prompt_file: docs/agents/roles/team/team_lead_alex.ru.md
-    command: &pi_glm_flash_max          # pi + zai (glm-5.3-flash, vision)
+    command: &pi_glm_flash_high         # pi + zai (glm-5.3-flash, vision, thinking high)
       - pi
       - --mode
       - json
@@ -19,7 +29,7 @@ roles:
       - --model
       - glm-5.3-flash
       - --thinking
-      - max
+      - high
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -27,33 +37,11 @@ roles:
 
   system_analyst_sherlock:
     prompt_file: docs/agents/roles/team/system_analyst_sherlock.ru.md
-    command: *pi_glm_flash_max
+    command: *pi_glm_flash_high
 
   system_architect_gandalf:
     prompt_file: docs/agents/roles/team/system_architect_gandalf.ru.md
-    command: &pi_glm_max               # pi + zai (glm-5.3 — старшая модель)
-      - pi
-      - --mode
-      - json
-      - -p
-      - --provider
-      - zai
-      - --model
-      - glm-5.3
-      - --thinking
-      - max
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
-
-  system_architect_loki:
-    prompt_file: docs/agents/roles/team/system_architect_loki.ru.md
-    command: *pi_glm_flash_max
-
-  backend_developer_levsha:
-    prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
-    command:
+    command: &pi_glm_high               # pi + zai (glm-5.3 — старшая модель, thinking high)
       - pi
       - --mode
       - json
@@ -69,9 +57,27 @@ roles:
       - --append-system-prompt
       - "@append-system-prompt"
 
+  system_architect_loki:
+    prompt_file: docs/agents/roles/team/system_architect_loki.ru.md
+    command: &pi_glm_flash_max
+      - pi
+      - --mode
+      - json
+      - -p
+      - --provider
+      - zai
+      - --model
+      - glm-5.3-flash
+      - --thinking
+      - max
+
+  backend_developer_levsha:
+    prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
+    command: *pi_glm_flash_max
+
   backend_developer_tony:
     prompt_file: docs/agents/roles/team/backend_developer_tony.ru.md
-    command: *pi_glm_flash_max
+    command: *pi_glm_flash_high
 
   code_reviewer_backend_puaro:
     prompt_file: docs/agents/roles/team/code_reviewer_backend_puaro.ru.md
@@ -93,43 +99,15 @@ roles:
 
   qa_backend_house:
     prompt_file: docs/agents/roles/team/qa_backend_house.ru.md
-    command:
-      - pi
-      - --mode
-      - json
-      - -p
-      - --provider
-      - zai
-      - --model
-      - glm-5.3
-      - --thinking
-      - medium
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+    command: *pi_glm_flash_high
 
   technical_writer_hermione:
     prompt_file: docs/agents/roles/team/technical_writer_hermione.ru.md
-    command:
-      - pi
-      - --mode
-      - json
-      - -p
-      - --provider
-      - zai
-      - --model
-      - glm-5.3-flash
-      - --thinking
-      - medium
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+    command: *pi_glm_flash_high
 
   technical_writer_ostap:
     prompt_file: docs/agents/roles/team/technical_writer_ostap.ru.md
-    command: *pi_glm_flash_max
+    command: *pi_glm_flash_high
 
   # ──────────────────────────────────────────────────────────────────────────────
   # HTTP-прокси для Codex CLI
