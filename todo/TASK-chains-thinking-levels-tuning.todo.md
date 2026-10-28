@@ -19,8 +19,8 @@ reviewer:
 approver:
 informed: []
 branch: task/chains-thinking-levels-tuning
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/439
+status: review
 ---
 
 # TASK-chains-thinking-levels-tuning: flash-first раскладка и режимы размышлений в config/chains.yaml
