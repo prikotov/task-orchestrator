@@ -7,6 +7,7 @@ namespace TaskOrchestrator\Tests\Integration\DependencyInjection;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use TaskOrchestrator\Common\Component\Layout\LayoutResourceNotFoundException;
 use TaskOrchestrator\Common\Kernel;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\InitCommand;
 
@@ -28,6 +29,10 @@ use TaskOrchestrator\Console\Module\Orchestrator\Command\InitCommand;
  *    независимость от APP_LOCALE и от локали Symfony-переводчика
  *    (kernel.default_locale), смена локали без
  *    очистки кеша при том же корне кеша;
+ *  - runtime layout (roles_dir/skills_dir/chains_yaml) — runtime env-параметры
+ *    (%env(task_orchestrator_layout:...)%): переход package → host → package на
+ *    повторных boot с персистентным кешем без ручной очистки (QA-3) и явное
+ *    исключение при отсутствии обоих кандидатов (битая сборка);
  *  - Resource PHP-файлы (bridge модуля AgentRunner) исключены из auto-discovery
  *    сервисов (resource/exclude в config/services.yaml).
  *
@@ -240,12 +245,13 @@ final class KernelIntegrationTest extends TestCase
         $_SERVER['APP_CACHE_DIR'] = $cacheDir;
 
         try {
-            // Первый запуск: компилирует и сохраняет контейнер с локалью en.
+            // Первый запуск: компилирует и сохраняет контейнер с локалью en;
+            // фиксируем сигнатуры его PHP-артефактов (md5+size+mtime+inode).
             $restoreEn = $this->isolateEnvVar('TASK_ORCHESTRATOR_LOCALE', 'en');
             $first = new Kernel('test', false);
             $first->boot();
             self::assertSame('en', $first->getContainer()->getParameter('task_orchestrator.locale'));
-            self::assertFileExists($cacheDir . '/test');
+            $containerSnapshot = $this->assertCompiledContainerSaved($cacheDir);
             $first->shutdown();
             $restoreEn();
 
@@ -257,6 +263,10 @@ final class KernelIntegrationTest extends TestCase
                 $second = new Kernel('test', false);
                 $second->boot();
                 self::assertSame('ru', $second->getContainer()->getParameter('task_orchestrator.locale'));
+                // Контейнер переиспользован, а не пересобран: тот же набор
+                // артефактов с теми же сигнатурами (смена env-значения не
+                // инвалидирует кеш — в этом и есть фикс stale-cache).
+                $this->assertCompiledContainerReused($containerSnapshot, $cacheDir);
                 $second->shutdown();
             } finally {
                 $restoreRu();
@@ -265,6 +275,240 @@ final class KernelIntegrationTest extends TestCase
             unset($_SERVER['APP_CACHE_DIR']);
             $this->removeDirectory($cacheDir);
         }
+    }
+
+    #[Test]
+    public function layoutParametersSwitchFromPackageToHostAndBackWithoutCacheClearing(): void
+    {
+        // Stale-cache regression (QA-3): roles_dir/skills_dir/chains_yaml —
+        // runtime env-параметры (%env(task_orchestrator_layout:...)%). Ранее выбор
+        // host/package запекался при первой компиляции контейнера: PHAR,
+        // впервые запущенный до появления host-ресурсов, фиксировал phar://
+        // fallback, и созданные позже host-роли/skills/цепочки были не видны до
+        // ручной очистки кеша. Теперь переход package → host → package
+        // происходит на повторных boot с ТЕМ ЖЕ персистентным кеш-корнем
+        // (getParameter() в Symfony резолвит плейсхолдер динамически при
+        // обращении).
+        $cacheDir = $this->createIsolatedCacheDir();
+        $restoreCacheDir = $this->isolateEnvVar('APP_CACHE_DIR', $cacheDir);
+        $hostRoot = sys_get_temp_dir() . '/to-kernel-layout-host-' . bin2hex(random_bytes(6));
+        mkdir($hostRoot, 0777, true);
+
+        try {
+            // Первый запуск: host-ресурсов нет — все три параметра в package.
+            $first = new Kernel('test', false, $hostRoot);
+            $first->boot();
+            $this->assertLayoutParametersPointToPackage($first);
+            // Контейнер скомпилирован и сохранён: фиксируем сигнатуры его
+            // PHP-артефактов (обёртка <KernelTestContainer>.php + скрытый граф
+            // в Container<хеш>). Boot №2/№3 обязаны переиспользовать ТЕ ЖЕ файлы:
+            // пересборка между запусками переписала бы их (сменился бы mtime) и
+            // ассерты ниже покраснели — это прямое доказательство работы с
+            // stale-кешем, а не регенерации контейнера.
+            $containerSnapshot = $this->assertCompiledContainerSaved($cacheDir);
+            $first->shutdown();
+
+            // В host-проекте появляются ресурсы (roles + skills + chains.yaml).
+            mkdir($hostRoot . '/docs/agents/roles/team', 0777, true);
+            mkdir($hostRoot . '/docs/agents/skills', 0777, true);
+            mkdir($hostRoot . '/config', 0777, true);
+            file_put_contents($hostRoot . '/config/chains.yaml', "chains: []\n");
+
+            // Повторный запуск: тот же корень кеша, кеш не очищается — параметры
+            // обязаны разрешиться в host-пути.
+            $second = new Kernel('test', false, $hostRoot);
+            $second->boot();
+            $this->assertLayoutParametersPointToHost($second, $hostRoot);
+            // Переиспользование stale-контейнера: тот же набор файлов с теми
+            // же сигнатурами (раньше доказывалось лишь существование корня
+            // кеша — не исключало пересборки между boot).
+            $this->assertCompiledContainerReused($containerSnapshot, $cacheDir);
+            $second->shutdown();
+
+            // Обратный пограничный сценарий: host-ресурсы удалены — параметры
+            // возвращаются к package-fallback на том же кеше.
+            $this->removeDirectory($hostRoot . '/docs');
+            $this->removeDirectory($hostRoot . '/config');
+
+            $third = new Kernel('test', false, $hostRoot);
+            $third->boot();
+            $this->assertLayoutParametersPointToPackage($third);
+            $this->assertCompiledContainerReused($containerSnapshot, $cacheDir);
+            $third->shutdown();
+        } finally {
+            $restoreCacheDir();
+            $this->removeDirectory($hostRoot);
+            $this->removeDirectory($cacheDir);
+        }
+    }
+
+    #[Test]
+    public function missingHostAndPackageLayoutResourceFailsWithExplicitException(): void
+    {
+        // Негативный тест «битой сборки» (правка ревью Локи №1): ни host-, ни
+        // package-ресурса нет → явное исключение с безопасным текстом (без
+        // содержимого кеша и несуществующих путей); возврат несуществующего
+        // пути запрещён. Повреждённый дистрибутив имитируется швом
+        // getKernelParameters(): package_dir переопределён на пустой каталог
+        // (реальный пакет ресурс имеет), host-корень пуст.
+        //
+        // ❗ Ленивое разрешение env: исключение возникает при ПЕРВОМ ОБРАЩЕНИИ
+        // к параметру (getParameter → env-процессор), а НЕ в boot() — старт
+        // ядра «битой сборки» проходит успешно. Fail-fast на старте НЕ
+        // предусмотрен — не ждать его при ручной QA-проверке.
+        $cacheDir = $this->createIsolatedCacheDir();
+        $restoreCacheDir = $this->isolateEnvVar('APP_CACHE_DIR', $cacheDir);
+        $hostRoot = sys_get_temp_dir() . '/to-kernel-broken-host-' . bin2hex(random_bytes(6));
+        $brokenPackageRoot = sys_get_temp_dir() . '/to-kernel-broken-package-' . bin2hex(random_bytes(6));
+        mkdir($hostRoot, 0777, true);
+        mkdir($brokenPackageRoot, 0777, true);
+
+        $kernel = new class ('test', false, $hostRoot, $brokenPackageRoot) extends Kernel {
+            public function __construct(string $environment, bool $debug, string $projectRoot, private readonly string $brokenPackageRoot)
+            {
+                parent::__construct($environment, $debug, $projectRoot);
+            }
+
+            #[\Override]
+            protected function getKernelParameters(): array
+            {
+                $parameters = parent::getKernelParameters();
+                $parameters['task_orchestrator.package_dir'] = $this->brokenPackageRoot;
+
+                return $parameters;
+            }
+        };
+
+        try {
+            $kernel->boot();
+
+            try {
+                $kernel->getContainer()->getParameter('task_orchestrator.roles_dir');
+                self::fail('Ожидалось LayoutResourceNotFoundException при отсутствии обоих ресурсов.');
+            } catch (LayoutResourceNotFoundException $e) {
+                self::assertStringContainsString(
+                    'Ни host-, ни package-ресурс не найден — дистрибутив повреждён',
+                    $e->getMessage(),
+                );
+                // Безопасная диагностика: без несуществующих абсолютных путей.
+                self::assertStringNotContainsString($hostRoot, $e->getMessage());
+                self::assertStringNotContainsString($brokenPackageRoot, $e->getMessage());
+            }
+        } finally {
+            $kernel->shutdown();
+            $restoreCacheDir();
+            $this->removeDirectory($hostRoot);
+            $this->removeDirectory($brokenPackageRoot);
+            $this->removeDirectory($cacheDir);
+        }
+    }
+
+    /**
+     * Утверждает, что все три layout-параметра разрешены в package-корень
+     * (fallback упакованных ресурсов; packageRoot теста = реальный корень пакета).
+     */
+    private function assertLayoutParametersPointToPackage(Kernel $kernel): void
+    {
+        $container = $kernel->getContainer();
+
+        self::assertSame(
+            $this->packageRoot . '/docs/agents/roles/team',
+            $container->getParameter('task_orchestrator.roles_dir'),
+        );
+        self::assertSame(
+            $this->packageRoot . '/docs/agents/skills',
+            $container->getParameter('task_orchestrator.skills_dir'),
+        );
+        self::assertSame(
+            $this->packageRoot . '/config/chains.yaml',
+            $container->getParameter('task_orchestrator.chains_yaml'),
+        );
+    }
+
+    /**
+     * Утверждает, что все три layout-параметра разрешены в корень host-проекта.
+     */
+    private function assertLayoutParametersPointToHost(Kernel $kernel, string $hostRoot): void
+    {
+        $container = $kernel->getContainer();
+
+        self::assertSame(
+            $hostRoot . '/docs/agents/roles/team',
+            $container->getParameter('task_orchestrator.roles_dir'),
+        );
+        self::assertSame(
+            $hostRoot . '/docs/agents/skills',
+            $container->getParameter('task_orchestrator.skills_dir'),
+        );
+        self::assertSame(
+            $hostRoot . '/config/chains.yaml',
+            $container->getParameter('task_orchestrator.chains_yaml'),
+        );
+    }
+
+    /**
+     * Снимок скомпилированного контейнера в кеше: карта «относительный путь →
+     * сигнатура md5:размер:mtime:inode» всех PHP-артефактов контейнера — обёртки
+     * <KernelTestContainer>.php и скрытого графа в подкаталоге Container<хеш>
+     * (подкаталоги версионны/хешированы, поэтому фиксируем всё дерево).
+     *
+     * inode — обязательная часть сигнатуры: повторная компиляция
+     * детерминированна (совпадает md5 и размер), а целочисленный mtime PHP
+     * имеет секундное разрешение и совпадает при пересборке в ту же секунду.
+     * Но Symfony записывает артефакты атомарно (временный файл + rename),
+     * поэтому любая перезапись меняет inode; при переиспользовании файл
+     * не переписывается вовсе — только это надёжно отличает работу со
+     * скомпилированным контейнером от тихой пересборки между запусками.
+     *
+     * @return array<string, string> карта относительных путей → сигнатуры
+     */
+    private function compiledContainerSnapshot(string $cacheDir): array
+    {
+        $snapshot = [];
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($cacheDir, \FilesystemIterator::SKIP_DOTS),
+        );
+
+        foreach ($iterator as $file) {
+            assert($file instanceof \SplFileInfo);
+            if (!str_ends_with($file->getFilename(), 'Container.php')) {
+                continue;
+            }
+
+            $path = $file->getPathname();
+            $snapshot[substr($path, strlen($cacheDir) + 1)] =
+                md5_file($path) . ':' . $file->getSize() . ':' . $file->getMTime() . ':' . $file->getInode();
+        }
+
+        return $snapshot;
+    }
+
+    /**
+     * Утверждает, что контейнер скомпилирован и сохранён в кеш, и возвращает
+     * снимок его артефактов для сравнения после следующих boot. Пустой снимок
+     * отвергается явно — иначе проверка переиспользования вырождалась бы в
+     * тривиально зелёную.
+     *
+     * @return array<string, string> снимок артефактов контейнера
+     */
+    private function assertCompiledContainerSaved(string $cacheDir): array
+    {
+        $snapshot = $this->compiledContainerSnapshot($cacheDir);
+        self::assertNotEmpty($snapshot, 'PHP-артефакты скомпилированного контейнера не найдены в кеш-корне.');
+
+        return $snapshot;
+    }
+
+    /**
+     * Утверждает переиспользование контейнера между запусками: тот же набор
+     * артефактов с теми же сигнатурами (md5/size/mtime/inode). Появление или
+     * исчезновение файла, смена любой сигнатуры = пересборка кеша = провал.
+     *
+     * @param array<string, string> $expected снимок после предыдущего запуска
+     */
+    private function assertCompiledContainerReused(array $expected, string $cacheDir): void
+    {
+        self::assertSame($expected, $this->compiledContainerSnapshot($cacheDir));
     }
 
     /**

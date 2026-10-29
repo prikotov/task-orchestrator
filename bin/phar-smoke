@@ -201,6 +201,115 @@ DISTRIBUTABLE_CWD="${TMP_CWD}/distributable"
 mkdir -p "${DISTRIBUTABLE_CWD}"
 check_commands 'distributable' "${DISTRIBUTABLE_CWD}"
 
+# 3) Runtime layout (QA-3): первый запуск в чистом host-проекте фиксирует
+# контейнер с package-fallback; после создания host-роли повторный запуск БЕЗ
+# очистки кеша обязан резолвить роль из host-каталога, а не из phar:// (ранее
+# выбор host/package запекался в скомпилированный контейнер и не менялся до
+# ручной чистки кеша). Оба запуска идут с ДЕФОЛТНЫМ кешем PHAR (без
+# APP_CACHE_DIR): TMPDIR между шагами не меняется, поэтому корень кеша
+# (системный временный каталог, изолированный по паре host+PHAR) совпадает.
+LAYOUT_CWD="${TMP_CWD}/layout-host"
+mkdir -p "${LAYOUT_CWD}"
+LAYOUT_ROLE_NAME='backend_developer_levsha'
+LAYOUT_ROLE_REL="docs/agents/roles/team/${LAYOUT_ROLE_NAME}.ru.md"
+
+# Извлекает role_file из JSON-вывода agent:role-skills (роли/skills лежат в
+# package, роль объявляет без skills — вывод не зависит от host-окружения).
+layout_role_file() {
+  local json role_file
+  if ! json="$(
+    cd "${LAYOUT_CWD}" || exit 125
+    php "${PHAR_PATH}" agent:role-skills "${LAYOUT_ROLE_NAME}" --format=json 2>&1
+  )"; then
+    echo "ERROR: PHAR agent:role-skills завершился с ошибкой (runtime layout):" >&2
+    echo "${json}" >&2
+    return 1
+  fi
+
+  role_file="$(printf '%s' "${json}" | sed -n 's/^[[:space:]]*"role_file":[[:space:]]*"\(.*\)",\{0,1\}$/\1/p')"
+
+  if [[ -z "${role_file}" ]]; then
+    echo "ERROR: не удалось извлечь role_file из вывода agent:role-skills:" >&2
+    echo "${json}" >&2
+    return 1
+  fi
+
+  printf '%s' "${role_file}"
+}
+
+# Подтверждает, что role_file указывает ВНУТРЬ упакованного PHAR (а не в host).
+# Контракт role_file — путь относительно base_path (host-базис), поэтому ссылка
+# на пакет приходит в одном из двух видов:
+#   * абсолютный `phar://<архив>/docs/...`;
+#   * относительный результат makePathRelative от host-базиса:
+#     `<../>*phar:<архив>/docs/...` (число «../» = глубина host-базиса,
+#     сегменты «phar://» схлопнуты в «phar:» с одинарным слешем).
+# Общий инвариант: точное вхождение абсолютного пути НАШЕГО архива
+# (task-orchestrator.phar) и точного суффикса роли пакета. Host-путь, пустая
+# строка или мусор без адреса архива проверку не проходят — «непустая строка»
+# или «просто содержит phar:» не принимается.
+is_phar_role_file() {
+  local role_file="$1"
+  # Эталоны вынесены в переменные: в правой части [[ == ]] литерал в кавычках
+  # НЕ интерпретируется как glob-шаблон (метасимволы пути архива — буквальные),
+  # а для относительной формы ведущая * остаётся ВНЕ кавычек — суффикс-матч.
+  # Смысл проверки не ослаблен: точное вхождение пути архива + суффикс роли.
+  local expected_absolute="phar://${PHAR_PATH}/${LAYOUT_ROLE_REL}"
+  local expected_relative="phar:${PHAR_PATH}/${LAYOUT_ROLE_REL}"
+  [[ "${role_file}" == "${expected_absolute}" ]] \
+    || [[ "${role_file}" == *"${expected_relative}" ]]
+}
+
+# Восстанавливает физический абсолютный путь из значения role_file (контракт —
+# путь относительно host-базиса; абсолютный формат также разрешим: cd по
+# абсолютному dirname перекрывает базу). pwd -P ≡ realpath в
+# LocateRoleFileService — устойчиво к симлинкам временного каталога. Ссылка на
+# PHAR сюда физически НЕ резолвится (относительного каталога «phar:...» в host
+# не существует): при фолбэке в пакет функция вернёт пустую строку, а не путь.
+resolve_role_file_real_path() {
+  local role_file="$1"
+  (
+    cd "${LAYOUT_CWD}" 2>/dev/null || exit 1
+    cd -- "${role_file%/*}" 2>/dev/null || exit 1
+    printf '%s/%s' "$(pwd -P)" "${role_file##*/}"
+  ) || true
+}
+
+echo "Phar smoke [layout]: runtime-переключение roles_dir на host без очистки кеша"
+
+# Первый запуск в чистом host: контейнер компилируется с package-fallback —
+# роль обязана резолвиться из упакованного PHAR. Формат role_file — путь
+# относительно host-базиса, поэтому принимаются оба вида ссылки на архив
+# (см. is_phar_role_file): абсолютный phar:// и относительный <../>*phar:.
+first_role_file="$(layout_role_file)"
+if ! is_phar_role_file "${first_role_file}"; then
+  echo "ERROR: первый запуск в чистом host обязан резолвить роль из PHAR (${PHAR_PATH}), получено: ${first_role_file}" >&2
+  exit 1
+fi
+echo "  ✓ первый запуск: роль из PHAR (${first_role_file})"
+
+# В host-проекте появляется роль (копия существующей роли пакета).
+mkdir -p "${LAYOUT_CWD}/docs/agents/roles/team"
+cp "${ROOT_DIR}/${LAYOUT_ROLE_REL}" "${LAYOUT_CWD}/${LAYOUT_ROLE_REL}"
+
+# Повторный запуск без очистки кеша (тот же TMPDIR, без APP_CACHE_DIR): роль
+# обязана резолвиться из host-каталога. Роль из host приходит относительным
+# путём от base_path, поэтому сравнение ведётся по восстановленному
+# физическому абсолютному пути (pwd -P ≡ realpath в LocateRoleFileService —
+# устойчиво к симлинкам временного каталога).
+host_role_real="$(cd "${LAYOUT_CWD}/docs/agents/roles/team" && pwd -P)/${LAYOUT_ROLE_NAME}.ru.md"
+second_role_file="$(layout_role_file)"
+second_role_real="$(resolve_role_file_real_path "${second_role_file}")"
+if [[ -z "${second_role_real}" || "${second_role_real}" != "${host_role_real}" ]]; then
+  cat >&2 <<MESSAGE
+ERROR: повторный запуск без очистки кеша должен резолвить роль из host.
+  ожидается: ${host_role_real}
+  получено:   ${second_role_file}${second_role_real:+ (физически: ${second_role_real})}
+MESSAGE
+  exit 1
+fi
+echo "  ✓ повторный запуск: роль из host без очистки кеша (${second_role_file})"
+
 # Расширенный E2E-контракт дистрибутива (полная матрица agent:init, запуск
 # become-role.sh, перемещение PHAR A → B на дефолтном кеше) живёт в PHP-тесте
 # apps/console/tests/E2E/Phar/PharDistributionTest.php (локальная пред-PR цель

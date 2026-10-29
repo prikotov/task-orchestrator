@@ -177,7 +177,7 @@ Source/Composer creates a relative symlink to the skill inside the package. PHAR
 
 Full support applies only to `agent:init`/`become-role` and does not change the overall channel status: Composer is the primary distribution channel, while PHAR remains a secondary, best-effort channel (published as feasible, without self-update or other general guarantees).
 
-PHAR installation limitation: the archive must stay at the physical path recorded in `.phar-binding` at installation time. After moving or deleting the PHAR, repeat the installation from the new location: `php task-orchestrator.phar agent:init --force`. No manual cache cleanup is needed: the PHAR container cache is isolated by the archive's physical path.
+PHAR installation limitation: the archive must stay at the physical path recorded in `.phar-binding` at installation time. After moving or deleting the PHAR, repeat the installation from the new location: `php task-orchestrator.phar agent:init --force`. No manual cache cleanup is needed: the PHAR container cache is isolated by the archive's physical path. Roles, skills, and `config/chains.yaml` created in the host project after the first run are picked up on the very next run — layout paths (`roles_dir`/`skills_dir`/`chains_yaml`) are resolved at runtime instead of being baked into the container cache.
 
 Minimal `config/chains.yaml` — two roles and a two-step chain:
 

@@ -4,7 +4,7 @@ type: chore
 created: 2026-04-23
 value: V2
 complexity: C2
-priority: P2
+priority: P3
 depends_on: TASK-chore-composer-library-type
 epic: EPIC-feat-standalone-cli
 author: Тимлид (Алекс)
