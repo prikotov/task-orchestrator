@@ -34,6 +34,25 @@ services:
     tags:
       - { name: container.env_var_processor }
 
+  # --- Runtime layout host/package (roles_dir / skills_dir / chains_yaml) ---
+  # Env-процессор prefix `task_orchestrator_layout` (Component/Layout): выбирает
+  # host- или package-путь ресурса при каждом запуске (Container::getEnv в
+  # runtime через чистый HostPackageLayoutResolver), поэтому layout-ресурсы
+  # host-проекта, созданные после первого запуска PHAR, доступны на следующем
+  # запуске БЕЗ очистки кеша (QA-3); при отсутствии обоих кандидатов — явное
+  # исключение. Потребители — модули AgentRole, ChainDefinition и ChainExecution
+  # (через %task_orchestrator.roles_dir% и др.).
+  # ❗ Аргументы процессора — ТОЛЬКО plain-параметры контейнера (base_path,
+  # package_dir): %env(...)% в аргументах env-процессора запрещён — рекурсия
+  # Container::getEnv() (см. PHPDoc класса). Тег только маркирует процессор:
+  # префикс объявлен в самом классе (getProvidedTypes()).
+  TaskOrchestrator\Common\Component\Layout\TaskOrchestratorLayoutEnvVarProcessor:
+    arguments:
+      $hostRoot: '%task_orchestrator.base_path%'
+      $packageRoot: '%task_orchestrator.package_dir%'
+    tags:
+      - { name: container.env_var_processor }
+
   # --- Use Case шины (CommandBus/QueryBus) ---
   # PHAR-safe: явные определения (без resource:). Аргумент $handlers (PSR-11
   # локатор «класс сообщения => сервис хендлера») проставляет UseCaseBusCompilerPass

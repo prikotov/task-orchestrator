@@ -541,8 +541,22 @@ Use Case шины (диспетчеризация Command/Query Handler-ов п�
 Параметры `task_orchestrator.*` задаются в `Kernel::getKernelParameters()` на самом раннем этапе.
 В Composer-host контейнер CLI кешируется отдельно от контейнера основного приложения: `<host>/var/cache/task-orchestrator/<release-version>/<env>`. Сегмент версии предотвращает повторное использование несовместимого DI-контейнера после обновления пакета. В PHAR writable-корень уходит в системный временный каталог и изолируется по паре (host-проект, физический путь архива): параметры `package_dir`/`phar_path` замораживаются в кеш при компиляции, поэтому после перемещения архива изоляция по его пути даёт свежий контейнер без ручной чистки кеша. Явный `APP_CACHE_DIR` сохраняет приоритет и задаёт пользовательский корень кеша.
 Модульные файлы используют собственные параметры `module.<name>.*`, при необходимости ссылаясь на
-`task_orchestrator.*` как на источник. Параметр `base_path`/`roles_dir`/`chains_yaml` — с
-dual-context resolution (разрешение путей для двух контекстов: standalone и vendor-binary).
+`task_orchestrator.*` как на источник. Параметр `base_path` — с dual-context resolution (разрешение путей
+для двух контекстов: standalone и vendor-binary).
+
+**Runtime layout (`roles_dir`/`skills_dir`/`chains_yaml`).** Layout-пути НЕ замораживаются в
+скомпилированном контейнере: `Kernel::getKernelParameters()` задаёт их как динамические env-плейсхолдеры
+`%env(task_orchestrator_layout:roles_dir)%` и т.п., а выбор host/package выполняется при каждом запуске
+тонким env-процессором `TaskOrchestratorLayoutEnvVarProcessor` (`src/Component/Layout/`) поверх чистого
+резолвера `HostPackageLayoutResolver` без Symfony-зависимостей (только `is_dir`/`is_file`): host-путь при
+наличии ресурса в host-проекте, иначе package-путь (fallback упакованных ресурсов). Поэтому роли, skills и
+`config/chains.yaml`, созданные в host-проекте после первого запуска PHAR, доступны уже при следующем
+запуске без ручной очистки кеша (ранее выбор запекался при первой компиляции — дефект QA-3). При отсутствии
+И host-, И package-ресурса резолвер бросает явное `LayoutResourceNotFoundException` («дистрибутив повреждён»),
+а не возвращает несуществующий путь. Аргументы env-процессора — только plain-параметры контейнера
+(`%task_orchestrator.base_path%`, `%task_orchestrator.package_dir%`): `%env(...)%` в аргументах процессора
+запрещён — рекурсия `Container::getEnv()`; имя после префикса (`roles_dir` и др.) — дискриминатор ресурса,
+не env-переменная.
 
 ### Presentation-слой (в приложении-хосте)
 
@@ -570,18 +584,23 @@ apps/console/config/agent_chains.yaml
 | Параметр | Описание |
 |---|---|
 | `roles_dir` | Путь к role prompt файлам (`.md`) |
+| `skills_dir` | Путь к каталогу skills (файлы `SKILL.md`) |
 | `chains_yaml` | Путь к YAML-конфигурации цепочек |
 | `chains_session_dir` | Путь к каталогу сессий оркестрации |
 | `base_path` | Корень проекта для построения относительных путей |
 
 ### Значения по умолчанию
 
+Layout-пути (`roles_dir`, `skills_dir`, `chains_yaml`) разрешаются при каждом запуске: host-путь при наличии
+ресурса в host-проекте, иначе package-путь (fallback) — см. параграф «Runtime layout» выше. Остальные пути фиксируются по корню host-проекта (standalone — package root):
+
 ```yaml
 task_orchestrator:
-    roles_dir: '<package_root>/docs/agents/roles/team'
-    chains_yaml: '<package_root>/config/chains.yaml'
-    chains_session_dir: '<package_root>/var/sessions'
-    base_path: '<package_root>'
+    roles_dir: '<host_root или package_root>/docs/agents/roles/team'
+    skills_dir: '<host_root или package_root>/docs/agents/skills'
+    chains_yaml: '<host_root или package_root>/config/chains.yaml'
+    chains_session_dir: '<host_root>/var/sessions'
+    base_path: '<host_root>'
 ```
 
 ## Мультидвижковая архитектура

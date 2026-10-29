@@ -49,7 +49,11 @@ use const PHP_OS_FAMILY;
  * package root, если в host-проекте ресурсов нет). В standalone-режиме
  * $projectRoot не передаётся и совпадает с package root. host-ресурсы
  * разрешаются через {@see getProjectRoot()}, package-ресурсы — через
- * getPackageDir()/getProjectDir().
+ * getPackageDir()/getProjectDir(). Layout-пути (roles_dir/skills_dir/chains_yaml)
+ * разрешаются во время выполнения (runtime) env-процессором Component/Layout
+ * ({@see \TaskOrchestrator\Common\Component\Layout\TaskOrchestratorLayoutEnvVarProcessor}):
+ * они НЕ запекаются в скомпилированный контейнер, поэтому ресурсы host-проекта,
+ * созданные после первого запуска, видны при следующем запуске без очистки кеша.
  *
  * Phar: package root доступен только для чтения, поэтому cache/log при работе
  * из Phar уходят в системный временный каталог, изолированный по паре
@@ -189,9 +193,6 @@ class Kernel extends BaseKernel
         $parameters['task_orchestrator.is_phar'] = $this->isPhar();
         $parameters['task_orchestrator.phar_path'] = $this->resolvePharPath();
         $parameters['task_orchestrator.chains_session_dir'] = $projectRoot . '/var/sessions';
-        $parameters['task_orchestrator.roles_dir'] = $this->resolveRolesDir($projectRoot, $packageDir);
-        $parameters['task_orchestrator.skills_dir'] = $this->resolveSkillsDir($projectRoot, $packageDir);
-        $parameters['task_orchestrator.chains_yaml'] = $this->resolveChainsYaml($projectRoot, $packageDir);
         $parameters['task_orchestrator.platform_family'] = $this->platformFamily;
 
         // Локаль AI-ролей (role files + каталог skills) задаётся runtime
@@ -205,6 +206,18 @@ class Kernel extends BaseKernel
         // default_locale в config/packages/translation.yaml) независима от
         // локали AI-ролей.
         $parameters['task_orchestrator.locale'] = '%env(task_orchestrator_locale:TASK_ORCHESTRATOR_LOCALE)%';
+
+        // Runtime layout (roles_dir/skills_dir/chains_yaml) — тоже динамические
+        // env-параметры (QA-3): выбор host/package НЕ запекается в скомпилированный
+        // контейнер, а выполняется env-процессором Component/Layout при каждом
+        // обращении к параметру. Ресурсы host-проекта, созданные после первого
+        // запуска PHAR, разрешаются в host уже на следующем запуске без ручной
+        // очистки кеша; fallback на упакованные ресурсы пакета сохраняется, а при
+        // отсутствии обоих кандидатов процессор бросает явное исключение.
+        // Имя после префикса — дискриминатор ресурса процессора, не env-переменная.
+        $parameters['task_orchestrator.roles_dir'] = '%env(task_orchestrator_layout:roles_dir)%';
+        $parameters['task_orchestrator.skills_dir'] = '%env(task_orchestrator_layout:skills_dir)%';
+        $parameters['task_orchestrator.chains_yaml'] = '%env(task_orchestrator_layout:chains_yaml)%';
 
         $parameters['app.version'] = $this->resolveVersion();
 
@@ -316,30 +329,6 @@ class Kernel extends BaseKernel
                 public: true,
             ))->register($container);
         }
-    }
-
-    /**
-     * Роли: host-проект → package root (поведение прежнего bin/task-orchestrator).
-     */
-    private function resolveRolesDir(string $projectRoot, string $packageDir): string
-    {
-        $candidate = $projectRoot . '/docs/agents/roles/team';
-
-        return is_dir($candidate) ? $candidate : $packageDir . '/docs/agents/roles/team';
-    }
-
-    private function resolveSkillsDir(string $projectRoot, string $packageDir): string
-    {
-        $candidate = $projectRoot . '/docs/agents/skills';
-
-        return is_dir($candidate) ? $candidate : $packageDir . '/docs/agents/skills';
-    }
-
-    private function resolveChainsYaml(string $projectRoot, string $packageDir): string
-    {
-        $candidate = $projectRoot . '/config/chains.yaml';
-
-        return is_file($candidate) ? $candidate : $packageDir . '/config/chains.yaml';
     }
 
     private function resolveVersion(): string
