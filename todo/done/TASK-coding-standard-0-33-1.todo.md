@@ -19,7 +19,7 @@ reviewer:
 approver:
 informed: []
 branch: task/coding-standard-0-33-1
-pr: https://github.com/prikotov/task-orchestrator/pull/438
+pr: https://github.com/prikotov/task-orchestrator/pull/441
 status: done
 ---
 
