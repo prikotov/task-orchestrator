@@ -119,6 +119,8 @@ composer-host-smoke: ## Проверить agent:init в физической Co
 
 .PHONY: check
 check: ## Запустить все проверки (phpstan + deptrac + psalm + phpmd + phpcs + md-links + validate-todo + validate-roles + validate-language + tests)
+	vendor/bin/coding-standard-verify
+	vendor/bin/coding-standard-di-check
 	@${MAKE} --no-print-directory phpstan deptrac psalm phpmd phpcs md-links validate-todo validate-roles validate-language tests && \
 		{ echo; echo "✅ Все проверки завершены успешно."; } || \
 		{ echo; echo "❌ Проверки завершены с ошибками."; exit 1; }
