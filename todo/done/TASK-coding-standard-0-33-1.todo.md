@@ -3,7 +3,7 @@ type: build
 created: 2026-10-28
 due:
 started: 2026-10-28 14:15:43 (1793196943)
-completed:
+completed: 2026-10-29 08:38:33 (1793263113)
 cancelled:
 value: V1
 complexity: C1
@@ -20,7 +20,7 @@ approver:
 informed: []
 branch: task/coding-standard-0-33-1
 pr: https://github.com/prikotov/task-orchestrator/pull/438
-status: review
+status: done
 ---
 
 # TASK-coding-standard-0-33-1: обновить prikotov/coding-standard до актуального релиза
