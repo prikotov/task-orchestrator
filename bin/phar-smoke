@@ -316,6 +316,91 @@ echo "  ✓ повторный запуск: роль из host без очис�
 # `make phar-e2e`): PHPUnit и dev-зависимости недоступны в production-install
 # окружении этого smoke.
 
+# 4) Жизненный цикл кеш-корня PHAR (FR-4): перемещение A → B на дефолтном кеше
+# (без APP_CACHE_DIR между шагами). Первый запуск из A материализует корень A
+# (mkdir → flock → маркер владения). Перемещение архива и запуск из B создают
+# корень B и автоматически удаляют устаревший корень A (валидный маркер,
+# свободный flock — прежний процесс завершился). Изоляция от layout-шага:
+# собственный TMPDIR (sys_get_temp_dir() учитывает TMPDIR) и чистый host-каталог.
+# Имя файла-маркера — контракт CacheRootOwnerMarker::FILENAME (см.
+# src/Component/PharCache/CacheRootOwnerMarker.php).
+A2B_TMP="${TMP_CWD}/a2b-tmp"
+A2B_DIR_A="${TMP_CWD}/a2b-location-a"
+A2B_DIR_B="${TMP_CWD}/a2b-location-b"
+A2B_ROOTS_DIR="${A2B_TMP}/task-orchestrator"
+A2B_OWNER_MARKER='.task-orchestrator-owner.json'
+mkdir -p "${A2B_TMP}" "${A2B_DIR_A}" "${A2B_DIR_B}"
+PHAR_A="${A2B_DIR_A}/task-orchestrator.phar"
+PHAR_B="${A2B_DIR_B}/task-orchestrator.phar"
+cp "${PHAR_PATH}" "${PHAR_A}"
+
+echo "Phar smoke [cache-root]: перемещение A → B, автоочистка устаревшего корня"
+
+if ! a2b_list_a="$(
+  cd "${A2B_DIR_A}" || exit 125
+  TMPDIR="${A2B_TMP}" php "${PHAR_A}" list --raw 2>&1
+)"; then
+  echo "ERROR: запуск PHAR из расположения A не удался" >&2
+  echo "${a2b_list_a}" >&2
+  exit 1
+fi
+
+if [[ ! -d "${A2B_ROOTS_DIR}" ]]; then
+  echo "ERROR: базовый каталог кеш-корней не материализован: ${A2B_ROOTS_DIR}" >&2
+  exit 1
+fi
+
+mapfile -t a2b_roots_before < <(ls -1 "${A2B_ROOTS_DIR}")
+if [[ ${#a2b_roots_before[@]} -ne 1 ]]; then
+  echo "ERROR: после запуска из A ожидался ровно один кеш-корень, найдено: ${#a2b_roots_before[@]}" >&2
+  ls -1 "${A2B_ROOTS_DIR}" >&2
+  exit 1
+fi
+root_a="${a2b_roots_before[0]}"
+if [[ ! -f "${A2B_ROOTS_DIR}/${root_a}/${A2B_OWNER_MARKER}" ]]; then
+  echo "ERROR: маркер владения отсутствует в корне A (${root_a})" >&2
+  exit 1
+fi
+echo "  ✓ запуск из A: корень материализован с маркером (${root_a})"
+
+mv "${PHAR_A}" "${PHAR_B}"
+
+if ! a2b_list_b="$(
+  cd "${A2B_DIR_B}" || exit 125
+  TMPDIR="${A2B_TMP}" php "${PHAR_B}" list --raw 2>&1
+)"; then
+  echo "ERROR: запуск PHAR из расположения B не удался" >&2
+  echo "${a2b_list_b}" >&2
+  exit 1
+fi
+
+# Корень B работоспособен: команды модулей зарегистрированы (контейнер собран).
+if ! awk -v expected='agent:init' '$1 == expected { found = 1 } END { exit(found ? 0 : 1) }' \
+  <<< "${a2b_list_b}"; then
+  echo "ERROR: контейнер корня B не содержит команду 'agent:init'" >&2
+  echo "${a2b_list_b}" >&2
+  exit 1
+fi
+
+mapfile -t a2b_roots_after < <(ls -1 "${A2B_ROOTS_DIR}")
+for a2b_root in "${a2b_roots_after[@]}"; do
+  if [[ "${a2b_root}" == "${root_a}" ]]; then
+    echo "ERROR: устаревший корень A (${root_a}) не удалён после запуска из B" >&2
+    exit 1
+  fi
+done
+if [[ ${#a2b_roots_after[@]} -ne 1 ]]; then
+  echo "ERROR: после запуска из B ожидался ровно один кеш-корень (B), найдено: ${#a2b_roots_after[@]}" >&2
+  ls -1 "${A2B_ROOTS_DIR}" >&2
+  exit 1
+fi
+root_b="${a2b_roots_after[0]}"
+if [[ ! -f "${A2B_ROOTS_DIR}/${root_b}/${A2B_OWNER_MARKER}" ]]; then
+  echo "ERROR: маркер владения отсутствует в корне B (${root_b})" >&2
+  exit 1
+fi
+echo "  ✓ запуск из B: корень A удалён (${root_a}), корень B жив и работает (${root_b})"
+
 if [[ "${KEEP_PHAR_ARTIFACT}" == '1' ]]; then
   echo "Phar release artifact preserved: ${PHAR_PATH}"
 fi
