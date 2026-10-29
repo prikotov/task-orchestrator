@@ -19,7 +19,7 @@ reviewer:
 approver:
 informed: []
 branch: task/chains-thinking-levels-tuning
-pr: https://github.com/prikotov/task-orchestrator/pull/439
+pr: https://github.com/prikotov/task-orchestrator/pull/442
 status: done
 started: 2026-10-28
 ---
