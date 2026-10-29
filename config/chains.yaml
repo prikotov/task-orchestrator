@@ -1,35 +1,30 @@
 roles:
   # ──────────────────────────────────────────────────────────────────────────
-  # Профили делегирования (2026-10-24): провайдер openai-codex заблокировал
-  # доступ — codex-конфиги отключены. Роли переведены на zai:
-  #   * glm-5.3-flash — быстрая vision-модель (подходит для ролей дизайнеров,
-  #     если появятся);
-  #   * glm-5.3 — старшая модель для архитектуры;
-  #   * ollama qwen3.8:27b-pi-100k (nserv) — ревью кода.
-  #
-  # Flash-first и режимы размышлений (2026-10-28, решение владельца, по образцу
-  # stocks2 PR #405 и TasK PR #3144): подписочные квоты Z.AI/MiMo расходуются
-  # быстрее нормы, поэтому thinking max остаётся только там, где глубокое
-  # рассуждение окупается — реализация (Левша) и контраргументы (Локи); лёгкие
-  # проверяемые роли (координация, аналитика, QA, техписы) работают на high.
-  # Старшая модель glm-5.3 остаётся у архитектора (Гэндальф) — роль «умной
-  # модели»; thinking снижен до high (для знаниевых консультаций глубокое
-  # max-рассуждение не требуется). Учтите: thinkingLevelMap GLM поддерживает
-  # только low/high/max — режим medium клампуется, поэтому указан явный high.
+  # Профили делегирования: синхронизированы с принятыми раскладками
+  # stocks2 (PR #405) и TasK (PR #3144) — 2026-10-29, решение владельца:
+  #   * mimo-v2.6-pro — координация (Алекс, thinking off), архитектура
+  #     (Гэндальф, high), требования (Шерлок, high), документация
+  #     (Гермиона, off) — «умная модель» для координации/знаниевых ролей;
+  #   * glm-5.3-flash max — реализация (Левша) и контраргументы (Локи);
+  #   * glm-5.3-flash high — лёгкие проверяемые роли (Тони, Хаус, Остап);
+  #   * ollama qwen3.8:27b-pi-100k (nserv) — ревью кода (Пуаро).
+  # thinkingLevelMap GLM поддерживает только low/high/max (medium клампуется),
+  # у MiMo — только off/high; значение 'off' закавычено, иначе YAML парсит
+  # off как false.
   # ──────────────────────────────────────────────────────────────────────────
   team_lead_alex:
     prompt_file: docs/agents/roles/team/team_lead_alex.ru.md
-    command: &pi_glm_flash_high         # pi + zai (glm-5.3-flash, vision, thinking high)
+    command: &pi_mimo_pro_off           # pi + xiaomi (mimo-v2.6-pro, thinking off)
       - pi
       - --mode
       - json
       - -p
       - --provider
-      - zai
+      - xiaomi-token-plan-sgp
       - --model
-      - glm-5.3-flash
+      - mimo-v2.6-pro
       - --thinking
-      - high
+      - 'off'
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -37,19 +32,15 @@ roles:
 
   system_analyst_sherlock:
     prompt_file: docs/agents/roles/team/system_analyst_sherlock.ru.md
-    command: *pi_glm_flash_high
-
-  system_architect_gandalf:
-    prompt_file: docs/agents/roles/team/system_architect_gandalf.ru.md
-    command: &pi_glm_high               # pi + zai (glm-5.3 — старшая модель, thinking high)
+    command: &pi_mimo_pro_high          # pi + xiaomi (mimo-v2.6-pro, thinking high)
       - pi
       - --mode
       - json
       - -p
       - --provider
-      - zai
+      - xiaomi-token-plan-sgp
       - --model
-      - glm-5.3
+      - mimo-v2.6-pro
       - --thinking
       - high
       - --system-prompt
@@ -57,9 +48,13 @@ roles:
       - --append-system-prompt
       - "@append-system-prompt"
 
+  system_architect_gandalf:
+    prompt_file: docs/agents/roles/team/system_architect_gandalf.ru.md
+    command: *pi_mimo_pro_high
+
   system_architect_loki:
     prompt_file: docs/agents/roles/team/system_architect_loki.ru.md
-    command: &pi_glm_flash_max
+    command: &pi_glm_flash_max          # pi + zai (glm-5.3-flash, vision)
       - pi
       - --mode
       - json
@@ -70,6 +65,10 @@ roles:
       - glm-5.3-flash
       - --thinking
       - max
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
 
   backend_developer_levsha:
     prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
@@ -77,7 +76,21 @@ roles:
 
   backend_developer_tony:
     prompt_file: docs/agents/roles/team/backend_developer_tony.ru.md
-    command: *pi_glm_flash_high
+    command: &pi_glm_flash_high         # pi + zai (glm-5.3-flash, thinking high)
+      - pi
+      - --mode
+      - json
+      - -p
+      - --provider
+      - zai
+      - --model
+      - glm-5.3-flash
+      - --thinking
+      - high
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
 
   code_reviewer_backend_puaro:
     prompt_file: docs/agents/roles/team/code_reviewer_backend_puaro.ru.md
@@ -103,7 +116,7 @@ roles:
 
   technical_writer_hermione:
     prompt_file: docs/agents/roles/team/technical_writer_hermione.ru.md
-    command: *pi_glm_flash_high
+    command: *pi_mimo_pro_off
 
   technical_writer_ostap:
     prompt_file: docs/agents/roles/team/technical_writer_ostap.ru.md
