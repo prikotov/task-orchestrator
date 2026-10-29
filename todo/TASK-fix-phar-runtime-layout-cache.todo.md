@@ -15,8 +15,8 @@ epic:
 author: Аналитик Шерлок (codex-cli)
 assignee: Бэкендер Левша (codex-cli)
 branch: task/phar-runtime-layout-cache
-pr: 
-status: todo
+pr: https://github.com/prikotov/task-orchestrator/pull/440
+status: review
 ---
 
 # TASK-fix-phar-runtime-layout-cache: Устранить заморозку runtime layout (QA-3)
