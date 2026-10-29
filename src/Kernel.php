@@ -12,10 +12,14 @@ use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use TaskOrchestrator\Common\Component\CommandBus\DependencyInjection\UseCaseBusCompilerPass;
 use TaskOrchestrator\Common\Component\ModuleSystem\DependencyInjection\ModuleServiceRegistrar;
 use TaskOrchestrator\Common\Component\ModuleSystem\ModuleKernelTrait;
+use TaskOrchestrator\Common\Component\PharCache\CacheRootGarbageCollector;
+use TaskOrchestrator\Common\Component\PharCache\CacheRootOwner;
+use TaskOrchestrator\Common\Component\PharCache\CacheRootOwnershipLock;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStepServiceInterface;
 use TaskOrchestrator\Common\ValueObject\ReleaseVersionVo;
+use Throwable;
 use const PHP_OS_FAMILY;
 
 /**
@@ -59,6 +63,18 @@ use const PHP_OS_FAMILY;
  * из Phar уходят в системный временный каталог, изолированный по паре
  * (host-проект, физический путь PHAR) — см. writableRoot().
  *
+ * Жизненный цикл кеш-корня PHAR (FR-4): в PHAR-режиме до parent::boot() ядро
+ * захватывает свой корень во владение (mkdir `0700` → flock(LOCK_EX|LOCK_NB) →
+ * маркер владения со self-hash; {@see CacheRootOwner}) и удерживает дескриптор
+ * блокировки до завершения процесса. Затем выполняется ограниченная очистка
+ * устаревших корней прежних расположений ({@see CacheRootGarbageCollector}):
+ * удаляются только корни с валидным маркером (self-hash ↔ имя каталога),
+ * свободным flock и совпадающим владельцем (fileowner === posix_getuid);
+ * текущий, активный, неизвестный (без маркера, в том числе legacy) и симлинк
+ * узлы сохраняются. Вне PHAR захват и очистка — no-op. Сбой очистки —
+ * предупреждение в STDERR, не меняющее exit code команды (warning-семантика
+ * контракта; fail-fast отклонён: он маскирует результат команды).
+ *
  * @psalm-suppress PropertyNotSetInConstructor
  */
 class Kernel extends BaseKernel
@@ -80,6 +96,35 @@ class Kernel extends BaseKernel
         private readonly string $platformFamily = PHP_OS_FAMILY,
     ) {
         parent::__construct($environment, $debug);
+    }
+
+    /**
+     * Дескриптор блокировки владения собственным кеш-корнем PHAR. Удерживается
+     * до завершения процесса (см. {@see boot()}); null — вне PHAR либо захват
+     * не состоялся (активный чужой корень / незащищённые права).
+     */
+    private ?CacheRootOwnershipLock $pharCacheRootLock = null;
+
+    /**
+     * Загрузка ядра: в PHAR-режиме перед сборкой контейнера выполняется
+     * захват кеш-корня во владение (mkdir → flock → маркер, ДО parent::boot())
+     * и очистка устаревших корней прежних расположений. Вне PHAR — no-op.
+     *
+     * Дескриптор блокировки собственного корня (см. $pharCacheRootLock)
+     * удерживается до завершения процесса: это арбитр активности для параллельных
+     * запусков и защиты корня от чужой очистки. При аварийном завершении блокировка
+     * освобождается ОС; shutdown() блокировку НЕ снимает (сознательно: ядро может
+     * перезапускаться в рамках процесса — повторный boot сохраняет владение).
+     */
+    #[Override]
+    public function boot(): void
+    {
+        if (!$this->booted) {
+            $this->claimPharCacheRoot();
+            $this->collectStalePharCacheRoots();
+        }
+
+        parent::boot();
     }
 
     /**
@@ -416,9 +461,97 @@ class Kernel extends BaseKernel
             return $this->getProjectRoot();
         }
 
-        return rtrim(sys_get_temp_dir(), '/\\')
-            . '/task-orchestrator/'
-            . hash('xxh64', $this->getProjectRoot() . "\0" . $pharPath);
+        return $this->pharCacheBaseDir() . '/' . $this->pharCacheRootName();
+    }
+
+    /**
+     * Базовый каталог кеш-корней PHAR: `<sys_tmp>/task-orchestrator`.
+     *
+     * Protected — проверяемый шов для перенаправления базового каталога
+     * кеш-корней в изолированный временный каталог в тестах ядра: интеграционные
+     * тесты жизненного цикла ({@see CacheRootGarbageCollector}) не должны
+     * выполнять очистку в реальном системном temp (там лежат корни действующих
+     * PHAR-запусков) — по образцу resolvePharPath().
+     */
+    protected function pharCacheBaseDir(): string
+    {
+        return rtrim(sys_get_temp_dir(), '/\\') . '/task-orchestrator';
+    }
+
+    /**
+     * Self-hash собственного кеш-корня: хеш пары (host-проект, физический путь
+     * PHAR) — совпадает с именем каталога корня ({@see writableRoot()}) и со
+     * значением в маркере владения.
+     */
+    private function pharCacheRootName(): string
+    {
+        return hash('xxh64', $this->getProjectRoot() . "\0" . (string) $this->resolvePharPath());
+    }
+
+    /**
+     * Захват собственного кеш-корня во владение (только PHAR; вне PHAR — no-op):
+     * mkdir `0700` → flock(LOCK_EX|LOCK_NB) → маркер владения. Неудачный захват
+     * (активный чужой корень, незащищённые права) не прерывает загрузку: ядро
+     * продолжает работу без признака владения.
+     */
+    private function claimPharCacheRoot(): void
+    {
+        if ($this->pharCacheRootLock !== null || $this->resolvePharPath() === null) {
+            return;
+        }
+
+        $this->pharCacheRootLock = (new CacheRootOwner())->claim(
+            $this->pharCacheBaseDir(),
+            $this->pharCacheRootName(),
+        );
+    }
+
+    /**
+     * Очистка устаревших кеш-корней (только PHAR; вне PHAR — no-op).
+     *
+     * Warning-семантика контракта FR-4: любой сбой очистки не прерывает загрузку
+     * и не меняет exit code команды — в STDERR выдаётся безопасная диагностика
+     * (только счётчики, без путей и содержимого кеша).
+     */
+    private function collectStalePharCacheRoots(): void
+    {
+        if ($this->resolvePharPath() === null) {
+            return;
+        }
+
+        try {
+            $report = (new CacheRootGarbageCollector())->collect(
+                $this->pharCacheBaseDir(),
+                $this->pharCacheRootName(),
+            );
+
+            if ($report->hasFailures()) {
+                $this->reportCacheRootCleanupFailure(
+                    'task-orchestrator: не удалось полностью очистить устаревшие кеш-каталоги (приложение работает; '
+                    . $report->toSafeSummary()
+                    . '); повторная попытка — при следующем запуске.',
+                );
+            }
+        } catch (Throwable) {
+            $this->reportCacheRootCleanupFailure(
+                'task-orchestrator: очистка устаревших кеш-каталогов прервана ошибкой '
+                . '(приложение работает); повторная попытка — при следующем запуске.',
+            );
+        }
+    }
+
+    /**
+     * Выдаёт предупреждение о сбое очистки в STDERR (без путей и содержимого
+     * кеша). Protected — проверяемый шов для перехвата диагностики в тестах
+     * (по образцу resolvePharPath() в Kernel).
+     */
+    protected function reportCacheRootCleanupFailure(string $message): void
+    {
+        // defined(): константа STDERR объявлена только в CLI SAPI (в web-контексте
+        // и в части тестовых прогонов её нет); для Psalm STDERR — всегда resource.
+        if (defined('STDERR')) {
+            fwrite(STDERR, $message . PHP_EOL);
+        }
     }
 
     private function isPhar(): bool

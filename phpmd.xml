@@ -71,7 +71,16 @@
     </rule>
     <rule ref="rulesets/cleancode.xml/StaticAccess">
         <properties>
-            <property name="ignorepattern" value="/^(create|createFrom|from|tryFrom|cases|normalize|parse|build|format|clean)/"/>
+            <!--
+                acquire*/encode/decode/skipped — статические фабрики и чистые
+                stateless-кодировщики компонента PharCache (FR-4, жизненный цикл
+                кеш-корней PHAR): acquireToOwn/acquireToInspect — фабрики
+                блокировки (приватный конструктор + flock), encode/decode —
+                чистое кодирование/разбор содержимого маркера без I/O,
+                skipped — фабрика отчёта о пропущенной очистке. StaticAccess
+                для них — false positive (как и для чистых фабрик create*/from).
+            -->
+            <property name="ignorepattern" value="/^(create|createFrom|from|tryFrom|cases|normalize|parse|build|format|clean|acquire|encode|decode|skipped)/"/>
         </properties>
     </rule>
     <rule ref="rulesets/design.xml">
