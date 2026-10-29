@@ -177,7 +177,7 @@ php vendor/bin/task-orchestrator agent:init
 
 完整支援僅限於 `agent:init`／`become-role`，不會改變管道的整體地位：Composer 是主要發行管道，PHAR 仍是 secondary/best-effort 管道（視情況發佈，不含 self-update 與其他一般性保證）。
 
-PHAR 安裝限制：封存檔必須保持在安裝時記錄於 `.phar-binding` 的實體路徑。移動或刪除 PHAR 後，請從新路徑重新安裝：`php task-orchestrator.phar agent:init --force`。無需手動清理快取：PHAR 容器快取依封存檔的實體路徑隔離。首次執行後才在 host 專案中建立的 roles、skills 與 `config/chains.yaml`，會在下一次執行時自動生效——layout 路徑（`roles_dir`／`skills_dir`／`chains_yaml`）於執行時期解析，不會固定寫入容器快取。
+PHAR 安裝限制：封存檔必須保持在安裝時記錄於 `.phar-binding` 的實體路徑。移動或刪除 PHAR 後，請從新路徑重新安裝：`php task-orchestrator.phar agent:init --force`。無需手動清理快取：PHAR 容器快取依封存檔的實體路徑隔離，且舊位置失效的快取根目錄會在下一次執行時自動刪除（清理政策與 NFS/Windows 限制——[架構文件](docs/guide/architecture.md#жизненный-цикл-и-очистка-кеш-корней-phar-fr-4)）。首次執行後才在 host 專案中建立的 roles、skills 與 `config/chains.yaml`，會在下一次執行時自動生效——layout 路徑（`roles_dir`／`skills_dir`／`chains_yaml`）於執行時期解析，不會固定寫入容器快取。
 
 最小的 `config/chains.yaml` — 兩個角色和一個兩步驟鏈條：
 
