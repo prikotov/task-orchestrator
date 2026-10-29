@@ -3,7 +3,7 @@ type: fix
 created: 2026-09-12 10:54:13 (1789210453)
 due: 
 started: 
-completed: 
+completed: 2026-10-29 05:21:48 (1793251308)
 cancelled: 
 value: V2
 complexity: C2
@@ -16,7 +16,7 @@ author: Аналитик Шерлок (codex-cli)
 assignee: Бэкендер Левша (codex-cli)
 branch: task/phar-runtime-layout-cache
 pr: https://github.com/prikotov/task-orchestrator/pull/440
-status: review
+status: done
 ---
 
 # TASK-fix-phar-runtime-layout-cache: Устранить заморозку runtime layout (QA-3)
@@ -49,14 +49,14 @@ status: review
 
 - **Где делаем:**
   - `src/Component/Layout/` — чистый резолвер host/package-ресурсов без Symfony-зависимостей и тонкий env-процессор (размещение зафиксировано ревью архитектора Локи);
-  - `src/Kernel.php` — вычисление layout-параметров `task_orchestrator.roles_dir`, `task_orchestrator.skills_dir`, `task_orchestrator.chains_yaml` во время выполнения вместо фиксации в скомпилированном контейнере согласно [конвенции Symfony-конфигурации](../docs/conventions/configuration/configuration.md);
+  - `src/Kernel.php` — вычисление layout-параметров `task_orchestrator.roles_dir`, `task_orchestrator.skills_dir`, `task_orchestrator.chains_yaml` во время выполнения вместо фиксации в скомпилированном контейнере согласно [конвенции Symfony-конфигурации](../../docs/conventions/configuration/configuration.md);
   - конфигурация и потребители layout-параметров в `src/Module/*/Resource/config/services.yaml` — только если runtime-разрешение требует правки потребителей;
-  - `tests/Integration/DependencyInjection/KernelIntegrationTest.php` и целевые integration-тесты согласно [конвенции тестирования](../docs/conventions/testing/index.md) — существующий тест дополняется, а не переписывается;
+  - `tests/Integration/DependencyInjection/KernelIntegrationTest.php` и целевые integration-тесты согласно [конвенции тестирования](../../docs/conventions/testing/index.md) — существующий тест дополняется, а не переписывается;
   - `bin/phar-smoke` — воспроизведение смены host-layout на реально собранном PHAR;
   - пользовательская и архитектурная документация о PHAR-кеше и разрешении host-ресурсов.
 - **Текущее поведение:** `Kernel::getKernelParameters()` во время первой компиляции контейнера выбирает host-путь только при наличии соответствующего ресурса, иначе фиксирует fallback (резервный путь) внутри PHAR. Последующее создание host-ресурса не меняет сохранённые `roles_dir`, `skills_dir` или `chains_yaml`. Изоляция `writableRoot()` по паре `(host project, physical PHAR path)` (исправление QA-1) сохраняется без изменений и не пересматривается.
 - **Scope:** инвентаризировать layout-зависимые параметры; устранить заморозку выбора host/package для ролей, skills и файла цепочек; добавить integration- и PHAR-проверки перехода package → host → package с персистентным кешем; синхронизировать документацию.
-- **Границы (Out of Scope):** не изменять установку `become-role`, `.phar-binding`, контракты `agent:init` и выполненные критерии `TASK-feat-phar-full-become-role-install`; не менять source/Composer layout без выявленной общей ошибки; не выполнять общий рефакторинг `Kernel`; не добавлять новые зависимости, self-update (самообновление) или общесистемный сборщик мусора; жизненный цикл и очистка устаревших PHAR-кеш-корней (FR-4) — вынесены в [`TASK-fix-phar-cache-root-lifecycle`](backlog/TASK-fix-phar-cache-root-lifecycle.todo.md).
+- **Границы (Out of Scope):** не изменять установку `become-role`, `.phar-binding`, контракты `agent:init` и выполненные критерии `TASK-feat-phar-full-become-role-install`; не менять source/Composer layout без выявленной общей ошибки; не выполнять общий рефакторинг `Kernel`; не добавлять новые зависимости, self-update (самообновление) или общесистемный сборщик мусора; жизненный цикл и очистка устаревших PHAR-кеш-корней (FR-4) — вынесены в [`TASK-fix-phar-cache-root-lifecycle`](../backlog/TASK-fix-phar-cache-root-lifecycle.todo.md).
 
 ## 3. Требования, MoSCoW (Requirements)
 
@@ -83,7 +83,7 @@ status: review
 ### ⚫ Не будем делать (Won't Have)
 
 - [ ] Не изменять выполненные критерии, реализацию managed copy (управляемой копии) или runtime-привязку `become-role` выполненной задачи.
-- [ ] Не реализовывать жизненный цикл и очистку PHAR-кеш-корней (FR-4): flock (блокировка файла), маркеры владения, удаление устаревших корней — предмет [`TASK-fix-phar-cache-root-lifecycle`](backlog/TASK-fix-phar-cache-root-lifecycle.todo.md).
+- [ ] Не реализовывать жизненный цикл и очистку PHAR-кеш-корней (FR-4): flock (блокировка файла), маркеры владения, удаление устаревших корней — предмет [`TASK-fix-phar-cache-root-lifecycle`](../backlog/TASK-fix-phar-cache-root-lifecycle.todo.md).
 - [ ] Не менять публичные контракты команд, формат ролей/skills/цепочек или общий статус PHAR как secondary/best-effort (вторичного канала с ограниченными гарантиями).
 - [ ] Не добавлять фоновые процессы, cron (планировщик), миграции БД или новые сторонние зависимости.
 - [ ] Не выполнять несвязанные FR-1, CR-1 и CR-4 из code review (ревью кода) выполненной задачи.
@@ -123,8 +123,8 @@ git diff --check
 
 ## 7. Риски и зависимости (Risks and Dependencies)
 
-- Решение о декомпозиции: ревью архитектора Локи от 2026-10-28 — вердикт «одобрено с замечаниями» (обязательные правки №1–№3 включены в Must Have, №4 — размещение `Component/Layout` — в контекст); решение аналитика Шерлока от 2026-10-28 (подтверждено пользователем) — декомпозиция вариантом А: этот файл — TASK-A (runtime layout), жизненный цикл PHAR-кеш-корней выделен в [`TASK-fix-phar-cache-root-lifecycle`](backlog/TASK-fix-phar-cache-root-lifecycle.todo.md).
-- Зависимость: [`TASK-feat-phar-full-become-role-install`](done/TASK-feat-phar-full-become-role-install.todo.md) вводит текущую cache isolation (изоляцию кеша) по паре `(host project, physical PHAR path)` и подтверждает наблюдения QA-3/FR-4. Эта задача является отдельным follow-up (последующей работой) и не расширяет scope зависимости.
+- Решение о декомпозиции: ревью архитектора Локи от 2026-10-28 — вердикт «одобрено с замечаниями» (обязательные правки №1–№3 включены в Must Have, №4 — размещение `Component/Layout` — в контекст); решение аналитика Шерлока от 2026-10-28 (подтверждено пользователем) — декомпозиция вариантом А: этот файл — TASK-A (runtime layout), жизненный цикл PHAR-кеш-корней выделен в [`TASK-fix-phar-cache-root-lifecycle`](../backlog/TASK-fix-phar-cache-root-lifecycle.todo.md).
+- Зависимость: [`TASK-feat-phar-full-become-role-install`](TASK-feat-phar-full-become-role-install.todo.md) вводит текущую cache isolation (изоляцию кеша) по паре `(host project, physical PHAR path)` и подтверждает наблюдения QA-3/FR-4. Эта задача является отдельным follow-up (последующей работой) и не расширяет scope зависимости.
 - Runtime env placeholder (динамический плейсхолдер окружения) Symfony подходит для строковых значений, но выбор первого существующего host/package ресурса требует явной модели; механическое перенесение текущей проверки существования в env processor (обработчик переменной окружения) может смешать конфигурацию и файловую политику — поэтому резолвер выносится в чистый `Component/Layout`, а env-процессор остаётся тонким.
 - Изоляция по физическому пути PHAR устраняет замороженные `package_dir`/`phar_path` после перемещения; новая реализация не должна вернуть QA-1 или нарушить рабочий smoke-сценарий A → B.
 - Удаление host-ресурса после компиляции — обратный пограничный сценарий: при существующем package-ресурсе система возвращается к fallback, при отсутствии обоих ресурсов — завершается явным исключением, но никогда не использует несуществующий замороженный путь.
@@ -132,19 +132,19 @@ git diff --check
 
 ## 8. Источники (Sources)
 
-- [QA: QA-3 — заморозка `roles_dir`](../docs/agents/reports/qa-backend/2026-09-12_09-25_phar-become-role-qa.md).
-- [Follow-up code review: FR-2/FR-4](../docs/agents/reports/code-reviewer-backend/2026-09-12_10-03_phar-become-role-followup-review.md).
-- [QA retest: остаточные кеш-корни](../docs/agents/reports/qa-backend/2026-09-12_10-10_phar-become-role-qa-retest.md).
+- [QA: QA-3 — заморозка `roles_dir`](../../docs/agents/reports/qa-backend/2026-09-12_09-25_phar-become-role-qa.md).
+- [Follow-up code review: FR-2/FR-4](../../docs/agents/reports/code-reviewer-backend/2026-09-12_10-03_phar-become-role-followup-review.md).
+- [QA retest: остаточные кеш-корни](../../docs/agents/reports/qa-backend/2026-09-12_10-10_phar-become-role-qa-retest.md).
 - Ревью архитектора Локи от 2026-10-28 (вердикт «одобрено с замечаниями») — обязательные правки отражены в Must Have и §9.
-- [Зависимая задача](done/TASK-feat-phar-full-become-role-install.todo.md).
-- [Конвенция Symfony-конфигурации](../docs/conventions/configuration/configuration.md).
-- [Конвенция тестирования](../docs/conventions/testing/index.md).
+- [Зависимая задача](TASK-feat-phar-full-become-role-install.todo.md).
+- [Конвенция Symfony-конфигурации](../../docs/conventions/configuration/configuration.md).
+- [Конвенция тестирования](../../docs/conventions/testing/index.md).
 - `src/Kernel.php`.
 - `bin/phar-smoke`.
 
 ## 9. Комментарии (Comments)
 
-Задача декомпозирована (вариант А). Ревью архитектора Локи от 2026-10-28 — вердикт «одобрено с замечаниями»; по его итогам аналитик Шерлок принял (пользователь подтвердил) split: TASK-A — устранение заморозки runtime layout (этот файл; ID сохранён, ссылки из [`TASK-feat-phar-full-become-role-install`](done/TASK-feat-phar-full-become-role-install.todo.md) остаются валидными), TASK-B — жизненный цикл PHAR-кеш-корней (FR-4, [`TASK-fix-phar-cache-root-lifecycle`](backlog/TASK-fix-phar-cache-root-lifecycle.todo.md)). Обязательные правки ревью: №1 — явное исключение при отсутствии обоих ресурсов, №2 — запрет env-плейсхолдеров в аргументах env-процессора, №3 — дополнение (не переписывание) `KernelIntegrationTest` с переходом package → host → package на повторном boot с персистентным кешем и негативным тестом битой сборки, №4 — размещение в `Component/Layout`. Если реализация потребует затронуть очистку корней — остановиться и перенести работу в TASK-B, не расширяя scope скрыто.
+Задача декомпозирована (вариант А). Ревью архитектора Локи от 2026-10-28 — вердикт «одобрено с замечаниями»; по его итогам аналитик Шерлок принял (пользователь подтвердил) split: TASK-A — устранение заморозки runtime layout (этот файл; ID сохранён, ссылки из [`TASK-feat-phar-full-become-role-install`](TASK-feat-phar-full-become-role-install.todo.md) остаются валидными), TASK-B — жизненный цикл PHAR-кеш-корней (FR-4, [`TASK-fix-phar-cache-root-lifecycle`](../backlog/TASK-fix-phar-cache-root-lifecycle.todo.md)). Обязательные правки ревью: №1 — явное исключение при отсутствии обоих ресурсов, №2 — запрет env-плейсхолдеров в аргументах env-процессора, №3 — дополнение (не переписывание) `KernelIntegrationTest` с переходом package → host → package на повторном boot с персистентным кешем и негативным тестом битой сборки, №4 — размещение в `Component/Layout`. Если реализация потребует затронуть очистку корней — остановиться и перенести работу в TASK-B, не расширяя scope скрыто.
 
 ## История изменений (Change History)
 

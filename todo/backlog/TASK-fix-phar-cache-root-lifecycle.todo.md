@@ -55,7 +55,7 @@ status: backlog
   - пользовательская и архитектурная документация: политика очистки, ограничения NFS/Windows, поведение при аварийном завершении.
 - **Текущее поведение:** изоляция `writableRoot()` по паре `(host project, physical PHAR path)` исправляет переиспользование контейнера после перемещения PHAR (закрытие QA-1), но каждый новый физический путь создаёт отдельный корень без автоматического удаления предыдущего; признака владения (маркера) у корней нет.
 - **Scope:** маркер владения с self-hash, flock-арбитр активности, ограниченный GC (сборка мусора) только в PHAR-режиме, матрица тестов, warning-семантика ошибки очистки, документирование ограничений.
-- **Границы (Out of Scope):** не трогать runtime layout-параметры (`roles_dir`, `skills_dir`, `chains_yaml`) и резолвер `Component/Layout` — это [`TASK-fix-phar-runtime-layout-cache`](../TASK-fix-phar-runtime-layout-cache.todo.md); не менять контракты `become-role`/`agent:init`; не менять source/Composer layout и не рефакторить `Kernel` целиком; не добавлять новые зависимости, self-update (самообновление) или общесистемный сборщик мусора.
+- **Границы (Out of Scope):** не трогать runtime layout-параметры (`roles_dir`, `skills_dir`, `chains_yaml`) и резолвер `Component/Layout` — это [`TASK-fix-phar-runtime-layout-cache`](../done/TASK-fix-phar-runtime-layout-cache.todo.md); не менять контракты `become-role`/`agent:init`; не менять source/Composer layout и не рефакторить `Kernel` целиком; не добавлять новые зависимости, self-update (самообновление) или общесистемный сборщик мусора.
 
 ## 3. Требования, MoSCoW (Requirements)
 
@@ -85,7 +85,7 @@ status: backlog
 
 ### ⚫ Won't Have (Не будем делать)
 
-- [ ] Не трогать runtime layout-параметры и резолвер `Component/Layout` — предмет [`TASK-fix-phar-runtime-layout-cache`](../TASK-fix-phar-runtime-layout-cache.todo.md).
+- [ ] Не трогать runtime layout-параметры и резолвер `Component/Layout` — предмет [`TASK-fix-phar-runtime-layout-cache`](../done/TASK-fix-phar-runtime-layout-cache.todo.md).
 - [ ] Не менять публичные контракты CLI-команд, формат ролей/skills/цепочек и выполненные критерии [`TASK-feat-phar-full-become-role-install`](../done/TASK-feat-phar-full-become-role-install.todo.md) (изоляция `writableRoot()` по паре остаётся).
 - [ ] Не удалять каталоги по возрасту, шаблону имени или рекурсивному сканированию системного temp (временного каталога) без полного набора признаков владения.
 - [ ] Не удалять активные (заблокированные flock) и неоднозначные каталоги.
@@ -130,7 +130,7 @@ git diff --check
 - Враждебный системный temp: злоумышленник или другой процесс может создать совпадающий путь, симлинк или каталог чужого владельца; обязательны `lstat`, проверка `fileowner` и прав `0700`; без полного набора признаков владения удаление запрещено.
 - Legacy-корни без маркера не идентифицируются и сохраняются — осознанная цена совместимости; накопление ограничивается ротацией системного temp.
 - Аварийное завершение процесса: lock освобождается ОС; корень с маркером прежнего расположения удаляется при следующем GC, незавершённый корень без маркера сохраняется.
-- Зависимости: [`TASK-feat-phar-full-become-role-install`](../done/TASK-feat-phar-full-become-role-install.todo.md) вводит изоляцию корней по паре (основание FR-4); [`TASK-fix-phar-runtime-layout-cache`](../TASK-fix-phar-runtime-layout-cache.todo.md) правит runtime layout — реализация не должна конфликтовать с его изменениями `Kernel`.
+- Зависимости: [`TASK-feat-phar-full-become-role-install`](../done/TASK-feat-phar-full-become-role-install.todo.md) вводит изоляцию корней по паре (основание FR-4); [`TASK-fix-phar-runtime-layout-cache`](../done/TASK-fix-phar-runtime-layout-cache.todo.md) правит runtime layout — реализация не должна конфликтовать с его изменениями `Kernel`.
 - Значения `V2` и `C3` обоснованы так: накопление корней — осознанная цена изоляции, вред ограничен размером temp, но устранение требует конкурентного flock-арбитра, POSIX-зависимостей, безопасного удаления в потенциально враждебном каталоге и реальных PHAR-проверок — высокая техническая сложность при средней ценности.
 
 ## 8. Источники (Sources)
@@ -138,7 +138,7 @@ git diff --check
 - [QA retest: остаточные кеш-корни (FR-4, QA-1)](../../docs/agents/reports/qa-backend/2026-09-12_10-10_phar-become-role-qa-retest.md).
 - [Follow-up code review: FR-2/FR-4](../../docs/agents/reports/code-reviewer-backend/2026-09-12_10-03_phar-become-role-followup-review.md).
 - [Зависимая задача: изоляция кеша](../done/TASK-feat-phar-full-become-role-install.todo.md).
-- [Сопряжённая задача: runtime layout](../TASK-fix-phar-runtime-layout-cache.todo.md).
+- [Сопряжённая задача: runtime layout](../done/TASK-fix-phar-runtime-layout-cache.todo.md).
 - [Конвенции проекта](../../docs/conventions/index.md).
 - [Конвенция тестирования](../../docs/conventions/testing/index.md).
 - `src/Kernel.php`.
@@ -146,7 +146,7 @@ git diff --check
 
 ## 9. Комментарии (Comments)
 
-Задача выделена при декомпозиции вариантом А (решение аналитика Шерлока от 2026-10-28, подтверждено пользователем) из [`TASK-fix-phar-runtime-layout-cache`](../TASK-fix-phar-runtime-layout-cache.todo.md) после ревью архитектора Локи (вердикт «одобрено с замечаниями»); Must Have выше — зафиксированный контракт этого ревью, а не предложения исполнителя. Boot-time flock и маркер владения — контракт системы, а не детали реализации: смена схемы требует возврата задачи автору. Fail-fast при ошибке очистки отклонён сознательно: он маскирует результат основной команды; решение о warning-семантике зафиксировано до реализации.
+Задача выделена при декомпозиции вариантом А (решение аналитика Шерлока от 2026-10-28, подтверждено пользователем) из [`TASK-fix-phar-runtime-layout-cache`](../done/TASK-fix-phar-runtime-layout-cache.todo.md) после ревью архитектора Локи (вердикт «одобрено с замечаниями»); Must Have выше — зафиксированный контракт этого ревью, а не предложения исполнителя. Boot-time flock и маркер владения — контракт системы, а не детали реализации: смена схемы требует возврата задачи автору. Fail-fast при ошибке очистки отклонён сознательно: он маскирует результат основной команды; решение о warning-семантике зафиксировано до реализации.
 
 ## История изменений (Change History)
 
