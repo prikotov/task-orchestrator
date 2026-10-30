@@ -2,7 +2,7 @@
 type: chore
 created: 2026-10-30 02:29:49 (1793327389)
 due: 
-started: 
+started: 2026-10-30 03:28:48 (1793330928)
 completed: 
 cancelled: 
 value: V3
@@ -13,10 +13,10 @@ cost_fact:
 depends_on: 
 epic: 
 author: Аналитик Шерлок (pi)
-assignee: 
-branch: 
+assignee: Аналитик Шерлок (pi)
+branch: task/phar-cache-roots-prevention
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-arch-phar-cache-roots-prevention: Предотвращение накопления PHAR-кеш-корней
@@ -94,3 +94,4 @@ php vendor/bin/todo-md validate todo/TASK-arch-phar-cache-roots-prevention.todo.
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-10-30 02:29:49 (1793327389) | Аналитик Шерлок (pi) | Создание задачи |
+| 2026-10-30 03:28:48 (1793330928) | Тимлид Алекс (pi) | Запуск: status → in_progress, assignee → Аналитик Шерлок (pi), branch → task/phar-cache-roots-prevention |
