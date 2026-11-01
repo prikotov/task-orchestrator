@@ -3,7 +3,7 @@ type: chore
 created: 2026-10-30 02:29:49 (1793327389)
 due: 
 started: 2026-10-30 03:28:48 (1793330928)
-completed: 
+completed: 2026-11-01 12:32:09 (1793536329)
 cancelled: 
 value: V3
 complexity: C2
@@ -15,8 +15,8 @@ epic:
 author: Аналитик Шерлок (pi)
 assignee: Аналитик Шерлок (pi)
 branch: task/phar-cache-roots-prevention
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/445
+status: done
 ---
 
 # TASK-arch-phar-cache-roots-prevention: Предотвращение накопления PHAR-кеш-корней
