@@ -505,7 +505,7 @@ src/Module/<Name>/
 
 Общий `config/services.yaml` остаётся тонким: импортирует `console_services.yaml`, объявляет общий alias `Psr\Clock\ClockInterface` → `SystemClock` (сам `SystemClock` — единственный concrete-сервис `src/Component/` — задан явным определением). Алиасы интерфейсов, scalar arguments (скалярные аргументы), tagged iterators (итераторы по тегам) конкретных модулей живут в модульных `src/Module/<Name>/Resource/config/services.yaml`. Никаких операторов `resource:`/`exclude:` в корневых YAML не осталось — все они ломались в PHAR через `GlobResource` (см. ниже) и заменены на PHAR-safe регистрацию.
 
-Корень пакета (каталог пакета с `src/`, `apps/`, `config/`) разрешается через `Kernel::getPackageDir() = dirname(__DIR__)` — CWD-независимо (наследуемый `getProjectDir()` в PHAR даёт неверный `phar://.../src`, т.к. `composer.json` не упакован в PHAR). `getPackageDir()` используется для `config/modules.php`, параметра `task_orchestrator.package_dir` и базовых путей PHAR-safe регистрации.
+Корень пакета (каталог пакета с `src/`, `apps/`, `config/`) разрешается через `Kernel::packageDir() = dirname(__DIR__)` — CWD-независимо (наследуемый `getProjectDir()` в PHAR даёт неверный `phar://.../src`, т.к. `composer.json` не упакован в PHAR). Метод публичный: `Kernel` реализует `PharRuntimePathsProviderInterface` (`src/Component/PharRuntime/`) — провайдер путей запущенного кода для DI (см. ниже). `packageDir()` используется для `config/modules.php`, параметра `task_orchestrator.package_dir` (runtime-разрешение) и базовых путей PHAR-safe регистрации.
 
 ### PHAR-safe регистрация сервисов модуля
 
@@ -539,7 +539,9 @@ Use Case шины (диспетчеризация Command/Query Handler-ов п�
 - **За пределами доменных модулей.** Тот же `ModuleServiceRegistrar` (generic: параметр `serviceDir`, опция `public`) применяется в `Kernel::registerConsoleServices()` для регистрации команд и подписчиков `apps/console/src/Module/*/Command|EventSubscriber/` (теги `console.command`/`kernel.event_subscriber` добавляются на уровне контейнера autoconfig Symfony).
 
 Параметры `task_orchestrator.*` задаются в `Kernel::getKernelParameters()` на самом раннем этапе.
-В Composer-host контейнер CLI кешируется отдельно от контейнера основного приложения: `<host>/var/cache/task-orchestrator/<release-version>/<env>`. Сегмент версии предотвращает повторное использование несовместимого DI-контейнера после обновления пакета. В PHAR writable-корень уходит в системный временный каталог и изолируется по паре (host-проект, физический путь архива): параметры `package_dir`/`phar_path` замораживаются в кеш при компиляции, поэтому после перемещения архива изоляция по его пути даёт свежий контейнер без ручной чистки кеша. Явный `APP_CACHE_DIR` сохраняет приоритет и задаёт пользовательский корень кеша.
+В Composer-host контейнер CLI кешируется отдельно от контейнера основного приложения: `<host>/var/cache/task-orchestrator/<release-version>/<env>`. Сегмент версии предотвращает повторное использование несовместимого DI-контейнера после обновления пакета. В PHAR writable-корень уходит в системный временный каталог и изолируется по паре (host-проект, физический путь архива): phar-зависимые параметры `package_dir`/`phar_path` НЕ замораживаются в кеш — они разрешаются в runtime (см. ниже), поэтому даже переиспользованный контейнер ссылается на запущенный архив, а изоляция по пути архива дополнительно даёт свежую компиляцию после перемещения PHAR без ручной чистки кеша. Явный `APP_CACHE_DIR` сохраняет приоритет и задаёт пользовательский корень кеша.
+
+Phar-зависимые параметры ядра `task_orchestrator.package_dir` и `task_orchestrator.phar_path` — динамические env-плейсхолдеры (`%env(task_orchestrator_phar:package_dir)%` и т.п.): значения НЕ запекаются в скомпилированный контейнер, а разрешаются в момент обращения к параметру env-процессором `TaskOrchestratorPharEnvVarProcessor` (`src/Component/PharRuntime/`) от провайдера путей запущенного кода — самого ядра (`Kernel` реализует `PharRuntimePathsProviderInterface`: `packageDir()` — location-based, `runningPharPath()` — защищённый шов `resolvePharPath()` = `Phar::running(false)`). После перемещения PHAR потребители (layout-резолвер package-fallback, привязка `.phar-binding` команды `agent:init`) получают пути от ЗАПУЩЕННОГО архива даже при переиспользовании персистентного кеша контейнера в `debug=false`: `ConfigCache` в этом режиме не проверяет свежесть (`is_file()`), поэтому runtime-разрешение — единственный источник актуальных путей (шаг (A) решения П2, `docs/research/phar-cache-roots-prevention.md`). Аргументы env-процессора — только сервисы без env-зависимостей (провайдер — alias на ядро); `%env(...)%` в аргументах процессора запрещён — рекурсия `Container::getEnv()`.
 Модульные файлы используют собственные параметры `module.<name>.*`, при необходимости ссылаясь на
 `task_orchestrator.*` как на источник. Параметр `base_path` — с dual-context resolution (разрешение путей
 для двух контекстов: standalone и vendor-binary).
@@ -592,10 +594,12 @@ Use Case шины (диспетчеризация Command/Query Handler-ов п�
 `config/chains.yaml`, созданные в host-проекте после первого запуска PHAR, доступны уже при следующем
 запуске без ручной очистки кеша (ранее выбор запекался при первой компиляции — дефект QA-3). При отсутствии
 И host-, И package-ресурса резолвер бросает явное `LayoutResourceNotFoundException` («дистрибутив повреждён»),
-а не возвращает несуществующий путь. Аргументы env-процессора — только plain-параметры контейнера
-(`%task_orchestrator.base_path%`, `%task_orchestrator.package_dir%`): `%env(...)%` в аргументах процессора
-запрещён — рекурсия `Container::getEnv()`; имя после префикса (`roles_dir` и др.) — дискриминатор ресурса,
-не env-переменная.
+а не возвращает несуществующий путь. Аргументы env-процессора — только plain-параметр контейнера
+(`%task_orchestrator.base_path%`) и сервисы без env-зависимостей: package-корень процессор берёт в runtime
+у провайдера путей запущенного кода `PharRuntimePathsProviderInterface` (alias на ядро, `Component/PharRuntime`),
+а НЕ параметром `%task_orchestrator.package_dir%` — тот стал env-плейсхолдером (шаг (A) решения П2);
+`%env(...)%` в аргументах процессора запрещён — рекурсия `Container::getEnv()`; имя после префикса
+(`roles_dir` и др.) — дискриминатор ресурса, не env-переменная.
 
 ### Presentation-слой (в приложении-хосте)
 

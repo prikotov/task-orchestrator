@@ -12,6 +12,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
+use TaskOrchestrator\Common\Component\PharRuntime\PharRuntimePathsProviderInterface;
 use TaskOrchestrator\Console\Module\Orchestrator\Command\InitCommand;
 use TaskOrchestrator\Console\Module\Orchestrator\Skill\Service\InstallBecomeRoleService;
 
@@ -51,11 +52,31 @@ final class InitCommandTest extends TestCase
         $this->filesystem = new Filesystem();
         $this->filesystem->mkdir($this->basePath);
 
+        // Провайдер путей запущенного кода (в контейнере — alias на `kernel`):
+        // Source/Composer-ветка не зависит от пути PHAR — runningPharPath() = null.
+        $pathsProvider = new class ($this->packageDir) implements PharRuntimePathsProviderInterface {
+            public function __construct(
+                private readonly string $packageDir,
+            ) {
+            }
+
+            #[Override]
+            public function packageDir(): string
+            {
+                return $this->packageDir;
+            }
+
+            #[Override]
+            public function runningPharPath(): ?string
+            {
+                return null;
+            }
+        };
+
         $installer = new InstallBecomeRoleService(
-            packageDir: $this->packageDir,
+            pathsProvider: $pathsProvider,
             basePath: $this->basePath,
             isPhar: false,
-            pharPath: null,
             filesystem: $this->filesystem,
         );
 

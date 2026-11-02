@@ -34,6 +34,33 @@ services:
     tags:
       - { name: container.env_var_processor }
 
+  # --- Runtime phar-зависимые пути ядра (package_dir / phar_path) ---
+  # Env-процессор prefix `task_orchestrator_phar` (Component/PharRuntime):
+  # разрешает параметры ядра task_orchestrator.package_dir/phar_path В МОМЕНТ
+  # обращения, а не при компиляции (шаг (A) решения П2): значения НЕ запекаются
+  # в скомпилированный контейнер, поэтому после перемещения PHAR потребители
+  # (layout-резолвер package-fallback, привязка .phar-binding команды agent:init)
+  # получают пути от ЗАПУЩЕННОГО архива даже при переиспользовании персистентного
+  # кеша контейнера в debug=false — без очистки кеша и без мёртвых phar://-ссылок.
+  # Источник значений — провайдер путей запущенного кода (alias на `kernel`:
+  # packageDir() — location-based, runningPharPath() — защищённый шов
+  # resolvePharPath()). Тег только маркирует процессор: префикс объявлен в самом
+  # классе (getProvidedTypes()).
+  # ❗ Аргументы процессора — ТОЛЬКО plain-параметры контейнера либо сервисы БЕЗ
+  # env-зависимостей: %env(...)% в аргументах env-процессора запрещён — рекурсия
+  # Container::getEnv() (см. PHPDoc класса). По этой же причине
+  # TaskOrchestratorLayoutEnvVarProcessor ниже получает package-корень через
+  # провайдер, а не через %task_orchestrator.package_dir% (тот стал
+  # env-плейсхолдером).
+  TaskOrchestrator\Common\Component\PharRuntime\PharRuntimePathsProviderInterface:
+    alias: kernel
+
+  TaskOrchestrator\Common\Component\PharRuntime\TaskOrchestratorPharEnvVarProcessor:
+    arguments:
+      $pathsProvider: '@TaskOrchestrator\Common\Component\PharRuntime\PharRuntimePathsProviderInterface'
+    tags:
+      - { name: container.env_var_processor }
+
   # --- Runtime layout host/package (roles_dir / skills_dir / chains_yaml) ---
   # Env-процессор prefix `task_orchestrator_layout` (Component/Layout): выбирает
   # host- или package-путь ресурса при каждом запуске (Container::getEnv в
@@ -42,14 +69,17 @@ services:
   # запуске БЕЗ очистки кеша (QA-3); при отсутствии обоих кандидатов — явное
   # исключение. Потребители — модули AgentRole, ChainDefinition и ChainExecution
   # (через %task_orchestrator.roles_dir% и др.).
-  # ❗ Аргументы процессора — ТОЛЬКО plain-параметры контейнера (base_path,
-  # package_dir): %env(...)% в аргументах env-процессора запрещён — рекурсия
-  # Container::getEnv() (см. PHPDoc класса). Тег только маркирует процессор:
+  # ❗ Аргументы процессора — ТОЛЬКО plain-параметры контейнера (base_path) и
+  # сервисы БЕЗ env-зависимостей: %env(...)% в аргументах env-процессора
+  # запрещён — рекурсия Container::getEnv() (см. PHPDoc класса). Package-корень
+  # берётся у провайдера Component/PharRuntime (alias на `kernel`) в runtime,
+  # а НЕ параметром %task_orchestrator.package_dir% — тот стал env-плейсхолдером
+  # и в аргументах env-процессора запрещён. Тег только маркирует процессор:
   # префикс объявлен в самом классе (getProvidedTypes()).
   TaskOrchestrator\Common\Component\Layout\TaskOrchestratorLayoutEnvVarProcessor:
     arguments:
       $hostRoot: '%task_orchestrator.base_path%'
-      $packageRoot: '%task_orchestrator.package_dir%'
+      $pathsProvider: '@TaskOrchestrator\Common\Component\PharRuntime\PharRuntimePathsProviderInterface'
     tags:
       - { name: container.env_var_processor }
 
@@ -73,17 +103,19 @@ services:
   # Специализированный Presentation-сервис установки общего skill become-role
   # (см. TaskOrchestrator\Console\Module\Orchestrator\Skill). source/Composer —
   # относительный симлинк; PHAR — управляемая копия с runtime-привязкой
-  # .phar-binding к физическому пути запущенного PHAR. Параметры ядра
-  # (package_dir/base_path/is_phar/phar_path) — единственный источник путей;
-  # Filesystem резолвится через FrameworkBundle. Сама команда InitCommand
-  # регистрируется PHAR-safe регистратором Kernel::registerConsoleServices()
-  # и получает сервис через явный alias ниже (autowire).
+  # .phar-binding к физическому пути запущенного PHAR. Phar-зависимые пути
+  # (package-корень, физический путь PHAR) резолвятся в runtime через провайдер
+  # Component/PharRuntime (alias на `kernel`) — не замораживаются в кеш
+  # контейнера (шаг (A) решения П2); не phar-зависимые (base_path/is_phar) —
+  # plain-параметры ядра. Filesystem резолвится через FrameworkBundle. Сама
+  # команда InitCommand регистрируется PHAR-safe регистратором
+  # Kernel::registerConsoleServices() и получает сервис через явный alias ниже
+  # (autowire).
   TaskOrchestrator\Console\Module\Orchestrator\Skill\Service\InstallBecomeRoleService:
     arguments:
-      $packageDir: '%task_orchestrator.package_dir%'
+      $pathsProvider: '@TaskOrchestrator\Common\Component\PharRuntime\PharRuntimePathsProviderInterface'
       $basePath: '%task_orchestrator.base_path%'
       $isPhar: '%task_orchestrator.is_phar%'
-      $pharPath: '%task_orchestrator.phar_path%'
 
   TaskOrchestrator\Console\Module\Orchestrator\Skill\InstallBecomeRoleServiceInterface:
     alias: TaskOrchestrator\Console\Module\Orchestrator\Skill\Service\InstallBecomeRoleService

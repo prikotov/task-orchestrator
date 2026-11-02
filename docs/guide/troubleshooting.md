@@ -327,7 +327,7 @@ The service "TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Servi
    ```
    Ошибка `Kernel`/compile укажет на отсутствующий bundle, модуль или битый `config/services.yaml`.
 
-2. Параметры вычисляются в `Kernel::getKernelParameters()` из двух каталогов: **корень пакета** (`getPackageDir()` = `dirname(__DIR__)` от `src/Kernel.php` — CWD-независимо, источник `config/`, `task_orchestrator.package_dir`) и **проект-потребитель** (`getProjectRoot()`, источник ролей, цепочек и `base_path`). Проверьте, что файлы существуют и разрешаются корректно:
+2. Параметры вычисляются в `Kernel::getKernelParameters()` из двух каталогов: **корень пакета** (`packageDir()` = `dirname(__DIR__)` от `src/Kernel.php` — CWD-независимо, источник `config/`, `task_orchestrator.package_dir`) и **проект-потребитель** (`getProjectRoot()`, источник ролей, цепочек и `base_path`). Phar-зависимые параметры (`package_dir`/`phar_path`) разрешаются в runtime от запущенного кода/архива (env-процессор `Component/PharRuntime`) — их устаревшее значение после перемещения PHAR не является причиной ошибки. Проверьте, что файлы существуют и разрешаются корректно:
    - роли: `<project_root>/docs/agents/roles/team` (fallback на корень пакета);
    - цепочки: `<project_root>/config/chains.yaml` (fallback на корень пакета);
    - конфигурация контейнера: `config/bundles.php`, `config/modules.php`, `config/packages/`, `config/services.yaml`, `config/console_services.yaml`.
@@ -444,7 +444,7 @@ php task-orchestrator.phar agent:init --force
 
 **Причина:** контейнер собран «пустым» по модулям (пустым). Обычно это сборка, зависящая от рабочего каталога в PHAR:
 
-- сломан корень пакета: наследуемый `getProjectDir()` в PHAR даёт неверный `phar://.../src` (`composer.json` не упакован в PHAR) → `getModules()` возвращает `[]` → ни один модуль не грузится. Фикс — `Kernel::getPackageDir() = dirname(__DIR__)`;
+- сломан корень пакета: наследуемый `getProjectDir()` в PHAR даёт неверный `phar://.../src` (`composer.json` не упакован в PHAR) → `getModules()` возвращает `[]` → ни один модуль не грузится. Фикс — `Kernel::packageDir() = dirname(__DIR__)`;
 - сломан PHAR-safe регистратор (`ModuleServiceRegistrar`): если вместо него остался оператор `resource:` — `GlobResource` возвращает 0 файлов по `phar://`.
 
 **Диагностика:**

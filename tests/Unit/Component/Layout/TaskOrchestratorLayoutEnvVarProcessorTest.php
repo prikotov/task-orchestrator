@@ -10,15 +10,19 @@ use PHPUnit\Framework\TestCase;
 use TaskOrchestrator\Common\Component\Layout\HostPackageLayoutResolver;
 use TaskOrchestrator\Common\Component\Layout\LayoutResourceNotFoundException;
 use TaskOrchestrator\Common\Component\Layout\TaskOrchestratorLayoutEnvVarProcessor;
+use TaskOrchestrator\Common\Component\PharRuntime\PharRuntimePathsProviderInterface;
 
 /**
  * Unit-тест env-процессора runtime layout
  * {@see TaskOrchestratorLayoutEnvVarProcessor}.
  *
  * Закрепляет контракт процессора:
- *  - конструктор принимает ТОЛЬКО plain-значения (host-корень и package-корень
- *    как строки — в контейнере это plain-параметры %task_orchestrator.base_path%
- *    и %task_orchestrator.package_dir%; %env(...)% в аргументах процессора
+ *  - конструктор принимает plain-строку host-корня (в контейнере — plain-параметр
+ *    %task_orchestrator.base_path%) и провайдер путей запущенного кода
+ *    PharRuntimePathsProviderInterface (env-free сервис, alias на `kernel`):
+ *    package-корень берётся в runtime методом packageDir(); передача
+ *    %task_orchestrator.package_dir% параметром больше невозможна — тот стал
+ *    env-плейсхолдером (шаг (A) решения П2), а %env(...)% в аргументах процессора
  *    запрещён — рекурсия Container::getEnv(), см. PHPDoc класса);
  *  - имя в плейсхолдере — дискриминатор ресурса, а не env-переменная: $getEnv
  *    не вызывается, значение из окружения не читается;
@@ -45,9 +49,29 @@ final class TaskOrchestratorLayoutEnvVarProcessorTest extends TestCase
         mkdir($this->hostRoot, 0777, true);
         mkdir($this->packageRoot, 0777, true);
 
-        // Контракт plain-параметров: процессор строится из двух строк (в
-        // контейнере — plain-параметры), без env-зависимостей.
-        $this->processor = new TaskOrchestratorLayoutEnvVarProcessor($this->hostRoot, $this->packageRoot);
+        // Контракт аргументов: plain-строка host-корня + env-free провайдер
+        // путей запущенного кода (package-корень резолвится в runtime).
+        $this->processor = new TaskOrchestratorLayoutEnvVarProcessor(
+            $this->hostRoot,
+            new class ($this->packageRoot) implements PharRuntimePathsProviderInterface {
+                public function __construct(
+                    private readonly string $packageDir,
+                ) {
+                }
+
+                #[\Override]
+                public function packageDir(): string
+                {
+                    return $this->packageDir;
+                }
+
+                #[\Override]
+                public function runningPharPath(): ?string
+                {
+                    return null;
+                }
+            },
+        );
     }
 
     #[\Override]
@@ -124,7 +148,24 @@ final class TaskOrchestratorLayoutEnvVarProcessorTest extends TestCase
 
         $processor = new TaskOrchestratorLayoutEnvVarProcessor(
             $this->hostRoot . '/',
-            $this->packageRoot . '/',
+            new class ($this->packageRoot . '/') implements PharRuntimePathsProviderInterface {
+                public function __construct(
+                    private readonly string $packageDir,
+                ) {
+                }
+
+                #[\Override]
+                public function packageDir(): string
+                {
+                    return $this->packageDir;
+                }
+
+                #[\Override]
+                public function runningPharPath(): ?string
+                {
+                    return null;
+                }
+            },
         );
 
         self::assertSame(
