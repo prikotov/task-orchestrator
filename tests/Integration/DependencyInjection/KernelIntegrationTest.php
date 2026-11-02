@@ -22,8 +22,12 @@ use TaskOrchestrator\Console\Module\Orchestrator\Command\InitCommand;
  *    bundles.php, modules.php грузятся из пакета);
  *  - кеш Composer-host изолирован от приложения и разделён по версии пакета;
  *  - кеш/log PHAR изолированы по паре (host-проект, физический путь архива):
- *    замороженные в персистентный кеш package_dir/phar_path не переживают
- *    перемещения PHAR (QA-1);
+ *    изоляция «пары» остаётся действующим контрактом (QA-1);
+ *  - phar-зависимые параметры ядра (package_dir/phar_path) — runtime
+ *    env-параметры (%env(task_orchestrator_phar:...)%): при перемещении PHAR
+ *    на переиспользованном персистентном кеше (debug=false, ConfigCache не
+ *    проверяет свежесть) параметры разрешаются от ЗАПУЩЕННОГО архива без
+ *    пересборки контейнера и очистки кеша (шаг (A) решения П2);
  *  - локаль AI-ролей (task_orchestrator.locale, env TASK_ORCHESTRATOR_LOCALE) —
  *    runtime env-параметр: автоматический поиск при отсутствии значения,
  *    независимость от APP_LOCALE и от локали Symfony-переводчика
@@ -348,9 +352,13 @@ final class KernelIntegrationTest extends TestCase
         // Негативный тест «битой сборки» (правка ревью Локи №1): ни host-, ни
         // package-ресурса нет → явное исключение с безопасным текстом (без
         // содержимого кеша и несуществующих путей); возврат несуществующего
-        // пути запрещён. Повреждённый дистрибутив имитируется швом
-        // getKernelParameters(): package_dir переопределён на пустой каталог
-        // (реальный пакет ресурс имеет), host-корень пуст.
+        // пути запрещён. Повреждённый дистрибутив имитируется швом packageDir():
+        // layout-процессор берёт package-корень у провайдера путей запущенного
+        // кода (Kernel::packageDir(), а НЕ параметр %task_orchestrator.package_dir%
+        // — тот стал env-плейсхолдером Component/PharRuntime), host-корень пуст.
+        // В «пустом» пакете создаются пустые каталоги PHAR-safe регистратора
+        // (компиляция требует их существования, но ресурсных файлов там нет —
+        // docs/agents/roles, docs/agents/skills, config/chains.yaml отсутствуют).
         //
         // ❗ Ленивое разрешение env: исключение возникает при ПЕРВОМ ОБРАЩЕНИИ
         // к параметру (getParameter → env-процессор), а НЕ в boot() — старт
@@ -361,7 +369,10 @@ final class KernelIntegrationTest extends TestCase
         $hostRoot = sys_get_temp_dir() . '/to-kernel-broken-host-' . bin2hex(random_bytes(6));
         $brokenPackageRoot = sys_get_temp_dir() . '/to-kernel-broken-package-' . bin2hex(random_bytes(6));
         mkdir($hostRoot, 0777, true);
-        mkdir($brokenPackageRoot, 0777, true);
+        mkdir($brokenPackageRoot . '/apps/console/src/Module/Orchestrator/Command', 0777, true);
+        mkdir($brokenPackageRoot . '/apps/console/src/Module/GitIdentity/Command', 0777, true);
+        mkdir($brokenPackageRoot . '/apps/console/src/Module/AgentRole/Command', 0777, true);
+        mkdir($brokenPackageRoot . '/apps/console/src/Module/Orchestrator/EventSubscriber', 0777, true);
 
         $kernel = new class ('test', false, $hostRoot, $brokenPackageRoot) extends Kernel {
             public function __construct(string $environment, bool $debug, string $projectRoot, private readonly string $brokenPackageRoot)
@@ -370,12 +381,9 @@ final class KernelIntegrationTest extends TestCase
             }
 
             #[\Override]
-            protected function getKernelParameters(): array
+            public function packageDir(): string
             {
-                $parameters = parent::getKernelParameters();
-                $parameters['task_orchestrator.package_dir'] = $this->brokenPackageRoot;
-
-                return $parameters;
+                return $this->brokenPackageRoot;
             }
         };
 
@@ -626,6 +634,91 @@ final class KernelIntegrationTest extends TestCase
         self::assertStringNotContainsString('/tools/', $cacheDir);
     }
 
+    #[Test]
+    public function pharMoveResolvesRuntimeParamsOnReusedPersistentContainer(): void
+    {
+        // Шаг (A) решения П2: phar-зависимые параметры task_orchestrator.
+        // package_dir/phar_path — динамические env-параметры (%env(
+        // task_orchestrator_phar:...)%). Сценарий «перемещения PHAR» на
+        // ПЕРЕИСПОЛЬЗОВАННОМ персистентном кеше (debug=false): ConfigCache не
+        // проверяет свежесть (гипотеза D3 — подтверждается прямо в тесте:
+        // второй boot НЕ пересобирает контейнер), поэтому runtime-разрешение —
+        // единственный источник актуальных путей. Швы: физический путь архива
+        // инъецируется через resolvePharPath() (в реальном PHAR —
+        // Phar::running(false)), phar://-корень запущенного кода — через
+        // packageDir() (в реальном PHAR — dirname(__DIR__) от загруженного
+        // Kernel.php), базовый каталог кеш-корней — через pharCacheBaseDir()
+        // (изоляция теста от реального <sys_tmp>/task-orchestrator).
+        // Корень кеша фиксируется APP_CACHE_DIR (полное пользовательское
+        // переопределение изоляции «пары» — конфигурация, которую защищает
+        // шаг (A); с упрощением ключа изоляции в шаге (B) она станет дефолтом).
+        $hostRoot = sys_get_temp_dir() . '/to-kernel-phar-move-host-' . bin2hex(random_bytes(6));
+        mkdir($hostRoot, 0777, true);
+        $cacheRoot = sys_get_temp_dir() . '/to-kernel-phar-move-cache-' . bin2hex(random_bytes(6));
+        $restoreCacheDir = $this->isolateEnvVar('APP_CACHE_DIR', $cacheRoot);
+
+        try {
+            // Первый запуск из «старого» расположения: компиляция контейнера,
+            // параметры разрешаются от запущенного кода и инъецированного
+            // пути архива.
+            $oldLocation = $this->createPharMovedKernel($hostRoot, '/tools/task-orchestrator.phar');
+            $oldLocation->boot();
+            $container = $oldLocation->getContainer();
+            self::assertSame(
+                $this->packageRoot,
+                $container->getParameter('task_orchestrator.package_dir'),
+            );
+            self::assertSame(
+                '/tools/task-orchestrator.phar',
+                $container->getParameter('task_orchestrator.phar_path'),
+            );
+            $containerSnapshot = $this->assertCompiledContainerSaved($cacheRoot);
+            $oldLocation->shutdown();
+
+            // ПЕРЕМЕЩЕНИЕ PHAR = смена корня загруженного кода: компиляция
+            // первого запуска выполнялась по реальному packageDir() (код на
+            // исходном месте), runtime-корень второго запуска переключается
+            // на phar://-путь нового расположения (в реальном PHAR
+            // dirname(__DIR__) от загруженного Kernel.php меняется сам).
+            // При паразитной пересборке (регрессия заморозки) компиляция громко
+            // упадёт: каталогов по phar:///tools2/... не существует.
+            $newLocation = $this->createPharMovedKernel(
+                $hostRoot,
+                '/tools2/task-orchestrator.phar',
+                runtimePackageDir: 'phar:///tools2/task-orchestrator.phar',
+            );
+            $newLocation->boot();
+            try {
+                $container = $newLocation->getContainer();
+
+                // Контейнер переиспользован, а не пересобран: тот же набор
+                // артефактов с теми же сигнатурами. Это и есть подтверждение
+                // гипотезы D3: в debug=false ConfigCache не проверяет свежесть —
+                // устаревший контейнер загружается вслепую при изменившемся
+                // физическом пути архива.
+                $this->assertCompiledContainerReused($containerSnapshot, $cacheRoot);
+
+                // Runtime-разрешение шага (A): оба phar-зависимых параметра
+                // разрешены от ЗАПУЩЕННОГО (нового) архива — мёртвых
+                // phar://<старый путь>-ссылок нет.
+                self::assertSame(
+                    'phar:///tools2/task-orchestrator.phar',
+                    $container->getParameter('task_orchestrator.package_dir'),
+                );
+                self::assertSame(
+                    '/tools2/task-orchestrator.phar',
+                    $container->getParameter('task_orchestrator.phar_path'),
+                );
+            } finally {
+                $newLocation->shutdown();
+            }
+        } finally {
+            $restoreCacheDir();
+            $this->removeDirectory($hostRoot);
+            $this->removeDirectory($cacheRoot);
+        }
+    }
+
     private function createPharContextKernel(string $projectRoot, string $pharPath): Kernel
     {
         return new class ('prod', false, $projectRoot, $pharPath) extends Kernel {
@@ -638,6 +731,54 @@ final class KernelIntegrationTest extends TestCase
             protected function resolvePharPath(): ?string
             {
                 return $this->injectedPharPath;
+            }
+        };
+    }
+
+    /**
+     * Ядро с инъекцией PHAR-контекста «перемещённого архива»:
+     *  - resolvePharPath(): физический путь архива (в реальном PHAR —
+     *    Phar::running(false));
+     *  - runtimePackageDir(): переключаемый runtime-корень запущенного кода
+     *    (в реальном PHAR — dirname(__DIR__) от загруженного Kernel.php, он
+     *    меняется при перемещении архива сам); null — компиляция и runtime
+     *    идут по реальному packageDir();
+     *  - pharCacheBaseDir(): изолированный базовый каталог кеш-корней —
+     *    тест не пишет в реальный <sys_tmp>/task-orchestrator, где лежат
+     *    корни действующих PHAR-запусков.
+     */
+    private function createPharMovedKernel(string $projectRoot, string $pharPath, ?string $runtimePackageDir = null): Kernel
+    {
+        $baseDir = rtrim(sys_get_temp_dir(), '/\\') . '/task-orchestrator-phar-move-roots';
+
+        return new class ('prod', false, $projectRoot, $pharPath, $baseDir, $runtimePackageDir) extends Kernel {
+            public function __construct(
+                string $environment,
+                bool $debug,
+                string $projectRoot,
+                private readonly string $injectedPharPath,
+                private readonly string $injectedBaseDir,
+                private readonly ?string $runtimePackageDir = null,
+            ) {
+                parent::__construct($environment, $debug, $projectRoot);
+            }
+
+            #[\Override]
+            protected function resolvePharPath(): ?string
+            {
+                return $this->injectedPharPath;
+            }
+
+            #[\Override]
+            public function packageDir(): string
+            {
+                return $this->runtimePackageDir ?? parent::packageDir();
+            }
+
+            #[\Override]
+            protected function pharCacheBaseDir(): string
+            {
+                return $this->injectedBaseDir;
             }
         };
     }

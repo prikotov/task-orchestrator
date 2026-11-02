@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use TaskOrchestrator\Common\Component\PharRuntime\PharRuntimePathsProviderInterface;
 use TaskOrchestrator\Console\Module\Orchestrator\Skill\BecomeRoleInstallOutcomeEnum;
 use TaskOrchestrator\Console\Module\Orchestrator\Skill\Service\InstallBecomeRoleService;
 
@@ -390,10 +391,12 @@ final class InstallBecomeRoleServiceTest extends TestCase
         };
 
         $service = new InstallBecomeRoleService(
-            packageDir: $this->temp . '/package',
+            pathsProvider: $this->createPathsProvider(
+                packageDir: $this->temp . '/package',
+                pharPath: self::PHAR_PATH,
+            ),
             basePath: $this->basePath,
             isPhar: true,
-            pharPath: self::PHAR_PATH,
             filesystem: $filesystem,
         );
 
@@ -512,10 +515,9 @@ final class InstallBecomeRoleServiceTest extends TestCase
     private function createServiceWithFailingSwitch(): InstallBecomeRoleService
     {
         return new class (
-            $this->temp . '/package',
+            $this->createPathsProvider($this->temp . '/package', self::PHAR_PATH),
             $this->basePath,
             true,
-            self::PHAR_PATH,
             $this->filesystem,
         ) extends InstallBecomeRoleService {
             private int $renameCalls = 0;
@@ -540,10 +542,9 @@ final class InstallBecomeRoleServiceTest extends TestCase
     private function createServiceWithFailingSwitchAndRollback(): InstallBecomeRoleService
     {
         return new class (
-            $this->temp . '/package',
+            $this->createPathsProvider($this->temp . '/package', self::PHAR_PATH),
             $this->basePath,
             true,
-            self::PHAR_PATH,
             $this->filesystem,
         ) extends InstallBecomeRoleService {
             private int $renameCalls = 0;
@@ -562,13 +563,42 @@ final class InstallBecomeRoleServiceTest extends TestCase
         };
     }
 
+    /**
+     * Заглушка провайдера путей запущенного кода: фиксирует значения, которые
+     * в production отдает ядро (Kernel::packageDir()/runningPharPath()).
+     */
+    private function createPathsProvider(string $packageDir, ?string $pharPath): PharRuntimePathsProviderInterface
+    {
+        return new class ($packageDir, $pharPath) implements PharRuntimePathsProviderInterface {
+            public function __construct(
+                private readonly string $packageDir,
+                private readonly ?string $pharPath,
+            ) {
+            }
+
+            #[Override]
+            public function packageDir(): string
+            {
+                return $this->packageDir;
+            }
+
+            #[Override]
+            public function runningPharPath(): ?string
+            {
+                return $this->pharPath;
+            }
+        };
+    }
+
     private function createService(?string $pharPath = self::PHAR_PATH): InstallBecomeRoleService
     {
         return new InstallBecomeRoleService(
-            packageDir: $this->temp . '/package',
+            pathsProvider: $this->createPathsProvider(
+                packageDir: $this->temp . '/package',
+                pharPath: $pharPath,
+            ),
             basePath: $this->basePath,
             isPhar: true,
-            pharPath: $pharPath,
             filesystem: $this->filesystem,
         );
     }
