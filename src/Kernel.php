@@ -15,6 +15,7 @@ use TaskOrchestrator\Common\Component\ModuleSystem\ModuleKernelTrait;
 use TaskOrchestrator\Common\Component\PharCache\CacheRootGarbageCollector;
 use TaskOrchestrator\Common\Component\PharCache\CacheRootOwner;
 use TaskOrchestrator\Common\Component\PharCache\CacheRootOwnershipLock;
+use TaskOrchestrator\Common\Component\PharRuntime\PharRuntimePathsProviderInterface;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStepServiceInterface;
@@ -32,14 +33,15 @@ use const PHP_OS_FAMILY;
  * (подгрузка Resource/config/services.yaml, Twig- и Translation-путей).
  *
  * Package root (каталог пакета с src/, apps/, config/) разрешается через
- * {@see getPackageDir()} = dirname(__DIR__): CWD-независимо и одинаково в
+ * {@see packageDir()} = dirname(__DIR__): CWD-независимо и одинаково в
  * обычной FS и в PHAR (где наследуемый BaseKernel::getProjectDir() даёт
  * неверный phar://.../src, так как composer.json не упакован в PHAR).
- * getPackageDir() используется для config/modules.php и параметра
- * task_orchestrator.package_dir.
+ * packageDir() используется для config/modules.php, параметра
+ * task_orchestrator.package_dir (через env-процессор Component/PharRuntime,
+ * см. ниже) и базовых путей PHAR-safe регистрации.
  *
  * {@see getProjectDir()} переопределён: в PHAR возвращает package root
- * (через getPackageDir()), в обычной FS — наследуемый поиск по composer.json.
+ * (через packageDir()), в обычной FS — наследуемый поиск по composer.json.
  * Это чинит Symfony-конфигурацию в PHAR (config/bundles.php, config/packages/*,
  * config/services.yaml грузятся через MicroKernelTrait::getConfigDir() =
  * getProjectDir()/config) и параметр kernel.project_dir.
@@ -53,15 +55,24 @@ use const PHP_OS_FAMILY;
  * package root, если в host-проекте ресурсов нет). В standalone-режиме
  * $projectRoot не передаётся и совпадает с package root. host-ресурсы
  * разрешаются через {@see getProjectRoot()}, package-ресурсы — через
- * getPackageDir()/getProjectDir(). Layout-пути (roles_dir/skills_dir/chains_yaml)
+ * packageDir()/getProjectDir(). Layout-пути (roles_dir/skills_dir/chains_yaml)
  * разрешаются во время выполнения (runtime) env-процессором Component/Layout
  * ({@see \TaskOrchestrator\Common\Component\Layout\TaskOrchestratorLayoutEnvVarProcessor}):
  * они НЕ запекаются в скомпилированный контейнер, поэтому ресурсы host-проекта,
  * созданные после первого запуска, видны при следующем запуске без очистки кеша.
+ * Phar-зависимые package_dir/phar_path разрешаются так же в runtime —
+ * env-процессором Component/PharRuntime
+ * ({@see \TaskOrchestrator\Common\Component\PharRuntime\TaskOrchestratorPharEnvVarProcessor},
+ * шаг (A) решения П2): после перемещения PHAR все потребители получают значения
+ * от запущенного архива, даже если персистентный кеш контейнера переиспользуется
+ * в debug=false (ConfigCache не проверяет свежесть). Ядро выступает провайдером
+ * путей ({@see PharRuntimePathsProviderInterface}): packageDir() — location-based,
+ * runningPharPath() — защищённый шов resolvePharPath().
  *
  * Phar: package root доступен только для чтения, поэтому cache/log при работе
  * из Phar уходят в системный временный каталог, изолированный по паре
- * (host-проект, физический путь PHAR) — см. writableRoot().
+ * (host-проект, физический путь PHAR) — см. writableRoot(); упрощение ключа
+ * изоляции — отдельный шаг (B) решения П2, здесь он не выполняется.
  *
  * Жизненный цикл кеш-корня PHAR (FR-4): в PHAR-режиме до parent::boot() ядро
  * захватывает свой корень во владение (mkdir `0700` → flock(LOCK_EX|LOCK_NB) →
@@ -77,7 +88,7 @@ use const PHP_OS_FAMILY;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-class Kernel extends BaseKernel
+class Kernel extends BaseKernel implements PharRuntimePathsProviderInterface
 {
     use MicroKernelTrait;
     use ModuleKernelTrait;
@@ -147,7 +158,7 @@ class Kernel extends BaseKernel
      * config/packages/*, config/bundles.php (через MicroKernelTrait::getConfigDir()
      * = getProjectDir()/config) и ломается весь PHAR-контейнер.
      *
-     * Поэтому в PHAR явно возвращаем package root ({@see getPackageDir()}): там
+     * Поэтому в PHAR явно возвращаем package root ({@see packageDir()}): там
      * лежат config/, src/, templates/, упакованные в архив. В обычной FS
      * поведение наследуемого getProjectDir() сохраняется.
      *
@@ -157,11 +168,12 @@ class Kernel extends BaseKernel
     #[Override]
     public function getProjectDir(): string
     {
-        return $this->isPhar() ? $this->getPackageDir() : parent::getProjectDir();
+        return $this->isPhar() ? $this->packageDir() : parent::getProjectDir();
     }
 
     /**
-     * Package root: каталог пакета, где лежат src/, apps/, config/.
+     * Package root: каталог пакета, где лежат src/, apps/, config/. Реализация
+     * {@see PharRuntimePathsProviderInterface::packageDir()}.
      *
      * CWD-независимо и работает как в обычной файловой системе, так и в PHAR.
      * В PHAR composer.json не упакован, поэтому наследуемый
@@ -170,12 +182,40 @@ class Kernel extends BaseKernel
      * dirname(__FILE__). Kernel.php лежит в src/, поэтому package root =
      * dirname(__DIR__).
      *
+     * ВНИМАНИЕ: в PHAR это runtime-значение запущенного кода (phar://-корень
+     * запущенного архива). Как параметр контейнера
+     * task_orchestrator.package_dir оно отдаётся через env-процессор
+     * Component/PharRuntime и НЕ замораживается при компиляции; сам метод
+     * используется и на этапе компиляции (config/modules.php, PHAR-safe
+     * регистрация) — там загруженный код совпадает с запущенным.
+     *
+     * НЕ путать с {@see getProjectRoot()} — каталогом host-проекта для ролей,
+     * цепочек, base_path и writable cache/log.
+     *
      *   dev:  dirname('/path/src')          = '/path'           (root проекта).
      *   PHAR: dirname('phar://x.phar/src')  = 'phar://x.phar'   (root PHAR).
      */
-    private function getPackageDir(): string
+    #[Override]
+    public function packageDir(): string
     {
         return dirname(__DIR__);
+    }
+
+    /**
+     * Физический путь запущенного PHAR или null вне PHAR. Реализация
+     * {@see PharRuntimePathsProviderInterface::runningPharPath()}.
+     *
+     * Runtime-источник env-процессора Component/PharRuntime: параметры
+     * task_orchestrator.package_dir/phar_path разрешаются от запущенного
+     * архива при каждом обращении (шаг (A) решения П2) — в том числе на
+     * переиспользованном персистентном кеше контейнера. Делегирует защищённому
+     * шву {@see resolvePharPath()} (инъекция пути в тестах ядра вне реального
+     * архива).
+     */
+    #[Override]
+    public function runningPharPath(): ?string
+    {
+        return $this->resolvePharPath();
     }
 
     /**
@@ -185,10 +225,12 @@ class Kernel extends BaseKernel
      * `<host>/var/cache/<env>` небезопасен: там может лежать контейнер другого
      * Kernel или предыдущей версии task-orchestrator. Версия входит в путь,
      * поэтому обновлённый пакет компилирует совместимый контейнер автоматически.
-     * В Phar к корню добавляется изоляция по физическому пути архива
-     * ({@see writableRoot()}): замороженные в кеш package_dir/phar_path не
-     * переживают перемещения PHAR. Явный APP_CACHE_DIR остаётся полным
-     * пользовательским переопределением.
+     * В Phar к корню добавляется изоляция по паре (host-проект, физический
+     * путь архива) ({@see writableRoot()}) — действующий контракт изоляции
+     * кеш-корней; phar-зависимые параметры ядра при этом разрешаются в runtime
+     * (env-процессор Component/PharRuntime), поэтому даже переиспользованный
+     * контейнер ссылается на запущенный архив. Явный APP_CACHE_DIR остаётся
+     * полным пользовательским переопределением.
      */
     #[Override]
     public function getCacheDir(): string
@@ -222,6 +264,9 @@ class Kernel extends BaseKernel
      * Устанавливаются на этапе конструирования контейнера (раньше любого импорта
      * конфигурации), поэтому task_orchestrator.* доступны services.yaml и
      * модульным Resource/config/services.yaml без отдельной настройки.
+     * Обычные (plain) параметры запекаются при компиляции; phar-зависимые
+     * (package_dir/phar_path), layout-пути и локаль AI-ролей остаются
+     * динамическими env-плейсхолдерами и резолвятся в runtime (см. ниже).
      *
      * @return array<string, mixed>
      */
@@ -230,13 +275,27 @@ class Kernel extends BaseKernel
     {
         $parameters = parent::getKernelParameters();
 
-        $packageDir = $this->getPackageDir();
         $projectRoot = $this->getProjectRoot();
 
-        $parameters['task_orchestrator.package_dir'] = $packageDir;
+        // Phar-зависимые пути — динамические env-параметры (шаг (A) решения П2):
+        // в скомпилированном контейнере параметр остаётся env-плейсхолдером и
+        // резолвится через env-процессор Component/PharRuntime при КАЖДОМ
+        // обращении к параметру от ЗАПУЩЕННОГО кода/архива (провайдер — ядро:
+        // packageDir()/runningPharPath(), см. PharRuntimePathsProviderInterface).
+        // Поэтому перемещение PHAR не оставляет мёртвых phar://-ссылок даже при
+        // переиспользовании персистентного кеша в debug=false (ConfigCache не
+        // проверяет свежесть); внешний контракт agent:init сохранён (.phar-binding
+        // = физический путь запущенного PHAR). Имя после префикса —
+        // дискриминатор ресурса процессора, не env-переменная.
+        $parameters['task_orchestrator.package_dir'] = '%env(task_orchestrator_phar:package_dir)%';
+        $parameters['task_orchestrator.phar_path'] = '%env(task_orchestrator_phar:phar_path)%';
+
+        // base_path/chains_session_dir — host-корень и его производная: в
+        // dual-context от пути PHAR не зависят (фар-зависимость — только в
+        // standalone-PHAR, D4 — вне объёма шага (A)), поэтому остаются обычными
+        // параметрами. is_phar — флаг режима, от пути архива не зависит.
         $parameters['task_orchestrator.base_path'] = $projectRoot;
         $parameters['task_orchestrator.is_phar'] = $this->isPhar();
-        $parameters['task_orchestrator.phar_path'] = $this->resolvePharPath();
         $parameters['task_orchestrator.chains_session_dir'] = $projectRoot . '/var/sessions';
         $parameters['task_orchestrator.platform_family'] = $this->platformFamily;
 
@@ -317,7 +376,7 @@ class Kernel extends BaseKernel
      */
     private function getModules(): array
     {
-        $file = $this->getPackageDir() . '/config/modules.php';
+        $file = $this->packageDir() . '/config/modules.php';
 
         return is_file($file) ? require $file : [];
     }
@@ -345,7 +404,7 @@ class Kernel extends BaseKernel
      */
     private function registerConsoleServices(ContainerBuilder $container): void
     {
-        $appsConsoleModule = $this->getPackageDir() . '/apps/console/src/Module';
+        $appsConsoleModule = $this->packageDir() . '/apps/console/src/Module';
 
         foreach (
             [
@@ -442,14 +501,14 @@ class Kernel extends BaseKernel
      *
      * Из Phar package root доступен только для чтения — используем системный
      * временный каталог, изолированный по паре (host-проект, физический путь
-     * PHAR). Физический путь архива обязан входить в ключ изоляции: параметры
-     * task_orchestrator.package_dir/phar_path (и производные от package_dir)
-     * вычисляются при компиляции и замораживаются в персистентном кеше
-     * контейнера, поэтому кеш, общий для двух расположений одного архива,
-     * продолжал бы ссылаться на мёртвый phar://<старый путь> после перемещения
-     * PHAR. Изоляция по паре даёт свежую компиляцию после перемещения архива
-     * без ручной чистки кеша (контракт повторной установки agent:init --force
-     * из нового расположения). В обычном режиме — host-проект (projectRoot),
+     * PHAR). Физический путь архива входит в ключ изоляции по действующему
+     * контракту «пары»: phar-зависимые параметры task_orchestrator.package_dir/
+     * phar_path больше НЕ замораживаются (шаг (A) решения П2 — runtime-разрешение
+     * через env-процессор Component/PharRuntime), но изоляция по паре сохраняется
+     * и дополнительно даёт свежую компиляцию после перемещения архива — контракт
+     * повторной установки agent:init --force из нового расположения. Упрощение
+     * ключа (только host-проект) — отдельный шаг (B) решения П2, здесь не
+     * выполняется. В обычном режиме — host-проект (projectRoot),
      * что даёт изоляцию кеша по CWD и согласовано с другими writable-путями
      * (var/sessions, var/cache/git-identity).
      */
@@ -564,9 +623,10 @@ class Kernel extends BaseKernel
      *
      * Единственный штатный источник физического пути архива — Phar::running(false):
      * разбор строки `phar://` недопустим (слэши/чувствительность к регистру хоста).
-     * Используется сервисом установки become-role (agent:init в PHAR) для
-     * runtime-привязки управляемой копии skill к конкретному файлу PHAR и ключом
-     * изоляции writable-корня ({@see writableRoot()}).
+     * Единый защищённый шов пути архива: публичный {@see runningPharPath()}
+     * (провайдер Component/PharRuntime — runtime env-параметры
+     * task_orchestrator.package_dir/phar_path и привязка .phar-binding
+     * agent:init) и ключ изоляции writable-корня ({@see writableRoot()}).
      *
      * Protected — проверяемый шов для инъекции физического пути PHAR в тестах
      * ядра вне реального архива (по образцу renamePath() в

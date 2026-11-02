@@ -9,6 +9,7 @@ use RuntimeException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+use TaskOrchestrator\Common\Component\PharRuntime\PharRuntimePathsProviderInterface;
 use TaskOrchestrator\Console\Module\Orchestrator\Skill\BecomeRoleInstallOutcomeEnum;
 use TaskOrchestrator\Console\Module\Orchestrator\Skill\BecomeRoleInstallResultDto;
 use TaskOrchestrator\Console\Module\Orchestrator\Skill\InstallBecomeRoleServiceInterface;
@@ -42,6 +43,15 @@ use Throwable;
  * и защищает только кооперативные параллельные запуски (не SIGKILL/отключение
  * питания/внешние процессы).
  *
+ * Phar-зависимые пути (package-корень для источника skill и физический путь
+ * PHAR для привязки .phar-binding) резолвятся в runtime через
+ * {@see PharRuntimePathsProviderInterface} (провайдер путей запущенного кода,
+ * alias на сервис `kernel`): после перемещения PHAR повторная установка из
+ * нового расположения (контракт agent:init --force) берёт пути от ЗАПУЩЕННОГО
+ * архива, даже если персистентный кеш контейнера переиспользуется в debug=false
+ * (шаг (A) решения П2). Внешний контракт сохранён: `.phar-binding` = физический
+ * путь запущенного PHAR (паритет с resolvePharPath() = Phar::running(false)).
+ *
  * Класс не объявлен final намеренно: protected {@see renamePath()} — проверяемый
  * тестовый шов коммит-фазы (инъекция отказа второго переименования для проверки
  * отката в integration-тестах).
@@ -66,10 +76,9 @@ class InstallBecomeRoleService implements InstallBecomeRoleServiceInterface
     private const string BACKUP_PREFIX = '.become-role.backup.';
 
     public function __construct(
-        private readonly string $packageDir,
+        private readonly PharRuntimePathsProviderInterface $pathsProvider,
         private readonly string $basePath,
         private readonly bool $isPhar,
-        private readonly ?string $pharPath,
         private readonly Filesystem $filesystem,
     ) {
     }
@@ -152,7 +161,7 @@ class InstallBecomeRoleService implements InstallBecomeRoleServiceInterface
      */
     private function installManagedCopy(bool $force): BecomeRoleInstallResultDto
     {
-        $pharPath = $this->pharPath;
+        $pharPath = $this->pathsProvider->runningPharPath();
         if ($pharPath === null || $pharPath === '') {
             throw new RuntimeException('физический путь запущенного PHAR недоступен; обновите PHAR-дистрибутив');
         }
@@ -504,7 +513,7 @@ class InstallBecomeRoleService implements InstallBecomeRoleServiceInterface
 
     private function sourcePath(): string
     {
-        return Path::canonicalize($this->packageDir . '/' . self::SKILL_RELATIVE_PATH);
+        return Path::canonicalize($this->pathsProvider->packageDir() . '/' . self::SKILL_RELATIVE_PATH);
     }
 
     private function targetDirPath(): string

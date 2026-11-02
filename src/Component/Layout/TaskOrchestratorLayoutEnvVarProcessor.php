@@ -7,6 +7,7 @@ namespace TaskOrchestrator\Common\Component\Layout;
 use InvalidArgumentException;
 use Override;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
+use TaskOrchestrator\Common\Component\PharRuntime\PharRuntimePathsProviderInterface;
 
 /**
  * Env-процессор runtime layout-путей task-orchestrator (prefix `task_orchestrator_layout`).
@@ -25,15 +26,20 @@ use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
  * образцу встроенного Symfony-процессора `const` имя никогда не читается из
  * окружения, замыкание $getEnv не вызывается, задать значение через env нельзя.
  *
- * ❗ Контракт конструктора: ТОЛЬКО plain-параметры контейнера —
- * %task_orchestrator.base_path% (host-корень) и %task_orchestrator.package_dir%
- * (package-корень). Запрещено передавать в аргументы процессора env-плейсхолдеры
- * (%env(...)%): процессор создаётся контейнером при разрешении env-переменной,
- * поэтому %env()% в аргументах приводит к рекурсии Container::getEnv()
- * (ParameterCircularReferenceException). Правило распространяется и на будущие
- * зависимости процессора: их аргументы также обязаны быть plain-параметрами
- * либо сервисами без env-зависимостей. Ровно по этой причине резолвер
- * инстанциируется здесь из двух plain-строк, а не внедряется отдельным сервисом
+ * ❗ Контракт конструктора: аргументы — ТОЛЬКО plain-параметр контейнера
+ * (%task_orchestrator.base_path%, host-корень) и сервисы БЕЗ env-зависимостей
+ * ({@see PharRuntimePathsProviderInterface}, alias на сервис `kernel`).
+ * Запрещено передавать в аргументы процессора env-плейсхолдеры (%env(...)%):
+ * процессор создаётся контейнером при разрешении env-переменной, поэтому %env()%
+ * в аргументах приводит к рекурсии Container::getEnv()
+ * (ParameterCircularReferenceException). Ровно поэтому package-корень больше НЕ
+ * передаётся параметром %task_orchestrator.package_dir% (он сам стал
+ * env-плейсхолдером — runtime-разрешение через Component/PharRuntime, шаг (A)
+ * решения П2), а берётся у провайдера путей ({@see PharRuntimePathsProviderInterface::packageDir()})
+ * при построении резолвера — тоже в runtime. Правило распространяется и на
+ * будущие зависимости процессора: их аргументы также обязаны быть
+ * plain-параметрами либо сервисами без env-зависимостей. Резолвер
+ * инстанциируется здесь через `new`, а не внедряется отдельным сервисом
  * с собственной конфигурацией.
  */
 final class TaskOrchestratorLayoutEnvVarProcessor implements EnvVarProcessorInterface
@@ -53,16 +59,21 @@ final class TaskOrchestratorLayoutEnvVarProcessor implements EnvVarProcessorInte
     private readonly HostPackageLayoutResolver $resolver;
 
     /**
-     * @param string $hostRoot    корень host-проекта (plain-параметр
-     *                            %task_orchestrator.base_path%; см. контракт класса)
-     * @param string $packageRoot package-корень (plain-параметр
-     *                            %task_orchestrator.package_dir%)
+     * @param string $hostRoot      корень host-проекта (plain-параметр
+     *                              %task_orchestrator.base_path%; см. контракт класса)
+     * @param PharRuntimePathsProviderInterface $pathsProvider провайдер путей
+     *                              запущенного кода (env-free сервис, alias на
+     *                              `kernel`): package-корень берётся в runtime
+     *                              методом packageDir() — НЕ параметром
+     *                              %task_orchestrator.package_dir%, чтобы не
+     *                              нарушить контракт «без %env(...)% в аргументах
+     *                              env-процессора» (рекурсия Container::getEnv())
      */
     public function __construct(
         string $hostRoot,
-        string $packageRoot,
+        PharRuntimePathsProviderInterface $pathsProvider,
     ) {
-        $this->resolver = new HostPackageLayoutResolver($hostRoot, $packageRoot);
+        $this->resolver = new HostPackageLayoutResolver($hostRoot, $pathsProvider->packageDir());
     }
 
     /**
