@@ -244,6 +244,8 @@ CI `phar-smoke` падал с `FileLocatorFileNotFoundException`: команды
 
 `getPackageDir()` используется в `getModules()` и `getKernelParameters()` (для `task_orchestrator.package_dir`). Наследуемый `getProjectDir()` (нужен Symfony для `kernel.project_dir`, маршрутизации и кэша) и `getProjectRoot()` (host-проект ролей/цепочек) не переопределяются. Доказано сравнительным экспериментом: `getProjectDir()` → 0 модулей, `getPackageDir()` → 5 модулей.
 
+> **Актуализация 2026-11-02** (TASK-arch-phar-cache-runtime-params, шаг (A) решения П2): метод переименован в `public packageDir()` — `Kernel` реализует `PharRuntimePathsProviderInterface` (`src/Component/PharRuntime/`); параметр `task_orchestrator.package_dir` больше не вычисляется в `getKernelParameters()` как plain-значение — он стал динамическим env-плейсхолдером `%env(task_orchestrator_phar:package_dir)%` с runtime-разрешением env-процессором `Component/PharRuntime` (после перемещения PHAR потребители получают пути от запущенного архива даже при переиспользовании персистентного кеша контейнера).
+
 ### Расширение регистрации, совместимой с PHAR за пределы доменных модулей
 
 Помимо доменных модулей `src/Module/*`, операторы `resource:` использовались ещё в 4 местах — все ломались в PHAR по той же причине (`GlobResource` + `phar://`). После Варианта 4 они тоже переведены на регистрацию, совместимую с PHAR:
