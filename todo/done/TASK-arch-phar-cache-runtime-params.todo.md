@@ -2,8 +2,8 @@
 type: feat
 created: 2026-11-02 01:43:19 (1793583799)
 due: 
-started: 
-completed: 
+started: 2026-11-02 09:34:08 (1793586848)
+completed: 2026-11-02 11:30:27 (1793593827)
 cancelled: 
 value: V3
 complexity: C3
@@ -15,8 +15,8 @@ epic:
 author: Аналитик Шерлок (pi)
 assignee: Бэкендер Левша (pi)
 branch: task/phar-cache-runtime-params
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/448
+status: done
 ---
 
 # TASK-arch-phar-cache-runtime-params: Runtime-разрешение phar-зависимых параметров ядра
