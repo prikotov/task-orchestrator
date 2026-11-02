@@ -13,10 +13,10 @@ cost_fact:
 depends_on: TASK-arch-phar-cache-roots-prevention
 epic: 
 author: Аналитик Шерлок (pi)
-assignee: 
-branch: 
+assignee: Бэкендер Левша (pi)
+branch: task/phar-cache-runtime-params
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-arch-phar-cache-runtime-params: Runtime-разрешение phar-зависимых параметров ядра
