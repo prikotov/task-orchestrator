@@ -3,7 +3,7 @@ type: docs
 created: 2026-11-03 04:15:57 (1793679357)
 due: 
 started: 2026-11-03 04:15:57 (1793679357)
-completed: 
+completed: 2026-11-03 04:25:21 (1793679921)
 cancelled: 
 value: V2
 complexity: C2
@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/release-v0-10-0
 pr: https://github.com/prikotov/task-orchestrator/pull/451
-status: in_progress
+status: done
 ---
 
 # TASK-release-v0-10-0-preparation: Подготовка релиза v0.10.0
