@@ -606,7 +606,13 @@ YAML);
             roleFile: $this->piRoleFile,
             softTimeout: 60,
             hardTimeout: 120,
-            stallTimeout: 10,
+            // Стресс-тест проверяет SIGPIPE/throughput-контракт, а не stall-тайминг.
+            // Фейковый раннер, заблокированный на записи в полный FIFO (64KB), спит
+            // в write() с нулевой CPU/IO-дельтой — liveness-gate считает его idle,
+            // и под нагрузкой CI (reader отстаёт) tight stall=10 давал ложные
+            // reason=stall (флейк). 45с поглощают планировочные паузы CI; потолки
+            // soft=60/hard=120 сохраняют границу патологического зависания.
+            stallTimeout: 45,
             processTimeout: 120.0,
         );
 
@@ -657,7 +663,10 @@ YAML);
             roleFile: $this->piRoleFile,
             softTimeout: 60,
             hardTimeout: 120,
-            stallTimeout: 10,
+            // См. комментарий в largeSuccessfulEventStream...: stall-детектор с
+            // liveness-gate не отличает «писатель заблокирован на полном FIFO» от
+            // зависания; generous stall убирает ложные срабатывания под нагрузкой CI.
+            stallTimeout: 45,
             processTimeout: 60.0,
         );
 
