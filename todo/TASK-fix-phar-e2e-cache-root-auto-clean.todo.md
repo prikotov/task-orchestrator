@@ -15,7 +15,7 @@ epic:
 author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/fix-phar-e2e-cache-root-auto-clean
-pr: 
+pr: https://github.com/prikotov/task-orchestrator/pull/452
 status: in_progress
 ---
 
