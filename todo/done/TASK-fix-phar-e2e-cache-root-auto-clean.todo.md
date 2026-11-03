@@ -3,7 +3,7 @@ type: test
 created: 2026-11-03 05:10:21 (1793682621)
 due: 
 started: 2026-11-03 05:10:21 (1793682621)
-completed: 
+completed: 2026-11-03 05:25:55 (1793683555)
 cancelled: 
 value: V2
 complexity: C1
@@ -16,7 +16,7 @@ author: Тимлид Алекс (pi)
 assignee: Тимлид Алекс (pi)
 branch: task/fix-phar-e2e-cache-root-auto-clean
 pr: https://github.com/prikotov/task-orchestrator/pull/452
-status: in_progress
+status: done
 ---
 
 # TASK-fix-phar-e2e-cache-root-auto-clean: Обновить асерт E2E изоляции PHAR-кеша под контракт FR-4
