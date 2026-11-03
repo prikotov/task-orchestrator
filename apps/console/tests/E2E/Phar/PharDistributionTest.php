@@ -307,11 +307,15 @@ final class PharDistributionTest extends TestCase
         self::assertStringContainsString('Роль: backend_developer_levsha', $roleScript->getOutput());
         self::assertStringContainsString('Файл роли:', $roleScript->getOutput());
 
-        // 6) Прямое доказательство изоляции: для A и B материализованы разные
-        // корни дефолтного кеша — контейнер A не переиспользуется запуском из B.
+        // 6) Прямое доказательство контракта FR-4 (#443): дефолтный кеш изолируется
+        // по физическому пути архива (контейнер A не переиспользуется запуском из B),
+        // а устаревший корень A зачищается автоматически при загрузке из B — без
+        // ручной чистки остаётся ровно один кеш-корень, захваченный во владение
+        // запуском из B (маркер владения на месте).
         $cacheRoots = glob($sandboxTmp . '/task-orchestrator/*', GLOB_ONLYDIR);
         self::assertNotFalse($cacheRoots);
-        self::assertGreaterThanOrEqual(2, count($cacheRoots), 'дефолтный кеш PHAR не изолирован по физическому пути архива');
+        self::assertCount(1, $cacheRoots, 'дефолтный кеш PHAR: устаревший корень A не зачищен автоматически при запуске из B (FR-4)');
+        self::assertFileExists($cacheRoots[0] . '/.task-orchestrator-owner.json', 'оставшийся кеш-корень не захвачен во владение запуском из B');
     }
 
     /**
