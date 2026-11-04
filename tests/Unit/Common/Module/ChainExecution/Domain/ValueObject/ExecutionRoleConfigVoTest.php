@@ -19,7 +19,7 @@ final class ExecutionRoleConfigVoTest extends TestCase
     #[DataProvider('complexityProvider')]
     public function testResolveCommandSelectsNearestHigherThenLower(array $commands, int $complexity, array $expected): void
     {
-        $config = new ExecutionRoleConfigVo(command: ['legacy'], commandsByComplexity: $commands);
+        $config = new ExecutionRoleConfigVo(command: $commands === [] ? ['legacy'] : [], commandsByComplexity: $commands);
 
         self::assertSame($expected, $config->resolveCommand($complexity));
     }
@@ -36,5 +36,18 @@ final class ExecutionRoleConfigVoTest extends TestCase
         yield 'single lower command' => [['C1' => ['one']], 5, ['one']];
         yield 'single higher command' => [['C4' => ['four']], 0, ['four']];
         yield 'legacy command' => [[], 3, ['legacy']];
+    }
+
+    public function testBaseCommandActsAsC3(): void
+    {
+        $config = new ExecutionRoleConfigVo(
+            command: ['default'],
+            commandsByComplexity: ['C1' => ['one'], 'C4' => ['four']],
+        );
+
+        self::assertSame(['one'], $config->resolveCommand(0));
+        self::assertSame(['default'], $config->resolveCommand(2));
+        self::assertSame(['default'], $config->resolveCommand(3));
+        self::assertSame(['four'], $config->resolveCommand(5));
     }
 }

@@ -506,13 +506,18 @@ YAML);
 
         $fixturePath = $fixtureDir . '/chains.yaml';
         file_put_contents($fixturePath, <<<'YAML'
+command_profiles:
+  low:
+    command: [--model, low]
+  default:
+    command: [--model, default]
 roles:
   analyst:
     prompt_file: docs/roles/analyst.md
     system_prompt_file: prompts/subagent/base_system.md
-    command:
-      - --model
-      - gpt-4o-mini
+    command_profile: default
+    commands_by_complexity:
+      C1: low
     timeout: 600
   architect:
     command:
@@ -541,6 +546,8 @@ YAML);
             self::assertNotNull($analyst);
             self::assertSame(600, $analyst->getTimeout());
             self::assertSame('docs/roles/analyst.md', $analyst->getPromptFile());
+            self::assertSame(['--model', 'default'], $analyst->getCommand());
+            self::assertSame(['C1' => ['--model', 'low']], $analyst->getCommandsByComplexity());
             self::assertSame('prompts/subagent/base_system.md', $analyst->getSystemPromptFile());
 
             $architect = $chain->getRoleConfig('architect');

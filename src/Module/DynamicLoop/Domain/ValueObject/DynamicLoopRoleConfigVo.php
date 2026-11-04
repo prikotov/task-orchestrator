@@ -40,19 +40,23 @@ final readonly class DynamicLoopRoleConfigVo
      */
     public function resolveCommand(int $complexity): array
     {
-        if ($this->commandsByComplexity === []) {
+        $commands = $this->commandsByComplexity;
+        if ($this->command !== [] && !isset($commands['C3'])) {
+            $commands['C3'] = $this->command;
+        }
+        if ($commands === []) {
             return $this->command;
         }
 
         for ($level = $complexity; $level <= 5; ++$level) {
-            if (isset($this->commandsByComplexity['C' . $level])) {
-                return $this->commandsByComplexity['C' . $level];
+            if (isset($commands['C' . $level])) {
+                return $commands['C' . $level];
             }
         }
 
         for ($level = $complexity - 1; $level >= 0; --$level) {
-            if (isset($this->commandsByComplexity['C' . $level])) {
-                return $this->commandsByComplexity['C' . $level];
+            if (isset($commands['C' . $level])) {
+                return $commands['C' . $level];
             }
         }
 

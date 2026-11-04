@@ -39,8 +39,9 @@ roles:
 |---|---|---|
 | `prompt_file` | да | Путь к .md файлу роли. При наличии `system_prompt_file` передаётся через `--append-system-prompt` |
 | `system_prompt_file` | нет | Основной системный промпт. Без него `prompt_file` заменяет системный промпт, как раньше |
-| `command` | да | CLI-команда для запуска агента. `@system-prompt` резолвится в путь к активному системному промпту |
-| `commands_by_complexity` | нет | Частичный набор команд по уровням `C0–C5`; имеет приоритет над `command` |
+| `command` | нет | Явная CLI-команда; считается базовой командой уровня `C3` |
+| `command_profile` | нет | Имя профиля из верхнеуровневой `command_profiles`; альтернатива явной `command` |
+| `commands_by_complexity` | нет | Отклонения от базовой команды: уровень → имя профиля |
 | `fallback` | нет | Альтернативная команда при недоступности основного runner |
 
 ## Выбор команды по сложности задачи
@@ -48,16 +49,24 @@ roles:
 Если текст запуска содержит идентификатор `TASK-*`, оркестратор читает `complexity` из соответствующего файла в `todo/`. При отсутствии поля используется `C3`; отсутствующий или неоднозначный файл и недопустимое значение вызывают ошибку.
 
 ```yaml
+command_profiles:
+  glm_flash_high:
+    command: [pi, -p, --model, glm-5.3-flash, --thinking, high]
+  glm_flash_max:
+    command: [pi, -p, --model, glm-5.3-flash, --thinking, max]
+  kimi_high:
+    command: [pi, -p, --model, k3.1-pro, --thinking, high]
+
 roles:
   backend_developer_levsha:
     prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
+    command_profile: glm_flash_max
     commands_by_complexity:
-      C1: [pi, -p, --model, glm-5.3-flash, --thinking, high]
-      C3: [pi, -p, --model, glm-5.3-flash, --thinking, max]
-      C4: [pi, -p, --model, k3.1-pro, --thinking, high]
+      C1: glm_flash_high
+      C4: kimi_high
 ```
 
-Выбирается точный уровень либо ближайший настроенный уровень выше. Если выше ничего нет, выбирается ближайший уровень ниже. Поэтому в примере `C0–C1` используют `C1`, `C2–C3` — `C3`, `C4–C5` — `C4`. Если настроена только `C1`, она используется для всех уровней. Без `commands_by_complexity` одиночная `command` работает как раньше.
+Базовая `command` или `command_profile` считается уровнем `C3`. Выбирается точный уровень либо ближайший настроенный уровень выше; если выше ничего нет — ближайший ниже. Поэтому `C0–C1` используют `C1`, `C2–C3` — базовый `glm_flash_max`, `C4–C5` — `kimi_high`. Без отклонений базовая команда используется для всех уровней. Явные команды в `commands_by_complexity` также поддерживаются для обратной совместимости.
 
 ## Маппинг имени → файл
 

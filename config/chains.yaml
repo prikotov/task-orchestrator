@@ -1,3 +1,101 @@
+command_profiles:
+  glm_flash_high:
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --provider
+      - zai
+      - --model
+      - glm-5.3-flash
+      - --thinking
+      - high
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+  glm_flash_max:
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --provider
+      - zai
+      - --model
+      - glm-5.3-flash
+      - --thinking
+      - max
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+  mimo_pro_high:
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --provider
+      - xiaomi-token-plan-sgp
+      - --model
+      - mimo-v2.6-pro
+      - --thinking
+      - high
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+  mimo_pro_off:
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --provider
+      - xiaomi-token-plan-sgp
+      - --model
+      - mimo-v2.6-pro
+      - --thinking
+      - 'off'
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+  kimi_high:
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --provider
+      - kimi-coding
+      - --model
+      - k3.1-pro
+      - --thinking
+      - high
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+  ollama_huihui_medium:
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --provider
+      - ollama
+      - --model
+      - huihui-ai:pi-100k
+      - --thinking
+      - medium
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+
 roles:
   # ──────────────────────────────────────────────────────────────────────────
   # Профили делегирования: синхронизированы с принятыми раскладками
@@ -24,168 +122,55 @@ roles:
   team_lead_alex:
     prompt_file: docs/agents/roles/team/team_lead_alex.ru.md
     system_prompt_file: prompts/subagent/base_system.md
-    command:                            # pi + zai (glm-5.3-flash, thinking high) — coordination
-      - pi
-      - --mode
-      - json
-      - -p
-      - --provider
-      - zai
-      - --model
-      - glm-5.3-flash
-      - --thinking
-      - high
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+    command_profile: glm_flash_high
 
   system_analyst_sherlock:
     prompt_file: docs/agents/roles/team/system_analyst_sherlock.ru.md
     system_prompt_file: prompts/subagent/base_system.md
-    command: &pi_mimo_pro_high          # pi + xiaomi (mimo-v2.6-pro, thinking high)
-      - pi
-      - --mode
-      - json
-      - -p
-      - --provider
-      - xiaomi-token-plan-sgp
-      - --model
-      - mimo-v2.6-pro
-      - --thinking
-      - high
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+    command_profile: mimo_pro_high
 
   system_architect_gandalf:
     prompt_file: docs/agents/roles/team/system_architect_gandalf.ru.md
     system_prompt_file: prompts/subagent/base_system.md
-    command: &pi_kimi_high              # pi + kimi (k3.1-pro, thinking high)
-      - pi
-      - --mode
-      - json
-      - -p
-      - --provider
-      - kimi-coding
-      - --model
-      - k3.1-pro
-      - --thinking
-      - high
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+    command_profile: kimi_high
 
   system_architect_loki:
     prompt_file: docs/agents/roles/team/system_architect_loki.ru.md
     system_prompt_file: prompts/subagent/base_system.md
-    command: *pi_mimo_pro_high          # pi + xiaomi (mimo-v2.6-pro, thinking high) — vendor diversity
+    command_profile: mimo_pro_high
 
   backend_developer_levsha:
     prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
     system_prompt_file: prompts/subagent/base_system.md
+    command_profile: glm_flash_max
     commands_by_complexity:
-      C1: &pi_glm_flash_high
-        - pi
-        - --mode
-        - json
-        - -p
-        - --provider
-        - zai
-        - --model
-        - glm-5.3-flash
-        - --thinking
-        - high
-        - --system-prompt
-        - "@system-prompt"
-        - --append-system-prompt
-        - "@append-system-prompt"
-      C3: &pi_glm_flash_max
-      C4: *pi_kimi_high
-    command: *pi_glm_flash_max          # pi + zai (glm-5.3-flash, vision)
-      - pi
-      - --mode
-      - json
-      - -p
-      - --provider
-      - zai
-      - --model
-      - glm-5.3-flash
-      - --thinking
-      - max
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+      C1: glm_flash_high
+      C4: kimi_high
 
   backend_developer_tony:
     prompt_file: docs/agents/roles/team/backend_developer_tony.ru.md
     system_prompt_file: prompts/subagent/base_system.md
-    command: &pi_glm_flash_high         # pi + zai (glm-5.3-flash, thinking high)
-      - pi
-      - --mode
-      - json
-      - -p
-      - --provider
-      - zai
-      - --model
-      - glm-5.3-flash
-      - --thinking
-      - high
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+    command_profile: glm_flash_high
 
   code_reviewer_backend_puaro:
     prompt_file: docs/agents/roles/team/code_reviewer_backend_puaro.ru.md
     system_prompt_file: prompts/subagent/base_system.md
-    command: &pi_ollama_huihui_medium   # pi + ollama (huihui-ai на nserv) — ревью кода
-      - pi
-      - --mode
-      - json
-      - -p
-      - --provider
-      - ollama
-      - --model
-      - huihui-ai:pi-100k
-      - --thinking
-      - medium
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+    command_profile: ollama_huihui_medium
 
   qa_backend_house:
     prompt_file: docs/agents/roles/team/qa_backend_house.ru.md
     system_prompt_file: prompts/subagent/base_system.md
-    command: *pi_glm_flash_high
+    command_profile: glm_flash_high
 
   technical_writer_hermione:
     prompt_file: docs/agents/roles/team/technical_writer_hermione.ru.md
     system_prompt_file: prompts/subagent/base_system.md
-    command: &pi_mimo_pro_off           # pi + xiaomi (mimo-v2.6-pro, thinking off)
-      - pi
-      - --mode
-      - json
-      - -p
-      - --provider
-      - xiaomi-token-plan-sgp
-      - --model
-      - mimo-v2.6-pro
-      - --thinking
-      - 'off'
-      - --system-prompt
-      - "@system-prompt"
-      - --append-system-prompt
-      - "@append-system-prompt"
+    command_profile: mimo_pro_off
 
   technical_writer_ostap:
     prompt_file: docs/agents/roles/team/technical_writer_ostap.ru.md
     system_prompt_file: prompts/subagent/base_system.md
-    command: *pi_glm_flash_high
+    command_profile: glm_flash_high
 
   # ──────────────────────────────────────────────────────────────────────────────
   # HTTP-прокси для Codex CLI
