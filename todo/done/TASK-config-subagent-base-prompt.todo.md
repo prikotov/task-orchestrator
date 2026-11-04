@@ -3,7 +3,7 @@ type: feat
 created: 2026-11-04 10:10:37 (1793787037)
 due: 
 started: 2026-11-04 10:11:31 (1793787091)
-completed: 
+completed: 2026-11-04 10:13:42 (1793787222)
 cancelled: 
 value: V2
 complexity: C2
@@ -15,8 +15,8 @@ epic:
 author: backend_developer_levsha
 assignee: backend_developer_levsha
 branch: task/subagent-base-system-prompt
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/457
+status: done
 ---
 
 # TASK-config-subagent-base-prompt: Сохранить базовые инструкции сабагентов при погружении в роль
