@@ -81,7 +81,25 @@ roles:
 
   backend_developer_levsha:
     prompt_file: docs/agents/roles/team/backend_developer_levsha.ru.md
-    command: &pi_glm_flash_max          # pi + zai (glm-5.3-flash, vision)
+    commands_by_complexity:
+      C1: &pi_glm_flash_high
+        - pi
+        - --mode
+        - json
+        - -p
+        - --provider
+        - zai
+        - --model
+        - glm-5.3-flash
+        - --thinking
+        - high
+        - --system-prompt
+        - "@system-prompt"
+        - --append-system-prompt
+        - "@append-system-prompt"
+      C3: &pi_glm_flash_max
+      C4: *pi_kimi_high
+    command: *pi_glm_flash_max          # pi + zai (glm-5.3-flash, vision)
       - pi
       - --mode
       - json

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject;
 
+use InvalidArgumentException;
+
 /**
  * Value Object конфигурации роли для оркестрации.
  *
@@ -24,6 +26,7 @@ final readonly class RoleConfigVo
      * @param int|null $timeout таймаут в секундах. Если null — из chain или default.
      * @param string|null $promptFile путь к файлу описания роли (относительно корня проекта).
      *        Если null — используется неявная конвенция {rolesDir}/{roleName}.ru.md.
+     * @param array<string, list<string>> $commandsByComplexity команды по уровням C0–C5.
      * @param FallbackConfigVo|null $fallback конфигурация fallback runner'а.
      *        Определяет альтернативную CLI-команду для запуска при ошибке основного runner'а.
      *        Первый элемент fallback.command — имя runner'а в registry.
@@ -33,8 +36,17 @@ final readonly class RoleConfigVo
         private array $command = [],
         private ?int $timeout = null,
         private ?string $promptFile = null,
+        private array $commandsByComplexity = [],
         private ?FallbackConfigVo $fallback = null,
     ) {
+        foreach ($commandsByComplexity as $level => $command) {
+            if (preg_match('/^C[0-5]$/', $level) !== 1) {
+                throw new InvalidArgumentException(sprintf('Invalid task complexity level "%s".', $level));
+            }
+            if ($command === []) {
+                throw new InvalidArgumentException(sprintf('Command for task complexity "%s" must not be empty.', $level));
+            }
+        }
     }
 
     /**
@@ -43,6 +55,14 @@ final readonly class RoleConfigVo
     public function getCommand(): array
     {
         return $this->command;
+    }
+
+    /**
+     * @return array<string, list<string>>
+     */
+    public function getCommandsByComplexity(): array
+    {
+        return $this->commandsByComplexity;
     }
 
     public function getTimeout(): ?int

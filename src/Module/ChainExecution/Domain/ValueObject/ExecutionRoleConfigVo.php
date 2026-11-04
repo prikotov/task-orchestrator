@@ -13,11 +13,13 @@ final readonly class ExecutionRoleConfigVo
 {
     /**
      * @param list<string> $command
+     * @param array<string, list<string>> $commandsByComplexity
      */
     public function __construct(
         private array $command = [],
         private ?int $timeout = null,
         private ?string $promptFile = null,
+        private array $commandsByComplexity = [],
         private ?ExecutionFallbackConfigVo $fallback = null,
     ) {
     }
@@ -27,6 +29,30 @@ final readonly class ExecutionRoleConfigVo
      */
     public function getCommand(): array
     {
+        return $this->command;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function resolveCommand(int $complexity): array
+    {
+        if ($this->commandsByComplexity === []) {
+            return $this->command;
+        }
+
+        for ($level = $complexity; $level <= 5; ++$level) {
+            if (isset($this->commandsByComplexity['C' . $level])) {
+                return $this->commandsByComplexity['C' . $level];
+            }
+        }
+
+        for ($level = $complexity - 1; $level >= 0; --$level) {
+            if (isset($this->commandsByComplexity['C' . $level])) {
+                return $this->commandsByComplexity['C' . $level];
+            }
+        }
+
         return $this->command;
     }
 

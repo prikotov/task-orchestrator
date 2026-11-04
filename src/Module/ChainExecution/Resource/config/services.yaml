@@ -109,6 +109,10 @@ services:
       $basePath: '%module.chain_execution.base_path%'
       $locale: '%task_orchestrator.locale%'
 
+  TaskOrchestrator\Common\Module\ChainExecution\Infrastructure\Service\Task\FileTaskComplexityResolverService:
+    arguments:
+      $basePath: '%module.chain_execution.base_path%'
+
   TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler:
     arguments:
       $strategies: !tagged_iterator orchestrator.execution_strategy

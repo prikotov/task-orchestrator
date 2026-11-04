@@ -15,12 +15,14 @@ final readonly class DynamicLoopRoleConfigVo
      * @param list<string> $command полная CLI-команда для запуска агента
      * @param int|null $timeout таймаут в секундах
      * @param string|null $promptFile путь к файлу описания роли
+     * @param array<string, list<string>> $commandsByComplexity команды по уровням C0–C5
      * @param DynamicLoopFallbackConfigVo|null $fallback конфигурация fallback runner'а
      */
     public function __construct(
         private array $command = [],
         private ?int $timeout = null,
         private ?string $promptFile = null,
+        private array $commandsByComplexity = [],
         private ?DynamicLoopFallbackConfigVo $fallback = null,
     ) {
     }
@@ -30,6 +32,30 @@ final readonly class DynamicLoopRoleConfigVo
      */
     public function getCommand(): array
     {
+        return $this->command;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function resolveCommand(int $complexity): array
+    {
+        if ($this->commandsByComplexity === []) {
+            return $this->command;
+        }
+
+        for ($level = $complexity; $level <= 5; ++$level) {
+            if (isset($this->commandsByComplexity['C' . $level])) {
+                return $this->commandsByComplexity['C' . $level];
+            }
+        }
+
+        for ($level = $complexity - 1; $level >= 0; --$level) {
+            if (isset($this->commandsByComplexity['C' . $level])) {
+                return $this->commandsByComplexity['C' . $level];
+            }
+        }
+
         return $this->command;
     }
 

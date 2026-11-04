@@ -227,6 +227,7 @@ final readonly class ChainExecutionDefinitionMapperService implements ChainExecu
                 command: $config->getCommand(),
                 timeout: $config->getTimeout(),
                 promptFile: $config->getPromptFile(),
+                commandsByComplexity: $config->getCommandsByComplexity(),
                 fallback: $this->mapFallback($config->getFallback()),
             );
         }

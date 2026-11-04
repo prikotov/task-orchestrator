@@ -9,6 +9,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainStepTypeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Agent\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
+use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Task\TaskComplexityResolverInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionFallbackConfigVo;
@@ -29,6 +30,7 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
         private RunAgentServiceInterface $agentRunner,
         private ResolveChainRunnerServiceInterface $runnerHelper,
         private FormatPromptServiceInterface $formatter,
+        private ?TaskComplexityResolverInterface $complexityResolver = null,
     ) {
     }
 
@@ -51,7 +53,8 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
             : null;
 
         $roleConfig = $context->roleConfig;
-        $roleCommand = $roleConfig?->getCommand() ?? [];
+        $complexity = $this->complexityResolver?->resolve($context->task) ?? 3;
+        $roleCommand = $roleConfig?->resolveCommand($complexity) ?? [];
         $runnerName = $this->resolveRunnerName($step, $roleCommand);
         $command = $this->resolveCommand($step, $roleCommand, $runnerName);
         // systemPrompt = путь к prompt_file роли: runner'ы резолвят @system-prompt

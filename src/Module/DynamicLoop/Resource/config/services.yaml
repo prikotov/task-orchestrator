@@ -86,6 +86,10 @@ services:
     alias: TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainDefinition\DynamicLoopDefinitionMapperService
 
   # Infrastructure Service parameters
+  TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\Task\FileTaskComplexityResolverService:
+    arguments:
+      $basePath: '%module.dynamic_loop.base_path%'
+
   TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger:
     arguments:
       $chainsSessionDir: '%module.dynamic_loop.chains_session_dir%'
