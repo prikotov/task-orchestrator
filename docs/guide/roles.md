@@ -9,6 +9,7 @@
 roles:
   system_analyst:
     prompt_file: docs/agents/roles/team/system_analyst.ru.md
+    system_prompt_file: prompts/subagent/base_system.md
     command:
       - pi
       - --mode
@@ -17,7 +18,7 @@ roles:
       - --model
       - glm-4.7
       - --system-prompt
-      - "@system-prompt"         # резолвится в содержимое prompt_file
+      - "@system-prompt"         # резолвится в system_prompt_file
       - --append-system-prompt
       - "@append-system-prompt" # опционально, не у всех ролей
       - --tools
@@ -36,8 +37,9 @@ roles:
 
 | Поле | Обязательное | Описание |
 |---|---|---|
-| `prompt_file` | да | Путь к .md файлу роли (system prompt) |
-| `command` | да | CLI-команда для запуска агента. `@system-prompt` резолвится в содержимое файла |
+| `prompt_file` | да | Путь к .md файлу роли. При наличии `system_prompt_file` передаётся через `--append-system-prompt` |
+| `system_prompt_file` | нет | Основной системный промпт. Без него `prompt_file` заменяет системный промпт, как раньше |
+| `command` | да | CLI-команда для запуска агента. `@system-prompt` резолвится в путь к активному системному промпту |
 | `fallback` | нет | Альтернативная команда при недоступности основного runner |
 
 ## Маппинг имени → файл

@@ -69,6 +69,7 @@ final readonly class ResolveChainRunnerService implements ResolveChainRunnerServ
             workingDir: $primaryRequest->getWorkingDir(),
             timeout: $primaryRequest->getTimeout(),
             command: $fallbackCommand,
+            runnerArgs: $primaryRequest->getRunnerArgs(),
             runnerName: $fallbackRunnerName,
         );
 
