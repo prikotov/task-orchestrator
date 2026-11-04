@@ -228,6 +228,7 @@ final readonly class ChainExecutionDefinitionMapperService implements ChainExecu
                 timeout: $config->getTimeout(),
                 promptFile: $config->getPromptFile(),
                 commandsByComplexity: $config->getCommandsByComplexity(),
+                systemPromptFile: $config->getSystemPromptFile(),
                 fallback: $this->mapFallback($config->getFallback()),
             );
         }

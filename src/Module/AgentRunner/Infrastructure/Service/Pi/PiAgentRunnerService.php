@@ -85,9 +85,16 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
             ));
         }
 
-        // Доп. аргументы runner'а (prompt-файлы от dynamic loop)
-        foreach ($request->getRunnerArgs() as $arg) {
-            $command[] = $arg;
+        // Доп. аргументы runner'а. Если command уже содержит слот append-промпта,
+        // он резолвится из runnerArgs ниже; повторная пара аргументов не нужна.
+        $hasAppendPromptSlot = in_array('@append-system-prompt', $command, true);
+        $runnerArgs = $request->getRunnerArgs();
+        for ($i = 0, $count = count($runnerArgs); $i < $count; ++$i) {
+            if ($hasAppendPromptSlot && $runnerArgs[$i] === '--append-system-prompt' && isset($runnerArgs[$i + 1])) {
+                ++$i;
+                continue;
+            }
+            $command[] = $runnerArgs[$i];
         }
 
         // Разрешение @file → содержимое файла

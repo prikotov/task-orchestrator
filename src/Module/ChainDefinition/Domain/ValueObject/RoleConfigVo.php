@@ -9,7 +9,7 @@ use InvalidArgumentException;
 /**
  * Value Object конфигурации роли для оркестрации.
  *
- * Описывает per-role настройки: полная CLI-команда, таймаут, путь к файлу описания роли,
+ * Описывает per-role настройки: полная CLI-команда, таймаут, пути к базовому и ролевому промптам,
  * а также опциональный fallback — альтернативную CLI-команду для запуска при ошибке основного runner'а.
  * Определяется в YAML (секция roles) и применяется handler при запуске агента.
  */
@@ -27,6 +27,8 @@ final readonly class RoleConfigVo
      * @param string|null $promptFile путь к файлу описания роли (относительно корня проекта).
      *        Если null — используется неявная конвенция {rolesDir}/{roleName}.ru.md.
      * @param array<string, list<string>> $commandsByComplexity команды по уровням C0–C5.
+     * @param string|null $systemPromptFile путь к базовому системному промпту. Если задан,
+     *        promptFile передаётся через append-system-prompt, а не заменяет базовый промпт.
      * @param FallbackConfigVo|null $fallback конфигурация fallback runner'а.
      *        Определяет альтернативную CLI-команду для запуска при ошибке основного runner'а.
      *        Первый элемент fallback.command — имя runner'а в registry.
@@ -37,6 +39,7 @@ final readonly class RoleConfigVo
         private ?int $timeout = null,
         private ?string $promptFile = null,
         private array $commandsByComplexity = [],
+        private ?string $systemPromptFile = null,
         private ?FallbackConfigVo $fallback = null,
     ) {
         foreach ($commandsByComplexity as $level => $command) {
@@ -78,6 +81,11 @@ final readonly class RoleConfigVo
     public function getPromptFile(): ?string
     {
         return $this->promptFile;
+    }
+
+    public function getSystemPromptFile(): ?string
+    {
+        return $this->systemPromptFile;
     }
 
     /**

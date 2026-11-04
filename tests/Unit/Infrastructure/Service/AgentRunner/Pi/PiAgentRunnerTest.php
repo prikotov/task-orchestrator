@@ -216,6 +216,7 @@ final class PiAgentRunnerTest extends TestCase
             $idx = array_search('--append-system-prompt', $command, true);
             self::assertSame($tmpFile, $command[$idx + 1], '@append-system-prompt must be resolved to file path');
             self::assertNotContains('@append-system-prompt', $command, 'literal marker must not remain');
+            self::assertSame(1, count(array_keys($command, '--append-system-prompt', true)));
         } finally {
             @unlink($tmpFile);
         }

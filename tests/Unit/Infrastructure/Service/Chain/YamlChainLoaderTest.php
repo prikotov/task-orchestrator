@@ -509,6 +509,7 @@ YAML);
 roles:
   analyst:
     prompt_file: docs/roles/analyst.md
+    system_prompt_file: prompts/subagent/base_system.md
     command:
       - --model
       - gpt-4o-mini
@@ -540,12 +541,14 @@ YAML);
             self::assertNotNull($analyst);
             self::assertSame(600, $analyst->getTimeout());
             self::assertSame('docs/roles/analyst.md', $analyst->getPromptFile());
+            self::assertSame('prompts/subagent/base_system.md', $analyst->getSystemPromptFile());
 
             $architect = $chain->getRoleConfig('architect');
             self::assertNotNull($architect);
             self::assertSame(['--model', 'o3-mini'], $architect->getCommand());
             self::assertNull($architect->getTimeout());
             self::assertNull($architect->getPromptFile());
+            self::assertNull($architect->getSystemPromptFile());
 
             self::assertNull($chain->getRoleConfig('nonexistent'));
         } finally {

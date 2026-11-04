@@ -372,7 +372,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     /**
      * Парсит секцию `roles` из YAML.
      *
-     * Каждый элемент: { command, commands_by_complexity, timeout, prompt_file, fallback }.
+     * Каждый элемент: { command, commands_by_complexity, timeout, prompt_file, system_prompt_file, fallback }.
      * Все поля опциональны.
      *
      * Формат fallback в YAML:
@@ -400,6 +400,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
                 timeout: $config['timeout'] ?? null,
                 promptFile: $config['prompt_file'] ?? null,
                 commandsByComplexity: $config['commands_by_complexity'] ?? [],
+                systemPromptFile: $config['system_prompt_file'] ?? null,
                 fallback: $this->parseFallbackConfig($config),
             );
         }
