@@ -13,7 +13,6 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Agent\RunAgentS
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\FormatPromptServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ResolveChainRunnerServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteAgentStepService;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Task\TaskComplexityResolverInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionRoleConfigVo;
@@ -333,34 +332,6 @@ final class ExecuteAgentStepServiceTest extends TestCase
         );
 
         $runner->run($step, $context);
-    }
-
-    #[Test]
-    public function runSelectsCommandByTaskComplexity(): void
-    {
-        $agentRunner = $this->createMock(RunAgentServiceInterface::class);
-        $agentRunner->expects($this->once())->method('run')->with(
-            $this->callback(static fn (ChainRunRequestVo $request): bool => $request->getCommand() === ['pi', '--model', 'high']),
-        )->willReturn(ChainRunResultVo::createSuccess('Result'));
-        $complexityResolver = $this->createMock(TaskComplexityResolverInterface::class);
-        $complexityResolver->expects($this->once())->method('resolve')->with('TASK-test')->willReturn(2);
-        $runner = new ExecuteAgentStepService(
-            $agentRunner,
-            $this->createMock(ResolveChainRunnerServiceInterface::class),
-            $this->createMock(FormatPromptServiceInterface::class),
-            $complexityResolver,
-        );
-
-        $runner->run(
-            new ExecutionStepVo(type: ChainStepTypeEnum::agent, role: 'developer'),
-            new StepContextVo(
-                task: 'TASK-test',
-                roleConfig: new ExecutionRoleConfigVo(commandsByComplexity: [
-                    'C1' => ['pi', '--model', 'low'],
-                    'C3' => ['pi', '--model', 'high'],
-                ]),
-            ),
-        );
     }
 
     #[Test]

@@ -9,7 +9,6 @@ use Symfony\Component\Process\Process;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Agent\RunAgentServiceInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Chain\Shared\PromptFormatterInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\ExecuteConditionalStepServiceInterface;
-use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Task\TaskComplexityResolverInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunRequestVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ChainRunResultVo;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ConditionalStepResultVo;
@@ -29,7 +28,6 @@ final readonly class ExecuteConditionalStepService implements ExecuteConditional
     public function __construct(
         private RunAgentServiceInterface $agentRunner,
         private PromptFormatterInterface $promptFormatter,
-        private ?TaskComplexityResolverInterface $complexityResolver = null,
     ) {
     }
 
@@ -72,7 +70,7 @@ final readonly class ExecuteConditionalStepService implements ExecuteConditional
             tools: $step->getTools(),
             workingDir: $workingDir,
             timeout: $roleConfig?->getTimeout() ?? $timeout,
-            command: $roleConfig?->resolveCommand($this->complexityResolver?->resolve($task) ?? 3) ?? [],
+            command: $roleConfig?->getCommand() ?? [],
             runnerName: $runnerName,
             noContextFiles: $noContextFiles || $step->hasNoContextFiles(),
         );

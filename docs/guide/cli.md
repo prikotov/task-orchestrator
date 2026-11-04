@@ -13,7 +13,7 @@ php vendor/bin/task-orchestrator list
 
 ### `agent:orchestrate`
 
-Основная команда оркестрации — запускает цепочку агентов (Static или Dynamic). Для выбора `commands_by_complexity` аргумент `<task>` должен содержать идентификатор `TASK-*`; сложность читается из файла задачи, при отсутствии поля используется `C3`.
+Основная команда оркестрации — запускает цепочку агентов (Static или Dynamic).
 
 ```bash
 php vendor/bin/task-orchestrator <task> [options]

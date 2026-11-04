@@ -37,13 +37,15 @@ PROMPT
 | `--runner`        | —          | Раннер: `pi` или `codex` (env `RUNNER`)                      | `roles.<role>.command[0]`, иначе `pi` |
 | `--provider`      | —          | Provider (провайдер) для `pi` (env `PROVIDER`)               | `roles.<role>.command --provider`, иначе — |
 | `--model`         | —          | Модель (env `MODEL`)                                         | `roles.<role>.command --model`, иначе — |
-| `--reasoning`     | —          | Reasoning/thinking effort (pi: `--thinking`, codex: `-c model_reasoning_effort=...`) | `roles.<role>.command`, иначе — |
+| `--reasoning`     | —          | Reasoning/thinking effort (pi: `--thinking`, codex: `-c model_reasoning_effort=...`) | Выбранный командный профиль, иначе — |
+| `--task-id`       | —          | Идентификатор `TASK-*`; сложность читается из файла задачи | — |
+| `--complexity`    | —          | Явная сложность `C0–C5`; приоритет над `--task-id` | `C3` |
 | `[prompt text]`   | —          | Промпт. Если не указан — читается из stdin                   | —            |
 
 ### Профиль делегирования роли
 
 Если `--runner`/`RUNNER`, `--provider`/`PROVIDER`, `--model`/`MODEL`, `--reasoning`/`REASONING` не заданы явно,
-скрипт берёт значения из `config/chains.yaml` секции `roles.<role>.command`.
+скрипт выбирает команду из `config/chains.yaml` по сложности. Базовый `roles.<role>.command_profile` или `command` считается уровнем `C3`; `commands_by_complexity` задаёт отклонения. Для отсутствующего уровня выбирается ближайший выше, затем ближайший ниже.
 Имя роли вычисляется по `--role-file`: например,
 `docs/agents/roles/team/backend_developer_levsha.ru.md` → `backend_developer_levsha`.
 
@@ -51,7 +53,7 @@ PROMPT
 
 1. CLI option (опция CLI): `--runner`, `--provider`, `--model`, `--reasoning`.
 2. Env (переменная окружения): `RUNNER`, `PROVIDER`, `MODEL`, `REASONING`.
-3. Role delegation profile (профиль делегирования роли): `roles.<role>.command`.
+3. Role delegation profile (профиль делегирования роли): команда, выбранная по `--complexity`, `--task-id` или `C3`.
 4. Default (значение по умолчанию): `pi` только для runner.
 
 Из `command` извлекаются:
@@ -65,6 +67,17 @@ PROMPT
 - если `runner` не задан явно и берётся из профиля роли — profile `provider`/`model`/`reasoning` применяются;
 - если `runner` задан явно через CLI/env и совпадает с profile runner — profile `provider`/`model`/`reasoning` можно применять как defaults (значения по умолчанию);
 - если `runner` задан явно через CLI/env и отличается от profile runner — profile `provider`/`model`/`reasoning` не применяются; они остаются пустыми, пока не заданы явно через CLI/env.
+
+Пример с чтением сложности из задачи:
+
+```bash
+<skill-dir>/scripts/watch-subagent.sh \
+  -s 600 \
+  -r docs/agents/roles/team/backend_developer_levsha.ru.md \
+  --task-id TASK-feat-complexity-based-role-commands <<'PROMPT'
+<prompt>
+PROMPT
+```
 
 ### Раннеры
 

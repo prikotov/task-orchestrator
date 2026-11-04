@@ -33,34 +33,6 @@ final readonly class ExecutionRoleConfigVo
         return $this->command;
     }
 
-    /**
-     * @return list<string>
-     */
-    public function resolveCommand(int $complexity): array
-    {
-        $commands = $this->commandsByComplexity;
-        if ($this->command !== [] && !isset($commands['C3'])) {
-            $commands['C3'] = $this->command;
-        }
-        if ($commands === []) {
-            return $this->command;
-        }
-
-        for ($level = $complexity; $level <= 5; ++$level) {
-            if (isset($commands['C' . $level])) {
-                return $commands['C' . $level];
-            }
-        }
-
-        for ($level = $complexity - 1; $level >= 0; --$level) {
-            if (isset($commands['C' . $level])) {
-                return $commands['C' . $level];
-            }
-        }
-
-        return $this->command;
-    }
-
     public function getTimeout(): ?int
     {
         return $this->timeout;

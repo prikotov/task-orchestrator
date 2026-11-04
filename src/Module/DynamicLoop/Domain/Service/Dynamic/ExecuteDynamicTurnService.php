@@ -9,7 +9,6 @@ use Override;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Task\TaskComplexityResolverInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
@@ -40,7 +39,6 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         private FormatDynamicJournalServiceInterface $journal,
         private DynamicLoopSessionLoggerInterface $sessionLogger,
         private CheckDynamicLoopBudgetServiceInterface $budgetChecker,
-        private ?TaskComplexityResolverInterface $complexityResolver = null,
     ) {
     }
 
@@ -289,7 +287,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $context->workingDir,
             $responseFilesList,
             $partRoleConfig?->getTimeout() ?? $context->timeout,
-            $partRoleConfig?->resolveCommand($this->complexityResolver?->resolve($context->topic) ?? 3) ?? [],
+            $partRoleConfig?->getCommand() ?? [],
             $prevResponsePaths !== [],
             $challenge,
             $partRoleConfig?->getPromptFile(),
@@ -349,7 +347,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             workingDir: $context->workingDir,
             responseFilesList: $facResponseFilesList,
             timeout: $finRoleConfig?->getTimeout() ?? $context->timeout,
-            command: $finRoleConfig?->resolveCommand($this->complexityResolver?->resolve($context->topic) ?? 3) ?? [],
+            command: $finRoleConfig?->getCommand() ?? [],
             retryPolicy: $chain->getDefaultRetryPolicy(),
         );
 
@@ -489,7 +487,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $execution->getFacilitatorSummary(),
             $facResponseFilesList,
             $facRoleConfig?->getTimeout() ?? $context->timeout,
-            $facRoleConfig?->resolveCommand($this->complexityResolver?->resolve($context->topic) ?? 3) ?? [],
+            $facRoleConfig?->getCommand() ?? [],
             $retryPolicy,
         );
     }
