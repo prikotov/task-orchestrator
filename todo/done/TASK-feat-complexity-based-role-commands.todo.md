@@ -3,7 +3,7 @@ type: feat
 created: 2026-11-04 10:39:14 (1793788754)
 due: 
 started: 2026-11-04 10:45:09 (1793789109)
-completed: 2026-11-04 14:20:41 (1793802041)
+completed: 2026-11-04 14:59:45 (1793804385)
 cancelled: 
 value: V2
 complexity: C3
@@ -16,7 +16,7 @@ author: system_analyst_sherlock
 assignee: backend_developer_levsha
 branch: task/complexity-based-role-commands
 pr: https://github.com/prikotov/task-orchestrator/pull/458
-status: review
+status: done
 ---
 
 # TASK-feat-complexity-based-role-commands: Выбирать команду запуска роли по сложности задачи
@@ -93,12 +93,12 @@ status: review
 ## 4. План реализации (Implementation Plan)
 
 1. [x] Зафиксировать YAML-контракт частичного набора команд роли и обратную совместимость с `command`.
-2. [x] Добавить типизированное представление команд по [Value Object](../docs/conventions/core-patterns/value-object.md).
+2. [x] Добавить типизированное представление команд по [Value Object](../../docs/conventions/core-patterns/value-object.md).
 3. [x] Реализовать детерминированный выбор ближайшего уровня с модульными тестами всех граничных случаев.
 4. [x] Реализовать чтение `complexity` по `--task-id` в `watch-subagent.sh` с приоритетом `--complexity`.
 5. [x] Интегрировать выбор именованного командного профиля в skill `run-subagent`.
 6. [x] Обновить `config/chains.yaml`, `docs/guide/roles.md` и `docs/guide/cli.md`.
-7. [x] Добавить модульные и интеграционные тесты по [Testing](../docs/conventions/testing/index.md).
+7. [x] Добавить модульные и интеграционные тесты по [Testing](../../docs/conventions/testing/index.md).
 
 ## 5. Критерии приёмки (Definition of Done)
 
