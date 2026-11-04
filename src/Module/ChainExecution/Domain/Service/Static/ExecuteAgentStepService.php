@@ -54,21 +54,21 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
         $roleCommand = $roleConfig?->getCommand() ?? [];
         $runnerName = $this->resolveRunnerName($step, $roleCommand);
         $command = $this->resolveCommand($step, $roleCommand, $runnerName);
-        // Без base_prompt_file сохраняется прежнее поведение: prompt_file заменяет
-        // системный промпт. С base_prompt_file роль добавляется отдельным append-промптом.
-        $basePromptFile = $roleConfig?->getBasePromptFile();
+        // Без system_prompt_file сохраняется прежнее поведение: prompt_file заменяет
+        // системный промпт. С system_prompt_file роль добавляется отдельным append-промптом.
+        $systemPromptFile = $roleConfig?->getSystemPromptFile();
         $promptFile = $roleConfig?->getPromptFile();
         $request = new ChainRunRequestVo(
             role: $role,
             task: $context->task,
-            systemPrompt: $basePromptFile ?? $promptFile,
+            systemPrompt: $systemPromptFile ?? $promptFile,
             previousContext: $formattedContext,
             model: $step->getModel(),
             tools: $step->getTools(),
             workingDir: $context->workingDir,
             timeout: $roleConfig?->getTimeout() ?? $context->timeout,
             command: $command,
-            runnerArgs: $basePromptFile !== null && $promptFile !== null
+            runnerArgs: $systemPromptFile !== null && $promptFile !== null
                 ? ['--append-system-prompt', $promptFile]
                 : [],
             runnerName: $runnerName,
@@ -91,7 +91,7 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
                 $step,
                 $request,
                 $duration,
-                $basePromptFile ?? $promptFile,
+                $systemPromptFile ?? $promptFile,
                 $result,
                 $timedOut,
             );

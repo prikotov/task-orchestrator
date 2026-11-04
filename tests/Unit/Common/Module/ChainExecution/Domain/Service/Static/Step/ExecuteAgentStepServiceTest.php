@@ -362,7 +362,7 @@ final class ExecuteAgentStepServiceTest extends TestCase
                 task: 'Test task',
                 roleConfig: new ExecutionRoleConfigVo(
                     promptFile: 'docs/agents/roles/team/analyst.ru.md',
-                    basePromptFile: 'prompts/subagent/base_system.md',
+                    systemPromptFile: 'prompts/subagent/base_system.md',
                 ),
             ),
         );
