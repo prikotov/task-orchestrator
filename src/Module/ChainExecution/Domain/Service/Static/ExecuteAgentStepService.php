@@ -54,20 +54,23 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
         $roleCommand = $roleConfig?->getCommand() ?? [];
         $runnerName = $this->resolveRunnerName($step, $roleCommand);
         $command = $this->resolveCommand($step, $roleCommand, $runnerName);
-        // systemPrompt = путь к prompt_file роли: runner'ы резолвят @system-prompt
-        // маркер в command (codex -c model_instructions_file, pi --system-prompt)
-        // в этот путь. Раньше передавался только в fallback-path; primary-path
-        // получал null → codex падал на literal "@system-prompt" (No such file).
+        // Без base_prompt_file сохраняется прежнее поведение: prompt_file заменяет
+        // системный промпт. С base_prompt_file роль добавляется отдельным append-промптом.
+        $basePromptFile = $roleConfig?->getBasePromptFile();
+        $promptFile = $roleConfig?->getPromptFile();
         $request = new ChainRunRequestVo(
             role: $role,
             task: $context->task,
-            systemPrompt: $roleConfig?->getPromptFile(),
+            systemPrompt: $basePromptFile ?? $promptFile,
             previousContext: $formattedContext,
             model: $step->getModel(),
             tools: $step->getTools(),
             workingDir: $context->workingDir,
             timeout: $roleConfig?->getTimeout() ?? $context->timeout,
             command: $command,
+            runnerArgs: $basePromptFile !== null && $promptFile !== null
+                ? ['--append-system-prompt', $promptFile]
+                : [],
             runnerName: $runnerName,
             noContextFiles: $context->noContextFiles || $step->hasNoContextFiles(),
         );
@@ -88,7 +91,7 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
                 $step,
                 $request,
                 $duration,
-                $roleConfig?->getPromptFile(), // @phpstan-ignore nullsafe.neverNull
+                $basePromptFile ?? $promptFile,
                 $result,
                 $timedOut,
             );

@@ -18,6 +18,7 @@ final readonly class ExecutionRoleConfigVo
         private array $command = [],
         private ?int $timeout = null,
         private ?string $promptFile = null,
+        private ?string $basePromptFile = null,
         private ?ExecutionFallbackConfigVo $fallback = null,
     ) {
     }
@@ -38,6 +39,11 @@ final readonly class ExecutionRoleConfigVo
     public function getPromptFile(): ?string
     {
         return $this->promptFile;
+    }
+
+    public function getBasePromptFile(): ?string
+    {
+        return $this->basePromptFile;
     }
 
     public function getFallback(): ?ExecutionFallbackConfigVo

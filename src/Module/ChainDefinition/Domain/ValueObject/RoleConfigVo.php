@@ -7,7 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject;
 /**
  * Value Object конфигурации роли для оркестрации.
  *
- * Описывает per-role настройки: полная CLI-команда, таймаут, путь к файлу описания роли,
+ * Описывает per-role настройки: полная CLI-команда, таймаут, пути к базовому и ролевому промптам,
  * а также опциональный fallback — альтернативную CLI-команду для запуска при ошибке основного runner'а.
  * Определяется в YAML (секция roles) и применяется handler при запуске агента.
  */
@@ -24,6 +24,8 @@ final readonly class RoleConfigVo
      * @param int|null $timeout таймаут в секундах. Если null — из chain или default.
      * @param string|null $promptFile путь к файлу описания роли (относительно корня проекта).
      *        Если null — используется неявная конвенция {rolesDir}/{roleName}.ru.md.
+     * @param string|null $basePromptFile путь к базовому системному промпту. Если задан,
+     *        promptFile передаётся через append-system-prompt, а не заменяет базовый промпт.
      * @param FallbackConfigVo|null $fallback конфигурация fallback runner'а.
      *        Определяет альтернативную CLI-команду для запуска при ошибке основного runner'а.
      *        Первый элемент fallback.command — имя runner'а в registry.
@@ -33,6 +35,7 @@ final readonly class RoleConfigVo
         private array $command = [],
         private ?int $timeout = null,
         private ?string $promptFile = null,
+        private ?string $basePromptFile = null,
         private ?FallbackConfigVo $fallback = null,
     ) {
     }
@@ -58,6 +61,11 @@ final readonly class RoleConfigVo
     public function getPromptFile(): ?string
     {
         return $this->promptFile;
+    }
+
+    public function getBasePromptFile(): ?string
+    {
+        return $this->basePromptFile;
     }
 
     /**
