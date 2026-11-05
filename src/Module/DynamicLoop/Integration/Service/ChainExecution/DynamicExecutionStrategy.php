@@ -121,8 +121,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
             throw new LogicException("Failed to resume session from: {$resumeDir}");
         }
 
-        // Явная --complexity приоритетнее сохранённой в session.json; legacy-сессия без
-        // поля complexity даёт C3 (DynamicLoopSessionStateVo::DEFAULT_COMPLEXITY).
+        // Явная --complexity приоритетнее сохранённой в session.json.
         $complexity = $command->complexity ?? $state->getComplexity();
         $config = $this->chainProvider->loadDynamicChainConfig($chainInfo->name, $complexity);
 

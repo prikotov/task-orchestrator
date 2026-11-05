@@ -95,7 +95,7 @@ final class OrchestrateCommand extends Command
             ->addOption(self::OPT_MAX_ROUNDS, null, InputOption::VALUE_OPTIONAL, 'Макс. раундов (dynamic)')
             ->addOption(self::OPT_FACILITATOR, null, InputOption::VALUE_OPTIONAL, 'Роль фасилитатора (dynamic)')
             ->addOption(self::OPT_PARTICIPANTS, null, InputOption::VALUE_OPTIONAL, 'Участники через запятую (dynamic)')
-            ->addOption(self::OPT_RESUME, null, InputOption::VALUE_OPTIONAL, 'Путь к директории сессии для resume. Сложность берётся из session.json (legacy-сессия без поля — C3); явная --complexity переопределяет')
+            ->addOption(self::OPT_RESUME, null, InputOption::VALUE_OPTIONAL, 'Путь к директории сессии для resume')
             ->addOption(self::OPT_NO_AUDIT_LOG, null, InputOption::VALUE_NONE, 'Отключить audit-логирование')
             ->addOption(self::OPT_REPORT_FORMAT, null, InputOption::VALUE_OPTIONAL, 'Формат отчёта: text|json (none — отключить)', 'text')
             ->addOption(self::OPT_REPORT_FILE, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу для записи отчёта')
@@ -275,8 +275,7 @@ final class OrchestrateCommand extends Command
      *
      * Для resume (--resume без явной --complexity) возвращает null: сессия хранит
      * сложность, зафиксированную при первичном запуске (поле complexity в session.json,
-     * см. ChainSessionWriter); DynamicExecutionStrategy::resume() применит её, а
-     * legacy-сессия без поля трактуется как C3.
+     * см. ChainSessionWriter); DynamicExecutionStrategy::resume() применит её.
      *
      * @return int|null уровень 0–5 или null — «сложность не задана явно, берём из session.json».
      *

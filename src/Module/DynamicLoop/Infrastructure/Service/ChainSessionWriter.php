@@ -169,13 +169,13 @@ final class ChainSessionWriter
         $this->topic = $this->readSessionFile($sessionDir, $data['topic_file'] ?? '');
         $this->budget = isset($data['budget']) && is_array($data['budget']) ? DynamicLoopBudgetVo::createFromArray($data['budget']) : null;
         $complexity = $data['complexity'] ?? null;
-        if ($complexity !== null && (!is_int($complexity) || $complexity < 0 || $complexity > 5)) {
+        if (!is_int($complexity) || $complexity < 0 || $complexity > 5) {
             throw new RuntimeException(sprintf(
-                'Invalid complexity value in session.json of %s: expected 0-5 (C0-C5).',
+                'Invalid complexity value in session.json of %s: expected integer 0-5 (C0-C5).',
                 $sessionDir,
             ));
         }
-        $this->complexity = $complexity ?? DynamicLoopSessionStateVo::DEFAULT_COMPLEXITY;
+        $this->complexity = $complexity;
         $this->resumedState = new DynamicLoopSessionStateVo(
             topic: $this->topic, facilitator: $this->facilitator,
             participants: $this->participants, maxRounds: $this->maxRounds,
