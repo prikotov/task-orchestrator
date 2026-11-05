@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-05
+
+[Сравнение v0.10.0...v0.11.0](https://github.com/prikotov/task-orchestrator/compare/v0.10.0...v0.11.0)
+
+### Added
+
+- Выбор именованного командного профиля сабагента по сложности `TASK-*` через `--task-id` или явный `--complexity`, а также разделение базового и ролевого системных промптов (#457, #458).
+
 ## [0.10.0] - 2026-11-03
 
 [Сравнение v0.9.2...v0.10.0](https://github.com/prikotov/task-orchestrator/compare/v0.9.2...v0.10.0)
