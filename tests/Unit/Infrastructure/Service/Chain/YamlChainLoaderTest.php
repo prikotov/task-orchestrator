@@ -514,7 +514,7 @@ command_profiles:
 roles:
   analyst:
     prompt_file: docs/roles/analyst.md
-    system_prompt_file: prompts/subagent/base_system.md
+    system_prompt_file: config/prompts/subagent/base_system.md
     command_profile: default
     commands_by_complexity:
       C1: low
@@ -547,7 +547,7 @@ YAML);
             self::assertSame(600, $analyst->getTimeout());
             self::assertSame('docs/roles/analyst.md', $analyst->getPromptFile());
             self::assertSame(['--model', 'default'], $analyst->getCommand());
-            self::assertSame('prompts/subagent/base_system.md', $analyst->getSystemPromptFile());
+            self::assertSame('config/prompts/subagent/base_system.md', $analyst->getSystemPromptFile());
 
             $architect = $chain->getRoleConfig('architect');
             self::assertNotNull($architect);

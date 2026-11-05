@@ -116,9 +116,9 @@ YAML);
         mkdir(dirname($consumerRoleFile), 0777, true);
         mkdir(dirname($consumerConfig), 0777, true);
         mkdir($consumerRoot . '/todo', 0777, true);
-        mkdir($consumerRoot . '/prompts/subagent', 0777, true);
+        mkdir($consumerRoot . '/config/prompts/subagent', 0777, true);
         file_put_contents($consumerRoot . '/todo/TASK-consumer.todo.md', "---\ncomplexity: C4\n---\n");
-        file_put_contents($consumerRoot . '/prompts/subagent/base_system.md', "Consumer base system prompt.\n");
+        file_put_contents($consumerRoot . '/config/prompts/subagent/base_system.md', "Consumer base system prompt.\n");
         copy(
             $projectRoot . '/docs/agents/skills/run-subagent/scripts/watch-subagent.sh',
             $installedSkillDir . '/scripts/watch-subagent.sh',
@@ -137,7 +137,7 @@ command_profiles:
     command: [codex, exec, --json, --model, consumer-high, -c, 'model_reasoning_effort="high"']
 roles:
   backend_developer_levsha:
-    system_prompt_file: prompts/subagent/base_system.md
+    system_prompt_file: config/prompts/subagent/base_system.md
     commands_by_complexity:
       C4: consumer_high
     command:
@@ -185,7 +185,7 @@ YAML);
         // Единый базовый промпт: roles.<role>.system_prompt_file резолвится от
         // PROJECT_ROOT проекта-потребителя, а не от каталога пакета в vendor.
         self::assertStringContainsString(
-            'model_instructions_file=' . $consumerRoot . '/prompts/subagent/base_system.md',
+            'model_instructions_file=' . $consumerRoot . '/config/prompts/subagent/base_system.md',
             $args,
         );
     }
@@ -199,7 +199,7 @@ command_profiles:
     command: [pi, --mode, json, -p, --provider, zai, --model, pi-role-model, --thinking, high]
 roles:
   team_lead_alex:
-    system_prompt_file: prompts/subagent/base_system.md
+    system_prompt_file: config/prompts/subagent/base_system.md
     command_profile: pi_profile
 YAML);
 
@@ -210,7 +210,7 @@ YAML);
 
         $args = (string) file_get_contents($this->argsCaptureFile);
         self::assertStringContainsString(
-            '--system-prompt ' . $projectRoot . '/prompts/subagent/base_system.md',
+            '--system-prompt ' . $projectRoot . '/config/prompts/subagent/base_system.md',
             $args,
         );
         self::assertStringNotContainsString('subagent_system.txt', $args);
@@ -230,7 +230,7 @@ command_profiles:
     command: [codex, exec, --json, --model, codex-role-model, -c, 'model_reasoning_effort="xhigh"']
 roles:
   backend_developer_levsha:
-    system_prompt_file: prompts/subagent/base_system.md
+    system_prompt_file: config/prompts/subagent/base_system.md
     command_profile: codex_profile
 YAML);
 
@@ -241,7 +241,7 @@ YAML);
 
         $args = (string) file_get_contents($this->argsCaptureFile);
         self::assertStringContainsString(
-            'model_instructions_file=' . $projectRoot . '/prompts/subagent/base_system.md',
+            'model_instructions_file=' . $projectRoot . '/config/prompts/subagent/base_system.md',
             $args,
         );
         self::assertStringNotContainsString('subagent_system.txt', $args);

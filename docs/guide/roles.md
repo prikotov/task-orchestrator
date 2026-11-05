@@ -9,7 +9,7 @@
 roles:
   system_analyst:
     prompt_file: docs/agents/roles/team/system_analyst.ru.md
-    system_prompt_file: prompts/subagent/base_system.md
+    system_prompt_file: config/prompts/subagent/base_system.md
     command:
       - pi
       - --mode
