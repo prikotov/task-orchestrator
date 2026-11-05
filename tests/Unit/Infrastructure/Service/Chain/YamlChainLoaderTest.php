@@ -608,6 +608,146 @@ YAML);
     }
 
     #[Test]
+    public function loadAcceptsValidCommandsByComplexityWithoutVoMapping(): void
+    {
+        // commands_by_complexity валидируется лоадером fail-fast, но в RoleConfigVo не попадает:
+        // выбор команды по сложности выполняет watch-subagent.sh, PHP-оркестратор применяет базовую команду.
+        self::assertFalse(method_exists(RoleConfigVo::class, 'getCommandsByComplexity'));
+
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_cbc_valid_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+command_profiles:
+  low:
+    command: [--model, low]
+  default:
+    command: [--model, default]
+roles:
+  analyst:
+    command_profile: default
+    commands_by_complexity:
+      C0: low
+      C5:
+        - --model
+        - max
+chains:
+  s:
+    steps:
+      - { type: agent, role: analyst }
+YAML);
+
+        try {
+            $loader = self::createLoader($fixturePath);
+            $chain = $loader->load('s');
+
+            $analyst = $chain->getRoleConfig('analyst');
+            self::assertNotNull($analyst);
+            // В VO попадает только базовая команда, отклонения по сложности не сохраняются.
+            self::assertSame(['--model', 'default'], $analyst->getCommand());
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadThrowsOnUnknownProfileInCommandsByComplexity(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_cbc_noprofile_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+command_profiles:
+  default:
+    command: [--model, default]
+roles:
+  analyst:
+    command_profile: default
+    commands_by_complexity:
+      C0: missing_profile
+chains:
+  s:
+    steps:
+      - { type: agent, role: analyst }
+YAML);
+
+        try {
+            $loader = self::createLoader($fixturePath);
+            $this->expectException(\InvalidArgumentException::class);
+            $this->expectExceptionMessage('Unknown command profile "missing_profile" for role "analyst" at complexity level "C0"');
+            $loader->load('s');
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadThrowsOnInvalidLevelInCommandsByComplexity(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_cbc_badlevel_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+command_profiles:
+  default:
+    command: [--model, default]
+roles:
+  analyst:
+    command_profile: default
+    commands_by_complexity:
+      C9: default
+chains:
+  s:
+    steps:
+      - { type: agent, role: analyst }
+YAML);
+
+        try {
+            $loader = self::createLoader($fixturePath);
+            $this->expectException(\InvalidArgumentException::class);
+            $this->expectExceptionMessage('invalid task complexity level "C9" in commands_by_complexity (expected C0-C5)');
+            $loader->load('s');
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
+    public function loadThrowsOnEmptyInlineCommandInCommandsByComplexity(): void
+    {
+        $fixtureDir = sys_get_temp_dir() . '/agent_chains_cbc_empty_' . uniqid();
+        mkdir($fixtureDir);
+        $fixturePath = $fixtureDir . '/chains.yaml';
+        file_put_contents($fixturePath, <<<'YAML'
+command_profiles:
+  default:
+    command: [--model, default]
+roles:
+  analyst:
+    command_profile: default
+    commands_by_complexity:
+      C5: []
+chains:
+  s:
+    steps:
+      - { type: agent, role: analyst }
+YAML);
+
+        try {
+            $loader = self::createLoader($fixturePath);
+            $this->expectException(\InvalidArgumentException::class);
+            $this->expectExceptionMessage('inline command for task complexity "C5" must not be empty');
+            $loader->load('s');
+        } finally {
+            unlink($fixturePath);
+            rmdir($fixtureDir);
+        }
+    }
+
+    #[Test]
     public function loadRolesWithRunnerAndPromptFile(): void
     {
         $fixtureDir = sys_get_temp_dir() . '/agent_chains_roles_full_' . uniqid();

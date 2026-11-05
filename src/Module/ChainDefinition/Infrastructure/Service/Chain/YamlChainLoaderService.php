@@ -372,8 +372,12 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     /**
      * Парсит секцию `roles` из YAML.
      *
-     * Каждый элемент: { command, commands_by_complexity, timeout, prompt_file, system_prompt_file, fallback }.
+     * Каждый элемент: { command, command_profile, commands_by_complexity, timeout, prompt_file, system_prompt_file, fallback }.
      * Все поля опциональны.
+     *
+     * Поле `commands_by_complexity` валидируется fail-fast (см. self::validateCommandsByComplexity()),
+     * но в RoleConfigVo не попадает: выбор команды по сложности задачи выполняет только
+     * watch-subagent.sh (навык run-subagent), PHP-оркестратор применяет базовую command/command_profile.
      *
      * Формат fallback в YAML:
      *   fallback:
@@ -386,6 +390,8 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
      * @param array<string, array{command: list<string>}> $profiles
      *
      * @return array<string, RoleConfigVo>
+     *
+     * @throws InvalidArgumentException при неизвестном командном профиле или некорректном commands_by_complexity
      */
     private function parseRoles(array $raw, array $profiles): array
     {
@@ -405,6 +411,8 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
                 $command = $profiles[$profileName]['command'];
             }
 
+            $this->validateCommandsByComplexity($roleName, $profiles, $config);
+
             $roles[$roleName] = new RoleConfigVo(
                 command: $command,
                 timeout: $config['timeout'] ?? null,
@@ -415,6 +423,79 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
         }
 
         return $roles;
+    }
+
+    /**
+     * Валидирует fail-fast поле roles.<name>.commands_by_complexity.
+     *
+     * Поле не входит в RoleConfigVo: выбор команды по сложности задачи выполняет
+     * только watch-subagent.sh (навык run-subagent). PHP-оркестратор (agent:orchestrate)
+     * применяет базовую command/command_profile. Тем не менее некорректное поле должно
+     * ломать загрузку конфигурации немедленно, а не при первом запуске скрипта.
+     *
+     * Правила:
+     * - ключ — уровень строго из диапазона C0–C5;
+     * - строковое значение — имя существующего профиля из command_profiles;
+     * - массив-значение — непустая inline CLI-команда.
+     *
+     * @param array<string, mixed> $roleConfig
+     * @param array<string, array{command: list<string>}> $profiles
+     *
+     * @throws InvalidArgumentException при неверном уровне, неизвестном профиле или пустой inline-команде
+     */
+    private function validateCommandsByComplexity(string $roleName, array $profiles, array $roleConfig): void
+    {
+        $commandsByComplexity = $roleConfig['commands_by_complexity'] ?? [];
+
+        if ($commandsByComplexity === []) {
+            return;
+        }
+
+        if (!is_array($commandsByComplexity)) {
+            throw new InvalidArgumentException(sprintf(
+                'Role "%s": commands_by_complexity must be a map of complexity levels (C0-C5) to command profiles or inline commands.',
+                $roleName,
+            ));
+        }
+
+        foreach ($commandsByComplexity as $level => $value) {
+            if (!is_string($level) || preg_match('/^C[0-5]$/', $level) !== 1) {
+                throw new InvalidArgumentException(sprintf(
+                    'Role "%s": invalid task complexity level "%s" in commands_by_complexity (expected C0-C5).',
+                    $roleName,
+                    is_string($level) ? $level : get_debug_type($level),
+                ));
+            }
+
+            if (is_array($value)) {
+                if ($value === []) {
+                    throw new InvalidArgumentException(sprintf(
+                        'Role "%s": inline command for task complexity "%s" must not be empty.',
+                        $roleName,
+                        $level,
+                    ));
+                }
+                continue;
+            }
+
+            if (!is_string($value)) {
+                throw new InvalidArgumentException(sprintf(
+                    'Role "%s": commands_by_complexity.%s must be a command profile name or inline command, %s given.',
+                    $roleName,
+                    $level,
+                    get_debug_type($value),
+                ));
+            }
+
+            if (!isset($profiles[$value]['command'])) {
+                throw new InvalidArgumentException(sprintf(
+                    'Unknown command profile "%s" for role "%s" at complexity level "%s".',
+                    $value,
+                    $roleName,
+                    $level,
+                ));
+            }
+        }
     }
 
     /**

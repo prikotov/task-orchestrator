@@ -42,7 +42,7 @@ status: done
 
 ## 2. Контекст и Границы (Context and Scope)
 
-- Scope: `composer.json`, `composer.lock`, локальный init документации, удаление неиспользуемых `commandsByComplexity` из PHP-слоёв.
+- Scope: `composer.json`, `composer.lock`, локальный init документации, удаление неиспользуемых `commandsByComplexity` из PHP-слоёв, доработка по независимым review (Пуаро, Гэндальф): fail-fast валидация `commands_by_complexity` в `YamlChainLoaderService` без хранения в VO, документация `docs/guide/roles.md`, запись в `CHANGELOG.md`.
 - Out of scope: обновление остальных прямых зависимостей и изменение конфигурации проекта.
 
 ## 3. Требования, MoSCoW (Requirements)
@@ -51,6 +51,7 @@ status: done
 - [x] `coding-standard` 0.34.0, `git-workflow` 0.4.2, `todo-md` 0.3.0.
 - [x] Init документации выполнен без итоговых изменений конфигов.
 - [x] `make check` успешен.
+- [x] Доработка по review: удаление `commandsByComplexity` из PHP VO/мапперов сохранено; `commands_by_complexity` валидируется в `YamlChainLoaderService` (уровни C0–C5, существование профилей, непустота inline-команд) без попадания в `RoleConfigVo`; unit-тесты на невалидные и валидные варианты; `docs/guide/roles.md` и `CHANGELOG.md` (несовместимое изменение 0.x) актуализированы.
 
 ### ⚫ Won't Have (Не будем делать)
 - Обновление Symfony, PHPUnit и других пакетов вне запрошенной группы.
@@ -89,3 +90,4 @@ php vendor/bin/todo-md validate todo/TASK-update-prikotov-dependencies.todo.md
 | Дата | Автор (роль) | Изменение |
 | :--- | :--- | :--- |
 | 2026-11-05 | backend_developer_levsha | Обновление зависимостей и документации |
+| 2026-11-05 | backend_developer_levsha | Доработка по review Пуаро и Гэндальфа: fail-fast валидация commands_by_complexity в лоадере (без VO), unit-тесты, docs/guide/roles.md, CHANGELOG |

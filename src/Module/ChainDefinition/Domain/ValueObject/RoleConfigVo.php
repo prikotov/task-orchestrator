@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject;
 
-
 /**
  * Value Object конфигурации роли для оркестрации.
  *

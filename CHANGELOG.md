@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Публичные PHP-контракты `commandsByComplexity`: свойство и геттер `RoleConfigVo::getCommandsByComplexity()`, поля в `ExecutionRoleConfigVo`, `DynamicLoopRoleConfigVo` и соответствующих мапперах. Несовместимое изменение в рамках 0.x (#460). YAML-поле `commands_by_complexity` сохранено: выбор команды по сложности выполняет только `watch-subagent.sh` (навык run-subagent), PHP-оркестратор применяет базовую `command`/`command_profile`, а `YamlChainLoaderService` валидирует поле fail-fast при загрузке (уровни `C0`–`C5`, существование профилей, непустота inline-команд).
+
 ## [0.11.0] - 2026-11-05
 
 [Сравнение v0.10.0...v0.11.0](https://github.com/prikotov/task-orchestrator/compare/v0.10.0...v0.11.0)
