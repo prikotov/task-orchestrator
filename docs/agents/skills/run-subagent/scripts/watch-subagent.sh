@@ -23,6 +23,8 @@
 #   --provider <string>  — провайдер pi (priority: CLI > env PROVIDER > role profile).
 #   --model <string>     — модель (priority: CLI > env MODEL > role profile).
 #   --reasoning <string> — reasoning/thinking effort (priority: CLI > env REASONING > role profile).
+#   --task-id <TASK-*>   — прочитать complexity из файла задачи.
+#   --complexity <C0-C5> — явно задать сложность (приоритет над --task-id; default: C3).
 #   [prompt text]        — промпт. Если не указан — читается из stdin.
 #
 # Переменные окружения (наблюдаемость):
@@ -84,6 +86,8 @@ RUNNER="${RUNNER:-}"
 PROVIDER="${PROVIDER:-}"
 MODEL="${MODEL:-}"
 REASONING="${REASONING:-}"
+TASK_ID=""
+COMPLEXITY=""
 RUNNER_EXPLICIT=false
 PROVIDER_EXPLICIT=false
 PROVIDER_CLI_EXPLICIT=false
@@ -136,6 +140,8 @@ while [[ $# -gt 0 ]]; do
         --provider)         PROVIDER="$2"; PROVIDER_EXPLICIT=true; PROVIDER_CLI_EXPLICIT=true; shift 2 ;;
         --model)            MODEL="$2"; MODEL_EXPLICIT=true; shift 2 ;;
         --reasoning)        REASONING="$2"; REASONING_EXPLICIT=true; shift 2 ;;
+        --task-id)          TASK_ID="$2"; shift 2 ;;
+        --complexity)       COMPLEXITY="$2"; shift 2 ;;
         -h|--help)
             echo "Использование: $0 -s <soft-timeout> [options] [prompt text]"
             echo "  -s, --soft-timeout   базовый таймаут в секундах (обязателен)"
@@ -147,6 +153,8 @@ while [[ $# -gt 0 ]]; do
             echo "  --provider <string>  провайдер pi (priority: CLI > env PROVIDER > role profile)"
             echo "  --model <string>     модель (priority: CLI > env MODEL > role profile)"
             echo "  --reasoning <string> reasoning effort (priority: CLI > env REASONING > role profile)"
+            echo "  --task-id <TASK-*>   прочитать complexity из файла задачи"
+            echo "  --complexity <C0-C5> явно задать сложность (приоритет над --task-id; default: C3)"
             echo "  -h, --help           эта справка"
             exit 0
             ;;
@@ -199,6 +207,9 @@ load_role_profile() {
     ROLE_PROFILE_AUTOLOAD="$AUTOLOAD_FILE" \
     ROLE_PROFILE_CONFIG="$CHAINS_CONFIG" \
     ROLE_PROFILE_NAME="$role_name" \
+    ROLE_PROFILE_PROJECT_ROOT="$PROJECT_ROOT" \
+    ROLE_PROFILE_TASK_ID="$TASK_ID" \
+    ROLE_PROFILE_COMPLEXITY="$COMPLEXITY" \
     php <<'PHP'
 <?php
 
@@ -207,6 +218,9 @@ declare(strict_types=1);
 $autoload = getenv('ROLE_PROFILE_AUTOLOAD') ?: '';
 $configPath = getenv('ROLE_PROFILE_CONFIG') ?: '';
 $roleName = getenv('ROLE_PROFILE_NAME') ?: '';
+$projectRoot = getenv('ROLE_PROFILE_PROJECT_ROOT') ?: '';
+$taskId = getenv('ROLE_PROFILE_TASK_ID') ?: '';
+$complexityOption = getenv('ROLE_PROFILE_COMPLEXITY') ?: '';
 
 if ($autoload === '' || $configPath === '' || $roleName === '' || !is_file($autoload) || !is_file($configPath)) {
     exit(0);
@@ -220,9 +234,71 @@ try {
     exit(0);
 }
 
-$command = $config['roles'][$roleName]['command'] ?? [];
-if (!is_array($command)) {
-    $command = [];
+$complexity = 3;
+if ($complexityOption !== '') {
+    if (preg_match('/^C[0-5]$/', $complexityOption) !== 1) {
+        fwrite(STDERR, sprintf('Invalid complexity "%s": expected C0-C5.\n', $complexityOption));
+        exit(2);
+    }
+    $complexity = (int) substr($complexityOption, 1);
+} elseif ($taskId !== '') {
+    $paths = glob(rtrim($projectRoot, '/') . '/todo/{,done/,backlog/,cancelled/}' . $taskId . '.todo.md', GLOB_BRACE);
+    if ($paths === false || count($paths) !== 1) {
+        fwrite(STDERR, sprintf('Expected exactly one file for task "%s".\n', $taskId));
+        exit(2);
+    }
+    $content = file_get_contents($paths[0]);
+    if ($content === false) {
+        fwrite(STDERR, sprintf('Unable to read task "%s".\n', $taskId));
+        exit(2);
+    }
+    if (preg_match('/^complexity:\s*(C[0-5])\s*$/mi', $content, $matches) === 1) {
+        $complexity = (int) substr($matches[1], 1);
+    } elseif (preg_match('/^complexity:\s*(\S+)\s*$/mi', $content, $matches) === 1) {
+        fwrite(STDERR, sprintf('Invalid complexity "%s" in task "%s".\n', $matches[1], $taskId));
+        exit(2);
+    }
+}
+
+$role = $config['roles'][$roleName] ?? [];
+$profiles = $config['command_profiles'] ?? [];
+$resolveProfile = static function (mixed $command) use ($profiles): array {
+    if (is_string($command)) {
+        if (!isset($profiles[$command]['command']) || !is_array($profiles[$command]['command'])) {
+            throw new \InvalidArgumentException(sprintf('Unknown command profile "%s".', $command));
+        }
+        return $profiles[$command]['command'];
+    }
+    return is_array($command) ? $command : [];
+};
+
+try {
+    $command = $resolveProfile($role['command_profile'] ?? $role['command'] ?? []);
+    $commands = $role['commands_by_complexity'] ?? [];
+    if ($command !== [] && !isset($commands['C3'])) {
+        $commands['C3'] = $command;
+    }
+    $selected = $command;
+    $found = false;
+    foreach (range($complexity, 5) as $level) {
+        if (isset($commands['C' . $level])) {
+            $selected = $resolveProfile($commands['C' . $level]);
+            $found = true;
+            break;
+        }
+    }
+    if (!$found) {
+        for ($level = $complexity - 1; $level >= 0; --$level) {
+            if (isset($commands['C' . $level])) {
+                $selected = $resolveProfile($commands['C' . $level]);
+                break;
+            }
+        }
+    }
+    $command = $selected;
+} catch (\Throwable $error) {
+    fwrite(STDERR, $error->getMessage() . "\n");
+    exit(2);
 }
 
 $command = array_map(
@@ -299,7 +375,7 @@ apply_role_profile_defaults() {
     local profile_output profile_runner profile_provider profile_model profile_reasoning
     local apply_profile_pair=true
 
-    profile_output="$(load_role_profile "$role_name" 2>/dev/null || true)"
+    profile_output="$(load_role_profile "$role_name")"
     profile_runner="$(sed -n '1p' <<< "$profile_output")"
     profile_provider="$(sed -n '2p' <<< "$profile_output")"
     profile_model="$(sed -n '3p' <<< "$profile_output")"

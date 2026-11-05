@@ -13,11 +13,13 @@ final readonly class ExecutionRoleConfigVo
 {
     /**
      * @param list<string> $command
+     * @param array<string, list<string>> $commandsByComplexity
      */
     public function __construct(
         private array $command = [],
         private ?int $timeout = null,
         private ?string $promptFile = null,
+        private array $commandsByComplexity = [],
         private ?string $systemPromptFile = null,
         private ?ExecutionFallbackConfigVo $fallback = null,
     ) {

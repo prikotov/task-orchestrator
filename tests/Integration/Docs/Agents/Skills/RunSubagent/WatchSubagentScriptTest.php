@@ -39,8 +39,16 @@ final class WatchSubagentScriptTest extends TestCase
         file_put_contents($this->roleFile, "# Test role\n");
         file_put_contents($this->piRoleFile, "# Test pi role\n");
         file_put_contents($this->chainsConfig, <<<'YAML'
+command_profiles:
+  role_low:
+    command: [codex, exec, --json, --model, low-model, -c, 'model_reasoning_effort="low"']
+  role_high:
+    command: [codex, exec, --json, --model, high-model, -c, 'model_reasoning_effort="high"']
 roles:
   backend_developer_levsha:
+    commands_by_complexity:
+      C1: role_low
+      C4: role_high
     command:
       - codex
       - exec
@@ -85,6 +93,16 @@ YAML);
     }
 
     #[Test]
+    public function selectsCommandProfileByExplicitComplexity(): void
+    {
+        $this->runScript(arguments: ['--complexity', 'C4']);
+
+        $args = (string) file_get_contents($this->argsCaptureFile);
+        self::assertStringContainsString('--model high-model', $args);
+        self::assertStringContainsString('model_reasoning_effort=high', $args);
+    }
+
+    #[Test]
     public function usesConsumerProjectRoleProfileWhenInstalledThroughComposer(): void
     {
         $projectRoot = dirname(__DIR__, 6);
@@ -97,6 +115,8 @@ YAML);
         mkdir($installedSkillDir . '/scripts', 0777, true);
         mkdir(dirname($consumerRoleFile), 0777, true);
         mkdir(dirname($consumerConfig), 0777, true);
+        mkdir($consumerRoot . '/todo', 0777, true);
+        file_put_contents($consumerRoot . '/todo/TASK-consumer.todo.md', "---\ncomplexity: C4\n---\n");
         copy(
             $projectRoot . '/docs/agents/skills/run-subagent/scripts/watch-subagent.sh',
             $installedSkillDir . '/scripts/watch-subagent.sh',
@@ -110,8 +130,13 @@ YAML);
 
         file_put_contents($consumerRoleFile, "# Consumer role\n");
         file_put_contents($consumerConfig, <<<'YAML'
+command_profiles:
+  consumer_high:
+    command: [codex, exec, --json, --model, consumer-high, -c, 'model_reasoning_effort="high"']
 roles:
   backend_developer_levsha:
+    commands_by_complexity:
+      C4: consumer_high
     command:
       - codex
       - exec
@@ -133,6 +158,8 @@ YAML);
                 '4',
                 '-r',
                 $consumerRoleFile,
+                '--task-id',
+                'TASK-consumer',
                 'Consumer project profile',
             ],
             $consumerRoot,
@@ -150,8 +177,8 @@ YAML);
         self::assertSame('codex', trim((string) file_get_contents($this->runnerCaptureFile)));
 
         $args = (string) file_get_contents($this->argsCaptureFile);
-        self::assertStringContainsString('--model consumer-model', $args);
-        self::assertStringContainsString('model_reasoning_effort=medium', $args);
+        self::assertStringContainsString('--model consumer-high', $args);
+        self::assertStringContainsString('model_reasoning_effort=high', $args);
     }
 
     #[Test]

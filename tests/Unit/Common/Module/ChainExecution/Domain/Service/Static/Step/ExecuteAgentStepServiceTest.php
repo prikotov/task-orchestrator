@@ -346,10 +346,7 @@ final class ExecuteAgentStepServiceTest extends TestCase
                         'docs/agents/roles/team/analyst.ru.md',
                     ];
             }),
-        )->willReturn(
-            ChainRunResultVo::createSuccess('Result', 50, 100, cost: 0.005),
-        );
-
+        )->willReturn(ChainRunResultVo::createSuccess('Result', 50, 100, cost: 0.005));
         $runner = new ExecuteAgentStepService(
             $agentRunner,
             $this->createMock(ResolveChainRunnerServiceInterface::class),

@@ -98,7 +98,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
 
         $yaml = Yaml::parseFile($this->yamlPath);
         $rawChains = $yaml['chains'] ?? [];
-        $roles = $this->parseRoles($yaml['roles'] ?? []);
+        $roles = $this->parseRoles($yaml['roles'] ?? [], $yaml['command_profiles'] ?? []);
 
         foreach ($rawChains as $name => $raw) {
             $this->chains[$name] = $this->parseChainDefinition($name, $raw, $roles);
@@ -372,7 +372,7 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     /**
      * Парсит секцию `roles` из YAML.
      *
-     * Каждый элемент: { command, timeout, prompt_file, system_prompt_file, fallback }.
+     * Каждый элемент: { command, commands_by_complexity, timeout, prompt_file, system_prompt_file, fallback }.
      * Все поля опциональны.
      *
      * Формат fallback в YAML:
@@ -383,10 +383,11 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
      *       - gpt-4o
      *
      * @param array<string, mixed> $raw
+     * @param array<string, array{command: list<string>}> $profiles
      *
      * @return array<string, RoleConfigVo>
      */
-    private function parseRoles(array $raw): array
+    private function parseRoles(array $raw, array $profiles): array
     {
         $roles = [];
 
@@ -395,10 +396,33 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
                 continue;
             }
 
+            $command = $config['command'] ?? [];
+            if (isset($config['command_profile'])) {
+                $profileName = $config['command_profile'];
+                if (!isset($profiles[$profileName]['command'])) {
+                    throw new InvalidArgumentException(sprintf('Unknown command profile "%s" for role "%s".', $profileName, $roleName));
+                }
+                $command = $profiles[$profileName]['command'];
+            }
+
+            $commandsByComplexity = [];
+            foreach ($config['commands_by_complexity'] ?? [] as $level => $profileName) {
+                if (is_array($profileName)) {
+                    $commandsByComplexity[$level] = $profileName;
+                    continue;
+                }
+                if (!isset($profiles[$profileName]['command'])) {
+                    throw new InvalidArgumentException(sprintf('Unknown command profile "%s" for role "%s" at %s.', $profileName, $roleName, $level));
+                }
+                $commandsByComplexity[$level] = $profiles[$profileName]['command'];
+            }
+
+            /** @var array<string, list<string>> $commandsByComplexity */
             $roles[$roleName] = new RoleConfigVo(
-                command: $config['command'] ?? [],
+                command: $command,
                 timeout: $config['timeout'] ?? null,
                 promptFile: $config['prompt_file'] ?? null,
+                commandsByComplexity: $commandsByComplexity,
                 systemPromptFile: $config['system_prompt_file'] ?? null,
                 fallback: $this->parseFallbackConfig($config),
             );
