@@ -125,16 +125,16 @@ roles:
     system_prompt_file: prompts/subagent/base_system.md
     command_profile: glm_flash_max
     commands_by_complexity:
-      C1: glm_flash_high
-      C4: kimi_high
+      C0: glm_flash_high
+      C5: kimi_high
 
   backend_developer_tony:
     prompt_file: docs/agents/roles/team/backend_developer_tony.ru.md
     system_prompt_file: prompts/subagent/base_system.md
     command_profile: glm_flash_high
     commands_by_complexity:
-      C1: ollama_huihui_medium
-      C4: glm_flash_max
+      C0: ollama_huihui_medium
+      C5: glm_flash_max
 
   code_reviewer_backend_puaro:
     prompt_file: docs/agents/roles/team/code_reviewer_backend_puaro.ru.md
