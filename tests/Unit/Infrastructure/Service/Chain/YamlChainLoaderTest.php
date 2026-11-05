@@ -547,7 +547,6 @@ YAML);
             self::assertSame(600, $analyst->getTimeout());
             self::assertSame('docs/roles/analyst.md', $analyst->getPromptFile());
             self::assertSame(['--model', 'default'], $analyst->getCommand());
-            self::assertSame(['C1' => ['--model', 'low']], $analyst->getCommandsByComplexity());
             self::assertSame('prompts/subagent/base_system.md', $analyst->getSystemPromptFile());
 
             $architect = $chain->getRoleConfig('architect');

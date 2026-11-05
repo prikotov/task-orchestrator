@@ -122,7 +122,6 @@ final readonly class DynamicLoopDefinitionMapperService implements DynamicLoopCo
                 command: $config->getCommand(),
                 timeout: $config->getTimeout(),
                 promptFile: $config->getPromptFile(),
-                commandsByComplexity: $config->getCommandsByComplexity(),
             );
         }
 

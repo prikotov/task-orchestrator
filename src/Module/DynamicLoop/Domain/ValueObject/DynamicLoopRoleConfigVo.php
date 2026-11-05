@@ -15,14 +15,12 @@ final readonly class DynamicLoopRoleConfigVo
      * @param list<string> $command полная CLI-команда для запуска агента
      * @param int|null $timeout таймаут в секундах
      * @param string|null $promptFile путь к файлу описания роли
-     * @param array<string, list<string>> $commandsByComplexity команды по уровням C0–C5
      * @param DynamicLoopFallbackConfigVo|null $fallback конфигурация fallback runner'а
      */
     public function __construct(
         private array $command = [],
         private ?int $timeout = null,
         private ?string $promptFile = null,
-        private array $commandsByComplexity = [],
         private ?DynamicLoopFallbackConfigVo $fallback = null,
     ) {
     }

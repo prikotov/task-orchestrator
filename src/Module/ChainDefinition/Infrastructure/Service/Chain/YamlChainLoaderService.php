@@ -405,24 +405,10 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
                 $command = $profiles[$profileName]['command'];
             }
 
-            $commandsByComplexity = [];
-            foreach ($config['commands_by_complexity'] ?? [] as $level => $profileName) {
-                if (is_array($profileName)) {
-                    $commandsByComplexity[$level] = $profileName;
-                    continue;
-                }
-                if (!isset($profiles[$profileName]['command'])) {
-                    throw new InvalidArgumentException(sprintf('Unknown command profile "%s" for role "%s" at %s.', $profileName, $roleName, $level));
-                }
-                $commandsByComplexity[$level] = $profiles[$profileName]['command'];
-            }
-
-            /** @var array<string, list<string>> $commandsByComplexity */
             $roles[$roleName] = new RoleConfigVo(
                 command: $command,
                 timeout: $config['timeout'] ?? null,
                 promptFile: $config['prompt_file'] ?? null,
-                commandsByComplexity: $commandsByComplexity,
                 systemPromptFile: $config['system_prompt_file'] ?? null,
                 fallback: $this->parseFallbackConfig($config),
             );
