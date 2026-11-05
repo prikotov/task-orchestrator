@@ -81,17 +81,6 @@ PROMPT
 - если `runner` задан явно через CLI/env и совпадает с profile runner — profile `provider`/`model`/`reasoning` можно применять как defaults (значения по умолчанию);
 - если `runner` задан явно через CLI/env и отличается от profile runner — profile `provider`/`model`/`reasoning` не применяются; они остаются пустыми, пока не заданы явно через CLI/env.
 
-Пример с чтением сложности из задачи:
-
-```bash
-<skill-dir>/scripts/watch-subagent.sh \
-  -s 600 \
-  -r docs/agents/roles/team/backend_developer_levsha.ru.md \
-  --task-id TASK-feat-complexity-based-role-commands <<'PROMPT'
-<prompt>
-PROMPT
-```
-
 ### Раннеры
 
 #### pi (default или профиль роли)
