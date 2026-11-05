@@ -3,7 +3,7 @@ type: chore
 created: 2026-11-05
 due: 
 started: 
-completed: 
+completed: 2026-11-05 03:57:15 (1793851035)
 cancelled: 
 value: V2
 complexity: C1
@@ -15,8 +15,8 @@ epic:
 author: backend_developer_levsha
 assignee: 
 branch: release/0.11.0
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/459
+status: done
 ---
 
 # TASK-release-v0-11-0-preparation: Подготовить релиз v0.11.0
