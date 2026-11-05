@@ -116,7 +116,9 @@ YAML);
         mkdir(dirname($consumerRoleFile), 0777, true);
         mkdir(dirname($consumerConfig), 0777, true);
         mkdir($consumerRoot . '/todo', 0777, true);
+        mkdir($consumerRoot . '/prompts/subagent', 0777, true);
         file_put_contents($consumerRoot . '/todo/TASK-consumer.todo.md', "---\ncomplexity: C4\n---\n");
+        file_put_contents($consumerRoot . '/prompts/subagent/base_system.md', "Consumer base system prompt.\n");
         copy(
             $projectRoot . '/docs/agents/skills/run-subagent/scripts/watch-subagent.sh',
             $installedSkillDir . '/scripts/watch-subagent.sh',
@@ -135,6 +137,7 @@ command_profiles:
     command: [codex, exec, --json, --model, consumer-high, -c, 'model_reasoning_effort="high"']
 roles:
   backend_developer_levsha:
+    system_prompt_file: prompts/subagent/base_system.md
     commands_by_complexity:
       C4: consumer_high
     command:
@@ -179,6 +182,113 @@ YAML);
         $args = (string) file_get_contents($this->argsCaptureFile);
         self::assertStringContainsString('--model consumer-high', $args);
         self::assertStringContainsString('model_reasoning_effort=high', $args);
+        // Единый базовый промпт: roles.<role>.system_prompt_file резолвится от
+        // PROJECT_ROOT проекта-потребителя, а не от каталога пакета в vendor.
+        self::assertStringContainsString(
+            'model_instructions_file=' . $consumerRoot . '/prompts/subagent/base_system.md',
+            $args,
+        );
+    }
+
+    #[Test]
+    public function roleSystemPromptFileOverrideReplacesPackagedPromptForPiRunner(): void
+    {
+        file_put_contents($this->chainsConfig, <<<'YAML'
+command_profiles:
+  pi_profile:
+    command: [pi, --mode, json, -p, --provider, zai, --model, pi-role-model, --thinking, high]
+roles:
+  team_lead_alex:
+    system_prompt_file: prompts/subagent/base_system.md
+    command_profile: pi_profile
+YAML);
+
+        $projectRoot = dirname(__DIR__, 6);
+        $this->runScript(roleFile: $this->piRoleFile);
+
+        self::assertSame('pi', trim((string) file_get_contents($this->runnerCaptureFile)));
+
+        $args = (string) file_get_contents($this->argsCaptureFile);
+        self::assertStringContainsString(
+            '--system-prompt ' . $projectRoot . '/prompts/subagent/base_system.md',
+            $args,
+        );
+        self::assertStringNotContainsString('subagent_system.txt', $args);
+        // Become-role append не меняется — навыки роли продолжают работать.
+        self::assertStringContainsString(
+            '--append-system-prompt Работай от лица роли: team_lead_alex',
+            $args,
+        );
+    }
+
+    #[Test]
+    public function roleSystemPromptFileOverrideReplacesPackagedPromptForCodexRunner(): void
+    {
+        file_put_contents($this->chainsConfig, <<<'YAML'
+command_profiles:
+  codex_profile:
+    command: [codex, exec, --json, --model, codex-role-model, -c, 'model_reasoning_effort="xhigh"']
+roles:
+  backend_developer_levsha:
+    system_prompt_file: prompts/subagent/base_system.md
+    command_profile: codex_profile
+YAML);
+
+        $projectRoot = dirname(__DIR__, 6);
+        $this->runScript();
+
+        self::assertSame('codex', trim((string) file_get_contents($this->runnerCaptureFile)));
+
+        $args = (string) file_get_contents($this->argsCaptureFile);
+        self::assertStringContainsString(
+            'model_instructions_file=' . $projectRoot . '/prompts/subagent/base_system.md',
+            $args,
+        );
+        self::assertStringNotContainsString('subagent_system.txt', $args);
+        self::assertStringContainsString(
+            'additional_instructions=Работай от лица роли: backend_developer_levsha',
+            $args,
+        );
+    }
+
+    #[Test]
+    public function fallsBackToPackagedSystemPromptWhenRoleHasNoOverride(): void
+    {
+        // Конфиг setUp не содержит system_prompt_file — оба раннера получают
+        // упакованный рядом со скриптом subagent_system.txt (прежнее поведение).
+        $packaged = dirname(__DIR__, 6) . '/docs/agents/skills/run-subagent/scripts/subagent_system.txt';
+
+        $this->runScript(roleFile: $this->piRoleFile, arguments: ['--runner', 'pi']);
+        self::assertStringContainsString(
+            '--system-prompt ' . $packaged,
+            (string) file_get_contents($this->argsCaptureFile),
+        );
+
+        $this->runScript(arguments: ['--runner', 'codex']);
+        self::assertStringContainsString(
+            'model_instructions_file=' . $packaged,
+            (string) file_get_contents($this->argsCaptureFile),
+        );
+    }
+
+    #[Test]
+    public function failsFastWhenRoleSystemPromptFileDoesNotExist(): void
+    {
+        // Ключ задан, файла нет — тихий откат на дефолт скрыл бы неверный промпт.
+        file_put_contents($this->chainsConfig, <<<'YAML'
+command_profiles:
+  codex_profile:
+    command: [codex, exec, --json, --model, codex-role-model]
+roles:
+  backend_developer_levsha:
+    system_prompt_file: prompts/subagent/missing_base_system.md
+    command_profile: codex_profile
+YAML);
+
+        $process = $this->runScript(expectSuccess: false);
+
+        self::assertFalse($process->isSuccessful());
+        self::assertStringContainsString('system_prompt_file не найден', $process->getErrorOutput());
     }
 
     #[Test]

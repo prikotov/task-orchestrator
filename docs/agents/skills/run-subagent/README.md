@@ -14,7 +14,7 @@ docs/agents/skills/run-subagent/
 ├── README.md                     # этот документ (операторский справочник)
 └── scripts/
     ├── watch-subagent.sh         # обёртка запуска (контрактная версия: v1)
-    └── subagent_system.txt       # упрощённый системный промпт сабагента
+    └── subagent_system.txt       # дефолтный системный промпт сабагента (override: roles.<role>.system_prompt_file)
 ```
 
 Логи запусков — в `var/log/watch-subagent/` (gitignored).
