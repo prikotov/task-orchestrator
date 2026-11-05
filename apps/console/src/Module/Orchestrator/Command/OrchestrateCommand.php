@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Console\Module\Orchestrator\Command;
 
+use InvalidArgumentException;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -63,8 +64,15 @@ final class OrchestrateCommand extends Command
     private const string OPT_VALIDATE_CONFIG = 'validate-config';
     private const string OPT_CONFIG = 'config';
     private const string OPT_MAX_TIME = 'max-time';
+    private const string OPT_TASK_ID = 'task-id';
+    private const string OPT_COMPLEXITY = 'complexity';
 
     public const string LOCK_RESOURCE = 'command:agent:orchestrate';
+
+    /**
+     * Сложность задачи по умолчанию: уровень C3 (единый контракт с навыком run-subagent).
+     */
+    public const int DEFAULT_COMPLEXITY = 3;
 
     public function __construct(
         private readonly CommandBusComponentInterface $commandBus,
@@ -87,14 +95,16 @@ final class OrchestrateCommand extends Command
             ->addOption(self::OPT_MAX_ROUNDS, null, InputOption::VALUE_OPTIONAL, 'Макс. раундов (dynamic)')
             ->addOption(self::OPT_FACILITATOR, null, InputOption::VALUE_OPTIONAL, 'Роль фасилитатора (dynamic)')
             ->addOption(self::OPT_PARTICIPANTS, null, InputOption::VALUE_OPTIONAL, 'Участники через запятую (dynamic)')
-            ->addOption(self::OPT_RESUME, null, InputOption::VALUE_OPTIONAL, 'Путь к директории сессии для resume')
+            ->addOption(self::OPT_RESUME, null, InputOption::VALUE_OPTIONAL, 'Путь к директории сессии для resume. Сложность берётся из session.json (legacy-сессия без поля — C3); явная --complexity переопределяет')
             ->addOption(self::OPT_NO_AUDIT_LOG, null, InputOption::VALUE_NONE, 'Отключить audit-логирование')
             ->addOption(self::OPT_REPORT_FORMAT, null, InputOption::VALUE_OPTIONAL, 'Формат отчёта: text|json (none — отключить)', 'text')
             ->addOption(self::OPT_REPORT_FILE, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу для записи отчёта')
             ->addOption(self::OPT_NO_CONTEXT_FILES, null, InputOption::VALUE_NONE, 'Отключить автоматическую загрузку контекстных файлов (AGENTS.md, CLAUDE.md)')
             ->addOption(self::OPT_VALIDATE_CONFIG, null, InputOption::VALUE_NONE, 'Проверить конфигурацию цепочки без запуска оркестрации')
             ->addOption(self::OPT_CONFIG, null, InputOption::VALUE_OPTIONAL, 'Путь к файлу chains.yaml (переопределяет путь по умолчанию)')
-            ->addOption(self::OPT_MAX_TIME, null, InputOption::VALUE_OPTIONAL, 'Макс. время сессии в секундах (dynamic). Если не задан — из chain.max_time, иначе default 3600');
+            ->addOption(self::OPT_MAX_TIME, null, InputOption::VALUE_OPTIONAL, 'Макс. время сессии в секундах (dynamic). Если не задан — из chain.max_time, иначе default 3600')
+            ->addOption(self::OPT_TASK_ID, null, InputOption::VALUE_REQUIRED, 'Идентификатор задачи TASK-*: сложность читается из поля complexity файла todo/<id>.todo.md (todo/, done/, backlog/, cancelled/)')
+            ->addOption(self::OPT_COMPLEXITY, null, InputOption::VALUE_REQUIRED, 'Явная сложность задачи C0-C5 (приоритет над --task-id и сложностью из session.json при resume; по умолчанию C3)');
     }
 
     #[Override]
@@ -154,6 +164,17 @@ final class OrchestrateCommand extends Command
             $noContextFiles = (bool) $input->getOption(self::OPT_NO_CONTEXT_FILES);
             $maxTime = $this->resolveOptionalIntOption($input, self::OPT_MAX_TIME);
 
+            // Сложность задачи (C0-C5) резолвится до вызова Application: отклонения
+            // commands_by_complexity применяются при маппинге цепочки, до запуска любого агента.
+            // Для resume без явной --complexity вернётся null: сложность берётся из session.json.
+            try {
+                $complexity = $this->resolveComplexity($input, $workingDir, $resumeDir);
+            } catch (InvalidArgumentException $e) {
+                $io->error($e->getMessage());
+
+                return OrchestrateExitCodeEnum::invalidConfig->value;
+            }
+
             if ($resumeDir !== null && $resumeDir !== '') {
                 $io->section(sprintf('🔄 Resuming session: %s', $resumeDir));
 
@@ -167,6 +188,7 @@ final class OrchestrateCommand extends Command
                     noAuditLog: $noAuditLog,
                     noContextFiles: $noContextFiles,
                     maxTime: $maxTime,
+                    complexity: $complexity,
                 ));
 
                 // Resume всегда резолвит exit code как dynamic — информация о типе цепочки не сохраняется в сессии.
@@ -205,6 +227,7 @@ final class OrchestrateCommand extends Command
                 noAuditLog: $noAuditLog,
                 noContextFiles: $noContextFiles,
                 maxTime: $maxTime,
+                complexity: $complexity,
             ));
 
             // Генерация отчёта (если задан формат)
@@ -238,6 +261,91 @@ final class OrchestrateCommand extends Command
         } finally {
             $lock->release();
         }
+    }
+
+    /**
+     * Вычисляет сложность задачи уровнем 0-5 (C0-C5) по приоритету:
+     * явная --complexity > сложность из session.json при resume > поле complexity файла
+     * задачи --task-id > C3.
+     *
+     * Единый контракт с навыком run-subagent (watch-subagent.sh): сложность выбирает
+     * команду роли из отклонений commands_by_complexity (см.
+     * RoleConfigVo::resolveCommandByComplexity()). База поиска файла задачи —
+     * рабочая директория (--working-dir), иначе текущая директория процесса.
+     *
+     * Для resume (--resume без явной --complexity) возвращает null: сессия хранит
+     * сложность, зафиксированную при первичном запуске (поле complexity в session.json,
+     * см. ChainSessionWriter); DynamicExecutionStrategy::resume() применит её, а
+     * legacy-сессия без поля трактуется как C3.
+     *
+     * @return int|null уровень 0–5 или null — «сложность не задана явно, берём из session.json».
+     *
+     * @throws InvalidArgumentException при невалидной --complexity, отсутствующем,
+     *         неоднозначном или нечитаемом файле задачи, невалидном значении complexity в нём.
+     */
+    private function resolveComplexity(InputInterface $input, null|string $workingDir, null|string $resumeDir): ?int
+    {
+        /** @var string|null $complexityOption */
+        $complexityOption = $input->getOption(self::OPT_COMPLEXITY);
+
+        if ($complexityOption !== null && $complexityOption !== '') {
+            if (preg_match('/^C[0-5]$/', $complexityOption) !== 1) {
+                throw new InvalidArgumentException(sprintf('Invalid complexity "%s": expected C0-C5.', $complexityOption));
+            }
+
+            return (int) substr($complexityOption, 1);
+        }
+
+        if ($resumeDir !== null && $resumeDir !== '') {
+            return null;
+        }
+
+        /** @var string|null $taskId */
+        $taskId = $input->getOption(self::OPT_TASK_ID);
+
+        if ($taskId !== null && $taskId !== '') {
+            return $this->resolveComplexityFromTaskFile($taskId, $workingDir);
+        }
+
+        return self::DEFAULT_COMPLEXITY;
+    }
+
+    /**
+     * Читает сложность задачи из поля complexity файла todo/<taskId>.todo.md.
+     *
+     * Файл ищется ровно один в todo/, todo/done/, todo/backlog/, todo/cancelled/;
+     * отсутствие поля complexity означает уровень по умолчанию (C3).
+     *
+     * @throws InvalidArgumentException если файл не найден ровно один, нечитаем
+     *         или содержит невалидное значение complexity.
+     */
+    private function resolveComplexityFromTaskFile(string $taskId, null|string $workingDir): int
+    {
+        $baseDir = $workingDir !== null && $workingDir !== '' ? rtrim($workingDir, '/') : (string) getcwd();
+        $paths = glob($baseDir . '/todo/{,done/,backlog/,cancelled/}' . $taskId . '.todo.md', GLOB_BRACE);
+
+        if ($paths === false || count($paths) !== 1) {
+            throw new InvalidArgumentException(sprintf(
+                'Expected exactly one task file for task "%s" in todo/ (todo, done, backlog, cancelled).',
+                $taskId,
+            ));
+        }
+
+        $content = file_get_contents($paths[0]);
+
+        if ($content === false) {
+            throw new InvalidArgumentException(sprintf('Unable to read task file "%s".', $paths[0]));
+        }
+
+        if (preg_match('/^complexity:\s*(C[0-5])\s*$/mi', $content, $matches) === 1) {
+            return (int) substr($matches[1], 1);
+        }
+
+        if (preg_match('/^complexity:\s*(\S+)\s*$/mi', $content, $matches) === 1) {
+            throw new InvalidArgumentException(sprintf('Invalid complexity "%s" in task "%s".', $matches[1], $taskId));
+        }
+
+        return self::DEFAULT_COMPLEXITY;
     }
 
     /**

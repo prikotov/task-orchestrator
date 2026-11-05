@@ -40,7 +40,12 @@ final readonly class StaticExecutionStrategyService implements StaticExecutionSt
     #[Override]
     public function execute(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        $config = $this->chainProvider->loadStaticChainConfig($chainInfo->name);
+        $config = $this->chainProvider->loadStaticChainConfig(
+            $chainInfo->name,
+            // C3 — дефолтная сложность (единый контракт с навыком run-subagent);
+            // совпадает с int $complexity = 3 в ChainDefinitionProviderInterface.
+            $command->complexity ?? 3,
+        );
 
         $result = $this->staticChainExecutor->execute(
             $config,

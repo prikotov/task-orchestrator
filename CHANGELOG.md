@@ -7,9 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Removed
+### Added
 
-- Публичные PHP-контракты `commandsByComplexity`: свойство и геттер `RoleConfigVo::getCommandsByComplexity()`, поля в `ExecutionRoleConfigVo`, `DynamicLoopRoleConfigVo` и соответствующих мапперах. Несовместимое изменение в рамках 0.x (#460). YAML-поле `commands_by_complexity` сохранено: выбор команды по сложности выполняет только `watch-subagent.sh` (навык run-subagent), PHP-оркестратор применяет базовую `command`/`command_profile`, а `YamlChainLoaderService` валидирует поле fail-fast при загрузке (уровни `C0`–`C5`, существование профилей, непустота inline-команд).
+- Выбор команды роли по сложности задачи в PHP-оркестраторе: `agent:orchestrate` принимает `--task-id TASK-*` (поле `complexity` файла задачи в `todo/`) и явный `--complexity C0–C5` (приоритет; по умолчанию `C3`). Отклонения `commands_by_complexity` применяются на ACL-границе мапперов ChainExecution/DynamicLoop (`RoleConfigVo::resolveCommandByComplexity()`, правило «точный уровень → ближайший выше → ближайший ниже, базовая команда = C3») — единое правило с `watch-subagent.sh` (навык run-subagent) (#460).
+- `YamlChainLoaderService` резолвит `commands_by_complexity` в полные команды при загрузке: имена профилей из `command_profiles` и inline-команды попадают в `RoleConfigVo`; валидация fail-fast сохранена (уровни `C0`–`C5`, существование профилей, непустота inline-команд) (#460).
 
 ## [0.11.0] - 2026-11-05
 

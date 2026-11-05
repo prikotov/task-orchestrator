@@ -608,12 +608,11 @@ YAML);
     }
 
     #[Test]
-    public function loadAcceptsValidCommandsByComplexityWithoutVoMapping(): void
+    public function loadResolvesCommandsByComplexityIntoVo(): void
     {
-        // commands_by_complexity валидируется лоадером fail-fast, но в RoleConfigVo не попадает:
-        // выбор команды по сложности выполняет watch-subagent.sh, PHP-оркестратор применяет базовую команду.
-        self::assertFalse(method_exists(RoleConfigVo::class, 'getCommandsByComplexity'));
-
+        // Поле попадает в RoleConfigVo: имена профилей резолвятся в полные команды при загрузке,
+        // inline-команды сохраняются как есть. Выбор по уровню выполняет
+        // RoleConfigVo::resolveCommandByComplexity() на ACL-границе мапперов.
         $fixtureDir = sys_get_temp_dir() . '/agent_chains_cbc_valid_' . uniqid();
         mkdir($fixtureDir);
         $fixturePath = $fixtureDir . '/chains.yaml';
@@ -643,8 +642,11 @@ YAML);
 
             $analyst = $chain->getRoleConfig('analyst');
             self::assertNotNull($analyst);
-            // В VO попадает только базовая команда, отклонения по сложности не сохраняются.
             self::assertSame(['--model', 'default'], $analyst->getCommand());
+            self::assertSame([
+                'C0' => ['--model', 'low'],
+                'C5' => ['--model', 'max'],
+            ], $analyst->getCommandsByComplexity());
         } finally {
             unlink($fixturePath);
             rmdir($fixtureDir);

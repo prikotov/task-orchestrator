@@ -15,7 +15,11 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBud
 interface DynamicLoopSessionWriterInterface
 {
     /**
+     * Начинает сессию и сохраняет сложность задачи в session.json:
+     * при resume без явной CLI-опции --complexity используется сохранённое значение.
+     *
      * @param list<string> $participants
+     * @param int $complexity уровень сложности задачи 0–5 (C0–C5), выбранный на CLI-границе
      */
     public function startSession(
         string $chainName,
@@ -23,6 +27,7 @@ interface DynamicLoopSessionWriterInterface
         string $facilitator,
         array $participants,
         int $maxRounds,
+        int $complexity,
     ): string;
 
     public function logRound(

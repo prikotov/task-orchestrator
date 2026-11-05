@@ -65,28 +65,28 @@ final readonly class ChainExecutionDefinitionMapperService implements ChainExecu
     }
 
     #[Override]
-    public function loadStaticChainConfig(string $chainName): ExecutionStaticChainConfigVo
+    public function loadStaticChainConfig(string $chainName, int $complexity = 3): ExecutionStaticChainConfigVo
     {
         $chain = $this->queryBus->query(new LoadRawChainQuery($chainName));
         assert($chain instanceof StaticChainDefinitionVo);
 
-        return $this->mapStaticChain($chain);
+        return $this->mapStaticChain($chain, $complexity);
     }
 
     #[Override]
-    public function loadConditionalChainConfig(string $chainName): ExecutionConditionalChainConfigVo
+    public function loadConditionalChainConfig(string $chainName, int $complexity = 3): ExecutionConditionalChainConfigVo
     {
         $chain = $this->queryBus->query(new LoadRawChainQuery($chainName));
         assert($chain instanceof ConditionalChainDefinitionVo);
 
-        return $this->mapConditionalChain($chain);
+        return $this->mapConditionalChain($chain, $complexity);
     }
 
     /**
      * Маппит StaticChainDefinitionVo → ExecutionStaticChainConfigVo.
      */
     #[Override]
-    public function mapStaticChain(StaticChainDefinitionVo $chain): ExecutionStaticChainConfigVo
+    public function mapStaticChain(StaticChainDefinitionVo $chain, int $complexity = 3): ExecutionStaticChainConfigVo
     {
         $shared = $chain->getSharedDefinition();
 
@@ -96,7 +96,7 @@ final readonly class ChainExecutionDefinitionMapperService implements ChainExecu
             fixIterations: $this->mapFixIterations($chain->getFixIterations()),
             budget: $this->mapBudget($shared->getBudget()),
             timeout: $shared->getTimeout(),
-            roles: $this->mapRoles($shared->getRoles()),
+            roles: $this->mapRoles($shared->getRoles(), $complexity),
             defaultRetryPolicy: $this->mapRetryPolicy($chain->getDefaultRetryPolicy()),
         );
     }
@@ -105,7 +105,7 @@ final readonly class ChainExecutionDefinitionMapperService implements ChainExecu
      * Маппит ConditionalChainDefinitionVo → ExecutionConditionalChainConfigVo.
      */
     #[Override]
-    public function mapConditionalChain(ConditionalChainDefinitionVo $chain): ExecutionConditionalChainConfigVo
+    public function mapConditionalChain(ConditionalChainDefinitionVo $chain, int $complexity = 3): ExecutionConditionalChainConfigVo
     {
         $shared = $chain->getSharedDefinition();
 
@@ -114,7 +114,7 @@ final readonly class ChainExecutionDefinitionMapperService implements ChainExecu
             steps: $this->mapSteps($chain->getSteps()),
             budget: $this->mapBudget($shared->getBudget()),
             timeout: $shared->getTimeout(),
-            roles: $this->mapRoles($shared->getRoles()),
+            roles: $this->mapRoles($shared->getRoles(), $complexity),
         );
     }
 
@@ -216,17 +216,24 @@ final readonly class ChainExecutionDefinitionMapperService implements ChainExecu
     }
 
     /**
+     * Маппит роли с применением отклонений по сложности задачи.
+     *
+     * Отклонения commands_by_complexity применяются один раз на ACL-границе:
+     * в Execution VO уходит уже выбранная целая команда (RoleConfigVo::resolveCommandByComplexity()),
+     * до запуска любого агента.
+     *
      * @param array<string, RoleConfigVo> $roles
      * @return array<string, ExecutionRoleConfigVo>
      */
-    private function mapRoles(array $roles): array
+    private function mapRoles(array $roles, int $complexity): array
     {
         $result = [];
         foreach ($roles as $role => $config) {
             $result[$role] = new ExecutionRoleConfigVo(
-                command: $config->getCommand(),
+                command: $config->resolveCommandByComplexity($complexity),
                 timeout: $config->getTimeout(),
                 promptFile: $config->getPromptFile(),
+                commandsByComplexity: $config->getCommandsByComplexity(),
                 systemPromptFile: $config->getSystemPromptFile(),
                 fallback: $this->mapFallback($config->getFallback()),
             );

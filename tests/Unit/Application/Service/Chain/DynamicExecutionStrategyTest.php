@@ -676,6 +676,34 @@ final class DynamicExecutionStrategyTest extends TestCase
         self::assertNull($capturedLogger);
     }
 
+    #[Test]
+    public function executePassesCommandComplexityToProvider(): void
+    {
+        // Сложность из OrchestrateChainCommand доходит до провайдера: отклонения
+        // commands_by_complexity применяются при маппинге, до запуска агента.
+        $this->setUpDynamicConfig('complexity-aware', complexity: 4);
+
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturn(new DynamicLoopResultVo(
+                roundResults: [],
+                totalTime: 0.0,
+                totalInputTokens: 0,
+                totalOutputTokens: 0,
+                totalCost: 0.0,
+                synthesis: 'Done',
+                maxRoundsReached: false,
+            ));
+
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('complexity-aware', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'complexity-aware',
+                task: 'Test',
+                complexity: 4,
+            ),
+        );
+    }
+
     // --- resume() ---
 
     #[Test]
@@ -684,7 +712,9 @@ final class DynamicExecutionStrategyTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Failed to resume session');
 
-        $this->setUpDynamicConfig('test');
+        // При null-state resume() падает раньше загрузки конфига — провайдер не вызывается.
+        $this->chainProvider->expects(self::never())
+            ->method('loadDynamicChainConfig');
 
         $this->sessionLogger->method('resumeSession');
         $this->sessionLogger->method('getResumedState')->willReturn(null);
@@ -1189,6 +1219,94 @@ final class DynamicExecutionStrategyTest extends TestCase
         self::assertSame($auditLogger, $capturedLogger);
     }
 
+    #[Test]
+    public function resumeUsesSavedComplexityFromSessionState(): void
+    {
+        // Arrange: CLI complexity не задан (null) — провайдер получает сложность,
+        // сохранённую в session.json (C5).
+        $this->setUpDynamicConfig('complexity-resume', complexity: 5);
+
+        $state = new DynamicLoopSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+            complexity: 5,
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $this->dynamicLoopRunner->method('execute')->willReturn(new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed with saved complexity',
+            maxRoundsReached: false,
+        ));
+
+        // Act
+        $this->strategy->resume(
+            new ExecutionChainInfoVo('complexity-resume', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'complexity-resume',
+                task: 'Test',
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
+
+        // Assert: setUpDynamicConfig зафиксировал loadDynamicChainConfig('complexity-resume', 5).
+    }
+
+    #[Test]
+    public function resumeExplicitComplexityOverridesSessionState(): void
+    {
+        // Arrange: явный CLI --complexity=2 приоритетнее сохранённой в session.json C5.
+        $this->setUpDynamicConfig('complexity-resume', complexity: 2);
+
+        $state = new DynamicLoopSessionStateVo(
+            topic: 'Resumed topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+            complexity: 5,
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $this->dynamicLoopRunner->method('execute')->willReturn(new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Resumed with explicit complexity',
+            maxRoundsReached: false,
+        ));
+
+        // Act
+        $this->strategy->resume(
+            new ExecutionChainInfoVo('complexity-resume', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'complexity-resume',
+                task: 'Test',
+                complexity: 2,
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
+
+        // Assert: setUpDynamicConfig зафиксировал loadDynamicChainConfig('complexity-resume', 2).
+    }
+
     // --- Helpers ---
 
     private function setUpDynamicConfig(
@@ -1196,6 +1314,7 @@ final class DynamicExecutionStrategyTest extends TestCase
         int $maxRounds = 10,
         ?int $timeout = null,
         ?int $maxTime = null,
+        int $complexity = 3,
     ): void {
         $config = new DynamicLoopConfigVo(
             name: $name,
@@ -1221,7 +1340,7 @@ final class DynamicExecutionStrategyTest extends TestCase
 
         $this->chainProvider->expects(self::once())
             ->method('loadDynamicChainConfig')
-            ->with($name)
+            ->with($name, $complexity)
             ->willReturn($config);
     }
 }

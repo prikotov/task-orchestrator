@@ -631,6 +631,278 @@ YAML);
         self::assertSame(OrchestrateExitCodeEnum::timeout->value, $tester->getStatusCode());
     }
 
+    // ─── Task complexity resolution (explicit --complexity > --task-id file > C3) ──
+
+    #[Test]
+    public function executeWithoutComplexityOptionsPassesDefaultC3ToHandler(): void
+    {
+        $chain = $this->createStaticChainDefinition();
+        $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+            });
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--report-format' => 'none']);
+
+        self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+        self::assertNotNull($capturedCommand);
+        self::assertSame(OrchestrateCommand::DEFAULT_COMPLEXITY, $capturedCommand->complexity);
+    }
+
+    #[Test]
+    public function executeWithExplicitComplexityPassesLevelToHandler(): void
+    {
+        $chain = $this->createStaticChainDefinition();
+        $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+            });
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--complexity' => 'C4', '--report-format' => 'none']);
+
+        self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+        self::assertNotNull($capturedCommand);
+        self::assertSame(4, $capturedCommand->complexity);
+    }
+
+    #[Test]
+    public function executeWithInvalidComplexityOptionFailsWithInvalidConfig(): void
+    {
+        $chain = $this->createStaticChainDefinition();
+        $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+        $this->orchestrateHandler->expects(self::never())->method('__invoke');
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['task' => 'test', '--complexity' => 'C9', '--report-format' => 'none']);
+
+        self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
+        self::assertStringContainsString('Invalid complexity "C9": expected C0-C5.', $tester->getDisplay());
+    }
+
+    #[Test]
+    public function executeWithTaskIdReadsComplexityFromTaskFile(): void
+    {
+        $baseDir = $this->createTaskFile('TASK-test-complex', 'complexity: C1');
+
+        try {
+            $chain = $this->createStaticChainDefinition();
+            $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+            $capturedCommand = null;
+            $this->orchestrateHandler
+                ->method('__invoke')
+                ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                    $capturedCommand = $cmd;
+
+                    return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+                });
+
+            $tester = $this->createCommandTester();
+            $tester->execute([
+                'task' => 'test',
+                '--task-id' => 'TASK-test-complex',
+                '--working-dir' => $baseDir,
+                '--report-format' => 'none',
+            ]);
+
+            self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+            self::assertNotNull($capturedCommand);
+            self::assertSame(1, $capturedCommand->complexity);
+        } finally {
+            $this->removeDirRecursive($baseDir);
+        }
+    }
+
+    #[Test]
+    public function executeWithTaskIdWithoutComplexityFieldUsesDefault(): void
+    {
+        $baseDir = $this->createTaskFile('TASK-test-nocomplex', null);
+
+        try {
+            $chain = $this->createStaticChainDefinition();
+            $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+            $capturedCommand = null;
+            $this->orchestrateHandler
+                ->method('__invoke')
+                ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                    $capturedCommand = $cmd;
+
+                    return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+                });
+
+            $tester = $this->createCommandTester();
+            $tester->execute([
+                'task' => 'test',
+                '--task-id' => 'TASK-test-nocomplex',
+                '--working-dir' => $baseDir,
+                '--report-format' => 'none',
+            ]);
+
+            self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+            self::assertNotNull($capturedCommand);
+            self::assertSame(OrchestrateCommand::DEFAULT_COMPLEXITY, $capturedCommand->complexity);
+        } finally {
+            $this->removeDirRecursive($baseDir);
+        }
+    }
+
+    #[Test]
+    public function executeWithInvalidComplexityInTaskFileFailsWithInvalidConfig(): void
+    {
+        $baseDir = $this->createTaskFile('TASK-test-badcomplex', 'complexity: urgent');
+
+        try {
+            $chain = $this->createStaticChainDefinition();
+            $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+            $this->orchestrateHandler->expects(self::never())->method('__invoke');
+
+            $tester = $this->createCommandTester();
+            $tester->execute([
+                'task' => 'test',
+                '--task-id' => 'TASK-test-badcomplex',
+                '--working-dir' => $baseDir,
+                '--report-format' => 'none',
+            ]);
+
+            self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
+            self::assertStringContainsString('Invalid complexity "urgent" in task "TASK-test-badcomplex".', $tester->getDisplay());
+        } finally {
+            $this->removeDirRecursive($baseDir);
+        }
+    }
+
+    #[Test]
+    public function executeWithMissingTaskFileFailsWithInvalidConfig(): void
+    {
+        $baseDir = sys_get_temp_dir() . '/orchestrate_task_missing_' . uniqid();
+        mkdir($baseDir . '/todo', 0777, true);
+
+        try {
+            $chain = $this->createStaticChainDefinition();
+            $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+            $this->orchestrateHandler->expects(self::never())->method('__invoke');
+
+            $tester = $this->createCommandTester();
+            $tester->execute([
+                'task' => 'test',
+                '--task-id' => 'TASK-test-absent',
+                '--working-dir' => $baseDir,
+                '--report-format' => 'none',
+            ]);
+
+            self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
+            self::assertStringContainsString('Expected exactly one task file for task "TASK-test-absent"', $tester->getDisplay());
+        } finally {
+            $this->removeDirRecursive($baseDir);
+        }
+    }
+
+    #[Test]
+    public function executeWithAmbiguousTaskIdFailsWithInvalidConfig(): void
+    {
+        $baseDir = $this->createTaskFile('TASK-test-dup', 'complexity: C2');
+        mkdir($baseDir . '/todo/done', 0777, true);
+        file_put_contents($baseDir . '/todo/done/TASK-test-dup.todo.md', "---\ncomplexity: C0\n---\n");
+
+        try {
+            $chain = $this->createStaticChainDefinition();
+            $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+            $this->orchestrateHandler->expects(self::never())->method('__invoke');
+
+            $tester = $this->createCommandTester();
+            $tester->execute([
+                'task' => 'test',
+                '--task-id' => 'TASK-test-dup',
+                '--working-dir' => $baseDir,
+                '--report-format' => 'none',
+            ]);
+
+            self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
+            self::assertStringContainsString('Expected exactly one task file for task "TASK-test-dup"', $tester->getDisplay());
+        } finally {
+            $this->removeDirRecursive($baseDir);
+        }
+    }
+
+    #[Test]
+    public function executeWithExplicitComplexityPrioritizedOverTaskId(): void
+    {
+        $baseDir = $this->createTaskFile('TASK-test-priority', 'complexity: C1');
+
+        try {
+            $chain = $this->createStaticChainDefinition();
+            $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
+
+            $capturedCommand = null;
+            $this->orchestrateHandler
+                ->method('__invoke')
+                ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                    $capturedCommand = $cmd;
+
+                    return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+                });
+
+            $tester = $this->createCommandTester();
+            $tester->execute([
+                'task' => 'test',
+                '--complexity' => 'C5',
+                '--task-id' => 'TASK-test-priority',
+                '--working-dir' => $baseDir,
+                '--report-format' => 'none',
+            ]);
+
+            self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
+            self::assertNotNull($capturedCommand);
+            self::assertSame(5, $capturedCommand->complexity);
+        } finally {
+            $this->removeDirRecursive($baseDir);
+        }
+    }
+
+    #[Test]
+    public function executeResumePassesResolvedComplexityToHandler(): void
+    {
+        $capturedCommand = null;
+        $this->orchestrateHandler
+            ->method('__invoke')
+            ->willReturnCallback(function (OrchestrateChainCommand $cmd) use (&$capturedCommand): OrchestrateChainResultDto {
+                $capturedCommand = $cmd;
+
+                return new OrchestrateChainResultDto(stepResults: [], budgetExceeded: false);
+            });
+
+        $tester = $this->createCommandTester();
+        $tester->execute([
+            'task' => 'test',
+            '--resume' => 'var/sessions/2026-01-01_abc',
+            '--complexity' => 'C2',
+            '--report-format' => 'none',
+        ]);
+
+        self::assertNotNull($capturedCommand);
+        self::assertSame('var/sessions/2026-01-01_abc', $capturedCommand->resumeDir);
+        self::assertSame(2, $capturedCommand->complexity);
+    }
+
     // ─── Helpers ───────────────────────────────────────────────────────────────
 
     private function createCommandTester(): CommandTester
@@ -659,5 +931,55 @@ YAML);
                 new ChainStepDto(role: 'agent', runner: 'pi', label: '', isQualityGate: false),
             ],
         );
+    }
+
+    /**
+     * Создаёт временную директорию с файлом задачи todo/<taskId>.todo.md.
+     *
+     * @param string|null $complexityLine строка frontmatter сложности (null — поле не добавляется)
+     *
+     * @return string базовая директория для --working-dir
+     */
+    private function createTaskFile(string $taskId, null|string $complexityLine): string
+    {
+        $baseDir = sys_get_temp_dir() . '/orchestrate_task_' . uniqid();
+        mkdir($baseDir . '/todo', 0777, true);
+
+        $frontmatter = "---\ntype: feature\n";
+
+        if ($complexityLine !== null) {
+            $frontmatter .= $complexityLine . "\n";
+        }
+
+        $frontmatter .= "---\n\n# " . $taskId . "\n";
+        file_put_contents($baseDir . '/todo/' . $taskId . '.todo.md', $frontmatter);
+
+        return $baseDir;
+    }
+
+    private function removeDirRecursive(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $items = scandir($dir);
+        self::assertNotFalse($items);
+
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            $path = $dir . '/' . $item;
+
+            if (is_dir($path)) {
+                $this->removeDirRecursive($path);
+            } else {
+                unlink($path);
+            }
+        }
+
+        rmdir($dir);
     }
 }

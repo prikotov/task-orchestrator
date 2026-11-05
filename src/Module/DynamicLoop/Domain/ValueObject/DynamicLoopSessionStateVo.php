@@ -12,6 +12,12 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject;
 final readonly class DynamicLoopSessionStateVo
 {
     /**
+     * Сложность задачи по умолчанию: уровень C3 (единый контракт с навыком run-subagent).
+     * Сессии, созданные до появления поля complexity в session.json, считаются C3.
+     */
+    public const int DEFAULT_COMPLEXITY = 3;
+
+    /**
      * @param list<string> $participants
      */
     public function __construct(
@@ -22,6 +28,7 @@ final readonly class DynamicLoopSessionStateVo
         private int $completedRounds,
         private string $discussionHistory,
         private string $facilitatorJournal,
+        private int $complexity = self::DEFAULT_COMPLEXITY,
     ) {
     }
 
@@ -61,5 +68,13 @@ final readonly class DynamicLoopSessionStateVo
     public function getFacilitatorJournal(): string
     {
         return $this->facilitatorJournal;
+    }
+
+    /**
+     * Сложность задачи уровнем 0–5 (C0–C5), зафиксированная при запуске сессии.
+     */
+    public function getComplexity(): int
+    {
+        return $this->complexity;
     }
 }

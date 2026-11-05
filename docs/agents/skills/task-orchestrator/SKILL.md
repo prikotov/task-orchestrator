@@ -36,6 +36,8 @@ php vendor/bin/task-orchestrator agent:orchestrate [options] [--] <task>
 | `--timeout` | `-t` | Таймаут на шаг (секунды) | `600` |
 | `--dry-run` | — | Показать план без запуска | — |
 | `--config` | — | Путь к файлу `chains.yaml` (переопределяет путь по умолчанию) | — |
+| `--task-id` | — | Идентификатор задачи `TASK-*`: сложность читается из поля `complexity` файла `todo/<id>.todo.md` (`todo/`, `done/`, `backlog/`, `cancelled/`; файл должен найтись ровно один) | — |
+| `--complexity` | — | Явная сложность задачи `C0–C5` (приоритет над `--task-id`). Выбирает команду роли из отклонений `commands_by_complexity` | `C3` |
 | `--validate-config` | — | Проверить конфигурацию без запуска | — |
 | `--resume` | — | Путь к директории сессии для возобновления | — |
 | `--report-format` | — | Формат отчёта: `text`, `json`, `none` | `text` |

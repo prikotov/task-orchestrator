@@ -12,7 +12,9 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject\ExecutionSt
  * Контракт загрузки конфигурации цепочки из ChainDefinition.
  *
  * Реализация (ChainExecutionDefinitionMapper) находится в Integration-слое
- * и маппит ChainDefinition VO → Execution VO.
+ * и маппит ChainDefinition VO → Execution VO. Сложность задачи задаётся на CLI/Application
+ * границе и передаётся готовым значением: отклонения commands_by_complexity применяются
+ * при маппинге, до запуска любого агента. По умолчанию — C3.
  */
 interface ChainDefinitionProviderInterface
 {
@@ -25,11 +27,19 @@ interface ChainDefinitionProviderInterface
 
     /**
      * Загружает конфигурацию static-цепочки по имени.
+     *
+     * @param int $complexity готовая сложность задачи уровнем 0–5 (C0–C5):
+     *        отклонения commands_by_complexity применяются к командам ролей при маппинге
+     *        (по умолчанию C3; дефолт подставляет CLI-граница agent:orchestrate).
      */
-    public function loadStaticChainConfig(string $chainName): ExecutionStaticChainConfigVo;
+    public function loadStaticChainConfig(string $chainName, int $complexity = 3): ExecutionStaticChainConfigVo;
 
     /**
      * Загружает конфигурацию conditional-цепочки по имени.
+     *
+     * @param int $complexity готовая сложность задачи уровнем 0–5 (C0–C5):
+     *        отклонения commands_by_complexity применяются к командам ролей при маппинге
+     *        (по умолчанию C3; дефолт подставляет CLI-граница agent:orchestrate).
      */
-    public function loadConditionalChainConfig(string $chainName): ExecutionConditionalChainConfigVo;
+    public function loadConditionalChainConfig(string $chainName, int $complexity = 3): ExecutionConditionalChainConfigVo;
 }

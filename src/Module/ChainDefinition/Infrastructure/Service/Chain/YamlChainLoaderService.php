@@ -375,9 +375,10 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
      * Каждый элемент: { command, command_profile, commands_by_complexity, timeout, prompt_file, system_prompt_file, fallback }.
      * Все поля опциональны.
      *
-     * Поле `commands_by_complexity` валидируется fail-fast (см. self::validateCommandsByComplexity()),
-     * но в RoleConfigVo не попадает: выбор команды по сложности задачи выполняет только
-     * watch-subagent.sh (навык run-subagent), PHP-оркестратор применяет базовую command/command_profile.
+     * Поле `commands_by_complexity` валидируется fail-fast (см. self::resolveCommandsByComplexity())
+     * и попадает в RoleConfigVo: имена профилей резолвятся в полные команды при загрузке,
+     * выбор команды по сложности выполняет RoleConfigVo::resolveCommandByComplexity()
+     * на границе модулей (Integration-мапперы ChainExecution/DynamicLoop).
      *
      * Формат fallback в YAML:
      *   fallback:
@@ -411,12 +412,11 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
                 $command = $profiles[$profileName]['command'];
             }
 
-            $this->validateCommandsByComplexity($roleName, $profiles, $config);
-
             $roles[$roleName] = new RoleConfigVo(
                 command: $command,
                 timeout: $config['timeout'] ?? null,
                 promptFile: $config['prompt_file'] ?? null,
+                commandsByComplexity: $this->resolveCommandsByComplexity($roleName, $profiles, $config),
                 systemPromptFile: $config['system_prompt_file'] ?? null,
                 fallback: $this->parseFallbackConfig($config),
             );
@@ -426,12 +426,11 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
     }
 
     /**
-     * Валидирует fail-fast поле roles.<name>.commands_by_complexity.
+     * Валидирует fail-fast и резолвит поле roles.<name>.commands_by_complexity.
      *
-     * Поле не входит в RoleConfigVo: выбор команды по сложности задачи выполняет
-     * только watch-subagent.sh (навык run-subagent). PHP-оркестратор (agent:orchestrate)
-     * применяет базовую command/command_profile. Тем не менее некорректное поле должно
-     * ломать загрузку конфигурации немедленно, а не при первом запуске скрипта.
+     * Значения поля — имена существующих профилей из command_profiles либо непустые
+     * inline-команды; в VO попадают только полные команды (list<string>). Некорректное
+     * поле ломает загрузку конфигурации немедленно, а не при первом запуске агента.
      *
      * Правила:
      * - ключ — уровень строго из диапазона C0–C5;
@@ -441,14 +440,16 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
      * @param array<string, mixed> $roleConfig
      * @param array<string, array{command: list<string>}> $profiles
      *
+     * @return array<string, list<string>> уровень C0–C5 → полная CLI-команда уровня.
+     *
      * @throws InvalidArgumentException при неверном уровне, неизвестном профиле или пустой inline-команде
      */
-    private function validateCommandsByComplexity(string $roleName, array $profiles, array $roleConfig): void
+    private function resolveCommandsByComplexity(string $roleName, array $profiles, array $roleConfig): array
     {
         $commandsByComplexity = $roleConfig['commands_by_complexity'] ?? [];
 
         if ($commandsByComplexity === []) {
-            return;
+            return [];
         }
 
         if (!is_array($commandsByComplexity)) {
@@ -457,6 +458,8 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
                 $roleName,
             ));
         }
+
+        $resolved = [];
 
         foreach ($commandsByComplexity as $level => $value) {
             if (!is_string($level) || preg_match('/^C[0-5]$/', $level) !== 1) {
@@ -475,6 +478,8 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
                         $level,
                     ));
                 }
+                /** @var list<string> $value array_map сохраняет непрерывную нумерацию */
+                $resolved[$level] = array_map('strval', $value);
                 continue;
             }
 
@@ -495,7 +500,11 @@ final class YamlChainLoaderService implements YamlChainLoaderServiceInterface
                     $level,
                 ));
             }
+
+            $resolved[$level] = $profiles[$value]['command'];
         }
+
+        return $resolved;
     }
 
     /**

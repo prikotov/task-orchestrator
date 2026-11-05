@@ -63,7 +63,7 @@ final class StaticExecutionStrategyTest extends TestCase
 
         $this->chainProvider->expects(self::once())
             ->method('loadStaticChainConfig')
-            ->with('static-test')
+            ->with('static-test', 3)
             ->willReturn($config);
 
         $staticResult = $this->createStaticChainResult([
@@ -99,7 +99,7 @@ final class StaticExecutionStrategyTest extends TestCase
         $config = $this->createStaticConfigWithTimeout(200);
         $this->chainProvider->expects(self::once())
             ->method('loadStaticChainConfig')
-            ->with('static-test')
+            ->with('static-test', 3)
             ->willReturn($config);
 
         $capturedTimeout = -1;
@@ -135,7 +135,7 @@ final class StaticExecutionStrategyTest extends TestCase
         $config = $this->createStaticConfigWithTimeout(200);
         $this->chainProvider->expects(self::once())
             ->method('loadStaticChainConfig')
-            ->with('static-test')
+            ->with('static-test', 3)
             ->willReturn($config);
 
         $capturedTimeout = -1;
@@ -172,7 +172,7 @@ final class StaticExecutionStrategyTest extends TestCase
         $config = $this->createStaticConfig();
         $this->chainProvider->expects(self::once())
             ->method('loadStaticChainConfig')
-            ->with('static-test')
+            ->with('static-test', 3)
             ->willReturn($config);
 
         $capturedTimeout = -1;
@@ -213,6 +213,28 @@ final class StaticExecutionStrategyTest extends TestCase
             chainName: 'static-test',
             task: 'Test',
             resumeDir: '/tmp/resume',
+        ));
+    }
+
+    #[Test]
+    public function executePassesCommandComplexityToProvider(): void
+    {
+        // Сложность из OrchestrateChainCommand доходит до провайдера: отклонения
+        // commands_by_complexity применяются при маппинге, до запуска агента.
+        $chainInfo = new ExecutionChainInfoVo('static-test', ChainExecutionTypeEnum::staticType);
+        $config = $this->createStaticConfig();
+
+        $this->chainProvider->expects(self::once())
+            ->method('loadStaticChainConfig')
+            ->with('static-test', 4)
+            ->willReturn($config);
+
+        $this->staticChainExecutor->method('execute')->willReturn($this->createStaticChainResult([]));
+
+        $this->strategy->execute($chainInfo, new OrchestrateChainCommand(
+            chainName: 'static-test',
+            task: 'Do work',
+            complexity: 4,
         ));
     }
 

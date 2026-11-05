@@ -44,6 +44,7 @@ final class ChainSessionLoggerBudgetTest extends TestCase
             facilitator: 'analyst',
             participants: ['dev'],
             maxRounds: 10,
+            complexity: 3,
         );
         $this->logger->setBudget($budget);
 
@@ -63,6 +64,7 @@ final class ChainSessionLoggerBudgetTest extends TestCase
             facilitator: 'analyst',
             participants: ['dev'],
             maxRounds: 10,
+            complexity: 3,
         );
 
         $sessionData = $this->readSessionJson($sessionDir);
@@ -81,6 +83,7 @@ final class ChainSessionLoggerBudgetTest extends TestCase
             facilitator: 'analyst',
             participants: ['dev'],
             maxRounds: 10,
+            complexity: 3,
         );
         $this->logger->setBudget($budget);
         $this->logger->interruptSession('budget_exceeded');
@@ -110,6 +113,7 @@ final class ChainSessionLoggerBudgetTest extends TestCase
             facilitator: 'analyst',
             participants: ['dev'],
             maxRounds: 10,
+            complexity: 3,
         );
         $this->logger->interruptSession('agent_error');
 
@@ -127,6 +131,7 @@ final class ChainSessionLoggerBudgetTest extends TestCase
             facilitator: 'analyst',
             participants: ['dev'],
             maxRounds: 10,
+            complexity: 3,
         );
 
         // До setBudget — null
@@ -153,6 +158,7 @@ final class ChainSessionLoggerBudgetTest extends TestCase
             facilitator: 'analyst',
             participants: ['dev'],
             maxRounds: 10,
+            complexity: 3,
         );
         $this->logger->setBudget($budget);
 
@@ -184,6 +190,7 @@ final class ChainSessionLoggerBudgetTest extends TestCase
             facilitator: 'analyst',
             participants: ['dev'],
             maxRounds: 10,
+            complexity: 3,
         );
         $this->logger->setBudget($budget);
         $this->logger->interruptSession('budget_exceeded');

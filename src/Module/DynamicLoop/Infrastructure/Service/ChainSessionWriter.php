@@ -29,6 +29,7 @@ final class ChainSessionWriter
     /** @var array<string, mixed> */
     private array $invocation = [];
     private ?DynamicLoopBudgetVo $budget = null;
+    private int $complexity = DynamicLoopSessionStateVo::DEFAULT_COMPLEXITY;
     private ?DynamicLoopSessionStateVo $resumedState = null;
 
     public function __construct(
@@ -39,13 +40,14 @@ final class ChainSessionWriter
     ) {}
 
     /** @param list<string> $participants */
-    public function startSession(string $chainName, string $topic, string $facilitator, array $participants, int $maxRounds): string
+    public function startSession(string $chainName, string $topic, string $facilitator, array $participants, int $maxRounds, int $complexity): string
     {
         $this->chainName = $chainName;
         $this->topic = $topic;
         $this->facilitator = $facilitator;
         $this->participants = $participants;
         $this->maxRounds = $maxRounds;
+        $this->complexity = $complexity;
         $dirName = (new DateTimeImmutable('now'))->format('Y-m-d_H-i-s');
         $sessionDir = sprintf('%s/%s/%s', $this->chainsSessionDir, $chainName, $dirName);
         $this->storage->createDirectory($sessionDir);
@@ -166,12 +168,21 @@ final class ChainSessionWriter
         $this->roundFiles = $this->parseRoundFiles($data['rounds'] ?? []);
         $this->topic = $this->readSessionFile($sessionDir, $data['topic_file'] ?? '');
         $this->budget = isset($data['budget']) && is_array($data['budget']) ? DynamicLoopBudgetVo::createFromArray($data['budget']) : null;
+        $complexity = $data['complexity'] ?? null;
+        if ($complexity !== null && (!is_int($complexity) || $complexity < 0 || $complexity > 5)) {
+            throw new RuntimeException(sprintf(
+                'Invalid complexity value in session.json of %s: expected 0-5 (C0-C5).',
+                $sessionDir,
+            ));
+        }
+        $this->complexity = $complexity ?? DynamicLoopSessionStateVo::DEFAULT_COMPLEXITY;
         $this->resumedState = new DynamicLoopSessionStateVo(
             topic: $this->topic, facilitator: $this->facilitator,
             participants: $this->participants, maxRounds: $this->maxRounds,
             completedRounds: $data['completed_rounds'] ?? 0,
             discussionHistory: $this->readSessionFile($sessionDir, $data['discussion_history_file'] ?? ''),
             facilitatorJournal: $this->readSessionFile($sessionDir, $data['facilitator_journal_file'] ?? ''),
+            complexity: $this->complexity,
         );
     }
 
@@ -299,7 +310,8 @@ final class ChainSessionWriter
         $data = [
             'chain' => $this->chainName, 'topic_file' => 'topic.md',
             'facilitator' => $this->facilitator, 'participants' => $this->participants,
-            'max_rounds' => $this->maxRounds, 'completed_steps' => $completedSteps,
+            'max_rounds' => $this->maxRounds, 'complexity' => $this->complexity,
+            'completed_steps' => $completedSteps,
             'completed_rounds' => $this->calculateCompletedRounds(),
             'discussion_history_file' => 'discussion_history.md',
             'facilitator_journal_file' => 'facilitator_journal.md',

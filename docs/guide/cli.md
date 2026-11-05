@@ -40,6 +40,8 @@ php vendor/bin/task-orchestrator <task> [options]
 | `--no-context-files` | — | Не загружать AGENTS.md/CLAUDE.md | — |
 | `--validate-config` | — | Проверить конфигурацию без запуска | — |
 | `--config` | — | Путь к файлу `chains.yaml` (переопределяет путь по умолчанию) | — |
+| `--task-id` | — | Идентификатор задачи `TASK-*`: сложность читается из поля `complexity` файла `todo/<id>.todo.md` (ищется ровно один в `todo/`, `todo/done/`, `todo/backlog/`, `todo/cancelled/`) | — |
+| `--complexity` | — | Явная сложность задачи `C0–C5` (приоритет над `--task-id`). Выбирает команду роли из отклонений `commands_by_complexity` | `C3` |
 
 **Примеры:**
 
@@ -64,6 +66,10 @@ php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml 
 
 # Валидация кастомного конфига
 php vendor/bin/task-orchestrator agent:orchestrate --config=path/to/chains.yaml --validate-config "check"
+
+# Сложность из файла задачи (поле complexity: C1) и явная сложность (приоритетнее)
+php vendor/bin/task-orchestrator agent:orchestrate "Implement feature" --task-id TASK-feat-payment-gateway
+php vendor/bin/task-orchestrator agent:orchestrate "Implement feature" --complexity C4
 ```
 
 **Коды завершения:**
