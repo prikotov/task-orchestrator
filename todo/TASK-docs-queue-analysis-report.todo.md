@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/queue-analysis-report
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/463
+status: review
 ---
 
 # TASK-docs-queue-analysis-report: Отчёт анализа очереди задач todo
@@ -96,4 +96,5 @@ ls docs/agents/reports/system-analyst/2026-11-06_19-47_task-queue-analysis.md
 | :--- | :--- | :--- |
 | 2026-11-06 13:51:31 (1793973091) | pi | Создание задачи |
 | 2026-11-06 13:55:00 (1793973300) | pi | Заполнена постановка (Human Brief, scope, DoD, план) |
-| 2026-11-06 13:57:00 (1793973420) | pi | author/assignee приведены к формату `<роль> (<агент>)`; branch, start |
+| 2026-11-06 13:57:00 (1793973420) | pi | author/assignee в формате «роль (агент)»; заданы branch, start |
+| 2026-11-06 14:02:00 (1793973720) | pi | pr → PR #463; статус review |
