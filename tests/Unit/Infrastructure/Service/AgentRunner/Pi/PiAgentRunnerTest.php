@@ -158,7 +158,7 @@ final class PiAgentRunnerTest extends TestCase
     // ──── buildCommand: system prompt ───────────────────────────────────
 
     #[Test]
-    public function buildCommandAppendsSystemPromptWhenProvided(): void
+    public function buildCommandAddsSystemPromptWhenProvided(): void
     {
         $request = new AgentRunRequestVo(
             role: 'test',
@@ -167,8 +167,8 @@ final class PiAgentRunnerTest extends TestCase
         );
         $command = $this->runner->buildCommand($request);
 
-        self::assertContains('--append-system-prompt', $command);
-        $idx = array_search('--append-system-prompt', $command, true);
+        self::assertContains('--system-prompt', $command);
+        $idx = array_search('--system-prompt', $command, true);
         self::assertSame('You are a system analyst.', $command[$idx + 1]);
     }
 

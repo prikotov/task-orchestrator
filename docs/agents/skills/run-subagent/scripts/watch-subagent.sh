@@ -482,8 +482,8 @@ RUNNER_CMD=()
 build_runner_command() {
     case "$RUNNER" in
         pi)
-            # Базовый промпт дополняет штатный: pi сам формирует список инструментов и правила.
-            RUNNER_CMD=(pi --mode json -p --append-system-prompt "$SYSTEM_PROMPT_FILE")
+            # Собственный упрощённый промпт; схемы инструментов и навыки Pi сохраняются.
+            RUNNER_CMD=(pi --mode json -p --system-prompt "$SYSTEM_PROMPT_FILE")
             [[ -n "$PROVIDER" ]] && RUNNER_CMD+=(--provider "$PROVIDER")
             [[ -n "$MODEL" ]] && RUNNER_CMD+=(--model "$MODEL")
             [[ -n "$REASONING" ]] && RUNNER_CMD+=(--thinking "$REASONING")

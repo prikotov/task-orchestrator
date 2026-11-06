@@ -16,7 +16,7 @@ author: backend_developer_levsha
 assignee: 
 branch: task/update-prikotov-dependencies
 pr: https://github.com/prikotov/task-orchestrator/pull/460
-status: done
+status: review
 ---
 
 # TASK-update-prikotov-dependencies: Обновить пакеты prikotov и документацию
