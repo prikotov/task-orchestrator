@@ -3,7 +3,7 @@ type: chore
 created: 2026-11-05
 due: 
 started: 
-completed: 2026-11-06 08:45:47 (1793954747)
+completed: 2026-11-06 09:09:00 (1793956140)
 cancelled: 
 value: V2
 complexity: C1
@@ -16,7 +16,7 @@ author: backend_developer_levsha
 assignee: 
 branch: task/update-prikotov-dependencies
 pr: https://github.com/prikotov/task-orchestrator/pull/460
-status: review
+status: done
 ---
 
 # TASK-update-prikotov-dependencies: Обновить пакеты prikotov и документацию
