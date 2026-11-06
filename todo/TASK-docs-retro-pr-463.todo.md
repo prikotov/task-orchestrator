@@ -19,8 +19,8 @@ reviewer:
 approver:
 informed: []
 branch: task/retro-pr-463
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/464
+status: review
 ---
 
 # TASK-docs-retro-pr-463: Ретроспектива TASK-docs-queue-analysis-report (PR 463)
