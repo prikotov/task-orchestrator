@@ -86,6 +86,27 @@ final class ConditionalExecutionStrategyTest extends TestCase
         $this->strategy->resume($chainInfo, $command);
     }
 
+    public function testExecutePassesCommandComplexityToProvider(): void
+    {
+        // Сложность из OrchestrateChainCommand доходит до провайдера: отклонения
+        // commands_by_complexity применяются при маппинге, до запуска агента.
+        $chainInfo = new ExecutionChainInfoVo('test-chain', ChainExecutionTypeEnum::conditionalType);
+        $config = $this->createConfigFromSteps([]);
+
+        $this->chainProvider->expects(self::once())
+            ->method('loadConditionalChainConfig')
+            ->with('test-chain', 2)
+            ->willReturn($config);
+
+        $command = new OrchestrateChainCommand(
+            chainName: 'test-chain',
+            task: 'test task',
+            complexity: 2,
+        );
+
+        $this->strategy->execute($chainInfo, $command);
+    }
+
     // ─── execute() — no conditions ────────────────────────────────────
 
     public function testExecuteStepsWithoutConditions(): void
@@ -99,7 +120,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         ]);
         $this->chainProvider->expects(self::once())
             ->method('loadConditionalChainConfig')
-            ->with('test-chain')
+            ->with('test-chain', 3)
             ->willReturn($config);
 
         $this->conditionEvaluator->expects($this->never())->method('evaluate');
@@ -149,7 +170,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         ]);
         $this->chainProvider->expects(self::once())
             ->method('loadConditionalChainConfig')
-            ->with('test-chain')
+            ->with('test-chain', 3)
             ->willReturn($config);
 
         $this->conditionEvaluator->expects($this->once())
@@ -195,7 +216,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         ]);
         $this->chainProvider->expects(self::once())
             ->method('loadConditionalChainConfig')
-            ->with('test-chain')
+            ->with('test-chain', 3)
             ->willReturn($config);
 
         $this->conditionEvaluator->expects($this->once())
@@ -249,7 +270,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         ]);
         $this->chainProvider->expects(self::once())
             ->method('loadConditionalChainConfig')
-            ->with('test-chain')
+            ->with('test-chain', 3)
             ->willReturn($config);
 
         $evalCount = 0;
@@ -305,7 +326,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         ]);
         $this->chainProvider->expects(self::once())
             ->method('loadConditionalChainConfig')
-            ->with('test-chain')
+            ->with('test-chain', 3)
             ->willReturn($config);
 
         $capturedContext = null;
@@ -355,7 +376,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         ]);
         $this->chainProvider->expects(self::once())
             ->method('loadConditionalChainConfig')
-            ->with('test-chain')
+            ->with('test-chain', 3)
             ->willReturn($config);
 
         $this->conditionEvaluator->expects($this->once())
@@ -398,7 +419,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         ]);
         $this->chainProvider->expects(self::once())
             ->method('loadConditionalChainConfig')
-            ->with('test-chain')
+            ->with('test-chain', 3)
             ->willReturn($config);
 
         $this->conditionEvaluator->expects($this->never())->method('evaluate');
@@ -435,7 +456,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         ]);
         $this->chainProvider->expects(self::once())
             ->method('loadConditionalChainConfig')
-            ->with('test-chain')
+            ->with('test-chain', 3)
             ->willReturn($config);
 
         $this->stepExecutor->expects($this->once())
@@ -475,7 +496,7 @@ final class ConditionalExecutionStrategyTest extends TestCase
         ]);
         $this->chainProvider->expects(self::once())
             ->method('loadConditionalChainConfig')
-            ->with('test-chain')
+            ->with('test-chain', 3)
             ->willReturn($config);
 
         $capturedTimeout = null;

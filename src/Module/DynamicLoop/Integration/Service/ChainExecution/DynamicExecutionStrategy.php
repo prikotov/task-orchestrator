@@ -22,6 +22,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoo
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSessionStateVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
 
 /**
@@ -55,7 +56,8 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     #[Override]
     public function execute(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        $config = $this->chainProvider->loadDynamicChainConfig($chainInfo->name);
+        $complexity = $command->complexity ?? DynamicLoopSessionStateVo::DEFAULT_COMPLEXITY;
+        $config = $this->chainProvider->loadDynamicChainConfig($chainInfo->name, $complexity);
 
         $facilitatorRole = $command->facilitator ?? $config->getFacilitator();
         $participants = $command->participants ?? $config->getParticipants();
@@ -70,6 +72,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
             $facilitatorRole,
             $participants,
             $maxRounds,
+            $complexity,
         );
         $auditLogger = $this->resolveAuditLogger($sessionDir, $command->noAuditLog);
         $this->sessionLogger->setBudget($config->getBudget());
@@ -107,8 +110,6 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     #[Override]
     public function resume(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        $config = $this->chainProvider->loadDynamicChainConfig($chainInfo->name);
-
         $resumeDir = $command->resumeDir;
         assert($resumeDir !== null);
 
@@ -119,6 +120,10 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
         if ($state === null) {
             throw new LogicException("Failed to resume session from: {$resumeDir}");
         }
+
+        // Явная --complexity приоритетнее сохранённой в session.json.
+        $complexity = $command->complexity ?? $state->getComplexity();
+        $config = $this->chainProvider->loadDynamicChainConfig($chainInfo->name, $complexity);
 
         $this->sessionLogger->setBudget($config->getBudget());
         $resumeTimeout = $command->timeout ?? $config->getTimeout() ?? self::DEFAULT_DYNAMIC_TIMEOUT;

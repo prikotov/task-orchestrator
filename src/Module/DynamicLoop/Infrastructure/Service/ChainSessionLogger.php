@@ -57,8 +57,9 @@ final class ChainSessionLogger implements DynamicLoopSessionLoggerInterface
         string $facilitator,
         array $participants,
         int $maxRounds,
+        int $complexity,
     ): string {
-        return $this->writer->startSession($chainName, $topic, $facilitator, $participants, $maxRounds);
+        return $this->writer->startSession($chainName, $topic, $facilitator, $participants, $maxRounds, $complexity);
     }
 
     #[Override]

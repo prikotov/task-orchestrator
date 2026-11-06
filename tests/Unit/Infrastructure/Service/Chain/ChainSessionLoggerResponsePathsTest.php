@@ -45,6 +45,7 @@ final class ChainSessionLoggerResponsePathsTest extends TestCase
             facilitator: 'team_lead_alex',
             participants: ['system_architect_loki', 'backend_developer_levsha'],
             maxRounds: 10,
+            complexity: 3,
         );
 
         // Шаг 1 — facilitator (не participant, не попадает в список)
@@ -114,6 +115,7 @@ final class ChainSessionLoggerResponsePathsTest extends TestCase
             facilitator: 'team_lead_alex',
             participants: ['system_architect_loki'],
             maxRounds: 10,
+            complexity: 3,
         );
 
         // Только facilitator — не должен попасть в результат
@@ -145,6 +147,7 @@ final class ChainSessionLoggerResponsePathsTest extends TestCase
             facilitator: 'team_lead_alex',
             participants: ['system_architect_loki', 'backend_developer_levsha'],
             maxRounds: 10,
+            complexity: 3,
         );
 
         $this->logger->logRound(

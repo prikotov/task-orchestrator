@@ -340,7 +340,7 @@ final class ExecuteAgentStepServiceTest extends TestCase
         $agentRunner = $this->createMock(RunAgentServiceInterface::class);
         $agentRunner->expects($this->once())->method('run')->with(
             $this->callback(function (ChainRunRequestVo $request): bool {
-                return $request->getSystemPrompt() === 'prompts/subagent/base_system.md'
+                return $request->getSystemPrompt() === 'config/prompts/subagent/base_system.md'
                     && $request->getRunnerArgs() === [
                         '--append-system-prompt',
                         'docs/agents/roles/team/analyst.ru.md',
@@ -359,7 +359,7 @@ final class ExecuteAgentStepServiceTest extends TestCase
                 task: 'Test task',
                 roleConfig: new ExecutionRoleConfigVo(
                     promptFile: 'docs/agents/roles/team/analyst.ru.md',
-                    systemPromptFile: 'prompts/subagent/base_system.md',
+                    systemPromptFile: 'config/prompts/subagent/base_system.md',
                 ),
             ),
         );

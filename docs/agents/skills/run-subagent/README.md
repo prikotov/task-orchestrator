@@ -14,10 +14,14 @@ docs/agents/skills/run-subagent/
 ├── README.md                     # этот документ (операторский справочник)
 └── scripts/
     ├── watch-subagent.sh         # обёртка запуска (контрактная версия: v1)
-    └── subagent_system.txt       # упрощённый системный промпт сабагента
+    └── subagent_system.txt       # дефолтный системный промпт сабагента (override: roles.<role>.system_prompt_file)
 ```
 
 Логи запусков — в `var/log/watch-subagent/` (gitignored).
+
+## Системный промпт и роль
+
+Если в `config/chains.yaml` задан `roles.<role>.system_prompt_file`, используется этот файл; иначе — `scripts/subagent_system.txt`. Отсутствующий заданный файл — ошибка запуска. Для Pi собственный упрощённый промпт передаётся через `--system-prompt`, для Codex — через `model_instructions_file`. Роль подключается отдельно через `become-role`; схемы инструментов и навыки сохраняются.
 
 ## Параметры (полная справка)
 
@@ -32,18 +36,17 @@ docs/agents/skills/run-subagent/
 | `--provider`      | —          | Провайдер для `pi` (только для pi)                                             | профиль роли |
 | `--model`         | —          | Модель                                                                          | профиль роли |
 | `--reasoning`     | —          | Усилие рассуждения/обдумывания (pi: `--thinking`, codex: `model_reasoning_effort=…`) | профиль роли |
+| `--task-id`       | —          | `TASK-*`; сложность читается из файла задачи | — |
+| `--complexity`    | —          | Явная сложность `C0–C5`; приоритет над `--task-id` | `C3` |
 | `[prompt text]`   | —          | Промпт. Если не указан — читается из стандартного ввода                                     | —            |
 
 ### Резолв `--runner`/`--provider`/`--model`/`--reasoning`
 
 Приоритет: **параметр CLI → env → профиль роли → значение по умолчанию**.
 
-Профиль роли берётся из секции `roles.<role>.command` в `config/chains.yaml`
-(имя роли вычисляется по `--role-file`, например
-`docs/agents/roles/team/backend_developer_levsha.ru.md` → `backend_developer_levsha`).
-Из `command` извлекаются runner (первый элемент), provider (`--provider`),
-model (`--model`), reasoning (`--thinking`/`--reasoning` или
-`model_reasoning_effort=…`).
+Профиль роли выбирается из `config/chains.yaml` по сложности: базовый `roles.<role>.command_profile` или `command` соответствует `C3`, а `commands_by_complexity` задаёт отклонения. Если точного уровня нет, выбирается ближайший выше, затем ближайший ниже. Имя роли вычисляется по `--role-file`, например `docs/agents/roles/team/backend_developer_levsha.ru.md` → `backend_developer_levsha`.
+
+Из выбранной команды извлекаются runner (первый элемент), provider (`--provider`), model (`--model`), reasoning (`--thinking`/`--reasoning` или `model_reasoning_effort=…`).
 
 Явные значения не затираются профилем роли. `provider`/`model`/`reasoning` из
 профиля применяются как связанная группа с profile-runner: если раннер задан

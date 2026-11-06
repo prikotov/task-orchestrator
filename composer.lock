@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b91ee2353f806ef864e1a6f2908c7cb",
+    "content-hash": "38197c4934a3b906af82e9f72d57ce00",
     "packages": [
         {
             "name": "monolog/monolog",
@@ -3526,16 +3526,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v8.1.9",
+            "version": "v8.1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "6107ee26a25215c3df3af0a3315e56bb4fd0b7db"
+                "reference": "e8266f55160f674f290a5f567cb55e11e21f921b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/6107ee26a25215c3df3af0a3315e56bb4fd0b7db",
-                "reference": "6107ee26a25215c3df3af0a3315e56bb4fd0b7db",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/e8266f55160f674f290a5f567cb55e11e21f921b",
+                "reference": "e8266f55160f674f290a5f567cb55e11e21f921b",
                 "shasum": ""
             },
             "require": {
@@ -3578,7 +3578,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v8.1.9"
+                "source": "https://github.com/symfony/yaml/tree/v8.1.11"
             },
             "funding": [
                 {
@@ -3598,7 +3598,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-12T12:37:13+00:00"
+            "time": "2026-11-04T08:39:20+00:00"
         },
         {
             "name": "twig/twig",
@@ -6465,16 +6465,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "2.3.11",
+            "version": "2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "c9fb3e1560c6a33eca59c9a2fcb4d9925445a0a4"
+                "reference": "af8e840551031d254cfdb3a18a62c3470a309c10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/c9fb3e1560c6a33eca59c9a2fcb4d9925445a0a4",
-                "reference": "c9fb3e1560c6a33eca59c9a2fcb4d9925445a0a4",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/af8e840551031d254cfdb3a18a62c3470a309c10",
+                "reference": "af8e840551031d254cfdb3a18a62c3470a309c10",
                 "shasum": ""
             },
             "require": {
@@ -6506,9 +6506,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.3.11"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.4.1"
             },
-            "time": "2026-10-28T10:46:50+00:00"
+            "time": "2026-10-30T19:36:28+00:00"
         },
         {
             "name": "phpstan/phpstan",
@@ -7051,16 +7051,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.33.2",
+            "version": "v0.34.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/coding-standard.git",
-                "reference": "00ad4fb409056ff13f62e1e023f7b0b5ee65081b"
+                "reference": "bc9078893ead057e356a7194cef84774bbfaced5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/00ad4fb409056ff13f62e1e023f7b0b5ee65081b",
-                "reference": "00ad4fb409056ff13f62e1e023f7b0b5ee65081b",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/bc9078893ead057e356a7194cef84774bbfaced5",
+                "reference": "bc9078893ead057e356a7194cef84774bbfaced5",
                 "shasum": ""
             },
             "require": {
@@ -7174,23 +7174,23 @@
                 "sniffs"
             ],
             "support": {
-                "source": "https://github.com/prikotov/coding-standard/tree/v0.33.2",
+                "source": "https://github.com/prikotov/coding-standard/tree/v0.34.0",
                 "issues": "https://github.com/prikotov/coding-standard/issues"
             },
-            "time": "2026-10-25T02:27:08+00:00"
+            "time": "2026-11-04T08:34:01+00:00"
         },
         {
             "name": "prikotov/git-workflow",
-            "version": "v0.4.1",
+            "version": "v0.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/git-workflow.git",
-                "reference": "e7712f2c24e39ac1ec61bb6af61247effbcc1da8"
+                "reference": "cf6794c361781c53a13942e764ea51d70ba56cc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/e7712f2c24e39ac1ec61bb6af61247effbcc1da8",
-                "reference": "e7712f2c24e39ac1ec61bb6af61247effbcc1da8",
+                "url": "https://api.github.com/repos/prikotov/git-workflow/zipball/cf6794c361781c53a13942e764ea51d70ba56cc3",
+                "reference": "cf6794c361781c53a13942e764ea51d70ba56cc3",
                 "shasum": ""
             },
             "require": {
@@ -7227,23 +7227,23 @@
                 "workflow"
             ],
             "support": {
-                "source": "https://github.com/prikotov/git-workflow/tree/v0.4.1",
+                "source": "https://github.com/prikotov/git-workflow/tree/v0.4.2",
                 "issues": "https://github.com/prikotov/git-workflow/issues"
             },
-            "time": "2026-09-22T01:30:01+00:00"
+            "time": "2026-09-25T00:43:56+00:00"
         },
         {
             "name": "prikotov/todo-md",
-            "version": "v0.0.14",
+            "version": "v0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/todo-md.git",
-                "reference": "0988d34bd77631d68eee12e9ede156ced8f6a8cf"
+                "reference": "7c93bc9bbc80f59eb48ca8a9208e7043830791cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/todo-md/zipball/0988d34bd77631d68eee12e9ede156ced8f6a8cf",
-                "reference": "0988d34bd77631d68eee12e9ede156ced8f6a8cf",
+                "url": "https://api.github.com/repos/prikotov/todo-md/zipball/7c93bc9bbc80f59eb48ca8a9208e7043830791cb",
+                "reference": "7c93bc9bbc80f59eb48ca8a9208e7043830791cb",
                 "shasum": ""
             },
             "require": {
@@ -7278,10 +7278,10 @@
                 "todo"
             ],
             "support": {
-                "source": "https://github.com/prikotov/todo-md/tree/v0.0.14",
+                "source": "https://github.com/prikotov/todo-md/tree/v0.3.0",
                 "issues": "https://github.com/prikotov/todo-md/issues"
             },
-            "time": "2026-09-16T03:43:18+00:00"
+            "time": "2026-11-04T10:52:40+00:00"
         },
         {
             "name": "psalm/plugin-symfony",
@@ -8965,16 +8965,16 @@
         },
         {
             "name": "slevomat/coding-standard",
-            "version": "8.31.2",
+            "version": "8.31.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/slevomat/coding-standard.git",
-                "reference": "d4fcefff8bec24814e1c165dfb4c3bdfa91faf5c"
+                "reference": "b5c34b28811ee2ed323c52c7dabe2f2802dd2f8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/slevomat/coding-standard/zipball/d4fcefff8bec24814e1c165dfb4c3bdfa91faf5c",
-                "reference": "d4fcefff8bec24814e1c165dfb4c3bdfa91faf5c",
+                "url": "https://api.github.com/repos/slevomat/coding-standard/zipball/b5c34b28811ee2ed323c52c7dabe2f2802dd2f8a",
+                "reference": "b5c34b28811ee2ed323c52c7dabe2f2802dd2f8a",
                 "shasum": ""
             },
             "require": {
@@ -9014,7 +9014,7 @@
             ],
             "support": {
                 "issues": "https://github.com/slevomat/coding-standard/issues",
-                "source": "https://github.com/slevomat/coding-standard/tree/8.31.2"
+                "source": "https://github.com/slevomat/coding-standard/tree/8.31.3"
             },
             "funding": [
                 {
@@ -9026,7 +9026,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-25T09:45:11+00:00"
+            "time": "2026-10-28T16:34:46+00:00"
         },
         {
             "name": "spatie/array-to-xml",

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Для запуска ролей Pi используется собственный упрощённый системный промпт через `--system-prompt`, без штатной преамбулы и документации Pi; схемы инструментов и навыки сохраняются (#460).
+
+### Added
+
+- Выбор команды роли по сложности задачи в PHP-оркестраторе: `agent:orchestrate` принимает `--task-id TASK-*` (поле `complexity` файла задачи в `todo/`) и явный `--complexity C0–C5` (приоритет; по умолчанию `C3`). Отклонения `commands_by_complexity` применяются на ACL-границе мапперов ChainExecution/DynamicLoop (`RoleConfigVo::resolveCommandByComplexity()`, правило «точный уровень → ближайший выше → ближайший ниже, базовая команда = C3») — единое правило с `watch-subagent.sh` (навык run-subagent) (#460).
+- `YamlChainLoaderService` резолвит `commands_by_complexity` в полные команды при загрузке: имена профилей из `command_profiles` и inline-команды попадают в `RoleConfigVo`; валидация fail-fast сохранена (уровни `C0`–`C5`, существование профилей, непустота inline-команд) (#460).
+
 ## [0.11.0] - 2026-11-05
 
 [Сравнение v0.10.0...v0.11.0](https://github.com/prikotov/task-orchestrator/compare/v0.10.0...v0.11.0)

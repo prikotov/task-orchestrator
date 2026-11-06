@@ -20,7 +20,7 @@ class StubSessionLogger implements DynamicLoopSessionLoggerInterface
     protected ?string $sessionDir = null;
 
     #[Override]
-    public function startSession(string $chainName, string $topic, string $facilitator, array $participants, int $maxRounds): string
+    public function startSession(string $chainName, string $topic, string $facilitator, array $participants, int $maxRounds, int $complexity): string
     {
         $this->sessionDir = sys_get_temp_dir() . '/test_session_' . uniqid();
         mkdir($this->sessionDir, 0777, true);

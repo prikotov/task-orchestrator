@@ -44,7 +44,12 @@ final readonly class ConditionalExecutionStrategyService implements ConditionalE
     #[Override]
     public function execute(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
-        $config = $this->chainProvider->loadConditionalChainConfig($chainInfo->name);
+        $config = $this->chainProvider->loadConditionalChainConfig(
+            $chainInfo->name,
+            // C3 — дефолтная сложность (единый контракт с навыком run-subagent);
+            // совпадает с int $complexity = 3 в ChainDefinitionProviderInterface.
+            $command->complexity ?? 3,
+        );
         $steps = $config->steps;
         $timeout = $command->timeout ?? $config->timeout ?? self::DEFAULT_CONDITIONAL_TIMEOUT;
 

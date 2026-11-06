@@ -27,6 +27,13 @@
 #   --complexity <C0-C5> — явно задать сложность (приоритет над --task-id; default: C3).
 #   [prompt text]        — промпт. Если не указан — читается из stdin.
 #
+# Базовый системный промпт: по умолчанию scripts/subagent_system.txt (рядом со
+# скриптом). Если в config/chains.yaml у роли задан roles.<role>.system_prompt_file
+# (относительный путь от PROJECT_ROOT, абсолютный — как есть) — используется этот
+# файл: единый базовый промпт для skill и PHP-оркестратора. Become-role
+# append-промпт не меняется. Файл по ключу, но отсутствующий на диске — ошибка
+# запуска (fail-fast), а не тихий откат на дефолт.
+#
 # Переменные окружения (наблюдаемость):
 #   WATCH_LOG_DIR          — каталог run-логов (default: var/log/watch-subagent).
 #   WATCH_KEEP_TMP=1       — сохранять TMPDIR (events.ndjson, gaps.tsv, stderr)
@@ -114,6 +121,8 @@ else
     AUTOLOAD_FILE="$PROJECT_ROOT/vendor/autoload.php"
 fi
 
+# Дефолт: упакованный упрощённый промпт рядом со скриптом. Переопределяется
+# roles.<role>.system_prompt_file из chains.yaml (см. apply_role_profile_defaults).
 SYSTEM_PROMPT_FILE="$SCRIPT_DIR/subagent_system.txt"
 CHAINS_CONFIG="${CHAINS_CONFIG:-$PROJECT_ROOT/config/chains.yaml}"
 
@@ -367,19 +376,41 @@ echo $extractRunner($command), "\n";
 echo trim($extractOption($command, ['--provider']), "\"'"), "\n";
 echo trim($extractOption($command, ['--model']), "\"'"), "\n";
 echo $extractReasoning($command), "\n";
+// Строка 5: roles.<role>.system_prompt_file (относительный путь от PROJECT_ROOT;
+// пусто — использовать упакованный subagent_system.txt).
+$systemPromptFile = $role['system_prompt_file'] ?? '';
+echo is_string($systemPromptFile) ? $systemPromptFile : '', "\n";
 PHP
 }
 
 apply_role_profile_defaults() {
     local role_name="$1"
-    local profile_output profile_runner profile_provider profile_model profile_reasoning
+    local profile_output profile_runner profile_provider profile_model profile_reasoning profile_system_prompt
     local apply_profile_pair=true
+    local resolved_system_prompt
 
     profile_output="$(load_role_profile "$role_name")"
     profile_runner="$(sed -n '1p' <<< "$profile_output")"
     profile_provider="$(sed -n '2p' <<< "$profile_output")"
     profile_model="$(sed -n '3p' <<< "$profile_output")"
     profile_reasoning="$(sed -n '4p' <<< "$profile_output")"
+    profile_system_prompt="$(sed -n '5p' <<< "$profile_output")"
+
+    # Override базового системного промпта из chains.yaml: единый промпт для
+    # skill и PHP-оркестратора. Ключ отсутствует — дефолт (subagent_system.txt);
+    # ключ задан, но файла нет — fail-fast, тихий откат скрыл бы неверный промпт.
+    if [[ -n "$profile_system_prompt" ]]; then
+        if [[ "$profile_system_prompt" == /* ]]; then
+            resolved_system_prompt="$profile_system_prompt"
+        else
+            resolved_system_prompt="$PROJECT_ROOT/$profile_system_prompt"
+        fi
+        if [[ ! -f "$resolved_system_prompt" ]]; then
+            echo "Ошибка: roles.$role_name.system_prompt_file не найден: $resolved_system_prompt" >&2
+            exit 1
+        fi
+        SYSTEM_PROMPT_FILE="$resolved_system_prompt"
+    fi
 
     if [[ "$RUNNER_EXPLICIT" == true && "$RUNNER" != "$profile_runner" ]]; then
         apply_profile_pair=false
@@ -451,6 +482,7 @@ RUNNER_CMD=()
 build_runner_command() {
     case "$RUNNER" in
         pi)
+            # Собственный упрощённый промпт; схемы инструментов и навыки Pi сохраняются.
             RUNNER_CMD=(pi --mode json -p --system-prompt "$SYSTEM_PROMPT_FILE")
             [[ -n "$PROVIDER" ]] && RUNNER_CMD+=(--provider "$PROVIDER")
             [[ -n "$MODEL" ]] && RUNNER_CMD+=(--model "$MODEL")
@@ -629,6 +661,7 @@ log_run() {
 
 log_run "=== RUN START ==="
 log_run "runner=$RUNNER role=$ROLE_FILE role_slug=$RUN_ROLE_SLUG"
+log_run "system_prompt=$SYSTEM_PROMPT_FILE"
 log_run "provider=${PROVIDER:-<none>} model=${MODEL:-<none>} reasoning=${REASONING:-<none>}"
 log_run "soft_timeout=${SOFT_TIMEOUT}s hard_timeout=${HARD_TIMEOUT}s stall_timeout=${STALL_TIMEOUT}s output=${OUTPUT}"
 log_run "effective_hard=${EFFECTIVE_HARD:-<computed-later>}s"

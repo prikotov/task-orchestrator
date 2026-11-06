@@ -34,19 +34,19 @@ final readonly class DynamicLoopDefinitionMapperService implements DynamicLoopCo
     }
 
     #[Override]
-    public function loadDynamicChainConfig(string $chainName): DynamicLoopConfigVo
+    public function loadDynamicChainConfig(string $chainName, int $complexity = 3): DynamicLoopConfigVo
     {
         $chain = $this->queryBus->query(new LoadRawChainQuery($chainName));
         assert($chain instanceof DynamicChainDefinitionVo);
 
-        return $this->map($chain);
+        return $this->map($chain, $complexity);
     }
 
     /**
      * Маппит DynamicChainDefinitionVo → DynamicLoopConfigVo.
      */
     #[Override]
-    public function map(DynamicChainDefinitionVo $chain): DynamicLoopConfigVo
+    public function map(DynamicChainDefinitionVo $chain, int $complexity = 3): DynamicLoopConfigVo
     {
         $shared = $chain->getSharedDefinition();
         $promptConfig = $chain->getPromptConfiguration();
@@ -57,7 +57,7 @@ final readonly class DynamicLoopDefinitionMapperService implements DynamicLoopCo
             budget: $this->mapBudget($shared->getBudget()),
             timeout: $shared->getTimeout(),
             maxTime: $shared->getMaxTime(),
-            roleConfigs: $this->mapRoleConfigs($shared->getRoles()),
+            roleConfigs: $this->mapRoleConfigs($shared->getRoles(), $complexity),
             facilitator: $chain->getFacilitator(),
             participants: $chain->getParticipants(),
             maxRounds: $chain->getMaxRounds(),
@@ -110,16 +110,21 @@ final readonly class DynamicLoopDefinitionMapperService implements DynamicLoopCo
     }
 
     /**
-     * @param array<string, RoleConfigVo> $roles
+     * Маппит роли с применением отклонений по сложности задачи.
      *
+     * Отклонения commands_by_complexity применяются один раз на ACL-границе:
+     * в DynamicLoop VO уходит уже выбранная целая команда (RoleConfigVo::resolveCommandByComplexity()),
+     * до запуска любого агента.
+     *
+     * @param array<string, RoleConfigVo> $roles
      * @return array<string, DynamicLoopRoleConfigVo>
      */
-    private function mapRoleConfigs(array $roles): array
+    private function mapRoleConfigs(array $roles, int $complexity): array
     {
         $result = [];
         foreach ($roles as $role => $config) {
             $result[$role] = new DynamicLoopRoleConfigVo(
-                command: $config->getCommand(),
+                command: $config->resolveCommandByComplexity($complexity),
                 timeout: $config->getTimeout(),
                 promptFile: $config->getPromptFile(),
                 commandsByComplexity: $config->getCommandsByComplexity(),
