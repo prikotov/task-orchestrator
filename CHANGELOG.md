@@ -5,11 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.12.0] - 2026-11-06
+
+[Сравнение v0.11.0...v0.12.0](https://github.com/prikotov/task-orchestrator/compare/v0.11.0...v0.12.0)
+
+Выбор команд по сложности во всех типах цепочек, упрощённый системный промпт ролей и обновление пакетов `prikotov/*`.
 
 ### Changed
 
 - Для запуска ролей Pi используется собственный упрощённый системный промпт через `--system-prompt`, без штатной преамбулы и документации Pi; схемы инструментов и навыки сохраняются (#460).
+- **Несовместимо:** resume dynamic chain требует целочисленное поле `complexity` (`0–5`) в `session.json`; сессии без него отклоняются с ошибкой вместо неявного `C3` (#460).
 
 ### Added
 
