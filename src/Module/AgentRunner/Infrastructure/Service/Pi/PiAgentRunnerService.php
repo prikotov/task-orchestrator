@@ -121,8 +121,12 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
         }
 
         // System prompt — только если не задан в command
-        if ($request->getSystemPrompt() !== null && !in_array('--system-prompt', $command, true)) {
-            $command[] = '--system-prompt';
+        // Базовый промпт дополняет штатный: pi сам формирует список инструментов и правила.
+        if ($request->getSystemPrompt() !== null
+            && !in_array('--system-prompt', $command, true)
+            && !in_array($request->getSystemPrompt(), $command, true)
+        ) {
+            $command[] = '--append-system-prompt';
             $command[] = $request->getSystemPrompt();
         }
 

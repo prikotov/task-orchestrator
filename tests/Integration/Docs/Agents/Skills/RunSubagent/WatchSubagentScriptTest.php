@@ -210,7 +210,7 @@ YAML);
 
         $args = (string) file_get_contents($this->argsCaptureFile);
         self::assertStringContainsString(
-            '--system-prompt ' . $projectRoot . '/config/prompts/subagent/base_system.md',
+            '--append-system-prompt ' . $projectRoot . '/config/prompts/subagent/base_system.md',
             $args,
         );
         self::assertStringNotContainsString('subagent_system.txt', $args);
@@ -260,7 +260,7 @@ YAML);
 
         $this->runScript(roleFile: $this->piRoleFile, arguments: ['--runner', 'pi']);
         self::assertStringContainsString(
-            '--system-prompt ' . $packaged,
+            '--append-system-prompt ' . $packaged,
             (string) file_get_contents($this->argsCaptureFile),
         );
 

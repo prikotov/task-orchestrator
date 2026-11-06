@@ -11,7 +11,7 @@ command_profiles:
       - glm-5.3-flash
       - --thinking
       - high
-      - --system-prompt
+      - --append-system-prompt
       - "@system-prompt"
       - --append-system-prompt
       - "@append-system-prompt"
@@ -27,7 +27,7 @@ command_profiles:
       - glm-5.3-flash
       - --thinking
       - max
-      - --system-prompt
+      - --append-system-prompt
       - "@system-prompt"
       - --append-system-prompt
       - "@append-system-prompt"
@@ -43,7 +43,7 @@ command_profiles:
       - mimo-v2.6-pro
       - --thinking
       - high
-      - --system-prompt
+      - --append-system-prompt
       - "@system-prompt"
       - --append-system-prompt
       - "@append-system-prompt"
@@ -59,7 +59,7 @@ command_profiles:
       - mimo-v2.6-pro
       - --thinking
       - 'off'
-      - --system-prompt
+      - --append-system-prompt
       - "@system-prompt"
       - --append-system-prompt
       - "@append-system-prompt"
@@ -75,7 +75,7 @@ command_profiles:
       - k3.1-pro
       - --thinking
       - high
-      - --system-prompt
+      - --append-system-prompt
       - "@system-prompt"
       - --append-system-prompt
       - "@append-system-prompt"
@@ -91,7 +91,7 @@ command_profiles:
       - huihui-ai:pi-100k
       - --thinking
       - medium
-      - --system-prompt
+      - --append-system-prompt
       - "@system-prompt"
       - --append-system-prompt
       - "@append-system-prompt"

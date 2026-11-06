@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Базовый системный промпт сабагента для Pi подключается через `--append-system-prompt`: штатные разделы доступных инструментов и правил формируются автоматически с учётом фактической конфигурации запуска (#460).
+
 ### Added
 
 - Выбор команды роли по сложности задачи в PHP-оркестраторе: `agent:orchestrate` принимает `--task-id TASK-*` (поле `complexity` файла задачи в `todo/`) и явный `--complexity C0–C5` (приоритет; по умолчанию `C3`). Отклонения `commands_by_complexity` применяются на ACL-границе мапперов ChainExecution/DynamicLoop (`RoleConfigVo::resolveCommandByComplexity()`, правило «точный уровень → ближайший выше → ближайший ниже, базовая команда = C3») — единое правило с `watch-subagent.sh` (навык run-subagent) (#460).

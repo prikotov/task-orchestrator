@@ -17,8 +17,8 @@ roles:
       - -p
       - --model
       - glm-4.7
-      - --system-prompt
-      - "@system-prompt"         # резолвится в system_prompt_file
+      - --append-system-prompt
+      - "@system-prompt"        # дополняет штатный промпт Pi
       - --append-system-prompt
       - "@append-system-prompt" # опционально, не у всех ролей
       - --tools
@@ -38,7 +38,7 @@ roles:
 | Поле | Обязательное | Описание |
 |---|---|---|
 | `prompt_file` | да | Путь к .md файлу роли. При наличии `system_prompt_file` передаётся через `--append-system-prompt` |
-| `system_prompt_file` | нет | Основной системный промпт. Без него `prompt_file` заменяет системный промпт, как раньше. Применяется и PHP-оркестратором, и skill-скриптом `watch-subagent.sh` (навык run-subagent) — единый базовый промпт для обоих механизмов; путь относительный от корня проекта, отсутствующий файл — ошибка запуска |
+| `system_prompt_file` | нет | Базовый системный промпт. Для Pi дополняет штатный промпт, сохраняя автоматически формируемые разделы инструментов и правил. Применяется PHP-оркестратором и `watch-subagent.sh`; путь относительный от корня проекта, отсутствующий файл — ошибка запуска |
 | `command` | нет | Явная CLI-команда; считается базовой командой уровня `C3` |
 | `command_profile` | нет | Имя профиля из верхнеуровневой `command_profiles`; альтернатива явной `command` |
 | `commands_by_complexity` | нет | Отклонения от базовой команды: уровень → имя профиля или inline-команда. Применяются и `watch-subagent.sh` (навык run-subagent), и PHP-оркестратором `agent:orchestrate` |

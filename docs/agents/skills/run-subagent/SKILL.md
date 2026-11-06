@@ -91,7 +91,7 @@ PROMPT
 PROMPT
 ```
 
-Команда: `pi --mode json -p --system-prompt <file> [--provider <provider>] --append-system-prompt "Возьми на себя роль из файла: <role>"`; Pi сохраняет сессию в `~/.pi/agent/sessions`.
+Команда: `pi --mode json -p --append-system-prompt <base-file> [--provider <provider>] --append-system-prompt "Возьми на себя роль из файла: <role>"`. Базовый файл дополняет штатный промпт Pi: динамические разделы инструментов и правил сохраняются. Pi сохраняет сессию в `~/.pi/agent/sessions`.
 
 #### codex
 
