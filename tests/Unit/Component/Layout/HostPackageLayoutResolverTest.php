@@ -78,6 +78,60 @@ final class HostPackageLayoutResolverTest extends TestCase
     }
 
     #[Test]
+    public function skillsDirsListHostFirstWhenBothExist(): void
+    {
+        // host и package каталоги skills существуют: список [host, package] —
+        // первый каталог со skill выигрывает, host дополняет/переопределяет package.
+        mkdir($this->hostRoot . '/docs/agents/skills', 0777, true);
+        mkdir($this->packageRoot . '/docs/agents/skills', 0777, true);
+
+        $resolver = new HostPackageLayoutResolver($this->hostRoot, $this->packageRoot);
+
+        self::assertSame(
+            [$this->hostRoot . '/docs/agents/skills', $this->packageRoot . '/docs/agents/skills'],
+            $resolver->resolveSkillsDirs(),
+        );
+    }
+
+    #[Test]
+    public function skillsDirsListFallsBackToPackageOnly(): void
+    {
+        mkdir($this->packageRoot . '/docs/agents/skills', 0777, true);
+
+        $resolver = new HostPackageLayoutResolver($this->hostRoot, $this->packageRoot);
+
+        self::assertSame(
+            [$this->packageRoot . '/docs/agents/skills'],
+            $resolver->resolveSkillsDirs(),
+        );
+    }
+
+    #[Test]
+    public function skillsDirsListDeduplicatesIdenticalRoots(): void
+    {
+        // Standalone-режим: host-корень совпадает с package — без дублей.
+        mkdir($this->hostRoot . '/docs/agents/skills', 0777, true);
+
+        $resolver = new HostPackageLayoutResolver($this->hostRoot, $this->hostRoot);
+
+        self::assertSame(
+            [$this->hostRoot . '/docs/agents/skills'],
+            $resolver->resolveSkillsDirs(),
+        );
+    }
+
+    #[Test]
+    public function skillsDirsListThrowsWhenNeitherExists(): void
+    {
+        $resolver = new HostPackageLayoutResolver($this->hostRoot, $this->packageRoot);
+
+        $this->expectException(LayoutResourceNotFoundException::class);
+        $this->expectExceptionMessage(HostPackageLayoutResolver::SKILLS_DIR_RELATIVE_PATH);
+
+        $resolver->resolveSkillsDirs();
+    }
+
+    #[Test]
     public function missingDirectoryInBothRootsThrowsExplicitException(): void
     {
         // Ни host-, ни package-ресурса — явное исключение битой сборки

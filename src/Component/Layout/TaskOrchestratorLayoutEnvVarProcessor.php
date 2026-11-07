@@ -50,11 +50,17 @@ final class TaskOrchestratorLayoutEnvVarProcessor implements EnvVarProcessorInte
     /** Дискриминатор ресурса: каталог role-файлов (параметр roles_dir). */
     public const string RESOURCE_ROLES_DIR = 'roles_dir';
 
-    /** Дискриминатор ресурса: каталог skills (параметр skills_dir). */
+    /** Дискриминатор ресурса: каталог skills (параметр skills_dir, одиночный). */
     public const string RESOURCE_SKILLS_DIR = 'skills_dir';
+
+    /** Дискриминатор ресурса: каталоги skills в порядке приоритета host → package (skills_dirs). */
+    public const string RESOURCE_SKILLS_DIRS = 'skills_dirs';
 
     /** Дискриминатор ресурса: YAML-конфигурация цепочек (параметр chains_yaml). */
     public const string RESOURCE_CHAINS_YAML = 'chains_yaml';
+
+    /** Разделитель каталогов в строковом значении skills_dirs (пайп маловероятен в путях). */
+    public const string SKILLS_DIRS_SEPARATOR = '|';
 
     private readonly HostPackageLayoutResolver $resolver;
 
@@ -86,13 +92,18 @@ final class TaskOrchestratorLayoutEnvVarProcessor implements EnvVarProcessorInte
         return match ($name) {
             self::RESOURCE_ROLES_DIR => $this->resolver->resolveRolesDir(),
             self::RESOURCE_SKILLS_DIR => $this->resolver->resolveSkillsDir(),
+            self::RESOURCE_SKILLS_DIRS => implode(
+                self::SKILLS_DIRS_SEPARATOR,
+                $this->resolver->resolveSkillsDirs(),
+            ),
             self::RESOURCE_CHAINS_YAML => $this->resolver->resolveChainsYaml(),
             default => throw new InvalidArgumentException(sprintf(
-                'Неизвестный ресурс layout "%s" для процессора %s; ожидаются: %s, %s, %s.',
+                'Неизвестный ресурс layout "%s" для процессора %s; ожидаются: %s, %s, %s, %s.',
                 $name,
                 self::ENV_PREFIX,
                 self::RESOURCE_ROLES_DIR,
                 self::RESOURCE_SKILLS_DIR,
+                self::RESOURCE_SKILLS_DIRS,
                 self::RESOURCE_CHAINS_YAML,
             )),
         };
