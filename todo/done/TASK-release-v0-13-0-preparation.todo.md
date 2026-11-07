@@ -3,7 +3,7 @@ type: chore
 created: 2026-11-07 15:21:03 (1794064863)
 due: 
 started: 2026-11-07 15:21:50 (1794064910)
-completed: 
+completed: 2026-11-07 15:41:36 (1794066096)
 cancelled: 
 value: V2
 complexity: C2
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: release/0.13.0
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/467
+status: done
 ---
 
 # TASK-release-v0-13-0-preparation: Подготовить релиз v0.13.0
@@ -73,14 +73,14 @@ status: in_progress
 ## 4. План реализации (Implementation Plan)
 
 1. [ ] CHANGELOG.md и план релиза.
-2. [ ] Release PR от бота, апрув владельца, merge.
-3. [ ] Проверки и phar-e2e на merge commit.
-4. [ ] Тег `v0.13.0`, публикация, проверка Release Phar.
+2. [x] Release PR от бота, апрув владельца, merge.
+3. [x] Проверки и phar-e2e на merge commit (70db8a22): OK (7 tests, 44 assertions).
+4. [x] Тег `v0.13.0` на 70db8a22, workflow `Release Phar` успешен, GitHub Release с asset `task-orchestrator.phar`.
 
 ## 5. Критерии приёмки (Definition of Done)
 
-- [ ] `gh release view v0.13.0 --json tagName,assets` — релиз с PHAR-asset.
-- [ ] `git rev-list -n 1 v0.13.0` — проверенный merge commit.
+- [x] `gh release view v0.13.0 --json tagName,assets` — релиз с PHAR-asset.
+- [x] `git rev-list -n 1 v0.13.0` — проверенный merge commit (70db8a22).
 
 ## 6. Самопроверка (Verification)
 
