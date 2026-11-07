@@ -9,10 +9,12 @@
 parameters:
   module.agent_role.module_dir: '%task_orchestrator.package_dir%/src/Module/AgentRole'
   # Каталог ролей и skills берётся из глобальных параметров Kernel
-  # (task_orchestrator.roles_dir / skills_dir) — единый источник путей
-  # host-проекта с fallback на package_dir.
+  # (task_orchestrator.roles_dir / skills_dirs) — единый источник путей
+  # host-проекта с fallback на package_dir. skills_dirs — упорядоченный
+  # список (host → package, разделитель «|»): host переопределяет
+  # одноимённые skills и дополняет пакет своими.
   module.agent_role.roles_dir: '%task_orchestrator.roles_dir%'
-  module.agent_role.skills_dir: '%task_orchestrator.skills_dir%'
+  module.agent_role.skills_dirs: '%task_orchestrator.skills_dirs%'
 
 services:
   _defaults:
@@ -50,4 +52,4 @@ services:
 
   TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Service\YamlLoadSkillFrontmatterService:
     arguments:
-      $skillsDir: '%module.agent_role.skills_dir%'
+      $skillsDirs: '%module.agent_role.skills_dirs%'
