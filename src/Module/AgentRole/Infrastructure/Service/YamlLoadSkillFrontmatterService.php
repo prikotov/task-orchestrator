@@ -24,14 +24,17 @@ use TaskOrchestrator\Common\Module\AgentRole\Infrastructure\Component\Frontmatte
 /**
  * Читает метаданные skill из YAML-frontmatter файла SKILL.md.
  *
- * Резолвит путь к skill по имени: `<skills_dir>/<name>/SKILL.md`. Имя skill
- * берётся из frontmatter (поле `name`) с фолбэком на переданное имя (каталог),
- * как делают pi и codex.
+ * Резолвит путь к skill по имени: первый существующий файл
+ * `<skills_dir>/<name>/SKILL.md` по списку каталогов (приоритет: host-проект
+ * → package, порядок задаётся wiring'ом). Каталоги дополняют друг друга:
+ * host-проект переопределяет одноимённые skills пакета и добавляет свои.
+ * Имя skill берётся из frontmatter (поле `name`) с фолбэком на переданное
+ * имя (каталог), как делают pi и codex.
  */
 final readonly class YamlLoadSkillFrontmatterService implements LoadSkillFrontmatterServiceInterface
 {
     public function __construct(
-        private string $skillsDir,
+        private string $skillsDirs,
         private FrontmatterYamlParser $frontmatterParser,
     ) {
     }
@@ -39,11 +42,20 @@ final readonly class YamlLoadSkillFrontmatterService implements LoadSkillFrontma
     #[Override]
     public function read(SkillNameVo $skillName): SkillMetadataVo
     {
-        $skillDir = rtrim($this->skillsDir, '/') . '/' . $skillName->value();
-        $skillFile = $skillDir . '/SKILL.md';
+        $dirs = $this->skillsDirsList();
+        $skillFile = null;
+        $skillDir = null;
+        foreach ($dirs as $dir) {
+            $candidate = rtrim($dir, '/') . '/' . $skillName->value() . '/SKILL.md';
+            if (is_file($candidate)) {
+                $skillFile = $candidate;
+                $skillDir = $dir;
+                break;
+            }
+        }
 
-        if (!is_file($skillFile)) {
-            throw new SkillNotFoundException($skillName->value(), $this->skillsDir);
+        if ($skillFile === null || $skillDir === null) {
+            throw new SkillNotFoundException($skillName->value(), implode(' | ', $dirs));
         }
 
         $content = file_get_contents($skillFile);
@@ -66,6 +78,26 @@ final readonly class YamlLoadSkillFrontmatterService implements LoadSkillFrontma
             location: $location,
             dependsOn: $dependsOn,
         );
+    }
+
+    /**
+     * @return list<non-empty-string> упорядоченный список каталогов skills (host → package)
+     */
+    private function skillsDirsList(): array
+    {
+        $dirs = array_values(array_filter(
+            array_map(
+                static fn (string $dir): string => trim($dir),
+                explode('|', $this->skillsDirs),
+            ),
+            static fn (string $dir): bool => $dir !== '',
+        ));
+
+        if ($dirs === []) {
+            throw new InvalidArgumentException('Skills dirs list is empty.');
+        }
+
+        return $dirs;
     }
 
     /**

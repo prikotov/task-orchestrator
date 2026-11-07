@@ -68,10 +68,40 @@ final readonly class HostPackageLayoutResolver
 
     /**
      * Каталог skills (skills_dir): host-проект при наличии, иначе package.
+     *
+     * Устаревший одиночный контракт: для по-skill приоритета «host переопределяет/
+     * дополняет package» используйте {@see resolveSkillsDirs()}.
      */
     public function resolveSkillsDir(): string
     {
         return $this->resolveDirectory(self::SKILLS_DIR_RELATIVE_PATH);
+    }
+
+    /**
+     * Каталоги skills (skills_dirs): все существующие кандидаты в порядке
+     * приоритета host → package (дедупликация при совпадении корней в
+     * standalone-режиме). Первый каталог, содержащий skill, выигрывает: host
+     * переопределяет одноимённые skills и дополняет package новыми.
+     *
+     * @return list<string>
+     */
+    public function resolveSkillsDirs(): array
+    {
+        $dirs = [];
+        foreach ([
+            self::hostPath(self::SKILLS_DIR_RELATIVE_PATH),
+            self::packagePath(self::SKILLS_DIR_RELATIVE_PATH),
+        ] as $candidate) {
+            if (is_dir($candidate) && !in_array($candidate, $dirs, true)) {
+                $dirs[] = $candidate;
+            }
+        }
+
+        if ($dirs === []) {
+            throw new LayoutResourceNotFoundException(self::SKILLS_DIR_RELATIVE_PATH);
+        }
+
+        return $dirs;
     }
 
     /**

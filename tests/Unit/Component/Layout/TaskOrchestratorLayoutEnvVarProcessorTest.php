@@ -97,6 +97,17 @@ final class TaskOrchestratorLayoutEnvVarProcessorTest extends TestCase
             $this->resolve(TaskOrchestratorLayoutEnvVarProcessor::RESOURCE_SKILLS_DIR),
         );
         self::assertSame(
+            $this->hostRoot . '/docs/agents/skills',
+            $this->resolve(TaskOrchestratorLayoutEnvVarProcessor::RESOURCE_SKILLS_DIRS),
+        );
+
+        mkdir($this->packageRoot . '/docs/agents/skills', 0777, true);
+        self::assertSame(
+            $this->hostRoot . '/docs/agents/skills'
+                . '|' . $this->packageRoot . '/docs/agents/skills',
+            $this->resolve(TaskOrchestratorLayoutEnvVarProcessor::RESOURCE_SKILLS_DIRS),
+        );
+        self::assertSame(
             $this->packageRoot . '/config/chains.yaml',
             $this->resolve(TaskOrchestratorLayoutEnvVarProcessor::RESOURCE_CHAINS_YAML),
         );

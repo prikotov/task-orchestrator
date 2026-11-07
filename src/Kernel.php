@@ -321,6 +321,7 @@ class Kernel extends BaseKernel implements PharRuntimePathsProviderInterface
         // Имя после префикса — дискриминатор ресурса процессора, не env-переменная.
         $parameters['task_orchestrator.roles_dir'] = '%env(task_orchestrator_layout:roles_dir)%';
         $parameters['task_orchestrator.skills_dir'] = '%env(task_orchestrator_layout:skills_dir)%';
+        $parameters['task_orchestrator.skills_dirs'] = '%env(task_orchestrator_layout:skills_dirs)%';
         $parameters['task_orchestrator.chains_yaml'] = '%env(task_orchestrator_layout:chains_yaml)%';
 
         $parameters['app.version'] = $this->resolveVersion();
