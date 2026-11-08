@@ -10,6 +10,8 @@ personality:
   adizes: ["A"]
   big_five: "O5 C8 E4 A8 N2"
 expertise: "Написание и актуализация документации: руководства, API-контракты, release notes, описание архитектуры, встроенная справка."
+skills:
+  - pi-native-rendering
 description: "Отвечает за пользовательскую документацию, release notes и встроенную справку."
 ---
 
