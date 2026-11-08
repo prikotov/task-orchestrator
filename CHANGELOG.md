@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2026-11-08
+
+[Сравнение v0.13.0...v0.14.0](https://github.com/prikotov/task-orchestrator/compare/v0.13.0...v0.14.0)
+
+Скилл встроенного рендеринга pi в каталоге пакета и полный каталог skills в PHAR.
+
+### Added
+
+- Скилл `pi-native-rendering` в каталоге пакета (`docs/agents/skills/`): встроенный рендеринг pi для ролей — mermaid (flowchart/sequence/state/class/er), LaTeX, GFM-таблицы, kitty-картинки; подключён 7 пакетным ролям (Гэндальф, Локи, Шерлок, Гермиона, Остап, Левша, Тони); downstream-хосты переопределяют per-skill (#469).
+
+### Fixed
+
+- PHAR пакует весь каталог `docs/agents/skills` вместо одного `become-role`: smoke-фаза `[layout]` падала на ролях со скиллом, отсутствующим в PHAR (#469).
+
 ## [0.13.0] - 2026-11-07
 
 [Сравнение v0.12.0...v0.13.0](https://github.com/prikotov/task-orchestrator/compare/v0.12.0...v0.13.0)
