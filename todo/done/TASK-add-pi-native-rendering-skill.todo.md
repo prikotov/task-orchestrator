@@ -3,7 +3,7 @@ type: docs
 created: 2026-11-08 02:36:43 (1794105403)
 due: 
 started: 2026-11-08 02:37:01 (1794105421)
-completed: 
+completed: 2026-11-08 02:37:45 (1794105465)
 cancelled: 
 value: V2
 complexity: C2
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: feat/add-pi-native-rendering-skill
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/469
+status: done
 ---
 
 # TASK-add-pi-native-rendering-skill: Добавить скилл pi-native-rendering в каталог пакета
