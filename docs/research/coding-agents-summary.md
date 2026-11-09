@@ -44,13 +44,15 @@
 | 19 | **Crush** | FSL | ⚠️ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ⚠️ | **20** | ⚠️ Частично (6/10) |
 | 20 | **Codex CLI** | A-2.0 | ⚠️ | ⚠️ | ⚠️ | ✅ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ✅ | **19** | ⚠️ Частично (6/10) |
 | 21 | **Factory Droid** | Пропр. | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | **17** | ⚠️ Частично (6/10) |
-| 22 | **ZCode (Z.AI)** | Пропр. | ❌ | ❌ | ⚠️ | ✅ | ❌ | ❌ | ⚠️ | ⚠️ | ✅ | ❌ | **17** | ❌ Не подходит (4/10) |
+| 22 | **ZCode (Z.AI)** | Пропр. | ❌ | ❌ | ⚠️ | ✅ | ❌ | ⚠️ | ✅ | ⚠️ | ✅ | ❌ | **19** | ⚠️ Условно (6/10) — дельта 2026-11-09, см. примечание ниже |
 | 23 | **codehamr** | MIT | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ⚠️ | ✅ | ⚠️ | ✅ | **16** | ❌ Не подходит (4/10) |
 | 24 | **GitHub Copilot CLI** | Пропр. | ⚠️ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | **12** | ❌ Не подходит (3/10) |
 
 > **Примечание:** omp и Pi имеют одинаковую формальную сумму 30/30, но omp занимает первое место как надмножество Pi: сохраняет критичный JSON/headless surface (поверхность запуска без интерфейса) и добавляет Rust-core, LSP/DAP, native subagents, advisor, memory, ACP и 40+ провайдеров. Pi остаётся стабильным baseline (базовой точкой) и fallback (резервом).
 
 > `*` SDK 9/10 — отдельная качественная оценка программного API по шкале 10 (НЕ часть CLI-суммы; не складывается и не усредняется с ней). Покритериально: К1–К5, К7–К10 ✅; К6 ⚠️ (ACP/`astream` есть, но готового `watch-subagent.sh` JSONL contract нет — нужен Python-runner или ACP/client adapter). Именно К6 ограничивает итог до 9/10. Детальная SDK-таблица по 10 критериям — в [deepagents-comparison.md](coding-agents/deepagents-comparison.md).
+>
+> **Дельта-обновление 2026-11-09 (строка #22, ZCode desktop v3.17.2):** внутри desktop-пакета обнаружен штатный headless CLI (`zcode-cli` 0.17.1): `--prompt`/`--json`, OAuth `login zai|bigmodel`, потоковый протокол `app-server` («ZCode Protocol» v1: `session/setModel` `{providerId, modelId}`, `session/send`, `provider/refreshRegistry`), Anthropic-совместимые эндпоинты подписок (Individual Coding Plan `https://api.z.ai/api/anthropic`; Start plan `https://zcode.z.ai/api/v1/zcode-plan/anthropic`, модель `GLM-5.3-Flash`). Пересмотр: К6 ❌→⚠️, К7 ⚠️→✅, 17→19/30, вердикт ❌→⚠️ Условно (6/10). Ограничения: интерфейс публично не документирован, CLI распространяется только внутри desktop-пакета, системный промпт на запуск не подставить (К1 ❌). Позиция в рейтинге не пересортирована (дельта-правка одной строки). Детали — в [zcode-coding-agent-comparison.md](coding-agents/zcode-coding-agent-comparison.md), раздел «Обновление 2026-11-09».
 >
 > Для DeepSeek Harness (#6, 26/30) SDK-оценка 9/10 по той же шкале: К1–К5, К8–К10 ✅, К6 ✅ (JSON-RPC turns API + cancellation), К7 ⚠️ (токен-метр и usage в JSONL-логах есть, $ — нет) и минус за preview-статус runtime. При равной сумме 26 с OpenCode (#5) dsh ниже из-за developer preview без релизов. Детально — в [deepseek-harness-comparison.md](coding-agents/deepseek-harness-comparison.md).
 
@@ -316,7 +318,7 @@
 |-------|-----------|---------|-----------|--------------|--------------------|---------------|-----------|--------------|---------------|-------------|---------|
 | **Claude Code** | ✅ `--system-prompt` + `--append-system-prompt` | ✅ `--append-system-prompt` | ⚠️ Нет CLI | ⚠️ Только CLAUDE.md | ❌ `.claude/skills/` | ✅ `--print --output-format json` | ✅ Полная + $ | ❌ $20+/мес | ⚠️ Anthropic only | ❌ Проприетарная | 7/10 |
 | **Factory Droid** | ⚠️ Только конфиг | ⚠️ Custom Droids | ⚠️ Нет CLI | ✅ Авто | ⚠️ С настройкой | ✅ JSON-RPC | ⚠️ Токены без $ | ❌ $20+/мес | ⚠️ 10 BYOK | ❌ Проприетарная | 6/10 |
-| **ZCode (Z.AI)** | ❌ Нет | ❌ Нет ролей | ⚠️ SKILL.md + импорт GUI | ✅ AGENTS.md + CLAUDE.md | ❌ Только `~/.zcode/skills/` | ❌ Нет headless/JSON | ⚠️ GUI only | ⚠️ Free trial quota | ✅ Z.ai + BYOK | ❌ Проприетарная | 4/10 |
+| **ZCode (Z.AI)** | ❌ Нет | ❌ Нет ролей | ⚠️ SKILL.md + импорт GUI | ✅ AGENTS.md + CLAUDE.md | ❌ Только `~/.zcode/skills/` | ⚠️ headless CLI + протокол (не документ.) | ✅ `--json` + протокол | ⚠️ Free trial quota | ✅ Z.ai + BYOK | ❌ Проприетарная | 6/10 |
 | **GitHub Copilot CLI** | ⚠️ copilot-instructions.md | ⚠️ User prompt only | ❌ Нет | ⚠️ copilot-instructions.md | ❌ Нет | ⚠️ Plain text/ограничен | ❌ Нет | ⚠️ Copilot Free | ❌ GitHub only | ❌ Проприетарная | 3/10 |
 
 ---
@@ -508,7 +510,7 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 | 14 | Codex CLI | [codex-cli-comparison.md](coding-agents/codex-cli-comparison.md) | ⚠️ Частично (6/10) |
 | 15 | Factory Droid | [droid-agent-comparison.md](coding-agents/droid-agent-comparison.md) | ⚠️ Частично (6/10) |
 | 16 | OpenClaw | [openclaw-agent-comparison.md](coding-agents/openclaw-agent-comparison.md) | ❌ Не подходит (4/10) |
-| 17 | ZCode (Z.AI) | [zcode-coding-agent-comparison.md](coding-agents/zcode-coding-agent-comparison.md) | ❌ Не подходит (4/10) |
+| 17 | ZCode (Z.AI) | [zcode-coding-agent-comparison.md](coding-agents/zcode-coding-agent-comparison.md) | ⚠️ Условно (6/10) — дельта 2026-11-09 |
 | 18 | GitHub Copilot CLI | [copilot-cli-comparison.md](coding-agents/copilot-cli-comparison.md) | ❌ Не подходит (3/10) |
 | 19 | Nanocoder | [nanocoder-comparison.md](coding-agents/nanocoder-comparison.md) | ⚠️ Частично (7/10) |
 | 20 | NanoClaw | [nanoclaw-comparison.md](coding-agents/nanoclaw-comparison.md) | ❌ Не подходит (4/10) |
@@ -552,5 +554,5 @@ qwen -p "$PROMPT" --output-format stream-json --yolo \
 |-------|------|------------|------|-------|
 | Claude Code | TypeScript/Node.js | Anthropic only | $20+/мес | 7/10 |
 | Factory Droid | Go (бинарник) | 10 BYOK | $20+/мес | 6/10 |
-| ZCode (Z.AI) | Desktop (закрытый) | Z.ai + BYOK | Free trial quota / Coding Plans | 4/10 |
+| ZCode (Z.AI) | Desktop + встроенный CLI (закрытый) | Z.ai + BYOK | Free trial quota / Coding Plans / Start plan (выходная квота) | 6/10 |
 | GitHub Copilot CLI | Go (бинарник) | GitHub only | Free limited / $19+/мес | 3/10 |
