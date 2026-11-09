@@ -66,3 +66,22 @@
 - Для сабагентной интеграции ZCode **не кандидат** (Tier 0) — остаётся паттерн-референс.
 - При развитии нашего `dynamic-loop`/`quality-gate` учесть идею Goal Mode (self-verification).
 - Дождаться review → PR → merge от пользователя (merge только по явному подтверждению).
+
+---
+
+## Обновление 2026-11-09 (desktop v3.17.2): блокер К6 снят частично
+
+**Статус К6:** обнаружен **штатный headless CLI** — `zcode-cli` 0.17.1 (внутреннее имя `apps/zcode-cli`), упакован внутри desktop-пакета (`resources/glm/zcode.cjs`). GUI-версия 3.17.2 управляет этим же CLI через протокол `app-server --stdio` («ZCode Protocol» v1). Блокер «нет headless/JSON/programmatic-интерфейса» снят частично: headless есть, но публично не документирован.
+
+**Ключевые факты:**
+
+- `--prompt` (запуск без TUI), `--json` (финальный JSON с usage), `--mode yolo|build|edit|plan|guarded`, `--cwd`, `--attach`, `--resume`/`-c`, `login zai|bigmodel` (OAuth через браузер).
+- Протокол `app-server`: `session/create`, `session/setModel` (`{providerId, modelId, options.reasoningLevel}`), `session/send` (`content` + `modelSelection`), `session/subscribe`, `provider/refreshRegistry`, `provider/updateAccountConfig`.
+- Подписочные эндпоинты (Anthropic-совместимые): Individual Coding Plan — `https://api.z.ai/api/anthropic` (`GLM-5.3`/`GLM-5.3-Flash`); Start plan (выходная квота) — `https://zcode.z.ai/api/v1/zcode-plan/anthropic` (`GLM-5.3-Flash`); обычный API-ключ — `https://api.z.ai/api/paas/v4` (OpenAI-совместимый).
+- Наблюдаемость: rollout-журнал `~/.zcode/cli/rollout/model-io-sess_<id>.jsonl`, БД `~/.zcode/cli/db/db.sqlite` (`model_usage`).
+
+**Экспериментально подтверждено:** извлечение CLI и запуск системным Node работает; цепочка протокола `session/create` → `provider/refreshRegistry` → `session/setModel` → `session/send` выполняется (ход выполнен, `model_usage` записан, события получены). До `login zai` реестр standalone-CLI содержит только персональных провайдеров из `~/.zcode/v2/provider_config.json`; слэш-команды в headless не обрабатываются; `providerOrder` на дефолт headless не влияет.
+
+**Пересмотр:** К6 ❌→⚠️, К7 ⚠️→✅, 17→19/30, вердикт ❌ Не подходит (4/10) → **⚠️ Условно (6/10)**. Детально — [zcode-coding-agent-comparison.md](../../../research/coding-agents/zcode-coding-agent-comparison.md), раздел «Обновление 2026-11-09».
+
+**Ограничения пересмотра:** интерфейс не документирован (может измениться без предупреждения), CLI не распространяется отдельно от desktop-пакета, `--system-prompt` нет (К1 ❌), роли отсутствуют (К2 ❌) — для постоянной интеграции в `watch-subagent.sh` не рекомендуется; для личного сценария «выполнить задачи на подписочной квоте» — пригоден.
