@@ -3,7 +3,7 @@ type: docs
 created: 2026-11-10 06:21:27 (1794291687)
 due: 
 started: 2026-11-10 06:22:33 (1794291753)
-completed: 
+completed: 2026-11-10 06:29:55 (1794292195)
 cancelled: 
 value: V2
 complexity: C2
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/pi-native-rendering-pi-1.5.1
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/476
+status: done
 ---
 
 # TASK-docs-pi-native-rendering-pi-1-5-1: Актуализировать скилл pi-native-rendering под pi 1.5.1
@@ -50,7 +50,7 @@ status: in_progress
 *   **Где делаем:** `docs/agents/skills/pi-native-rendering/SKILL.md`; отчёт анализа — `docs/agents/reports/system-analyst/2026-11-10_12-52_pi-native-rendering-pi-1-5-1.md`
 *   **Текущее поведение:** скилл запрещает `pie/gitGraph/mindmap` (в pi 1.5.1 они рисуются), правил кликабельности нет
 *   **Прецеденты для переиспользования:** нет (пионерная актуализация этого скилла)
-*   **Критичные конвенции:** [SKILL-CREATION.md](../docs/agents/skills/SKILL-CREATION.md) — стандарт оформления навыков
+*   **Критичные конвенции:** [SKILL-CREATION.md](../../docs/agents/skills/SKILL-CREATION.md) — стандарт оформления навыков
 *   **Границы (Out of Scope):** файлы ролей (подключают скилл по ссылке), `docs/guide/diagrams.md` (GitHub-рендеринг), код и тесты, поддержка безсхемных путей в ответах
 
 ## 3. Требования, MoSCoW (Requirements)
@@ -88,7 +88,7 @@ grep -n "gantt" docs/agents/skills/pi-native-rendering/SKILL.md
 - Клик-матрица снята в ghostty: поведение безсхемных путей в других терминалах может отличаться, поэтому эталоном в скилле оставлен спецификационный `file://`, а `/абсолютный/путь` явно запрещён.
 
 ## 8. Источники (Sources)
-- [x] [Отчёт анализа](../docs/agents/reports/system-analyst/2026-11-10_12-52_pi-native-rendering-pi-1-5-1.md)
+- [x] [Отчёт анализа](../../docs/agents/reports/system-analyst/2026-11-10_12-52_pi-native-rendering-pi-1-5-1.md)
 - [x] Changelog pi 1.5.1 (локальный пакет `@earendil-works/pi-coding-agent`)
 - [x] [PR #8158](https://github.com/earendil-works/pi/pull/8158) — upgraded terminal Mermaid rendering
 
