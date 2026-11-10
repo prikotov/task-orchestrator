@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.1] - 2026-11-10
+
+[Сравнение v0.14.0...v0.14.1](https://github.com/prikotov/task-orchestrator/compare/v0.14.0...v0.14.1)
+
+Актуализация скилла `pi-native-rendering` под pi 1.5.1 и новые research-постановки.
+
+### Changed
+
+- Скилл `pi-native-rendering` актуализирован под pi 1.5.1: рисуемые типы диаграмм расширены (`pie`, `mindmap`, `timeline`, `gitGraph`), запрет перенесён на нерисуемые (`gantt`, `journey`, `quadrantChart`, `sankey`); добавлен блок «Кликабельность ссылок» — эталон `file://`/`https://` и отказ для голых/относительных/тильда-путей (#476).
+- Обновлены выводы ZCode: bundled headless CLI (desktop v3.17.2) (#473).
+
+### Added
+
+- Research-постановки: память агента (Anthropic, Osinara), агентное ревью кода (Anthropic), гид Google по agent skills, feasibility dsh, X-пост dsh (#471, #474, #475).
+
 ## [0.14.0] - 2026-11-08
 
 [Сравнение v0.13.0...v0.14.0](https://github.com/prikotov/task-orchestrator/compare/v0.13.0...v0.14.0)
