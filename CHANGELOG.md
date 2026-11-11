@@ -5,11 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.15.0] - 2026-11-11
 
-### Changed (breaking)
+[Сравнение v0.14.1...v0.15.0](https://github.com/prikotov/task-orchestrator/compare/v0.14.1...v0.15.0)
 
-- `watch-subagent.sh` (скилл `run-subagent`): обязателен один из параметров `--task-id`/`--complexity` — запуск без них завершается ошибкой до старта раннера. Некорректное значение `--complexity` (вне `C0–C5`) также отклоняется до запуска. Причина: ~96% запусков в проектах-потребителях падали в дефолт, из-за чего тиры моделей `commands_by_complexity` не включались. В `RUN START` run-log добавлена строка `complexity=<C0–C5> source=<explicit|task-file> task_id=<ID|none>`.
+Обязательный уровень сложности при запуске сабагентов (`run-subagent`) и строка сложности в run-log. Несовместимое изменение: `watch-subagent.sh` больше не запускается без `--task-id`/`--complexity`.
+
+### Changed
+
+- `watch-subagent.sh` (скилл `run-subagent`): обязателен один из параметров `--task-id`/`--complexity` — запуск без них завершается ошибкой до старта раннера. Некорректное значение `--complexity` (вне `C0–C5`) также отклоняется до запуска. Причина: ~96% запусков в проектах-потребителях падали в дефолт, из-за чего тиры моделей `commands_by_complexity` не включались. В `RUN START` run-log добавлена строка `complexity=<C0–C5> source=<explicit|task-file> task_id=<ID|none>` (#479).
+- Документация скиллов `run-subagent`, `task-via-subagents`, `epic-via-subagents` и `docs/guide/roles.md` синхронизирована с новым требованием (#479).
+
+### Несовместимость
+
+- Проекты-потребители, вызывающие `watch-subagent.sh` без параметров сложности (вне-задачные запуски — ретро, диагностики, внешние обёртки), должны передавать `--complexity C0–C5` (для задач с файлом — `--task-id TASK-*`).
 
 ## [0.14.1] - 2026-11-10
 
