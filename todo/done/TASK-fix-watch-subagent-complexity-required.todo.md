@@ -3,7 +3,7 @@ type: fix
 created: 2026-11-11 03:32:45 (1794367965)
 due: 
 started: 2026-11-11 03:33:46 (1794368026)
-completed: 
+completed: 2026-11-11 04:14:50 (1794370490)
 cancelled: 
 value: V3
 complexity: C2
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/complexity-required-watch-subagent
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/479
+status: done
 ---
 
 # TASK-fix-watch-subagent-complexity-required: Требовать явный уровень сложности в watch-subagent.sh (--task-id или --complexity)
