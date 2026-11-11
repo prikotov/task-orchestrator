@@ -3,7 +3,7 @@ type: chore
 created: 2026-11-11 05:11:57 (1794373917)
 due: 
 started: 2026-11-11 05:12:02 (1794373922)
-completed: 
+completed: 2026-11-11 05:16:16 (1794374176)
 cancelled: 
 value: V2
 complexity: C2
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: release/0.15.0
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/480
+status: done
 ---
 
 # TASK-release-v0-15-0-preparation: Подготовить релиз v0.15.0
