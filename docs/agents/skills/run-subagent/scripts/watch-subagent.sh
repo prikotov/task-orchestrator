@@ -24,7 +24,11 @@
 #   --model <string>     — модель (priority: CLI > env MODEL > role profile).
 #   --reasoning <string> — reasoning/thinking effort (priority: CLI > env REASONING > role profile).
 #   --task-id <TASK-*>   — прочитать complexity из файла задачи.
-#   --complexity <C0-C5> — явно задать сложность (приоритет над --task-id; default: C3).
+#   --complexity <C0-C5> — явно задать сложность (приоритет над --task-id).
+#   Обязателен хотя бы один источник уровня: --task-id или --complexity
+#   (если переданы оба, действует --complexity). Запуск без уровня — ошибка
+#   (fail-fast): иначе тиры моделей commands_by_complexity не включаются
+#   и запуск незаметно уходит на базовый профиль.
 #   [prompt text]        — промпт. Если не указан — читается из stdin.
 #
 # Базовый системный промпт: по умолчанию scripts/subagent_system.txt (рядом со
@@ -163,7 +167,8 @@ while [[ $# -gt 0 ]]; do
             echo "  --model <string>     модель (priority: CLI > env MODEL > role profile)"
             echo "  --reasoning <string> reasoning effort (priority: CLI > env REASONING > role profile)"
             echo "  --task-id <TASK-*>   прочитать complexity из файла задачи"
-            echo "  --complexity <C0-C5> явно задать сложность (приоритет над --task-id; default: C3)"
+            echo "  --complexity <C0-C5> явно задать сложность (приоритет над --task-id)"
+            echo "                       обязателен хотя бы один из --task-id/--complexity"
             echo "  -h, --help           эта справка"
             exit 0
             ;;
@@ -196,6 +201,24 @@ fi
 if [[ ! -f "$ROLE_FILE" ]]; then
     echo "Ошибка: файл роли не найден: $ROLE_FILE" >&2
     exit 1
+fi
+
+# Обязателен один из параметров --task-id/--complexity: он выбирает командный
+# профиль роли (commands_by_complexity в chains.yaml). Fail-fast до старта
+# раннера — ноль расхода токенов: без параметров тиры моделей не включаются,
+# и запуск незаметно уходит на базовый профиль.
+COMPLEXITY_SOURCE=""
+if [[ -n "$COMPLEXITY" ]]; then
+    if [[ ! "$COMPLEXITY" =~ ^C[0-5]$ ]]; then
+        echo "Ошибка: --complexity ожидает значение C0-C5, получено: '$COMPLEXITY'" >&2
+        exit 1
+    fi
+    COMPLEXITY_SOURCE="explicit"
+elif [[ -z "$TASK_ID" ]]; then
+    echo "Ошибка: не задан уровень сложности. Укажите --task-id <TASK-*> (уровень читается из поля complexity файла задачи) или --complexity <C0-C5> (для запуска без файла задачи)." >&2
+    exit 1
+else
+    COMPLEXITY_SOURCE="task-file"
 fi
 
 derive_role_name() {
@@ -231,6 +254,13 @@ $projectRoot = getenv('ROLE_PROFILE_PROJECT_ROOT') ?: '';
 $taskId = getenv('ROLE_PROFILE_TASK_ID') ?: '';
 $complexityOption = getenv('ROLE_PROFILE_COMPLEXITY') ?: '';
 
+if ($complexityOption === '' && $taskId === '') {
+    // Оборонительный fail-fast: bash-валидация отсекает этот случай раньше,
+    // но прямой вызов load_role_profile не должен молча уходить в дефолт.
+    fwrite(STDERR, "Complexity is required: pass --complexity C0-C5 or --task-id TASK-*.\n");
+    exit(2);
+}
+
 if ($autoload === '' || $configPath === '' || $roleName === '' || !is_file($autoload) || !is_file($configPath)) {
     exit(0);
 }
@@ -243,7 +273,7 @@ try {
     exit(0);
 }
 
-$complexity = 3;
+$complexity = 0;
 if ($complexityOption !== '') {
     if (preg_match('/^C[0-5]$/', $complexityOption) !== 1) {
         fwrite(STDERR, sprintf('Invalid complexity "%s": expected C0-C5.\n', $complexityOption));
@@ -380,6 +410,8 @@ echo $extractReasoning($command), "\n";
 // пусто — использовать упакованный subagent_system.txt).
 $systemPromptFile = $role['system_prompt_file'] ?? '';
 echo is_string($systemPromptFile) ? $systemPromptFile : '', "\n";
+// Строка 6: резолв-уровень сложности C<n> — для строки complexity в RUN START.
+echo 'C', $complexity, "\n";
 PHP
 }
 
@@ -395,6 +427,9 @@ apply_role_profile_defaults() {
     profile_model="$(sed -n '3p' <<< "$profile_output")"
     profile_reasoning="$(sed -n '4p' <<< "$profile_output")"
     profile_system_prompt="$(sed -n '5p' <<< "$profile_output")"
+    # Глобальная (не local): читается в RUN START. Пусто, если конфигурация
+    # ролей недоступна (нет chains.yaml/php) — тогда профиль не выбирался.
+    PROFILE_COMPLEXITY="$(sed -n '6p' <<< "$profile_output")"
 
     # Override базового системного промпта из chains.yaml: единый промпт для
     # skill и PHP-оркестратора. Ключ отсутствует — дефолт (subagent_system.txt);
@@ -663,6 +698,7 @@ log_run "=== RUN START ==="
 log_run "runner=$RUNNER role=$ROLE_FILE role_slug=$RUN_ROLE_SLUG"
 log_run "system_prompt=$SYSTEM_PROMPT_FILE"
 log_run "provider=${PROVIDER:-<none>} model=${MODEL:-<none>} reasoning=${REASONING:-<none>}"
+log_run "complexity=${PROFILE_COMPLEXITY:-<unresolved>} source=${COMPLEXITY_SOURCE} task_id=${TASK_ID:-<none>}"
 log_run "soft_timeout=${SOFT_TIMEOUT}s hard_timeout=${HARD_TIMEOUT}s stall_timeout=${STALL_TIMEOUT}s output=${OUTPUT}"
 log_run "effective_hard=${EFFECTIVE_HARD:-<computed-later>}s"
 log_run "run_log=$RUN_LOG"

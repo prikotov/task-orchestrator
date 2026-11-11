@@ -172,7 +172,7 @@ master
 
 ## Сложность задач
 
-При запуске задачи через `run-subagent` передавай `--task-id <TASK-ID>` для выбора командного профиля по сложности. Явный `--complexity <C0-C5>` имеет приоритет над файлом задачи.
+При запуске задачи через `run-subagent` передавай `--task-id <TASK-ID>` для выбора командного профиля по сложности. Явный `--complexity <C0-C5>` имеет приоритет над файлом задачи. Один из параметров — `--task-id` или `--complexity` — обязателен: если не передан ни один, запуск завершается ошибкой.
 
 Уровень уже задан в YAML front matter задачи в поле `complexity`. Отдельно определять его перед запуском не нужно: `--task-id` читает значение из файла автоматически. Для ручного переопределения используй `--complexity`.
 
@@ -225,7 +225,7 @@ Stall-timeout — время без единого JSONL-события, пос�
 
 Пример запуска ревью:
 ```bash
-scripts/watch-subagent.sh -s 600 -t 300 -o text,files -r docs/agents/roles/team/code_reviewer_backend_puaro.ru.md <<'PROMPT'
+scripts/watch-subagent.sh -s 600 -t 300 -o text,files --task-id <TASK-ID> -r docs/agents/roles/team/code_reviewer_backend_puaro.ru.md <<'PROMPT'
 <prompt>
 PROMPT
 ```

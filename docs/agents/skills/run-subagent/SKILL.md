@@ -37,14 +37,19 @@ PROMPT
 | `--model` | — | Модель | профиль роли |
 | `--reasoning` | — | Уровень рассуждения | профиль роли |
 | `--task-id` | — | `TASK-*`, из файла которого читается сложность | — |
-| `--complexity` | — | Сложность `C0–C5`; приоритет над `--task-id` | `C3` |
+| `--complexity` | — | Сложность `C0–C5`; приоритет над `--task-id` | — |
 | `[prompt text]` | — | Задание аргументом; без него читается из stdin | — |
 
 Явные параметры `--runner`, `--provider`, `--model` и `--reasoning` переопределяют профиль роли. Обычно их указывать не нужно.
 
+🔴 Обязателен хотя бы один из параметров — `--task-id` или `--complexity`: уровень выбирает командный профиль роли. Если переданы оба, действует `--complexity`. Если не передан ни один, запуск завершается ошибкой до старта агента.
+
 ## Сложность
 
-Используй `--task-id`, если у задачи есть файл. `--complexity` нужен для явного переопределения или запуска без файла задачи.
+Один из параметров — `--task-id` или `--complexity` — обязателен: если не передан ни один, скрипт завершается с ошибкой до запуска агента. Передать оба допустимо — тогда действует `--complexity`.
+
+- У задачи есть файл — передавай `--task-id`: уровень читается из поля `complexity` её front matter.
+- Файла задачи нет (консультация, ретро, диагностика) — задавай `--complexity` явно.
 
 | Уровень | Назначение |
 |---|---|
@@ -67,16 +72,17 @@ PROMPT
 ```
 
 ```bash
-# Получить только ответ и список изменённых файлов
+# Получить только ответ и список изменённых файлов (файл задачи есть — берём --task-id)
 <skill-dir>/scripts/watch-subagent.sh -s 600 -o text,files \
-  -r docs/agents/roles/team/backend_developer_levsha.ru.md <<'PROMPT'
+  -r docs/agents/roles/team/backend_developer_levsha.ru.md \
+  --task-id TASK-example <<'PROMPT'
 Выполни задачу: todo/TASK-example.todo.md. Сообщи результат и изменённые файлы.
 PROMPT
 ```
 
 ```bash
-# Провести ревью без изменения файлов
-<skill-dir>/scripts/watch-subagent.sh -s 300 -o text \
+# Провести ревью без изменения файлов (файла задачи нет — явный --complexity)
+<skill-dir>/scripts/watch-subagent.sh -s 300 -o text --complexity C1 \
   -r docs/agents/roles/team/code_reviewer_backend_puaro.ru.md <<'PROMPT'
 Проверь текущие изменения. Ничего не изменяй. Верни APPROVE или замечания.
 PROMPT
