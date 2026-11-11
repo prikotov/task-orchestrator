@@ -37,7 +37,9 @@ docs/agents/skills/run-subagent/
 | `--model`         | —          | Модель                                                                          | профиль роли |
 | `--reasoning`     | —          | Усилие рассуждения/обдумывания (pi: `--thinking`, codex: `model_reasoning_effort=…`) | профиль роли |
 | `--task-id`       | —          | `TASK-*`; сложность читается из файла задачи | — |
-| `--complexity`    | —          | Явная сложность `C0–C5`; приоритет над `--task-id` | `C3` |
+| `--complexity`    | —          | Явная сложность `C0–C5`; приоритет над `--task-id` | — |
+
+🔴 Уровень сложности обязателен: ровно один из `--task-id`/`--complexity`. Без них скрипт завершается ошибкой до запуска раннера; некорректное значение `--complexity` (вне `C0–C5`) также отклоняется. Фактический уровень и его источник (`explicit`/`task-file`) пишутся в `RUN START` run-log (строка `complexity=… source=… task_id=…`).
 | `[prompt text]`   | —          | Промпт. Если не указан — читается из стандартного ввода                                     | —            |
 
 ### Резолв `--runner`/`--provider`/`--model`/`--reasoning`
@@ -128,7 +130,8 @@ Stall-порог по умолчанию — 360 секунд для всех р
 
 ### `run.log`
 
-Содержит строки: `=== RUN START ===`, параметры запуска,
+Содержит строки: `=== RUN START ===`, параметры запуска (включая
+`complexity=<C0–C5> source=<explicit|task-file> task_id=<ID|none>`),
 `watcher_heartbeat elapsed=… stall_gap=… agent_alive=…` (каждые N сек),
 при срабатывании — `watcher_fired reason=…`,
 и финальный `=== RUN SUMMARY === … === END SUMMARY ===`.

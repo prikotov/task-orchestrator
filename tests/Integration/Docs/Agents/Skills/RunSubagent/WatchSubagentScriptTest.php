@@ -103,6 +103,51 @@ YAML);
     }
 
     #[Test]
+    public function failsFastWhenNeitherTaskIdNorComplexityIsProvided(): void
+    {
+        // injectDefaultComplexity: false — проверяем именно отсутствие обоих флагов.
+        $process = $this->runScript(expectSuccess: false, injectDefaultComplexity: false);
+
+        self::assertNotSame(0, $process->getExitCode());
+        self::assertStringContainsString('не задан уровень сложности', $process->getErrorOutput());
+        self::assertStringContainsString('--task-id', $process->getErrorOutput());
+        self::assertStringContainsString('--complexity', $process->getErrorOutput());
+        // Ошибка до старта раннера: фейковый агент не должен быть запущен.
+        self::assertFileDoesNotExist($this->runnerCaptureFile);
+    }
+
+    #[Test]
+    public function failsFastWhenComplexityFormatIsInvalid(): void
+    {
+        $process = $this->runScript(
+            arguments: ['--complexity', 'C9'],
+            expectSuccess: false,
+        );
+
+        self::assertNotSame(0, $process->getExitCode());
+        self::assertStringContainsString('C0-C5', $process->getErrorOutput());
+        self::assertFileDoesNotExist($this->runnerCaptureFile);
+    }
+
+    #[Test]
+    public function logsResolvedComplexitySourceAndTaskIdInRunStart(): void
+    {
+        $logDir = $this->tempDir . '/logs';
+
+        $this->runScript(
+            arguments: ['--complexity', 'C4'],
+            env: ['WATCH_LOG_DIR' => $logDir],
+        );
+
+        $runLog = $this->findLatestRunLog($logDir);
+        self::assertNotNull($runLog);
+        self::assertStringContainsString(
+            'complexity=C4 source=explicit task_id=<none>',
+            (string) file_get_contents($runLog),
+        );
+    }
+
+    #[Test]
     public function usesConsumerProjectRoleProfileWhenInstalledThroughComposer(): void
     {
         $projectRoot = dirname(__DIR__, 6);
@@ -171,6 +216,7 @@ YAML);
                 'RUNNER_CAPTURE_FILE' => $this->runnerCaptureFile,
                 'ARGS_CAPTURE_FILE' => $this->argsCaptureFile,
                 'STDIN_CAPTURE_FILE' => $this->stdinCaptureFile,
+                'WATCH_LOG_DIR' => $consumerRoot . '/var/log',
             ],
         );
         $process->setTimeout(10);
@@ -187,6 +233,15 @@ YAML);
         self::assertStringContainsString(
             'model_instructions_file=' . $consumerRoot . '/config/prompts/subagent/base_system.md',
             $args,
+        );
+
+        // Источник уровня — файл задачи: в RUN START фиксируются резолв-уровень,
+        // источник и идентификатор задачи (сквозная проверка вывода PHP-блока).
+        $runLog = $this->findLatestRunLog($consumerRoot . '/var/log');
+        self::assertNotNull($runLog);
+        self::assertStringContainsString(
+            'complexity=C4 source=task-file task_id=TASK-consumer',
+            (string) file_get_contents($runLog),
         );
     }
 
@@ -837,6 +892,7 @@ YAML);
         ?int $softTimeout = 2,
         ?int $hardTimeout = 4,
         float $processTimeout = 10.0,
+        bool $injectDefaultComplexity = true,
     ): Process {
         $projectRoot = dirname(__DIR__, 6);
         $script = $projectRoot . '/docs/agents/skills/run-subagent/scripts/watch-subagent.sh';
@@ -857,6 +913,20 @@ YAML);
         }
         $command[] = '-r';
         $command[] = $roleFile ?? $this->roleFile;
+
+        // Молчаливый дефолт C3 удалён из скрипта: без --task-id/--complexity
+        // запуск завершается ошибкой. Helper подставляет нейтральный C3, чтобы
+        // существующие сценарии проверяли своё поведение, а не валидацию уровня.
+        $hasComplexitySource = false;
+        foreach ($arguments as $argument) {
+            if ($argument === '--complexity' || $argument === '--task-id') {
+                $hasComplexitySource = true;
+                break;
+            }
+        }
+        if (!$hasComplexitySource && $injectDefaultComplexity) {
+            $arguments = [...$arguments, '--complexity', 'C3'];
+        }
 
         $process = new Process(
             array_merge($command, $arguments, [$prompt]),
