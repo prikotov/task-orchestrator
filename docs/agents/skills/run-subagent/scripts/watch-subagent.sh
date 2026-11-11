@@ -25,10 +25,11 @@
 #   --reasoning <string> — reasoning/thinking effort (priority: CLI > env REASONING > role profile).
 #   --task-id <TASK-*>   — прочитать complexity из файла задачи.
 #   --complexity <C0-C5> — явно задать сложность (приоритет над --task-id).
-#   Обязателен ровно один источник уровня: --task-id или --complexity.
-#   Молчаливый дефолт C3 удалён: запуск без уровня — ошибка (fail-fast),
-#   иначе тиры моделей commands_by_complexity не включаются и запуск
-#   незаметно уходит на базовый профиль.
+#   Обязателен хотя бы один источник уровня: --task-id или --complexity
+#   (если переданы оба, действует --complexity). Молчаливый дефолт C3 удалён:
+#   запуск без уровня — ошибка (fail-fast), иначе тиры моделей
+#   commands_by_complexity не включаются и запуск незаметно уходит
+#   на базовый профиль.
 #   [prompt text]        — промпт. Если не указан — читается из stdin.
 #
 # Базовый системный промпт: по умолчанию scripts/subagent_system.txt (рядом со
@@ -168,7 +169,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --reasoning <string> reasoning effort (priority: CLI > env REASONING > role profile)"
             echo "  --task-id <TASK-*>   прочитать complexity из файла задачи"
             echo "  --complexity <C0-C5> явно задать сложность (приоритет над --task-id)"
-            echo "                       обязателен ровно один из --task-id/--complexity"
+            echo "                       обязателен хотя бы один из --task-id/--complexity"
             echo "  -h, --help           эта справка"
             exit 0
             ;;
