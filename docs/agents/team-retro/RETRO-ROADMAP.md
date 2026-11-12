@@ -47,7 +47,7 @@
 
 - **Счётчик:** 1
 - **Ретро:** [2026-11-03](2026-11-03_05-40-release-v0100-phar-e2e-flaky.md)
-- **Решение и ссылки:** До порога. Частный случай закрыт [PR #453](https://github.com/prikotov/task-orchestrator/pull/453) (stall 10→45 с в large-stream тестах `WatchSubagentScriptTest`; причина — liveness-gate читает заблокированный на полном FIFO писатель как idle). Класс остаётся под наблюдением: при новом повторе — детерминировать конкретный тест по прецеденту `TASK-fix-static-chain-metrics-flaky-test`.
+- **Решение и ссылки:** До порога. Частный случай закрыт [PR #453](https://github.com/prikotov/task-orchestrator/pull/453) (stall 10→45 с в large-stream тестах `WatchSubagentScriptTest`; причина — liveness-gate читает заблокированный на полном FIFO писатель как idle). Класс остаётся под наблюдением: при новом повторе — детерминировать конкретный тест по прецеденту `TASK-fix-static-chain-metrics-flaky-test`. Повтор 2026-11-12 (тот же класс, тест `stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout` в предрелизном прогоне v0.15.1) закрывается задачей `TASK-test-watchsubagent-stall-flaky` — она же закрывает запись `N-4`.
 
 ### Задача переносится в `done` после merge вместо до апрува — `watch`
 
@@ -115,11 +115,11 @@
 - **Ретро:** [2026-08-18](2026-08-18_10-35-codex-idle-kill-investigation.md)
 - **Решение и ссылки:** До порога. Кандидат в бэклог из ревью PR #352.
 
-### N-4: флаки liveness-теста `stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout` — `watch`
+### N-4: флаки liveness-теста `stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout` — `escalated`
 
 - **Счётчик:** 1
 - **Ретро:** [2026-08-18](2026-08-18_10-35-codex-idle-kill-investigation.md)
-- **Решение и ссылки:** До порога. Кандидат в бэклог из ревью PR #352.
+- **Решение и ссылки:** Создана задача `TASK-test-watchsubagent-stall-flaky` (по запросу владельца 2026-11-12 после повтора падения `reason=soft_timeout` в предрелизном прогоне v0.15.1; счётчик не увеличивался — повтор зафиксирован в сессии, а не в ретро). После решения перевести в `resolved` и указать PR.
 
 ### Молчаливый `exit 1` Codex без сохранённого rollout — `watch`
 
