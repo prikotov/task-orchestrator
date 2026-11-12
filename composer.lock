@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "38197c4934a3b906af82e9f72d57ce00",
+    "content-hash": "bc17e5778bea86634053b1bf3f3a0d97",
     "packages": [
         {
             "name": "monolog/monolog",
@@ -7234,16 +7234,16 @@
         },
         {
             "name": "prikotov/todo-md",
-            "version": "v0.3.0",
+            "version": "v0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/todo-md.git",
-                "reference": "7c93bc9bbc80f59eb48ca8a9208e7043830791cb"
+                "reference": "f5ad8b087e9903dd1b6401082c7acb0013edff0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/todo-md/zipball/7c93bc9bbc80f59eb48ca8a9208e7043830791cb",
-                "reference": "7c93bc9bbc80f59eb48ca8a9208e7043830791cb",
+                "url": "https://api.github.com/repos/prikotov/todo-md/zipball/f5ad8b087e9903dd1b6401082c7acb0013edff0f",
+                "reference": "f5ad8b087e9903dd1b6401082c7acb0013edff0f",
                 "shasum": ""
             },
             "require": {
@@ -7278,10 +7278,10 @@
                 "todo"
             ],
             "support": {
-                "source": "https://github.com/prikotov/todo-md/tree/v0.3.0",
+                "source": "https://github.com/prikotov/todo-md/tree/v0.4.0",
                 "issues": "https://github.com/prikotov/todo-md/issues"
             },
-            "time": "2026-11-04T10:52:40+00:00"
+            "time": "2026-11-11T15:27:03+00:00"
         },
         {
             "name": "psalm/plugin-symfony",
