@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.1] - 2026-11-12
+
+[Сравнение v0.15.0...v0.15.1](https://github.com/prikotov/task-orchestrator/compare/v0.15.0...v0.15.1)
+
+Обратная связь постановщику в ретроспективе и обновление dev-зависимости todo-md до v0.4.0. Несовместимых изменений нет.
+
+### Added
+
+- Скилл `retrospective`: обратная связь постановщику — Шаг 2 («Анализ ролей и постановки») определяет постановщика предмета ретро по файлу, RACI и первоисточникам сессии и формирует четыре блока (что и когда делать, чего и когда не делать, что делают хорошо, что следует изменить) с доказательствами по контракту; Шаг 6 — обязательный раздел в файле ретро, Шаг 8 — блок в отчёте; шаблон ретро и README дополнены. Адресат-владелец — только по работам, где постановку делал он сам (#481).
+
+### Changed
+
+- `prikotov/todo-md` (dev-зависимость) обновлён с `v0.3.0` до `v0.4.0`: CLI `create`/`start` принимает модель и уровень мышления явными ключами `--model`/`--thinking`; ограничение `^0.3.0` → `^0.4.0` (#482).
+
 ## [0.15.0] - 2026-11-11
 
 [Сравнение v0.14.1...v0.15.0](https://github.com/prikotov/task-orchestrator/compare/v0.14.1...v0.15.0)
