@@ -3,7 +3,7 @@ type: chore
 created: 2026-11-12 02:37:50 (1794451070)
 due: 
 started: 2026-11-12 02:38:00 (1794451080)
-completed: 
+completed: 2026-11-12 09:51:30 (1794451890)
 cancelled: 
 value: V2
 complexity: C2
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: release/0.15.1
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/483
+status: done
 ---
 
 # TASK-release-v0-15-1-preparation: Подготовить релиз v0.15.1
@@ -55,8 +55,8 @@ status: in_progress
 - [x] Ветка `release/0.15.1` от актуального `main`.
 - [x] `CHANGELOG.md`: секция `[0.15.1]`, compare-ссылка.
 - [x] `docs/releases/v0.15.1/release-plan.md`.
-- [ ] Предрелизные проверки (включая `phar-smoke`, `phar-e2e`).
-- [ ] PR в `main`, метка `pi`, CI зелёный, задача в `done` до апрува.
+- [x] Предрелизные проверки (включая `phar-smoke`, `phar-e2e`).
+- [x] PR в `main`, метка `pi`, CI зелёный, задача в `done` до апрува.
 - [ ] Слияние по подтверждению владельца, проверка merge commit, тег `v0.15.1`, GitHub Release.
 ### ⚫ Won't Have (Не будем делать)
 - Повышение minor/major (нет feat/fix/breaking), рефакторинг phpmd-замечаний.
@@ -65,12 +65,12 @@ status: in_progress
 1. [x] Ветка `release/0.15.1` от актуального `main`.
 2. [x] `CHANGELOG.md`: секция `[0.15.1]` с compare-ссылкой.
 3. [x] `docs/releases/v0.15.1/release-plan.md`.
-4. [ ] Предрелизные проверки (включая `phar-smoke`, `phar-e2e`).
-5. [ ] PR в `main`, метка `pi`, CI зелёный, задача в `done` до апрува.
+4. [x] Предрелизные проверки (включая `phar-smoke`, `phar-e2e`).
+5. [x] PR в `main`, метка `pi`, CI зелёный, задача в `done` до апрува.
 6. [ ] Слияние по подтверждению владельца, проверка merge commit, тег `v0.15.1`, GitHub Release.
 
 ## 5. Критерии приёмки (Definition of Done)
-- [ ] Предрелизные проверки зелёные: `composer validate --strict`, `vendor/bin/phpunit`, `vendor/bin/psalm`, deptrac, `make phar-smoke PHAR_EXPECTED_VERSION=dev`, `make phar-e2e`.
+- [x] Предрелизные проверки зелёные: `composer validate --strict`, `vendor/bin/phpunit`, `vendor/bin/psalm`, deptrac, `make phar-smoke PHAR_EXPECTED_VERSION=dev`, `make phar-e2e`.
 - [ ] PR `release/0.15.1` → `main` одобрен владельцем и слит по подтверждению.
 - [ ] Тег `v0.15.1` на проверенном merge commit; GitHub Release с PHAR-asset; workflow `Release Phar` успешен.
 
@@ -92,3 +92,4 @@ php vendor/bin/todo-md validate
 | :--- | :--- | :--- |
 | 2026-11-12 02:37:50 (1794451070) | Тимлид Алекс (pi) | Создание задачи |
 | 2026-11-12 02:38:00 (1794451080) | Тимлид Алекс (pi) | Назначение исполнителя, запуск (ветка `release/0.15.1`) |
+| 2026-11-12 09:51:30 (1794451890) | Тимлид Алекс (pi) | CI зелёный, PR #483, задача переведена в `done` до апрува |
