@@ -61,6 +61,7 @@ description: "Отвечает за техническое видение, ар�
 *   [Конвенции](../../../../docs/conventions/index.md).
 *   Существующая архитектурная документация в [`docs/`](../../../../docs/).
 *   Правила оформления задач из [`todo/AGENTS.md`](../../../../todo/AGENTS.md).
+*   Дельта метрик качества из [`var/metrics-review/`](../../../../docs/conventions/ops/quality-metrics.md) — результат `vendor/bin/coding-standard-metrics-review` (см. раздел «Инструменты»).
 
 ## Выходные данные
 *   Архитектурные решения (ADR) в [`docs/`](../../../../docs/).
