@@ -47,7 +47,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Gene
  */
 final class OrchestrateCommand extends Command
 {
-    private const string ARG_TASK = 'task';
+    private const string ARG_THEME = 'тема';
     private const string OPT_CHAIN = 'chain';
     private const string OPT_WORKING_DIR = 'working-dir';
     private const string OPT_DRY_RUN = 'dry-run';
@@ -86,7 +86,7 @@ final class OrchestrateCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument(self::ARG_TASK, InputArgument::REQUIRED, 'Задача для оркестрации')
+            ->addArgument(self::ARG_THEME, InputArgument::REQUIRED, 'Тема для оркестрации')
             ->addOption(self::OPT_CHAIN, 'c', InputOption::VALUE_OPTIONAL, 'Имя цепочки', 'implement')
             ->addOption(self::OPT_WORKING_DIR, 'd', InputOption::VALUE_OPTIONAL, 'Рабочая директория')
             ->addOption(self::OPT_DRY_RUN, null, InputOption::VALUE_NONE, 'Показать план без запуска')
@@ -135,7 +135,7 @@ final class OrchestrateCommand extends Command
 
         try {
             /** @var string $task */
-            $task = $input->getArgument(self::ARG_TASK);
+            $task = $input->getArgument(self::ARG_THEME);
             /** @var string $chainName */
             $chainName = $input->getOption(self::OPT_CHAIN);
             /** @var bool $dryRun */

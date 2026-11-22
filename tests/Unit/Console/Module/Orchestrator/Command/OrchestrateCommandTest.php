@@ -75,7 +75,7 @@ final class OrchestrateCommandTest extends TestCase
             ));
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'do something', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'do something', '--report-format' => 'none']);
 
         self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
     }
@@ -122,7 +122,7 @@ final class OrchestrateCommandTest extends TestCase
             ));
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--timeout' => '600', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--timeout' => '600', '--report-format' => 'none']);
 
         self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
     }
@@ -147,7 +147,7 @@ final class OrchestrateCommandTest extends TestCase
 
         // Act
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--report-format' => 'none']);
 
         // Assert: timeout null → execution-strategy возьмёт chain config / hard default.
         self::assertNotNull($capturedCommand);
@@ -172,7 +172,7 @@ final class OrchestrateCommandTest extends TestCase
 
         // Act: явный --timeout=120 должен иметь приоритет над chain config.
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--timeout' => '120', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--timeout' => '120', '--report-format' => 'none']);
 
         // Assert
         self::assertNotNull($capturedCommand);
@@ -199,7 +199,7 @@ final class OrchestrateCommandTest extends TestCase
 
         // Act: явный --timeout=0.
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--timeout' => '0', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--timeout' => '0', '--report-format' => 'none']);
 
         // Assert: 0 сохранён как явный override; resolveOptionalIntOption не схлопнул его в null.
         self::assertNotNull($capturedCommand);
@@ -226,7 +226,7 @@ final class OrchestrateCommandTest extends TestCase
 
         // Act: --timeout='' (явная пустая строка).
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--timeout' => '', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--timeout' => '', '--report-format' => 'none']);
 
         // Assert: пустая строка → null (не 0).
         self::assertNotNull($capturedCommand);
@@ -251,7 +251,7 @@ final class OrchestrateCommandTest extends TestCase
 
         // Act: --max-time НЕ передан.
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--report-format' => 'none']);
 
         // Assert: maxTime null → chain.max_time / hard default не затёрт.
         self::assertNotNull($capturedCommand);
@@ -276,7 +276,7 @@ final class OrchestrateCommandTest extends TestCase
 
         // Act: явный --max-time=999.
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--max-time' => '999', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--max-time' => '999', '--report-format' => 'none']);
 
         // Assert
         self::assertNotNull($capturedCommand);
@@ -303,7 +303,7 @@ final class OrchestrateCommandTest extends TestCase
 
         // Act: явный --max-time=0.
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--max-time' => '0', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--max-time' => '0', '--report-format' => 'none']);
 
         // Assert: 0 сохранён как явный override; resolveOptionalIntOption не схлопнул его в null.
         self::assertNotNull($capturedCommand);
@@ -338,7 +338,7 @@ final class OrchestrateCommandTest extends TestCase
 
         // Act: resume без явного --timeout.
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--resume' => '/tmp/resume-dir']);
+        $tester->execute(['тема' => 'test', '--resume' => '/tmp/resume-dir']);
 
         // Assert: precedence для resume такой же, как для initial run.
         self::assertNotNull($capturedCommand);
@@ -374,7 +374,7 @@ final class OrchestrateCommandTest extends TestCase
 
         // Act: resume с явным --timeout=240.
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--resume' => '/tmp/resume-dir', '--timeout' => '240', '--max-time' => '7200']);
+        $tester->execute(['тема' => 'test', '--resume' => '/tmp/resume-dir', '--timeout' => '240', '--max-time' => '7200']);
 
         // Assert
         self::assertNotNull($capturedCommand);
@@ -391,7 +391,7 @@ final class OrchestrateCommandTest extends TestCase
         $this->loadChainHandler->method('__invoke')->willReturn(new LoadChainResult($chain));
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'Create REST API', '--dry-run' => true]);
+        $tester->execute(['тема' => 'Create REST API', '--dry-run' => true]);
 
         $output = $tester->getDisplay();
         self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
@@ -414,7 +414,7 @@ final class OrchestrateCommandTest extends TestCase
         );
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => '_', '--validate-config' => true]);
+        $tester->execute(['тема' => '_', '--validate-config' => true]);
 
         $output = $tester->getDisplay();
         self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
@@ -433,7 +433,7 @@ final class OrchestrateCommandTest extends TestCase
         );
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => '_', '--validate-config' => true, '--chain' => 'implement']);
+        $tester->execute(['тема' => '_', '--validate-config' => true, '--chain' => 'implement']);
 
         $output = $tester->getDisplay();
         self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
@@ -455,7 +455,7 @@ final class OrchestrateCommandTest extends TestCase
         );
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => '_', '--validate-config' => true, '--chain' => 'broken']);
+        $tester->execute(['тема' => '_', '--validate-config' => true, '--chain' => 'broken']);
 
         $output = $tester->getDisplay();
         self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
@@ -470,7 +470,7 @@ final class OrchestrateCommandTest extends TestCase
     {
         $tester = $this->createCommandTester();
         $tester->execute([
-            'task' => 'do something',
+            'тема' => 'do something',
             '--config' => '/nonexistent/chains.yaml',
         ]);
 
@@ -515,7 +515,7 @@ YAML);
                 ));
 
             $tester->execute([
-                'task' => 'do something',
+                'тема' => 'do something',
                 '--chain' => 'custom',
                 '--config' => $tmpPath,
                 '--report-format' => 'none',
@@ -560,7 +560,7 @@ YAML);
             $tester = new CommandTester($application->find('agent:orchestrate'));
 
             $tester->execute([
-                'task' => '_',
+                'тема' => '_',
                 '--validate-config' => true,
                 '--config' => $tmpPath,
             ]);
@@ -588,7 +588,7 @@ YAML);
             ));
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'do something', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'do something', '--report-format' => 'none']);
 
         self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
     }
@@ -606,7 +606,7 @@ YAML);
             ->willThrowException(new \RuntimeException('Agent failed'));
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--report-format' => 'none']);
 
         self::assertSame(OrchestrateExitCodeEnum::chainFailed->value, $tester->getStatusCode());
     }
@@ -626,7 +626,7 @@ YAML);
             ));
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--report-format' => 'none']);
 
         self::assertSame(OrchestrateExitCodeEnum::timeout->value, $tester->getStatusCode());
     }
@@ -649,7 +649,7 @@ YAML);
             });
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--report-format' => 'none']);
 
         self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
         self::assertNotNull($capturedCommand);
@@ -672,7 +672,7 @@ YAML);
             });
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--complexity' => 'C4', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--complexity' => 'C4', '--report-format' => 'none']);
 
         self::assertSame(OrchestrateExitCodeEnum::success->value, $tester->getStatusCode());
         self::assertNotNull($capturedCommand);
@@ -688,7 +688,7 @@ YAML);
         $this->orchestrateHandler->expects(self::never())->method('__invoke');
 
         $tester = $this->createCommandTester();
-        $tester->execute(['task' => 'test', '--complexity' => 'C9', '--report-format' => 'none']);
+        $tester->execute(['тема' => 'test', '--complexity' => 'C9', '--report-format' => 'none']);
 
         self::assertSame(OrchestrateExitCodeEnum::invalidConfig->value, $tester->getStatusCode());
         self::assertStringContainsString('Invalid complexity "C9": expected C0-C5.', $tester->getDisplay());
@@ -714,7 +714,7 @@ YAML);
 
             $tester = $this->createCommandTester();
             $tester->execute([
-                'task' => 'test',
+                'тема' => 'test',
                 '--task-id' => 'TASK-test-complex',
                 '--working-dir' => $baseDir,
                 '--report-format' => 'none',
@@ -748,7 +748,7 @@ YAML);
 
             $tester = $this->createCommandTester();
             $tester->execute([
-                'task' => 'test',
+                'тема' => 'test',
                 '--task-id' => 'TASK-test-nocomplex',
                 '--working-dir' => $baseDir,
                 '--report-format' => 'none',
@@ -775,7 +775,7 @@ YAML);
 
             $tester = $this->createCommandTester();
             $tester->execute([
-                'task' => 'test',
+                'тема' => 'test',
                 '--task-id' => 'TASK-test-badcomplex',
                 '--working-dir' => $baseDir,
                 '--report-format' => 'none',
@@ -802,7 +802,7 @@ YAML);
 
             $tester = $this->createCommandTester();
             $tester->execute([
-                'task' => 'test',
+                'тема' => 'test',
                 '--task-id' => 'TASK-test-absent',
                 '--working-dir' => $baseDir,
                 '--report-format' => 'none',
@@ -830,7 +830,7 @@ YAML);
 
             $tester = $this->createCommandTester();
             $tester->execute([
-                'task' => 'test',
+                'тема' => 'test',
                 '--task-id' => 'TASK-test-dup',
                 '--working-dir' => $baseDir,
                 '--report-format' => 'none',
@@ -863,7 +863,7 @@ YAML);
 
             $tester = $this->createCommandTester();
             $tester->execute([
-                'task' => 'test',
+                'тема' => 'test',
                 '--complexity' => 'C5',
                 '--task-id' => 'TASK-test-priority',
                 '--working-dir' => $baseDir,
@@ -892,7 +892,7 @@ YAML);
 
         $tester = $this->createCommandTester();
         $tester->execute([
-            'task' => 'test',
+            'тема' => 'test',
             '--resume' => 'var/sessions/2026-01-01_abc',
             '--complexity' => 'C2',
             '--report-format' => 'none',

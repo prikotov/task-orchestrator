@@ -86,7 +86,7 @@ YAML);
 
         $tester = $this->createCommandTester($configPath);
         $tester->execute([
-            'task' => '_',
+            'тема' => '_',
             '--validate-config' => true,
             '--chain' => 'broken',
             '--config' => $configPath,
@@ -127,7 +127,7 @@ YAML);
 
         $tester = $this->createCommandTester($configPath);
         $tester->execute([
-            'task' => '_',
+            'тема' => '_',
             '--validate-config' => true,
             '--chain' => 'dup',
             '--config' => $configPath,
@@ -165,7 +165,7 @@ YAML);
 
         $tester = $this->createCommandTester($configPath);
         $tester->execute([
-            'task' => '_',
+            'тема' => '_',
             '--validate-config' => true,
             '--chain' => 'good',
             '--config' => $configPath,
