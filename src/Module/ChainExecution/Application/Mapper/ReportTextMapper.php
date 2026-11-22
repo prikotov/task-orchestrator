@@ -7,6 +7,7 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper;
 use Override;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportFormatMapperInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\ParticipantMetricsDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\StepResultDto;
 
 
@@ -14,9 +15,17 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\Or
 
 /**
  * Маппинг OrchestrateChainResultDto → CLI-friendly текстовый отчёт.
+ *
+ * Для dynamic-цепочек добавляет секцию «Participants metrics» — агрегированные
+ * по ролям метрики участников (модель, выступления, время, токены, кэш, стоимость).
  */
 final readonly class ReportTextMapper implements ReportFormatMapperInterface
 {
+    public function __construct(
+        private readonly ParticipantsMetricsMapper $participantsMetricsMapper,
+    ) {
+    }
+
     #[Override]
     public function map(OrchestrateChainResultDto $result, string $chainName, string $task): string
     {
@@ -24,9 +33,10 @@ final readonly class ReportTextMapper implements ReportFormatMapperInterface
         $header = $this->buildHeader($chainName, $task, $separator);
         $summary = $this->buildSummary($result);
         $body = $this->buildBody($result);
+        $participants = $this->buildParticipantsSection($result);
         $footer = $this->buildFooter($result, $separator);
 
-        return $header . $summary . $body . $footer;
+        return $header . $summary . $body . $participants . $footer;
     }
 
     /**
@@ -116,6 +126,111 @@ final readonly class ReportTextMapper implements ReportFormatMapperInterface
         }
 
         return '';
+    }
+
+    /**
+     * Строит секцию «Participants metrics»: агрегированные по ролям метрики участников.
+     */
+    private function buildParticipantsSection(OrchestrateChainResultDto $result): string
+    {
+        $metrics = $this->participantsMetricsMapper->aggregate($result);
+        if ($metrics === []) {
+            return '';
+        }
+
+        $headers = [
+            'Participant', 'Model', 'Speeches', 'Facilitator', 'Time',
+            'Tok in', 'Tok out', 'Cache read', 'Cache %', 'Cost',
+        ];
+        $rows = array_map($this->formatParticipantRow(...), $metrics);
+
+        return 'Participants metrics' . "\n"
+            . $this->renderTable($headers, $rows) . "\n";
+    }
+
+    /**
+     * Ячейки одной строки таблицы участников.
+     *
+     * @return list<string>
+     */
+    private function formatParticipantRow(ParticipantMetricsDto $metrics): array
+    {
+        return [
+            $metrics->role,
+            $this->formatModel($metrics),
+            (string) $metrics->speeches,
+            (string) $metrics->facilitatorSteps,
+            sprintf('%.1fs', $metrics->totalDuration),
+            $this->formatTokens($metrics->inputTokens),
+            $this->formatTokens($metrics->outputTokens),
+            $this->formatTokens($metrics->cacheReadTokens),
+            $metrics->cacheHitRate === null
+                ? 'н/д'
+                : sprintf('%.1f%%', $metrics->cacheHitRate * 100.0),
+            sprintf('$%.4f', $metrics->cost),
+        ];
+    }
+
+    /**
+     * Рендерит модель участника: provider/model (thinking); «н/д» — если данных нет.
+     */
+    private function formatModel(ParticipantMetricsDto $metrics): string
+    {
+        if ($metrics->model === null) {
+            return 'н/д';
+        }
+
+        $label = $metrics->provider !== null
+            ? sprintf('%s/%s', $metrics->provider, $metrics->model)
+            : $metrics->model;
+
+        return $metrics->thinking !== null
+            ? sprintf('%s (%s)', $label, $metrics->thinking)
+            : $label;
+    }
+
+    /**
+     * Рендерит таблицу с выравниванием колонок по ширине данных.
+     *
+     * Ширина считается в символах (mb_strlen, UTF-8), а не в байтах —
+     * кириллические значения («н/д») иначе ломают выравнивание колонок.
+     *
+     * @param list<string> $headers
+     * @param list<list<string>> $rows
+     */
+    private function renderTable(array $headers, array $rows): string
+    {
+        $widths = array_map('mb_strlen', $headers);
+        foreach ($rows as $row) {
+            foreach ($row as $col => $cell) {
+                $widths[$col] = max($widths[$col], mb_strlen($cell));
+            }
+        }
+
+        $lines = [$this->renderTableRow($headers, $widths)];
+        $lines[] = implode(' ', array_map(
+            static fn (int $width): string => str_repeat('-', $width),
+            $widths,
+        ));
+        foreach ($rows as $row) {
+            $lines[] = $this->renderTableRow($row, $widths);
+        }
+
+        return implode("\n", $lines);
+    }
+
+    /**
+     * @param array<int, string> $cells
+     * @param array<int, int> $widths
+     */
+    private function renderTableRow(array $cells, array $widths): string
+    {
+        $padded = [];
+        foreach ($cells as $col => $cell) {
+            $padded[] = mb_str_pad($cell, $widths[$col]);
+        }
+
+        return rtrim(implode(' ', $padded));
     }
 
     /**

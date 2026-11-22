@@ -21,6 +21,7 @@ final readonly class RunAgentResultDto
         public float $cost = 0.0,
         public int $exitCode = 0,
         public ?string $model = null,
+        public ?string $provider = null,
         public int $turns = 0,
         public bool $isError = false,
         public ?string $errorMessage = null,

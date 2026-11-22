@@ -25,6 +25,7 @@ final class AgentResultVoTest extends TestCase
             cacheWriteTokens: 5,
             cost: 0.01,
             model: 'claude-3.5-sonnet',
+            provider: 'anthropic',
             turns: 2,
         );
 
@@ -36,6 +37,7 @@ final class AgentResultVoTest extends TestCase
         self::assertSame(0.01, $vo->getCost());
         self::assertSame(0, $vo->getExitCode());
         self::assertSame('claude-3.5-sonnet', $vo->getModel());
+        self::assertSame('anthropic', $vo->getProvider());
         self::assertSame(2, $vo->getTurns());
         self::assertFalse($vo->isError());
         self::assertNull($vo->getErrorMessage());
@@ -51,6 +53,7 @@ final class AgentResultVoTest extends TestCase
         self::assertSame(0, $vo->getOutputTokens());
         self::assertSame(0.0, $vo->getCost());
         self::assertNull($vo->getModel());
+        self::assertNull($vo->getProvider());
         self::assertFalse($vo->isError());
     }
 

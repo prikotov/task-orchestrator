@@ -185,7 +185,61 @@ final class PiJsonlParserTest extends TestCase
         self::assertSame(3, $result['cacheWriteTokens']);
         self::assertSame(0.25, $result['cost']);
         self::assertSame('glm-test', $result['model']);
+        self::assertNull($result['provider']);
         self::assertSame(2, $result['turns']);
+    }
+
+    // ──── provider + толерантность к формату usage ─────────────────────
+
+    #[Test]
+    public function parseExtractsProviderFromMessageEnd(): void
+    {
+        $jsonl = implode("\n", [
+            '{"type":"message_end","message":{"role":"assistant","content":[{"type":"text","text":"OK"}],'
+            . '"provider":"zai","model":"glm-5.3-flash","usage":{"input":100,"output":50,"turns":1,'
+            . '"cache":{"read":80,"write":10},"cost":{"total":0.01}}}}',
+            '{"type":"agent_end","messages":[{"role":"assistant","content":[{"type":"text","text":"OK"}]}]}',
+        ]);
+
+        $result = $this->feedJsonl($jsonl);
+
+        self::assertSame('zai', $result['provider']);
+        self::assertSame('glm-5.3-flash', $result['model']);
+        self::assertSame(80, $result['cacheReadTokens']);
+        self::assertSame(10, $result['cacheWriteTokens']);
+    }
+
+    #[Test]
+    public function parseProviderIsNullWhenStreamDoesNotReportIt(): void
+    {
+        $jsonl = implode("\n", [
+            '{"type":"message_end","message":{"role":"assistant","content":[{"type":"text","text":"OK"}],'
+            . '"model":"solo-model","usage":{"input":1,"output":1,"turns":1,"cost":{"total":0.0}}}}',
+            '{"type":"agent_end","messages":[{"role":"assistant","content":[{"type":"text","text":"OK"}]}]}',
+        ]);
+
+        $result = $this->feedJsonl($jsonl);
+
+        self::assertNull($result['provider']);
+        self::assertSame('solo-model', $result['model']);
+    }
+
+    #[Test]
+    public function parseToleratesFlatCacheReadCacheWriteUsageFormat(): void
+    {
+        // Старые версии pi отдают кэш-токены плоскими полями usage.cacheRead/cacheWrite.
+        $jsonl = implode("\n", [
+            '{"type":"message_end","message":{"role":"assistant","content":[{"type":"text","text":"OK"}],'
+            . '"provider":"anthropic","model":"claude","usage":{"input":10,"output":5,"turns":1,'
+            . '"cacheRead":8,"cacheWrite":2,"cost":{"total":0.0}}}}',
+            '{"type":"agent_end","messages":[{"role":"assistant","content":[{"type":"text","text":"OK"}]}]}',
+        ]);
+
+        $result = $this->feedJsonl($jsonl);
+
+        self::assertSame(8, $result['cacheReadTokens']);
+        self::assertSame(2, $result['cacheWriteTokens']);
+        self::assertSame('anthropic', $result['provider']);
     }
 
     // ──── error-контракт: stopReason:"error" + errorMessage ───────────────
@@ -295,7 +349,7 @@ final class PiJsonlParserTest extends TestCase
     }
 
     /**
-     * @return array{outputText: string, inputTokens: int, outputTokens: int, cacheReadTokens: int, cacheWriteTokens: int, cost: float, model: string|null, turns: int, isError: bool, errorMessage: string}
+     * @return array{outputText: string, inputTokens: int, outputTokens: int, cacheReadTokens: int, cacheWriteTokens: int, cost: float, model: string|null, provider: string|null, turns: int, isError: bool, errorMessage: string}
      */
     private function feedJsonl(string $jsonl): array
     {

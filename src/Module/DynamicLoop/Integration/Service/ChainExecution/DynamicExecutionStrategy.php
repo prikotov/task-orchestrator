@@ -293,6 +293,11 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
                 systemPrompt: $roundVo->systemPrompt,
                 userPrompt: $roundVo->userPrompt,
                 timedOut: $roundVo->timedOut,
+                model: $roundVo->model,
+                provider: $roundVo->provider,
+                thinking: $roundVo->thinking,
+                cacheReadTokens: $roundVo->cacheReadTokens,
+                cacheWriteTokens: $roundVo->cacheWriteTokens,
             ),
             $roundVos,
         );

@@ -28,6 +28,7 @@ final class PiJsonlParser
     private int $turns = 0;
     private float $cost = 0.0;
     private ?string $model = null;
+    private ?string $provider = null;
     private string $lastAssistantText = '';
     private bool $hasAgentEnd = false;
 
@@ -62,6 +63,7 @@ final class PiJsonlParser
         $this->turns = 0;
         $this->cost = 0.0;
         $this->model = null;
+        $this->provider = null;
         $this->lastAssistantText = '';
         $this->hasAgentEnd = false;
         $this->errorState = new PiErrorStateVo();
@@ -110,9 +112,9 @@ final class PiJsonlParser
     /**
      * Возвращает итоговый результат парсинга потока.
      *
-     * Ключи isError и errorMessage — additive: они не удаляют существующие ключи.
+     * Ключи isError, errorMessage и provider — additive: они не удаляют существующие ключи.
      *
-     * @return array{outputText: string, inputTokens: int, outputTokens: int, cacheReadTokens: int, cacheWriteTokens: int, cost: float, model: string|null, turns: int, isError: bool, errorMessage: string}
+     * @return array{outputText: string, inputTokens: int, outputTokens: int, cacheReadTokens: int, cacheWriteTokens: int, cost: float, model: string|null, provider: string|null, turns: int, isError: bool, errorMessage: string}
      */
     public function result(): array
     {
@@ -129,6 +131,7 @@ final class PiJsonlParser
             'cacheWriteTokens' => $this->cacheWriteTokens,
             'cost' => $this->cost,
             'model' => $this->model,
+            'provider' => $this->provider,
             'turns' => $this->turns,
             'isError' => $this->errorState->isError(),
             'errorMessage' => $this->errorState->errorMessage(),
@@ -229,6 +232,9 @@ final class PiJsonlParser
     /**
      * Извлекает usage-метрики из message_end.
      *
+     * Кэш-токены толерантны к формату: вложенный usage.cache.read/write (актуальный pi)
+     * и плоский usage.cacheRead/cacheWrite (старые версии pi).
+     *
      * @param array<string, mixed> $decoded
      */
     private function applyUsageMetrics(array $decoded): void
@@ -256,12 +262,16 @@ final class PiJsonlParser
         $this->inputTokens += (int) ($usage['input'] ?? 0);
         $this->outputTokens += (int) ($usage['output'] ?? 0);
         $this->turns = (int) ($usage['turns'] ?? 0);
-        $this->cacheReadTokens += (int) ($cacheInfo['read'] ?? 0);
-        $this->cacheWriteTokens += (int) ($cacheInfo['write'] ?? 0);
+        $this->cacheReadTokens += (int) ($cacheInfo['read'] ?? $usage['cacheRead'] ?? 0);
+        $this->cacheWriteTokens += (int) ($cacheInfo['write'] ?? $usage['cacheWrite'] ?? 0);
         $this->cost += (float) ($costInfo['total'] ?? 0.0);
 
         if (isset($message['model']) && is_string($message['model'])) {
             $this->model = $message['model'];
+        }
+
+        if (isset($message['provider']) && is_string($message['provider'])) {
+            $this->provider = $message['provider'];
         }
     }
 

@@ -24,7 +24,7 @@ final class ChainSessionWriter
     /** @var list<string> */
     private array $participants = [];
     private int $maxRounds = 0;
-    /** @var array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, response?: string, error?: string, error_message?: string, invocation?: string}> */
+    /** @var array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string, invocation?: string}> */
     private array $roundFiles = [];
     /** @var array<string, mixed> */
     private array $invocation = [];
@@ -61,6 +61,12 @@ final class ChainSessionWriter
         return $sessionDir;
     }
 
+    /**
+     * Записывает один шаг сессии (round).
+     *
+     * Модельные поля и кэш-токены попадают в session.json; null/0 — отсутствие
+     * данных (раннер их не сообщил), при resume старых сессий читаются как «н/д».
+     */
     public function logRound(
         int $step,
         int $round,
@@ -76,6 +82,11 @@ final class ChainSessionWriter
         ?string $invocation = null,
         bool $isError = false,
         ?string $errorMessage = null,
+        ?string $model = null,
+        ?string $provider = null,
+        ?string $thinking = null,
+        int $cacheReadTokens = 0,
+        int $cacheWriteTokens = 0,
     ): void {
         $this->assertActiveSession();
         $dir = $this->currentSessionDir;
@@ -92,6 +103,9 @@ final class ChainSessionWriter
             'is_facilitator' => $isFacilitator, 'round' => $round,
             'duration' => round($duration, 1), 'input_tokens' => $inputTokens,
             'output_tokens' => $outputTokens, 'cost' => round($cost, 4),
+            'model' => $model, 'provider' => $provider, 'thinking' => $thinking,
+            'cache_read_tokens' => $cacheReadTokens,
+            'cache_write_tokens' => $cacheWriteTokens,
         ];
         $artifactName = $baseName . ($isError ? '_4_error.md' : '_4_response.md');
         $artifactContent = $isError ? ($errorMessage ?? 'Agent returned an error.') : $response;
@@ -222,7 +236,7 @@ final class ChainSessionWriter
     public function getCurrentSessionDir(): ?string { return $this->currentSessionDir; }
 
     /**
-     * @return array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, response?: string, error?: string, error_message?: string, invocation?: string}>
+     * @return array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string, invocation?: string}>
      */
     public function getRoundFiles(): array { return $this->roundFiles; }
 
@@ -240,9 +254,14 @@ final class ChainSessionWriter
     }
 
     /**
+     * Парсит rounds[] из session.json.
+     *
+     * Модельные поля и кэш-токены опциональны: старые сессии (до появления полей)
+     * читаются без ошибок — отсутствие данных даёт null/0 и «н/д» в отчёте.
+     *
      * @param list<array<string, mixed>> $roundsData
      *
-     * @return array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, response?: string, error?: string, error_message?: string}>
+     * @return array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string}>
      */
     private function parseRoundFiles(array $roundsData): array
     {
@@ -255,6 +274,11 @@ final class ChainSessionWriter
                 'is_facilitator' => $rd['is_facilitator'] ?? false, 'round' => (int) ($rd['round'] ?? 0),
                 'duration' => (float) ($rd['duration'] ?? 0), 'input_tokens' => (int) ($rd['input_tokens'] ?? 0),
                 'output_tokens' => (int) ($rd['output_tokens'] ?? 0), 'cost' => (float) ($rd['cost'] ?? 0),
+                'model' => isset($rd['model']) && is_string($rd['model']) ? $rd['model'] : null,
+                'provider' => isset($rd['provider']) && is_string($rd['provider']) ? $rd['provider'] : null,
+                'thinking' => isset($rd['thinking']) && is_string($rd['thinking']) ? $rd['thinking'] : null,
+                'cache_read_tokens' => (int) ($rd['cache_read_tokens'] ?? 0),
+                'cache_write_tokens' => (int) ($rd['cache_write_tokens'] ?? 0),
             ];
             if (($rd['response_file'] ?? '') !== '') {
                 $roundFile['response'] = $rd['response_file'];
@@ -292,6 +316,10 @@ final class ChainSessionWriter
                 'user_prompt_file' => $files['user'],
                 'duration' => $files['duration'], 'input_tokens' => $files['input_tokens'],
                 'output_tokens' => $files['output_tokens'], 'cost' => $files['cost'],
+                'model' => $files['model'], 'provider' => $files['provider'],
+                'thinking' => $files['thinking'],
+                'cache_read_tokens' => $files['cache_read_tokens'],
+                'cache_write_tokens' => $files['cache_write_tokens'],
             ];
             if (isset($files['response'])) {
                 $entry['response_file'] = $files['response'];

@@ -16,7 +16,7 @@ final class ChainSessionReader
      *
      * Каждый элемент содержит роль участника и путь к файлу.
      *
-     * @param array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, response?: string, error?: string, error_message?: string, invocation?: string}> $roundFiles
+     * @param array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string, invocation?: string}> $roundFiles
      *
      * @return list<array{role: string, path: string}>
      */
@@ -45,9 +45,9 @@ final class ChainSessionReader
     /**
      * Возвращает массив roundFiles для подсчёта participant-раундов.
      *
-     * @param array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, response?: string, error?: string, error_message?: string, invocation?: string}> $roundFiles
+     * @param array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string, invocation?: string}> $roundFiles
      *
-     * @return array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, response?: string, error?: string, error_message?: string, invocation?: string}>
+     * @return array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string, invocation?: string}>
      */
     public function getRoundFiles(array $roundFiles): array
     {

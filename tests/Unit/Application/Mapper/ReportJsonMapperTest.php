@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Application\Mapper;
 
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ParticipantsMetricsMapper;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportJsonMapper;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
@@ -22,7 +23,7 @@ final class ReportJsonMapperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mapper = new ReportJsonMapper();
+        $this->mapper = new ReportJsonMapper(new ParticipantsMetricsMapper());
     }
 
     #[Test]
@@ -256,6 +257,105 @@ final class ReportJsonMapperTest extends TestCase
         self::assertFalse($data['rounds'][1]['is_facilitator']);
         self::assertSame('We agreed', $data['synthesis']);
         self::assertFalse($data['max_rounds_reached']);
+        // Модельные поля раундов без данных — null.
+        self::assertNull($data['rounds'][0]['model']);
+        self::assertNull($data['rounds'][0]['provider']);
+        self::assertNull($data['rounds'][0]['thinking']);
+        self::assertSame(0, $data['rounds'][0]['cache_read_tokens']);
+    }
+
+    #[Test]
+    public function mapDynamicChainReportContainsParticipants(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            roundResults: [
+                new DynamicRoundResultDto(
+                    round: 1,
+                    role: 'team_lead',
+                    isFacilitator: true,
+                    outputText: 'Discussion',
+                    inputTokens: 1000,
+                    outputTokens: 500,
+                    cost: 0.03,
+                    duration: 8.0,
+                    model: 'glm-5.3-flash',
+                    provider: 'zai',
+                    thinking: 'high',
+                    cacheReadTokens: 4000,
+                    cacheWriteTokens: 500,
+                ),
+                new DynamicRoundResultDto(
+                    round: 2,
+                    role: 'backend_developer',
+                    isFacilitator: false,
+                    outputText: 'Suggestion',
+                    inputTokens: 2000,
+                    outputTokens: 1500,
+                    cost: 0.05,
+                    duration: 12.0,
+                    model: 'glm-5.3-flash',
+                    provider: 'zai',
+                    thinking: 'high',
+                    cacheReadTokens: 6000,
+                    cacheWriteTokens: 300,
+                ),
+            ],
+            totalTime: 20.0,
+            totalInputTokens: 3000,
+            totalOutputTokens: 2000,
+            totalCost: 0.08,
+        );
+
+        $json = $this->mapper->map($result, 'brainstorm', 'Discuss API');
+        $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertCount(2, $data['participants']);
+
+        $facilitator = $data['participants'][0];
+        self::assertSame('team_lead', $facilitator['role']);
+        self::assertSame('glm-5.3-flash', $facilitator['model']);
+        self::assertSame('zai', $facilitator['provider']);
+        self::assertSame('high', $facilitator['thinking']);
+        self::assertSame(0, $facilitator['speeches']);
+        self::assertSame(1, $facilitator['facilitator_steps']);
+        self::assertSame(8000, $facilitator['total_duration_ms']);
+        self::assertEqualsWithDelta(4000 / 5000, $facilitator['cache_hit_rate'], 1e-4);
+
+        $participant = $data['participants'][1];
+        self::assertSame('backend_developer', $participant['role']);
+        self::assertSame(1, $participant['speeches']);
+        self::assertSame(0, $participant['facilitator_steps']);
+        self::assertSame(12000, $participant['total_duration_ms']);
+        self::assertEqualsWithDelta(6000 / 8000, $participant['cache_hit_rate'], 1e-4);
+    }
+
+    #[Test]
+    public function mapDynamicChainReportParticipantsWithoutModelYieldNulls(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            roundResults: [
+                new DynamicRoundResultDto(
+                    round: 1,
+                    role: 'team_lead',
+                    isFacilitator: true,
+                    outputText: 'Discussion',
+                    inputTokens: 0,
+                    outputTokens: 0,
+                    cost: 0.0,
+                    duration: 3.0,
+                ),
+            ],
+            totalTime: 3.0,
+        );
+
+        $json = $this->mapper->map($result, 'brainstorm', 'Old session resume');
+        $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertCount(1, $data['participants']);
+        self::assertNull($data['participants'][0]['model']);
+        self::assertNull($data['participants'][0]['provider']);
+        self::assertNull($data['participants'][0]['thinking']);
+        self::assertNull($data['participants'][0]['cache_hit_rate']);
     }
 
     #[Test]

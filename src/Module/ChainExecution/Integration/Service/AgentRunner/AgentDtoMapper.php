@@ -76,6 +76,7 @@ final readonly class AgentDtoMapper
             cacheWriteTokens: $dto->cacheWriteTokens,
             cost: $dto->cost,
             model: $dto->model,
+            provider: $dto->provider,
             turns: $dto->turns,
         );
     }
