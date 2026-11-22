@@ -12,6 +12,20 @@
 {"ts":"...","event":"chain_result","chain":"implement","steps_count":4,"total_cost":0.089,"duration_ms":45000,"status":"success"}
 ```
 
+### Audit динамических цепочек
+
+Dynamic-цепочки пишут тот же набор событий (`chain_start` / `step_start` / `step_result` /
+`chain_result`) в `audit.jsonl` внутри каталога сессии (`var/sessions/<chain>/<date>_<time>/audit.jsonl`);
+отключается опцией `--no-audit-log`. Записи `step_result` динамического шага содержат модельные поля
+и кэш-токены:
+
+```
+{"ts":"...","event":"step_result","chain":"brainstorm","step":3,"role":"backend_developer","runner":"pi","input_tokens":1500,"output_tokens":800,"cache_read_tokens":8200,"cache_write_tokens":900,"model":"glm-5.3-flash","provider":"zai","thinking":"high","cost":0.023,"duration_ms":5432,"status":"success"}
+```
+
+- `model`, `provider`, `thinking` — модель шага; `null`, если раннер не сообщил (старые сессии, fallback-раннеры).
+- `cache_read_tokens` / `cache_write_tokens` — кэш-токены из `usage` финального `message_end`; `0`, если раннер их не отдаёт.
+
 ### Архитектура audit-логирования
 
 ```
@@ -51,7 +65,7 @@ task_orchestrator:
 
 ### Ограничения
 
-- Журнал аудита (audit trail) поддерживается только для **static-цепочек**. Dynamic-цепочки будут покрыты в отдельной задаче.
+- Audit static-цепочек настраивается глобально (`audit_log_path`); dynamic-цепочки пишут audit в каталог своей сессии независимо от этой настройки (отключение — `--no-audit-log`).
 - Проваленный quality gate (`passed: false`) логируется со `status: "success"` (gate выполнился без ошибки, результат проверки — отдельная информация).
 
 ## Budget (ограничение стоимости)
@@ -121,6 +135,20 @@ Steps: 5 | Duration: 45s | Cost: $0.089
 Budget: $0.089 / $5.00 (1.8%)
 Iterations: 0
 ```
+
+Отчёты динамических цепочек дополнительно содержат секцию «Participants metrics» — агрегированную
+по ролям таблицу участников (модель, выступления, время, токены, кэш, стоимость):
+
+```
+Participants metrics
+Participant       Model                     Speeches Facilitator Time   Tok in Tok out Cache read Cache % Cost
+team_lead_alex    zai/glm-5.3-flash (high)  0        1           8.0s   1.0k   500     8.0k       88.9%   $0.0200
+backend_developer zai/glm-5.3-flash (high)  2        0           22.0s  4.0k   3.0k    10.0k      71.4%   $0.1000
+```
+
+- Модель рендерится как `provider/model (thinking)`; «н/д» — если раннер не сообщил модель
+  (раунды старых сессий без новых полей). При разных моделях у участника — маркер `mixed`.
+- `Cache %` = `cache_read / (cache_read + input)`; «н/д» — если токены не сообщены.
 
 ### JSON-формат
 
