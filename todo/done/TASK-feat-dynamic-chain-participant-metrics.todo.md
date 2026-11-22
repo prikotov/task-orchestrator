@@ -3,7 +3,7 @@ type: feat
 created: 2026-11-21 03:10:22 (1795230622)
 due: 
 started: 2026-11-22 11:02:52 (1795345372)
-completed: 
+completed: 2026-11-22 12:01:18 (1795348878)
 cancelled: 
 value: V3
 complexity: C2
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/participant-metrics
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/487
+status: done
 ---
 
 # TASK-feat-dynamic-chain-participant-metrics: Метрики участников в отчётах dynamic-цепочек (модель, выступления, время, токены, кэш)
