@@ -24,6 +24,15 @@ final readonly class DynamicLoopContextVo
         public ?string $workingDir = null,
         public int $timeout = 300,
         public ?int $maxTime = null,
+        /**
+         * Дополнение от Лида при resume: текст аргумента task CLI-команды.
+         *
+         * Фасилитатор получает его отдельным блоком «Дополнение от Лида» в
+         * continue-промпте (при пустом журнале — в start-промпте) и маршрутизирует
+         * раунды по новой вводной. null — дополнения нет (обычный запуск или
+         * resume без новой вводной), блок не рендерится.
+         */
+        public ?string $taskAddendum = null,
     ) {
     }
 }

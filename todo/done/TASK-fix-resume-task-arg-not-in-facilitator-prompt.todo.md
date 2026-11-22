@@ -2,8 +2,8 @@
 type: fix
 created: 2026-11-21 03:10:22 (1795230622)
 due: 
-started: 
-completed: 
+started: 2026-11-22 06:25:33 (1795328733)
+completed: 2026-11-22 07:10:49 (1795331449)
 cancelled: 
 value: V3
 complexity: C2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Арагорн (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
-pr: 
-status: todo
+branch: task/resume-task-arg-facilitator
+pr: https://github.com/prikotov/task-orchestrator/pull/486
+status: done
 ---
 
 # TASK-fix-resume-task-arg-not-in-facilitator-prompt: При resume dynamic-цепочки аргумент task не доходит до промптов фасилитатора
@@ -84,3 +84,6 @@ php vendor/bin/todo-md validate todo/TASK-fix-resume-task-arg-not-in-facilitator
 | :--- | :--- | :--- |
 | 2026-11-21 03:10:22 (1795230622) | Тимлид Арагорн (pi) | Создание задачи |
 | 2026-11-21 | Тимлид (pi) | Приведение структуры к шаблону проекта: добавлены Expected Result и Verification, требования переведены в MoSCoW-подсекции, формат author нормализован; содержание сохранено |
+| 2026-11-22 | Бэкендер Левша (pi) | Реализация и самопроверка: проброс task-аргумента при resume до промптов фасилитатора; unit/integration-тесты, документация; ревью Пуаро — ОДОБРЕНО |
+| 2026-11-22 | Тимлид (pi) | Доработка по замечаниям ревью: укрепление теста (assertCount+end), комментарий об осознанной нормализации на всех путях |
+| 2026-11-22 | Тимлид (pi) | Эксперимент с переименованием аргумента task (theme/тема) откачен по решению владельца: контракт остался `task` — «оркестрируем задачу»; в доки добавлено описание позиционного аргумента task (Шаг 3 скилла brainstorm) |

@@ -55,6 +55,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         int $timeout,
         array $command = [],
         ?DynamicLoopRetryPolicyVo $retryPolicy = null,
+        ?string $taskAddendum = null,
     ): array {
         $ctx = $this->formatter->buildFacilitatorContext(
             $facilitatorStartPrompt,
@@ -62,6 +63,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             $topic,
             $facilitatorSummary,
             $responseFilesList,
+            $taskAddendum,
         );
 
         $systemPromptFile = $this->sessionWriter->writePromptFile(

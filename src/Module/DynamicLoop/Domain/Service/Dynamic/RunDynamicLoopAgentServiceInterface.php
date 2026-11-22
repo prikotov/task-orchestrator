@@ -15,6 +15,8 @@ interface RunDynamicLoopAgentServiceInterface
 {
     /**
      * @param list<string> $command
+     * @param string|null $taskAddendum Дополнение от Лида при resume (аргумент task
+     *                                  CLI-команды); рендерится блоком в continue/start-промпте
      *
      * @return array{DynamicLoopTurnResultVo, FacilitatorResponseVo}
      */
@@ -33,6 +35,7 @@ interface RunDynamicLoopAgentServiceInterface
         int $timeout,
         array $command = [],
         ?DynamicLoopRetryPolicyVo $retryPolicy = null,
+        ?string $taskAddendum = null,
     ): array;
 
     /**

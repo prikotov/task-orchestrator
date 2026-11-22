@@ -798,6 +798,106 @@ final class DynamicExecutionStrategyTest extends TestCase
     }
 
     #[Test]
+    public function resumePassesCommandTaskAsAddendumToContext(): void
+    {
+        $this->setUpDynamicConfig('brainstorm', 5);
+
+        $state = new DynamicLoopSessionStateVo(
+            topic: 'Original topic',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 5,
+            completedRounds: 2,
+            discussionHistory: 'History',
+            facilitatorJournal: 'Journal',
+        );
+
+        $this->sessionLogger->method('resumeSession');
+        $this->sessionLogger->method('getResumedState')->willReturn($state);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        );
+
+        $capturedAddendum = 'unset';
+        $capturedTopic = '';
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
+            ) use (
+                &$capturedAddendum,
+                &$capturedTopic,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedAddendum = $ctx->taskAddendum;
+                $capturedTopic = $ctx->topic;
+
+                return $loopResult;
+            });
+
+        $this->strategy->resume(
+            new ExecutionChainInfoVo('brainstorm', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'brainstorm',
+                task: 'Появились скриншоты, дайте слово участникам',
+                resumeDir: '/tmp/resume-dir',
+            ),
+        );
+
+        // Task-аргумент доходит до контекста фасилитатора, тема берётся из сессии.
+        self::assertSame('Появились скриншоты, дайте слово участникам', $capturedAddendum);
+        self::assertSame('Original topic', $capturedTopic);
+    }
+
+    #[Test]
+    public function executeLeavesAddendumNull(): void
+    {
+        $this->setUpDynamicConfig('brainstorm', 5);
+
+        $loopResult = new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 1.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        );
+
+        $capturedAddendum = 'unset';
+        $this->dynamicLoopRunner->method('execute')
+            ->willReturnCallback(function (
+                DynamicLoopConfigVo $c,
+                DynamicLoopContextVo $ctx,
+            ) use (
+                &$capturedAddendum,
+                $loopResult,
+            ): DynamicLoopResultVo {
+                $capturedAddendum = $ctx->taskAddendum;
+
+                return $loopResult;
+            });
+
+        $this->strategy->execute(
+            new ExecutionChainInfoVo('brainstorm', ChainExecutionTypeEnum::dynamicType),
+            new OrchestrateChainCommand(
+                chainName: 'brainstorm',
+                task: 'Design a new system',
+            ),
+        );
+
+        // При обычном запуске task уже является темой — дополнения нет.
+        self::assertNull($capturedAddendum);
+    }
+
+    #[Test]
     public function resumeUsesChainTimeoutWhenNoCliOverride(): void
     {
         $this->setUpDynamicConfig('timed_chain', timeout: 600);

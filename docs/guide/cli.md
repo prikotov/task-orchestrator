@@ -16,7 +16,7 @@ php vendor/bin/task-orchestrator list
 Основная команда оркестрации — запускает цепочку агентов (Static или Dynamic).
 
 ```bash
-php vendor/bin/task-orchestrator <task> [options]
+php vendor/bin/task-orchestrator agent:orchestrate <task> [options]
 ```
 
 | Опция | Сокращение | Описание | По умолчанию |

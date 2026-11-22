@@ -489,6 +489,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $facRoleConfig?->getTimeout() ?? $context->timeout,
             $facRoleConfig?->getCommand() ?? [],
             $retryPolicy,
+            $context->taskAddendum,
         );
     }
 

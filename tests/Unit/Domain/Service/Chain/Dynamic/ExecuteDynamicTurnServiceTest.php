@@ -135,6 +135,51 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
     }
 
     #[Test]
+    public function runFacilitatorTurnForwardsTaskAddendumToAgentRunner(): void
+    {
+        $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
+        $context = $this->createContext('facilitator', ['architect'], taskAddendum: 'Новая вводная от Лида');
+        $execution = new DynamicLoopExecution();
+        $execution->advanceStep();
+        $execution->advanceRound();
+
+        $turnResult = $this->createSuccessTurnResult('response');
+        $facResponse = FacilitatorResponseVo::createNextRole('architect', 'challenge text');
+
+        $capturedAddendum = 'unset';
+        $mockRunner = $this->createMock(RunDynamicLoopAgentServiceInterface::class);
+        $mockRunner->expects(self::once())
+            ->method('runFacilitator')
+            ->willReturnCallback(
+                static function (...$args) use (&$capturedAddendum, $turnResult, $facResponse): array {
+                    self::assertCount(15, $args);
+                    $capturedAddendum = end($args);
+
+                    return [$turnResult, $facResponse];
+                },
+            );
+        $service = new ExecuteDynamicTurnService(
+            $mockRunner,
+            $this->roundRecorder,
+            $this->journal,
+            $this->sessionLogger,
+            $this->budgetChecker,
+        );
+        $this->roundRecorder->method('record');
+        $this->journal->method('formatFacilitatorEntry')->willReturn('');
+        $this->journal->method('formatFacilitatorDiscussionEntry')->willReturn('');
+        $this->sessionLogger->method('getResponseFilePaths')->willReturn([]);
+        $this->sessionLogger->method('writeContextFile');
+        $this->budgetChecker->method('checkAndApply')->willReturn(null);
+
+        $service->runFacilitatorTurn(
+            $chain, $context, $execution, null, null,
+        );
+
+        self::assertSame('Новая вводная от Лида', $capturedAddendum);
+    }
+
+    #[Test]
     public function runFacilitatorTurnReturnsBreakOnBudgetExceeded(): void
     {
         $chain = $this->createDynamicConfig('test', 'facilitator', ['architect']);
@@ -626,6 +671,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         string $facilitator,
         array $participants,
         int $maxRounds = 10,
+        ?string $taskAddendum = null,
     ): DynamicLoopContextVo {
         return new DynamicLoopContextVo(
             facilitatorRole: $facilitator,
@@ -643,6 +689,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
             ),
             workingDir: '/tmp/test',
             timeout: 600,
+            taskAddendum: $taskAddendum,
         );
     }
 }

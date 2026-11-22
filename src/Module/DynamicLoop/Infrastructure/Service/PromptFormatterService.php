@@ -30,6 +30,16 @@ final readonly class PromptFormatterService implements DynamicLoopPromptFormatte
         );
     }
 
+    /**
+     * Собирает контекст фасилитатора.
+     *
+     * При непустом дополнении (taskAddendum) добавляет в промпт блок
+     * «Дополнение от Лида»: в continue-промпте — через четвёртый плейсхолдер
+     * %s (после секции файлов), в start-промпте — суффиксом в конце.
+     * Дополнение передаётся последним аргументом sprintf: легаси-шаблоны
+     * из трёх плейсхолдеров рендерятся как прежде (лишний аргумент игнорируется).
+     * При пустом или отсутствующем дополнении блок не рендерится.
+     */
     #[Override]
     public function buildFacilitatorContext(
         string $startPrompt,
@@ -37,10 +47,33 @@ final readonly class PromptFormatterService implements DynamicLoopPromptFormatte
         string $topic,
         string $facilitatorSummary,
         string $responseFilesList,
+        ?string $taskAddendum = null,
     ): string {
-        return ($facilitatorSummary !== '' || $responseFilesList !== '')
-            ? sprintf($continuePrompt, $topic, $facilitatorSummary, $responseFilesList)
-            : sprintf($startPrompt, $topic);
+        $addendumBlock = self::buildAddendumBlock($taskAddendum);
+
+        $context = ($facilitatorSummary !== '' || $responseFilesList !== '')
+            ? sprintf($continuePrompt, $topic, $facilitatorSummary, $responseFilesList, $addendumBlock)
+            : sprintf($startPrompt, $topic) . $addendumBlock;
+
+        // Схлопывание лишних пустых строк — ОСОЗНАННОЕ РЕШЕНИЕ, применяется
+        // НА ВСЕХ путях рендера без исключений: и в continue-промпте (с блоком
+        // дополнения и без него между секциями остаётся 3 переноса подряд),
+        // и в start-промпте, и на resume без task / с пустым addendum
+        // (блок не рендерится, но контекст нормализуется так же). Так формат
+        // промпта не зависит от пути сборки и наличия дополнения.
+        return preg_replace('/\n{3,}/', "\n\n", $context) ?? $context;
+    }
+
+    /**
+     * Блок «Дополнение от Лида»: заголовок + текст; без дополнения — пустая строка.
+     */
+    private static function buildAddendumBlock(?string $taskAddendum): string
+    {
+        if ($taskAddendum === null || trim($taskAddendum) === '') {
+            return '';
+        }
+
+        return sprintf("\n\n[Дополнение от Лида — новая вводная]:\n%s", trim($taskAddendum));
     }
 
     #[Override]
