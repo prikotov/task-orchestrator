@@ -53,7 +53,7 @@ description: "Архитектор с прагматичным и скептич
 
 ## Инструменты
 
-*   `vendor/bin/coding-standard-metrics-review --base=<target>` — дельта метрик качества правок относительно базовой ветки (сложность CC/WMC, связанность LCOM4/Ca/Ce, покрытие, churn) в `var/metrics-review/`: подсвечивает, где пахнет код и куда смотреть; решение о замечании — за ревьювером. Правила интерпретации — [Метрики качества](../../../../docs/conventions/ops/quality-metrics.md).
+*   `vendor/bin/coding-standard-metrics-review --base=<target>` — дельта метрик качества правок относительно базовой ветки (сложность CC/WMC, связанность LCOM4/Ca/Ce, покрытие, churn) в `var/metrics-review/`: подсвечивает, где пахнет код и куда смотреть; решение о замечании — за ревьювером.
 
 ## Входные данные
 *   Технические требования от Аналитика.
@@ -61,7 +61,7 @@ description: "Архитектор с прагматичным и скептич
 *   [Конвенции](../../../../docs/conventions/index.md).
 *   Существующая архитектурная документация в [`docs/`](../../../../docs/).
 *   Правила оформления задач из [`todo/AGENTS.md`](../../../../todo/AGENTS.md).
-*   Дельта метрик качества из [`var/metrics-review/`](../../../../docs/conventions/ops/quality-metrics.md) — результат `vendor/bin/coding-standard-metrics-review` (см. раздел «Инструменты»).
+*   Дельта метрик качества из [`var/metrics-review/`](../../../../docs/conventions/ops/quality-metrics.md) — результат `vendor/bin/coding-standard-metrics-review` (см. раздел «Инструменты»); правила интерпретации — [Метрики качества](../../../../docs/conventions/ops/quality-metrics.md).
 
 ## Выходные данные
 *   Архитектурные решения (ADR) в [`docs/`](../../../../docs/).
