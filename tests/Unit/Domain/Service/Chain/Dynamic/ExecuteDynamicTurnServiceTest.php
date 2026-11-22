@@ -300,6 +300,54 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         self::assertSame('timeout', $result->interruptionReason);
     }
 
+    // ─── resolveThinking (thinking-уровень из команды роли) ───────────
+
+    #[Test]
+    public function resolveThinkingExtractsValueAfterFlag(): void
+    {
+        $config = new DynamicLoopRoleConfigVo(
+            command: ['pi', '--mode', 'json', '--provider', 'zai', '--model', 'glm-5.3-flash', '--thinking', 'high'],
+        );
+
+        self::assertSame('high', ExecuteDynamicTurnService::resolveThinking($config));
+    }
+
+    #[Test]
+    public function resolveThinkingReturnsNullWhenFlagMissing(): void
+    {
+        $config = new DynamicLoopRoleConfigVo(
+            command: ['pi', '--mode', 'json', '--provider', 'zai', '--model', 'glm-5.3-flash'],
+        );
+
+        self::assertNull(ExecuteDynamicTurnService::resolveThinking($config));
+    }
+
+    #[Test]
+    public function resolveThinkingReturnsNullWhenFlagIsLastWithoutValue(): void
+    {
+        $config = new DynamicLoopRoleConfigVo(
+            command: ['pi', '--model', 'glm-5.3-flash', '--thinking'],
+        );
+
+        self::assertNull(ExecuteDynamicTurnService::resolveThinking($config));
+    }
+
+    #[Test]
+    public function resolveThinkingReturnsNullWhenNextPartIsAnotherFlag(): void
+    {
+        $config = new DynamicLoopRoleConfigVo(
+            command: ['pi', '--thinking', '--model', 'glm-5.3-flash'],
+        );
+
+        self::assertNull(ExecuteDynamicTurnService::resolveThinking($config));
+    }
+
+    #[Test]
+    public function resolveThinkingReturnsNullForNullConfig(): void
+    {
+        self::assertNull(ExecuteDynamicTurnService::resolveThinking(null));
+    }
+
     // ─── runParticipantTurn ───────────────────────────────────────────
 
     #[Test]
@@ -527,7 +575,11 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
             outputText: 'Hello',
             inputTokens: 100,
             outputTokens: 50,
+            cacheReadTokens: 7000,
+            cacheWriteTokens: 900,
             cost: 0.05,
+            model: 'glm-5.3-flash',
+            provider: 'zai',
         );
         $turnResult = new DynamicLoopTurnResultVo(
             agentResult: $agentResult,
@@ -537,7 +589,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
             invocation: 'inv',
         );
 
-        $roundVo = ExecuteDynamicTurnService::toRoundResultVo($turnResult, 1, 'role', true);
+        $roundVo = ExecuteDynamicTurnService::toRoundResultVo($turnResult, 1, 'role', true, 'high');
 
         self::assertSame(1, $roundVo->round);
         self::assertSame('role', $roundVo->role);
@@ -545,12 +597,17 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         self::assertSame('Hello', $roundVo->outputText);
         self::assertSame(100, $roundVo->inputTokens);
         self::assertSame(50, $roundVo->outputTokens);
+        self::assertSame(7000, $roundVo->cacheReadTokens);
+        self::assertSame(900, $roundVo->cacheWriteTokens);
         self::assertSame(0.05, $roundVo->cost);
         self::assertSame(2.5, $roundVo->duration);
         self::assertFalse($roundVo->isError);
         self::assertSame('inv', $roundVo->invocation);
         self::assertSame('system', $roundVo->systemPrompt);
         self::assertSame('prompt', $roundVo->userPrompt);
+        self::assertSame('glm-5.3-flash', $roundVo->model);
+        self::assertSame('zai', $roundVo->provider);
+        self::assertSame('high', $roundVo->thinking);
     }
 
     // ─── Helpers ───────────────────────────────────────────────────────

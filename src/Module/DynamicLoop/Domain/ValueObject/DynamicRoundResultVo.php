@@ -9,6 +9,10 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject;
  *
  * Domain-аналог Application DTO DynamicRoundResultDto.
  * Содержит только primitives — без Application зависимостей.
+ *
+ * Модельные поля (model/provider/thinking) и кэш-токены заполняются, если раннер
+ * сообщил их; для восстановленных раундов старых сессий они равны null/0
+ * (отчёт рендерит «н/д»).
  */
 final readonly class DynamicRoundResultVo
 {
@@ -27,6 +31,11 @@ final readonly class DynamicRoundResultVo
         public string $systemPrompt = '',
         public string $userPrompt = '',
         public bool $timedOut = false,
+        public ?string $model = null,
+        public ?string $provider = null,
+        public ?string $thinking = null,
+        public int $cacheReadTokens = 0,
+        public int $cacheWriteTokens = 0,
     ) {
     }
 }

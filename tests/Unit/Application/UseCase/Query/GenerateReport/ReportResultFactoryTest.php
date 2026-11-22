@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskOrchestrator\Tests\Unit\Application\UseCase\Query\GenerateReport;
 
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\ReportFormatEnum;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ParticipantsMetricsMapper;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportFormatMapperInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportJsonMapper;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportTextMapper;
@@ -22,8 +23,8 @@ final class ReportResultFactoryTest extends TestCase
     {
         /** @var array<string, ReportFormatMapperInterface> $mappers */
         $mappers = [
-            'text' => new ReportTextMapper(),
-            'json' => new ReportJsonMapper(),
+            'text' => new ReportTextMapper(new ParticipantsMetricsMapper()),
+            'json' => new ReportJsonMapper(new ParticipantsMetricsMapper()),
         ];
 
         $this->factory = new ReportResultFactory($mappers);

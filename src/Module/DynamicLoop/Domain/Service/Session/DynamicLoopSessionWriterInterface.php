@@ -30,6 +30,12 @@ interface DynamicLoopSessionWriterInterface
         int $complexity,
     ): string;
 
+    /**
+     * Записывает один шаг сессии (round) в session.json.
+     *
+     * Модельные поля и кэш-токены заполняются, если раннер их сообщил;
+     * null/0 — записываются как отсутствие данных (старые сессии читаются без них).
+     */
     public function logRound(
         int $step,
         int $round,
@@ -45,6 +51,11 @@ interface DynamicLoopSessionWriterInterface
         ?string $invocation = null,
         bool $isError = false,
         ?string $errorMessage = null,
+        ?string $model = null,
+        ?string $provider = null,
+        ?string $thinking = null,
+        int $cacheReadTokens = 0,
+        int $cacheWriteTokens = 0,
     ): void;
 
     public function completeSession(

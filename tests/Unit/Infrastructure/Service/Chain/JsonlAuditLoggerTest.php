@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Infrastructure\Service\Chain;
 
-use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\JsonlAuditLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\JsonlAuditLogger;
 use const JSON_THROW_ON_ERROR;
 
 #[CoversClass(JsonlAuditLogger::class)]
@@ -127,6 +127,106 @@ final class JsonlAuditLoggerTest extends TestCase
         $record = json_decode(trim($content), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/', $record['ts']);
+    }
+
+    #[Test]
+    public function logDynamicStepResultWritesModelProviderThinkingAndCacheTokens(): void
+    {
+        $result = new DynamicRoundResultVo(
+            round: 2,
+            role: 'backend_developer',
+            isFacilitator: false,
+            outputText: 'Done',
+            inputTokens: 1000,
+            outputTokens: 500,
+            cost: 0.02,
+            duration: 12.0,
+            model: 'mimo-v2.6-pro',
+            provider: 'xiaomi-token-plan-sgp',
+            thinking: 'high',
+            cacheReadTokens: 4000,
+            cacheWriteTokens: 500,
+        );
+
+        $this->logger->logDynamicStepResult('brainstorm', 5, 'backend_developer', 'pi', $result, 1234.56);
+
+        $content = file_get_contents($this->logFile);
+        self::assertNotFalse($content);
+
+        $record = json_decode(trim($content), true, 512, JSON_THROW_ON_ERROR);
+
+        // Новые ключи участников: модель, провайдер, thinking, кэш-токены.
+        self::assertSame('mimo-v2.6-pro', $record['model']);
+        self::assertSame('xiaomi-token-plan-sgp', $record['provider']);
+        self::assertSame('high', $record['thinking']);
+        self::assertSame(4000, $record['cache_read_tokens']);
+        self::assertSame(500, $record['cache_write_tokens']);
+
+        // Базовые ключи step_result.
+        self::assertSame('step_result', $record['event']);
+        self::assertSame('brainstorm', $record['chain']);
+        self::assertSame(5, $record['step']);
+        self::assertSame('backend_developer', $record['role']);
+        self::assertSame('pi', $record['runner']);
+        self::assertSame(1000, $record['input_tokens']);
+        self::assertSame(500, $record['output_tokens']);
+        self::assertSame(0.02, $record['cost']);
+        self::assertSame(1234.6, $record['duration_ms']);
+        self::assertSame('success', $record['status']);
+        self::assertArrayNotHasKey('error_message', $record);
+    }
+
+    #[Test]
+    public function logDynamicStepResultWithoutMetricsWritesNullModelAndZeroCache(): void
+    {
+        $result = new DynamicRoundResultVo(
+            round: 1,
+            role: 'system_analyst',
+            isFacilitator: false,
+            outputText: 'Analysis',
+            inputTokens: 800,
+            outputTokens: 400,
+            cost: 0.01,
+            duration: 5.0,
+        );
+
+        $this->logger->logDynamicStepResult('brainstorm', 3, 'system_analyst', 'pi', $result, 5000.0);
+
+        $content = file_get_contents($this->logFile);
+        $record = json_decode(trim($content), true, 512, JSON_THROW_ON_ERROR);
+
+        // Раннер не сообщил модельные поля и кэш: ключи присутствуют, значения null/0.
+        self::assertNull($record['model']);
+        self::assertNull($record['provider']);
+        self::assertNull($record['thinking']);
+        self::assertSame(0, $record['cache_read_tokens']);
+        self::assertSame(0, $record['cache_write_tokens']);
+        self::assertSame('success', $record['status']);
+    }
+
+    #[Test]
+    public function logDynamicStepResultWritesErrorStatusAndMessage(): void
+    {
+        $result = new DynamicRoundResultVo(
+            round: 1,
+            role: 'team_lead',
+            isFacilitator: true,
+            outputText: '',
+            inputTokens: 0,
+            outputTokens: 0,
+            cost: 0.0,
+            duration: 1.0,
+            isError: true,
+            errorMessage: 'Agent crashed',
+        );
+
+        $this->logger->logDynamicStepResult('brainstorm', 1, 'team_lead', 'pi', $result, 1000.0);
+
+        $content = file_get_contents($this->logFile);
+        $record = json_decode(trim($content), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame('error', $record['status']);
+        self::assertSame('Agent crashed', $record['error_message']);
     }
 
     #[Test]

@@ -2,8 +2,8 @@
 type: feat
 created: 2026-11-21 03:10:22 (1795230622)
 due: 
-started: 
-completed: 
+started: 2026-11-22 11:02:52 (1795345372)
+completed: 2026-11-22 12:01:18 (1795348878)
 cancelled: 
 value: V3
 complexity: C2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Арагорн (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
-pr: 
-status: todo
+branch: task/participant-metrics
+pr: https://github.com/prikotov/task-orchestrator/pull/487
+status: done
 ---
 
 # TASK-feat-dynamic-chain-participant-metrics: Метрики участников в отчётах dynamic-цепочек (модель, выступления, время, токены, кэш)

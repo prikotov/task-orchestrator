@@ -163,6 +163,7 @@ final class AgentDtoMapperTest extends TestCase
             cost: 0.025,
             exitCode: 0,
             model: 'gpt-4',
+            provider: 'openai',
             turns: 3,
             isError: false,
             errorMessage: null,
@@ -179,6 +180,7 @@ final class AgentDtoMapperTest extends TestCase
         self::assertSame(5, $result->getCacheWriteTokens());
         self::assertSame(0.025, $result->getCost());
         self::assertSame('gpt-4', $result->getModel());
+        self::assertSame('openai', $result->getProvider());
         self::assertSame(3, $result->getTurns());
         self::assertSame(0, $result->getExitCode());
         self::assertNull($result->getErrorMessage());
@@ -196,6 +198,7 @@ final class AgentDtoMapperTest extends TestCase
             cost: 0.0,
             exitCode: 429,
             model: null,
+            provider: null,
             turns: 0,
             isError: true,
             errorMessage: 'Rate limit exceeded',
@@ -227,6 +230,7 @@ final class AgentDtoMapperTest extends TestCase
             cost: 0.0,
             exitCode: 1,
             model: null,
+            provider: null,
             turns: 0,
             isError: true,
             errorMessage: 'Agent timed out after 30 seconds.',
@@ -252,6 +256,7 @@ final class AgentDtoMapperTest extends TestCase
             cost: 0.01,
             exitCode: 0,
             model: 'gpt-4',
+            provider: 'openai',
             turns: 1,
             isError: false,
             errorMessage: null,

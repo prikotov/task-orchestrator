@@ -46,6 +46,7 @@ final readonly class RunAgentCommandHandler
             cost: $result->getCost(),
             exitCode: $result->getExitCode(),
             model: $result->getModel(),
+            provider: $result->getProvider(),
             turns: $result->getTurns(),
             isError: $result->isError(),
             errorMessage: $result->getErrorMessage(),

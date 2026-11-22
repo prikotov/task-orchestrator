@@ -20,6 +20,7 @@ final readonly class DynamicLoopRunResultVo
         private float $cost,
         private int $exitCode,
         private ?string $model,
+        private ?string $provider,
         private int $turns,
         private bool $isError,
         private ?string $errorMessage,
@@ -35,6 +36,7 @@ final readonly class DynamicLoopRunResultVo
         int $cacheWriteTokens = 0,
         float $cost = 0.0,
         ?string $model = null,
+        ?string $provider = null,
         int $turns = 0,
     ): self {
         return new self(
@@ -46,6 +48,7 @@ final readonly class DynamicLoopRunResultVo
             cost: $cost,
             exitCode: 0,
             model: $model,
+            provider: $provider,
             turns: $turns,
             isError: false,
             errorMessage: null,
@@ -66,6 +69,7 @@ final readonly class DynamicLoopRunResultVo
             cost: 0.0,
             exitCode: $exitCode,
             model: null,
+            provider: null,
             turns: 0,
             isError: true,
             errorMessage: $errorMessage,
@@ -111,6 +115,14 @@ final readonly class DynamicLoopRunResultVo
     public function getModel(): ?string
     {
         return $this->model;
+    }
+
+    /**
+     * Провайдер шага (например zai, openai-codex); null — раннер не сообщил.
+     */
+    public function getProvider(): ?string
+    {
+        return $this->provider;
     }
 
     public function getTurns(): int

@@ -214,6 +214,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $execution->getStep(),
             $context->facilitatorRole,
             true,
+            self::resolveThinking($facRoleConfig),
         );
         $facVo = new FacilitatorTurnResultVo(
             roundResult: $roundVo,
@@ -300,6 +301,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $execution->getStep(),
             $nextRole,
             false,
+            self::resolveThinking($partRoleConfig),
         );
         $this->roundRecorder->record(
             $execution,
@@ -356,6 +358,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $execution->getStep(),
             $context->facilitatorRole,
             true,
+            self::resolveThinking($finRoleConfig),
         );
         $this->roundRecorder->record(
             $execution,
@@ -386,11 +389,31 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         return $command[0];
     }
 
+    /**
+     * Извлекает уровень thinking из команды роли (профиль command: `--thinking <level>`).
+     *
+     * Возвращает null, если флаг отсутствует или значение выглядит как следующий флаг.
+     */
+    public static function resolveThinking(?DynamicLoopRoleConfigVo $roleConfig): ?string
+    {
+        $command = $roleConfig?->getCommand() ?? [];
+        foreach ($command as $i => $part) {
+            if ($part === '--thinking' && isset($command[$i + 1])) {
+                $next = $command[$i + 1];
+
+                return str_starts_with($next, '--') ? null : $next;
+            }
+        }
+
+        return null;
+    }
+
     public static function toRoundResultVo(
         DynamicLoopTurnResultVo $turn,
         int $step,
         string $role,
         bool $isFacilitator,
+        ?string $thinking = null,
     ): DynamicRoundResultVo {
         $agent = $turn->agentResult;
 
@@ -409,6 +432,11 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             systemPrompt: $turn->systemPrompt,
             userPrompt: $turn->userPrompt,
             timedOut: $agent->isTimedOut(),
+            model: $agent->getModel(),
+            provider: $agent->getProvider(),
+            thinking: $thinking,
+            cacheReadTokens: $agent->getCacheReadTokens(),
+            cacheWriteTokens: $agent->getCacheWriteTokens(),
         );
     }
 

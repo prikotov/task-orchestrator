@@ -184,6 +184,7 @@ final readonly class PiAgentRunnerService implements PiAgentRunnerServiceInterfa
             cacheWriteTokens: $parsed['cacheWriteTokens'],
             cost: $parsed['cost'],
             model: $parsed['model'],
+            provider: $parsed['provider'],
             turns: $parsed['turns'],
         );
     }

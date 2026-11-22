@@ -44,6 +44,11 @@ class StubSessionLogger implements DynamicLoopSessionLoggerInterface
         ?string $invocation = null,
         bool $isError = false,
         ?string $errorMessage = null,
+        ?string $model = null,
+        ?string $provider = null,
+        ?string $thinking = null,
+        int $cacheReadTokens = 0,
+        int $cacheWriteTokens = 0,
     ): void {
         // no-op
     }

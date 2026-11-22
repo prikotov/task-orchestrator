@@ -301,6 +301,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             cacheWriteTokens: $chainResult->getCacheWriteTokens(),
             cost: $chainResult->getCost(),
             model: $chainResult->getModel(),
+            provider: $chainResult->getProvider(),
             turns: $chainResult->getTurns(),
         );
     }

@@ -223,9 +223,16 @@ final class DynamicLoopExecution
     // ─── Init from resume ─────────────────────────────────────────────
 
     /**
-     * Восстанавливает round/participantRounds из файлов сессии.
+     * Восстанавливает состояние из rounds[] session.json при resume.
      *
-     * @param list<array{round?: int, is_facilitator: bool}> $roundFiles
+     * Каждый шаг восстанавливается как полный DynamicRoundResultVo (метрики,
+     * роль, модельные поля — если раннер их тогда сообщал) и аккумулируется
+     * в metrics: round results, totals и roleCosts становятся полным итогом
+     * сессии, а не только пост-resume части. Старые сессии без модельных
+     * полей восстанавливаются с model/provider/thinking = null и кэш-токенами 0
+     * — в отчёте такие шаги рендерятся как «н/д».
+     *
+     * @param list<array{round?: int, role?: mixed, is_facilitator: bool, duration?: mixed, input_tokens?: mixed, output_tokens?: mixed, cost?: mixed, model?: mixed, provider?: mixed, thinking?: mixed, cache_read_tokens?: mixed, cache_write_tokens?: mixed}> $roundFiles
      */
     public function restoreFromRoundFiles(array $roundFiles): void
     {
@@ -234,7 +241,38 @@ final class DynamicLoopExecution
             if ($round > $this->round) {
                 $this->round = $round;
             }
-            if (!$data['is_facilitator']) {
+
+            $isFacilitator = $data['is_facilitator'];
+            $roleRaw = $data['role'] ?? null;
+            $role = is_string($roleRaw) ? $roleRaw : '';
+            $cost = (float) ($data['cost'] ?? 0);
+            $modelRaw = $data['model'] ?? null;
+            $providerRaw = $data['provider'] ?? null;
+            $thinkingRaw = $data['thinking'] ?? null;
+
+            $this->metrics->recordRound(new DynamicRoundResultVo(
+                round: $round,
+                role: $role,
+                isFacilitator: $isFacilitator,
+                outputText: '',
+                inputTokens: (int) ($data['input_tokens'] ?? 0),
+                outputTokens: (int) ($data['output_tokens'] ?? 0),
+                cost: $cost,
+                duration: (float) ($data['duration'] ?? 0),
+                model: is_string($modelRaw) ? $modelRaw : null,
+                provider: is_string($providerRaw) ? $providerRaw : null,
+                thinking: is_string($thinkingRaw) ? $thinkingRaw : null,
+                cacheReadTokens: (int) ($data['cache_read_tokens'] ?? 0),
+                cacheWriteTokens: (int) ($data['cache_write_tokens'] ?? 0),
+            ));
+
+            // Restore включает в roleCosts все шаги, включая finalize; в живом
+            // ходе finalize-шаг в roleCosts не попадает (влияние нулевое —
+            // бюджет-чекер после finalize не вызывается).
+            if ($role !== '') {
+                $this->metrics->addRoleCost($role, $cost);
+            }
+            if (!$isFacilitator) {
                 $this->participantRounds++;
             }
         }

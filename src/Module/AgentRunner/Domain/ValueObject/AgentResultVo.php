@@ -7,7 +7,8 @@ namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject;
 /**
  * Value Object результата выполнения AI-агента.
  *
- * Immutable, содержит выходные данные агента и метрики использования.
+ * Immutable, содержит выходные данные агента и метрики использования
+ * (включая модель/провайдера шага и кэш-токены).
  */
 final readonly class AgentResultVo
 {
@@ -20,6 +21,7 @@ final readonly class AgentResultVo
         private float $cost,
         private int $exitCode,
         private ?string $model,
+        private ?string $provider,
         private int $turns,
         private bool $isError,
         private ?string $errorMessage,
@@ -38,6 +40,7 @@ final readonly class AgentResultVo
         int $cacheWriteTokens = 0,
         float $cost = 0.0,
         ?string $model = null,
+        ?string $provider = null,
         int $turns = 0,
     ): self {
         return new self(
@@ -49,6 +52,7 @@ final readonly class AgentResultVo
             cost: $cost,
             exitCode: 0,
             model: $model,
+            provider: $provider,
             turns: $turns,
             isError: false,
             errorMessage: null,
@@ -72,6 +76,7 @@ final readonly class AgentResultVo
             cost: 0.0,
             exitCode: $exitCode,
             model: null,
+            provider: null,
             turns: 0,
             isError: true,
             errorMessage: $errorMessage,
@@ -117,6 +122,14 @@ final readonly class AgentResultVo
     public function getModel(): ?string
     {
         return $this->model;
+    }
+
+    /**
+     * Провайдер шага (например zai, openai-codex); null — раннер не сообщил.
+     */
+    public function getProvider(): ?string
+    {
+        return $this->provider;
     }
 
     public function getTurns(): int

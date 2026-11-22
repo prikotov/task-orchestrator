@@ -8,6 +8,7 @@ use Override;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportFormatMapperInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\ParticipantMetricsDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\StepResultDto;
 
 
@@ -17,9 +18,17 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\Or
 
 /**
  * Маппинг OrchestrateChainResultDto → machine-readable JSON.
+ *
+ * Для dynamic-цепочек добавляет participants — агрегированные по ролям
+ * метрики участников (модель, выступления, время, токены, кэш, стоимость).
  */
 final readonly class ReportJsonMapper implements ReportFormatMapperInterface
 {
+    public function __construct(
+        private readonly ParticipantsMetricsMapper $participantsMetricsMapper,
+    ) {
+    }
+
     #[Override]
     public function map(OrchestrateChainResultDto $result, string $chainName, string $task): string
     {
@@ -39,6 +48,7 @@ final readonly class ReportJsonMapper implements ReportFormatMapperInterface
 
         $data = $this->appendSteps($data, $result);
         $data = $this->appendRounds($data, $result);
+        $data = $this->appendParticipants($data, $result);
         $data = $this->appendSynthesis($data, $result);
         $data = $this->appendSessionDir($data, $result);
 
@@ -102,10 +112,50 @@ final readonly class ReportJsonMapper implements ReportFormatMapperInterface
                 'output_tokens' => $round->outputTokens,
                 'cost' => round($round->cost, 6),
                 'duration_ms' => (int)round($round->duration * 1000.0),
+                'model' => $round->model,
+                'provider' => $round->provider,
+                'thinking' => $round->thinking,
+                'cache_read_tokens' => $round->cacheReadTokens,
+                'cache_write_tokens' => $round->cacheWriteTokens,
                 'error_message' => $round->errorMessage,
             ],
             array_keys($result->roundResults),
             $result->roundResults,
+        );
+
+        return $data;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
+    private function appendParticipants(array $data, OrchestrateChainResultDto $result): array
+    {
+        $metrics = $this->participantsMetricsMapper->aggregate($result);
+        if (count($metrics) === 0) {
+            return $data;
+        }
+
+        $data['participants'] = array_map(
+            static fn(ParticipantMetricsDto $participant): array => [
+                'role' => $participant->role,
+                'model' => $participant->model,
+                'provider' => $participant->provider,
+                'thinking' => $participant->thinking,
+                'speeches' => $participant->speeches,
+                'facilitator_steps' => $participant->facilitatorSteps,
+                'total_duration_ms' => (int)round($participant->totalDuration * 1000.0),
+                'input_tokens' => $participant->inputTokens,
+                'output_tokens' => $participant->outputTokens,
+                'cache_read_tokens' => $participant->cacheReadTokens,
+                'cache_hit_rate' => $participant->cacheHitRate === null
+                    ? null
+                    : round($participant->cacheHitRate, 4),
+                'cost' => round($participant->cost, 6),
+            ],
+            $metrics,
         );
 
         return $data;

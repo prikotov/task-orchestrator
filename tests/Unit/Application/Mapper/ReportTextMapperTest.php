@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Tests\Unit\Application\Mapper;
 
+use TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ParticipantsMetricsMapper;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Mapper\ReportTextMapper;
-use TaskOrchestrator\Common\Module\DynamicLoop\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;
+use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\DynamicRoundResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainResultDto;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\StepResultDto;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -22,7 +23,7 @@ final class ReportTextMapperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mapper = new ReportTextMapper();
+        $this->mapper = new ReportTextMapper(new ParticipantsMetricsMapper());
     }
 
     #[Test]
@@ -276,6 +277,174 @@ final class ReportTextMapperTest extends TestCase
         self::assertStringContainsString('[Round 1/2] 🎤 team_lead', $report);
         self::assertStringContainsString('[Round 2/2] backend_developer', $report);
         self::assertStringContainsString('Result: SUCCESS | Synthesis available', $report);
+    }
+
+    #[Test]
+    public function mapDynamicChainReportContainsParticipantsMetricsTable(): void
+    {
+        // Golden-тест секции «Participants metrics»: facilitator + participant
+        // с моделью, thinking, кэш-токенами и расчётом cache %.
+        $result = new OrchestrateChainResultDto(
+            roundResults: [
+                self::dynamicRound(
+                    role: 'team_lead_alex',
+                    isFacilitator: true,
+                    inputTokens: 1000,
+                    outputTokens: 500,
+                    cost: 0.02,
+                    duration: 8.0,
+                    model: 'glm-5.3-flash',
+                    provider: 'zai',
+                    thinking: 'high',
+                    cacheReadTokens: 8000,
+                ),
+                self::dynamicRound(
+                    role: 'backend_developer_levsha',
+                    isFacilitator: false,
+                    inputTokens: 2000,
+                    outputTokens: 1500,
+                    cost: 0.05,
+                    duration: 12.0,
+                    model: 'mimo-v2.6-pro',
+                    provider: 'xiaomi-token-plan-sgp',
+                    thinking: 'off',
+                    cacheReadTokens: 6000,
+                ),
+                self::dynamicRound(
+                    role: 'backend_developer_levsha',
+                    isFacilitator: false,
+                    inputTokens: 2000,
+                    outputTokens: 1500,
+                    cost: 0.05,
+                    duration: 10.0,
+                    model: 'mimo-v2.6-pro',
+                    provider: 'xiaomi-token-plan-sgp',
+                    thinking: 'off',
+                    cacheReadTokens: 4000,
+                ),
+            ],
+            totalTime: 30.0,
+            totalInputTokens: 5000,
+            totalOutputTokens: 3500,
+            totalCost: 0.12,
+            synthesis: 'We agreed on approach X',
+        );
+
+        $report = $this->mapper->map($result, 'brainstorm', 'Discuss API design');
+
+        self::assertStringContainsString('Participants metrics', $report);
+        self::assertStringContainsString('Participant', $report);
+        self::assertStringContainsString('Cache %', $report);
+        // facilitator: 1 шаг фасилитатора, 0 выступлений
+        self::assertStringContainsString('team_lead_alex', $report);
+        self::assertStringContainsString('zai/glm-5.3-flash (high)', $report);
+        // participant: 2 выступления, суммарно 22.0s, cache 10k/14k ≈ 71.4%
+        self::assertStringContainsString('xiaomi-token-plan-sgp/mimo-v2.6-pro (off)', $report);
+        self::assertStringContainsString('71.4%', $report);
+        self::assertStringContainsString('22.0s', $report);
+        self::assertStringContainsString('$0.1000', $report);
+    }
+
+    #[Test]
+    public function mapDynamicChainReportShowsUnknownModelAsNotAvailable(): void
+    {
+        // Раунды без модельных полей (старая сессия / раннер без model) — «н/д».
+        $result = new OrchestrateChainResultDto(
+            roundResults: [
+                new DynamicRoundResultDto(
+                    round: 1,
+                    role: 'team_lead',
+                    isFacilitator: true,
+                    outputText: 'Discuss',
+                    inputTokens: 0,
+                    outputTokens: 0,
+                    cost: 0.0,
+                    duration: 3.0,
+                ),
+            ],
+            totalTime: 3.0,
+        );
+
+        $report = $this->mapper->map($result, 'brainstorm', 'Old session resume');
+
+        self::assertStringContainsString('Participants metrics', $report);
+        self::assertStringContainsString('н/д', $report);
+
+        // Мини-ассерт выравнивания: «н/д» — 3 символа / 5 байт UTF-8, и байтовое
+        // выравнивание сдвинуло бы колонку «Cost» строки данных влево на 2
+        // позиции относительно шапки.
+        $headerLine = null;
+        $dataLine = null;
+        foreach (explode("\n", $report) as $line) {
+            if (str_starts_with($line, 'Participant ')) {
+                $headerLine = $line;
+            }
+            if (str_starts_with($line, 'team_lead ')) {
+                $dataLine = $line;
+            }
+        }
+        self::assertNotNull($headerLine);
+        self::assertNotNull($dataLine);
+        self::assertSame(
+            mb_strpos($headerLine, 'Cost'),
+            mb_strpos($dataLine, '$0.0000'),
+            'Колонка Cost строки данных должна совпадать по позиции с шапкой',
+        );
+    }
+
+    #[Test]
+    public function mapStaticChainReportDoesNotContainParticipantsSection(): void
+    {
+        $result = new OrchestrateChainResultDto(
+            stepResults: [
+                new StepResultDto(
+                    role: 'analyst',
+                    runner: 'pi',
+                    outputText: 'Analysis done',
+                    inputTokens: 100,
+                    outputTokens: 50,
+                    cost: 0.01,
+                    duration: 5.0,
+                    isError: false,
+                ),
+            ],
+            totalTime: 5.0,
+            totalInputTokens: 100,
+            totalOutputTokens: 50,
+            totalCost: 0.01,
+        );
+
+        $report = $this->mapper->map($result, 'implement', 'task');
+
+        self::assertStringNotContainsString('Participants metrics', $report);
+    }
+
+    private static function dynamicRound(
+        string $role,
+        bool $isFacilitator,
+        int $inputTokens,
+        int $outputTokens,
+        float $cost,
+        float $duration,
+        string $model,
+        string $provider,
+        string $thinking,
+        int $cacheReadTokens,
+    ): DynamicRoundResultDto {
+        return new DynamicRoundResultDto(
+            round: 1,
+            role: $role,
+            isFacilitator: $isFacilitator,
+            outputText: 'output',
+            inputTokens: $inputTokens,
+            outputTokens: $outputTokens,
+            cost: $cost,
+            duration: $duration,
+            model: $model,
+            provider: $provider,
+            thinking: $thinking,
+            cacheReadTokens: $cacheReadTokens,
+        );
     }
 
     #[Test]

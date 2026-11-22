@@ -27,6 +27,11 @@ final readonly class DynamicRoundResultDto
         public string $systemPrompt = '',
         public string $userPrompt = '',
         public bool $timedOut = false,
+        public ?string $model = null,
+        public ?string $provider = null,
+        public ?string $thinking = null,
+        public int $cacheReadTokens = 0,
+        public int $cacheWriteTokens = 0,
     ) {
     }
 }
