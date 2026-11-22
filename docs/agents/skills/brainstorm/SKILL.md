@@ -47,7 +47,7 @@ description: >
 ### **Шаг 3:** Запуск brainstorm
 
 ```bash
-    php vendor/bin/task-orchestrator agent:orchestrate "<тема>" --chain=brainstorm [опции]
+    php vendor/bin/task-orchestrator agent:orchestrate "<task>" --chain=brainstorm [опции]
 ```
 
 > ⚠️ Опция `--chain=brainstorm` **обязательна**: по умолчанию команда запускает цепочку `implement`, а не `brainstorm`.
@@ -56,7 +56,7 @@ description: >
 
 | Аргумент | Описание | Значения | По умолчанию |
 |----------|----------|----------|--------------|
-| `task`   | Позиционный (первый) аргумент команды — в примерах записан как `"<тема>"`: задача/вводная сессии. Обязательный; при resume служит «Дополнением от Лида» для фасилитатора (см. «Тонкости» раздела Resume) | текст | — |
+| `task`   | Позиционный (первый) аргумент: вводная сессии (для brainstorm — тема). Обязательный; при resume служит «Дополнением от Лида» для фасилитатора (см. «Тонкости» раздела Resume) | текст | — |
 
 Опции:
 
@@ -129,7 +129,7 @@ Brainstorm может быть прерван по таймауту шага, и
 2. Запусти команду с `--resume`:
 
 ```bash
-    php vendor/bin/task-orchestrator agent:orchestrate "<тема>" --chain=brainstorm \
+    php vendor/bin/task-orchestrator agent:orchestrate "<task>" --chain=brainstorm \
         --resume=var/sessions/brainstorm/<timestamp>
 ```
 
