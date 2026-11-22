@@ -2,7 +2,7 @@
 type: fix
 created: 2026-11-21 03:10:22 (1795230622)
 due: 
-started: 
+started: 2026-11-22 06:25:33 (1795328733)
 completed: 
 cancelled: 
 value: V3
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Арагорн (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/resume-task-arg-facilitator
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-fix-resume-task-arg-not-in-facilitator-prompt: При resume dynamic-цепочки аргумент task не доходит до промптов фасилитатора
