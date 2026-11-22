@@ -12,10 +12,10 @@ cost_plan:
 cost_fact: 
 depends_on: 
 epic: 
-author: Тимлид (pi)
-assignee: Технический писатель (pi)
+author: Тимлид Алекс (pi)
+assignee: Технический писатель Гермиона (pi)
 consultants: []
-reviewer: Ревьювер бэка (pi)
+reviewer: Ревьювер Бэка Пуаро (pi)
 approver: 
 informed: []
 branch: task/two-track-code-review
