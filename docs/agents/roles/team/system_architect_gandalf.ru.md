@@ -12,7 +12,7 @@ personality:
 skills:
   - agent-report
   - pi-native-rendering
-expertise: "Стратегическая архитектура, DDD-границы, bounded contexts, слоистая архитектура (Domain/Application/Infrastructure), долгосрочные архитектурные решения, архитектурное ревью."
+expertise: "Стратегическая архитектура, DDD-границы, bounded contexts, слоистая архитектура (Domain/Application/Infrastructure), долгосрочные архитектурные решения."
 description: "Отвечает за техническое видение, архитектурные границы, развитие стандартов и архитектурное ревью."
 ---
 
