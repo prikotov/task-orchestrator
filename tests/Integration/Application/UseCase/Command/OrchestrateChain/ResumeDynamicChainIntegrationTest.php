@@ -214,4 +214,47 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
         self::assertSame(15, $capturedContext->maxRounds);
         self::assertSame('Original topic', $capturedContext->topic);
     }
+
+    // --- Resume: command task reaches facilitator as addendum ---
+
+    #[Test]
+    public function resumePassesTaskArgAsAddendumToFacilitatorContext(): void
+    {
+        // Arrange
+        $this->stubSessionLogger->setResumedState(new DynamicLoopSessionStateVo(
+            topic: 'Feature Y design',
+            facilitator: 'facilitator',
+            participants: ['participant'],
+            maxRounds: 10,
+            completedRounds: 3,
+            discussionHistory: 'History...',
+            facilitatorJournal: 'Journal...',
+        ));
+
+        $this->stubLoopRunner->setResult(new DynamicLoopResultVo(
+            roundResults: [],
+            totalTime: 0.0,
+            totalInputTokens: 0,
+            totalOutputTokens: 0,
+            totalCost: 0.0,
+            synthesis: 'Done',
+            maxRoundsReached: false,
+        ));
+
+        $resumeDir = sys_get_temp_dir() . '/test_resume_addendum_' . uniqid();
+        mkdir($resumeDir, 0777, true);
+
+        // Act
+        ($this->handler)(new OrchestrateChainCommand(
+            chainName: 'dynamic_simple',
+            task: 'Появились скриншоты, дайте слово участникам',
+            resumeDir: $resumeDir,
+        ));
+
+        // Assert: task-аргумент доходит до контекста фасилитатора, тема — из сессии
+        $capturedContext = $this->stubLoopRunner->getCapturedContext();
+        self::assertNotNull($capturedContext);
+        self::assertSame('Появились скриншоты, дайте слово участникам', $capturedContext->taskAddendum);
+        self::assertSame('Feature Y design', $capturedContext->topic);
+    }
 }

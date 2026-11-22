@@ -24,6 +24,7 @@ final readonly class BuildDynamicContextService implements BuildDynamicContextSe
         ?string $workingDir,
         int $timeout,
         ?int $maxTime = null,
+        ?string $taskAddendum = null,
     ): DynamicLoopContextVo {
         $promptConfig = $chain->getPromptConfiguration();
 
@@ -46,6 +47,7 @@ final readonly class BuildDynamicContextService implements BuildDynamicContextSe
             workingDir: $workingDir,
             timeout: $timeout,
             maxTime: $maxTime,
+            taskAddendum: $taskAddendum,
         );
     }
 

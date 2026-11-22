@@ -14,6 +14,8 @@ interface BuildDynamicContextServiceInterface
 {
     /**
      * @param list<string> $participants
+     * @param string|null $taskAddendum Дополнение от Лида при resume (аргумент task
+     *                                  CLI-команды); null — дополнения нет
      */
     public function buildContext(
         DynamicLoopConfigVo $chain,
@@ -24,6 +26,7 @@ interface BuildDynamicContextServiceInterface
         ?string $workingDir,
         int $timeout,
         ?int $maxTime = null,
+        ?string $taskAddendum = null,
     ): DynamicLoopContextVo;
 
     /**

@@ -151,6 +151,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
             $command->workingDir,
             $resumeTimeout,
             $command->maxTime ?? $config->getMaxTime() ?? self::DEFAULT_DYNAMIC_MAX_TIME,
+            $command->task,
         );
 
         $loopResult = $this->runDynamicLoop(

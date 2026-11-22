@@ -17,6 +17,7 @@ interface DynamicLoopPromptFormatterInterface
         string $topic,
         string $facilitatorSummary,
         string $responseFilesList,
+        ?string $taskAddendum = null,
     ): string;
 
     public function buildFinalizeContext(
