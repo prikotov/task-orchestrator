@@ -47,7 +47,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Gene
  */
 final class OrchestrateCommand extends Command
 {
-    private const string ARG_THEME = 'theme';
+    private const string ARG_TASK = 'task';
     private const string OPT_CHAIN = 'chain';
     private const string OPT_WORKING_DIR = 'working-dir';
     private const string OPT_DRY_RUN = 'dry-run';
@@ -86,12 +86,12 @@ final class OrchestrateCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument(self::ARG_THEME, InputArgument::REQUIRED, 'Тема для оркестрации')
+            ->addArgument(self::ARG_TASK, InputArgument::REQUIRED, 'Задача для оркестрации')
             ->addOption(self::OPT_CHAIN, 'c', InputOption::VALUE_OPTIONAL, 'Имя цепочки', 'implement')
             ->addOption(self::OPT_WORKING_DIR, 'd', InputOption::VALUE_OPTIONAL, 'Рабочая директория')
             ->addOption(self::OPT_DRY_RUN, null, InputOption::VALUE_NONE, 'Показать план без запуска')
             ->addOption(self::OPT_TIMEOUT, 't', InputOption::VALUE_OPTIONAL, 'Таймаут на шаг (секунды). Если не задан — из chain.timeout, иначе default 600 (static/dynamic)')
-            ->addOption(self::OPT_TOPIC, null, InputOption::VALUE_OPTIONAL, 'Тема для dynamic-цепочки (по умолчанию = тема)')
+            ->addOption(self::OPT_TOPIC, null, InputOption::VALUE_OPTIONAL, 'Тема для dynamic-цепочки (по умолчанию = task)')
             ->addOption(self::OPT_MAX_ROUNDS, null, InputOption::VALUE_OPTIONAL, 'Макс. раундов (dynamic)')
             ->addOption(self::OPT_FACILITATOR, null, InputOption::VALUE_OPTIONAL, 'Роль фасилитатора (dynamic)')
             ->addOption(self::OPT_PARTICIPANTS, null, InputOption::VALUE_OPTIONAL, 'Участники через запятую (dynamic)')
@@ -135,7 +135,7 @@ final class OrchestrateCommand extends Command
 
         try {
             /** @var string $task */
-            $task = $input->getArgument(self::ARG_THEME);
+            $task = $input->getArgument(self::ARG_TASK);
             /** @var string $chainName */
             $chainName = $input->getOption(self::OPT_CHAIN);
             /** @var bool $dryRun */
