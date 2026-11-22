@@ -16,7 +16,7 @@ php vendor/bin/task-orchestrator list
 Основная команда оркестрации — запускает цепочку агентов (Static или Dynamic).
 
 ```bash
-php vendor/bin/task-orchestrator agent:orchestrate <тема> [options]
+php vendor/bin/task-orchestrator agent:orchestrate <theme> [options]
 ```
 
 | Опция | Сокращение | Описание | По умолчанию |
@@ -27,7 +27,7 @@ php vendor/bin/task-orchestrator agent:orchestrate <тема> [options]
 | `--working-dir` | `-d` | Рабочая директория проекта | — |
 | `--dry-run` | — | Показать план цепочки без запуска | — |
 | `--timeout` | `-t` | Таймаут на один шаг (секунды). При явном указании переопределяет `chain.timeout` | из `chain.timeout`, иначе `600` (static/dynamic) |
-| `--topic` | — | Тема для dynamic-цепочки (по умолчанию = аргумент «тема») | — |
+| `--topic` | — | Тема для dynamic-цепочки (по умолчанию = аргумент `theme`) | — |
 | `--max-rounds` | — | Макс. раундов (dynamic) | — |
 | `--max-time` | — | Макс. время сессии в секундах (dynamic). При явном указании переопределяет `chain.max_time` | из `chain.max_time`, иначе `3600` |
 | `--facilitator` | — | Роль фасилитатора (dynamic) | — |

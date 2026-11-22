@@ -22,10 +22,10 @@ description: Запуск оркестрации ИИ-агентов по цеп
 ## Синтаксис
 
 ```bash
-php vendor/bin/task-orchestrator agent:orchestrate [options] [--] <тема>
+php vendor/bin/task-orchestrator agent:orchestrate [options] [--] <theme>
 ```
 
-`<тема>` — тема (вводная) для агентов. Обязательный позиционный аргумент.
+`<theme>` — тема (вводная) для агентов. Обязательный позиционный аргумент.
 
 ## Опции
 

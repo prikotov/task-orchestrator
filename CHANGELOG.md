@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **BREAKING**: позиционный аргумент `task` команды `agent:orchestrate` переименован в `тема` (новое имя в `--help` и внутренний ключ; позиционный способ вызова не изменился). Причина: термин «тема» соответствует домену, а слово `task` перегружено на проекте (ID задач доски). При resume аргумент «тема» служит «Дополнением от Лида» для фасилитатора. Обновлены документы: `docs/guide/cli.md`, `docs/agents/skills/brainstorm/SKILL.md`, `docs/agents/skills/task-orchestrator/SKILL.md`.
+- **BREAKING**: позиционный аргумент `task` команды `agent:orchestrate` переименован в `theme` (новое имя в `--help` и внутренний ключ; позиционный способ вызова не изменился). Причина: слово `task` перегружено на проекте (ID задач доски); в документации тема обозначается русским термином «тема». При resume аргумент служит «Дополнением от Лида» для фасилитатора. Обновлены документы: `docs/guide/cli.md`, `docs/agents/skills/brainstorm/SKILL.md`, `docs/agents/skills/task-orchestrator/SKILL.md`.
 
 ## [0.15.1] - 2026-11-12
 

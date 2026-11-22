@@ -47,7 +47,7 @@ use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\Gene
  */
 final class OrchestrateCommand extends Command
 {
-    private const string ARG_THEME = 'тема';
+    private const string ARG_THEME = 'theme';
     private const string OPT_CHAIN = 'chain';
     private const string OPT_WORKING_DIR = 'working-dir';
     private const string OPT_DRY_RUN = 'dry-run';
