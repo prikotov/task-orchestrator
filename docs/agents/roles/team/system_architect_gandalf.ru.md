@@ -53,7 +53,7 @@ description: "Отвечает за техническое видение, ар�
 
 ## Инструменты
 
-*   `vendor/bin/coding-standard-metrics-review --base=<target>` — дельта метрик качества правок относительно базовой ветки (сложность CC/WMC, связанность LCOM4/Ca/Ce, покрытие, churn) в `var/metrics-review/`.
+*   `vendor/bin/coding-standard-metrics-review --base=<target>` формирует дельту метрик качества правок относительно базовой ветки (сложность CC/WMC, связанность LCOM4/Ca/Ce, покрытие, churn) в `var/metrics-review/`.
 
 ## Входные данные
 *   Технические требования от Аналитика.
