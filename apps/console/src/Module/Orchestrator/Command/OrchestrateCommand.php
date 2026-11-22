@@ -91,7 +91,7 @@ final class OrchestrateCommand extends Command
             ->addOption(self::OPT_WORKING_DIR, 'd', InputOption::VALUE_OPTIONAL, 'Рабочая директория')
             ->addOption(self::OPT_DRY_RUN, null, InputOption::VALUE_NONE, 'Показать план без запуска')
             ->addOption(self::OPT_TIMEOUT, 't', InputOption::VALUE_OPTIONAL, 'Таймаут на шаг (секунды). Если не задан — из chain.timeout, иначе default 600 (static/dynamic)')
-            ->addOption(self::OPT_TOPIC, null, InputOption::VALUE_OPTIONAL, 'Тема для dynamic-цепочки (по умолчанию = task)')
+            ->addOption(self::OPT_TOPIC, null, InputOption::VALUE_OPTIONAL, 'Тема для dynamic-цепочки (по умолчанию = тема)')
             ->addOption(self::OPT_MAX_ROUNDS, null, InputOption::VALUE_OPTIONAL, 'Макс. раундов (dynamic)')
             ->addOption(self::OPT_FACILITATOR, null, InputOption::VALUE_OPTIONAL, 'Роль фасилитатора (dynamic)')
             ->addOption(self::OPT_PARTICIPANTS, null, InputOption::VALUE_OPTIONAL, 'Участники через запятую (dynamic)')
