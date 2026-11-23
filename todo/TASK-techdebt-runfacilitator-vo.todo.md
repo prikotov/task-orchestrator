@@ -2,7 +2,7 @@
 type: refactor
 created: 2026-11-23 19:30:07 (1795437007)
 due: 
-started: 
+started: 2026-11-23 21:39:12 (1795444752)
 completed: 
 cancelled: 
 value: V2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Алекс (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/runfacilitator-vo
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-techdebt-runfacilitator-vo: Инкапсулировать хвост сигнатуры runFacilitator() в VO
