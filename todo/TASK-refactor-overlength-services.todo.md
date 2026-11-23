@@ -2,7 +2,7 @@
 type: refactor
 created: 2026-11-22 06:39:05 (1795329545)
 due: 
-started: 
+started: 2026-11-23 12:24:39 (1795411479)
 completed: 
 cancelled: 
 value: V2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Бэкендер Левша (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/refactor-overlength-services
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-refactor-overlength-services: Разбить классы, переросшие порог 500 LOC (Kernel, YamlChainLoaderService)
