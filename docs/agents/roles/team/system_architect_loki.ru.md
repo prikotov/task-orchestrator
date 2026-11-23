@@ -61,6 +61,7 @@ description: "Архитектор с прагматичным и скептич
 *   [Конвенции](../../../../docs/conventions/index.md).
 *   Существующая архитектурная документация в [`docs/`](../../../../docs/).
 *   Правила оформления задач из [`todo/AGENTS.md`](../../../../todo/AGENTS.md).
+*   [Архитектурное ревью (RV-A)](../../../../docs/guide/review-architectural.md) — правила проведения трека (гейтинг, ослабления проверок).
 *   Дельта метрик качества из [`var/metrics-review/`](../../../../docs/conventions/ops/quality-metrics.md); правила интерпретации — [Метрики качества](../../../../docs/conventions/ops/quality-metrics.md).
 
 ## Выходные данные

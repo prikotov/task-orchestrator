@@ -33,6 +33,7 @@ description: "Отвечает за функциональное ревью back
 *   Постановка задачи и критерии приёмки из [todo/](../../../../todo/AGENTS.md).
 *   [Конвенции](../../../../docs/conventions/index.md).
 *   [Конвенции тестирования](../../../../docs/conventions/testing/index.md).
+*   [Функциональное ревью (RV-F)](../../../../docs/guide/review-functional.md) — правила проведения трека.
 
 ## Выходные данные
 *   Список замечаний (Change Request) или Апрув.
