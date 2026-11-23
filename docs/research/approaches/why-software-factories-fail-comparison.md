@@ -63,7 +63,7 @@ Dex Horthy описывает провал `dark factory` (тёмная фабр
 
 | Тезис | Наши артефакты | Покрытие |
 |-------|----------------|----------|
-| Нельзя убирать человеческий `review` | [AGENTS.md / Pull Requests](../../../AGENTS.md#pull-request-запросы-на-слияние), [task-via-subagents / Self-review и Code Review](../../agents/skills/task-via-subagents/SKILL.md#шаг-4-самопроверка), [epic-via-subagents / ревью обязательно](../../agents/skills/epic-via-subagents/SKILL.md#шаг-6-ревью) | ✅ Уже покрыто |
+| Нельзя убирать человеческий `review` | [AGENTS.md / Pull Requests](../../../AGENTS.md#pull-request-запросы-на-слияние), [task-via-subagents / Self-review и Code Review](../../agents/skills/task-via-subagents/SKILL.md#шаг-4-самопроверка), [epic-via-subagents / ревью обязательно](../../agents/skills/epic-via-subagents/SKILL.md#шаг-6-функциональное-ревью) | ✅ Уже покрыто |
 | Поддерживаемость важнее локально зелёных тестов | [Конвенции первичны](../../../AGENTS.md#терминология), [Layer Interaction](../../conventions/layers/layers.md), [Architecture](../../guide/architecture.md) | ✅ Уже покрыто |
 | Риск `bad PR` дороже риска `many PRs` | [Один PR содержит одну задачу](../../../AGENTS.md#мини-чеклист-для-самопроверки), [todo/AGENTS.md / декомпозиция](../../../todo/AGENTS.md#декомпозиция-задач) | ✅ Уже покрыто |
 | Модель/RL не гарантирует качество | В проекте нет зависимости от конкретного обучения модели; качество обеспечивается процессом, ролями и проверками. | ⚠️ Информационный тезис |
