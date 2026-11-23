@@ -3,7 +3,7 @@ type: chore
 created: 2026-11-23 04:23:42 (1795407822)
 due: 
 started: 2026-11-23 04:24:30 (1795407870)
-completed: 
+completed: 2026-11-23 04:39:41 (1795408781)
 cancelled: 
 value: V2
 complexity: C1
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/chains-qwen4-review-profile
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/489
+status: done
 ---
 
 # TASK-chains-qwen4-review-profile: Перевод ревью (Пуаро) и Тони-C0 с ollama/huihui на Alibaba qwen4-max-preview
