@@ -5,6 +5,7 @@
 ## Содержание
 
 - [Архитектура](architecture.md) — структура модуля, DDD-слои, зависимости, CQRS, мультидвижковая архитектура
+- [Правила проведения ревью](code-review.md) — два трека (RV-F/RV-A), гейтинг архитектурного ревью, лимиты и апрувы, документирование расхождений
 - [Диаграммы](diagrams.md) — Mermaid-диаграммы: component-обзор слоёв, class-диаграмма Domain, диаграммы последовательностей (sequence, static/dynamic)
 - [Цепочки](chains.md) — static/dynamic цепочки, `fix_iterations`, `quality gates`, перекрёстная проверка моделей (cross-model verification)
 - [Роли](roles.md) — конфигурация ролей, маппинг на `.md` файлы
