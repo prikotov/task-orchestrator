@@ -22,7 +22,9 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\CollectF
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlChainStepMapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRetryPolicyMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRoleConfigMapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\ResolveYamlDynamicPromptsService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Enum\OrchestrateExitCodeEnum;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommandHandler;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Query\GenerateReport\GenerateReportQueryHandler;
@@ -191,6 +193,8 @@ YAML);
             new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification()),
             new YamlChainStepMapper(new ChainStepFactory(), new YamlRetryPolicyMapper()),
             new YamlRetryPolicyMapper(),
+            new YamlRoleConfigMapper(),
+            new ResolveYamlDynamicPromptsService(),
         );
         $validateHandler = new ValidateChainConfigQueryHandler(
             $chainLoader,

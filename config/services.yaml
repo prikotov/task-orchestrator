@@ -109,7 +109,7 @@ services:
   # контейнера (шаг (A) решения П2); не phar-зависимые (base_path/is_phar) —
   # plain-параметры ядра. Filesystem резолвится через FrameworkBundle. Сама
   # команда InitCommand регистрируется PHAR-safe регистратором
-  # Kernel::registerConsoleServices() и получает сервис через явный alias ниже
+  # ConsoleServicesRegistrar и получает сервис через явный alias ниже
   # (autowire).
   TaskOrchestrator\Console\Module\Orchestrator\Skill\Service\InstallBecomeRoleService:
     arguments:

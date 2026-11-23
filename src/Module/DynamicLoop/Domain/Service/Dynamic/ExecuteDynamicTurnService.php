@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic;
 
-use LogicException;
 use Override;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Entity\DynamicLoopExecution;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Helper\DynamicRoleCommandHelper;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Helper\DynamicRoundResultHelper;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Audit\DynamicLoopAuditLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Session\DynamicLoopSessionLoggerInterface;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopBudgetVo;
@@ -14,9 +15,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopCon
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRetryPolicyVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRoleConfigVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorResponseVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorTurnResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnBreakVo;
@@ -29,9 +28,6 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
 {
     /** @var string Причина прерывания цикла по таймауту */
     private const string INTERRUPTION_REASON_TIMEOUT = 'timeout';
-
-    /** @var string Ошибка пустого ответа агента */
-    private const string EMPTY_OUTPUT_ERROR_MESSAGE = 'Agent returned empty output.';
 
     public function __construct(
         private RunDynamicLoopAgentServiceInterface $agentRunner,
@@ -193,7 +189,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         );
         $facResponseFilesList = $this->buildResponseFilesList($facResponsePaths);
         $facRoleConfig = $chain->getRoleConfig($context->facilitatorRole);
-        $facRunner = self::resolveRunner($facRoleConfig);
+        $facRunner = DynamicRoleCommandHelper::parseRunner($facRoleConfig);
         $auditLogger?->logStepStart(
             $chain->getName(),
             $execution->getStep(),
@@ -209,12 +205,12 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $chain->getDefaultRetryPolicy(),
         );
 
-        $roundVo = self::toRoundResultVo(
+        $roundVo = DynamicRoundResultHelper::fromTurnResult(
             $turnResult,
             $execution->getStep(),
             $context->facilitatorRole,
             true,
-            self::resolveThinking($facRoleConfig),
+            DynamicRoleCommandHelper::parseThinking($facRoleConfig),
         );
         $facVo = new FacilitatorTurnResultVo(
             roundResult: $roundVo,
@@ -269,7 +265,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         );
         $responseFilesList = $this->buildResponseFilesList($prevResponsePaths);
         $partRoleConfig = $chain->getRoleConfig($nextRole);
-        $partRunner = self::resolveRunner($partRoleConfig);
+        $partRunner = DynamicRoleCommandHelper::parseRunner($partRoleConfig);
         $auditLogger?->logStepStart(
             $chain->getName(),
             $execution->getStep(),
@@ -294,14 +290,14 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $partRoleConfig?->getPromptFile(),
             $chain->getDefaultRetryPolicy(),
         );
-        $turnResult = self::normalizeEmptySuccessfulOutput($turnResult);
+        $turnResult = DynamicRoundResultHelper::normalizeEmptyOutput($turnResult);
 
-        $roundVo = self::toRoundResultVo(
+        $roundVo = DynamicRoundResultHelper::fromTurnResult(
             $turnResult,
             $execution->getStep(),
             $nextRole,
             false,
-            self::resolveThinking($partRoleConfig),
+            DynamicRoleCommandHelper::parseThinking($partRoleConfig),
         );
         $this->roundRecorder->record(
             $execution,
@@ -330,7 +326,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         );
         $facResponseFilesList = $this->buildResponseFilesList($facResponsePaths);
         $finRoleConfig = $chain->getRoleConfig($context->facilitatorRole);
-        $finRunner = self::resolveRunner($finRoleConfig);
+        $finRunner = DynamicRoleCommandHelper::parseRunner($finRoleConfig);
         $auditLogger?->logStepStart(
             $chain->getName(),
             $execution->getStep(),
@@ -353,12 +349,12 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             retryPolicy: $chain->getDefaultRetryPolicy(),
         );
 
-        $roundVo = self::toRoundResultVo(
+        $roundVo = DynamicRoundResultHelper::fromTurnResult(
             $turnResult,
             $execution->getStep(),
             $context->facilitatorRole,
             true,
-            self::resolveThinking($finRoleConfig),
+            DynamicRoleCommandHelper::parseThinking($finRoleConfig),
         );
         $this->roundRecorder->record(
             $execution,
@@ -375,87 +371,6 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         );
 
         return $turnResult;
-    }
-
-    public static function resolveRunner(?DynamicLoopRoleConfigVo $roleConfig): string
-    {
-        $command = $roleConfig?->getCommand() ?? [];
-        if ($command === [] || $command[0] === '') {
-            throw new LogicException(
-                'Role configuration must define a non-empty command with runner name as the first element.',
-            );
-        }
-
-        return $command[0];
-    }
-
-    /**
-     * Извлекает уровень thinking из команды роли (профиль command: `--thinking <level>`).
-     *
-     * Возвращает null, если флаг отсутствует или значение выглядит как следующий флаг.
-     */
-    public static function resolveThinking(?DynamicLoopRoleConfigVo $roleConfig): ?string
-    {
-        $command = $roleConfig?->getCommand() ?? [];
-        foreach ($command as $i => $part) {
-            if ($part === '--thinking' && isset($command[$i + 1])) {
-                $next = $command[$i + 1];
-
-                return str_starts_with($next, '--') ? null : $next;
-            }
-        }
-
-        return null;
-    }
-
-    public static function toRoundResultVo(
-        DynamicLoopTurnResultVo $turn,
-        int $step,
-        string $role,
-        bool $isFacilitator,
-        ?string $thinking = null,
-    ): DynamicRoundResultVo {
-        $agent = $turn->agentResult;
-
-        return new DynamicRoundResultVo(
-            round: $step,
-            role: $role,
-            isFacilitator: $isFacilitator,
-            outputText: $agent->getOutputText(),
-            inputTokens: $agent->getInputTokens(),
-            outputTokens: $agent->getOutputTokens(),
-            cost: $agent->getCost(),
-            duration: $turn->duration,
-            isError: $agent->isError(),
-            errorMessage: $agent->getErrorMessage(),
-            invocation: $turn->invocation,
-            systemPrompt: $turn->systemPrompt,
-            userPrompt: $turn->userPrompt,
-            timedOut: $agent->isTimedOut(),
-            model: $agent->getModel(),
-            provider: $agent->getProvider(),
-            thinking: $thinking,
-            cacheReadTokens: $agent->getCacheReadTokens(),
-            cacheWriteTokens: $agent->getCacheWriteTokens(),
-        );
-    }
-
-    private static function normalizeEmptySuccessfulOutput(DynamicLoopTurnResultVo $turnResult): DynamicLoopTurnResultVo
-    {
-        if ($turnResult->agentResult->isError() || trim($turnResult->agentResult->getOutputText()) !== '') {
-            return $turnResult;
-        }
-
-        return new DynamicLoopTurnResultVo(
-            agentResult: DynamicLoopRunResultVo::createError(
-                errorMessage: self::EMPTY_OUTPUT_ERROR_MESSAGE,
-                exitCode: 0,
-            ),
-            duration: $turnResult->duration,
-            userPrompt: $turnResult->userPrompt,
-            systemPrompt: $turnResult->systemPrompt,
-            invocation: $turnResult->invocation,
-        );
     }
 
     /**

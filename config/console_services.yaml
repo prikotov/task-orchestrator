@@ -11,8 +11,9 @@ services:
 
   # --- Console-команды и подписчики apps/console ---
   # Auto-discovery каталогов Command/EventSubscriber модулей apps/console
-  # выполняется PHAR-safe регистратором ModuleServiceRegistrar (public=true) в
-  # Kernel::build(): см. TaskOrchestrator\Common\Kernel::registerConsoleServices().
+  # выполняется PHAR-safe регистратором ConsoleServicesRegistrar (public=true)
+  # в Kernel::build(): см.
+  # TaskOrchestrator\Common\Component\ModuleSystem\DependencyInjection\ConsoleServicesRegistrar.
   # Раньше здесь были три блока `resource:` (apps/console/src/Module/.../Command/*
   # и .../EventSubscriber/*), но Symfony GlobResource не работает по phar:// и
   # ломал сборку PHAR — команды модулей не регистрировались в архиве.

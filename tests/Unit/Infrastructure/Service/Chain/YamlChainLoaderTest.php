@@ -16,7 +16,9 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\ChainRetry
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\ValueObject\RoleConfigVo;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlChainStepMapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRetryPolicyMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRoleConfigMapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\ResolveYamlDynamicPromptsService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -112,6 +114,8 @@ YAML;
             self::createFactory(),
             new YamlChainStepMapper(new ChainStepFactory(), $retryPolicyMapper),
             $retryPolicyMapper,
+            new YamlRoleConfigMapper(),
+            new ResolveYamlDynamicPromptsService(),
         );
     }
 
