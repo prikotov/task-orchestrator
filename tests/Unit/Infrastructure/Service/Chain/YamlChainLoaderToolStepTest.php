@@ -11,7 +11,9 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainStepFacto
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlChainStepMapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRetryPolicyMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRoleConfigMapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\ResolveYamlDynamicPromptsService;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -45,6 +47,8 @@ final class YamlChainLoaderToolStepTest extends TestCase
             self::createFactory(),
             new YamlChainStepMapper(new ChainStepFactory(), $retryPolicyMapper),
             $retryPolicyMapper,
+            new YamlRoleConfigMapper(),
+            new ResolveYamlDynamicPromptsService(),
         );
     }
 

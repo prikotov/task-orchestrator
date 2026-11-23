@@ -24,13 +24,11 @@ use TaskOrchestrator\Common\Component\ModuleSystem\Extension\TwigInterface;
  * prepend-extension-config ключа «framework».
  *
  * Trait не знает о конкретных модулях и не зависит от Doctrine (проект не
- * использует БД). Используется классом Kernel.
- *
- * Требует от использующего класса метод isEnvironmentIncluded(array $envs): bool.
+ * использует БД). Используется классом Kernel: включение модуля в текущее
+ * окружение решается внутри трейта (isEnvironmentIncluded) — отдельный
+ * контракт на использующий класс не требуется.
  *
  * @see \TaskOrchestrator\Common\Kernel
- *
- * @method bool isEnvironmentIncluded(array<string, bool> $envs)
  */
 trait ModuleKernelTrait
 {
@@ -95,5 +93,17 @@ trait ModuleKernelTrait
                 }
             }
         }
+    }
+
+    /**
+     * Модуль включён в текущее окружение: матчинг по $this->environment с
+     * fallback на ключ «all» (формат реестра config/modules.php — как
+     * config/bundles.php в Symfony).
+     *
+     * @param array<string, bool> $envs
+     */
+    private function isEnvironmentIncluded(array $envs): bool
+    {
+        return $envs[$this->environment] ?? $envs['all'] ?? false;
     }
 }

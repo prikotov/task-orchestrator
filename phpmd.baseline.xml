@@ -1,18 +1,5 @@
 <?xml version="1.0"?>
 <phpmd-baseline>
-  <!--
-    @techdebt 2026-11-22 — временное решение. Классы переросли порог 500 LOC в
-    коммитах b02b40ef (2026-11-06) и 493b7de6 (2026-11-07) вне рамок задачи
-    TASK-fix-resume-task-arg-not-in-facilitator-prompt: `make check` падает и на
-    origin/main (проверено на worktree c668fa03). Рефакторинг Kernel.php и
-    YamlChainLoaderService.php — отдельная задача TASK-refactor-overlength-services;
-    по её выполнении эти записи удаляются (политика PR #356: length-нарушения
-    в baseline не живут постоянно).
-  -->
-  <violation rule="PHPMD\Rule\Design\ExcessiveClassLength" file="src/Kernel.php"/>
-  <violation rule="PHPMD\Rule\Design\ExcessiveClassLength" file="src/Module/ChainDefinition/Infrastructure/Service/Chain/YamlChainLoaderService.php"/>
-  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/Kernel.php"/>
-  <violation rule="PHPMD\Rule\UnusedPrivateMethod" file="src/Kernel.php" method="isEnvironmentIncluded"/>
   <violation rule="PHPMD\Rule\CleanCode\ElseExpression" file="src/Module/GitIdentity/Application/UseCase/Command/ObtainToken/ObtainTokenCommandHandler.php"/>
   <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/Module/GitIdentity/Infrastructure/Component/GitHub/GitHubHttpComponent.php"/>
   <violation rule="PHPMD\Rule\CleanCode\ErrorControlOperator" file="src/Module/GitIdentity/Infrastructure/Service/FilesystemTokenCacheService.php" method="atomicWrite"/>

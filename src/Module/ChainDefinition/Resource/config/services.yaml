@@ -29,6 +29,9 @@ services:
   TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\YamlChainLoaderServiceInterface:
     alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService
 
+  TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Chain\ResolveYamlDynamicPromptsServiceInterface:
+    alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\ResolveYamlDynamicPromptsService
+
   TaskOrchestrator\Common\Module\ChainDefinition\Domain\Service\Connectivity\ConnectivityRoleTargetProviderInterface:
     alias: TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Connectivity\YamlConnectivityRoleTargetProviderService
 

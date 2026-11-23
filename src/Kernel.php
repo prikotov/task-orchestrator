@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common;
 
-use Composer\InstalledVersions;
 use Override;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use TaskOrchestrator\Common\Component\CommandBus\DependencyInjection\UseCaseBusCompilerPass;
-use TaskOrchestrator\Common\Component\ModuleSystem\DependencyInjection\ModuleServiceRegistrar;
+use TaskOrchestrator\Common\Component\ModuleSystem\DependencyInjection\ConsoleServicesRegistrar;
+use TaskOrchestrator\Common\Component\ModuleSystem\DependencyInjection\KernelParametersRegistrar;
 use TaskOrchestrator\Common\Component\ModuleSystem\ModuleKernelTrait;
 use TaskOrchestrator\Common\Component\PharCache\CacheRootGarbageCollector;
 use TaskOrchestrator\Common\Component\PharCache\CacheRootOwner;
 use TaskOrchestrator\Common\Component\PharCache\CacheRootOwnershipLock;
+use TaskOrchestrator\Common\Component\PharRuntime\PharRunningPathResolver;
 use TaskOrchestrator\Common\Component\PharRuntime\PharRuntimePathsProviderInterface;
+use TaskOrchestrator\Common\Component\Release\ReleaseVersionResolver;
 use TaskOrchestrator\Common\Module\AgentRunner\Domain\Service\AgentRunnerInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Contract\Chain\ExecutionStrategyInterface;
 use TaskOrchestrator\Common\Module\ChainExecution\Domain\Service\Static\ExecuteStepServiceInterface;
-use TaskOrchestrator\Common\ValueObject\ReleaseVersionVo;
 use Throwable;
 use const PHP_OS_FAMILY;
 
@@ -46,9 +47,10 @@ use const PHP_OS_FAMILY;
  * config/services.yaml грузятся через MicroKernelTrait::getConfigDir() =
  * getProjectDir()/config) и параметр kernel.project_dir.
  *
- * Параметры task_orchestrator.* устанавливаются в getKernelParameters() — это
- * самый ранний этап сборки контейнера, поэтому параметры гарантированно доступны
- * при импорте services.yaml (resource/exclude и аргументы ссылаются на них).
+ * Параметры task_orchestrator.* собирает KernelParametersRegistrar, устанавливаются
+ * они в getKernelParameters() — самый ранний этап сборки контейнера, поэтому
+ * параметры гарантированно доступны при импорте services.yaml (resource/exclude
+ * и аргументы ссылаются на них).
  *
  * Dual-context (vendor binary): конструктор принимает $projectRoot — каталог
  * host-проекта, из которого берутся роли, цепочки и base_path (с fallback на
@@ -261,72 +263,24 @@ class Kernel extends BaseKernel implements PharRuntimePathsProviderInterface
     /**
      * Параметры ядра: стандартные kernel.* + параметры TaskOrchestrator.
      *
-     * Устанавливаются на этапе конструирования контейнера (раньше любого импорта
-     * конфигурации), поэтому task_orchestrator.* доступны services.yaml и
-     * модульным Resource/config/services.yaml без отдельной настройки.
-     * Обычные (plain) параметры запекаются при компиляции; phar-зависимые
-     * (package_dir/phar_path), layout-пути и локаль AI-ролей остаются
-     * динамическими env-плейсхолдерами и резолвятся в runtime (см. ниже).
+     * Состав и семантика task_orchestrator.* — в
+     * {@see KernelParametersRegistrar::parameters()}: устанавливаются на этапе
+     * конструирования контейнера (раньше любого импорта конфигурации), поэтому
+     * доступны services.yaml и модульным Resource/config/services.yaml без
+     * отдельной настройки. Объединение через `+` безопасно: ключи kernel.* и
+     * task_orchestrator.* не пересекаются, приоритет у стандартных kernel.*.
      *
      * @return array<string, mixed>
      */
     #[Override]
     protected function getKernelParameters(): array
     {
-        $parameters = parent::getKernelParameters();
-
-        $projectRoot = $this->getProjectRoot();
-
-        // Phar-зависимые пути — динамические env-параметры (шаг (A) решения П2):
-        // в скомпилированном контейнере параметр остаётся env-плейсхолдером и
-        // резолвится через env-процессор Component/PharRuntime при КАЖДОМ
-        // обращении к параметру от ЗАПУЩЕННОГО кода/архива (провайдер — ядро:
-        // packageDir()/runningPharPath(), см. PharRuntimePathsProviderInterface).
-        // Поэтому перемещение PHAR не оставляет мёртвых phar://-ссылок даже при
-        // переиспользовании персистентного кеша в debug=false (ConfigCache не
-        // проверяет свежесть); внешний контракт agent:init сохранён (.phar-binding
-        // = физический путь запущенного PHAR). Имя после префикса —
-        // дискриминатор ресурса процессора, не env-переменная.
-        $parameters['task_orchestrator.package_dir'] = '%env(task_orchestrator_phar:package_dir)%';
-        $parameters['task_orchestrator.phar_path'] = '%env(task_orchestrator_phar:phar_path)%';
-
-        // base_path/chains_session_dir — host-корень и его производная: в
-        // dual-context от пути PHAR не зависят (фар-зависимость — только в
-        // standalone-PHAR, D4 — вне объёма шага (A)), поэтому остаются обычными
-        // параметрами. is_phar — флаг режима, от пути архива не зависит.
-        $parameters['task_orchestrator.base_path'] = $projectRoot;
-        $parameters['task_orchestrator.is_phar'] = $this->isPhar();
-        $parameters['task_orchestrator.chains_session_dir'] = $projectRoot . '/var/sessions';
-        $parameters['task_orchestrator.platform_family'] = $this->platformFamily;
-
-        // Локаль AI-ролей (role files + каталог skills) задаётся runtime
-        // env-плейсхолдером: в скомпилированном контейнере параметр остаётся
-        // динамическим (Container::getEnv() при обращении), поэтому смена
-        // TASK_ORCHESTRATOR_LOCALE применяется при следующем запуске БЕЗ очистки
-        // кеша при том же корне кеша. Нормализация контракта (пустая auto-локаль
-        // при незаданной/пустой переменной, trim, lower-case) — единая точка
-        // TaskOrchestratorLocaleEnvVarProcessor; fallback на APP_LOCALE
-        // отсутствует намеренно. Локаль Symfony-переводчика (framework.
-        // default_locale в config/packages/translation.yaml) независима от
-        // локали AI-ролей.
-        $parameters['task_orchestrator.locale'] = '%env(task_orchestrator_locale:TASK_ORCHESTRATOR_LOCALE)%';
-
-        // Runtime layout (roles_dir/skills_dir/chains_yaml) — тоже динамические
-        // env-параметры (QA-3): выбор host/package НЕ запекается в скомпилированный
-        // контейнер, а выполняется env-процессором Component/Layout при каждом
-        // обращении к параметру. Ресурсы host-проекта, созданные после первого
-        // запуска PHAR, разрешаются в host уже на следующем запуске без ручной
-        // очистки кеша; fallback на упакованные ресурсы пакета сохраняется, а при
-        // отсутствии обоих кандидатов процессор бросает явное исключение.
-        // Имя после префикса — дискриминатор ресурса процессора, не env-переменная.
-        $parameters['task_orchestrator.roles_dir'] = '%env(task_orchestrator_layout:roles_dir)%';
-        $parameters['task_orchestrator.skills_dir'] = '%env(task_orchestrator_layout:skills_dir)%';
-        $parameters['task_orchestrator.skills_dirs'] = '%env(task_orchestrator_layout:skills_dirs)%';
-        $parameters['task_orchestrator.chains_yaml'] = '%env(task_orchestrator_layout:chains_yaml)%';
-
-        $parameters['app.version'] = $this->resolveVersion();
-
-        return $parameters;
+        return parent::getKernelParameters() + (new KernelParametersRegistrar(
+            projectRoot: $this->getProjectRoot(),
+            isPhar: $this->isPhar(),
+            platformFamily: $this->platformFamily,
+            version: $this->resolveVersion(),
+        ))->parameters();
     }
 
     #[Override]
@@ -334,7 +288,11 @@ class Kernel extends BaseKernel implements PharRuntimePathsProviderInterface
     {
         $this->registerAutoconfiguration($container);
         $this->registerModules($container, $this->getModules());
-        $this->registerConsoleServices($container);
+
+        // PHAR-safe регистрация сервисов Presentation-слоя apps/console:
+        // механика каталогов/неймспейсов — в ConsoleServicesRegistrar (см. его
+        // PHPDoc про порядок относительно console_services.yaml и теги Command).
+        (new ConsoleServicesRegistrar($this->packageDir()))->register($container);
 
         // Шины Use Case: пас добавляется ПОСЛЕ регистрационных пасов модулей,
         // поэтому в process() видны все уже зарегистрированные хендлеры
@@ -383,118 +341,15 @@ class Kernel extends BaseKernel implements PharRuntimePathsProviderInterface
     }
 
     /**
-     * PHAR-safe регистрация сервисов Presentation-слоя apps/console
-     * (консольные команды и подписчики событий).
-     *
-     * Заменяет прежние блоки `resource:` в config/console_services.yaml, которые
-     * ломались в PHAR через Symfony GlobResource (возвращает 0 файлов по phar://).
-     *
-     * Каталоги apps/console захардкожены здесь, а не в config/modules.php:
-     * apps/console — это Presentation-слой конкретного CLI-приложения проекта
-     * (не доменный модуль и не переиспользуемая часть библиотеки), поэтому он
-     * не описывается ModuleInterface и не входит в реестр модулей.
-     *
-     * Регистратор вызывается в {@see build()}, до загрузки console_services.yaml
-     * (Symfony: prepareContainer→build → затем registerContainerConfiguration).
-     * Это безопасно: explicit defs в YAML (EventDispatcher/LockFactory/FlockStore)
-     * не пересекаются с FQCN этих каталогов. Теги `console.command` (Command) и
-     * `kernel.event_subscriber` (EventSubscriber) добавляются автоматически через
-     * container-wide registerForAutoconfiguration из FrameworkExtension — она
-     * применяется на этапе compile единообразно для dev и PHAR. public=true
-     * сохраняет прежнее поведение resource:-блоков (команды public).
+     * Действующая версия релиза: приоритет кандидатов и валидация SemVer —
+     * в {@see ReleaseVersionResolver} и {@see ReleaseVersionVo} (явный
+     * APP_RELEASE_VERSION → pretty-версия пакета → pretty-версия корневого
+     * пакета). Хелпер точки сборки создаётся через `new`: вызывается до/вне
+     * контейнера при сборке параметров ядра и пути кеш-корня.
      */
-    private function registerConsoleServices(ContainerBuilder $container): void
-    {
-        $appsConsoleModule = $this->packageDir() . '/apps/console/src/Module';
-
-        foreach (
-            [
-                [
-                    'dir' => $appsConsoleModule . '/Orchestrator/Command',
-                    'namespace' => 'TaskOrchestrator\Console\Module\Orchestrator\Command',
-                ],
-                [
-                    'dir' => $appsConsoleModule . '/GitIdentity/Command',
-                    'namespace' => 'TaskOrchestrator\Console\Module\GitIdentity\Command',
-                ],
-                [
-                    'dir' => $appsConsoleModule . '/AgentRole/Command',
-                    'namespace' => 'TaskOrchestrator\Console\Module\AgentRole\Command',
-                ],
-                [
-                    'dir' => $appsConsoleModule . '/Orchestrator/EventSubscriber',
-                    'namespace' => 'TaskOrchestrator\Console\Module\Orchestrator\EventSubscriber',
-                ],
-            ] as $registration
-        ) {
-            (new ModuleServiceRegistrar(
-                serviceDir: $registration['dir'],
-                serviceNamespace: $registration['namespace'],
-                excludeRelativePaths: [],
-                public: true,
-            ))->register($container);
-        }
-    }
-
     private function resolveVersion(): string
     {
-        return ReleaseVersionVo::createFromCandidates(
-            explicitReleaseVersion: $this->readExplicitReleaseVersion(),
-            packagePrettyVersion: $this->readPackagePrettyVersion(),
-            rootPrettyVersion: $this->readRootPrettyVersion(),
-        )->value();
-    }
-
-    /**
-     * Явно переданная версия release tag (инъецируется процессом сборки/окружением).
-     *
-     * null — значение не передано. Чистый nullable-контракт для {@see ReleaseVersionVo};
-     * валидацию SemVer выполняет Value Object.
-     */
-    private function readExplicitReleaseVersion(): ?string
-    {
-        $explicit = $_SERVER['APP_RELEASE_VERSION'] ?? null;
-
-        return is_string($explicit) && $explicit !== '' ? $explicit : null;
-    }
-
-    /**
-     * Точная pretty version (человекочитаемая версия) пакета Composer.
-     *
-     * Для Composer distribution (приложение как зависимость хост-проекта).
-     * null, если Composer runtime недоступен или пакет не установлен.
-     *
-     * В отличие от нормализованного {@see \Composer\InstalledVersions::getVersion()},
-     * pretty-значение сохраняет исходную SemVer и не превращается в `1.0.0.0`.
-     */
-    private function readPackagePrettyVersion(): ?string
-    {
-        if (!class_exists(InstalledVersions::class)) {
-            return null;
-        }
-
-        /** @var string|null $prettyVersion */
-        $prettyVersion = InstalledVersions::getPrettyVersion('prikotov/task-orchestrator');
-
-        return $prettyVersion;
-    }
-
-    /**
-     * Точная pretty version корневого пакета.
-     *
-     * Для root/PHAR. null, если Composer runtime недоступен.
-     */
-    private function readRootPrettyVersion(): ?string
-    {
-        if (!class_exists(InstalledVersions::class)) {
-            return null;
-        }
-
-        /** @var array<string, mixed> $rootPackage */
-        $rootPackage = InstalledVersions::getRootPackage();
-        $prettyVersion = $rootPackage['pretty_version'] ?? null;
-
-        return is_string($prettyVersion) && $prettyVersion !== '' ? $prettyVersion : null;
+        return (new ReleaseVersionResolver())->resolve();
     }
 
     /**
@@ -635,20 +490,8 @@ class Kernel extends BaseKernel implements PharRuntimePathsProviderInterface
      */
     protected function resolvePharPath(): ?string
     {
-        if (!class_exists(\Phar::class)) {
-            return null;
-        }
-
-        $running = \Phar::running(false);
-
-        return $running === '' ? null : $running;
-    }
-
-    /**
-     * @param array<string, bool> $envs
-     */
-    private function isEnvironmentIncluded(array $envs): bool
-    {
-        return $envs[$this->environment] ?? $envs['all'] ?? false;
+        // static API \Phar изолирован в PharRunningPathResolver (без StaticAccess
+        // в Kernel; см. его PHPDoc) — поведение идентично прежнему inline-коду.
+        return (new PharRunningPathResolver())->runningPath();
     }
 }

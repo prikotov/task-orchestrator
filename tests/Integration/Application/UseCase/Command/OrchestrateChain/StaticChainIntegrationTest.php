@@ -14,8 +14,10 @@ use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainDefinitio
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Factory\ChainStepFactory;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlChainStepMapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRetryPolicyMapper;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Mapper\Chain\YamlRoleConfigMapper;
 use TaskOrchestrator\Common\Module\ChainDefinition\Domain\Specification\Chain\FixIterationsReferenceIntegritySpecification;
 use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\YamlChainLoaderService;
+use TaskOrchestrator\Common\Module\ChainDefinition\Infrastructure\Service\Chain\ResolveYamlDynamicPromptsService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\Chain\StaticExecutionStrategyService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\Service\ExecuteStaticChainService;
 use TaskOrchestrator\Common\Module\ChainExecution\Application\UseCase\Command\OrchestrateChain\OrchestrateChainCommand;
@@ -63,7 +65,7 @@ final class StaticChainIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->chainLoader = new YamlChainLoaderService(self::FIXTURES_DIR . '/test_chains.yaml', new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification()), new YamlChainStepMapper(new ChainStepFactory(), new YamlRetryPolicyMapper()), new YamlRetryPolicyMapper());
+        $this->chainLoader = new YamlChainLoaderService(self::FIXTURES_DIR . '/test_chains.yaml', new ChainDefinitionFactory(new FixIterationsReferenceIntegritySpecification()), new YamlChainStepMapper(new ChainStepFactory(), new YamlRetryPolicyMapper()), new YamlRetryPolicyMapper(), new YamlRoleConfigMapper(), new ResolveYamlDynamicPromptsService());
         $this->stubAgent = new StubRunAgentService();
 
         $budgetService = $this->createStub(CheckStaticBudgetServiceInterface::class);

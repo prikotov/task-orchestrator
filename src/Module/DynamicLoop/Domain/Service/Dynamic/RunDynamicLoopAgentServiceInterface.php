@@ -14,6 +14,9 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorRes
 interface RunDynamicLoopAgentServiceInterface
 {
     /**
+     * @techdebt 2026-11-23: 15 позиционных скалярных параметров — инкапсуляция
+     * хвоста сигнатуры в VO отложена в техдолг, задача согласуется с владельцем.
+     *
      * @param list<string> $command
      * @param string|null $taskAddendum Дополнение от Лида при resume (аргумент task
      *                                  CLI-команды); рендерится блоком в continue/start-промпте
