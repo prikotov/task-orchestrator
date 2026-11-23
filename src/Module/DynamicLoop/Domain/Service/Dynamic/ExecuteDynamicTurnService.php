@@ -16,8 +16,11 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopCon
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRetryPolicyVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRoleConfigVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorFinalizeRunContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorResponseVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorRunContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorTurnResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\ParticipantRunContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnBreakVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnContinueVo;
 
@@ -274,21 +277,23 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         );
 
         $turnResult = $this->agentRunner->runParticipant(
-            $execution->getStep(),
-            $execution->getRound(),
-            $nextRole,
-            $context->topic,
-            $context->promptConfiguration->getBrainstormSystemPrompt(),
-            $context->promptConfiguration->getParticipantAppendPrompt(),
-            $context->promptConfiguration->getParticipantUserPrompt(),
-            $context->workingDir,
-            $responseFilesList,
-            $partRoleConfig?->getTimeout() ?? $context->timeout,
-            $partRoleConfig?->getCommand() ?? [],
-            $prevResponsePaths !== [],
-            $challenge,
-            $partRoleConfig?->getPromptFile(),
-            $chain->getDefaultRetryPolicy(),
+            step: $execution->getStep(),
+            round: $execution->getRound(),
+            role: $nextRole,
+            topic: $context->topic,
+            runContext: new ParticipantRunContextVo(
+                brainstormSystemPrompt: $context->promptConfiguration->getBrainstormSystemPrompt(),
+                participantAppendPrompt: $context->promptConfiguration->getParticipantAppendPrompt(),
+                participantUserPrompt: $context->promptConfiguration->getParticipantUserPrompt(),
+                workingDir: $context->workingDir,
+                responseFilesList: $responseFilesList,
+                timeout: $partRoleConfig?->getTimeout() ?? $context->timeout,
+                command: $partRoleConfig?->getCommand() ?? [],
+                hasPreviousResponses: $prevResponsePaths !== [],
+                challenge: $challenge,
+                promptFile: $partRoleConfig?->getPromptFile(),
+                retryPolicy: $chain->getDefaultRetryPolicy(),
+            ),
         );
         $turnResult = DynamicRoundResultHelper::normalizeEmptyOutput($turnResult);
 
@@ -339,14 +344,16 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             round: $execution->getRound(),
             facilitatorRole: $context->facilitatorRole,
             topic: $context->topic,
-            brainstormSystemPrompt: $context->promptConfiguration->getBrainstormSystemPrompt(),
-            facilitatorAppendPrompt: $context->promptConfiguration->getFacilitatorAppendPrompt(),
-            facilitatorFinalizePrompt: $context->promptConfiguration->getFacilitatorFinalizePrompt(),
-            workingDir: $context->workingDir,
-            responseFilesList: $facResponseFilesList,
-            timeout: $finRoleConfig?->getTimeout() ?? $context->timeout,
-            command: $finRoleConfig?->getCommand() ?? [],
-            retryPolicy: $chain->getDefaultRetryPolicy(),
+            runContext: new FacilitatorFinalizeRunContextVo(
+                brainstormSystemPrompt: $context->promptConfiguration->getBrainstormSystemPrompt(),
+                facilitatorAppendPrompt: $context->promptConfiguration->getFacilitatorAppendPrompt(),
+                facilitatorFinalizePrompt: $context->promptConfiguration->getFacilitatorFinalizePrompt(),
+                workingDir: $context->workingDir,
+                responseFilesList: $facResponseFilesList,
+                timeout: $finRoleConfig?->getTimeout() ?? $context->timeout,
+                command: $finRoleConfig?->getCommand() ?? [],
+                retryPolicy: $chain->getDefaultRetryPolicy(),
+            ),
         );
 
         $roundVo = DynamicRoundResultHelper::fromTurnResult(
@@ -418,21 +425,23 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         ?DynamicLoopRetryPolicyVo $retryPolicy = null,
     ): array {
         return $this->agentRunner->runFacilitator(
-            $execution->getStep(),
-            $execution->getRound(),
-            $context->facilitatorRole,
-            $context->topic,
-            $context->promptConfiguration->getBrainstormSystemPrompt(),
-            $context->promptConfiguration->getFacilitatorAppendPrompt(),
-            $context->promptConfiguration->getFacilitatorStartPrompt(),
-            $context->promptConfiguration->getFacilitatorContinuePrompt(),
-            $context->workingDir,
-            $execution->getFacilitatorSummary(),
-            $facResponseFilesList,
-            $facRoleConfig?->getTimeout() ?? $context->timeout,
-            $facRoleConfig?->getCommand() ?? [],
-            $retryPolicy,
-            $context->taskAddendum,
+            step: $execution->getStep(),
+            round: $execution->getRound(),
+            facilitatorRole: $context->facilitatorRole,
+            topic: $context->topic,
+            runContext: new FacilitatorRunContextVo(
+                brainstormSystemPrompt: $context->promptConfiguration->getBrainstormSystemPrompt(),
+                facilitatorAppendPrompt: $context->promptConfiguration->getFacilitatorAppendPrompt(),
+                facilitatorStartPrompt: $context->promptConfiguration->getFacilitatorStartPrompt(),
+                facilitatorContinuePrompt: $context->promptConfiguration->getFacilitatorContinuePrompt(),
+                workingDir: $context->workingDir,
+                facilitatorSummary: $execution->getFacilitatorSummary(),
+                responseFilesList: $facResponseFilesList,
+                timeout: $facRoleConfig?->getTimeout() ?? $context->timeout,
+                command: $facRoleConfig?->getCommand() ?? [],
+                retryPolicy: $retryPolicy,
+                taskAddendum: $context->taskAddendum,
+            ),
         );
     }
 

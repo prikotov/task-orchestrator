@@ -31,6 +31,7 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSes
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicRoundResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorResponseVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorRunContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnBreakVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\TurnContinueVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Infrastructure\Service\ChainSessionLogger;
@@ -111,9 +112,18 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         $mockRunner->expects(self::once())
             ->method('runFacilitator')
             ->willReturnCallback(
-                static function (...$args) use (&$capturedAddendum, $turnResult, $facResponse): array {
-                    self::assertCount(15, $args);
-                    $capturedAddendum = end($args);
+                static function (
+                    int $step,
+                    int $round,
+                    string $facilitatorRole,
+                    string $topic,
+                    FacilitatorRunContextVo $runContext,
+                ) use (&$capturedAddendum, $turnResult, $facResponse): array {
+                    self::assertSame(1, $step);
+                    self::assertSame(1, $round);
+                    self::assertSame('facilitator', $facilitatorRole);
+                    self::assertSame('Test topic', $topic);
+                    $capturedAddendum = $runContext->getTaskAddendum();
 
                     return [$turnResult, $facResponse];
                 },

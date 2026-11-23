@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\Service\Dynamic;
 
-use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRetryPolicyVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorFinalizeRunContextVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorResponseVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorRunContextVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\ParticipantRunContextVo;
 
 /**
  * Запускает агентов (facilitator/participant) в dynamic-цикле.
@@ -14,12 +16,11 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorRes
 interface RunDynamicLoopAgentServiceInterface
 {
     /**
-     * @techdebt 2026-11-23: 15 позиционных скалярных параметров — инкапсуляция
-     * хвоста сигнатуры в VO отложена в техдолг, задача согласуется с владельцем.
-     *
-     * @param list<string> $command
-     * @param string|null $taskAddendum Дополнение от Лида при resume (аргумент task
-     *                                  CLI-команды); рендерится блоком в continue/start-промпте
+     * @param string $facilitatorRole роль фасилитатора
+     * @param string $topic задача раунда (аргумент task CLI-команды)
+     * @param FacilitatorRunContextVo $runContext контекст запуска: промпты раунда,
+     *        состояние раунда (summary, список файлов ответов, taskAddendum)
+     *        и runtime-опции (workingDir, timeout, command, retryPolicy)
      *
      * @return array{DynamicLoopTurnResultVo, FacilitatorResponseVo}
      */
@@ -28,55 +29,36 @@ interface RunDynamicLoopAgentServiceInterface
         int $round,
         string $facilitatorRole,
         string $topic,
-        string $brainstormSystemPrompt,
-        string $facilitatorAppendPrompt,
-        string $facilitatorStartPrompt,
-        string $facilitatorContinuePrompt,
-        ?string $workingDir,
-        string $facilitatorSummary,
-        string $responseFilesList,
-        int $timeout,
-        array $command = [],
-        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
-        ?string $taskAddendum = null,
+        FacilitatorRunContextVo $runContext,
     ): array;
 
     /**
-     * @param list<string> $command
+     * @param string $role роль участника
+     * @param string $topic задача раунда (аргумент task CLI-команды)
+     * @param ParticipantRunContextVo $runContext контекст запуска: промпты раунда,
+     *        состояние раунда (список файлов ответов, hasPreviousResponses, challenge)
+     *        и runtime-опции (workingDir, timeout, command, promptFile, retryPolicy)
      */
     public function runParticipant(
         int $step,
         int $round,
         string $role,
         string $topic,
-        string $brainstormSystemPrompt,
-        string $participantAppendPrompt,
-        string $participantUserPrompt,
-        ?string $workingDir,
-        string $responseFilesList,
-        int $timeout,
-        array $command = [],
-        bool $hasPreviousResponses = true,
-        ?string $challenge = null,
-        ?string $promptFile = null,
-        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
+        ParticipantRunContextVo $runContext,
     ): DynamicLoopTurnResultVo;
 
     /**
-     * @param list<string> $command
+     * @param string $facilitatorRole роль фасилитатора
+     * @param string $topic задача раунда (аргумент task CLI-команды)
+     * @param FacilitatorFinalizeRunContextVo $runContext контекст запуска: промпты раунда,
+     *        состояние раунда (список файлов ответов) и runtime-опции
+     *        (workingDir, timeout, command, retryPolicy)
      */
     public function runFacilitatorFinalize(
         int $step,
         int $round,
         string $facilitatorRole,
         string $topic,
-        string $brainstormSystemPrompt,
-        string $facilitatorAppendPrompt,
-        string $facilitatorFinalizePrompt,
-        ?string $workingDir,
-        string $responseFilesList,
-        int $timeout,
-        array $command = [],
-        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
+        FacilitatorFinalizeRunContextVo $runContext,
     ): DynamicLoopTurnResultVo;
 }
