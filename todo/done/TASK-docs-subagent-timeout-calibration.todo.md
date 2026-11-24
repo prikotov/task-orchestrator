@@ -3,7 +3,7 @@ type: docs
 created: 2026-11-24 02:40:55 (1795488055)
 due: 
 started: 2026-11-24 04:47:36 (1795495656)
-completed: 
+completed: 2026-11-24 05:47:25 (1795499245)
 cancelled: 
 value: V2
 complexity: C2
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/docs-subagent-timeout-calibration
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/498
+status: done
 ---
 
 # TASK-docs-subagent-timeout-calibration: Калибровка таймаутов сабагентов `task-via-subagents` по весу работы
@@ -124,16 +124,16 @@ make check                                            # lint + валидаци�
 
 ## 8. Источники (Sources)
 
-- [ ] [Реестр ретроспектив: запись «Таблица таймаутов `task-via-subagents` не учитывает вес проверок и документной работы» (счётчик 6)](../docs/agents/team-retro/RETRO-ROADMAP.md)
-- [ ] [Ретро 2026-11-23 21-30: мера «стартовый `-s 900`» для реализационных C1–C2 с финальным `make check`](../docs/agents/team-retro/2026-11-23_21-30-task-refactor-overlength-services.md)
-- [ ] [Ретро runfacilitator-vo (повтор №6, предложение 1)](../docs/agents/team-retro/2026-11-23_08-56-runfacilitator-vo-task-retro.md)
-- [ ] [Скилл task-via-subagents: раздел «Таймауты сабагентов»](../docs/agents/skills/task-via-subagents/SKILL.md)
-- [ ] [Скилл run-subagent: параметры `-s`/`-m`/`-t`](../docs/agents/skills/run-subagent/SKILL.md)
+- [ ] [Реестр ретроспектив: запись «Таблица таймаутов `task-via-subagents` не учитывает вес проверок и документной работы» (счётчик 6)](../../docs/agents/team-retro/RETRO-ROADMAP.md)
+- [ ] [Ретро 2026-11-23 21-30: мера «стартовый `-s 900`» для реализационных C1–C2 с финальным `make check`](../../docs/agents/team-retro/2026-11-23_21-30-task-refactor-overlength-services.md)
+- [ ] [Ретро runfacilitator-vo (повтор №6, предложение 1)](../../docs/agents/team-retro/2026-11-23_08-56-runfacilitator-vo-task-retro.md)
+- [ ] [Скилл task-via-subagents: раздел «Таймауты сабагентов»](../../docs/agents/skills/task-via-subagents/SKILL.md)
+- [ ] [Скилл run-subagent: параметры `-s`/`-m`/`-t`](../../docs/agents/skills/run-subagent/SKILL.md)
 - [ ] Скрипт `docs/agents/skills/run-subagent/scripts/watch-subagent.sh:1097–1105` — формула `hard = max(soft×2, 1800)` (первоисточник, проверено по исходнику)
 
 ## 9. Комментарии (Comments)
 
-- Задача создана по порогу эскалации реестра ретроспектив (3+ упоминаний): запись «Таблица таймаутов…» [RETRO-ROADMAP.md](../docs/agents/team-retro/RETRO-ROADMAP.md) достигла счётчика 6, предложение владельцу сделано в ретро 2026-11-02, подтверждено повторами 2026-11-06 и 2026-11-23 (дважды); запись переведена в статус `escalated` со ссылкой на эту задачу.
+- Задача создана по порогу эскалации реестра ретроспектив (3+ упоминаний): запись «Таблица таймаутов…» [RETRO-ROADMAP.md](../../docs/agents/team-retro/RETRO-ROADMAP.md) достигла счётчика 6, предложение владельцу сделано в ретро 2026-11-02, подтверждено повторами 2026-11-06 и 2026-11-23 (дважды); запись переведена в статус `escalated` со ссылкой на эту задачу.
 - Формула hard-timeout проверена по исходнику скрипта (`watch-subagent.sh:1097–1105`): при незаданном `-m` потолок растёт вместе с soft (`max(soft×2, 1800)`), значит при перезапуске ×1.5 (900 → 1350) hard поднимается автоматически (2700) — в правках скилла отдельно требовать поднятия `-m` не нужно.
 - Исполнитель-агент запускается с калиброванным таймаутом по правилу из Must-1 (правки документов C1–C2 — базовый 600 достаточен, так как `make check` в этой задаче не финальный барьер сабагента).
 
