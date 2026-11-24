@@ -3,7 +3,7 @@ type: docs
 created: 2026-11-24 08:08:04 (1795507684)
 due: 
 started: 2026-11-24 08:38:20 (1795509500)
-completed: 
+completed: 2026-11-24 10:51:03 (1795517463)
 cancelled: 
 value: V2
 complexity: C1
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/docs-full-option-names-skills
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/500
+status: done
 ---
 
 # TASK-docs-full-option-names-skills: Уйти от кратких ключей CLI в документации скиллов — только полные имена опций
@@ -132,10 +132,10 @@ make check                                            # полный барье�
 ## 8. Источники (Sources)
 
 - [ ] Решение владельца 2026-11-24 (сессия тимлида): уйти от использования сокращений в документации скиллов
-- [ ] [Скилл run-subagent: таблица параметров и примеры](../docs/agents/skills/run-subagent/SKILL.md)
-- [ ] [README скилла run-subagent](../docs/agents/skills/run-subagent/README.md)
-- [ ] [Скилл task-via-subagents: раздел «Таймауты сабагентов»](../docs/agents/skills/task-via-subagents/SKILL.md)
-- [ ] [Скилл epic-via-subagents: раздел «Таймауты сабагентов»](../docs/agents/skills/epic-via-subagents/SKILL.md)
+- [ ] [Скилл run-subagent: таблица параметров и примеры](../../docs/agents/skills/run-subagent/SKILL.md)
+- [ ] [README скилла run-subagent](../../docs/agents/skills/run-subagent/README.md)
+- [ ] [Скилл task-via-subagents: раздел «Таймауты сабагентов»](../../docs/agents/skills/task-via-subagents/SKILL.md)
+- [ ] [Скилл epic-via-subagents: раздел «Таймауты сабагентов»](../../docs/agents/skills/epic-via-subagents/SKILL.md)
 
 ## 9. Комментарии (Comments)
 
