@@ -2,7 +2,7 @@
 type: docs
 created: 2026-11-24 08:08:04 (1795507684)
 due: 
-started: 
+started: 2026-11-24 08:38:20 (1795509500)
 completed: 
 cancelled: 
 value: V2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Алекс (pi)
-assignee: 
+assignee: Технический писатель Гермиона (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
 branch: task/docs-full-option-names-skills
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-docs-full-option-names-skills: Уйти от кратких ключей CLI в документации скиллов — только полные имена опций
