@@ -214,19 +214,12 @@ master
 
 ### Stall-timeout (`--stall-timeout`)
 
-Stall-timeout — время без единого JSONL-события, после которого агент считается зависшим. Срабатывает только если процесс реально простаивает (idle): если он активен (грузит CPU/IO — ретраит, ожидание ответа), stall не убивает, а ждёт до hard-timeout (см. `WATCH_STALL_RESPECT_LIVENESS` в SKILL run-subagent).
-По умолчанию 120 сек. Этого достаточно для реализации (C0–C3), но **недостаточно для ревью**:
-ревьювер читает много файлов, модель «думает» дольше между tool call'ами.
+Stall-timeout — время без единого JSONL-события, после которого агент считается зависшим. Срабатывает только если процесс реально простаивает (idle): если он активен (грузит CPU/IO — ретраит, ожидание ответа), stall не убивает, а ждёт до hard-timeout (см. `WATCH_STALL_RESPECT_LIVENESS` в README run-subagent).
+По умолчанию 360 сек (фактический дефолт скрипта: `STALL_TIMEOUT=360` в `watch-subagent.sh`). Дефолта достаточно для реализации, self-review и ревью: liveness-гейт не завершает активный процесс (грузит CPU/IO — ретраит, ожидание ответа). Если долгие ревью систематически упираются в stall — поднимай `--stall-timeout` при запуске.
 
-| Тип задачи      | `--stall-timeout` (stall) |
-|-----------------|---------------------------|
-| Реализация      | 120 сек      |
-| Self-review     | 180 сек      |
-| Ревью           | 300 сек      |
-
-Пример запуска ревью:
+Пример запуска ревью (stall по умолчанию — 360 сек):
 ```bash
-scripts/watch-subagent.sh --soft-timeout 900 --stall-timeout 300 --output text,files --task-id <TASK-ID> --role-file docs/agents/roles/team/code_reviewer_backend_puaro.ru.md <<'PROMPT'
+scripts/watch-subagent.sh --soft-timeout 900 --output text,files --task-id <TASK-ID> --role-file docs/agents/roles/team/code_reviewer_backend_puaro.ru.md <<'PROMPT'
 <prompt>
 PROMPT
 ```

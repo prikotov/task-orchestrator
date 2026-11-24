@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-11-24
 **Объект:** незакоммиченные изменения ветки `task/docs-full-option-names-skills` — `docs/agents/skills/run-subagent/SKILL.md`, `docs/agents/skills/run-subagent/README.md`, `docs/agents/skills/task-via-subagents/SKILL.md`, `docs/agents/skills/epic-via-subagents/SKILL.md` плюс 2 санкционированных фикса ссылок (`docs/agents/reports/code-reviewer-backend/2026-11-24_11-59_docs-subagent-timeout-calibration-review.md`, `docs/agents/team-retro/RETRO-ROADMAP.md`), diff 54+/54−; а также закоммиченные `95fd434d` (профиль Гермионы в `config/chains.yaml`) и `1974a57a` (поправка постановки)
-**Задача:** [TASK-docs-full-option-names-skills](../../../../todo/TASK-docs-full-option-names-skills.todo.md)
+**Задача:** [TASK-docs-full-option-names-skills](../../../../todo/done/TASK-docs-full-option-names-skills.todo.md)
 **Тип прохода:** RV — проверка связей и актуальности для docs-задачи (соответствие постановке, факты, ссылки, границы scope)
 
 ---
