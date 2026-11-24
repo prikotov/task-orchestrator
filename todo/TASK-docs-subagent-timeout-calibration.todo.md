@@ -2,7 +2,7 @@
 type: docs
 created: 2026-11-24 02:40:55 (1795488055)
 due: 
-started: 
+started: 2026-11-24 04:47:36 (1795495656)
 completed: 
 cancelled: 
 value: V2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Алекс (pi)
-assignee: 
+assignee: Технический писатель Остап (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/docs-subagent-timeout-calibration
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-docs-subagent-timeout-calibration: Калибровка таймаутов сабагентов `task-via-subagents` по весу работы
