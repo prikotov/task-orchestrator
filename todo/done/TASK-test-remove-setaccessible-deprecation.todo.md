@@ -2,8 +2,8 @@
 type: test
 created: 2026-11-24 03:50:21 (1795492221)
 due: 
-started: 
-completed: 
+started: 2026-11-24 04:36:16 (1795494976)
+completed: 2026-11-24 04:47:17 (1795495637)
 cancelled: 
 value: V2
 complexity: C0
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Алекс (pi)
-assignee: 
+assignee: Бэкендер Тони (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
-pr: 
-status: todo
+branch: task/test-remove-setaccessible-deprecation
+pr: https://github.com/prikotov/task-orchestrator/pull/497
+status: done
 ---
 
 # TASK-test-remove-setaccessible-deprecation: Убрать deprecated ReflectionMethod::setAccessible из теста FinalizeReserve
@@ -59,19 +59,19 @@ status: todo
 *   **Где делаем:** `tests/Unit/Domain/Service/Chain/Dynamic/RunDynamicLoopServiceFinalizeReserveTest.php` (строка 151; только тест, продакшн-код не трогается).
 *   **Текущее поведение:** вызов `$method->setAccessible(true);` генерирует deprecation-предупреждение PHPUnit с PHP 8.5 и не имеет эффекта с PHP 8.1+.
 *   **Прецеденты для переиспользования:** нет — единственное вхождение `setAccessible` в кодовой базе (проверено `grep -rn "setAccessible" tests/ src/ apps/` 2026-11-24).
-*   **Критичные конвенции:** [Конвенции тестирования](../docs/conventions/testing/index.md).
+*   **Критичные конвенции:** [Конвенции тестирования](../../docs/conventions/testing/index.md).
 *   **Границы (Out of Scope):** любые другие тесты/файлы; рефакторинг самого теста (структура, стабы, ассерты); настройка PHPUnit-конфигурации (фильтры deprecation); апгрейд зависимостей.
 
 ## 3. Требования, MoSCoW (Requirements)
 ### 🔴 Обязательно (Must Have)
 
-- [ ] Вызов `$method->setAccessible(true);` удалён из `RunDynamicLoopServiceFinalizeReserveTest.php`; ставшие лишними переменные/комментарии подчищены.
-- [ ] Прогон `vendor/bin/phpunit` не содержит deprecation-предупреждения про `ReflectionMethod::setAccessible()`.
-- [ ] Все тесты зелёные: поведение теста не изменилось.
+- [x] Вызов `$method->setAccessible(true);` удалён из `RunDynamicLoopServiceFinalizeReserveTest.php`; ставшие лишними переменные/комментарии подчищены.
+- [x] Прогон `vendor/bin/phpunit` не содержит deprecation-предупреждения про `ReflectionMethod::setAccessible()`.
+- [x] Все тесты зелёные: поведение теста не изменилось.
 
 ### 🟡 Желательно (Should Have)
 
-- [ ] Если рядом останутся пустые конструкции (неиспользуемая reflection-переменная) — минимальная подчистка без изменения логики теста.
+- [x] Если рядом останутся пустые конструкции (неиспользуемая reflection-переменная) — минимальная подчистка без изменения логики теста. (Не потребовалось: `$method` используется в `invoke()`, лишних конструкций нет.)
 
 ### 🟢 Опционально (Could Have)
 
@@ -85,20 +85,20 @@ status: todo
 
 ## 4. План реализации (Implementation Plan)
 
-1. [ ] Открыть `RunDynamicLoopServiceFinalizeReserveTest.php`, локализовать строку 151 и контекст использования `$method`.
-2. [ ] Удалить вызов `setAccessible(true)` (и ставшие лишними строки, если есть).
-3. [ ] `vendor/bin/phpunit tests/Unit/Domain/` — зелёный, без deprecation про setAccessible.
-4. [ ] Полный `vendor/bin/phpunit` + `vendor/bin/psalm` — зелёные.
-5. [ ] Обновить Change History задачи, перевести в `done`, PR.
+1. [x] Открыть `RunDynamicLoopServiceFinalizeReserveTest.php`, локализовать строку 151 и контекст использования `$method`.
+2. [x] Удалить вызов `setAccessible(true)` (и ставшие лишними строки, если есть).
+3. [x] `vendor/bin/phpunit tests/Unit/Domain/` — зелёный, без deprecation про setAccessible.
+4. [x] Полный `vendor/bin/phpunit` + `vendor/bin/psalm` — зелёные.
+5. [ ] Обновить Change History задачи, перевести в `done`, PR. (Change History обновлён; перенос в `done` и поле `pr` — после создания PR.)
 
 ## 5. Критерии приёмки (Definition of Done)
 
-- [ ] Сценарий протестирован (Unit/Integration)
-- [ ] Нет регрессий в смежных модулях
-- [ ] Обновлена техническая документация (если требуется)
-- [ ] Вызов `setAccessible` удалён; `grep -rn "setAccessible" tests/ src/ apps/` возвращает пусто.
-- [ ] `vendor/bin/phpunit` полный — зелёный, без deprecation про `ReflectionMethod::setAccessible()`.
-- [ ] `vendor/bin/psalm` — зелёный.
+- [x] Сценарий протестирован (Unit/Integration)
+- [x] Нет регрессий в смежных модулях
+- [x] Обновлена техническая документация (если требуется) — не требуется: продакшн-контракты не затронуты.
+- [x] Вызов `setAccessible` удалён; `grep -rn "setAccessible" tests/ src/ apps/` возвращает пусто.
+- [x] `vendor/bin/phpunit` полный — зелёный, без deprecation про `ReflectionMethod::setAccessible()`.
+- [x] `vendor/bin/psalm` — зелёный.
 - [ ] Задача в `done`, файл в `todo/done/`, поле `pr` заполнено.
 
 ## 6. Самопроверка (Verification)
@@ -119,17 +119,19 @@ php vendor/bin/todo-md validate TASK-test-remove-setaccessible-deprecation
 
 ## 8. Источники (Sources)
 
-- [ ] [Задача TASK-techdebt-runfacilitator-vo (done), раздел 9 — подтверждение предсуществующего deprecation](done/TASK-techdebt-runfacilitator-vo.todo.md)
-- [ ] [Ретро runfacilitator-vo — «Важные комментарии», пункт о deprecation](../docs/agents/team-retro/2026-11-23_08-56-runfacilitator-vo-task-retro.md)
+- [ ] [Задача TASK-techdebt-runfacilitator-vo (done), раздел 9 — подтверждение предсуществующего deprecation](TASK-techdebt-runfacilitator-vo.todo.md)
+- [ ] [Ретро runfacilitator-vo — «Важные комментарии», пункт о deprecation](../../docs/agents/team-retro/2026-11-23_08-56-runfacilitator-vo-task-retro.md)
 - [ ] Тест `tests/Unit/Domain/Service/Chain/Dynamic/RunDynamicLoopServiceFinalizeReserveTest.php` (строка 151)
 
 ## 9. Комментарии (Comments)
 
 - Задача заведена по решению владельца 2026-11-24 («сделай задачу») после отказа чинить deprecation в рамках PR #493 (вне рамок той задачи, подтверждено как предсуществующее).
 - Это микро-задача C0: однострочное удаление; исполнителю не запускать тяжёлых инструментов сверх Verification.
+- 2026-11-24, Бэкендер Тони: реализовано в ветке `task/test-remove-setaccessible-deprecation`. Удалена одна строка `$method->setAccessible(true);` (бывшая строка 151); переменная `$method` остаётся — используется в `invoke()`. `grep -rn "setAccessible" tests/ src/ apps/` — пусто. `make check` зелёный (PHPUnit: 1779 тестов, 5335 ассертов, 2 skipped; Psalm: No errors found). Первый прогон `make check` упал на несвязанном флаки-тесте `WatchSubagentScriptTest::stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout` (тайминги stall/heartbeat); изолированный прогон и повторный полный `make check` — зелёные. Коммит не выполнялся по запросу владельца.
 
 ## История изменений (Change History)
 
 | Дата | Автор | Изменение |
 | :--- | :--- | :--- |
 | 2026-11-24 03:50:21 (1795492221) | Тимлид Алекс (pi) | Создание задачи |
+| 2026-11-24 11:42:55 (1795495375) | Бэкендер Тони (pi) | Реализация: удалён вызов `setAccessible(true)` из теста; `make check` зелёный; отметки выполнения проставлены |
