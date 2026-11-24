@@ -3,7 +3,7 @@ type: docs
 created: 2026-11-24 11:26:22 (1795519582)
 due: 
 started: 2026-11-24 11:43:00 (1795520580)
-completed: 
+completed: 2026-11-24 12:20:47 (1795522847)
 cancelled: 
 value: V2
 complexity: C0
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/docs-stall-default-alignment
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/503
+status: done
 ---
 
 # TASK-docs-stall-default-alignment: Синхронизировать раздел Stall-timeout epic-via-subagents с фактическим дефолтом скрипта (360 сек)
