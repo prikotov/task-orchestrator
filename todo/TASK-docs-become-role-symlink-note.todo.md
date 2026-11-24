@@ -2,7 +2,7 @@
 type: docs
 created: 2026-11-24 11:32:22 (1795519942)
 due: 
-started: 
+started: 2026-11-24 12:24:28 (1795523068)
 completed: 
 cancelled: 
 value: V2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Алекс (pi)
-assignee: 
+assignee: Технический писатель Гермиона (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
 branch: task/become-role-symlink-note
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-docs-become-role-symlink-note: Добавить в SKILL.md become-role примечание о симлинке .agents/skills/become-role (ловушка find без -L)
