@@ -3,7 +3,7 @@ type: test
 created: 2026-11-24 03:50:21 (1795492221)
 due: 
 started: 2026-11-24 04:36:16 (1795494976)
-completed: 
+completed: 2026-11-24 04:47:17 (1795495637)
 cancelled: 
 value: V2
 complexity: C0
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/test-remove-setaccessible-deprecation
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/497
+status: done
 ---
 
 # TASK-test-remove-setaccessible-deprecation: Убрать deprecated ReflectionMethod::setAccessible из теста FinalizeReserve
@@ -59,7 +59,7 @@ status: in_progress
 *   **Где делаем:** `tests/Unit/Domain/Service/Chain/Dynamic/RunDynamicLoopServiceFinalizeReserveTest.php` (строка 151; только тест, продакшн-код не трогается).
 *   **Текущее поведение:** вызов `$method->setAccessible(true);` генерирует deprecation-предупреждение PHPUnit с PHP 8.5 и не имеет эффекта с PHP 8.1+.
 *   **Прецеденты для переиспользования:** нет — единственное вхождение `setAccessible` в кодовой базе (проверено `grep -rn "setAccessible" tests/ src/ apps/` 2026-11-24).
-*   **Критичные конвенции:** [Конвенции тестирования](../docs/conventions/testing/index.md).
+*   **Критичные конвенции:** [Конвенции тестирования](../../docs/conventions/testing/index.md).
 *   **Границы (Out of Scope):** любые другие тесты/файлы; рефакторинг самого теста (структура, стабы, ассерты); настройка PHPUnit-конфигурации (фильтры deprecation); апгрейд зависимостей.
 
 ## 3. Требования, MoSCoW (Requirements)
@@ -119,8 +119,8 @@ php vendor/bin/todo-md validate TASK-test-remove-setaccessible-deprecation
 
 ## 8. Источники (Sources)
 
-- [ ] [Задача TASK-techdebt-runfacilitator-vo (done), раздел 9 — подтверждение предсуществующего deprecation](done/TASK-techdebt-runfacilitator-vo.todo.md)
-- [ ] [Ретро runfacilitator-vo — «Важные комментарии», пункт о deprecation](../docs/agents/team-retro/2026-11-23_08-56-runfacilitator-vo-task-retro.md)
+- [ ] [Задача TASK-techdebt-runfacilitator-vo (done), раздел 9 — подтверждение предсуществующего deprecation](TASK-techdebt-runfacilitator-vo.todo.md)
+- [ ] [Ретро runfacilitator-vo — «Важные комментарии», пункт о deprecation](../../docs/agents/team-retro/2026-11-23_08-56-runfacilitator-vo-task-retro.md)
 - [ ] Тест `tests/Unit/Domain/Service/Chain/Dynamic/RunDynamicLoopServiceFinalizeReserveTest.php` (строка 151)
 
 ## 9. Комментарии (Comments)
