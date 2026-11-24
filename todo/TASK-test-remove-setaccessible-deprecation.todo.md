@@ -65,13 +65,13 @@ status: in_progress
 ## 3. Требования, MoSCoW (Requirements)
 ### 🔴 Обязательно (Must Have)
 
-- [ ] Вызов `$method->setAccessible(true);` удалён из `RunDynamicLoopServiceFinalizeReserveTest.php`; ставшие лишними переменные/комментарии подчищены.
-- [ ] Прогон `vendor/bin/phpunit` не содержит deprecation-предупреждения про `ReflectionMethod::setAccessible()`.
-- [ ] Все тесты зелёные: поведение теста не изменилось.
+- [x] Вызов `$method->setAccessible(true);` удалён из `RunDynamicLoopServiceFinalizeReserveTest.php`; ставшие лишними переменные/комментарии подчищены.
+- [x] Прогон `vendor/bin/phpunit` не содержит deprecation-предупреждения про `ReflectionMethod::setAccessible()`.
+- [x] Все тесты зелёные: поведение теста не изменилось.
 
 ### 🟡 Желательно (Should Have)
 
-- [ ] Если рядом останутся пустые конструкции (неиспользуемая reflection-переменная) — минимальная подчистка без изменения логики теста.
+- [x] Если рядом останутся пустые конструкции (неиспользуемая reflection-переменная) — минимальная подчистка без изменения логики теста. (Не потребовалось: `$method` используется в `invoke()`, лишних конструкций нет.)
 
 ### 🟢 Опционально (Could Have)
 
@@ -85,20 +85,20 @@ status: in_progress
 
 ## 4. План реализации (Implementation Plan)
 
-1. [ ] Открыть `RunDynamicLoopServiceFinalizeReserveTest.php`, локализовать строку 151 и контекст использования `$method`.
-2. [ ] Удалить вызов `setAccessible(true)` (и ставшие лишними строки, если есть).
-3. [ ] `vendor/bin/phpunit tests/Unit/Domain/` — зелёный, без deprecation про setAccessible.
-4. [ ] Полный `vendor/bin/phpunit` + `vendor/bin/psalm` — зелёные.
-5. [ ] Обновить Change History задачи, перевести в `done`, PR.
+1. [x] Открыть `RunDynamicLoopServiceFinalizeReserveTest.php`, локализовать строку 151 и контекст использования `$method`.
+2. [x] Удалить вызов `setAccessible(true)` (и ставшие лишними строки, если есть).
+3. [x] `vendor/bin/phpunit tests/Unit/Domain/` — зелёный, без deprecation про setAccessible.
+4. [x] Полный `vendor/bin/phpunit` + `vendor/bin/psalm` — зелёные.
+5. [ ] Обновить Change History задачи, перевести в `done`, PR. (Change History обновлён; перенос в `done` и поле `pr` — после создания PR.)
 
 ## 5. Критерии приёмки (Definition of Done)
 
-- [ ] Сценарий протестирован (Unit/Integration)
-- [ ] Нет регрессий в смежных модулях
-- [ ] Обновлена техническая документация (если требуется)
-- [ ] Вызов `setAccessible` удалён; `grep -rn "setAccessible" tests/ src/ apps/` возвращает пусто.
-- [ ] `vendor/bin/phpunit` полный — зелёный, без deprecation про `ReflectionMethod::setAccessible()`.
-- [ ] `vendor/bin/psalm` — зелёный.
+- [x] Сценарий протестирован (Unit/Integration)
+- [x] Нет регрессий в смежных модулях
+- [x] Обновлена техническая документация (если требуется) — не требуется: продакшн-контракты не затронуты.
+- [x] Вызов `setAccessible` удалён; `grep -rn "setAccessible" tests/ src/ apps/` возвращает пусто.
+- [x] `vendor/bin/phpunit` полный — зелёный, без deprecation про `ReflectionMethod::setAccessible()`.
+- [x] `vendor/bin/psalm` — зелёный.
 - [ ] Задача в `done`, файл в `todo/done/`, поле `pr` заполнено.
 
 ## 6. Самопроверка (Verification)
@@ -127,9 +127,11 @@ php vendor/bin/todo-md validate TASK-test-remove-setaccessible-deprecation
 
 - Задача заведена по решению владельца 2026-11-24 («сделай задачу») после отказа чинить deprecation в рамках PR #493 (вне рамок той задачи, подтверждено как предсуществующее).
 - Это микро-задача C0: однострочное удаление; исполнителю не запускать тяжёлых инструментов сверх Verification.
+- 2026-11-24, Бэкендер Тони: реализовано в ветке `task/test-remove-setaccessible-deprecation`. Удалена одна строка `$method->setAccessible(true);` (бывшая строка 151); переменная `$method` остаётся — используется в `invoke()`. `grep -rn "setAccessible" tests/ src/ apps/` — пусто. `make check` зелёный (PHPUnit: 1779 тестов, 5335 ассертов, 2 skipped; Psalm: No errors found). Первый прогон `make check` упал на несвязанном флаки-тесте `WatchSubagentScriptTest::stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout` (тайминги stall/heartbeat); изолированный прогон и повторный полный `make check` — зелёные. Коммит не выполнялся по запросу владельца.
 
 ## История изменений (Change History)
 
 | Дата | Автор | Изменение |
 | :--- | :--- | :--- |
 | 2026-11-24 03:50:21 (1795492221) | Тимлид Алекс (pi) | Создание задачи |
+| 2026-11-24 11:42:55 (1795495375) | Бэкендер Тони (pi) | Реализация: удалён вызов `setAccessible(true)` из теста; `make check` зелёный; отметки выполнения проставлены |

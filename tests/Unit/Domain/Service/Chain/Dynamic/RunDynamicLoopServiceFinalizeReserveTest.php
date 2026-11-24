@@ -148,7 +148,6 @@ final class RunDynamicLoopServiceFinalizeReserveTest extends TestCase
     public function shouldReserveForFinalizeReturnsFalseWhenMaxTimeIsNull(): void
     {
         $method = new ReflectionMethod(RunDynamicLoopService::class, 'shouldReserveForFinalize');
-        $method->setAccessible(true);
 
         $service = (new \ReflectionClass(RunDynamicLoopService::class))
             ->newInstanceWithoutConstructor();
