@@ -1,7 +1,7 @@
 # Ретроспектива: task-refactor-overlength-services
 
 **Дата:** 2026-11-23
-**Объект:** [TASK-refactor-overlength-services](../../../todo/done/TASK-refactor-overlength-services.todo.md) → [PR #490](https://github.com/prikotov/task-orchestrator/pull/490) (слит squash, `04e0d030`) + [TASK-techdebt-runfacilitator-vo](../../../todo/TASK-techdebt-runfacilitator-vo.todo.md) → [PR #491](https://github.com/prikotov/task-orchestrator/pull/491) (слит squash, `7ec3e6e8`)
+**Объект:** [TASK-refactor-overlength-services](../../../todo/done/TASK-refactor-overlength-services.todo.md) → [PR #490](https://github.com/prikotov/task-orchestrator/pull/490) (слит squash, `04e0d030`) + [TASK-techdebt-runfacilitator-vo](../../../todo/done/TASK-techdebt-runfacilitator-vo.todo.md) → [PR #491](https://github.com/prikotov/task-orchestrator/pull/491) (слит squash, `7ec3e6e8`)
 **Объём:** 2 задачи, 2 запроса на слияние (оба слиты)
 **Что делали:** разбивка трёх классов выше порога PHPMD 500 LOC (`Kernel.php` 564→497, `YamlChainLoaderService` 556→386, `ExecuteDynamicTurnService` 541→456) через конвейер `task-via-subagents`: реализация (Бэкендер Левша) → самопроверка → двухтрековое ревью RV-F (Ревьювер Бэка Пуаро) + RV-A (Архитектор Локи) → доработки → PR #490; постановка техдолга инкапсуляции `runFacilitator()` в VO → PR #491. 15 предметных запусков сабагентов (12:25–19:02 местного времени, UTC+7), из них 9 прерваны soft_timeout. Публикация обеих веток от имени `prikotov-agent[bot]`, merge по явному подтверждению владельца.
 
