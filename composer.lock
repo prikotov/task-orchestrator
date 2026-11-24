@@ -7051,16 +7051,16 @@
         },
         {
             "name": "prikotov/coding-standard",
-            "version": "v0.34.1",
+            "version": "v0.34.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/prikotov/coding-standard.git",
-                "reference": "d1f417d229260afc544433c13b7474cb95121e05"
+                "reference": "7f8fb61d358a924d0d655caf178911f1beb19b8c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/d1f417d229260afc544433c13b7474cb95121e05",
-                "reference": "d1f417d229260afc544433c13b7474cb95121e05",
+                "url": "https://api.github.com/repos/prikotov/coding-standard/zipball/7f8fb61d358a924d0d655caf178911f1beb19b8c",
+                "reference": "7f8fb61d358a924d0d655caf178911f1beb19b8c",
                 "shasum": ""
             },
             "require": {
@@ -7174,10 +7174,10 @@
                 "sniffs"
             ],
             "support": {
-                "source": "https://github.com/prikotov/coding-standard/tree/v0.34.1",
+                "source": "https://github.com/prikotov/coding-standard/tree/v0.34.2",
                 "issues": "https://github.com/prikotov/coding-standard/issues"
             },
-            "time": "2026-11-23T14:44:55+00:00"
+            "time": "2026-11-24T05:17:36+00:00"
         },
         {
             "name": "prikotov/git-workflow",
