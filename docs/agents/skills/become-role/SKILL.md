@@ -28,8 +28,6 @@ RACI-матрице. При сомнении бери `team_lead_alex` (дефо
 bash <skill-dir>/scripts/become-role.sh <имя-роли>
 ```
 
-**Примечание об установленном каталоге.** Установленный путь `.agents/skills/become-role` при установке Source/Composer — симлинк на каталог скилла в пакете, при установке из PHAR — управляемая копия. `find` по симлинку без `-L` не заходит внутрь ссылки и молча возвращает пустой список — «каталог пуст», хотя файлы на месте. Для проверки содержимого каталога используй `find -L` (например, `find -L <skill-dir> -type f`) либо реальный путь `docs/agents/skills/become-role/` (в host-проекте — `vendor/prikotov/task-orchestrator/docs/agents/skills/become-role/`).
-
 Пример вывода (`become-role.sh team_lead_alex`):
 
 ```
