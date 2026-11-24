@@ -2,8 +2,8 @@
 type: docs
 created: 2026-11-24 08:08:04 (1795507684)
 due: 
-started: 
-completed: 
+started: 2026-11-24 08:38:20 (1795509500)
+completed: 2026-11-24 10:51:03 (1795517463)
 cancelled: 
 value: V2
 complexity: C1
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Алекс (pi)
-assignee: 
+assignee: Технический писатель Гермиона (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
 branch: task/docs-full-option-names-skills
-pr: 
-status: todo
+pr: https://github.com/prikotov/task-orchestrator/pull/500
+status: done
 ---
 
 # TASK-docs-full-option-names-skills: Уйти от кратких ключей CLI в документации скиллов — только полные имена опций
@@ -75,6 +75,7 @@ status: todo
 - [ ] Все краткие ключи (`-s`, `-m`, `-t`, `-o`, `-r`) как ключи CLI заменены на полные имена (`--soft-timeout`, `--hard-timeout`, `--stall-timeout`, `--output`, `--role-file`) в: `run-subagent/SKILL.md` (раздел «Вызов», все примеры), `task-via-subagents/SKILL.md`, `epic-via-subagents/SKILL.md`.
 - [ ] `run-subagent/README.md` синхронизирован: упоминания и примеры с краткими ключами переведены на полные имена.
 - [ ] Границы терминов сохранены: в текстах, где сокращение является частью термина документа (например, «soft-timeout»), формулировки не искажаются; смысл каждой инструкции сохранён дословно, кроме замены имён ключей.
+- [ ] Профиль исполнителя `technical_writer_hermione` в `config/chains.yaml` поднят с `mimo_pro_off` до `mimo_pro_high` (включено в scope решением владельца 2026-11-24; причина — системное зацикливание модели с thinking off на многошаговых задачах, 6 из 6 последних запусков профиля — soft_timeout).
 - [ ] `make md-links` и `validate-language` зелёные на изменённых файлах; `php vendor/bin/todo-md validate TASK-docs-full-option-names-skills` — без ошибок.
 
 ### 🟡 Желательно (Should Have)
@@ -89,7 +90,7 @@ status: todo
 ### ⚫ Не будем делать (Won't Have)
 
 - [ ] Никаких правок `watch-subagent.sh` и его CLI-интерфейса: краткие ключи остаются рабочими (обратная совместимость).
-- [ ] Никаких правок ролей агентов, конвенций, конфигураций, таблиц сложности.
+- [ ] Никаких правок ролей агентов (файлы в `docs/agents/roles/`), конвенций, таблиц сложности. Правки конфигураций вне `config/chains.yaml` запрещены; исключение — профиль исполнителя `technical_writer_hermione`, включённый в scope решением владельца.
 - [ ] Никаких переименований понятий в текстах (например, «soft-timeout» остаётся «soft-timeout», меняются только имена ключей CLI).
 
 ## 4. План реализации (Implementation Plan)
@@ -115,7 +116,7 @@ status: todo
 ## 6. Самопроверка (Verification)
 
 ```bash
-grep -rnE '(^|[ \[(])-(s|m|t|o|r)([ \])]|$)' docs/agents/skills/run-subagent/SKILL.md docs/agents/skills/run-subagent/README.md docs/agents/skills/task-via-subagents/SKILL.md docs/agents/skills/epic-via-subagents/SKILL.md   # ожидание: пусто (нет кратких ключей CLI)
+grep -rnE '(^|[^[:alnum:]-])-(s|m|t|o|r)([^[:alnum:]-]|$)' docs/agents/skills/run-subagent/SKILL.md docs/agents/skills/run-subagent/README.md docs/agents/skills/task-via-subagents/SKILL.md docs/agents/skills/epic-via-subagents/SKILL.md   # ожидание: пусто (нет кратких ключей CLI)
 make md-links                                         # ссылки в документации
 vendor/bin/validate-language || make validate-language   # доля англицизмов
 php vendor/bin/todo-md validate TASK-docs-full-option-names-skills   # валидность задачи
@@ -131,10 +132,10 @@ make check                                            # полный барье�
 ## 8. Источники (Sources)
 
 - [ ] Решение владельца 2026-11-24 (сессия тимлида): уйти от использования сокращений в документации скиллов
-- [ ] [Скилл run-subagent: таблица параметров и примеры](../docs/agents/skills/run-subagent/SKILL.md)
-- [ ] [README скилла run-subagent](../docs/agents/skills/run-subagent/README.md)
-- [ ] [Скилл task-via-subagents: раздел «Таймауты сабагентов»](../docs/agents/skills/task-via-subagents/SKILL.md)
-- [ ] [Скилл epic-via-subagents: раздел «Таймауты сабагентов»](../docs/agents/skills/epic-via-subagents/SKILL.md)
+- [ ] [Скилл run-subagent: таблица параметров и примеры](../../docs/agents/skills/run-subagent/SKILL.md)
+- [ ] [README скилла run-subagent](../../docs/agents/skills/run-subagent/README.md)
+- [ ] [Скилл task-via-subagents: раздел «Таймауты сабагентов»](../../docs/agents/skills/task-via-subagents/SKILL.md)
+- [ ] [Скилл epic-via-subagents: раздел «Таймауты сабагентов»](../../docs/agents/skills/epic-via-subagents/SKILL.md)
 
 ## 9. Комментарии (Comments)
 
@@ -147,3 +148,5 @@ make check                                            # полный барье�
 | Дата | Автор | Изменение |
 | :--- | :--- | :--- |
 | 2026-11-24 08:08:04 (1795507684) | Тимлид Алекс (pi) | Создание задачи |
+| 2026-11-24 16:19:53 (1795511993) | Тимлид Алекс (pi) | Исправление постановки: grep-паттерн в разделе 6 был нерабочим — класс `[ \])]` внутри скобочного выражения парсился как `[ \]` + литералы `)]`, и паттерн не находил даже существующие краткие ключи (проверено: 32 вхождения по четырём файлам при пустом выводе старого паттерна). Заменён на рабочий `(^|[^[:alnum:]-])-(s|m|t|o|r)([^[:alnum:]-]|$)`. Замысел проверки (пустой вывод по четырём файлам) не менялся |
+| 2026-11-24 17:04:12 (1795514652) | Тимлид Алекс (pi) | Решение владельца в рамках этого PR: профиль исполнителя `technical_writer_hermione` в `config/chains.yaml` поднят до `mimo_pro_high` (был `mimo_pro_off`). Причина: 6 из 6 последних запусков профиля с thinking off завершились soft_timeout из-за зацикливания модели на повторяющихся идентичных вызовах; контрольные группы (mimo_pro_high, glm_flash_high) работают штатно. Out of Scope скорректирован соответственно |

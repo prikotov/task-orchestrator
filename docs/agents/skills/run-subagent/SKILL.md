@@ -16,7 +16,7 @@ description: Запуск сабагента для автономного вы�
 `<skill-dir>` — каталог этого `SKILL.md` из `<location>`.
 
 ```bash
-<skill-dir>/scripts/watch-subagent.sh -s <секунды> -r <файл-роли> [options] <<'PROMPT'
+<skill-dir>/scripts/watch-subagent.sh --soft-timeout <секунды> --role-file <файл-роли> [options] <<'PROMPT'
 <задание сабагенту>
 PROMPT
 ```
@@ -25,20 +25,20 @@ PROMPT
 
 ## Параметры
 
-| Параметр | Сокращение | Назначение | По умолчанию |
-|---|---|---|---|
-| `--soft-timeout` | `-s` | Целевое время задачи в секундах; обязателен | — |
-| `--hard-timeout` | `-m` | Абсолютный предел времени | max(soft × 2, 1800) |
-| `--stall-timeout` | `-t` | Предел отсутствия событий для простаивающего процесса | 360 |
-| `--output` | `-o` | Формат вывода: `raw`, `text`, `tools`, `files`; можно через запятую | `raw` |
-| `--role-file` | `-r` | Путь к файлу роли; обязателен | — |
-| `--runner` | — | `pi` или `codex` | профиль роли, иначе `pi` |
-| `--provider` | — | Провайдер для `pi` | профиль роли |
-| `--model` | — | Модель | профиль роли |
-| `--reasoning` | — | Уровень рассуждения | профиль роли |
-| `--task-id` | — | `TASK-*`, из файла которого читается сложность | — |
-| `--complexity` | — | Сложность `C0–C5`; приоритет над `--task-id` | — |
-| `[prompt text]` | — | Задание аргументом; без него читается из stdin | — |
+| Параметр | Назначение | По умолчанию |
+|---|---|---|
+| `--soft-timeout` | Целевое время задачи в секундах; обязателен | — |
+| `--hard-timeout` | Абсолютный предел времени | max(soft × 2, 1800) |
+| `--stall-timeout` | Предел отсутствия событий для простаивающего процесса | 360 |
+| `--output` | Формат вывода: `raw`, `text`, `tools`, `files`; можно через запятую | `raw` |
+| `--role-file` | Путь к файлу роли; обязателен | — |
+| `--runner` | `pi` или `codex` | профиль роли, иначе `pi` |
+| `--provider` | Провайдер для `pi` | профиль роли |
+| `--model` | Модель | профиль роли |
+| `--reasoning` | Уровень рассуждения | профиль роли |
+| `--task-id` | `TASK-*`, из файла которого читается сложность | — |
+| `--complexity` | Сложность `C0–C5`; приоритет над `--task-id` | — |
+| `[prompt text]` | Задание аргументом; без него читается из stdin | — |
 
 Явные параметры `--runner`, `--provider`, `--model` и `--reasoning` переопределяют профиль роли. Обычно их указывать не нужно.
 
@@ -64,8 +64,8 @@ PROMPT
 
 ```bash
 # Выполнить задачу в роли бэкендера
-<skill-dir>/scripts/watch-subagent.sh -s 600 \
-  -r docs/agents/roles/team/backend_developer_levsha.ru.md \
+<skill-dir>/scripts/watch-subagent.sh --soft-timeout 900 \
+  --role-file docs/agents/roles/team/backend_developer_levsha.ru.md \
   --task-id TASK-example <<'PROMPT'
 Выполни задачу по её инструкциям. Сообщи результат и проверки.
 PROMPT
@@ -73,8 +73,8 @@ PROMPT
 
 ```bash
 # Получить только ответ и список изменённых файлов (файл задачи есть — берём --task-id)
-<skill-dir>/scripts/watch-subagent.sh -s 600 -o text,files \
-  -r docs/agents/roles/team/backend_developer_levsha.ru.md \
+<skill-dir>/scripts/watch-subagent.sh --soft-timeout 900 --output text,files \
+  --role-file docs/agents/roles/team/backend_developer_levsha.ru.md \
   --task-id TASK-example <<'PROMPT'
 Выполни задачу: todo/TASK-example.todo.md. Сообщи результат и изменённые файлы.
 PROMPT
@@ -82,8 +82,8 @@ PROMPT
 
 ```bash
 # Провести ревью без изменения файлов (файла задачи нет — явный --complexity)
-<skill-dir>/scripts/watch-subagent.sh -s 300 -o text --complexity C1 \
-  -r docs/agents/roles/team/code_reviewer_backend_puaro.ru.md <<'PROMPT'
+<skill-dir>/scripts/watch-subagent.sh --soft-timeout 900 --output text --complexity C1 \
+  --role-file docs/agents/roles/team/code_reviewer_backend_puaro.ru.md <<'PROMPT'
 Проверь текущие изменения. Ничего не изменяй. Верни APPROVE или замечания.
 PROMPT
 ```

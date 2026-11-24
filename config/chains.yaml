@@ -150,7 +150,7 @@ roles:
   technical_writer_hermione:
     prompt_file: docs/agents/roles/team/technical_writer_hermione.ru.md
     system_prompt_file: config/prompts/subagent/base_system.md
-    command_profile: mimo_pro_off
+    command_profile: mimo_pro_high
 
   technical_writer_ostap:
     prompt_file: docs/agents/roles/team/technical_writer_ostap.ru.md
