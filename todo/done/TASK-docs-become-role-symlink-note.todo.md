@@ -3,7 +3,7 @@ type: docs
 created: 2026-11-24 11:32:22 (1795519942)
 due: 
 started: 2026-11-24 12:24:28 (1795523068)
-completed: 
+completed: 2026-11-24 12:39:22 (1795523962)
 cancelled: 
 value: V2
 complexity: C0
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/become-role-symlink-note
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/504
+status: done
 ---
 
 # TASK-docs-become-role-symlink-note: Добавить в SKILL.md become-role примечание о симлинке .agents/skills/become-role (ловушка find без -L)
