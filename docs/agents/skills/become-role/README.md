@@ -41,6 +41,8 @@ php task-orchestrator.phar agent:init
 
 Source/Composer создаёт относительный симлинк `.agents/skills/become-role` на skill внутри пакета. PHAR устанавливает управляемую копию skill и записывает в её корне runtime-привязку `.phar-binding` — физический путь PHAR, по которому `become-role.sh` вызывает CLI. Команда идемпотентна; `--force` заменяет отличающуюся установку.
 
+Симлинк даёт ловушку при проверке содержимого установленного каталога: `find .agents/skills/become-role -type f` **без `-L`** не заходит внутрь ссылки и молча возвращает пустой список с кодом успеха — «каталог пуст», хотя файлы на месте. Используй `find -L .agents/skills/become-role -type f` либо реальный путь каталога скилла: `docs/agents/skills/become-role/` в source checkout (локальной копии исходников), `vendor/prikotov/task-orchestrator/docs/agents/skills/become-role/` в host-проекте с Composer-установкой. В PHAR-установке (управляемая копия) `find` без `-L` работает штатно.
+
 После установки запускай скрипт через `bash` (прямой executable-bit не гарантируется, в том числе в копии из PHAR). Штатная форма для агента — плейсхолдер каталога скилла, как требует `SKILL.md` (`<skill-dir>` — каталог `SKILL.md`, резолвится из `<location>` раннера):
 
 ```bash
