@@ -2,7 +2,7 @@
 type: test
 created: 2026-11-24 03:50:21 (1795492221)
 due: 
-started: 
+started: 2026-11-24 04:36:16 (1795494976)
 completed: 
 cancelled: 
 value: V2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Алекс (pi)
-assignee: 
+assignee: Бэкендер Тони (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/test-remove-setaccessible-deprecation
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-test-remove-setaccessible-deprecation: Убрать deprecated ReflectionMethod::setAccessible из теста FinalizeReserve
