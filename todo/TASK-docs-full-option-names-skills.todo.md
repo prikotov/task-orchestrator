@@ -115,7 +115,7 @@ status: in_progress
 ## 6. Самопроверка (Verification)
 
 ```bash
-grep -rnE '(^|[ \[(])-(s|m|t|o|r)([ \])]|$)' docs/agents/skills/run-subagent/SKILL.md docs/agents/skills/run-subagent/README.md docs/agents/skills/task-via-subagents/SKILL.md docs/agents/skills/epic-via-subagents/SKILL.md   # ожидание: пусто (нет кратких ключей CLI)
+grep -rnE '(^|[^[:alnum:]-])-(s|m|t|o|r)([^[:alnum:]-]|$)' docs/agents/skills/run-subagent/SKILL.md docs/agents/skills/run-subagent/README.md docs/agents/skills/task-via-subagents/SKILL.md docs/agents/skills/epic-via-subagents/SKILL.md   # ожидание: пусто (нет кратких ключей CLI)
 make md-links                                         # ссылки в документации
 vendor/bin/validate-language || make validate-language   # доля англицизмов
 php vendor/bin/todo-md validate TASK-docs-full-option-names-skills   # валидность задачи
@@ -147,3 +147,4 @@ make check                                            # полный барье�
 | Дата | Автор | Изменение |
 | :--- | :--- | :--- |
 | 2026-11-24 08:08:04 (1795507684) | Тимлид Алекс (pi) | Создание задачи |
+| 2026-11-24 16:19:53 (1795511993) | Тимлид Алекс (pi) | Исправление постановки: grep-паттерн в разделе 6 был нерабочим — класс `[ \])]` внутри скобочного выражения парсился как `[ \]` + литералы `)]`, и паттерн не находил даже существующие краткие ключи (проверено: 32 вхождения по четырём файлам при пустом выводе старого паттерна). Заменён на рабочий `(^|[^[:alnum:]-])-(s|m|t|o|r)([^[:alnum:]-]|$)`. Замысел проверки (пустой вывод по четырём файлам) не менялся |
