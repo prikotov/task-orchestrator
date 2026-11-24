@@ -76,7 +76,7 @@ master
 
 Запусти сабагента-исполнителя.
 
-> `<role-title>` — заголовок роли из поля `title` файла роли (например, `Бэкендер Левша`). Файл роли передаётся через `-r`, путь в промпте не нужен.
+> `<role-title>` — заголовок роли из поля `title` файла роли (например, `Бэкендер Левша`). Файл роли передаётся через `--role-file`, путь в промпте не нужен.
 
 Пример промпта на реализацию:
 
@@ -196,37 +196,37 @@ master
 
 ## Таймауты сабагентов
 
-`watch-subagent.sh` принимает три таймаута: `-s` (soft), `-m` (hard), `-t` (stall).
+`watch-subagent.sh` принимает три таймаута: `--soft-timeout` (soft), `--hard-timeout` (hard), `--stall-timeout` (stall).
 
-### Soft-timeout (`-s`) и Hard-timeout (`-m`)
+### Soft-timeout (`--soft-timeout`) и Hard-timeout (`--hard-timeout`)
 
-| Сложность задачи | `-s` (soft) | `-m` (hard)  |
-|------------------|-------------|--------------|
+| Сложность задачи | `--soft-timeout` (soft) | `--hard-timeout` (hard) |
+|------------------|-------------------------|-------------------------|
 | C0–C2            | 900 сек     | auto (1800)  |
 | C3               | 1800 сек    | auto (3600)  |
 | C4               | 2400 сек    | 4800 сек     |
 | C5               | 3600 сек    | 7200 сек     |
 
-`-m` можно не указывать для C0–C3: скрипт автоматически вычислит `max(soft × 2, 1800)`.
-Для C4–C5 указывай `-m` явно, чтобы избежать слишком раннего хард-килла.
+`--hard-timeout` можно не указывать для C0–C3: скрипт автоматически вычислит `max(soft × 2, 1800)`.
+Для C4–C5 указывай `--hard-timeout` явно, чтобы избежать слишком раннего хард-килла.
 
 После перезапуска по таймауту увеличивай soft (примерно ×1.5), а не повторяй прежнее значение.
 
-### Stall-timeout (`-t`)
+### Stall-timeout (`--stall-timeout`)
 
 Stall-timeout — время без единого JSONL-события, после которого агент считается зависшим. Срабатывает только если процесс реально простаивает (idle): если он активен (грузит CPU/IO — ретраит, ожидание ответа), stall не убивает, а ждёт до hard-timeout (см. `WATCH_STALL_RESPECT_LIVENESS` в SKILL run-subagent).
 По умолчанию 120 сек. Этого достаточно для реализации (C0–C3), но **недостаточно для ревью**:
 ревьювер читает много файлов, модель «думает» дольше между tool call'ами.
 
-| Тип задачи      | `-t` (stall) |
-|-----------------|--------------|
+| Тип задачи      | `--stall-timeout` (stall) |
+|-----------------|---------------------------|
 | Реализация      | 120 сек      |
 | Self-review     | 180 сек      |
 | Ревью           | 300 сек      |
 
 Пример запуска ревью:
 ```bash
-scripts/watch-subagent.sh -s 600 -t 300 -o text,files --task-id <TASK-ID> -r docs/agents/roles/team/code_reviewer_backend_puaro.ru.md <<'PROMPT'
+scripts/watch-subagent.sh --soft-timeout 900 --stall-timeout 300 --output text,files --task-id <TASK-ID> --role-file docs/agents/roles/team/code_reviewer_backend_puaro.ru.md <<'PROMPT'
 <prompt>
 PROMPT
 ```

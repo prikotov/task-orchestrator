@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-11-24
 **Объект:** незакоммиченные изменения ветки `task/docs-subagent-timeout-calibration` — `docs/agents/skills/task-via-subagents/SKILL.md`, `docs/agents/skills/run-subagent/SKILL.md`, `todo/TASK-docs-subagent-timeout-calibration.todo.md` (diff 16+/2−) плюс стартовый коммит `36edeed6`
-**Задача:** [TASK-docs-subagent-timeout-calibration](../../../../todo/TASK-docs-subagent-timeout-calibration.todo.md)
+**Задача:** [TASK-docs-subagent-timeout-calibration](../../../../todo/done/TASK-docs-subagent-timeout-calibration.todo.md)
 **Тип прохода:** RV — проверка связей и актуальности для docs-задачи (соответствие постановке, факты, ссылки, границы scope)
 
 ---
