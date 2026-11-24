@@ -81,6 +81,12 @@ validate-todo: ## Валидация задач todo-md (только актив
 		done; \
 	fi
 
+.PHONY: validate-todo-repo
+validate-todo-repo: ## Валидация живых задач: корень todo + backlog (архив done/ и cancelled/ исключён — решение владельца)
+	@echo
+	@echo "Validate-Todo-Repo (root + backlog, done/cancelled excluded):"
+	@vendor/bin/todo-md validate todo/*.todo.md todo/backlog
+
 .PHONY: validate-roles
 validate-roles: ## Валидация файлов ролей AI-агентов
 	@echo

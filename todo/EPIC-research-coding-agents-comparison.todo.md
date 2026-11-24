@@ -179,7 +179,7 @@ flowchart LR
 - Разные языки/экосистемы (TypeScript, Rust, Go, Python) — оценка применимости паттернов
 
 ## 9. Sources (Источники)
-- Прецедент: `todo/done/EPIC-research-agent-frameworks-comparison.md`
+- Прецедент: `EPIC-research-agent-frameworks-comparison.todo.md`
 - Существующие comparison-документы: `docs/research/`
 - Ссылки на репозитории и документацию — в индивидуальных задачах
 
