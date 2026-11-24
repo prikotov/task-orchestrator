@@ -18,6 +18,9 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRet
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunRequestVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopRunResultVo;
 use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopTurnResultVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorFinalizeRunContextVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\FacilitatorRunContextVo;
+use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\ParticipantRunContextVo;
 
 /**
  * Запускает агентов (facilitator/participant) в dynamic-цикле.
@@ -45,39 +48,29 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         int $round,
         string $facilitatorRole,
         string $topic,
-        string $brainstormSystemPrompt,
-        string $facilitatorAppendPrompt,
-        string $facilitatorStartPrompt,
-        string $facilitatorContinuePrompt,
-        ?string $workingDir,
-        string $facilitatorSummary,
-        string $responseFilesList,
-        int $timeout,
-        array $command = [],
-        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
-        ?string $taskAddendum = null,
+        FacilitatorRunContextVo $runContext,
     ): array {
         $ctx = $this->formatter->buildFacilitatorContext(
-            $facilitatorStartPrompt,
-            $facilitatorContinuePrompt,
+            $runContext->getFacilitatorStartPrompt(),
+            $runContext->getFacilitatorContinuePrompt(),
             $topic,
-            $facilitatorSummary,
-            $responseFilesList,
-            $taskAddendum,
+            $runContext->getFacilitatorSummary(),
+            $runContext->getResponseFilesList(),
+            $runContext->getTaskAddendum(),
         );
 
         $systemPromptFile = $this->sessionWriter->writePromptFile(
             $step,
             $round,
             $facilitatorRole,
-            $brainstormSystemPrompt,
+            $runContext->getBrainstormSystemPrompt(),
             '_1_system.md',
         );
         $appendPromptFile = $this->sessionWriter->writePromptFile(
             $step,
             $round,
             $facilitatorRole,
-            $facilitatorAppendPrompt,
+            $runContext->getFacilitatorAppendPrompt(),
             '_2_append.md',
         );
 
@@ -88,11 +81,11 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             previousContext: $ctx,
             model: null,
             tools: null,
-            workingDir: $workingDir,
-            timeout: $timeout,
-            command: $command,
+            workingDir: $runContext->getWorkingDir(),
+            timeout: $runContext->getTimeout(),
+            command: $runContext->getCommand(),
             runnerArgs: ['--append-system-prompt', $appendPromptFile],
-            retryPolicy: $retryPolicy,
+            retryPolicy: $runContext->getRetryPolicy(),
         );
 
         $start = microtime(true);
@@ -104,7 +97,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             agentResult: $result,
             duration: $duration,
             userPrompt: $ctx,
-            systemPrompt: $brainstormSystemPrompt,
+            systemPrompt: $runContext->getBrainstormSystemPrompt(),
             invocation: $this->formatter->buildAgentInvocation(
                 $request,
                 $this->formatter->buildUserPromptFileName($step, $round, $facilitatorRole),
@@ -120,36 +113,26 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         int $round,
         string $role,
         string $topic,
-        string $brainstormSystemPrompt,
-        string $participantAppendPrompt,
-        string $participantUserPrompt,
-        ?string $workingDir,
-        string $responseFilesList,
-        int $timeout,
-        array $command = [],
-        bool $hasPreviousResponses = true,
-        ?string $challenge = null,
-        ?string $promptFile = null,
-        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
+        ParticipantRunContextVo $runContext,
     ): DynamicLoopTurnResultVo {
         /** @var string $resolvedRoleFilePath */
         $resolvedRoleFilePath = $this->queryBus->query(new GetPromptFilePathQuery($role));
-        $roleFilePath = $promptFile ?? $resolvedRoleFilePath;
-        $appendPromptContent = sprintf($participantAppendPrompt, $roleFilePath);
+        $roleFilePath = $runContext->getPromptFile() ?? $resolvedRoleFilePath;
+        $appendPromptContent = sprintf($runContext->getParticipantAppendPrompt(), $roleFilePath);
 
         $userPrompt = $this->formatter->buildParticipantUserPrompt(
-            $participantUserPrompt,
+            $runContext->getParticipantUserPrompt(),
             $topic,
-            $responseFilesList,
-            $hasPreviousResponses,
-            $challenge,
+            $runContext->getResponseFilesList(),
+            $runContext->hasPreviousResponses(),
+            $runContext->getChallenge(),
         );
 
         $systemPromptFile = $this->sessionWriter->writePromptFile(
             $step,
             $round,
             $role,
-            $brainstormSystemPrompt,
+            $runContext->getBrainstormSystemPrompt(),
             '_1_system.md',
         );
         $appendPromptFile = $this->sessionWriter->writePromptFile(
@@ -166,11 +149,11 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             systemPrompt: $systemPromptFile,
             previousContext: $userPrompt,
             model: null,
-            workingDir: $workingDir,
-            timeout: $timeout,
-            command: $command,
+            workingDir: $runContext->getWorkingDir(),
+            timeout: $runContext->getTimeout(),
+            command: $runContext->getCommand(),
             runnerArgs: ['--append-system-prompt', $appendPromptFile],
-            retryPolicy: $retryPolicy,
+            retryPolicy: $runContext->getRetryPolicy(),
         );
 
         $start = microtime(true);
@@ -181,7 +164,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             agentResult: $result,
             duration: $duration,
             userPrompt: $userPrompt,
-            systemPrompt: $brainstormSystemPrompt,
+            systemPrompt: $runContext->getBrainstormSystemPrompt(),
             invocation: $this->formatter->buildAgentInvocation(
                 $request,
                 $this->formatter->buildUserPromptFileName($step, $round, $role),
@@ -195,33 +178,26 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
         int $round,
         string $facilitatorRole,
         string $topic,
-        string $brainstormSystemPrompt,
-        string $facilitatorAppendPrompt,
-        string $facilitatorFinalizePrompt,
-        ?string $workingDir,
-        string $responseFilesList,
-        int $timeout,
-        array $command = [],
-        ?DynamicLoopRetryPolicyVo $retryPolicy = null,
+        FacilitatorFinalizeRunContextVo $runContext,
     ): DynamicLoopTurnResultVo {
         $ctx = $this->formatter->buildFinalizeContext(
-            $facilitatorFinalizePrompt,
+            $runContext->getFacilitatorFinalizePrompt(),
             $topic,
-            $responseFilesList,
+            $runContext->getResponseFilesList(),
         );
 
         $systemPromptFile = $this->sessionWriter->writePromptFile(
             $step,
             $round,
             $facilitatorRole,
-            $brainstormSystemPrompt,
+            $runContext->getBrainstormSystemPrompt(),
             '_1_system.md',
         );
         $appendPromptFile = $this->sessionWriter->writePromptFile(
             $step,
             $round,
             $facilitatorRole,
-            $facilitatorAppendPrompt,
+            $runContext->getFacilitatorAppendPrompt(),
             '_2_append.md',
         );
 
@@ -232,11 +208,11 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             previousContext: $ctx,
             model: null,
             tools: null,
-            workingDir: $workingDir,
-            timeout: $timeout,
-            command: $command,
+            workingDir: $runContext->getWorkingDir(),
+            timeout: $runContext->getTimeout(),
+            command: $runContext->getCommand(),
             runnerArgs: ['--append-system-prompt', $appendPromptFile],
-            retryPolicy: $retryPolicy,
+            retryPolicy: $runContext->getRetryPolicy(),
         );
 
         $start = microtime(true);
@@ -247,7 +223,7 @@ final readonly class RunDynamicLoopAgentService implements RunDynamicLoopAgentSe
             agentResult: $result,
             duration: $duration,
             userPrompt: $ctx,
-            systemPrompt: $brainstormSystemPrompt,
+            systemPrompt: $runContext->getBrainstormSystemPrompt(),
             invocation: $this->formatter->buildAgentInvocation(
                 $request,
                 $this->formatter->buildUserPromptFileName($step, $round, $facilitatorRole),

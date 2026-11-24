@@ -2,8 +2,8 @@
 type: refactor
 created: 2026-11-23 19:30:07 (1795437007)
 due: 
-started: 
-completed: 
+started: 2026-11-23 21:39:12 (1795444752)
+completed: 2026-11-23 22:38:45 (1795448325)
 cancelled: 
 value: V2
 complexity: C2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Алекс (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
-pr: 
-status: todo
+branch: task/runfacilitator-vo
+pr: https://github.com/prikotov/task-orchestrator/pull/493
+status: done
 ---
 
 # TASK-techdebt-runfacilitator-vo: Инкапсулировать хвост сигнатуры runFacilitator() в VO
@@ -98,8 +98,21 @@ php vendor/bin/todo-md validate todo/TASK-techdebt-runfacilitator-vo.todo.md
 ## 9. Комментарии (Comments)
 - Задача создана по явному подтверждению владельца (2026-11-23, сессия merge PR #490): «заведи».
 - Исполнитель и ревьювер по RACI для `refactor`: Бэкендер (реализация), Ревьювер Бэка (RV-F) + Архитектор (RV-A).
+- Решение при реализации (2026-11-23, Бэкендер Левша): VO-подход применён ко всем трём методам интерфейса `RunDynamicLoopAgentServiceInterface` — `runFacilitator()` (Must), `runParticipant()` и `runFacilitatorFinalize()` (Should/Could, паттерн ложится — сигнатуры однотипные). Каждый метод получил свой VO (`FacilitatorRunContextVo`, `ParticipantRunContextVo`, `FacilitatorFinalizeRunContextVo`) и сократился до 5 позиционных параметров идентификации (step, round, role, topic + VO). Частичная инкапсуляция оставила бы интерфейс неоднородным.
+- Инвариант VO: `timeout > 0` (InvalidArgumentException при нарушении) — остальные поля валидации не требуют (summary/responseFilesList могут быть пустыми легитимно, taskAddendum nullable).
+- Тест `runFacilitatorTurnForwardsTaskAddendumToAgentRunner`: обвязка захвата аргументов заменена (`assertCount(15)` → типизированный разбор VO); поведенческая проверка переноса taskAddendum (`assertSame`) не изменена.
+- Транзитный контракт изменений не потребовал: `ExecuteDynamicTurnServiceInterface` (`runFacilitatorTurn`/`runParticipantTurn`/…) и `RunDynamicLoopService` уже работают короткими сигнатурами (конфигурационные VO цепи); хвост сигнатуры agent runner'а собирается внутри `ExecuteDynamicTurnService` — правки ограничены `RunDynamicLoopAgentServiceInterface`, `ExecuteDynamicTurnService` и Integration-реализацией `RunDynamicLoopAgentService`.
+- Верификация после возобновления (прерывание по таймауту на финальной проверке, 2026-11-23): критерии раздела 5 подтверждены — три метода по 5 параметров с VO, `@techdebt` в модуле DynamicLoop отсутствует (grep чист), поведенческие assertions существующих тестов не изменены (правка только обвязки, см. выше).
+- `make check` — зелёный: PHPStan OK, Psalm OK (покрытие типов 98.9%), PHPMD 0 нарушений, PHPCS OK, Deptrac 0 ошибок/0 предупреждений, PHPUnit 1773 теста / 5207 assertions / 2 skipped.
+- 1 deprecation в PHPUnit не связана с задачей: `tests/Unit/Domain/Service/Chain/Dynamic/RunDynamicLoopServiceFinalizeReserveTest.php:151` — `ReflectionMethod::setAccessible()` deprecated с PHP 8.5 (не имеет эффекта с PHP 8.1). Файл вне изменений задачи, воспроизводится на базе `main` — по решению владельца не чинится, зафиксирована как предсуществующая (кандидат в отдельный техдолг).
+- Осознанное отступление (утверждено тимлидом Алексом, 2026-11-23): инвариант `timeout > 0` в run-контекстах (`FacilitatorRunContextVo`, `ParticipantRunContextVo`, `FacilitatorFinalizeRunContextVo`) добавляет fail-fast — значения `timeout <= 0` из CLI (`--timeout`) или role config теперь кидают `InvalidArgumentException` при старте turn (в т.ч. resume), тогда как раньше проходили транзитом в runner без валидации. Принято, потому что: (1) значения `timeout <= 0` не являются документированным контрактом; (2) процесс всё равно жил под hard cap `ProcessLivenessWatcher` (`max(0, 1800)`); (3) fail-fast согласован с AGENTS.md («немедленно завершай работу с ошибкой») и конвенцией VO. Код менять не требуется — оформление по запросу ревью (CR-2, RV-F).
 
 ## История изменений (Change History)
 | Дата | Автор | Изменение |
 | :--- | :--- | :--- |
 | 2026-11-23 19:30:07 (1795437007) | Тимлид Алекс (pi) | Создание задачи |
+| 2026-11-23 21:39:12 (1795444752) | Бэкендер Левша (pi) | Старт задачи (ветка `task/runfacilitator-vo`) |
+| 2026-11-23 21:46:58 (1795445218) | Бэкендер Левша (pi) | Реализация: 3 VO (`FacilitatorRunContextVo`, `ParticipantRunContextVo`, `FacilitatorFinalizeRunContextVo`) в `DynamicLoop/Domain/ValueObject/`; сигнатуры `runFacilitator()`/`runParticipant()`/`runFacilitatorFinalize()` сокращены до 5 параметров; `@techdebt` снят; обновлены `ExecuteDynamicTurnService` и Integration-реализация `RunDynamicLoopAgentService`; тесты: 3 новых VO-теста + адаптация обвязки `ExecuteDynamicTurnServiceTest`; `make check` — зелёный. Статус остаётся in_progress до PR/CI (коммит выполняет владелец) |
+| 2026-11-23 21:58:34 (1795445914) | Бэкендер Левша (pi) | Верификация после возобновления (предыдущий запуск прерван по таймауту): сверено с разделом 5 — сигнатуры 3 методов ≤ 5 параметров с VO, `@techdebt` снят, поведенческие assertions существующих тестов не изменены; `make check` зелёный (PHPStan/Psalm/PHPMD/PHPCS/Deptrac — 0 нарушений; PHPUnit 1773/5207, 2 skipped); 1 PHPUnit deprecation (`ReflectionMethod::setAccessible()`, PHP 8.5) предсуществующая на `main`, вне изменений задачи — не чинится, зафиксирована. Коммит выполняет владелец |
+| 2026-11-23 22:38:45 (1795448325) | Тимлид Алекс (pi) | Задача переведена в done после RV-F/RV-A апрувов и зелёного make check; PR #493 создан (метка pi), ветка task/runfacilitator-vo опубликована. Неблокирующая рекомендация ревью (finalize/participant-кейсы с ненулевой retryPolicy) — кандидат в будущий техдолг |
+| 2026-11-23 22:28:14 (1795447694) | Бэкендер Левша (pi) | Доработка по результатам ревью (итерация 2, RV-F Пуаро: 2026-11-23_22-08_runfacilitator-vo-review): CR-1 закрыт модульным тестом `tests/Unit/Common/Module/DynamicLoop/Integration/Service/ChainExecution/RunDynamicLoopAgentServiceTest.php` — 6 тестов / 128 assertions на стабах (`RunAgentQueryHandler`, `DynamicLoopSessionWriterInterface`, `FacilitatorResponseParserInterface`, `QueryBusComponentInterface`, `DynamicLoopPromptFormatterInterface`): закреплены порядок аргументов `buildFacilitatorContext`/`buildParticipantUserPrompt`/`buildFinalizeContext` (start vs continue, summary, responseFilesList, taskAddendum), поля `DynamicLoopRunRequestVo`, маппинг в `ChainRunRequestVo` (вкл. retry policy и error-path); эффективность проверки подтверждена мутацией (перестановка start/continue ловится). CR-2 оформлен как осознанное отступление (раздел 9, утверждено тимлидом). RV-A Локи — одобрено без замечаний (отчёт `docs/agents/reports/system-architect-loki/2026-11-23_22-19_runfacilitator-vo-architecture-review.md`). `make check` зелёный. Коммит выполняет владелец |
