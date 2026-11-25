@@ -84,3 +84,78 @@ jobs:
           php-version: '8.4'
 
       - run: make composer-host-smoke
+
+  doc-checks:
+    name: Doc checks (md-links, validate-todo, validate-language)
+    # Light job per owner decision 2026-11-03 ("critical-only CI"): doc checks only,
+    # reused from the Makefile (single source of truth, no command duplication).
+    # md-links validates internal links only (external URLs are skipped by the
+    # tool itself), so the job stays deterministic and network-free.
+    runs-on: ubuntu-latest
+    steps:
+      # Full history so the path filter can diff PR changes against the base SHA.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Path filter (docs-only concern): run on PRs touching docs/todo/configs,
+      # skip on code-only PRs. Push events (main/release) always run: they are
+      # rare, so no fragile HEAD~1 diffing is needed there.
+      - name: Detect changed paths
+        id: changes
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          run=true
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            changed="$(git diff --name-only "${BASE_SHA}...HEAD")"
+            if ! grep -Eq '^(docs/|todo/|\.github/workflows/|README|AGENTS\.md$|Makefile$|\.md-links\.php$|\.coding-standard\.php$|composer\.(json|lock)$)' <<<"$changed"; then
+              run=false
+            fi
+          fi
+          echo "run=${run}" >> "$GITHUB_OUTPUT"
+
+      - uses: shivammathur/setup-php@v2
+        if: steps.changes.outputs.run == 'true'
+        with:
+          php-version: '8.4'
+          cache: composer
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+        if: steps.changes.outputs.run == 'true'
+
+      # A fresh checkout lacks git-ignored doc material that tracked docs link
+      # to: vendored doc trees (copied into docs/ by *-init commands of the
+      # composer packages) and the local-only todo/AGENTS.md regulation file.
+      # Materialize them deterministically so md-links sees the same link
+      # surface as a maintained local checkout. The scanner does not descend
+      # into symlinked directories, so vendored docs are not re-validated
+      # (their own links are upstream's concern).
+      # @techdebt 2026-11-25: tracked as TASK-techdebt-track-todo-agents-md
+      # (commit todo/AGENTS.md to git, drop the CI stub).
+      - name: Materialize ignored doc paths
+        if: steps.changes.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          ln -s ../vendor/prikotov/coding-standard/docs/conventions docs/conventions
+          ln -s ../vendor/prikotov/git-workflow/docs/git-workflow docs/git-workflow
+          ln -s ../vendor/prikotov/todo-md/docs/todo-md docs/todo-md
+          if [ ! -e todo/AGENTS.md ]; then
+            cat > todo/AGENTS.md <<'EOF'
+          # Регламент работы с задачами (todo-md)
+
+          ## Декомпозиция задач
+
+          Заглушка для CI: полный регламент ведётся локально и не хранится в git.
+
+          ## Процесс работы с задачами
+
+          Заглушка для CI: полный регламент ведётся локально и не хранится в git.
+          EOF
+          fi
+
+      - name: Run doc checks (Makefile targets)
+        if: steps.changes.outputs.run == 'true'
+        run: make md-links validate-todo validate-language

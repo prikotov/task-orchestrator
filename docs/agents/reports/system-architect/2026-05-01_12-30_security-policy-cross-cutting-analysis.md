@@ -48,6 +48,6 @@ AI#14 статус: 📋 → ✅ Done, добавлена ссылка на до
 ## Источники
 
 - [Roadmap 2026 Q2–Q3](../../../releases/ROADMAP-2026-Q2-Q3.md)
-- [Протокол brainstorm #2](../../../../var/sessions/brainstorm/2026-04-30_16-02-26/result.md)
+- Протокол brainstorm #2: `var/sessions/brainstorm/2026-04-30_16-02-26/result.md`
 - [Исследование фреймворков](../../../research/agent-frameworks-summary.md) — Кластер 2: Безопасность
 - [ADR-006](../../../adr/006-execution-strategy-composition.md), [ADR-008](../../../adr/008-shared-kernel-contract.md)
