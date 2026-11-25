@@ -94,7 +94,7 @@ status: in_progress
 ```bash
 grep -n "Verification" docs/agents/skills/task-definition/SKILL.md   # сверка вставки вручную
 make md-links                                         # ссылки в документации
-make validate-language                                 # доля англицизмов (предупреждения о предсуществующих файлах — не о диффе)
+make validate-language                                # доля англицизмов (предупреждения о предсуществующих файлах — не о диффе)
 php vendor/bin/todo-md validate TASK-docs-verification-before-publish   # валидность задачи
 make check                                            # полный барьер перед PR — на этапе публикации постановки не прогоняется (реализация не завершена); прогоняет тимлид перед PR (пометка по Правилу A)
 ```
