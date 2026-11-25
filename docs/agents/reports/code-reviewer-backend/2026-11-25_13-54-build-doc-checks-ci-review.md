@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-11-25
 **Объект:** ветка `task/build-doc-checks-ci` (рабочее дерево относительно `main`): `.github/workflows/ci.yml`, `docs/agents/reports/system-architect/2026-05-01_12-30_security-policy-cross-cutting-analysis.md`, `docs/releases/security-policy-cross-cutting-analysis.md`, `todo/TASK-build-doc-checks-ci.todo.md`
-**Задача:** [todo/TASK-build-doc-checks-ci.todo.md](../../../../todo/TASK-build-doc-checks-ci.todo.md)
+**Задача:** [todo/TASK-build-doc-checks-ci.todo.md](../../../../todo/done/TASK-build-doc-checks-ci.todo.md)
 **Тип прохода:** полный RV (функциональное ревью: соответствие постановке, безопасность, качество, статическая оценка проверок)
 
 ---
