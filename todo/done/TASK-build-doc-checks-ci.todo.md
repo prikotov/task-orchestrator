@@ -3,7 +3,7 @@ type: docs
 created: 2026-11-24 16:48:08 (1795538888)
 due: 
 started: 2026-11-25 06:21:52 (1795587712)
-completed: 
+completed: 2026-11-25 07:07:19 (1795590439)
 cancelled: 
 value: V2
 complexity: C2
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/build-doc-checks-ci
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/510
+status: done
 ---
 
 # TASK-build-doc-checks-ci: Doc-проверки в CI для docs-only изменений
