@@ -2,7 +2,7 @@
 type: docs
 created: 2026-11-24 16:48:08 (1795538888)
 due: 
-started: 
+started: 2026-11-25 05:45:24 (1795585524)
 completed: 
 cancelled: 
 value: V2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Алекс (pi)
-assignee: 
+assignee: Технический писатель Гермиона (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
 branch: 
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-docs-rv-report-in-prompt: Явное требование файла отчёта в промпте полного RV конвейера
