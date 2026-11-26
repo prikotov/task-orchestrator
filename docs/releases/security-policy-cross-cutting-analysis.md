@@ -6,7 +6,7 @@
 **Дорожная карта:** AI#14, спринт 2 → входные данные для спринта 9 (реализация политики безопасности `SecurityPolicy`)
 **Источники:**
 - [Дорожная карта 2026 Q2–Q3](ROADMAP-2026-Q2-Q3.md) — `OQ-3`, триггер G4, план спринта 9
-- [Протокол мозгового штурма #2](../../var/sessions/brainstorm/2026-04-30_16-02-26/result.md) — консенсус: `SecurityPolicy` = отдельный модуль
+- Протокол мозгового штурма #2: `var/sessions/brainstorm/2026-04-30_16-02-26/result.md` — консенсус: `SecurityPolicy` = отдельный модуль
 - [Исследование фреймворков](../research/agent-frameworks-summary.md) — Кластер 2: Безопасность
 - [ADR-006: композиция ExecutionStrategy](../adr/006-execution-strategy-composition.md)
 - [ADR-008: контракт общего ядра (`контракт Shared Kernel`)](../adr/008-shared-kernel-contract.md)

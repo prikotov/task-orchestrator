@@ -84,3 +84,16 @@ jobs:
           php-version: '8.4'
 
       - run: make composer-host-smoke
+  local-check:
+    name: Local make check proof (marker)
+    # CI не запускает проверки (владелец, 2026-11-26) — верифицирует маркер
+    # локального make check; логика в bin/local-check-proof (цель Makefile: local-check-proof).
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      # Чекаут именно head PR: при merge-checkout HEAD^ — база, а не родитель маркерного коммита.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - run: make local-check-proof BASE_SHA=${{ github.event.pull_request.base.sha }}

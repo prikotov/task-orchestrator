@@ -124,3 +124,12 @@ check: ## Запустить все проверки (phpstan + deptrac + psalm 
 	@${MAKE} --no-print-directory phpstan deptrac psalm phpmd phpcs md-links validate-todo validate-roles validate-language tests && \
 		{ echo; echo "✅ Все проверки завершены успешно."; } || \
 		{ echo; echo "❌ Проверки завершены с ошибками."; exit 1; }
+	@# Маркер локального прогона для CI (job local-check верифицирует след, а не запускает проверки):
+	@# SHA проверенного коммита + время одной парой (POSIX-разбор, без bash-only heredoc).
+	@ts=$$(date -u '+%s %Y-%m-%d %H:%M:%S') && \
+		printf '{"commit":"%s","epoch":%s,"utc":"%s"}\n' "$$(git rev-parse HEAD)" "$${ts%% *}" "$${ts#* }" > .make-check.json && \
+		echo "🖊️ Маркер .make-check.json обновлён (проверен $$(git rev-parse --short HEAD)) — закоммить его последним коммитом PR."
+
+.PHONY: local-check-proof
+local-check-proof: ## CI: верифицировать маркер локального make check (BASE_SHA=<sha базы PR>)
+	@bin/local-check-proof "$(BASE_SHA)"
