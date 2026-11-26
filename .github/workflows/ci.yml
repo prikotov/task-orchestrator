@@ -91,6 +91,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
+      # Чекаут именно head PR: при merge-checkout HEAD^ — база, а не родитель маркерного коммита.
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}

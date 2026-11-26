@@ -132,8 +132,8 @@ check: ## Запустить все проверки (phpstan + deptrac + psalm 
 
 .PHONY: local-check-proof
 local-check-proof: ## CI: верифицировать маркер локального make check (BASE_SHA=<sha базы PR>)
-	@test -n "$(BASE_SHA)" || { echo "::error::BASE_SHA не передан"; exit 2; }
-	@changed="$$(git diff --name-only '$(BASE_SHA)...HEAD')"; \
+	@set -eu; test -n "$(BASE_SHA)" || { echo "::error::BASE_SHA не передан"; exit 2; }
+	@set -eu; changed="$$(git diff --name-only '$(BASE_SHA)...HEAD')"; \
 		code='^(src/|apps/|tests/|config/|bin/|\.todo-md\.php$$|Makefile$$|composer\.(json|lock)$$|phpunit\.xml\.dist$$|psalm\.xml$$|phpcs\.xml\.dist$$|phpmd\.xml$$|depfile\.yaml$$|\.coding-standard\.php$$|\.md-links\.php$$|phpstan\.neon\.dist$$|phpmd\.baseline\.xml$$)'; \
 		if ! printf '%s\n' "$$changed" | grep -Eq "$$code"; then \
 			echo "Правок кода нет (доки/todo) — make check не требуется, маркер не проверяется."; \
