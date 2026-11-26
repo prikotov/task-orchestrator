@@ -2,7 +2,7 @@
 type: test
 created: 2026-11-12 10:15:00 (1794453300)
 due: 
-started: 
+started: 2026-11-26 13:13:01 (1795698781)
 completed: 
 cancelled: 
 value: V2
@@ -18,9 +18,9 @@ consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/watchsubagent-stall-flaky
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-test-watchsubagent-stall-flaky: Стабилизировать флаки-тест WatchSubagentScriptTest про stall/soft-timeout
