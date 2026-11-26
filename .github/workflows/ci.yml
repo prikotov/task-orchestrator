@@ -87,7 +87,7 @@ jobs:
   local-check:
     name: Local make check proof (marker)
     # CI не запускает проверки (владелец, 2026-11-26) — верифицирует маркер
-    # локального make check; логика в Makefile: make local-check-proof.
+    # локального make check; логика в bin/local-check-proof (цель Makefile: local-check-proof).
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
