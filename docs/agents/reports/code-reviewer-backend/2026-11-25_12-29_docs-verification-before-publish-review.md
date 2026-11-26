@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-11-25
 **Объект:** дифф `main...task/docs-verification-before-publish` (коммиты `4e6e69c1`, `f4e77b50`): `docs/agents/skills/task-definition/SKILL.md` (+10), `todo/TASK-docs-verification-before-publish.todo.md` (+7/−6)
-**Задача:** [todo/TASK-docs-verification-before-publish.todo.md](../../../../todo/TASK-docs-verification-before-publish.todo.md)
+**Задача:** [todo/done/TASK-docs-verification-before-publish.todo.md](../../../../todo/done/TASK-docs-verification-before-publish.todo.md)
 
 ---
 
