@@ -84,78 +84,41 @@ jobs:
           php-version: '8.4'
 
       - run: make composer-host-smoke
-
-  doc-checks:
-    name: Doc checks (md-links, validate-todo, validate-language)
-    # Light job per owner decision 2026-11-03 ("critical-only CI"): doc checks only,
-    # reused from the Makefile (single source of truth, no command duplication).
-    # md-links validates internal links only (external URLs are skipped by the
-    # tool itself), so the job stays deterministic and network-free.
+  local-check:
+    name: Local make check proof (marker)
+    # Владелец 2026-11-26: CI не запускает проверки — верифицирует след локального
+    # прогона. make check при успехе пишет маркер .make-check.json с SHA проверенного
+    # коммита. На PR с правками кода job требует, чтобы маркер (последний коммит
+    # ветки) ссылался на предыдущий коммит. Для PR без правок кода (доки, todo)
+    # make check не требуется (исключение документационных правок из AGENTS.md) —
+    # job пропускается. Без PHP и composer: чтение маркера, сравнение SHA.
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      # Full history so the path filter can diff PR changes against the base SHA.
+      # Полная история — для diff-фильтра путей против базы PR.
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Path filter (docs-only concern): run on PRs touching docs/todo/configs,
-      # skip on code-only PRs. Push events (main/release) always run: they are
-      # rare, so no fragile HEAD~1 diffing is needed there.
-      - name: Detect changed paths
-        id: changes
+      - name: Verify local make check marker
         env:
-          EVENT_NAME: ${{ github.event_name }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -euo pipefail
-          run=true
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            changed="$(git diff --name-only "${BASE_SHA}...HEAD")"
-            if ! grep -Eq '^(docs/|todo/|\.github/workflows/|README|AGENTS\.md$|Makefile$|\.md-links\.php$|\.coding-standard\.php$|composer\.(json|lock)$)' <<<"$changed"; then
-              run=false
-            fi
+          changed="$(git diff --name-only "${BASE_SHA}...HEAD")"
+          code='^(src/|apps/|tests/|config/|bin/|\.todo-md\.php$|Makefile$|composer\.(json|lock)$|phpunit\.xml\.dist$|psalm\.xml$|phpcs\.xml\.dist$|phpmd\.xml$|depfile\.yaml$|\.coding-standard\.php$)'
+          if ! grep -Eq "$code" <<<"$changed"; then
+            echo "Правок кода нет (доки/todo) — make check не требуется, маркер не проверяется."
+            exit 0
           fi
-          echo "run=${run}" >> "$GITHUB_OUTPUT"
-
-      - uses: shivammathur/setup-php@v2
-        if: steps.changes.outputs.run == 'true'
-        with:
-          php-version: '8.4'
-          cache: composer
-
-      - run: composer install --no-interaction --prefer-dist --no-progress
-        if: steps.changes.outputs.run == 'true'
-
-      # A fresh checkout lacks git-ignored doc material that tracked docs link
-      # to: vendored doc trees (copied into docs/ by *-init commands of the
-      # composer packages) and the local-only todo/AGENTS.md regulation file.
-      # Materialize them deterministically so md-links sees the same link
-      # surface as a maintained local checkout. The scanner does not descend
-      # into symlinked directories, so vendored docs are not re-validated
-      # (their own links are upstream's concern).
-      # @techdebt 2026-11-25: tracked as TASK-techdebt-track-todo-agents-md
-      # (commit todo/AGENTS.md to git, drop the CI stub).
-      - name: Materialize ignored doc paths
-        if: steps.changes.outputs.run == 'true'
-        run: |
-          set -euo pipefail
-          ln -s ../vendor/prikotov/coding-standard/docs/conventions docs/conventions
-          ln -s ../vendor/prikotov/git-workflow/docs/git-workflow docs/git-workflow
-          ln -s ../vendor/prikotov/todo-md/docs/todo-md docs/todo-md
-          if [ ! -e todo/AGENTS.md ]; then
-            cat > todo/AGENTS.md <<'EOF'
-          # Регламент работы с задачами (todo-md)
-
-          ## Декомпозиция задач
-
-          Заглушка для CI: полный регламент ведётся локально и не хранится в git.
-
-          ## Процесс работы с задачами
-
-          Заглушка для CI: полный регламент ведётся локально и не хранится в git.
-          EOF
+          if [ ! -f .make-check.json ]; then
+            echo "::error::В PR правки кода, но .make-check.json отсутствует. Запусти make check на актуальном HEAD и закоммить обновлённый маркер последним коммитом."
+            exit 1
           fi
-
-      - name: Run doc checks (Makefile targets)
-        if: steps.changes.outputs.run == 'true'
-        run: make md-links validate-todo validate-language
+          checked_sha="$(python3 -c 'import json; print(json.load(open(".make-check.json"))["commit"])')"
+          previous_commit="$(git rev-parse "$(git rev-parse HEAD^)^")"
+          if [ "$checked_sha" != "$previous_commit" ]; then
+            echo "::error::Маркер ссылается на $checked_sha, а последний кодовый коммит ветки — $previous_commit. Перезапусти make check и закоммить маркер заново последним коммитом."
+            exit 1
+          fi
+          echo "Локальный make check подтверждён: маркер ссылается на $previous_commit."
