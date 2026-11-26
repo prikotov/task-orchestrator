@@ -4,7 +4,7 @@ created: 2026-11-25 13:57:54 (1795589874)
 due: 
 started: 
 completed: 
-cancelled: 
+cancelled: 2026-11-26 11:35:29 (1795692929)
 value: V3
 complexity: C1
 priority: P3
@@ -20,7 +20,7 @@ approver:
 informed: []
 branch: 
 pr: 
-status: todo
+status: cancelled
 ---
 
 # TASK-techdebt-track-todo-agents-md: Закоммитить todo/AGENTS.md в git и убрать заглушку из CI doc-checks
