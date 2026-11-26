@@ -132,15 +132,4 @@ check: ## Запустить все проверки (phpstan + deptrac + psalm 
 
 .PHONY: local-check-proof
 local-check-proof: ## CI: верифицировать маркер локального make check (BASE_SHA=<sha базы PR>)
-	@set -eu; test -n "$(BASE_SHA)" || { echo "::error::BASE_SHA не передан"; exit 2; }
-	@set -eu; changed="$$(git diff --name-only '$(BASE_SHA)...HEAD')"; \
-		code='^(src/|apps/|tests/|config/|bin/|\.todo-md\.php$$|Makefile$$|composer\.(json|lock)$$|phpunit\.xml\.dist$$|psalm\.xml$$|phpcs\.xml\.dist$$|phpmd\.xml$$|depfile\.yaml$$|\.coding-standard\.php$$|\.md-links\.php$$|phpstan\.neon\.dist$$|phpmd\.baseline\.xml$$)'; \
-		if ! printf '%s\n' "$$changed" | grep -Eq "$$code"; then \
-			echo "Правок кода нет (доки/todo) — make check не требуется, маркер не проверяется."; \
-			exit 0; \
-		fi; \
-		[ -f .make-check.json ] || { echo "::error::В PR правки кода, но .make-check.json отсутствует. Запусти make check на актуальном HEAD и закоммить обновлённый маркер последним коммитом."; exit 1; }; \
-		checked_sha="$$(python3 -c 'import json; print(json.load(open(".make-check.json"))["commit"])')"; \
-		previous_commit="$$(git rev-parse HEAD^)"; \
-		[ "$$checked_sha" = "$$previous_commit" ] || { echo "::error::Маркер ссылается на $$checked_sha, а последний кодовый коммит ветки — $$previous_commit. Перезапусти make check и закоммить маркер заново последним коммитом."; exit 1; }; \
-		echo "Локальный make check подтверждён: маркер ссылается на $$previous_commit."
+	@bin/local-check-proof "$(BASE_SHA)"
