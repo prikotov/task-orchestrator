@@ -96,8 +96,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Полная история — для diff-фильтра путей против базы PR.
+      # Явный чекаут head SHA PR: при дефолтном merge-checkout HEAD^ — это база,
+      # а не родитель маркерного коммита (merge-коммит имеет базу первым родителем).
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - name: Verify local make check marker
@@ -106,7 +109,7 @@ jobs:
         run: |
           set -euo pipefail
           changed="$(git diff --name-only "${BASE_SHA}...HEAD")"
-          code='^(src/|apps/|tests/|config/|bin/|\.todo-md\.php$|Makefile$|composer\.(json|lock)$|phpunit\.xml\.dist$|psalm\.xml$|phpcs\.xml\.dist$|phpmd\.xml$|depfile\.yaml$|\.coding-standard\.php$)'
+          code='^(src/|apps/|tests/|config/|bin/|\.todo-md\.php$|Makefile$|composer\.(json|lock)$|phpunit\.xml\.dist$|psalm\.xml$|phpcs\.xml\.dist$|phpmd\.xml$|depfile\.yaml$|\.coding-standard\.php$|\.md-links\.php$|phpstan\.neon\.dist$|phpmd\.baseline\.xml$'
           if ! grep -Eq "$code" <<<"$changed"; then
             echo "Правок кода нет (доки/todo) — make check не требуется, маркер не проверяется."
             exit 0
@@ -116,7 +119,7 @@ jobs:
             exit 1
           fi
           checked_sha="$(python3 -c 'import json; print(json.load(open(".make-check.json"))["commit"])')"
-          previous_commit="$(git rev-parse "$(git rev-parse HEAD^)^")"
+          previous_commit="$(git rev-parse HEAD^)"
           if [ "$checked_sha" != "$previous_commit" ]; then
             echo "::error::Маркер ссылается на $checked_sha, а последний кодовый коммит ветки — $previous_commit. Перезапусти make check и закоммить маркер заново последним коммитом."
             exit 1
