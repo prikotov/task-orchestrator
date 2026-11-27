@@ -1,5 +1,5 @@
 command_profiles:
-  deepseek_1017_max:
+  deepseek_flash_1017_max:
     command:
       - pi
       - --mode
@@ -180,7 +180,7 @@ roles:
   code_reviewer_backend_puaro:
     prompt_file: docs/agents/roles/team/code_reviewer_backend_puaro.ru.md
     system_prompt_file: config/prompts/subagent/base_system.md
-    command_profile: deepseek_1017_max
+    command_profile: deepseek_flash_1017_max
     commands_by_complexity:
       C0: glm_flash_high
       C4: qwen_max_medium
