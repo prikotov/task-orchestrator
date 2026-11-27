@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-11-27
 **Объект:** ветка `task/runcontext-retry-policy-cases` (HEAD `19ad0848`) + незакоммиченные правки рабочего дерева: `tests/Unit/Common/Module/DynamicLoop/Integration/Service/ChainExecution/RunDynamicLoopAgentServiceTest.php` (+118 строк); коммиты `a95145be` (старт задачи), `19ad0848` (док-фикс ссылок после мержа PR #510)
-**Задача:** [todo/TASK-techdebt-runcontext-retry-policy-cases.todo.md](../../../../todo/TASK-techdebt-runcontext-retry-policy-cases.todo.md)
+**Задача:** [todo/done/TASK-techdebt-runcontext-retry-policy-cases.todo.md](../../../../todo/done/TASK-techdebt-runcontext-retry-policy-cases.todo.md)
 **Тип прохода:** полный RV (функциональное ревью: соответствие постановке, границы, конвенции, статическая оценка тестов + точечные запуски проверок)
 **Вердикт:** 🔴 REQUEST CHANGES — 1 блокирующее замечание (CR-1), 3 важных (CR-2…CR-4), наблюдений без замечаний — 2. → Замечания устранены; верификационный проход 2026-11-27 17:20 — 🟢 APPROVE (раздел 7).
 

@@ -3,7 +3,7 @@
 **Роль:** Тестировщик Бэка Хаус (qa_backend_house)
 **Дата:** 2026-11-27
 **Объект:** ветка `task/runcontext-retry-policy-cases` (HEAD `19ad0848`) + незакоммиченные правки рабочего дерева: `tests/Unit/Common/Module/DynamicLoop/Integration/Service/ChainExecution/RunDynamicLoopAgentServiceTest.php` (+135 строк), `todo/TASK-techdebt-runcontext-retry-policy-cases.todo.md`
-**Задача:** [todo/TASK-techdebt-runcontext-retry-policy-cases.todo.md](../../../../todo/TASK-techdebt-runcontext-retry-policy-cases.todo.md)
+**Задача:** [todo/done/TASK-techdebt-runcontext-retry-policy-cases.todo.md](../../../../todo/done/TASK-techdebt-runcontext-retry-policy-cases.todo.md)
 **Тип прохода:** полное ревью тестового покрытия (полнота/чувствительность кейсов, симметрия трёх методов, независимое воспроизведение мутаций Must-3, конвенции тестирования, edge cases в скоупе)
 **Вердикт:** 🟢 APPROVE — замечаний к тестовому коду нет; запросов на изменения не требуется. Организационные шаги перед PR (коммит, полный барьер, перевод задачи в `done`) остаются за исполнителем — см. раздел 6.
 
