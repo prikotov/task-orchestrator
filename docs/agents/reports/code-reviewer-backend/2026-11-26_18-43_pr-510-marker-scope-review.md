@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-11-26
 **Объект:** ветка `task/build-doc-checks-ci`, коммиты `1a8f97be`, `92a2d9a6` (дифф `e36ade2e..HEAD`): `.github/workflows/ci.yml`, `Makefile`, `todo/TASK-build-doc-checks-ci.todo.md`, `todo/cancelled/TASK-techdebt-track-todo-agents-md.todo.md`, `docs/agents/reports/code-reviewer-backend/2026-11-25_13-54-build-doc-checks-ci-review.md`
-**Задача:** [todo/TASK-build-doc-checks-ci.todo.md](../../../../todo/TASK-build-doc-checks-ci.todo.md)
+**Задача:** [todo/done/TASK-build-doc-checks-ci.todo.md](../../../../todo/done/TASK-build-doc-checks-ci.todo.md)
 **Тип прохода:** полный RV (функциональное ревью: соответствие новой постановке, безопасность, качество, статическая оценка проверок)
 **Вердикт (исходный):** 🔴 REQUEST CHANGES — 2 блокирующих замечания (CR-1, CR-2), 4 важных (CR-3…CR-6), 1 косметическое.
 **Актуальный вердикт:** ✅ APPROVE — верификационные проходы разделов 6 (устранение CR-1…CR-6), 7 (перенос логики в Makefile, коммит `d41938a5`) и 8 (вынос shell-логики в `bin/local-check-proof`, коммит `b54fb926`).
