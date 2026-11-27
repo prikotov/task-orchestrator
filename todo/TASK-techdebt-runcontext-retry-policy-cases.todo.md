@@ -70,14 +70,14 @@ status: in_progress
 ## 3. Требования, MoSCoW (Requirements)
 ### 🔴 Обязательно (Must Have)
 
-- [ ] Кейс finalize: полный `FacilitatorFinalizeRunContextVo` → `runFacilitatorFinalize`; проверен 1:1 маппинг всех полей (по образцу существующих кейсов файла).
-- [ ] Кейс participant с ненулевой `retryPolicy`: политика повторов доезжает до `runParticipant` без перепутывания полей.
-- [ ] Эффективность новых кейсов подтверждена мутационной проверкой при реализации: временная перестановка смещённого поля роняет тест, после чего код возвращён как был.
-- [ ] `vendor/bin/phpunit` и `vendor/bin/psalm` зелёные.
+- [x] Кейс finalize: полный `FacilitatorFinalizeRunContextVo` → `runFacilitatorFinalize`; проверен 1:1 маппинг всех полей (по образцу существующих кейсов файла). — `runFacilitatorFinalizeMapsEnabledRetryPolicyToExecutionRetryPolicy`, все 8 полей VO проверены (после доработки CR-1 +17 строк: захват `$writtenPrompts`/`$finalizeContextArgs`).
+- [x] Кейс participant с ненулевой `retryPolicy`: политика повторов доезжает до `runParticipant` без перепутывания полей. — `runParticipantMapsEnabledRetryPolicyToExecutionRetryPolicy` (3/250/8000/2.5).
+- [x] Эффективность новых кейсов подтверждена мутационной проверкой при реализации: временная перестановка смещённого поля роняет тест, после чего код возвращён как был. — см. запись в Change History от 2026-11-27.
+- [x] `vendor/bin/phpunit` и `vendor/bin/psalm` зелёные. — полный phpunit 1782 тестов / 5372 утверждения (2 skipped — сторонние), psalm: No errors found.
 
 ### 🟡 Желательно (Should Have)
 
-- [ ] Если существующий facilitator-кейс уже использует ненулевую `retryPolicy` — в отчёте задачи указать это явно (дубликат не заводить).
+- [x] Если существующий facilitator-кейс уже использует ненулевую `retryPolicy` — в отчёте задачи указать это явно (дубликат не заводить). — существующий кейс `runFacilitatorMapsEnabledRetryPolicyToExecutionRetryPolicy` (строка ~175) уже покрывает ненулевую политику 2/500/9000/3.0; третий кейс не заведён (подтверждено ревью Пуаро, CR-3).
 
 ### 🟢 Опционально (Could Have)
 
@@ -91,11 +91,11 @@ status: in_progress
 
 ## 4. План реализации (Implementation Plan)
 
-1. [ ] Перечитать существующие кейсы `RunDynamicLoopAgentServiceTest.php`, отчёт ревью PR #493 (раздел с рекомендацией) и VO `FacilitatorFinalizeRunContextVo`/`ParticipantRunContextVo`.
-2. [ ] Добавить кейс finalize (Must-1) по образцу существующих.
-3. [ ] Добавить кейс participant с ненулевой `retryPolicy` (Must-2).
-4. [ ] Мутационная проверка: переставить поле → убедиться в падении → вернуть (Must-3).
-5. [ ] `vendor/bin/phpunit`, `vendor/bin/psalm`; при необходимости точечный `composer install`.
+1. [x] Перечитать существующие кейсы `RunDynamicLoopAgentServiceTest.php`, отчёт ревью PR #493 (раздел с рекомендацией) и VO `FacilitatorFinalizeRunContextVo`/`ParticipantRunContextVo`.
+2. [x] Добавить кейс finalize (Must-1) по образцу существующих.
+3. [x] Добавить кейс participant с ненулевой `retryPolicy` (Must-2).
+4. [x] Мутационная проверка: переставить поле → убедиться в падении → вернуть (Must-3).
+5. [x] `vendor/bin/phpunit`, `vendor/bin/psalm`; при необходимости точечный `composer install`.
 6. [ ] Обновить Change History задачи, перевести в `done`, PR.
 
 ## 5. Критерии приёмки (Definition of Done)
@@ -134,9 +134,17 @@ php vendor/bin/todo-md validate TASK-techdebt-runcontext-retry-policy-cases
 
 - Задача заведена по решению владельца 2026-11-24 («если нужно — оформи задачей») на базе неблокирующей рекомендации ревьюера в PR #493; приоритет P3 — отложенная страховка, не блокирует ничего.
 - Тип фикса — расширение тестовой сетки; в реестре ретроспектив отдельной записи не имеет (рекомендация ревью, не ретро-находка).
+- Решение тимлида 2026-11-27 (CR-4 отчёта ревью 2026-11-27_17-15): двухстрочный док-фикс битых ссылок (`19ad0848`) оставлен в этой ветке отдельным коммитом `docs(reports)`. Обоснование: ссылки на `todo/TASK-build-doc-checks-ci.todo.md` битые с мержа PR #510 (коммит `56555b44` — перенос файла задачи без обновления ссылок в отчётах ревью), падение воспроизведено на чистом HEAD; без фикса невозможен зелёный `make check` — обязательный барьер перед PR. Это завершение упущенной при мерже #510 очистки ссылок, а не новая задача.
+- Наблюдение исполнителя вне скоупа (потенциальный техдолг, задача не заводится по Won't Have): ветка `!$policy->isEnabled()` в `toExecutionRetryPolicy` (не-`null` политика с `maxRetries=0`) не покрыта — тестами задачи не требовалась.
 
 ## История изменений (Change History)
 
 | Дата | Автор | Изменение |
 | :--- | :--- | :--- |
 | 2026-11-24 03:50:21 (1795492221) | Тимлид Алекс (pi) | Создание задачи |
+| 2026-11-27 17:10:00 | Тимлид Алекс (pi) | Старт работы: `assignee: Бэкендер Левша (pi)`, `status: in_progress`, ветка `task/runcontext-retry-policy-cases`, публикация ветки токеном бота |
+| 2026-11-27 17:10:00 | Бэкендер Левша (pi) | Реализация Must-1/Must-2: кейсы `runFacilitatorFinalizeMapsEnabledRetryPolicyToExecutionRetryPolicy` (полный VO, 8 полей) и `runParticipantMapsEnabledRetryPolicyToExecutionRetryPolicy` (ненулевая политика 3/250/8000/2.5); +118 строк в `RunDynamicLoopAgentServiceTest.php`; phpunit полный — 1782/5372 OK, psalm OK. Should-1: дубликат не заведён — facilitator-путь с ненулевой политикой уже покрыт кейсом `runFacilitatorMapsEnabledRetryPolicyToExecutionRetryPolicy` (2/500/9000/3.0) |
+| 2026-11-27 17:10:00 | Бэкендер Левша (pi) | Мутационная проверка (Must-3), методика: временная рабочая копия `git worktree` от HEAD с полной копией `vendor` + `composer dump-autoload` (симлинк `vendor` давал невалидный первый прогон — автозагрузчик грузил классы основного репозитория; пересоздано, путь проверен `ReflectionClass`), контроль `git status` до/после, worktree удалён. Мутация 1: перестановка `initialDelayMs` ↔ `maxDelayMs` в `toExecutionRetryPolicy()` — упали ровно 3 retry-кейса (facilitator + 2 новых). Мутация 2: перестановка `command` ↔ `runnerArgs` в `runViaAgentRunner()` — упали facilitator-кейс и новый finalize-кейс |
+| 2026-11-27 17:19:00 | Ревьювер Бэка Пуаро (pi) | Полное ревью: REQUEST CHANGES (CR-1 Must-1 не буквально — 4 поля VO без ассертов; CR-2 Must-3 без записи; CR-3 Should-1 без записи; CR-4 скоуп док-фикса). Отчёт: `docs/agents/reports/code-reviewer-backend/2026-11-27_17-15_runcontext-retry-policy-cases-review.md` |
+| 2026-11-27 17:19:00 | Бэкендер Левша (pi) | Доработка CR-1: захват `$writtenPrompts`/`$finalizeContextArgs` через существующие параметры хелперов, ассерты на все 8 полей VO (+17 строк); phpunit модуль 33/220 OK, psalm OK; мутационная самопроверка новых ассертов — перестановки `brainstormSystemPrompt` ↔ `facilitatorAppendPrompt` и `facilitatorFinalizePrompt` ↔ `responseFilesList` роняют тест, откат из бэкапа |
+| 2026-11-27 17:19:00 | Тимлид Алекс (pi) | Закрытие CR-2/CR-3: чекбоксы Must/Should/плана отмечены, записи о мутационной проверке и Should-1 внесены; CR-4 — решение зафиксировано в разделе «Комментарии» |
