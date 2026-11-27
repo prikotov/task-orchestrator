@@ -10,7 +10,7 @@
 `src/Module/DynamicLoop/Domain/Service/Dynamic/FinalizeDynamicLoopService.php` (+1/−1),
 `src/Module/DynamicLoop/Domain/Service/Dynamic/RunDynamicLoopService.php` (+7/−0),
 `todo/TASK-techdebt-phpstan-suppressions-audit.todo.md` (+27/−18), `.make-check.json` (маркер `make check`)
-**Задача:** [todo/TASK-techdebt-phpstan-suppressions-audit.todo.md](../../../../todo/TASK-techdebt-phpstan-suppressions-audit.todo.md)
+**Задача:** [todo/TASK-techdebt-phpstan-suppressions-audit.todo.md](../../../../todo/done/TASK-techdebt-phpstan-suppressions-audit.todo.md)
 **Тип прохода:** полное ревью — полнота против постановки, конвенции подавлений, отсутствие изменений поведения, риск переключения `reportUnmatchedIgnoredErrors`, консистентность файла задачи, стиль и язык комментариев
 **Вердикт:** 🟡 **REQUEST CHANGES** — 1 обязательное замечание (**CR-1**: расхождение файла задачи с фактическим состоянием кода, правится одной строкой) и 4 рекомендации (**CR-2**…**CR-5**).
 
@@ -150,7 +150,7 @@ todo/…audit.todo.md               27/18  — файл задачи
 
 ### CR-1 [🟡 обязательное] Файл задачи и комментарий противоречат друг другу
 
-**Файл/строка:** [todo/TASK-techdebt-phpstan-suppressions-audit.todo.md:64](../../../../todo/TASK-techdebt-phpstan-suppressions-audit.todo.md) (и связанная правка в `src/Module/AgentRunner/Infrastructure/Service/ProcessLivenessWatcher.php:99-100`).
+**Файл/строка:** [todo/TASK-techdebt-phpstan-suppressions-audit.todo.md:64](../../../../todo/done/TASK-techdebt-phpstan-suppressions-audit.todo.md) (и связанная правка в `src/Module/AgentRunner/Infrastructure/Service/ProcessLivenessWatcher.php:99-100`).
 
 **Проблема.** В задаче записано: «✅ оставлено, причина уже была; актуализирована ссылка на прецеденты (**убран снятый** `property.unusedType`)». Факт: `property.unusedType` **не снят** — он живой и подавляется в `src/Module/AgentRunner/Infrastructure/Service/Codex/HttpsProxyBridge.php:53` (сматчен при `reportUnmatchedIgnoredErrors: true`, подтверждено прогоном). Более того, строка 107 того же файла задачи утверждает обратное: «`property.unusedType` из исходного списка «живых» **оставлен** с документированной причиной после эксперимента с сужением PHPDoc». Итог: внутреннее противоречие задачи и потеря в комментарии `ProcessLivenessWatcher.php` **живого** прецедента (сейчас там остался только `nullCoalesce.offset`).
 
@@ -198,7 +198,7 @@ todo/…audit.todo.md               27/18  — файл задачи
 
 ### CR-5 [🟢 рекомендация] Скоуп DoD шире фактического аудита
 
-**Файл/строка:** [todo/TASK-techdebt-phpstan-suppressions-audit.todo.md:81](../../../../todo/TASK-techdebt-phpstan-suppressions-audit.todo.md).
+**Файл/строка:** [todo/TASK-techdebt-phpstan-suppressions-audit.todo.md:81](../../../../todo/done/TASK-techdebt-phpstan-suppressions-audit.todo.md).
 
 **Проблема.** Критерий «В `src/` нет подавлений без причины и без ссылки на задачу/прецедент по конвенции» помечен `[x]`, но проверены только подавления PHPStan. В `src/` остаются **7** тегов `@psalm-suppress` без `@techdebt` (`src/Kernel.php:91`, `src/Component/ModuleSystem/ModuleInterface.php:49`, `.../Pi/PiAgentRunnerService.php:69`, `.../StaticExecutionStrategyService.php:77`, `.../RunStaticChainService.php:74` и `:93`, `.../RunDynamicLoopService.php:98`) — они предсуществующие и вне скоупа задачи, но формулировка критерия читается как «все подавления».
 
@@ -287,7 +287,7 @@ todo/…audit.todo.md               27/18  — файл задачи
 
 Дополнительно: удаление номеров строк закрывает и латентный дефект, отмеченный в §6 — адреса в комментарии больше не разъедутся при следующем сдвиге. Потеря живого прецедента, на которую указывал CR-1 (в комментарии оставался только `nullCoalesce.offset`), устранена: оба идентификатора снова на месте.
 
-**Файл задачи** — [todo/TASK-techdebt-phpstan-suppressions-audit.todo.md:64](../../../../todo/TASK-techdebt-phpstan-suppressions-audit.todo.md), текущее состояние:
+**Файл задачи** — [todo/TASK-techdebt-phpstan-suppressions-audit.todo.md:64](../../../../todo/done/TASK-techdebt-phpstan-suppressions-audit.todo.md), текущее состояние:
 
 > ✅ оставлено, причина уже была; актуализирована ссылка на прецеденты: живые `property.unusedType` и `nullCoalesce.offset` (оба оставлены в этом аудите), устаревшие номера строк убраны — актуальные адреса в §9;
 
@@ -325,7 +325,7 @@ todo/…audit.todo.md               27/18  — файл задачи
 
 ### 11.4 CR-5 — скоуп DoD — ✅ устранено
 
-[todo/TASK-techdebt-phpstan-suppressions-audit.todo.md:81](../../../../todo/TASK-techdebt-phpstan-suppressions-audit.todo.md), текущее состояние:
+[todo/TASK-techdebt-phpstan-suppressions-audit.todo.md:81](../../../../todo/done/TASK-techdebt-phpstan-suppressions-audit.todo.md), текущее состояние:
 
 > В `src/` нет `@phpstan-ignore`-подавлений без причины и без ссылки на задачу/прецедент по конвенции (подавления Psalm — вне скоупа этой задачи). ✅ 2026-11-27: все 4 оставшихся `@phpstan-ignore` имеют причину и `@techdebt`-ссылку на эту задачу.
 
