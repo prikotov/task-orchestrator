@@ -3,7 +3,7 @@ type: chore
 created: 2026-11-27 12:36:14 (1795782974)
 due:
 started: 2026-11-27 12:36:35 (1795782995)
-completed:
+completed: 2026-11-27 12:47:57 (1795783677)
 cancelled:
 value: V2
 complexity: C1
@@ -19,8 +19,8 @@ reviewer: Ревьювер Бэка Пуаро (pi@deepseek-v4.1-flash-1017~max)
 approver:
 informed: []
 branch: task/qwen4-max-switch-role-tiers
-pr:
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/519
+status: done
 ---
 
 # TASK-chains-qwen4-max-role-tiers: qwen4-max вместо preview и тир-схемы Пуаро/Тони
