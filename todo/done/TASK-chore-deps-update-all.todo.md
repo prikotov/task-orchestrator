@@ -3,7 +3,7 @@ type: chore
 created: 2026-11-27 14:26:32 (1795789592)
 due: 
 started: 2026-11-27 14:26:54 (1795789614)
-completed: 
+completed: 2026-11-27 15:39:07 (1795793947)
 cancelled: 
 value: V2
 complexity: C2
@@ -19,8 +19,8 @@ reviewer: Ревьювер Бэка Пуаро (pi)
 approver: 
 informed: []
 branch: task/deps-update-all
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/520
+status: done
 ---
 
 # TASK-chore-deps-update-all: Обновить все зависимости проекта до последних версий в рамках констрейнтов

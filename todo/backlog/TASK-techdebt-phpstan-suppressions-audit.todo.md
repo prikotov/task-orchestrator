@@ -95,7 +95,7 @@ php vendor/bin/todo-md validate
 ## 8. Источники (Sources)
 - Отчёт ревью: `docs/agents/reports/code-reviewer-backend/2026-11-27_22-07_deps-update-all-review.md` (CR-2, §3 — эксперименты с `reportUnmatchedIgnoredErrors: true`).
 - Конвенции: `docs/guide/review-functional.md:25`, `docs/guide/review-architectural.md:19`, `docs/conventions/ops/phpmd-suppressions-guidelines.md`.
-- Задача-источник нового подавления: `todo/TASK-chore-deps-update-all.todo.md`.
+- Задача-источник нового подавления: `todo/done/TASK-chore-deps-update-all.todo.md`.
 
 ## 9. Комментарии (Comments)
 - Адресация «мёртвых» подавлений дана по строке с `@phpstan-ignore` (в отчёте ревью часть адресов указана по строке срабатывания — отличается на одну строку).
