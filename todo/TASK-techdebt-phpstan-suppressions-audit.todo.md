@@ -2,7 +2,7 @@
 type: chore
 created: 2026-11-27 15:12:56 (1795792376)
 due: 
-started: 
+started: 2026-11-27 16:07:38 (1795795658)
 completed: 
 cancelled: 
 value: V2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Ревьювер Бэка Пуаро (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/phpstan-suppressions-audit
 pr: 
-status: backlog
+status: in_progress
 ---
 
 # TASK-techdebt-phpstan-suppressions-audit: Аудит подавлений PHPStan: 4 мёртвых suppress при reportUnmatchedIgnoredErrors: false
