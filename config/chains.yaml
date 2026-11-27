@@ -1,4 +1,20 @@
 command_profiles:
+  deepseek_flash_1017_max:
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --provider
+      - qwen-token-plan-individual
+      - --model
+      - deepseek-v4.1-flash-1017
+      - --thinking
+      - max
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
   glm_flash_high:
     command:
       - pi
@@ -79,6 +95,11 @@ command_profiles:
       - "@system-prompt"
       - --append-system-prompt
       - "@append-system-prompt"
+  # qwen4-max + --thinking medium: уровень подтверждён подпиской Alibaba Token
+  # Plan (AA оценивает qwen4-max в конфигах xhigh/medium/low) и закреплён
+  # локальным pi-override (~/.pi/agent/models.json, thinkingLevelMap:
+  # medium→medium); в upstream-каталоге pi medium→null — на среде без override
+  # уровень клампнется в high (запуск не ломается).
   qwen_max_medium:
     command:
       - pi
@@ -88,9 +109,25 @@ command_profiles:
       - --provider
       - qwen-token-plan-individual
       - --model
-      - qwen4-max-preview
+      - qwen4-max
       - --thinking
       - medium
+      - --system-prompt
+      - "@system-prompt"
+      - --append-system-prompt
+      - "@append-system-prompt"
+  qwen_max_xhigh:
+    command:
+      - pi
+      - --mode
+      - json
+      - -p
+      - --provider
+      - qwen-token-plan-individual
+      - --model
+      - qwen4-max
+      - --thinking
+      - xhigh
       - --system-prompt
       - "@system-prompt"
       - --append-system-prompt
@@ -99,8 +136,11 @@ command_profiles:
 roles:
   # thinkingLevelMap GLM поддерживает только low/high/max (medium клампуется),
   # у MiMo — только off/high; значение 'off' закавычено, иначе YAML парсит
-  # off как false. У Qwen поддерживаются low/medium/xhigh
-  # (off/minimal/high/max → null — не поддерживаются).
+  # off как false. Qwen (qwen4-max): low/medium/xhigh — по локальному
+  # pi-override (~/.pi/agent/models.json); в upstream-каталоге pi —
+  # low/high/xhigh (medium → null, клампнется в high). DeepSeek 1017
+  # (deepseek-v4.1-flash-1017, тот же провайдер qwen-token-plan-individual):
+  # low/high/max (max валиден).
   team_lead_alex:
     prompt_file: docs/agents/roles/team/team_lead_alex.ru.md
     system_prompt_file: config/prompts/subagent/base_system.md
@@ -132,15 +172,21 @@ roles:
   backend_developer_tony:
     prompt_file: docs/agents/roles/team/backend_developer_tony.ru.md
     system_prompt_file: config/prompts/subagent/base_system.md
-    command_profile: glm_flash_high
+    command_profile: glm_flash_max
     commands_by_complexity:
-      C0: qwen_max_medium
-      C5: glm_flash_max
+      C0: glm_flash_high
+      C2: glm_flash_high
+      C4: glm_flash_max
+      C5: kimi_high
 
   code_reviewer_backend_puaro:
     prompt_file: docs/agents/roles/team/code_reviewer_backend_puaro.ru.md
     system_prompt_file: config/prompts/subagent/base_system.md
-    command_profile: qwen_max_medium
+    command_profile: deepseek_flash_1017_max
+    commands_by_complexity:
+      C0: glm_flash_high
+      C4: qwen_max_medium
+      C5: qwen_max_xhigh
 
   qa_backend_house:
     prompt_file: docs/agents/roles/team/qa_backend_house.ru.md
