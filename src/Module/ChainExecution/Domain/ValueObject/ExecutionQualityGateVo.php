@@ -14,9 +14,9 @@ use InvalidArgumentException;
 final readonly class ExecutionQualityGateVo
 {
     public function __construct(
-        public string $command,
-        public string $label,
-        public int $timeoutSeconds = 120,
+        private string $command,
+        private string $label,
+        private int $timeoutSeconds = 120,
     ) {
         if (trim($command) === '') {
             throw new InvalidArgumentException('ExecutionQualityGateVo::command must not be empty.');
@@ -25,5 +25,20 @@ final readonly class ExecutionQualityGateVo
         if (trim($label) === '') {
             throw new InvalidArgumentException('ExecutionQualityGateVo::label must not be empty.');
         }
+    }
+
+    public function getCommand(): string
+    {
+        return $this->command;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function getTimeoutSeconds(): int
+    {
+        return $this->timeoutSeconds;
     }
 }

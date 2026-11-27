@@ -45,13 +45,13 @@ final readonly class ConditionalExecutionStrategyService implements ConditionalE
     public function execute(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
         $config = $this->chainProvider->loadConditionalChainConfig(
-            $chainInfo->name,
+            $chainInfo->getName(),
             // C3 — дефолтная сложность (единый контракт с навыком run-subagent);
             // совпадает с int $complexity = 3 в ChainDefinitionProviderInterface.
             $command->complexity ?? 3,
         );
-        $steps = $config->steps;
-        $timeout = $command->timeout ?? $config->timeout ?? self::DEFAULT_CONDITIONAL_TIMEOUT;
+        $steps = $config->getSteps();
+        $timeout = $command->timeout ?? $config->getTimeout() ?? self::DEFAULT_CONDITIONAL_TIMEOUT;
 
         /** @var list<StepResultDto> $stepResults */
         $stepResults = [];
@@ -113,7 +113,7 @@ final readonly class ConditionalExecutionStrategyService implements ConditionalE
     #[Override]
     public function supports(ExecutionChainInfoVo $chainInfo): bool
     {
-        return $chainInfo->type === ChainExecutionTypeEnum::conditionalType;
+        return $chainInfo->getType() === ChainExecutionTypeEnum::conditionalType;
     }
 
     // ─── Private helpers ──────────────────────────────────────────────────
@@ -158,7 +158,7 @@ final readonly class ConditionalExecutionStrategyService implements ConditionalE
 
         $stepResultDto = $this->toStepResultDto($result);
 
-        $this->executePostStepHook($step, $config->name, $stepResultDto);
+        $this->executePostStepHook($step, $config->getName(), $stepResultDto);
 
         return $stepResultDto;
     }
@@ -214,19 +214,19 @@ final readonly class ConditionalExecutionStrategyService implements ConditionalE
     private function toStepResultDto(ConditionalStepResultVo $result): StepResultDto
     {
         return new StepResultDto(
-            role: $result->role,
-            runner: $result->runner,
-            outputText: $result->outputText,
-            inputTokens: $result->inputTokens,
-            outputTokens: $result->outputTokens,
-            cost: $result->cost,
-            duration: $result->duration,
-            isError: $result->isError,
-            errorMessage: $result->errorMessage,
-            passed: $result->passed,
-            exitCode: $result->exitCode,
-            label: $result->label,
-            timedOut: $result->timedOut,
+            role: $result->getRole(),
+            runner: $result->getRunner(),
+            outputText: $result->getOutputText(),
+            inputTokens: $result->getInputTokens(),
+            outputTokens: $result->getOutputTokens(),
+            cost: $result->getCost(),
+            duration: $result->getDuration(),
+            isError: $result->isError(),
+            errorMessage: $result->getErrorMessage(),
+            passed: $result->isPassed(),
+            exitCode: $result->getExitCode(),
+            label: $result->getLabel(),
+            timedOut: $result->isTimedOut(),
         );
     }
 

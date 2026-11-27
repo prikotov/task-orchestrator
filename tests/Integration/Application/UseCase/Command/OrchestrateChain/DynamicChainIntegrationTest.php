@@ -187,11 +187,11 @@ final class DynamicChainIntegrationTest extends TestCase
 
         // Assert
         self::assertNotNull($capturedContext);
-        self::assertSame('facilitator', $capturedContext->facilitatorRole);
-        self::assertSame(['participant', 'analyst'], $capturedContext->participants);
-        self::assertSame(10, $capturedContext->maxRounds);
-        self::assertNotNull($capturedContext->promptConfiguration);
-        self::assertSame('Multi-participant brainstorm system.', $capturedContext->promptConfiguration->getBrainstormSystemPrompt());
+        self::assertSame('facilitator', $capturedContext->getFacilitatorRole());
+        self::assertSame(['participant', 'analyst'], $capturedContext->getParticipants());
+        self::assertSame(10, $capturedContext->getMaxRounds());
+        self::assertNotNull($capturedContext->getPromptConfiguration());
+        self::assertSame('Multi-participant brainstorm system.', $capturedContext->getPromptConfiguration()->getBrainstormSystemPrompt());
     }
 
     // --- Dynamic chain: max rounds reached ---

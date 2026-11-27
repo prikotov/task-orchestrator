@@ -22,14 +22,58 @@ final readonly class ExecutionStaticChainConfigVo
      * @param ExecutionRetryPolicyVo|null $defaultRetryPolicy политика retry по умолчанию
      */
     public function __construct(
-        public string $name,
-        public array $steps,
-        public array $fixIterations,
-        public ?ExecutionBudgetVo $budget,
-        public ?int $timeout,
-        public array $roles,
-        public ?ExecutionRetryPolicyVo $defaultRetryPolicy = null,
+        private string $name,
+        private array $steps,
+        private array $fixIterations,
+        private ?ExecutionBudgetVo $budget,
+        private ?int $timeout,
+        private array $roles,
+        private ?ExecutionRetryPolicyVo $defaultRetryPolicy = null,
     ) {
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return list<ExecutionStepVo> шаги цепочки
+     */
+    public function getSteps(): array
+    {
+        return $this->steps;
+    }
+
+    /**
+     * @return list<ExecutionFixIterationGroupVo> группы итераций
+     */
+    public function getFixIterations(): array
+    {
+        return $this->fixIterations;
+    }
+
+    public function getBudget(): ?ExecutionBudgetVo
+    {
+        return $this->budget;
+    }
+
+    public function getTimeout(): ?int
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * @return array<string, ExecutionRoleConfigVo> per-role конфигурация
+     */
+    public function getRoles(): array
+    {
+        return $this->roles;
+    }
+
+    public function getDefaultRetryPolicy(): ?ExecutionRetryPolicyVo
+    {
+        return $this->defaultRetryPolicy;
     }
 
     /**

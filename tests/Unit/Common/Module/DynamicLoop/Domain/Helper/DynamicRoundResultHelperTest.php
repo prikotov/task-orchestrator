@@ -39,23 +39,23 @@ final class DynamicRoundResultHelperTest extends TestCase
 
         $roundVo = DynamicRoundResultHelper::fromTurnResult($turnResult, 1, 'role', true, 'high');
 
-        self::assertSame(1, $roundVo->round);
-        self::assertSame('role', $roundVo->role);
-        self::assertTrue($roundVo->isFacilitator);
-        self::assertSame('Hello', $roundVo->outputText);
-        self::assertSame(100, $roundVo->inputTokens);
-        self::assertSame(50, $roundVo->outputTokens);
-        self::assertSame(7000, $roundVo->cacheReadTokens);
-        self::assertSame(900, $roundVo->cacheWriteTokens);
-        self::assertSame(0.05, $roundVo->cost);
-        self::assertSame(2.5, $roundVo->duration);
-        self::assertFalse($roundVo->isError);
-        self::assertSame('inv', $roundVo->invocation);
-        self::assertSame('system', $roundVo->systemPrompt);
-        self::assertSame('prompt', $roundVo->userPrompt);
-        self::assertSame('glm-5.3-flash', $roundVo->model);
-        self::assertSame('zai', $roundVo->provider);
-        self::assertSame('high', $roundVo->thinking);
+        self::assertSame(1, $roundVo->getRound());
+        self::assertSame('role', $roundVo->getRole());
+        self::assertTrue($roundVo->isFacilitator());
+        self::assertSame('Hello', $roundVo->getOutputText());
+        self::assertSame(100, $roundVo->getInputTokens());
+        self::assertSame(50, $roundVo->getOutputTokens());
+        self::assertSame(7000, $roundVo->getCacheReadTokens());
+        self::assertSame(900, $roundVo->getCacheWriteTokens());
+        self::assertSame(0.05, $roundVo->getCost());
+        self::assertSame(2.5, $roundVo->getDuration());
+        self::assertFalse($roundVo->isError());
+        self::assertSame('inv', $roundVo->getInvocation());
+        self::assertSame('system', $roundVo->getSystemPrompt());
+        self::assertSame('prompt', $roundVo->getUserPrompt());
+        self::assertSame('glm-5.3-flash', $roundVo->getModel());
+        self::assertSame('zai', $roundVo->getProvider());
+        self::assertSame('high', $roundVo->getThinking());
     }
 
     #[Test]
@@ -68,10 +68,10 @@ final class DynamicRoundResultHelperTest extends TestCase
 
         $roundVo = DynamicRoundResultHelper::fromTurnResult($turnResult, 2, 'architect', false);
 
-        self::assertSame(2, $roundVo->round);
-        self::assertSame('architect', $roundVo->role);
-        self::assertFalse($roundVo->isFacilitator);
-        self::assertNull($roundVo->thinking);
+        self::assertSame(2, $roundVo->getRound());
+        self::assertSame('architect', $roundVo->getRole());
+        self::assertFalse($roundVo->isFacilitator());
+        self::assertNull($roundVo->getThinking());
     }
 
     // ─── normalizeEmptyOutput ─────────────────────────────────────────
@@ -89,12 +89,12 @@ final class DynamicRoundResultHelperTest extends TestCase
 
         $normalized = DynamicRoundResultHelper::normalizeEmptyOutput($turnResult);
 
-        self::assertTrue($normalized->agentResult->isError());
-        self::assertSame('Agent returned empty output.', $normalized->agentResult->getErrorMessage());
-        self::assertSame(1.5, $normalized->duration);
-        self::assertSame('p', $normalized->userPrompt);
-        self::assertSame('s', $normalized->systemPrompt);
-        self::assertSame('inv', $normalized->invocation);
+        self::assertTrue($normalized->getAgentResult()->isError());
+        self::assertSame('Agent returned empty output.', $normalized->getAgentResult()->getErrorMessage());
+        self::assertSame(1.5, $normalized->getDuration());
+        self::assertSame('p', $normalized->getUserPrompt());
+        self::assertSame('s', $normalized->getSystemPrompt());
+        self::assertSame('inv', $normalized->getInvocation());
     }
 
     #[Test]
@@ -108,7 +108,7 @@ final class DynamicRoundResultHelperTest extends TestCase
         $normalized = DynamicRoundResultHelper::normalizeEmptyOutput($turnResult);
 
         self::assertSame($turnResult, $normalized);
-        self::assertFalse($normalized->agentResult->isError());
+        self::assertFalse($normalized->getAgentResult()->isError());
     }
 
     #[Test]
@@ -122,6 +122,6 @@ final class DynamicRoundResultHelperTest extends TestCase
         $normalized = DynamicRoundResultHelper::normalizeEmptyOutput($turnResult);
 
         self::assertSame($turnResult, $normalized);
-        self::assertSame('boom', $normalized->agentResult->getErrorMessage());
+        self::assertSame('boom', $normalized->getAgentResult()->getErrorMessage());
     }
 }

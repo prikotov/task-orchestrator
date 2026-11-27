@@ -294,9 +294,9 @@ final class DynamicLoopExecution
             synthesis: $this->synthesis,
             maxRoundsReached: $this->maxRoundsReached,
             interruptionReason: $this->interruptionReason,
-            budgetExceeded: $this->budgetBreak?->budgetExceeded ?? false, // @phpstan-ignore nullsafe.neverNull
-            budgetLimit: $this->budgetBreak?->budgetLimit ?? 0.0, // @phpstan-ignore nullsafe.neverNull
-            budgetExceededRole: $this->budgetBreak?->budgetExceededRole,
+            budgetExceeded: $this->budgetBreak?->isBudgetExceeded() ?? false, // @phpstan-ignore nullsafe.neverNull
+            budgetLimit: $this->budgetBreak?->getBudgetLimit() ?? 0.0, // @phpstan-ignore nullsafe.neverNull
+            budgetExceededRole: $this->budgetBreak?->getBudgetExceededRole(),
             maxTimeExceeded: $this->maxTimeExceeded,
         );
     }

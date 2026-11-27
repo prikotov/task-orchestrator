@@ -10,12 +10,45 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject;
 final readonly class FacilitatorTurnResultVo
 {
     public function __construct(
-        public DynamicRoundResultVo $roundResult,
-        public bool $done,
-        public ?string $nextRole,
-        public ?string $synthesis,
-        public ?string $challenge = null,
-        public string $userPrompt = '',
+        private DynamicRoundResultVo $roundResult,
+        private bool $done,
+        private ?string $nextRole,
+        private ?string $synthesis,
+        private ?string $challenge = null,
+        private string $userPrompt = '',
     ) {
+    }
+
+    public function getRoundResult(): DynamicRoundResultVo
+    {
+        return $this->roundResult;
+    }
+
+    /**
+     * Завершил ли фасилитатор обсуждение (synthesis получен).
+     */
+    public function isDone(): bool
+    {
+        return $this->done;
+    }
+
+    public function getNextRole(): ?string
+    {
+        return $this->nextRole;
+    }
+
+    public function getSynthesis(): ?string
+    {
+        return $this->synthesis;
+    }
+
+    public function getChallenge(): ?string
+    {
+        return $this->challenge;
+    }
+
+    public function getUserPrompt(): string
+    {
+        return $this->userPrompt;
     }
 }

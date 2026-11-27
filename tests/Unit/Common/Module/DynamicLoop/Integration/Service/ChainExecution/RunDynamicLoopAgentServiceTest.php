@@ -158,16 +158,16 @@ final class RunDynamicLoopAgentServiceTest extends TestCase
         self::assertCount(2, $result);
         $turnResult = $result[0];
         self::assertInstanceOf(DynamicLoopTurnResultVo::class, $turnResult);
-        self::assertSame('facilitator-json', $turnResult->agentResult->getOutputText());
-        self::assertSame(10, $turnResult->agentResult->getInputTokens());
-        self::assertSame(20, $turnResult->agentResult->getOutputTokens());
-        self::assertSame(0.5, $turnResult->agentResult->getCost());
-        self::assertSame('test-model', $turnResult->agentResult->getModel());
-        self::assertSame('test-provider', $turnResult->agentResult->getProvider());
-        self::assertSame(2, $turnResult->agentResult->getTurns());
-        self::assertSame('formatted-facilitator-context', $turnResult->userPrompt);
-        self::assertSame('brainstorm-system-prompt', $turnResult->systemPrompt);
-        self::assertSame('invocation-command', $turnResult->invocation);
+        self::assertSame('facilitator-json', $turnResult->getAgentResult()->getOutputText());
+        self::assertSame(10, $turnResult->getAgentResult()->getInputTokens());
+        self::assertSame(20, $turnResult->getAgentResult()->getOutputTokens());
+        self::assertSame(0.5, $turnResult->getAgentResult()->getCost());
+        self::assertSame('test-model', $turnResult->getAgentResult()->getModel());
+        self::assertSame('test-provider', $turnResult->getAgentResult()->getProvider());
+        self::assertSame(2, $turnResult->getAgentResult()->getTurns());
+        self::assertSame('formatted-facilitator-context', $turnResult->getUserPrompt());
+        self::assertSame('brainstorm-system-prompt', $turnResult->getSystemPrompt());
+        self::assertSame('invocation-command', $turnResult->getInvocation());
         self::assertSame($facilitatorResponse, $result[1]);
     }
 
@@ -230,17 +230,17 @@ final class RunDynamicLoopAgentServiceTest extends TestCase
 
         $turnResult = $result[0];
         self::assertInstanceOf(DynamicLoopTurnResultVo::class, $turnResult);
-        self::assertTrue($turnResult->agentResult->isError());
-        self::assertSame('agent boom', $turnResult->agentResult->getErrorMessage());
-        self::assertSame(42, $turnResult->agentResult->getExitCode());
-        self::assertTrue($turnResult->agentResult->isTimedOut());
+        self::assertTrue($turnResult->getAgentResult()->isError());
+        self::assertSame('agent boom', $turnResult->getAgentResult()->getErrorMessage());
+        self::assertSame(42, $turnResult->getAgentResult()->getExitCode());
+        self::assertTrue($turnResult->getAgentResult()->isTimedOut());
         // При ошибке ответ runner'а пуст — парсер вызывается с пустой строкой
         // (закрепляем текущее поведение маппинга).
         self::assertSame([''], $parsedTexts);
         // Метаданные хода заполняются и при ошибке.
-        self::assertSame('formatted-facilitator-context', $turnResult->userPrompt);
-        self::assertSame('brainstorm-system-prompt', $turnResult->systemPrompt);
-        self::assertSame('invocation-command', $turnResult->invocation);
+        self::assertSame('formatted-facilitator-context', $turnResult->getUserPrompt());
+        self::assertSame('brainstorm-system-prompt', $turnResult->getSystemPrompt());
+        self::assertSame('invocation-command', $turnResult->getInvocation());
     }
 
     // ─── runParticipant ───────────────────────────────────────────────
@@ -333,12 +333,12 @@ final class RunDynamicLoopAgentServiceTest extends TestCase
 
         // Результат хода.
         self::assertInstanceOf(DynamicLoopTurnResultVo::class, $turnResult);
-        self::assertSame('participant-output', $turnResult->agentResult->getOutputText());
-        self::assertSame(5, $turnResult->agentResult->getInputTokens());
-        self::assertSame(7, $turnResult->agentResult->getOutputTokens());
-        self::assertSame('formatted-participant-context', $turnResult->userPrompt);
-        self::assertSame('participant-brainstorm-system-prompt', $turnResult->systemPrompt);
-        self::assertSame('invocation-command', $turnResult->invocation);
+        self::assertSame('participant-output', $turnResult->getAgentResult()->getOutputText());
+        self::assertSame(5, $turnResult->getAgentResult()->getInputTokens());
+        self::assertSame(7, $turnResult->getAgentResult()->getOutputTokens());
+        self::assertSame('formatted-participant-context', $turnResult->getUserPrompt());
+        self::assertSame('participant-brainstorm-system-prompt', $turnResult->getSystemPrompt());
+        self::assertSame('invocation-command', $turnResult->getInvocation());
     }
 
     #[Test]
@@ -435,10 +435,10 @@ final class RunDynamicLoopAgentServiceTest extends TestCase
 
         // Результат хода.
         self::assertInstanceOf(DynamicLoopTurnResultVo::class, $turnResult);
-        self::assertSame('finalize-output', $turnResult->agentResult->getOutputText());
-        self::assertSame('formatted-finalize-context', $turnResult->userPrompt);
-        self::assertSame('finalize-brainstorm-system-prompt', $turnResult->systemPrompt);
-        self::assertSame('invocation-command', $turnResult->invocation);
+        self::assertSame('finalize-output', $turnResult->getAgentResult()->getOutputText());
+        self::assertSame('formatted-finalize-context', $turnResult->getUserPrompt());
+        self::assertSame('finalize-brainstorm-system-prompt', $turnResult->getSystemPrompt());
+        self::assertSame('invocation-command', $turnResult->getInvocation());
     }
 
     // ─── Фабрики стабов ───────────────────────────────────────────────

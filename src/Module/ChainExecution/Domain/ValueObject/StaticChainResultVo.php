@@ -18,15 +18,63 @@ final readonly class StaticChainResultVo
      * @param list<StaticStepResultVo> $stepResults
      */
     public function __construct(
-        public array $stepResults,
-        public float $totalTime,
-        public int $totalInputTokens,
-        public int $totalOutputTokens,
-        public float $totalCost,
-        public bool $budgetExceeded,
-        public float $budgetLimit,
-        public ?string $budgetExceededRole,
-        public int $totalIterations,
+        private array $stepResults,
+        private float $totalTime,
+        private int $totalInputTokens,
+        private int $totalOutputTokens,
+        private float $totalCost,
+        private bool $budgetExceeded,
+        private float $budgetLimit,
+        private ?string $budgetExceededRole,
+        private int $totalIterations,
     ) {
+    }
+
+    /**
+     * @return list<StaticStepResultVo>
+     */
+    public function getStepResults(): array
+    {
+        return $this->stepResults;
+    }
+
+    public function getTotalTime(): float
+    {
+        return $this->totalTime;
+    }
+
+    public function getTotalInputTokens(): int
+    {
+        return $this->totalInputTokens;
+    }
+
+    public function getTotalOutputTokens(): int
+    {
+        return $this->totalOutputTokens;
+    }
+
+    public function getTotalCost(): float
+    {
+        return $this->totalCost;
+    }
+
+    public function isBudgetExceeded(): bool
+    {
+        return $this->budgetExceeded;
+    }
+
+    public function getBudgetLimit(): float
+    {
+        return $this->budgetLimit;
+    }
+
+    public function getBudgetExceededRole(): ?string
+    {
+        return $this->budgetExceededRole;
+    }
+
+    public function getTotalIterations(): int
+    {
+        return $this->totalIterations;
     }
 }

@@ -91,8 +91,8 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         );
 
         self::assertInstanceOf(TurnContinueVo::class, $result);
-        self::assertSame('architect', $result->nextRole);
-        self::assertSame('challenge text', $result->challenge);
+        self::assertSame('architect', $result->getNextRole());
+        self::assertSame('challenge text', $result->getChallenge());
     }
 
     #[Test]
@@ -180,8 +180,8 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         );
 
         self::assertInstanceOf(TurnBreakVo::class, $result);
-        self::assertSame('budget_exceeded', $result->interruptionReason);
-        self::assertSame($budgetCheck, $result->budgetResult);
+        self::assertSame('budget_exceeded', $result->getInterruptionReason());
+        self::assertSame($budgetCheck, $result->getBudgetResult());
     }
 
     #[Test]
@@ -210,7 +210,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         );
 
         self::assertInstanceOf(TurnBreakVo::class, $result);
-        self::assertSame('agent_error', $result->interruptionReason);
+        self::assertSame('agent_error', $result->getInterruptionReason());
     }
 
     #[Test]
@@ -238,7 +238,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         );
 
         self::assertInstanceOf(TurnBreakVo::class, $result);
-        self::assertSame('Final answer', $result->synthesis);
+        self::assertSame('Final answer', $result->getSynthesis());
     }
 
     #[Test]
@@ -267,7 +267,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         );
 
         self::assertInstanceOf(TurnBreakVo::class, $result);
-        self::assertSame('timeout', $result->interruptionReason);
+        self::assertSame('timeout', $result->getInterruptionReason());
     }
 
     // ─── runParticipantTurn ───────────────────────────────────────────
@@ -284,7 +284,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         );
 
         self::assertInstanceOf(TurnContinueVo::class, $result);
-        self::assertNull($result->nextRole);
+        self::assertNull($result->getNextRole());
     }
 
     #[Test]
@@ -341,7 +341,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         );
 
         self::assertInstanceOf(TurnBreakVo::class, $result);
-        self::assertSame('budget_exceeded', $result->interruptionReason);
+        self::assertSame('budget_exceeded', $result->getInterruptionReason());
     }
 
     #[Test]
@@ -367,7 +367,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         );
 
         self::assertInstanceOf(TurnBreakVo::class, $result);
-        self::assertSame('agent_error', $result->interruptionReason);
+        self::assertSame('agent_error', $result->getInterruptionReason());
     }
 
     #[Test]
@@ -387,9 +387,9 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
                 $roundResult = $arguments[7];
 
                 self::assertInstanceOf(DynamicRoundResultVo::class, $roundResult);
-                self::assertTrue($roundResult->isError);
-                self::assertSame('', $roundResult->outputText);
-                self::assertSame('Agent returned empty output.', $roundResult->errorMessage);
+                self::assertTrue($roundResult->isError());
+                self::assertSame('', $roundResult->getOutputText());
+                self::assertSame('Agent returned empty output.', $roundResult->getErrorMessage());
             });
         $this->journal->expects(self::never())->method('formatDiscussionEntry');
         $this->journal->expects(self::never())->method('formatParticipantEntry');
@@ -402,7 +402,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         );
 
         self::assertInstanceOf(TurnBreakVo::class, $result);
-        self::assertSame('agent_error', $result->interruptionReason);
+        self::assertSame('agent_error', $result->getInterruptionReason());
     }
 
     #[Test]
@@ -451,7 +451,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
             );
 
             self::assertInstanceOf(TurnBreakVo::class, $result);
-            self::assertSame('agent_error', $result->interruptionReason);
+            self::assertSame('agent_error', $result->getInterruptionReason());
             self::assertSame([], $this->globFiles($sessionDir . '/*_4_response.md'));
             self::assertSame([], $sessionLogger->getResponseFilePaths($execution->getStep()));
 
@@ -485,7 +485,7 @@ final class ExecuteDynamicTurnServiceTest extends TestCase
         );
 
         self::assertInstanceOf(TurnContinueVo::class, $result);
-        self::assertNull($result->nextRole);
+        self::assertNull($result->getNextRole());
     }
 
     // ─── Helpers ───────────────────────────────────────────────────────

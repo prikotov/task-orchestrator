@@ -41,7 +41,7 @@ final readonly class StaticExecutionStrategyService implements StaticExecutionSt
     public function execute(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
         $config = $this->chainProvider->loadStaticChainConfig(
-            $chainInfo->name,
+            $chainInfo->getName(),
             // C3 — дефолтная сложность (единый контракт с навыком run-subagent);
             // совпадает с int $complexity = 3 в ChainDefinitionProviderInterface.
             $command->complexity ?? 3,
@@ -51,7 +51,7 @@ final readonly class StaticExecutionStrategyService implements StaticExecutionSt
             $config,
             $command->task,
             $command->workingDir,
-            $command->timeout ?? $config->timeout ?? self::DEFAULT_STATIC_TIMEOUT,
+            $command->timeout ?? $config->getTimeout() ?? self::DEFAULT_STATIC_TIMEOUT,
             null,
             $command->noContextFiles,
         );
@@ -68,7 +68,7 @@ final readonly class StaticExecutionStrategyService implements StaticExecutionSt
     #[Override]
     public function supports(ExecutionChainInfoVo $chainInfo): bool
     {
-        return $chainInfo->type === ChainExecutionTypeEnum::staticType;
+        return $chainInfo->getType() === ChainExecutionTypeEnum::staticType;
     }
 
     /**
@@ -80,41 +80,41 @@ final readonly class StaticExecutionStrategyService implements StaticExecutionSt
     {
         $stepDtos = array_map(
             static fn(StaticStepResultVo $step): StepResultDto => new StepResultDto(
-                role: $step->role,
-                runner: $step->runner,
-                outputText: $step->outputText,
-                inputTokens: $step->inputTokens,
-                outputTokens: $step->outputTokens,
-                cost: $step->cost,
-                duration: $step->duration,
-                isError: $step->isError,
-                errorMessage: $step->errorMessage,
-                fallbackRunnerUsed: $step->fallbackRunnerUsed,
-                iterationNumber: $step->iterationNumber,
-                iterationWarning: $step->iterationWarning,
-                passed: $step->passed,
-                exitCode: $step->exitCode,
-                label: $step->label,
-                timedOut: $step->timedOut,
+                role: $step->getRole(),
+                runner: $step->getRunner(),
+                outputText: $step->getOutputText(),
+                inputTokens: $step->getInputTokens(),
+                outputTokens: $step->getOutputTokens(),
+                cost: $step->getCost(),
+                duration: $step->getDuration(),
+                isError: $step->isError(),
+                errorMessage: $step->getErrorMessage(),
+                fallbackRunnerUsed: $step->getFallbackRunnerUsed(),
+                iterationNumber: $step->getIterationNumber(),
+                iterationWarning: $step->isIterationWarning(),
+                passed: $step->isPassed(),
+                exitCode: $step->getExitCode(),
+                label: $step->getLabel(),
+                timedOut: $step->isTimedOut(),
             ),
-            $result->stepResults,
+            $result->getStepResults(),
         );
 
         $chainTimedOut = array_any(
-            $result->stepResults,
-            static fn(StaticStepResultVo $step): bool => $step->timedOut,
+            $result->getStepResults(),
+            static fn(StaticStepResultVo $step): bool => $step->isTimedOut(),
         );
 
         return new OrchestrateChainResultDto(
             stepResults: $stepDtos,
-            totalTime: $result->totalTime,
-            totalInputTokens: $result->totalInputTokens,
-            totalOutputTokens: $result->totalOutputTokens,
-            totalCost: $result->totalCost,
-            budgetExceeded: $result->budgetExceeded,
-            budgetLimit: $result->budgetLimit,
-            budgetExceededRole: $result->budgetExceededRole,
-            totalIterations: $result->totalIterations,
+            totalTime: $result->getTotalTime(),
+            totalInputTokens: $result->getTotalInputTokens(),
+            totalOutputTokens: $result->getTotalOutputTokens(),
+            totalCost: $result->getTotalCost(),
+            budgetExceeded: $result->isBudgetExceeded(),
+            budgetLimit: $result->getBudgetLimit(),
+            budgetExceededRole: $result->getBudgetExceededRole(),
+            totalIterations: $result->getTotalIterations(),
             timedOut: $chainTimedOut,
         );
     }

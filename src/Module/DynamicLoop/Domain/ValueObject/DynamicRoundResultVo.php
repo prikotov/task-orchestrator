@@ -17,25 +17,120 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject;
 final readonly class DynamicRoundResultVo
 {
     public function __construct(
-        public int $round,
-        public string $role,
-        public bool $isFacilitator,
-        public string $outputText,
-        public int $inputTokens,
-        public int $outputTokens,
-        public float $cost,
-        public float $duration,
-        public bool $isError = false,
-        public ?string $errorMessage = null,
-        public ?string $invocation = null,
-        public string $systemPrompt = '',
-        public string $userPrompt = '',
-        public bool $timedOut = false,
-        public ?string $model = null,
-        public ?string $provider = null,
-        public ?string $thinking = null,
-        public int $cacheReadTokens = 0,
-        public int $cacheWriteTokens = 0,
+        private int $round,
+        private string $role,
+        private bool $isFacilitator,
+        private string $outputText,
+        private int $inputTokens,
+        private int $outputTokens,
+        private float $cost,
+        private float $duration,
+        private bool $isError = false,
+        private ?string $errorMessage = null,
+        private ?string $invocation = null,
+        private string $systemPrompt = '',
+        private string $userPrompt = '',
+        private bool $timedOut = false,
+        private ?string $model = null,
+        private ?string $provider = null,
+        private ?string $thinking = null,
+        private int $cacheReadTokens = 0,
+        private int $cacheWriteTokens = 0,
     ) {
+    }
+
+    public function getRound(): int
+    {
+        return $this->round;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function isFacilitator(): bool
+    {
+        return $this->isFacilitator;
+    }
+
+    public function getOutputText(): string
+    {
+        return $this->outputText;
+    }
+
+    public function getInputTokens(): int
+    {
+        return $this->inputTokens;
+    }
+
+    public function getOutputTokens(): int
+    {
+        return $this->outputTokens;
+    }
+
+    public function getCost(): float
+    {
+        return $this->cost;
+    }
+
+    public function getDuration(): float
+    {
+        return $this->duration;
+    }
+
+    public function isError(): bool
+    {
+        return $this->isError;
+    }
+
+    public function getErrorMessage(): ?string
+    {
+        return $this->errorMessage;
+    }
+
+    public function getInvocation(): ?string
+    {
+        return $this->invocation;
+    }
+
+    public function getSystemPrompt(): string
+    {
+        return $this->systemPrompt;
+    }
+
+    public function getUserPrompt(): string
+    {
+        return $this->userPrompt;
+    }
+
+    public function isTimedOut(): bool
+    {
+        return $this->timedOut;
+    }
+
+    public function getModel(): ?string
+    {
+        return $this->model;
+    }
+
+    public function getProvider(): ?string
+    {
+        return $this->provider;
+    }
+
+    public function getThinking(): ?string
+    {
+        return $this->thinking;
+    }
+
+    public function getCacheReadTokens(): int
+    {
+        return $this->cacheReadTokens;
+    }
+
+    public function getCacheWriteTokens(): int
+    {
+        return $this->cacheWriteTokens;
     }
 }

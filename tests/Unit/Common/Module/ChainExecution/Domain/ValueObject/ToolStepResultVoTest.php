@@ -22,10 +22,10 @@ final class ToolStepResultVoTest extends TestCase
             durationMs: 42.5,
         );
 
-        self::assertSame(0, $vo->exitCode);
-        self::assertSame('abc123', $vo->stdout);
-        self::assertTrue($vo->success);
-        self::assertSame(42.5, $vo->durationMs);
+        self::assertSame(0, $vo->getExitCode());
+        self::assertSame('abc123', $vo->getStdout());
+        self::assertTrue($vo->isSuccess());
+        self::assertSame(42.5, $vo->getDurationMs());
     }
 
     #[Test]
@@ -38,7 +38,7 @@ final class ToolStepResultVoTest extends TestCase
             durationMs: 10.0,
         );
 
-        self::assertSame(1, $vo->exitCode);
-        self::assertFalse($vo->success);
+        self::assertSame(1, $vo->getExitCode());
+        self::assertFalse($vo->isSuccess());
     }
 }

@@ -20,9 +20,9 @@ final readonly class QualityGateVo
      * @param int $timeoutSeconds таймаут выполнения в секундах
      */
     public function __construct(
-        public string $command,
-        public string $label,
-        public int $timeoutSeconds = 120,
+        private string $command,
+        private string $label,
+        private int $timeoutSeconds = 120,
     ) {
         if (trim($command) === '') {
             throw new InvalidArgumentException('QualityGateVo::command must not be empty.');
@@ -31,5 +31,20 @@ final readonly class QualityGateVo
         if (trim($label) === '') {
             throw new InvalidArgumentException('QualityGateVo::label must not be empty.');
         }
+    }
+
+    public function getCommand(): string
+    {
+        return $this->command;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function getTimeoutSeconds(): int
+    {
+        return $this->timeoutSeconds;
     }
 }

@@ -39,10 +39,10 @@ final class DynamicLoopMetrics
     public function recordRound(DynamicRoundResultVo $roundResult): void
     {
         $this->roundResults[] = $roundResult;
-        $this->totalTime += $roundResult->duration;
-        $this->totalInputTokens += $roundResult->inputTokens;
-        $this->totalOutputTokens += $roundResult->outputTokens;
-        $this->totalCost += $roundResult->cost;
+        $this->totalTime += $roundResult->getDuration();
+        $this->totalInputTokens += $roundResult->getInputTokens();
+        $this->totalOutputTokens += $roundResult->getOutputTokens();
+        $this->totalCost += $roundResult->getCost();
     }
 
     public function addRoleCost(string $role, float $cost): void

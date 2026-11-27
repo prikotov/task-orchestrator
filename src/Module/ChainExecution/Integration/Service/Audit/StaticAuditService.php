@@ -62,34 +62,34 @@ final readonly class StaticAuditService implements StaticAuditServiceInterface
     public function logChainResult(StaticChainAuditVo $audit): void
     {
         $this->auditLogger->logChainResult(new ChainResultAuditDto(
-            chainName: $audit->chainName,
-            totalDurationMs: $audit->totalDurationMs,
-            totalInputTokens: $audit->totalInputTokens,
-            totalOutputTokens: $audit->totalOutputTokens,
-            totalCost: $audit->totalCost,
-            budgetExceeded: $audit->budgetExceeded,
-            stepsCount: $audit->stepsCount,
+            chainName: $audit->getChainName(),
+            totalDurationMs: $audit->getTotalDurationMs(),
+            totalInputTokens: $audit->getTotalInputTokens(),
+            totalOutputTokens: $audit->getTotalOutputTokens(),
+            totalCost: $audit->getTotalCost(),
+            budgetExceeded: $audit->isBudgetExceeded(),
+            stepsCount: $audit->getStepsCount(),
             stepStatuses: array_map(
-                static fn(StaticStepAuditVo $step): StepAuditStatusDto => new StepAuditStatusDto($step->isError),
-                $audit->stepStatuses,
+                static fn(StaticStepAuditVo $step): StepAuditStatusDto => new StepAuditStatusDto($step->isError()),
+                $audit->getStepStatuses(),
             ),
         ));
     }
 
     private function mapToChainRunResult(StaticStepResultVo $stepResult): ChainRunResultVo
     {
-        if ($stepResult->isError) {
+        if ($stepResult->isError()) {
             return ChainRunResultVo::createError(
-                $stepResult->errorMessage ?? 'unknown',
-                timedOut: $stepResult->timedOut,
+                $stepResult->getErrorMessage() ?? 'unknown',
+                timedOut: $stepResult->isTimedOut(),
             );
         }
 
         return ChainRunResultVo::createSuccess(
-            $stepResult->outputText,
-            $stepResult->inputTokens,
-            $stepResult->outputTokens,
-            cost: $stepResult->cost,
+            $stepResult->getOutputText(),
+            $stepResult->getInputTokens(),
+            $stepResult->getOutputTokens(),
+            cost: $stepResult->getCost(),
         );
     }
 }

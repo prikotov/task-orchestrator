@@ -50,10 +50,10 @@ final class ExecutionStepVoToolTest extends TestCase
         $vo = $step->toToolStepVo();
 
         self::assertInstanceOf(ExecutionToolStepVo::class, $vo);
-        self::assertSame('echo test', $vo->command);
-        self::assertSame('Echo', $vo->label);
-        self::assertSame(10, $vo->timeoutSeconds);
-        self::assertSame('echo_out', $vo->outputKey);
+        self::assertSame('echo test', $vo->getCommand());
+        self::assertSame('Echo', $vo->getLabel());
+        self::assertSame(10, $vo->getTimeoutSeconds());
+        self::assertSame('echo_out', $vo->getOutputKey());
     }
 
     #[Test]

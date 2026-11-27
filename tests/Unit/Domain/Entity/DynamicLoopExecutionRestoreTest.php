@@ -60,14 +60,14 @@ final class DynamicLoopExecutionRestoreTest extends TestCase
         // Round results: полный список с модельными полями.
         $rounds = $execution->getRoundResults();
         self::assertCount(2, $rounds);
-        self::assertSame('team_lead', $rounds[0]->role);
-        self::assertTrue($rounds[0]->isFacilitator);
-        self::assertSame('glm-5.3-flash', $rounds[0]->model);
-        self::assertSame('zai', $rounds[0]->provider);
-        self::assertSame('high', $rounds[0]->thinking);
-        self::assertSame(4000, $rounds[0]->cacheReadTokens);
-        self::assertSame('mimo-v2.6-pro', $rounds[1]->model);
-        self::assertFalse($rounds[1]->isFacilitator);
+        self::assertSame('team_lead', $rounds[0]->getRole());
+        self::assertTrue($rounds[0]->isFacilitator());
+        self::assertSame('glm-5.3-flash', $rounds[0]->getModel());
+        self::assertSame('zai', $rounds[0]->getProvider());
+        self::assertSame('high', $rounds[0]->getThinking());
+        self::assertSame(4000, $rounds[0]->getCacheReadTokens());
+        self::assertSame('mimo-v2.6-pro', $rounds[1]->getModel());
+        self::assertFalse($rounds[1]->isFacilitator());
 
         // Totals: вся сессия (пост-resume раунды лягут сверху).
         $totals = $execution->getTotals();
@@ -104,11 +104,11 @@ final class DynamicLoopExecutionRestoreTest extends TestCase
 
         $rounds = $execution->getRoundResults();
         self::assertCount(1, $rounds);
-        self::assertNull($rounds[0]->model);
-        self::assertNull($rounds[0]->provider);
-        self::assertNull($rounds[0]->thinking);
-        self::assertSame(0, $rounds[0]->cacheReadTokens);
-        self::assertSame(0, $rounds[0]->cacheWriteTokens);
+        self::assertNull($rounds[0]->getModel());
+        self::assertNull($rounds[0]->getProvider());
+        self::assertNull($rounds[0]->getThinking());
+        self::assertSame(0, $rounds[0]->getCacheReadTokens());
+        self::assertSame(0, $rounds[0]->getCacheWriteTokens());
 
         // Totals и roleCosts восстановлены и без модельных полей.
         $totals = $execution->getTotals();

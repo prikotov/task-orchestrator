@@ -113,10 +113,10 @@ final class ChainStepVoToolTest extends TestCase
         $vo = $step->toToolStepVo();
 
         self::assertInstanceOf(ToolStepVo::class, $vo);
-        self::assertSame('git log -1 --format=%s', $vo->command);
-        self::assertSame('Last commit msg', $vo->label);
-        self::assertSame(10, $vo->timeoutSeconds);
-        self::assertSame('last_msg', $vo->outputKey);
+        self::assertSame('git log -1 --format=%s', $vo->getCommand());
+        self::assertSame('Last commit msg', $vo->getLabel());
+        self::assertSame(10, $vo->getTimeoutSeconds());
+        self::assertSame('last_msg', $vo->getOutputKey());
     }
 
     #[Test]

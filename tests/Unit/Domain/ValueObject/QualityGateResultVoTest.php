@@ -23,11 +23,11 @@ final class QualityGateResultVoTest extends TestCase
             durationMs: 1234.5,
         );
 
-        self::assertTrue($result->passed);
-        self::assertSame(0, $result->exitCode);
-        self::assertSame('Unit Tests', $result->label);
-        self::assertSame('OK (42 tests)', $result->output);
-        self::assertSame(1234.5, $result->durationMs);
+        self::assertTrue($result->isPassed());
+        self::assertSame(0, $result->getExitCode());
+        self::assertSame('Unit Tests', $result->getLabel());
+        self::assertSame('OK (42 tests)', $result->getOutput());
+        self::assertSame(1234.5, $result->getDurationMs());
     }
 
     #[Test]
@@ -41,7 +41,7 @@ final class QualityGateResultVoTest extends TestCase
             durationMs: 567.0,
         );
 
-        self::assertFalse($result->passed);
-        self::assertSame(1, $result->exitCode);
+        self::assertFalse($result->isPassed());
+        self::assertSame(1, $result->getExitCode());
     }
 }

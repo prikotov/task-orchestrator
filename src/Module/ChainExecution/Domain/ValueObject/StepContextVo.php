@@ -13,13 +13,51 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject;
 final readonly class StepContextVo
 {
     public function __construct(
-        public string $task,
-        public ?string $workingDir = null,
-        public int $timeout = 300,
-        public ?string $previousContext = null,
-        public ?int $iterationNumber = null,
-        public ?ExecutionRoleConfigVo $roleConfig = null,
-        public bool $noContextFiles = false,
+        private string $task,
+        private ?string $workingDir = null,
+        private int $timeout = 300,
+        private ?string $previousContext = null,
+        private ?int $iterationNumber = null,
+        private ?ExecutionRoleConfigVo $roleConfig = null,
+        private bool $noContextFiles = false,
     ) {
+    }
+
+    public function getTask(): string
+    {
+        return $this->task;
+    }
+
+    public function getWorkingDir(): ?string
+    {
+        return $this->workingDir;
+    }
+
+    public function getTimeout(): int
+    {
+        return $this->timeout;
+    }
+
+    public function getPreviousContext(): ?string
+    {
+        return $this->previousContext;
+    }
+
+    public function getIterationNumber(): ?int
+    {
+        return $this->iterationNumber;
+    }
+
+    public function getRoleConfig(): ?ExecutionRoleConfigVo
+    {
+        return $this->roleConfig;
+    }
+
+    /**
+     * Отключена ли автоматическая загрузка контекстных файлов проекта.
+     */
+    public function hasNoContextFiles(): bool
+    {
+        return $this->noContextFiles;
     }
 }

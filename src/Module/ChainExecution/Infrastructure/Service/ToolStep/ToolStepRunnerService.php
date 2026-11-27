@@ -18,8 +18,8 @@ final readonly class ToolStepRunnerService implements ToolStepRunnerServiceInter
     #[Override]
     public function run(ExecutionToolStepVo $tool): ToolStepResultVo
     {
-        $process = Process::fromShellCommandline($tool->command);
-        $process->setTimeout($tool->timeoutSeconds);
+        $process = Process::fromShellCommandline($tool->getCommand());
+        $process->setTimeout($tool->getTimeoutSeconds());
 
         $start = microtime(true);
 

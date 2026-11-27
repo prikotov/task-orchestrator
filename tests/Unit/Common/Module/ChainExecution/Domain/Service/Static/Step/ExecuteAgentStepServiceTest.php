@@ -79,15 +79,15 @@ final class ExecuteAgentStepServiceTest extends TestCase
 
         $result = $runner->run($step, $context);
 
-        self::assertSame('analyst', $result->role);
-        self::assertSame('pi', $result->runner);
-        self::assertSame('Analysis result', $result->outputText);
-        self::assertSame(100, $result->inputTokens);
-        self::assertSame(200, $result->outputTokens);
-        self::assertSame(0.01, $result->cost);
-        self::assertFalse($result->isError);
-        self::assertSame(1, $result->iterationNumber);
-        self::assertGreaterThan(0.0, $result->duration);
+        self::assertSame('analyst', $result->getRole());
+        self::assertSame('pi', $result->getRunner());
+        self::assertSame('Analysis result', $result->getOutputText());
+        self::assertSame(100, $result->getInputTokens());
+        self::assertSame(200, $result->getOutputTokens());
+        self::assertSame(0.01, $result->getCost());
+        self::assertFalse($result->isError());
+        self::assertSame(1, $result->getIterationNumber());
+        self::assertGreaterThan(0.0, $result->getDuration());
     }
 
     #[Test]
@@ -113,9 +113,9 @@ final class ExecuteAgentStepServiceTest extends TestCase
         $context = new StepContextVo(task: 'Test task');
         $result = $runner->run($step, $context);
 
-        self::assertTrue($result->isError);
-        self::assertSame('Agent failed: timeout exceeded', $result->errorMessage);
-        self::assertTrue($result->timedOut);
+        self::assertTrue($result->isError());
+        self::assertSame('Agent failed: timeout exceeded', $result->getErrorMessage());
+        self::assertTrue($result->isTimedOut());
     }
 
     #[Test]
@@ -255,7 +255,7 @@ final class ExecuteAgentStepServiceTest extends TestCase
 
         $result = $runner->run($step, $context);
 
-        self::assertSame('codex', $result->runner);
+        self::assertSame('codex', $result->getRunner());
     }
 
     #[Test]
@@ -294,7 +294,7 @@ final class ExecuteAgentStepServiceTest extends TestCase
 
         $result = $runner->run($step, $context);
 
-        self::assertSame('pi', $result->runner);
+        self::assertSame('pi', $result->getRunner());
     }
 
     #[Test]

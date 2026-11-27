@@ -50,11 +50,11 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         $budget = $chain->getBudget();
         $startTime = microtime(true);
 
-        $auditLogger?->logChainStart($chain->getName(), $context->topic);
+        $auditLogger?->logChainStart($chain->getName(), $context->getTopic());
 
-        while ($execution->getParticipantRounds() < $context->maxRounds) {
-            if ($this->shouldReserveForFinalize($context->maxTime, $startTime)) {
-                $this->applyTimeReserve($execution, $context->maxTime, $startTime);
+        while ($execution->getParticipantRounds() < $context->getMaxRounds()) {
+            if ($this->shouldReserveForFinalize($context->getMaxTime(), $startTime)) {
+                $this->applyTimeReserve($execution, $context->getMaxTime(), $startTime);
                 break;
             }
 
@@ -71,7 +71,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
             $partResult = $this->turnExecutor->runParticipantTurn(
                 $chain, $context, $execution, $budget, $auditLogger,
-                $facResult->nextRole, $facResult->challenge,
+                $facResult->getNextRole(), $facResult->getChallenge(),
             );
             if ($partResult instanceof TurnBreakVo) {
                 $this->applyBreakResult($execution, $partResult);
@@ -121,9 +121,9 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         DynamicLoopExecution $execution,
         TurnBreakVo $result,
     ): void {
-        $execution->setBudgetBreak($result->budgetResult);
-        $execution->setInterruptionReason($result->interruptionReason);
-        $execution->setSynthesis($result->synthesis);
+        $execution->setBudgetBreak($result->getBudgetResult());
+        $execution->setInterruptionReason($result->getInterruptionReason());
+        $execution->setSynthesis($result->getSynthesis());
     }
 
     private function finalizeIfNeeded(
@@ -134,7 +134,7 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
     ): void {
         $execution->markMaxRoundsReached(
             $execution->getSynthesis() === null
-            && $execution->getParticipantRounds() >= $context->maxRounds
+            && $execution->getParticipantRounds() >= $context->getMaxRounds()
             && !$execution->isMaxTimeExceeded(),
         );
 

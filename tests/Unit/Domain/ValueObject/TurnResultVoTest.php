@@ -21,8 +21,8 @@ final class TurnResultVoTest extends TestCase
     {
         $vo = new TurnContinueVo();
 
-        self::assertNull($vo->nextRole);
-        self::assertNull($vo->challenge);
+        self::assertNull($vo->getNextRole());
+        self::assertNull($vo->getChallenge());
     }
 
     #[Test]
@@ -30,8 +30,8 @@ final class TurnResultVoTest extends TestCase
     {
         $vo = new TurnContinueVo(nextRole: 'architect', challenge: 'Design it');
 
-        self::assertSame('architect', $vo->nextRole);
-        self::assertSame('Design it', $vo->challenge);
+        self::assertSame('architect', $vo->getNextRole());
+        self::assertSame('Design it', $vo->getChallenge());
     }
 
     // ─── TurnBreakVo ───────────────────────────────────────────────────
@@ -41,9 +41,9 @@ final class TurnResultVoTest extends TestCase
     {
         $vo = new TurnBreakVo();
 
-        self::assertNull($vo->interruptionReason);
-        self::assertNull($vo->synthesis);
-        self::assertNull($vo->budgetResult);
+        self::assertNull($vo->getInterruptionReason());
+        self::assertNull($vo->getSynthesis());
+        self::assertNull($vo->getBudgetResult());
     }
 
     #[Test]
@@ -51,8 +51,8 @@ final class TurnResultVoTest extends TestCase
     {
         $vo = new TurnBreakVo(synthesis: 'Final answer');
 
-        self::assertSame('Final answer', $vo->synthesis);
-        self::assertNull($vo->interruptionReason);
+        self::assertSame('Final answer', $vo->getSynthesis());
+        self::assertNull($vo->getInterruptionReason());
     }
 
     #[Test]
@@ -60,8 +60,8 @@ final class TurnResultVoTest extends TestCase
     {
         $vo = new TurnBreakVo(interruptionReason: 'agent_error');
 
-        self::assertSame('agent_error', $vo->interruptionReason);
-        self::assertNull($vo->synthesis);
+        self::assertSame('agent_error', $vo->getInterruptionReason());
+        self::assertNull($vo->getSynthesis());
     }
 
     #[Test]
@@ -77,8 +77,8 @@ final class TurnResultVoTest extends TestCase
             budgetResult: $budgetCheck,
         );
 
-        self::assertSame('budget_exceeded', $vo->interruptionReason);
-        self::assertSame($budgetCheck, $vo->budgetResult);
-        self::assertTrue($vo->budgetResult->budgetExceeded);
+        self::assertSame('budget_exceeded', $vo->getInterruptionReason());
+        self::assertSame($budgetCheck, $vo->getBudgetResult());
+        self::assertTrue($vo->getBudgetResult()->isBudgetExceeded());
     }
 }

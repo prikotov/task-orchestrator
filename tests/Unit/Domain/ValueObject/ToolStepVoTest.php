@@ -23,10 +23,10 @@ final class ToolStepVoTest extends TestCase
             label: 'Get commit hash',
         );
 
-        self::assertSame('git rev-parse HEAD', $vo->command);
-        self::assertSame('Get commit hash', $vo->label);
-        self::assertSame(120, $vo->timeoutSeconds);
-        self::assertNull($vo->outputKey);
+        self::assertSame('git rev-parse HEAD', $vo->getCommand());
+        self::assertSame('Get commit hash', $vo->getLabel());
+        self::assertSame(120, $vo->getTimeoutSeconds());
+        self::assertNull($vo->getOutputKey());
     }
 
     #[Test]
@@ -39,10 +39,10 @@ final class ToolStepVoTest extends TestCase
             outputKey: 'current_branch',
         );
 
-        self::assertSame('git branch --show-current', $vo->command);
-        self::assertSame('Get branch', $vo->label);
-        self::assertSame(30, $vo->timeoutSeconds);
-        self::assertSame('current_branch', $vo->outputKey);
+        self::assertSame('git branch --show-current', $vo->getCommand());
+        self::assertSame('Get branch', $vo->getLabel());
+        self::assertSame(30, $vo->getTimeoutSeconds());
+        self::assertSame('current_branch', $vo->getOutputKey());
     }
 
     // ── Constructor: validation ─────────────────────────────────────────────
@@ -97,6 +97,6 @@ final class ToolStepVoTest extends TestCase
     {
         $vo = new ToolStepVo(command: 'echo hi', label: 'Test', outputKey: null);
 
-        self::assertNull($vo->outputKey);
+        self::assertNull($vo->getOutputKey());
     }
 }

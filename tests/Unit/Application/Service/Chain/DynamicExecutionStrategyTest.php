@@ -165,8 +165,8 @@ final class DynamicExecutionStrategyTest extends TestCase
         );
 
         self::assertSame('Quick summary', $result->synthesis);
-        self::assertSame('custom_facilitator', $capturedContext->facilitatorRole);
-        self::assertSame(2, $capturedContext->maxRounds);
+        self::assertSame('custom_facilitator', $capturedContext->getFacilitatorRole());
+        self::assertSame(2, $capturedContext->getMaxRounds());
     }
 
     #[Test]
@@ -193,7 +193,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedTopic,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedTopic = $context->topic;
+                $capturedTopic = $context->getTopic();
 
                 return $loopResult;
             },
@@ -354,7 +354,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedTimeout,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedTimeout = $context->timeout;
+                $capturedTimeout = $context->getTimeout();
 
                 return $loopResult;
             },
@@ -395,7 +395,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedTimeout,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedTimeout = $context->timeout;
+                $capturedTimeout = $context->getTimeout();
 
                 return $loopResult;
             },
@@ -437,7 +437,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedTimeout,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedTimeout = $context->timeout;
+                $capturedTimeout = $context->getTimeout();
 
                 return $loopResult;
             },
@@ -479,7 +479,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedMaxTime,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedMaxTime = $context->maxTime;
+                $capturedMaxTime = $context->getMaxTime();
 
                 return $loopResult;
             },
@@ -523,7 +523,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedMaxTime,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedMaxTime = $context->maxTime;
+                $capturedMaxTime = $context->getMaxTime();
 
                 return $loopResult;
             },
@@ -568,7 +568,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedMaxTime,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedMaxTime = $context->maxTime;
+                $capturedMaxTime = $context->getMaxTime();
 
                 return $loopResult;
             },
@@ -836,8 +836,8 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedTopic,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedAddendum = $ctx->taskAddendum;
-                $capturedTopic = $ctx->topic;
+                $capturedAddendum = $ctx->getTaskAddendum();
+                $capturedTopic = $ctx->getTopic();
 
                 return $loopResult;
             });
@@ -880,7 +880,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedAddendum,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedAddendum = $ctx->taskAddendum;
+                $capturedAddendum = $ctx->getTaskAddendum();
 
                 return $loopResult;
             });
@@ -938,7 +938,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedTimeout,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedTimeout = $ctx->timeout;
+                $capturedTimeout = $ctx->getTimeout();
 
                 return $loopResult;
             });
@@ -996,7 +996,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedTimeout,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedTimeout = $ctx->timeout;
+                $capturedTimeout = $ctx->getTimeout();
 
                 return $loopResult;
             });
@@ -1055,7 +1055,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedTimeout,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedTimeout = $ctx->timeout;
+                $capturedTimeout = $ctx->getTimeout();
 
                 return $loopResult;
             });
@@ -1114,7 +1114,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedMaxTime,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedMaxTime = $ctx->maxTime;
+                $capturedMaxTime = $ctx->getMaxTime();
 
                 return $loopResult;
             });
@@ -1175,7 +1175,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedMaxTime,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedMaxTime = $ctx->maxTime;
+                $capturedMaxTime = $ctx->getMaxTime();
 
                 return $loopResult;
             });
@@ -1237,7 +1237,7 @@ final class DynamicExecutionStrategyTest extends TestCase
                 &$capturedMaxTime,
                 $loopResult,
             ): DynamicLoopResultVo {
-                $capturedMaxTime = $ctx->maxTime;
+                $capturedMaxTime = $ctx->getMaxTime();
 
                 return $loopResult;
             });

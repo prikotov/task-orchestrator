@@ -21,10 +21,10 @@ final readonly class ToolStepVo
      * @param string|null $outputKey ключ в ChainContext для записи stdout (null = не записывать)
      */
     public function __construct(
-        public string $command,
-        public string $label,
-        public int $timeoutSeconds = 120,
-        public ?string $outputKey = null,
+        private string $command,
+        private string $label,
+        private int $timeoutSeconds = 120,
+        private ?string $outputKey = null,
     ) {
         if (trim($command) === '') {
             throw new InvalidArgumentException('ToolStepVo::command must not be empty.');
@@ -37,5 +37,25 @@ final readonly class ToolStepVo
         if ($outputKey !== null && trim($outputKey) === '') {
             throw new InvalidArgumentException('ToolStepVo::outputKey must not be empty string.');
         }
+    }
+
+    public function getCommand(): string
+    {
+        return $this->command;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function getTimeoutSeconds(): int
+    {
+        return $this->timeoutSeconds;
+    }
+
+    public function getOutputKey(): ?string
+    {
+        return $this->outputKey;
     }
 }

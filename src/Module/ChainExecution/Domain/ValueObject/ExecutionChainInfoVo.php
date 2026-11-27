@@ -18,7 +18,17 @@ use TaskOrchestrator\Common\Module\ChainExecution\Domain\Enum\ChainExecutionType
 final readonly class ExecutionChainInfoVo
 {
     public function __construct(
-        public string $name,
-        public ChainExecutionTypeEnum $type,
+        private string $name,
+        private ChainExecutionTypeEnum $type,
     ) {}
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getType(): ChainExecutionTypeEnum
+    {
+        return $this->type;
+    }
 }

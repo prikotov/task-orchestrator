@@ -18,10 +18,30 @@ final readonly class ToolStepResultVo
      * @param float $durationMs длительность выполнения в миллисекундах
      */
     public function __construct(
-        public int $exitCode,
-        public string $stdout,
-        public bool $success,
-        public float $durationMs,
+        private int $exitCode,
+        private string $stdout,
+        private bool $success,
+        private float $durationMs,
     ) {
+    }
+
+    public function getExitCode(): int
+    {
+        return $this->exitCode;
+    }
+
+    public function getStdout(): string
+    {
+        return $this->stdout;
+    }
+
+    public function isSuccess(): bool
+    {
+        return $this->success;
+    }
+
+    public function getDurationMs(): float
+    {
+        return $this->durationMs;
     }
 }
