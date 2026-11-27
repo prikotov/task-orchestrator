@@ -2,7 +2,7 @@
 type: test
 created: 2026-11-26 14:26:08 (1795703168)
 due: 
-started: 
+started: 2026-11-27 12:46:05 (1795758365)
 completed: 
 cancelled: 
 value: V1
@@ -18,9 +18,9 @@ consultants: ["Тестировщик Бэка Хаус (pi)"]
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/cpu-coverage-process-is-active
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-techdebt-process-is-active-cpu-coverage: Покрытие CPU-ветки process_is_active в watch-subagent.sh
