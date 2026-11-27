@@ -42,7 +42,7 @@ status: done
 > **User Story:** Как владелец проекта, я хочу, чтобы командные профили ролей ссылались на актуальные модели подписки Alibaba Cloud и распределяли дорогую квоту по сложности задач, чтобы оркестрация не падала из-за убранной preview-модели и не сжигала квоту плана на тривиальных шагах.
 
 ### Цель по SMART (Goal)
-В `config/chains.yaml`: заменить модель профиля `qwen_max_medium` на `qwen4-max`; добавить профили `qwen_max_xhigh` (qwen4-max, thinking xhigh) и `deepseek_flash_1017_max` (deepseek-v4.1-flash-1017, thinking max); ревьюверу Пуаро задать тир-схему C0 `glm_flash_high` / база `deepseek_flash_1017_max` / C4 `qwen_max_medium` / C5 `qwen_max_xhigh`; Тони — C0 `glm_flash_high` / база `glm_flash_high` / C5 `kimi_high`. Проверка: `todo-md validate`, `lint:yaml`, `agent:orchestrate --validate-config`, PHPUnit, Psalm — зелёные.
+В `config/chains.yaml`: заменить модель профиля `qwen_max_medium` на `qwen4-max`; добавить профили `qwen_max_xhigh` (qwen4-max, thinking xhigh) и `deepseek_flash_1017_max` (deepseek-v4.1-flash-1017, thinking max); ревьюверу Пуаро задать тир-схему C0 `glm_flash_high` / база `deepseek_flash_1017_max` / C4 `qwen_max_medium` / C5 `qwen_max_xhigh`; Тони — база `glm_flash_max` (неявный уровень C3), тиры C0 `glm_flash_high`, C2 `glm_flash_high`, C4 `glm_flash_max`, C5 `kimi_high`. Проверка: `todo-md validate`, `lint:yaml`, `agent:orchestrate --validate-config`, PHPUnit, Psalm — зелёные.
 
 ## 2. Контекст и Границы (Context and Scope)
 * **Где делаем:** `config/chains.yaml` (секции `command_profiles`, `roles.code_reviewer_backend_puaro`, `roles.backend_developer_tony`)
@@ -57,7 +57,7 @@ status: done
 - [x] Новый профиль `qwen_max_xhigh`: qwen4-max, `--thinking xhigh`
 - [x] Новый профиль `deepseek_flash_1017_max`: провайдер `qwen-token-plan-individual`, модель `deepseek-v4.1-flash-1017`, `--thinking max`
 - [x] Пуаро: база `deepseek_flash_1017_max`, тиры C0 `glm_flash_high`, C4 `qwen_max_medium`, C5 `qwen_max_xhigh`
-- [x] Тони: C0 `glm_flash_high`, база `glm_flash_high` (без изменений), C5 `kimi_high`
+- [x] Тони: база `glm_flash_max` (неявный C3), тиры C0 `glm_flash_high`, C2 `glm_flash_high`, C4 `glm_flash_max`, C5 `kimi_high` (резолвинг C0–C2 → glm_flash_high, C3–C4 → glm_flash_max, C5 → kimi_high)
 - [x] PHPUnit и Psalm зелёные
 ### ⚫ Won't Have (Не будем делать)
 - Изменение остальных ролей, промптов и базовых профилей
@@ -108,3 +108,4 @@ php bin/console agent:orchestrate --validate-config
 | 2026-11-27 12:36:14 (1795782974) | Тимлид Алекс (pi@qwen4-max~medium) | Создание задачи |
 | 2026-11-27 12:36:35 (1795782995) | Тимлид Алекс (pi@qwen4-max~medium) | Переход в in_progress, назначение исполнителя и ревьювера |
 | 2026-11-27 20:02:08 (1795784528) | Тимлид Алекс (pi@qwen4-max~medium) | Переименование профиля deepseek_1017_max → deepseek_flash_1017_max по указанию владельца |
+| 2026-11-27 20:59:32 (1795787972) | Тимлид Алекс (pi@qwen4-max~medium) | Тир-схема Тони: C3–C4 подняты до glm_flash_max по указанию владельца |

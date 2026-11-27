@@ -172,9 +172,11 @@ roles:
   backend_developer_tony:
     prompt_file: docs/agents/roles/team/backend_developer_tony.ru.md
     system_prompt_file: config/prompts/subagent/base_system.md
-    command_profile: glm_flash_high
+    command_profile: glm_flash_max
     commands_by_complexity:
       C0: glm_flash_high
+      C2: glm_flash_high
+      C4: glm_flash_max
       C5: kimi_high
 
   code_reviewer_backend_puaro:
