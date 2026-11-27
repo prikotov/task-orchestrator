@@ -2,8 +2,8 @@
 type: test
 created: 2026-11-24 03:50:21 (1795492221)
 due: 
-started: 
-completed: 
+started: 2026-11-27 16:58:48 (1795773528)
+completed: 2026-11-27 17:35:47 (1795775747)
 cancelled: 
 value: V1
 complexity: C1
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/runcontext-retry-policy-cases
-pr: 
-status: in_progress
+pr: '#518'
+status: done
 ---
 
 # TASK-techdebt-runcontext-retry-policy-cases: Симметричные retry-policy кейсы в контракт-тесте RunDynamicLoopAgentService
@@ -96,17 +96,17 @@ status: in_progress
 3. [x] Добавить кейс participant с ненулевой `retryPolicy` (Must-2).
 4. [x] Мутационная проверка: переставить поле → убедиться в падении → вернуть (Must-3).
 5. [x] `vendor/bin/phpunit`, `vendor/bin/psalm`; при необходимости точечный `composer install`.
-6. [ ] Обновить Change History задачи, перевести в `done`, PR.
+6. [x] Обновить Change History задачи, перевести в `done`, PR (#518).
 
 ## 5. Критерии приёмки (Definition of Done)
 
-- [ ] Сценарий протестирован (Unit/Integration)
-- [ ] Нет регрессий в смежных модулях
-- [ ] Обновлена техническая документация (если требуется)
-- [ ] Кейсы Must-1 и Must-2 добавлены, файл теста симметрично покрывает все три метода интерфейса.
-- [ ] Мутационная проверка выполнена и зафиксирована в Change History задачи.
-- [ ] `vendor/bin/phpunit` (полный) и `vendor/bin/psalm` — зелёные.
-- [ ] Задача в `done`, файл в `todo/done/`, поле `pr` заполнено.
+- [x] Сценарий протестирован (Unit/Integration)
+- [x] Нет регрессий в смежных модулях
+- [x] Обновлена техническая документация (если требуется) — PHPDoc класса теста дополнен; CLI/контракты не менялись
+- [x] Кейсы Must-1 и Must-2 добавлены, файл теста симметрично покрывает все три метода интерфейса.
+- [x] Мутационная проверка выполнена и зафиксирована в Change History задачи.
+- [x] `vendor/bin/phpunit` (полный) и `vendor/bin/psalm` — зелёные. Полный барьер `make check` — зелёный.
+- [x] Задача в `done`, файл в `todo/done/`, поле `pr` заполнено (PR #518).
 
 ## 6. Самопроверка (Verification)
 
@@ -148,3 +148,4 @@ php vendor/bin/todo-md validate TASK-techdebt-runcontext-retry-policy-cases
 | 2026-11-27 17:19:00 | Ревьювер Бэка Пуаро (pi) | Полное ревью: REQUEST CHANGES (CR-1 Must-1 не буквально — 4 поля VO без ассертов; CR-2 Must-3 без записи; CR-3 Should-1 без записи; CR-4 скоуп док-фикса). Отчёт: `docs/agents/reports/code-reviewer-backend/2026-11-27_17-15_runcontext-retry-policy-cases-review.md` |
 | 2026-11-27 17:19:00 | Бэкендер Левша (pi) | Доработка CR-1: захват `$writtenPrompts`/`$finalizeContextArgs` через существующие параметры хелперов, ассерты на все 8 полей VO (+17 строк); phpunit модуль 33/220 OK, psalm OK; мутационная самопроверка новых ассертов — перестановки `brainstormSystemPrompt` ↔ `facilitatorAppendPrompt` и `facilitatorFinalizePrompt` ↔ `responseFilesList` роняют тест, откат из бэкапа |
 | 2026-11-27 17:19:00 | Тимлид Алекс (pi) | Закрытие CR-2/CR-3: чекбоксы Must/Should/плана отмечены, записи о мутационной проверке и Should-1 внесены; CR-4 — решение зафиксировано в разделе «Комментарии» |
+| 2026-11-27 17:35:47 (1795775747) | Тимлид Алекс (pi) | Верификационное ревью Пуаро — APPROVE (CR-1…CR-4 устранены); QA-ревью Хауса — APPROVE (3 контрольные мутации воспроизведены); `make check` — зелёный; задача переведена в `done`, перенесена в `todo/done/`, PR #518 |
