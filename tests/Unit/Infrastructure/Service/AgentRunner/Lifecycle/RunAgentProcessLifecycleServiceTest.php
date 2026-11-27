@@ -280,7 +280,7 @@ usleep(10000);
 fwrite(STDOUT, "_line\":2}\n{\"line\":3}");
 PHP);
 
-        $result = $this->runLifecycle([$command]);
+        $result = $this->runLifecycleScenario([$command]);
 
         self::assertFalse($result->isError());
         self::assertSame(['{"line":1}', '{"partial_line":2}', '{"line":3}'], $this->fedLines);
@@ -293,7 +293,7 @@ PHP);
 exit(0);
 PHP);
 
-        $result = $this->runLifecycle([$command]);
+        $result = $this->runLifecycleScenario([$command]);
 
         self::assertFalse($result->isError());
         self::assertSame([], $this->fedLines);
@@ -309,7 +309,7 @@ PHP);
 
         $capturedProcess = null;
         $capturedErrorOutput = null;
-        $result = $this->runLifecycle(
+        $result = $this->runLifecycleScenario(
             [$command],
             buildResult: function (Process $process, string $errorOutput) use (&$capturedProcess, &$capturedErrorOutput): AgentResultVo {
                 $capturedProcess = $process;
@@ -335,7 +335,7 @@ fwrite(STDERR, str_repeat('a', 100000));
 exit(2);
 PHP);
 
-        $result = $this->runLifecycle(
+        $result = $this->runLifecycleScenario(
             [$command],
             buildResult: static fn (Process $process, string $errorOutput): AgentResultVo => AgentResultVo::createError($errorOutput, 2),
         );
@@ -353,7 +353,7 @@ PHP);
 fwrite(STDOUT, getcwd() . "\n");
 PHP);
 
-        $result = $this->runLifecycle([$command], workingDir: $workingDir);
+        $result = $this->runLifecycleScenario([$command], workingDir: $workingDir);
 
         self::assertFalse($result->isError());
         self::assertSame([$workingDir], $this->fedLines);
@@ -367,7 +367,7 @@ fwrite(STDOUT, "{\"line\":1}\n");
 PHP);
 
         $resetCalls = 0;
-        $result = $this->runLifecycle(
+        $result = $this->runLifecycleScenario(
             [$command],
             resetParser: static function () use (&$resetCalls): void {
                 ++$resetCalls;
@@ -392,7 +392,7 @@ PHP);
 exit(getenv('HTTPS_PROXY') === 'http://proxy.example.com:8080' ? 0 : 7);
 PHP);
 
-        $result = $this->runLifecycle([$command]);
+        $result = $this->runLifecycleScenario([$command]);
 
         // exit(7) — если env не применился, hook вернёт ошибку по exit-коду
         self::assertFalse($result->isError());
@@ -409,7 +409,7 @@ PHP);
 exit(0);
 PHP);
 
-        $result = $this->runLifecycle([$command]);
+        $result = $this->runLifecycleScenario([$command]);
 
         self::assertTrue($result->isError());
         self::assertStringContainsString('Failed to prepare proxy environment:', $result->getErrorMessage());
@@ -428,7 +428,7 @@ PHP);
 exit(preg_match('#^http://127\.0\.0\.1:\d+$#', (string) getenv('HTTPS_PROXY')) === 1 ? 0 : 7);
 PHP);
 
-        $result = $this->runLifecycle([$command]);
+        $result = $this->runLifecycleScenario([$command]);
 
         // exit(7) — если env не применился, hook вернёт ошибку по exit-коду
         self::assertFalse($result->isError());
@@ -445,7 +445,7 @@ PHP);
 sleep(30);
 PHP);
 
-        $result = $this->runLifecycle([$command], requestTimeout: 1);
+        $result = $this->runLifecycleScenario([$command], requestTimeout: 1);
 
         self::assertTrue($result->isError());
         self::assertTrue($result->isTimedOut());
@@ -557,7 +557,7 @@ PHP);
      *
      * @param list<string> $command
      */
-    private function runLifecycle(
+    private function runLifecycleScenario(
         array $command,
         ?callable $resetParser = null,
         ?callable $buildResult = null,
