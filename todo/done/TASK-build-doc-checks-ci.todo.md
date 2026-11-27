@@ -3,7 +3,7 @@ type: ci
 created: 2026-11-24 16:48:08 (1795538888)
 due: 
 started: 2026-11-25 06:21:52 (1795587712)
-completed: 
+completed: 2026-11-27 09:45:47 (1795772747)
 cancelled: 
 value: V2
 complexity: C2
@@ -20,7 +20,7 @@ approver:
 informed: []
 branch: task/build-doc-checks-ci
 pr: https://github.com/prikotov/task-orchestrator/pull/510
-status: todo
+status: done
 ---
 
 # TASK-build-doc-checks-ci: CI верифицирует след локального make check (маркер)
