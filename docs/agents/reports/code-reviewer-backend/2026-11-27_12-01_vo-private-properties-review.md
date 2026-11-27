@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-11-27
 **Объект:** незакоммиченные изменения рабочего дерева ветки `task/vo-private-properties` против HEAD `1c6199ca` (73 файла: 26 Domain VO + 46 файлов-потребителей в `src/`/`tests/` + 1 md-отчёт; +1666/−755)
-**Задача:** [todo/TASK-techdebt-vo-private-properties.todo.md](../../../../todo/TASK-techdebt-vo-private-properties.todo.md)
+**Задача:** [todo/done/TASK-techdebt-vo-private-properties.todo.md](../../../../todo/done/TASK-techdebt-vo-private-properties.todo.md) (переведена в `done` после ревью, при открытии PR #515)
 
 ---
 
