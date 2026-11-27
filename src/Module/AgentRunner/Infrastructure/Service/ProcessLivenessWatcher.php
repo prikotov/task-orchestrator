@@ -93,7 +93,13 @@ final readonly class ProcessLivenessWatcher
             }
 
             if ($adaptiveIdleEnabled && $this->clock->now() - $lastActivity > $idleThreshold) {
-                if (!$process->isRunning()) {
+                // isRunning() опрашивает внешнее OS-состояние и может законно измениться, но
+                // PHPStan 2.3+ считает повторный опрос в одной итерации всегда-ложным.
+                // Проверка контрактна: естественное завершение перед idle-stop возвращает
+                // true без stop() (тест waitForNaturalExitImmediatelyBeforeIdleStopReturnsNaturally).
+                // @techdebt TASK-techdebt-phpstan-suppressions-audit (2026-11-27); прецеденты:
+                // property.unusedType, nullCoalesce.offset (HttpsProxyBridge.php:41,176).
+                if (!$process->isRunning()) { // @phpstan-ignore booleanNot.alwaysFalse
                     return true;
                 }
 
