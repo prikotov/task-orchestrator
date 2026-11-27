@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Алекс (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/runcontext-retry-policy-cases
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-techdebt-runcontext-retry-policy-cases: Симметричные retry-policy кейсы в контракт-тесте RunDynamicLoopAgentService
