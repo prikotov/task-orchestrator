@@ -43,11 +43,11 @@
 - **Ретро:** [2026-11-03](2026-11-03_05-40-release-v0100-phar-e2e-flaky.md)
 - **Решение и ссылки:** Регрессия E2E-асерта относительно контракта FR-4 (изменение #443 против теста из #387/#400) жила около недели и вскрылась только ручным прогоном перед тегом v0.10.0; асерт синхронизирован в [PR #452](https://github.com/prikotov/task-orchestrator/pull/452). Кандидат «подключить phar-e2e к CI» рассмотрен владельцем 2026-11-03 и **отклонён**: тесты исполняются в локальном окружении (быстрее и дешевле), в GitHub Actions — только критичное. Остаточный риск (забыть прогон перед релизом) закрывается чек-листом плана релиза, где `make phar-e2e` обязателен перед тегом; повторный пропуск — повод вернуться к записи.
 
-### Тайминговые интеграционные тесты флакают под нагрузкой CI — `watch`
+### Тайминговые интеграционные тесты флакают под нагрузкой CI — `resolved`
 
 - **Счётчик:** 1
 - **Ретро:** [2026-11-03](2026-11-03_05-40-release-v0100-phar-e2e-flaky.md)
-- **Решение и ссылки:** До порога. Частный случай закрыт [PR #453](https://github.com/prikotov/task-orchestrator/pull/453) (stall 10→45 с в large-stream тестах `WatchSubagentScriptTest`; причина — liveness-gate читает заблокированный на полном FIFO писатель как idle). Класс остаётся под наблюдением: при новом повторе — детерминировать конкретный тест по прецеденту `TASK-fix-static-chain-metrics-flaky-test`. Повтор 2026-11-12 (тот же класс, тест `stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout` в предрелизном прогоне v0.15.1) закрывается задачей `TASK-test-watchsubagent-stall-flaky` — она же закрывает запись `N-4`.
+- **Решение и ссылки:** Закрыто 2026-11-26. Первый частный случай — [PR #453](https://github.com/prikotov/task-orchestrator/pull/453) (stall 10→45 с в large-stream тестах `WatchSubagentScriptTest`; причина — liveness-gate читает заблокированный на полном FIFO писатель как idle). Повтор 2026-11-12 (тот же класс, тест `stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout` в предрелизном прогоне v0.15.1) — закрыт [PR #512](https://github.com/prikotov/task-orchestrator/pull/512) / `TASK-test-watchsubagent-stall-flaky`: причина — чистый busy-loop фейка без IO (квантованная CPU-дельта `ps times` обнуляется под голоданием), фикс — детерминированная IO-телеметрия фейкового раннера; negative-контроль на HEAD 4/4 FAIL, с фиксом 12/12 PASS. Она же закрывает запись `N-4`. При новом повторе другого теста класса — детерминировать по прецеденту `TASK-fix-static-chain-metrics-flaky-test`.
 
 ### Задача переносится в `done` после merge вместо до апрува — `watch`
 
@@ -115,11 +115,11 @@
 - **Ретро:** [2026-08-18](2026-08-18_10-35-codex-idle-kill-investigation.md)
 - **Решение и ссылки:** До порога. Кандидат в бэклог из ревью PR #352.
 
-### N-4: флаки liveness-теста `stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout` — `escalated`
+### N-4: флаки liveness-теста `stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout` — `resolved`
 
 - **Счётчик:** 1
 - **Ретро:** [2026-08-18](2026-08-18_10-35-codex-idle-kill-investigation.md)
-- **Решение и ссылки:** Создана задача `TASK-test-watchsubagent-stall-flaky` (по запросу владельца 2026-11-12 после повтора падения `reason=soft_timeout` в предрелизном прогоне v0.15.1; счётчик не увеличивался — повтор зафиксирован в сессии, а не в ретро). После решения перевести в `resolved` и указать PR.
+- **Решение и ссылки:** Закрыто 2026-11-26: [PR #512](https://github.com/prikotov/task-orchestrator/pull/512) / `TASK-test-watchsubagent-stall-flaky` (создана по запросу владельца 2026-11-12 после повтора падения `reason=soft_timeout` в предрелизном прогоне v0.15.1). Причина гонки — busy-loop фейка без IO под CPU-голоданием; доказательство — negative-контроль 4/4 FAIL на HEAD, 12/12 PASS с фиксом.
 
 ### Молчаливый `exit 1` Codex без сохранённого rollout — `watch`
 

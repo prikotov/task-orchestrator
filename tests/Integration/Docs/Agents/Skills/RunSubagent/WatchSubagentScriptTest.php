@@ -694,8 +694,13 @@ YAML);
     #[Test]
     public function stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout(): void
     {
-        // Процесс молчит в потоке, но грузит CPU (busy-loop) → liveness=active →
-        // stall-timeout НЕ убивает; запуск доживает до soft-timeout (watcher).
+        // Процесс молчит в потоке, но IO-активен (telemetry-loop: периодическая
+        // запись в stderr → детерминированная IO-дельта в /proc/<pid>/io) →
+        // liveness=active → stall-timeout НЕ убивает; запуск доживает до
+        // soft-timeout (watcher).
+        // Чистый busy-loop без IO флеймит под нагрузкой: CPU-дельта ps times
+        // квантуется целыми секундами, голодный процесс измеряется как idle и
+        // гибнет по stall раньше soft (TASK-test-watchsubagent-stall-flaky).
         $logDir = $this->tempDir . '/logs';
 
         $process = $this->runScript(
@@ -714,7 +719,7 @@ YAML);
         self::assertNotNull($runLog, 'run.log not found in ' . $logDir);
         $log = (string) file_get_contents($runLog);
 
-        self::assertStringContainsString('live=active', $log, 'watcher must see busy-loop process as active');
+        self::assertStringContainsString('live=active', $log, 'watcher must see the active process as active');
         self::assertStringContainsString('reason=soft_timeout', $log, 'active process must wait until soft-timeout, not stall');
         self::assertStringNotContainsString('reason=stall', $log, 'active process must NOT be killed by stall');
     }
@@ -748,8 +753,9 @@ YAML);
     #[Test]
     public function livenessGateCanBeDisabledAndKillsActiveProcessOnStall(): void
     {
-        // WATCH_STALL_RESPECT_LIVENESS=0 отключает gate: активный (busy-loop)
-        // процесс убивается по stall-timeout — старое поведение.
+        // WATCH_STALL_RESPECT_LIVENESS=0 отключает gate: активный (IO-активный,
+        // см. FAKE_RUNNER_HANG_ACTIVE) процесс убивается по stall-timeout —
+        // старое поведение.
         $logDir = $this->tempDir . '/logs';
 
         $process = $this->runScript(
@@ -974,10 +980,23 @@ if [[ "${FAKE_RUNNER_HANG:-0}" == "1" ]]; then
 fi
 if [[ "${FAKE_RUNNER_HANG_ACTIVE:-0}" == "1" ]]; then
     # Симуляция «работает, но молчит»: одно событие, затем тишина в потоке, но
-    # процесс грузит CPU (busy-loop) — process_is_active должен видеть active.
+    # процесс IO-активен (telemetry-loop: периодическая телеметрия в stderr —
+    # по аналогии с прогресс-выводом реальных раннеров) — process_is_active
+    # должен видеть active.
+    # Телеметрия — детерминированное IO-свидетельство активности. Один busy-loop
+    # флеймит под нагрузкой: CPU-дельта ps times квантуется целыми секундами, и
+    # у голодного процесса (<1 CPU-сек за окно) дельта = 0 при нулевом IO —
+    # watcher/основной цикл признают процесс idle и убивают по stall раньше
+    # soft_timeout (TASK-test-watchsubagent-stall-flaky, воспроизведено
+    # taskset-голоданием 2026-11-26). Каждая запись инкрементирует wchar в
+    # /proc/<pid>/io без квантования; cadence 0.1 с привязан к wall-clock и даёт
+    # несколько записей на каждое liveness-окно watcher'а.
     printf '{"type":"agent_start"}\n'
     end=$((SECONDS + 120))
-    while [ "$SECONDS" -lt "$end" ]; do :; done
+    while [ "$SECONDS" -lt "$end" ]; do
+        printf 'telemetry tick\n' >&2
+        sleep 0.1
+    done
     exit 0
 fi
 if [[ -n "${FAKE_RUNNER_STDERR:-}" ]]; then
