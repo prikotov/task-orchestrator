@@ -52,7 +52,6 @@ final readonly class ReportJsonMapper implements ReportFormatMapperInterface
         $data = $this->appendSynthesis($data, $result);
         $data = $this->appendSessionDir($data, $result);
 
-        /** @phpstan-ignore return.type */
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     }
 

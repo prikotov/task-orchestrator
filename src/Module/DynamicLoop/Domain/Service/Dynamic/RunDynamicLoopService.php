@@ -110,6 +110,13 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
 
         if ($startRound > 0) {
             $roundFiles = $this->sessionLogger->getRoundFiles();
+            // Domain-интерфейс DynamicLoopSessionLoggerInterface::getRoundFiles()
+            // объявляет слабый контракт array, restoreFromRoundFiles() ожидает
+            // list<array{...}>. Фактические данные логгера (ChainSessionReader)
+            // форме удовлетворяют, но статически неверифицируемо; сужение контракта
+            // интерфейса — изменение Domain+Infrastructure, вне рамок аудита.
+            // @techdebt TASK-techdebt-phpstan-suppressions-audit (2026-11-27);
+            // аналог — @psalm-suppress ArgumentTypeCoercion выше по методу.
             /** @phpstan-ignore argument.type */
             $execution->restoreFromRoundFiles($roundFiles);
         }

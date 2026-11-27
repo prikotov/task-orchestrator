@@ -8,4 +8,4 @@ parameters:
         - apps/console/src/
     excludePaths:
         - */migrations/*
-    reportUnmatchedIgnoredErrors: false
+    reportUnmatchedIgnoredErrors: true

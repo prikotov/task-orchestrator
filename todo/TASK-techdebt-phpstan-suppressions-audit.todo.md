@@ -54,31 +54,31 @@ status: in_progress
 
 ## 3. Требования, MoSCoW (Requirements)
 ### 🔴 Обязательно (Must Have)
-- [ ] Снять подтверждённые «мёртвые» подавления `nullsafe.neverNull` / `return.type` (не сматчены при `reportUnmatchedIgnoredErrors: true`, проверка 2026-11-27):
-  - `src/Module/ChainExecution/Application/Mapper/ReportJsonMapper.php:55` — `return.type` (над `json_encode` на :56);
-  - `src/Module/DynamicLoop/Domain/Entity/DynamicLoopExecution.php:297` и `:298` — `nullsafe.neverNull`;
-  - `src/Module/DynamicLoop/Domain/Service/Dynamic/FinalizeDynamicLoopService.php:95` — `nullsafe.neverNull`.
-- [ ] Перепроверить живые подавления (необходимость, идентификатор, оформление):
-  - `src/Module/AgentRunner/Infrastructure/Service/Codex/HttpsProxyBridge.php:41` — `property.unusedType`;
-  - `src/Module/AgentRunner/Infrastructure/Service/Codex/HttpsProxyBridge.php:176` — `nullCoalesce.offset`;
-  - `src/Module/AgentRunner/Infrastructure/Service/ProcessLivenessWatcher.php:102` — `booleanNot.alwaysFalse` (введено при обновлении PHPStan 2.3.7, см. TASK-chore-deps-update-all);
-  - `src/Module/DynamicLoop/Domain/Service/Dynamic/RunDynamicLoopService.php:113` — `argument.type`.
-- [ ] Принять решение по `reportUnmatchedIgnoredErrors` (предпочтительно `true`) и зафиксировать его в задаче.
+- [x] Снять подтверждённые «мёртвые» подавления `nullsafe.neverNull` / `return.type` (не сматчены при `reportUnmatchedIgnoredErrors: true`, проверка 2026-11-27):
+  - `src/Module/ChainExecution/Application/Mapper/ReportJsonMapper.php:55` — `return.type` (над `json_encode` на :56); ✅ снято 2026-11-27: PHPStan корректно выводит `non-falsy-string` для `json_encode` с `JSON_THROW_ON_ERROR`;
+  - `src/Module/DynamicLoop/Domain/Entity/DynamicLoopExecution.php:297` и `:298` — `nullsafe.neverNull`; ✅ снято 2026-11-27;
+  - `src/Module/DynamicLoop/Domain/Service/Dynamic/FinalizeDynamicLoopService.php:95` — `nullsafe.neverNull`. ✅ снято 2026-11-27.
+- [x] Перепроверить живые подавления (необходимость, идентификатор, оформление) — перепроверены 2026-11-27 экспериментальным снятием: все 4 сматчиваются, идентификаторы точны:
+  - `src/Module/AgentRunner/Infrastructure/Service/Codex/HttpsProxyBridge.php:41` — `property.unusedType`; ✅ оставлено: сужение PHPDoc до `resource|null` ломает Psalm (`RedundantConditionGivenDocblockType` на guard'ах `is_resource()`) — расхождение анализаторов, добавлена причина и `@techdebt`;
+  - `src/Module/AgentRunner/Infrastructure/Service/Codex/HttpsProxyBridge.php:176` — `nullCoalesce.offset`; ✅ оставлено: защитный guard, снятие `??` меняет поведение защитной ветки; добавлена причина и `@techdebt`;
+  - `src/Module/AgentRunner/Infrastructure/Service/ProcessLivenessWatcher.php:102` — `booleanNot.alwaysFalse` (введено при обновлении PHPStan 2.3.7, см. TASK-chore-deps-update-all); ✅ оставлено, причина уже была; актуализирована ссылка на прецеденты: живые `property.unusedType` и `nullCoalesce.offset` (оба оставлены в этом аудите), устаревшие номера строк убраны — актуальные адреса в §9;
+  - `src/Module/DynamicLoop/Domain/Service/Dynamic/RunDynamicLoopService.php:113` — `argument.type`. ✅ оставлено: слабый контракт `DynamicLoopSessionLoggerInterface::getRoundFiles(): array` против `list<array{...}>`; сужение контракта — отдельная задача (изменение Domain+Infrastructure); добавлена причина и `@techdebt`.
+- [x] Принять решение по `reportUnmatchedIgnoredErrors` (предпочтительно `true`) и зафиксировать его в задаче. ✅ Решение (2026-11-27): оставлено `true` постоянно — анализ зелёный (0 ошибок, несматченных подавлений нет), контроль «мёртвых» подавлений впредь автоматический.
 
 ### ⚫ Won't Have (Не будем делать)
 - Массовое переписывание кода под правила анализатора, где это меняет поведение.
 - Переход на глобальное ослабление конфигурации (`treatPhpDocTypesAsCertain: false` и аналоги).
 
 ## 4. План реализации (Implementation Plan)
-1. [ ] Временно включить `reportUnmatchedIgnoredErrors: true`, собрать полный список несматченных подавлений.
-2. [ ] Снять/актуализировать «мёртвые» подавления из раздела 3.
-3. [ ] Перепроверить живые подавления из раздела 3; обновить комментарии (причина, точный идентификатор).
-4. [ ] Зафиксировать решение по флагу; прогнать `make check`.
+1. [x] Временно включить `reportUnmatchedIgnoredErrors: true`, собрать полный список несматченных подавлений. ✅ 2026-11-27: ровно 4 несматченных, совпадают с подтверждёнными в задаче; других нет.
+2. [x] Снять/актуализировать «мёртвые» подавления из раздела 3. ✅ 2026-11-27: сняты все 4.
+3. [x] Перепроверить живые подавления из раздела 3; обновить комментарии (причина, точный идентификатор). ✅ 2026-11-27: 4 живых подтверждены; добавлены причины и `@techdebt` там, где их не было.
+4. [x] Зафиксировать решение по флагу; прогнать `make check`. ✅ 2026-11-27: `reportUnmatchedIgnoredErrors: true` оставлен постоянно; `make check` зелёный.
 
 ## 5. Критерии приёмки (Definition of Done)
-- [ ] `vendor/bin/phpstan analyse` — 0 ошибок; несматченных подавлений нет (при выбранном значении флага).
-- [ ] Полный `make check` зелёный.
-- [ ] В `src/` нет подавлений без причины и без ссылки на задачу/прецедент по конвенции.
+- [x] `vendor/bin/phpstan analyse` — 0 ошибок; несматченных подавлений нет (при выбранном значении флага). ✅ 2026-11-27, при `reportUnmatchedIgnoredErrors: true`.
+- [x] Полный `make check` зелёный. ✅ 2026-11-27: PHPStan/Psalm/Deptrac/PHPMD/PHPCS/PHPUnit (1782 теста, 5380 ассертов, 2 skipped) — OK.
+- [x] В `src/` нет `@phpstan-ignore`-подавлений без причины и без ссылки на задачу/прецедент по конвенции (подавления Psalm — вне скоупа этой задачи). ✅ 2026-11-27: все 4 оставшихся `@phpstan-ignore` имеют причину и `@techdebt`-ссылку на эту задачу.
 
 ## 6. Самопроверка (Verification)
 ```bash
@@ -99,9 +99,19 @@ php vendor/bin/todo-md validate
 
 ## 9. Комментарии (Comments)
 - Адресация «мёртвых» подавлений дана по строке с `@phpstan-ignore` (в отчёте ревью часть адресов указана по строке срабатывания — отличается на одну строку).
-- Полный инвентарь подавлений зафиксирован на 2026-11-27: 8 мест в `src/`; при выполнении задачи перечень обновить (новые подавления, появившиеся с момента создания).
+- Итоговый инвентарь подавлений `@phpstan-ignore` в `src/` (аудит 2026-11-27): 4 живых, все с причиной и `@techdebt`-ссылкой на эту задачу:
+  1. `src/Module/AgentRunner/Infrastructure/Service/Codex/HttpsProxyBridge.php` — `property.unusedType` (расхождение PHPStan/Psalm по `@var resource|false|null`);
+  2. `src/Module/AgentRunner/Infrastructure/Service/Codex/HttpsProxyBridge.php` — `nullCoalesce.offset` (защитный guard `?? false`);
+  3. `src/Module/AgentRunner/Infrastructure/Service/ProcessLivenessWatcher.php` — `booleanNot.alwaysFalse` (повторный опрос OS-состояния);
+  4. `src/Module/DynamicLoop/Domain/Service/Dynamic/RunDynamicLoopService.php` — `argument.type` (слабый контракт сессионного логгера).
+- Снято 4 «мёртвых» подавления из исходного инвентаря (8 → 4 живых); `property.unusedType` из исходного списка «живых» оставлен с документированной причиной после эксперимента с сужением PHPDoc (см. Must Have).
+- Адресация оставленных подавлений после аудита (строки сместились из-за добавленных комментариев; в Must Have — снимок на момент создания задачи): `HttpsProxyBridge.php:53` (`property.unusedType`), `HttpsProxyBridge.php:195` (`nullCoalesce.offset`), `ProcessLivenessWatcher.php:102` (`booleanNot.alwaysFalse`), `RunDynamicLoopService.php:120` (`argument.type`).
+- Потенциальный техдолг вне рамок этой задачи (отдельная задача при желании): сужение контракта `DynamicLoopSessionLoggerInterface::getRoundFiles()` до `list<array{...}>` снимет подавление `argument.type` (изменение контракта Domain+Infrastructure — требует своего PR и ревью).
 
 ## История изменений (Change History)
 | Дата | Автор | Изменение |
 | :--- | :--- | :--- |
 | 2026-11-27 15:12:56 (1795792376) | Ревьювер Бэка Пуаро (pi) | Создание задачи |
+| 2026-11-27 16:07:38 (1795795658) | Бэкендер Левша (pi) | Взятие задачи в работу (in_progress) |
+| 2026-11-27 | Бэкендер Левша (pi) | Аудит выполнен: сняты 4 «мёртвых» подавления; 4 живых перепроверены, добавлены причины и `@techdebt`; `reportUnmatchedIgnoredErrors: true` оставлен постоянно; phpstan/make check зелёные. Отмечены MoSCoW/план/DoD |
+| 2026-11-27 | Бэкендер Левша (pi) | Доработка по ревью (2026-11-27_23-31_phpstan-suppressions-audit-review): CR-1 — возвращён живой прецедент `property.unusedType` в комментарий `ProcessLivenessWatcher.php` (без номеров строк), строка 64 переформулирована без «снятый»; CR-3 — в `HttpsProxyBridge.php` уточнены идентификаторы Psalm (`DocblockTypeContradiction`, `RedundantConditionGivenDocblockType`); CR-5 — DoD сужен до `@phpstan-ignore`-подавлений (Psalm — вне скоупа) |
