@@ -2,7 +2,7 @@
 type: refactor
 created: 2026-11-27 02:51:32 (1795747892)
 due: 
-started: 
+started: 2026-11-27 04:09:54 (1795752594)
 completed: 
 cancelled: 
 value: V2
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: TASK-chore-deps-prikotov-bump
 epic: 
 author: Бэкендер Тони (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/vo-private-properties
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-techdebt-vo-private-properties: Перевести свойства VO в private с геттерами (правило coding-standard 0.35.0)
