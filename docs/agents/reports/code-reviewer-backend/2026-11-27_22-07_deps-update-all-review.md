@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-11-27
 **Объект:** незакоммиченные изменения ветки `task/deps-update-all` (база HEAD `d1f50a89`) — `composer.lock` (+322/−364: 45 пакетов обновлено, 1 удалён, добавленных нет), `src/Module/AgentRunner/Infrastructure/Service/ProcessLivenessWatcher.php` (+9/−1), `tests/Unit/Infrastructure/Service/AgentRunner/Lifecycle/RunAgentProcessLifecycleServiceTest.php` (11 вхождений переименования helper), `todo/TASK-chore-deps-update-all.todo.md`, `.make-check.json`
-**Задача:** [todo/TASK-chore-deps-update-all.todo.md](../../../../todo/TASK-chore-deps-update-all.todo.md)
+**Задача:** [todo/done/TASK-chore-deps-update-all.todo.md](../../../../todo/done/TASK-chore-deps-update-all.todo.md)
 **Тип прохода:** полное RV — соответствие постановке и скоупу, минимальность правок, обоснованность подавления PHPStan, качество правки теста, полнота файла задачи, конвенции проекта
 **Вердикт:** 🔴 **REQUEST CHANGES** — 1 блокирующее замечание (CR-1), 1 важное (CR-2), 5 косметических/процессных (CR-3…CR-7)
 
