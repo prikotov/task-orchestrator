@@ -3,7 +3,7 @@ type: chore
 created: 2026-11-26 14:26:08 (1795703168)
 due: 
 started: 2026-11-27 02:44:17 (1795747457)
-completed: 
+completed: 2026-11-27 03:22:12 (1795749732)
 cancelled: 
 value: V2
 complexity: C3
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/deps-prikotov-bump
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/514
+status: done
 ---
 
 # TASK-chore-deps-prikotov-bump: Подъём всех зависимостей prikotov/* до последних релизов
