@@ -16,14 +16,14 @@ final readonly class DynamicLoopContextVo
 {
     /** @param list<string> $participants */
     public function __construct(
-        public string $facilitatorRole,
-        public array $participants,
-        public int $maxRounds,
-        public string $topic,
-        public DynamicLoopPromptConfigVo $promptConfiguration,
-        public ?string $workingDir = null,
-        public int $timeout = 300,
-        public ?int $maxTime = null,
+        private string $facilitatorRole,
+        private array $participants,
+        private int $maxRounds,
+        private string $topic,
+        private DynamicLoopPromptConfigVo $promptConfiguration,
+        private ?string $workingDir = null,
+        private int $timeout = 300,
+        private ?int $maxTime = null,
         /**
          * Дополнение от Лида при resume: текст аргумента task CLI-команды.
          *
@@ -32,7 +32,58 @@ final readonly class DynamicLoopContextVo
          * раунды по новой вводной. null — дополнения нет (обычный запуск или
          * resume без новой вводной), блок не рендерится.
          */
-        public ?string $taskAddendum = null,
+        private ?string $taskAddendum = null,
     ) {
+    }
+
+    public function getFacilitatorRole(): string
+    {
+        return $this->facilitatorRole;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getParticipants(): array
+    {
+        return $this->participants;
+    }
+
+    public function getMaxRounds(): int
+    {
+        return $this->maxRounds;
+    }
+
+    public function getTopic(): string
+    {
+        return $this->topic;
+    }
+
+    public function getPromptConfiguration(): DynamicLoopPromptConfigVo
+    {
+        return $this->promptConfiguration;
+    }
+
+    public function getWorkingDir(): ?string
+    {
+        return $this->workingDir;
+    }
+
+    public function getTimeout(): int
+    {
+        return $this->timeout;
+    }
+
+    public function getMaxTime(): ?int
+    {
+        return $this->maxTime;
+    }
+
+    /**
+     * Дополнение от Лида при resume; null — дополнения нет.
+     */
+    public function getTaskAddendum(): ?string
+    {
+        return $this->taskAddendum;
     }
 }

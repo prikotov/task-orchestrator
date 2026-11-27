@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-11-27
 **Объект:** незакоммиченные изменения ветки `task/deps-prikotov-bump` (база HEAD `b1663539`): `.coding-standard.php` (+76/−?), `.github/workflows/secret-scan-pr-content.yml` (+30/−?), `composer.json` (2 констрейнта), `composer.lock` (28 пакетов), `docs/agents/reports/code-reviewer-backend/2026-11-26_21-05_watchsubagent-stall-flaky-review.md` (1 ссылка), `todo/TASK-chore-deps-prikotov-bump.todo.md` (+5), новый файл `todo/TASK-techdebt-vo-private-properties.todo.md`
-**Задача:** [todo/TASK-chore-deps-prikotov-bump.todo.md](../../../../todo/TASK-chore-deps-prikotov-bump.todo.md)
+**Задача:** [todo/done/TASK-chore-deps-prikotov-bump.todo.md](../../../../todo/done/TASK-chore-deps-prikotov-bump.todo.md) (перенесена в `done` после merge PR #514)
 
 ---
 

@@ -53,15 +53,15 @@ final readonly class ExecuteToolStepService implements ExecuteStepServiceInterfa
         }
 
         $result = $this->toolStepRunner->run($step->toToolStepVo());
-        $duration = $result->durationMs / 1000.0;
+        $duration = $result->getDurationMs() / 1000.0;
 
-        if (!$result->success) {
+        if (!$result->isSuccess()) {
             $this->logger?->warning(
                 sprintf(
                     '[StaticChainExecutor] Tool step "%s" failed (exit code %d): %s',
                     $step->getLabel(),
-                    $result->exitCode,
-                    $result->stdout,
+                    $result->getExitCode(),
+                    $result->getStdout(),
                 ),
             );
         }
@@ -69,17 +69,17 @@ final readonly class ExecuteToolStepService implements ExecuteStepServiceInterfa
         return new StaticStepResultVo(
             role: 'tool',
             runner: self::RUNNER_NAME,
-            outputText: $result->stdout,
+            outputText: $result->getStdout(),
             inputTokens: 0,
             outputTokens: 0,
             cost: 0.0,
             duration: $duration,
-            isError: !$result->success,
-            errorMessage: !$result->success
-                ? sprintf('Tool "%s" failed with exit code %d', $step->getLabel(), $result->exitCode)
+            isError: !$result->isSuccess(),
+            errorMessage: !$result->isSuccess()
+                ? sprintf('Tool "%s" failed with exit code %d', $step->getLabel(), $result->getExitCode())
                 : null,
             label: $step->getLabel(),
-            exitCode: $result->exitCode,
+            exitCode: $result->getExitCode(),
             outputKey: $step->getOutputKey(),
         );
     }

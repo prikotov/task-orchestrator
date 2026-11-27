@@ -174,9 +174,9 @@ final class ChainStepVoTest extends TestCase
         $vo = $step->toQualityGateVo();
 
         self::assertInstanceOf(QualityGateVo::class, $vo);
-        self::assertSame('make lint-php', $vo->command);
-        self::assertSame('Lint', $vo->label);
-        self::assertSame(60, $vo->timeoutSeconds);
+        self::assertSame('make lint-php', $vo->getCommand());
+        self::assertSame('Lint', $vo->getLabel());
+        self::assertSame(60, $vo->getTimeoutSeconds());
     }
 
     #[Test]

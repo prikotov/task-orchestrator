@@ -42,15 +42,15 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
     public function run(ExecutionStepVo $step, StepContextVo $context): StaticStepResultVo
     {
         $role = $step->getRole() ?? '';
-        $formattedContext = $context->previousContext !== null
+        $formattedContext = $context->getPreviousContext() !== null
             ? $this->formatter->buildStaticContext(
                 $role,
-                $context->previousContext,
-                $context->task,
+                $context->getPreviousContext(),
+                $context->getTask(),
             )
             : null;
 
-        $roleConfig = $context->roleConfig;
+        $roleConfig = $context->getRoleConfig();
         $roleCommand = $roleConfig?->getCommand() ?? [];
         $runnerName = $this->resolveRunnerName($step, $roleCommand);
         $command = $this->resolveCommand($step, $roleCommand, $runnerName);
@@ -60,19 +60,19 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
         $promptFile = $roleConfig?->getPromptFile();
         $request = new ChainRunRequestVo(
             role: $role,
-            task: $context->task,
+            task: $context->getTask(),
             systemPrompt: $systemPromptFile ?? $promptFile,
             previousContext: $formattedContext,
             model: $step->getModel(),
             tools: $step->getTools(),
-            workingDir: $context->workingDir,
-            timeout: $roleConfig?->getTimeout() ?? $context->timeout,
+            workingDir: $context->getWorkingDir(),
+            timeout: $roleConfig?->getTimeout() ?? $context->getTimeout(),
             command: $command,
             runnerArgs: $systemPromptFile !== null && $promptFile !== null
                 ? ['--append-system-prompt', $promptFile]
                 : [],
             runnerName: $runnerName,
-            noContextFiles: $context->noContextFiles || $step->hasNoContextFiles(),
+            noContextFiles: $context->hasNoContextFiles() || $step->hasNoContextFiles(),
         );
 
         $start = microtime(true);
@@ -108,7 +108,7 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
             isError: $result->isError(),
             errorMessage: $result->getErrorMessage(),
             fallbackRunnerUsed: $fallbackRunnerUsed,
-            iterationNumber: $context->iterationNumber,
+            iterationNumber: $context->getIterationNumber(),
             timedOut: $timedOut,
         );
     }
@@ -182,22 +182,22 @@ final readonly class ExecuteAgentStepService implements ExecuteStepServiceInterf
             $request,
             $promptFile,
         );
-        $duration += $fallbackResult->extraDuration;
-        $fallbackRunnerName = $fallbackResult->fallbackRunnerName;
+        $duration += $fallbackResult->getExtraDuration();
+        $fallbackRunnerName = $fallbackResult->getFallbackRunnerName();
 
         if ($fallbackRunnerName !== null) {
-            $result = $fallbackResult->isError
+            $result = $fallbackResult->isError()
                 ? ChainRunResultVo::createError(
-                    $fallbackResult->errorMessage ?? 'unknown',
-                    timedOut: $fallbackResult->timedOut,
+                    $fallbackResult->getErrorMessage() ?? 'unknown',
+                    timedOut: $fallbackResult->isTimedOut(),
                 )
                 : ChainRunResultVo::createSuccess(
-                    $fallbackResult->outputText,
-                    $fallbackResult->inputTokens,
-                    $fallbackResult->outputTokens,
-                    cost: $fallbackResult->cost,
+                    $fallbackResult->getOutputText(),
+                    $fallbackResult->getInputTokens(),
+                    $fallbackResult->getOutputTokens(),
+                    cost: $fallbackResult->getCost(),
                 );
-            $timedOut = !$fallbackResult->isError ? false : $fallbackResult->timedOut;
+            $timedOut = !$fallbackResult->isError() ? false : $fallbackResult->isTimedOut();
 
             return [$result, $duration, $fallbackRunnerName, $timedOut];
         }

@@ -71,20 +71,20 @@ final readonly class JsonlAuditLogger implements DynamicLoopAuditLoggerInterface
             'step' => $stepNumber,
             'role' => $role,
             'runner' => $runner,
-            'input_tokens' => $result->inputTokens,
-            'output_tokens' => $result->outputTokens,
-            'cache_read_tokens' => $result->cacheReadTokens,
-            'cache_write_tokens' => $result->cacheWriteTokens,
-            'model' => $result->model,
-            'provider' => $result->provider,
-            'thinking' => $result->thinking,
-            'cost' => $result->cost,
+            'input_tokens' => $result->getInputTokens(),
+            'output_tokens' => $result->getOutputTokens(),
+            'cache_read_tokens' => $result->getCacheReadTokens(),
+            'cache_write_tokens' => $result->getCacheWriteTokens(),
+            'model' => $result->getModel(),
+            'provider' => $result->getProvider(),
+            'thinking' => $result->getThinking(),
+            'cost' => $result->getCost(),
             'duration_ms' => round($durationMs, 1),
-            'status' => $result->isError ? 'error' : 'success',
+            'status' => $result->isError() ? 'error' : 'success',
         ];
 
-        if ($result->isError) {
-            $record['error_message'] = $result->errorMessage ?? 'unknown';
+        if ($result->isError()) {
+            $record['error_message'] = $result->getErrorMessage() ?? 'unknown';
         }
 
         $this->append($record);

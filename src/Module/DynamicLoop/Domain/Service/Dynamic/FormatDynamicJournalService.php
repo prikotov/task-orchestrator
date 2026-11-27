@@ -20,22 +20,22 @@ final readonly class FormatDynamicJournalService implements FormatDynamicJournal
     {
         $now = date('H:i:s');
         $datePrefix = date('Y-m-d');
-        $dur = round($fac->roundResult->duration, 1);
+        $dur = round($fac->getRoundResult()->getDuration(), 1);
         $header = sprintf(
             "[%s %s] Step %d | Round %d | %s",
             $datePrefix,
             $now,
             $step,
             $round,
-            $fac->roundResult->duration !== 0.0 ? "{$dur}s" : '',
+            $fac->getRoundResult()->getDuration() !== 0.0 ? "{$dur}s" : '',
         );
 
-        if ($fac->done) {
+        if ($fac->isDone()) {
             return sprintf("%s → synthesis (завершил обсуждение)\n", $header);
         }
 
-        if ($fac->nextRole !== null) {
-            return sprintf("%s → дал слово: %s\n", $header, $fac->nextRole);
+        if ($fac->getNextRole() !== null) {
+            return sprintf("%s → дал слово: %s\n", $header, $fac->getNextRole());
         }
 
         return '';

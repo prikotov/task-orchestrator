@@ -37,7 +37,7 @@ final class DynamicLoopExecutionMaxTimeTest extends TestCase
 
         $result = $execution->toLoopResultVo();
 
-        self::assertTrue($result->maxTimeExceeded);
+        self::assertTrue($result->isMaxTimeExceeded());
     }
 
     #[Test]
@@ -47,7 +47,7 @@ final class DynamicLoopExecutionMaxTimeTest extends TestCase
 
         $result = $execution->toLoopResultVo();
 
-        self::assertFalse($result->maxTimeExceeded);
+        self::assertFalse($result->isMaxTimeExceeded());
     }
 
     #[Test]
@@ -64,8 +64,8 @@ final class DynamicLoopExecutionMaxTimeTest extends TestCase
 
         $result = $execution->toLoopResultVo();
 
-        self::assertTrue($result->maxTimeExceeded);
-        self::assertSame('Final synthesis from reserved time', $result->synthesis);
+        self::assertTrue($result->isMaxTimeExceeded());
+        self::assertSame('Final synthesis from reserved time', $result->getSynthesis());
     }
 
     #[Test]

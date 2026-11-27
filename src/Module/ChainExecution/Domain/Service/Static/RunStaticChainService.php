@@ -46,8 +46,8 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
         ?StaticAuditServiceInterface $auditService = null,
         bool $noContextFiles = false,
     ): StaticChainResultVo {
-        $steps = $chain->steps;
-        $fixIterations = $chain->fixIterations;
+        $steps = $chain->getSteps();
+        $fixIterations = $chain->getFixIterations();
         $nameToIndexMap = $this->buildNameToIndexMap($steps);
         $groupForStep = $this->buildGroupForStepMap(
             $steps,
@@ -57,7 +57,7 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
         /** @var list<StaticStepResultVo> $results */
         $results = [];
         $startTime = microtime(true);
-        $auditService?->logChainStart($chain->name, $task);
+        $auditService?->logChainStart($chain->getName(), $task);
 
         $stepCount = count($steps);
         while (!$execution->isComplete($stepCount)) {
@@ -78,17 +78,17 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
             if ($stepResult === null) {
                 break;
             }
-            $results = $stepResult->results;
-            if ($stepResult->shouldRetry) {
+            $results = $stepResult->getResults();
+            if ($stepResult->isRetryNeeded()) {
                 continue;
             }
-            if ($stepResult->shouldBreak) {
+            if ($stepResult->isBreakNeeded()) {
                 break;
             }
         }
 
         $result = $this->buildResult(
-            $chain->name,
+            $chain->getName(),
             $startTime,
             $results, // @psalm-suppress ArgumentTypeCoercion loop reassignment widens type
             $execution,
@@ -122,7 +122,7 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
         $step = $steps[$execution->getStepIndex()];
         $budgetRole = ($step->isAgent() ? $step->getRole() : null) ?? ($step->isTool() ? 'tool' : 'quality_gate');
 
-        if ($this->budgetService->shouldBreakBeforeStep($execution, $chain->budget, $budgetRole)) {
+        if ($this->budgetService->shouldBreakBeforeStep($execution, $chain->getBudget(), $budgetRole)) {
             return null;
         }
 
@@ -144,19 +144,19 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
 
         $results[] = $stepResult;
         $execution->recordStep(
-            $stepResult->outputText,
-            $stepResult->inputTokens,
-            $stepResult->outputTokens,
-            $stepResult->cost,
-            $stepResult->duration,
+            $stepResult->getOutputText(),
+            $stepResult->getInputTokens(),
+            $stepResult->getOutputTokens(),
+            $stepResult->getCost(),
+            $stepResult->getDuration(),
             $role,
         );
 
-        $this->executePostStepHook($step, $chain->name, $stepResult);
+        $this->executePostStepHook($step, $chain->getName(), $stepResult);
 
         return $this->handlePostStep(
             $execution,
-            $chain->budget,
+            $chain->getBudget(),
             $budgetRole,
             $stepResult,
             $step,
@@ -186,12 +186,12 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
                 $execution,
                 $budget,
                 $budgetRole,
-                $stepResult->cost,
+                $stepResult->getCost(),
             )
         ) {
             return new StaticProcessResultVo($results, false, true);
         }
-        if ($stepResult->isError) {
+        if ($stepResult->isError()) {
             return new StaticProcessResultVo($results, false, true);
         }
 
@@ -234,7 +234,7 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
             ? $this->resolveAgentRunnerName($step, $roleConfig)
             : 'shell';
         $auditService?->logStepStart(
-            $chain->name,
+            $chain->getName(),
             $stepIndex1,
             $role,
             $runnerName,
@@ -256,12 +256,12 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
 
         $stepResult = $runner->run($step, $context);
         $auditService?->logStepResult(
-            $chain->name,
+            $chain->getName(),
             $stepIndex1,
             $role,
             $runnerName,
             $stepResult,
-            $stepResult->duration * 1000.0,
+            $stepResult->getDuration() * 1000.0,
         );
 
         return $stepResult;
@@ -301,7 +301,7 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
             budgetExceeded: $execution->isBudgetExceeded(),
             stepsCount: count($results),
             stepStatuses: array_map(
-                static fn(StaticStepResultVo $step): StaticStepAuditVo => new StaticStepAuditVo($step->isError),
+                static fn(StaticStepResultVo $step): StaticStepAuditVo => new StaticStepAuditVo($step->isError()),
                 $results,
             ),
         ));
@@ -330,25 +330,25 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
         }
         $lastIndex = count($results) - 1;
         $last = $results[$lastIndex];
-        if (!$last->iterationWarning) {
+        if (!$last->isIterationWarning()) {
             $results[$lastIndex] = new StaticStepResultVo(
-                role: $last->role,
-                runner: $last->runner,
-                outputText: $last->outputText,
-                inputTokens: $last->inputTokens,
-                outputTokens: $last->outputTokens,
-                cost: $last->cost,
-                duration: $last->duration,
-                isError: $last->isError,
-                errorMessage: $last->errorMessage,
-                fallbackRunnerUsed: $last->fallbackRunnerUsed,
-                iterationNumber: $last->iterationNumber,
+                role: $last->getRole(),
+                runner: $last->getRunner(),
+                outputText: $last->getOutputText(),
+                inputTokens: $last->getInputTokens(),
+                outputTokens: $last->getOutputTokens(),
+                cost: $last->getCost(),
+                duration: $last->getDuration(),
+                isError: $last->isError(),
+                errorMessage: $last->getErrorMessage(),
+                fallbackRunnerUsed: $last->getFallbackRunnerUsed(),
+                iterationNumber: $last->getIterationNumber(),
                 iterationWarning: true,
-                passed: $last->passed,
-                exitCode: $last->exitCode,
-                label: $last->label,
-                timedOut: $last->timedOut,
-                outputKey: $last->outputKey,
+                passed: $last->isPassed(),
+                exitCode: $last->getExitCode(),
+                label: $last->getLabel(),
+                timedOut: $last->isTimedOut(),
+                outputKey: $last->getOutputKey(),
             );
         }
 
@@ -431,10 +431,10 @@ final readonly class RunStaticChainService implements RunStaticChainServiceInter
         $hookContext = [
             'chain_name' => $chainName,
             'step_name' => $step->getName(),
-            'runner' => $stepResult->runner,
+            'runner' => $stepResult->getRunner(),
             'role' => $step->isAgent() ? ($step->getRole() ?? '') : ($step->isTool() ? 'tool' : 'quality_gate'),
-            'exit_code' => $stepResult->exitCode,
-            'duration' => $stepResult->duration,
+            'exit_code' => $stepResult->getExitCode(),
+            'duration' => $stepResult->getDuration(),
         ];
 
         $hookResult = $this->hookExecutor->execute($postStep, $hookContext);

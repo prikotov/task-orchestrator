@@ -218,10 +218,10 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
         // Assert: context built from resumed state
         $capturedContext = $this->stubLoopRunner->getCapturedContext();
         self::assertNotNull($capturedContext);
-        self::assertSame('facilitator', $capturedContext->facilitatorRole);
-        self::assertSame(['participant', 'analyst'], $capturedContext->participants);
-        self::assertSame(15, $capturedContext->maxRounds);
-        self::assertSame('Original topic', $capturedContext->topic);
+        self::assertSame('facilitator', $capturedContext->getFacilitatorRole());
+        self::assertSame(['participant', 'analyst'], $capturedContext->getParticipants());
+        self::assertSame(15, $capturedContext->getMaxRounds());
+        self::assertSame('Original topic', $capturedContext->getTopic());
     }
 
     // --- Resume: command task reaches facilitator as addendum ---
@@ -263,7 +263,7 @@ final class ResumeDynamicChainIntegrationTest extends TestCase
         // Assert: task-аргумент доходит до контекста фасилитатора, тема — из сессии
         $capturedContext = $this->stubLoopRunner->getCapturedContext();
         self::assertNotNull($capturedContext);
-        self::assertSame('Появились скриншоты, дайте слово участникам', $capturedContext->taskAddendum);
-        self::assertSame('Feature Y design', $capturedContext->topic);
+        self::assertSame('Появились скриншоты, дайте слово участникам', $capturedContext->getTaskAddendum());
+        self::assertSame('Feature Y design', $capturedContext->getTopic());
     }
 }

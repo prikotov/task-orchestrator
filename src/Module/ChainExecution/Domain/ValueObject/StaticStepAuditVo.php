@@ -13,7 +13,12 @@ namespace TaskOrchestrator\Common\Module\ChainExecution\Domain\ValueObject;
 final readonly class StaticStepAuditVo
 {
     public function __construct(
-        public bool $isError,
+        private bool $isError,
     ) {
+    }
+
+    public function isError(): bool
+    {
+        return $this->isError;
     }
 }

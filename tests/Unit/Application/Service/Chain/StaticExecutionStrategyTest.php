@@ -263,9 +263,9 @@ final class StaticExecutionStrategyTest extends TestCase
      */
     private function createStaticChainResult(array $steps): StaticChainResultVo
     {
-        $totalInput = array_sum(array_map(static fn(StaticStepResultVo $s): int => $s->inputTokens, $steps));
-        $totalOutput = array_sum(array_map(static fn(StaticStepResultVo $s): int => $s->outputTokens, $steps));
-        $totalCost = array_sum(array_map(static fn(StaticStepResultVo $s): float => $s->cost, $steps));
+        $totalInput = array_sum(array_map(static fn(StaticStepResultVo $s): int => $s->getInputTokens(), $steps));
+        $totalOutput = array_sum(array_map(static fn(StaticStepResultVo $s): int => $s->getOutputTokens(), $steps));
+        $totalCost = array_sum(array_map(static fn(StaticStepResultVo $s): float => $s->getCost(), $steps));
 
         return new StaticChainResultVo(
             stepResults: $steps,

@@ -57,7 +57,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     public function execute(ExecutionChainInfoVo $chainInfo, OrchestrateChainCommand $command): OrchestrateChainResultDto
     {
         $complexity = $command->complexity ?? DynamicLoopSessionStateVo::DEFAULT_COMPLEXITY;
-        $config = $this->chainProvider->loadDynamicChainConfig($chainInfo->name, $complexity);
+        $config = $this->chainProvider->loadDynamicChainConfig($chainInfo->getName(), $complexity);
 
         $facilitatorRole = $command->facilitator ?? $config->getFacilitator();
         $participants = $command->participants ?? $config->getParticipants();
@@ -123,7 +123,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
 
         // Явная --complexity приоритетнее сохранённой в session.json.
         $complexity = $command->complexity ?? $state->getComplexity();
-        $config = $this->chainProvider->loadDynamicChainConfig($chainInfo->name, $complexity);
+        $config = $this->chainProvider->loadDynamicChainConfig($chainInfo->getName(), $complexity);
 
         $this->sessionLogger->setBudget($config->getBudget());
         $resumeTimeout = $command->timeout ?? $config->getTimeout() ?? self::DEFAULT_DYNAMIC_TIMEOUT;
@@ -170,7 +170,7 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     #[Override]
     public function supports(ExecutionChainInfoVo $chainInfo): bool
     {
-        return $chainInfo->type === ChainExecutionTypeEnum::dynamicType;
+        return $chainInfo->getType() === ChainExecutionTypeEnum::dynamicType;
     }
 
     // ─── Private helpers ──────────────────────────────────────────────────
@@ -197,14 +197,14 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     {
         $reason = $loopResult->getCompletionReason();
 
-        if ($loopResult->synthesis !== null) {
+        if ($loopResult->getSynthesis() !== null) {
             $this->sessionLogger->completeSession(
-                $loopResult->synthesis,
-                $loopResult->totalTime,
-                $loopResult->totalInputTokens,
-                $loopResult->totalOutputTokens,
-                $loopResult->totalCost,
-                count($loopResult->roundResults),
+                $loopResult->getSynthesis(),
+                $loopResult->getTotalTime(),
+                $loopResult->getTotalInputTokens(),
+                $loopResult->getTotalOutputTokens(),
+                $loopResult->getTotalCost(),
+                count($loopResult->getRoundResults()),
                 $reason,
             );
             $this->dispatchCompletedEvent($loopResult, $sessionDir, $reason);
@@ -227,27 +227,27 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
 
     private function dispatchCompletedEvent(DynamicLoopResultVo $loopResult, ?string $sessionDir, string $reason): void
     {
-        $status = $loopResult->synthesis !== null ? 'completed' : 'interrupted';
+        $status = $loopResult->getSynthesis() !== null ? 'completed' : 'interrupted';
 
         $this->sessionNotifier->notifySessionCompleted(
             status: $status,
             completionReason: $reason,
-            totalRounds: count($loopResult->roundResults),
-            totalTime: $loopResult->totalTime,
-            totalInputTokens: $loopResult->totalInputTokens,
-            totalOutputTokens: $loopResult->totalOutputTokens,
-            totalCost: $loopResult->totalCost,
-            synthesis: $loopResult->synthesis,
+            totalRounds: count($loopResult->getRoundResults()),
+            totalTime: $loopResult->getTotalTime(),
+            totalInputTokens: $loopResult->getTotalInputTokens(),
+            totalOutputTokens: $loopResult->getTotalOutputTokens(),
+            totalCost: $loopResult->getTotalCost(),
+            synthesis: $loopResult->getSynthesis(),
             sessionDir: $sessionDir,
-            budgetExceeded: $loopResult->budgetExceeded,
-            budgetLimit: $loopResult->budgetLimit,
-            budgetExceededRole: $loopResult->budgetExceededRole,
+            budgetExceeded: $loopResult->isBudgetExceeded(),
+            budgetLimit: $loopResult->getBudgetLimit(),
+            budgetExceededRole: $loopResult->getBudgetExceededRole(),
         );
     }
 
     private function toResultDto(DynamicLoopResultVo $loopResult, ?string $sessionDir): OrchestrateChainResultDto
     {
-        $roundDtos = $this->toRoundResultDtos($loopResult->roundResults);
+        $roundDtos = $this->toRoundResultDtos($loopResult->getRoundResults());
 
         $chainTimedOut = array_any(
             $roundDtos,
@@ -256,16 +256,16 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
 
         return new OrchestrateChainResultDto(
             roundResults: $roundDtos,
-            totalTime: $loopResult->totalTime,
-            totalInputTokens: $loopResult->totalInputTokens,
-            totalOutputTokens: $loopResult->totalOutputTokens,
-            totalCost: $loopResult->totalCost,
-            synthesis: $loopResult->synthesis,
-            maxRoundsReached: $loopResult->maxRoundsReached,
+            totalTime: $loopResult->getTotalTime(),
+            totalInputTokens: $loopResult->getTotalInputTokens(),
+            totalOutputTokens: $loopResult->getTotalOutputTokens(),
+            totalCost: $loopResult->getTotalCost(),
+            synthesis: $loopResult->getSynthesis(),
+            maxRoundsReached: $loopResult->isMaxRoundsReached(),
             sessionDir: $sessionDir,
-            budgetExceeded: $loopResult->budgetExceeded,
-            budgetLimit: $loopResult->budgetLimit,
-            budgetExceededRole: $loopResult->budgetExceededRole,
+            budgetExceeded: $loopResult->isBudgetExceeded(),
+            budgetLimit: $loopResult->getBudgetLimit(),
+            budgetExceededRole: $loopResult->getBudgetExceededRole(),
             timedOut: $chainTimedOut,
         );
     }
@@ -279,25 +279,25 @@ final readonly class DynamicExecutionStrategy implements ExecutionStrategyInterf
     {
         return array_map(
             static fn(DynamicRoundResultVo $roundVo): ChainDynamicRoundResultDto => new ChainDynamicRoundResultDto(
-                round: $roundVo->round,
-                role: $roundVo->role,
-                isFacilitator: $roundVo->isFacilitator,
-                outputText: $roundVo->outputText,
-                inputTokens: $roundVo->inputTokens,
-                outputTokens: $roundVo->outputTokens,
-                cost: $roundVo->cost,
-                duration: $roundVo->duration,
-                isError: $roundVo->isError,
-                errorMessage: $roundVo->errorMessage,
-                invocation: $roundVo->invocation,
-                systemPrompt: $roundVo->systemPrompt,
-                userPrompt: $roundVo->userPrompt,
-                timedOut: $roundVo->timedOut,
-                model: $roundVo->model,
-                provider: $roundVo->provider,
-                thinking: $roundVo->thinking,
-                cacheReadTokens: $roundVo->cacheReadTokens,
-                cacheWriteTokens: $roundVo->cacheWriteTokens,
+                round: $roundVo->getRound(),
+                role: $roundVo->getRole(),
+                isFacilitator: $roundVo->isFacilitator(),
+                outputText: $roundVo->getOutputText(),
+                inputTokens: $roundVo->getInputTokens(),
+                outputTokens: $roundVo->getOutputTokens(),
+                cost: $roundVo->getCost(),
+                duration: $roundVo->getDuration(),
+                isError: $roundVo->isError(),
+                errorMessage: $roundVo->getErrorMessage(),
+                invocation: $roundVo->getInvocation(),
+                systemPrompt: $roundVo->getSystemPrompt(),
+                userPrompt: $roundVo->getUserPrompt(),
+                timedOut: $roundVo->isTimedOut(),
+                model: $roundVo->getModel(),
+                provider: $roundVo->getProvider(),
+                thinking: $roundVo->getThinking(),
+                cacheReadTokens: $roundVo->getCacheReadTokens(),
+                cacheWriteTokens: $roundVo->getCacheWriteTokens(),
             ),
             $roundVos,
         );

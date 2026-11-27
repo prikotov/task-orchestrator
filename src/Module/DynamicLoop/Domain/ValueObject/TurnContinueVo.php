@@ -16,8 +16,18 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject;
 final readonly class TurnContinueVo
 {
     public function __construct(
-        public ?string $nextRole = null,
-        public ?string $challenge = null,
+        private ?string $nextRole = null,
+        private ?string $challenge = null,
     ) {
+    }
+
+    public function getNextRole(): ?string
+    {
+        return $this->nextRole;
+    }
+
+    public function getChallenge(): ?string
+    {
+        return $this->challenge;
     }
 }

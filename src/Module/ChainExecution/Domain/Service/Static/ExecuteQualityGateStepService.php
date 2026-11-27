@@ -53,15 +53,15 @@ final readonly class ExecuteQualityGateStepService implements ExecuteStepService
         }
 
         $result = $this->qualityGateRunner->run($step->toQualityGateVo());
-        $duration = $result->durationMs / 1000.0;
+        $duration = $result->getDurationMs() / 1000.0;
 
-        if (!$result->passed) {
+        if (!$result->isPassed()) {
             $this->logger?->warning(
                 sprintf(
                     '[StaticChainExecutor] Quality gate "%s" failed (exit code %d): %s',
-                    $result->label,
-                    $result->exitCode,
-                    $result->output,
+                    $result->getLabel(),
+                    $result->getExitCode(),
+                    $result->getOutput(),
                 ),
             );
         }
@@ -69,15 +69,15 @@ final readonly class ExecuteQualityGateStepService implements ExecuteStepService
         return new StaticStepResultVo(
             role: 'quality_gate',
             runner: self::RUNNER_NAME,
-            outputText: $result->output,
+            outputText: $result->getOutput(),
             inputTokens: 0,
             outputTokens: 0,
             cost: 0.0,
             duration: $duration,
             isError: false,
-            label: $result->label,
-            passed: $result->passed,
-            exitCode: $result->exitCode,
+            label: $result->getLabel(),
+            passed: $result->isPassed(),
+            exitCode: $result->getExitCode(),
         );
     }
 }

@@ -58,7 +58,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
 
         $execution->getJournal()->appendDiscussionHistory(
             $this->journal->formatFacilitatorDiscussionEntry(
-                $context->facilitatorRole,
+                $context->getFacilitatorRole(),
                 $facResponse->isDone(),
                 $facResponse->getNextRole(),
                 $facResponse->getChallenge(),
@@ -66,24 +66,24 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             ),
         );
 
-        $stepCost = $turnResult->agentResult->getCost();
-        $execution->getMetrics()->addRoleCost($context->facilitatorRole, $stepCost);
+        $stepCost = $turnResult->getAgentResult()->getCost();
+        $execution->getMetrics()->addRoleCost($context->getFacilitatorRole(), $stepCost);
 
         $budgetCheck = $this->budgetChecker->checkAndApply(
             $execution,
             $budget,
-            $context->facilitatorRole,
+            $context->getFacilitatorRole(),
             $stepCost,
         );
-        if ($budgetCheck !== null && $budgetCheck->shouldBreak) {
+        if ($budgetCheck !== null && $budgetCheck->isBreakNeeded()) {
             return new TurnBreakVo(
                 interruptionReason: 'budget_exceeded',
                 budgetResult: $budgetCheck,
             );
         }
 
-        if ($turnResult->agentResult->isError()) {
-            $reason = $turnResult->agentResult->isTimedOut()
+        if ($turnResult->getAgentResult()->isError()) {
+            $reason = $turnResult->getAgentResult()->isTimedOut()
                 ? self::INTERRUPTION_REASON_TIMEOUT
                 : 'agent_error';
             $this->sessionLogger->interruptSession($reason);
@@ -99,7 +99,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         if (
             $nextRole !== null && in_array(
                 $nextRole,
-                $context->participants,
+                $context->getParticipants(),
                 true,
             )
         ) {
@@ -129,13 +129,13 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         if (
             $nextRole === null || !in_array(
                 $nextRole,
-                $context->participants,
+                $context->getParticipants(),
                 true,
             )
         ) {
             return new TurnContinueVo();
         }
-        if ($execution->getParticipantRounds() >= $context->maxRounds) {
+        if ($execution->getParticipantRounds() >= $context->getMaxRounds()) {
             return new TurnContinueVo();
         }
         $execution->advanceStep();
@@ -150,11 +150,11 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $challenge,
         );
 
-        $stepCost = $turnResult->agentResult->getCost();
+        $stepCost = $turnResult->getAgentResult()->getCost();
         $execution->getMetrics()->addRoleCost($nextRole, $stepCost);
 
-        if ($turnResult->agentResult->isError()) {
-            $reason = $turnResult->agentResult->isTimedOut()
+        if ($turnResult->getAgentResult()->isError()) {
+            $reason = $turnResult->getAgentResult()->isTimedOut()
                 ? self::INTERRUPTION_REASON_TIMEOUT
                 : 'agent_error';
             $this->sessionLogger->interruptSession($reason);
@@ -170,7 +170,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $nextRole,
             $stepCost,
         );
-        if ($budgetCheck !== null && $budgetCheck->shouldBreak) {
+        if ($budgetCheck !== null && $budgetCheck->isBreakNeeded()) {
             return new TurnBreakVo(
                 interruptionReason: 'budget_exceeded',
                 budgetResult: $budgetCheck,
@@ -191,12 +191,12 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $execution->getStep() - 1,
         );
         $facResponseFilesList = $this->buildResponseFilesList($facResponsePaths);
-        $facRoleConfig = $chain->getRoleConfig($context->facilitatorRole);
+        $facRoleConfig = $chain->getRoleConfig($context->getFacilitatorRole());
         $facRunner = DynamicRoleCommandHelper::parseRunner($facRoleConfig);
         $auditLogger?->logStepStart(
             $chain->getName(),
             $execution->getStep(),
-            $context->facilitatorRole,
+            $context->getFacilitatorRole(),
             $facRunner,
         );
 
@@ -211,7 +211,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         $roundVo = DynamicRoundResultHelper::fromTurnResult(
             $turnResult,
             $execution->getStep(),
-            $context->facilitatorRole,
+            $context->getFacilitatorRole(),
             true,
             DynamicRoleCommandHelper::parseThinking($facRoleConfig),
         );
@@ -221,7 +221,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             nextRole: $facResponse->getNextRole(),
             synthesis: $facResponse->getSynthesis(),
             challenge: $facResponse->getChallenge(),
-            userPrompt: $turnResult->userPrompt,
+            userPrompt: $turnResult->getUserPrompt(),
         );
 
         $this->roundRecorder->record(
@@ -230,7 +230,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $execution->getRound(),
             $chain->getName(),
             $facRunner,
-            $context->facilitatorRole,
+            $context->getFacilitatorRole(),
             true,
             $roundVo,
             $facResponse->getNextRole(),
@@ -280,14 +280,14 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             step: $execution->getStep(),
             round: $execution->getRound(),
             role: $nextRole,
-            topic: $context->topic,
+            topic: $context->getTopic(),
             runContext: new ParticipantRunContextVo(
-                brainstormSystemPrompt: $context->promptConfiguration->getBrainstormSystemPrompt(),
-                participantAppendPrompt: $context->promptConfiguration->getParticipantAppendPrompt(),
-                participantUserPrompt: $context->promptConfiguration->getParticipantUserPrompt(),
-                workingDir: $context->workingDir,
+                brainstormSystemPrompt: $context->getPromptConfiguration()->getBrainstormSystemPrompt(),
+                participantAppendPrompt: $context->getPromptConfiguration()->getParticipantAppendPrompt(),
+                participantUserPrompt: $context->getPromptConfiguration()->getParticipantUserPrompt(),
+                workingDir: $context->getWorkingDir(),
                 responseFilesList: $responseFilesList,
-                timeout: $partRoleConfig?->getTimeout() ?? $context->timeout,
+                timeout: $partRoleConfig?->getTimeout() ?? $context->getTimeout(),
                 command: $partRoleConfig?->getCommand() ?? [],
                 hasPreviousResponses: $prevResponsePaths !== [],
                 challenge: $challenge,
@@ -330,27 +330,27 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $execution->getStep() - 1,
         );
         $facResponseFilesList = $this->buildResponseFilesList($facResponsePaths);
-        $finRoleConfig = $chain->getRoleConfig($context->facilitatorRole);
+        $finRoleConfig = $chain->getRoleConfig($context->getFacilitatorRole());
         $finRunner = DynamicRoleCommandHelper::parseRunner($finRoleConfig);
         $auditLogger?->logStepStart(
             $chain->getName(),
             $execution->getStep(),
-            $context->facilitatorRole,
+            $context->getFacilitatorRole(),
             $finRunner,
         );
 
         $turnResult = $this->agentRunner->runFacilitatorFinalize(
             step: $execution->getStep(),
             round: $execution->getRound(),
-            facilitatorRole: $context->facilitatorRole,
-            topic: $context->topic,
+            facilitatorRole: $context->getFacilitatorRole(),
+            topic: $context->getTopic(),
             runContext: new FacilitatorFinalizeRunContextVo(
-                brainstormSystemPrompt: $context->promptConfiguration->getBrainstormSystemPrompt(),
-                facilitatorAppendPrompt: $context->promptConfiguration->getFacilitatorAppendPrompt(),
-                facilitatorFinalizePrompt: $context->promptConfiguration->getFacilitatorFinalizePrompt(),
-                workingDir: $context->workingDir,
+                brainstormSystemPrompt: $context->getPromptConfiguration()->getBrainstormSystemPrompt(),
+                facilitatorAppendPrompt: $context->getPromptConfiguration()->getFacilitatorAppendPrompt(),
+                facilitatorFinalizePrompt: $context->getPromptConfiguration()->getFacilitatorFinalizePrompt(),
+                workingDir: $context->getWorkingDir(),
                 responseFilesList: $facResponseFilesList,
-                timeout: $finRoleConfig?->getTimeout() ?? $context->timeout,
+                timeout: $finRoleConfig?->getTimeout() ?? $context->getTimeout(),
                 command: $finRoleConfig?->getCommand() ?? [],
                 retryPolicy: $chain->getDefaultRetryPolicy(),
             ),
@@ -359,7 +359,7 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         $roundVo = DynamicRoundResultHelper::fromTurnResult(
             $turnResult,
             $execution->getStep(),
-            $context->facilitatorRole,
+            $context->getFacilitatorRole(),
             true,
             DynamicRoleCommandHelper::parseThinking($finRoleConfig),
         );
@@ -369,11 +369,11 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
             $execution->getRound(),
             $chain->getName(),
             $finRunner,
-            $context->facilitatorRole,
+            $context->getFacilitatorRole(),
             true,
             $roundVo,
             done: true,
-            synthesis: $turnResult->agentResult->getOutputText(),
+            synthesis: $turnResult->getAgentResult()->getOutputText(),
             auditLogger: $auditLogger,
         );
 
@@ -391,13 +391,13 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         $execution->getJournal()->appendDiscussionHistory(
             $this->journal->formatDiscussionEntry(
                 $nextRole,
-                $turnResult->agentResult->getOutputText(),
+                $turnResult->getAgentResult()->getOutputText(),
             ),
         );
         $execution->getJournal()->appendFacilitatorJournal(
             $this->journal->formatParticipantEntry(
                 $nextRole,
-                $turnResult->agentResult->getOutputText(),
+                $turnResult->getAgentResult()->getOutputText(),
                 $execution->getStep(),
                 $execution->getRound(),
             ),
@@ -427,20 +427,20 @@ final readonly class ExecuteDynamicTurnService implements ExecuteDynamicTurnServ
         return $this->agentRunner->runFacilitator(
             step: $execution->getStep(),
             round: $execution->getRound(),
-            facilitatorRole: $context->facilitatorRole,
-            topic: $context->topic,
+            facilitatorRole: $context->getFacilitatorRole(),
+            topic: $context->getTopic(),
             runContext: new FacilitatorRunContextVo(
-                brainstormSystemPrompt: $context->promptConfiguration->getBrainstormSystemPrompt(),
-                facilitatorAppendPrompt: $context->promptConfiguration->getFacilitatorAppendPrompt(),
-                facilitatorStartPrompt: $context->promptConfiguration->getFacilitatorStartPrompt(),
-                facilitatorContinuePrompt: $context->promptConfiguration->getFacilitatorContinuePrompt(),
-                workingDir: $context->workingDir,
+                brainstormSystemPrompt: $context->getPromptConfiguration()->getBrainstormSystemPrompt(),
+                facilitatorAppendPrompt: $context->getPromptConfiguration()->getFacilitatorAppendPrompt(),
+                facilitatorStartPrompt: $context->getPromptConfiguration()->getFacilitatorStartPrompt(),
+                facilitatorContinuePrompt: $context->getPromptConfiguration()->getFacilitatorContinuePrompt(),
+                workingDir: $context->getWorkingDir(),
                 facilitatorSummary: $execution->getFacilitatorSummary(),
                 responseFilesList: $facResponseFilesList,
-                timeout: $facRoleConfig?->getTimeout() ?? $context->timeout,
+                timeout: $facRoleConfig?->getTimeout() ?? $context->getTimeout(),
                 command: $facRoleConfig?->getCommand() ?? [],
                 retryPolicy: $retryPolicy,
-                taskAddendum: $context->taskAddendum,
+                taskAddendum: $context->getTaskAddendum(),
             ),
         );
     }

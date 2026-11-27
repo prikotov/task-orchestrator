@@ -18,8 +18,8 @@ final readonly class QualityGateRunnerService implements QualityGateRunnerServic
     #[Override]
     public function run(ExecutionQualityGateVo $gate): QualityGateResultVo
     {
-        $process = Process::fromShellCommandline($gate->command);
-        $process->setTimeout($gate->timeoutSeconds);
+        $process = Process::fromShellCommandline($gate->getCommand());
+        $process->setTimeout($gate->getTimeoutSeconds());
 
         $start = microtime(true);
         $errorOutput = '';
@@ -38,7 +38,7 @@ final readonly class QualityGateRunnerService implements QualityGateRunnerServic
         }
 
         return new QualityGateResultVo(
-            label: $gate->label,
+            label: $gate->getLabel(),
             passed: $process->isSuccessful(),
             exitCode: $process->getExitCode() ?? 1,
             output: $output,

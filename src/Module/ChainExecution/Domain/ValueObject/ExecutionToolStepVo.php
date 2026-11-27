@@ -14,10 +14,10 @@ use InvalidArgumentException;
 final readonly class ExecutionToolStepVo
 {
     public function __construct(
-        public string $command,
-        public string $label,
-        public int $timeoutSeconds = 120,
-        public ?string $outputKey = null,
+        private string $command,
+        private string $label,
+        private int $timeoutSeconds = 120,
+        private ?string $outputKey = null,
     ) {
         if (trim($command) === '') {
             throw new InvalidArgumentException('ExecutionToolStepVo::command must not be empty.');
@@ -26,5 +26,25 @@ final readonly class ExecutionToolStepVo
         if (trim($label) === '') {
             throw new InvalidArgumentException('ExecutionToolStepVo::label must not be empty.');
         }
+    }
+
+    public function getCommand(): string
+    {
+        return $this->command;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function getTimeoutSeconds(): int
+    {
+        return $this->timeoutSeconds;
+    }
+
+    public function getOutputKey(): ?string
+    {
+        return $this->outputKey;
     }
 }

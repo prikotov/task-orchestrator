@@ -41,11 +41,11 @@ final readonly class CheckDynamicLoopBudgetService implements CheckDynamicLoopBu
             return null;
         }
 
-        if ($budgetCheck->warning80Triggered) {
+        if ($budgetCheck->isWarning80Triggered()) {
             $execution->markBudgetWarning80Logged();
         }
-        if ($budgetCheck->warningMessage !== '') {
-            $execution->getJournal()->appendFacilitatorJournal($budgetCheck->warningMessage);
+        if ($budgetCheck->getWarningMessage() !== '') {
+            $execution->getJournal()->appendFacilitatorJournal($budgetCheck->getWarningMessage());
             $this->sessionLogger->writeContextFile(
                 'facilitator_journal.md',
                 $execution->getFacilitatorJournal(),

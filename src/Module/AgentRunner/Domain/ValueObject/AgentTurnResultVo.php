@@ -13,11 +13,36 @@ namespace TaskOrchestrator\Common\Module\AgentRunner\Domain\ValueObject;
 final readonly class AgentTurnResultVo
 {
     public function __construct(
-        public AgentResultVo $agentResult,
-        public float $duration,
-        public string $userPrompt = '',
-        public string $systemPrompt = '',
-        public ?string $invocation = null,
+        private AgentResultVo $agentResult,
+        private float $duration,
+        private string $userPrompt = '',
+        private string $systemPrompt = '',
+        private ?string $invocation = null,
     ) {
+    }
+
+    public function getAgentResult(): AgentResultVo
+    {
+        return $this->agentResult;
+    }
+
+    public function getDuration(): float
+    {
+        return $this->duration;
+    }
+
+    public function getUserPrompt(): string
+    {
+        return $this->userPrompt;
+    }
+
+    public function getSystemPrompt(): string
+    {
+        return $this->systemPrompt;
+    }
+
+    public function getInvocation(): ?string
+    {
+        return $this->invocation;
     }
 }

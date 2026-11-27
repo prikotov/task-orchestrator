@@ -44,21 +44,21 @@ final readonly class FinalizeDynamicLoopService implements FinalizeDynamicLoopSe
             $auditLogger,
         );
 
-        $dur = round($turnResult->duration, 1);
+        $dur = round($turnResult->getDuration(), 1);
         $execution->getJournal()->appendFacilitatorJournal(sprintf(
             "[%s %s] Step %d | Round %d | %s → synthesis (финализация)\n",
             date('Y-m-d'),
             date('H:i'),
             $execution->getStep(),
             $execution->getRound(),
-            $turnResult->duration !== 0.0 ? "{$dur}s" : '',
+            $turnResult->getDuration() !== 0.0 ? "{$dur}s" : '',
         ));
         $this->sessionLogger->writeContextFile(
             'facilitator_journal.md',
             $execution->getFacilitatorJournal(),
         );
 
-        $raw = $turnResult->agentResult->getOutputText();
+        $raw = $turnResult->getAgentResult()->getOutputText();
         $parsed = $this->facParser->parse($raw);
         $execution->setSynthesis($parsed->getSynthesis() ?? $raw);
     }
@@ -92,11 +92,11 @@ final readonly class FinalizeDynamicLoopService implements FinalizeDynamicLoopSe
             totalInputTokens: $execution->getTotals()['in'],
             totalOutputTokens: $execution->getTotals()['out'],
             totalCost: $execution->getTotals()['cost'],
-            budgetExceeded: $execution->getBudgetBreak()?->budgetExceeded ?? false, // @phpstan-ignore nullsafe.neverNull
+            budgetExceeded: $execution->getBudgetBreak()?->isBudgetExceeded() ?? false, // @phpstan-ignore nullsafe.neverNull
             stepsCount: count($execution->getRoundResults()),
             stepStatuses: array_map(
                 static fn(DynamicRoundResultVo $round): DynLoopStepAuditDto => new DynLoopStepAuditDto(
-                    $round->isError,
+                    $round->isError(),
                 ),
                 $execution->getRoundResults(),
             ),

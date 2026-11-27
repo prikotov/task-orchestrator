@@ -31,10 +31,10 @@ final class ToolStepRunnerTest extends TestCase
 
         $result = $this->runner->run($vo);
 
-        self::assertTrue($result->success);
-        self::assertSame(0, $result->exitCode);
-        self::assertStringContainsString('hello', $result->stdout);
-        self::assertGreaterThan(0.0, $result->durationMs);
+        self::assertTrue($result->isSuccess());
+        self::assertSame(0, $result->getExitCode());
+        self::assertStringContainsString('hello', $result->getStdout());
+        self::assertGreaterThan(0.0, $result->getDurationMs());
     }
 
     #[Test]
@@ -48,8 +48,8 @@ final class ToolStepRunnerTest extends TestCase
 
         $result = $this->runner->run($vo);
 
-        self::assertFalse($result->success);
-        self::assertNotSame(0, $result->exitCode);
+        self::assertFalse($result->isSuccess());
+        self::assertNotSame(0, $result->getExitCode());
     }
 
     #[Test]
@@ -63,9 +63,9 @@ final class ToolStepRunnerTest extends TestCase
 
         $result = $this->runner->run($vo);
 
-        self::assertTrue($result->success);
-        self::assertStringContainsString('line1', $result->stdout);
-        self::assertStringContainsString('line2', $result->stdout);
+        self::assertTrue($result->isSuccess());
+        self::assertStringContainsString('line1', $result->getStdout());
+        self::assertStringContainsString('line2', $result->getStdout());
     }
 
     #[Test]
@@ -79,7 +79,7 @@ final class ToolStepRunnerTest extends TestCase
 
         $result = $this->runner->run($vo);
 
-        self::assertFalse($result->success);
-        self::assertSame(42, $result->exitCode);
+        self::assertFalse($result->isSuccess());
+        self::assertSame(42, $result->getExitCode());
     }
 }

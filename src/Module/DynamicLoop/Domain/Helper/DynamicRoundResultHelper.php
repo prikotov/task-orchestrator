@@ -39,7 +39,7 @@ final class DynamicRoundResultHelper
         bool $isFacilitator,
         ?string $thinking = null,
     ): DynamicRoundResultVo {
-        $agent = $turn->agentResult;
+        $agent = $turn->getAgentResult();
 
         return new DynamicRoundResultVo(
             round: $step,
@@ -49,12 +49,12 @@ final class DynamicRoundResultHelper
             inputTokens: $agent->getInputTokens(),
             outputTokens: $agent->getOutputTokens(),
             cost: $agent->getCost(),
-            duration: $turn->duration,
+            duration: $turn->getDuration(),
             isError: $agent->isError(),
             errorMessage: $agent->getErrorMessage(),
-            invocation: $turn->invocation,
-            systemPrompt: $turn->systemPrompt,
-            userPrompt: $turn->userPrompt,
+            invocation: $turn->getInvocation(),
+            systemPrompt: $turn->getSystemPrompt(),
+            userPrompt: $turn->getUserPrompt(),
             timedOut: $agent->isTimedOut(),
             model: $agent->getModel(),
             provider: $agent->getProvider(),
@@ -71,7 +71,7 @@ final class DynamicRoundResultHelper
      */
     public static function normalizeEmptyOutput(DynamicLoopTurnResultVo $turnResult): DynamicLoopTurnResultVo
     {
-        if ($turnResult->agentResult->isError() || trim($turnResult->agentResult->getOutputText()) !== '') {
+        if ($turnResult->getAgentResult()->isError() || trim($turnResult->getAgentResult()->getOutputText()) !== '') {
             return $turnResult;
         }
 
@@ -80,10 +80,10 @@ final class DynamicRoundResultHelper
                 errorMessage: self::EMPTY_OUTPUT_ERROR_MESSAGE,
                 exitCode: 0,
             ),
-            duration: $turnResult->duration,
-            userPrompt: $turnResult->userPrompt,
-            systemPrompt: $turnResult->systemPrompt,
-            invocation: $turnResult->invocation,
+            duration: $turnResult->getDuration(),
+            userPrompt: $turnResult->getUserPrompt(),
+            systemPrompt: $turnResult->getSystemPrompt(),
+            invocation: $turnResult->getInvocation(),
         );
     }
 }

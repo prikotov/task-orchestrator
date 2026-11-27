@@ -35,9 +35,9 @@ final class OrchestrateChainCommandHandlerTest extends TestCase
 
         // Default supports(): static supports static, dynamic supports dynamic
         $this->staticStrategy->method('supports')
-            ->willReturnCallback(static fn(ExecutionChainInfoVo $chainInfo): bool => $chainInfo->type === ChainExecutionTypeEnum::staticType);
+            ->willReturnCallback(static fn(ExecutionChainInfoVo $chainInfo): bool => $chainInfo->getType() === ChainExecutionTypeEnum::staticType);
         $this->dynamicStrategy->method('supports')
-            ->willReturnCallback(static fn(ExecutionChainInfoVo $chainInfo): bool => $chainInfo->type === ChainExecutionTypeEnum::dynamicType);
+            ->willReturnCallback(static fn(ExecutionChainInfoVo $chainInfo): bool => $chainInfo->getType() === ChainExecutionTypeEnum::dynamicType);
 
         $this->handler = $this->createHandler();
     }

@@ -18,9 +18,24 @@ namespace TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject;
 final readonly class TurnBreakVo
 {
     public function __construct(
-        public ?string $interruptionReason = null,
-        public ?string $synthesis = null,
-        public ?DynamicBudgetCheckVo $budgetResult = null,
+        private ?string $interruptionReason = null,
+        private ?string $synthesis = null,
+        private ?DynamicBudgetCheckVo $budgetResult = null,
     ) {
+    }
+
+    public function getInterruptionReason(): ?string
+    {
+        return $this->interruptionReason;
+    }
+
+    public function getSynthesis(): ?string
+    {
+        return $this->synthesis;
+    }
+
+    public function getBudgetResult(): ?DynamicBudgetCheckVo
+    {
+        return $this->budgetResult;
     }
 }

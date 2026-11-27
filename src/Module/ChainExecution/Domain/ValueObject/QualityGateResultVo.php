@@ -19,11 +19,36 @@ final readonly class QualityGateResultVo
      * @param float $durationMs длительность выполнения в миллисекундах
      */
     public function __construct(
-        public string $label,
-        public bool $passed,
-        public int $exitCode,
-        public string $output,
-        public float $durationMs,
+        private string $label,
+        private bool $passed,
+        private int $exitCode,
+        private string $output,
+        private float $durationMs,
     ) {
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function isPassed(): bool
+    {
+        return $this->passed;
+    }
+
+    public function getExitCode(): int
+    {
+        return $this->exitCode;
+    }
+
+    public function getOutput(): string
+    {
+        return $this->output;
+    }
+
+    public function getDurationMs(): float
+    {
+        return $this->durationMs;
     }
 }

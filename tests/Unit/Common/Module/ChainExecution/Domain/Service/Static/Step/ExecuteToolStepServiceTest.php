@@ -60,14 +60,14 @@ final class ExecuteToolStepServiceTest extends TestCase
         $context = new StepContextVo(task: 'test task');
         $result = $strategy->run($step, $context);
 
-        self::assertFalse($result->isError);
-        self::assertSame('abc123def', $result->outputText);
-        self::assertSame('tool', $result->role);
-        self::assertSame('shell', $result->runner);
-        self::assertSame('Get commit', $result->label);
-        self::assertSame(0, $result->exitCode);
-        self::assertSame('commit_hash', $result->outputKey);
-        self::assertGreaterThan(0.0, $result->duration);
+        self::assertFalse($result->isError());
+        self::assertSame('abc123def', $result->getOutputText());
+        self::assertSame('tool', $result->getRole());
+        self::assertSame('shell', $result->getRunner());
+        self::assertSame('Get commit', $result->getLabel());
+        self::assertSame(0, $result->getExitCode());
+        self::assertSame('commit_hash', $result->getOutputKey());
+        self::assertGreaterThan(0.0, $result->getDuration());
     }
 
     #[Test]
@@ -92,11 +92,11 @@ final class ExecuteToolStepServiceTest extends TestCase
         $context = new StepContextVo(task: 'test task');
         $result = $strategy->run($step, $context);
 
-        self::assertTrue($result->isError);
-        self::assertSame('fatal: not a git repository', $result->outputText);
-        self::assertSame(1, $result->exitCode);
-        self::assertNotNull($result->errorMessage);
-        self::assertStringContainsString('failed', $result->errorMessage);
+        self::assertTrue($result->isError());
+        self::assertSame('fatal: not a git repository', $result->getOutputText());
+        self::assertSame(1, $result->getExitCode());
+        self::assertNotNull($result->getErrorMessage());
+        self::assertStringContainsString('failed', $result->getErrorMessage());
     }
 
     #[Test]
@@ -113,9 +113,9 @@ final class ExecuteToolStepServiceTest extends TestCase
         $context = new StepContextVo(task: 'test task');
         $result = $strategy->run($step, $context);
 
-        self::assertFalse($result->isError);
-        self::assertSame('', $result->outputText);
-        self::assertSame(0, $result->exitCode);
+        self::assertFalse($result->isError());
+        self::assertSame('', $result->getOutputText());
+        self::assertSame(0, $result->getExitCode());
     }
 
     #[Test]
@@ -124,10 +124,10 @@ final class ExecuteToolStepServiceTest extends TestCase
         $toolRunner = $this->createMock(ToolStepRunnerInterface::class);
         $toolRunner->expects($this->once())->method('run')->with(
             $this->callback(function (ExecutionToolStepVo $vo): bool {
-                return $vo->command === 'git log -1 --format=%s'
-                    && $vo->label === 'Last commit msg'
-                    && $vo->timeoutSeconds === 15
-                    && $vo->outputKey === 'last_msg';
+                return $vo->getCommand() === 'git log -1 --format=%s'
+                    && $vo->getLabel() === 'Last commit msg'
+                    && $vo->getTimeoutSeconds() === 15
+                    && $vo->getOutputKey() === 'last_msg';
             }),
         )->willReturn(new ToolStepResultVo(
             exitCode: 0,

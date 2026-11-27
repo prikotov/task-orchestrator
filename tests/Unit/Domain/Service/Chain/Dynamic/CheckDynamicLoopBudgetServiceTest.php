@@ -130,9 +130,9 @@ final class CheckDynamicLoopBudgetServiceTest extends TestCase
         $result = $this->service->checkAndApply($execution, $budget, 'architect', 12.0);
 
         self::assertNotNull($result);
-        self::assertTrue($result->shouldBreak);
-        self::assertTrue($result->budgetExceeded);
-        self::assertSame('architect', $result->budgetExceededRole);
+        self::assertTrue($result->isBreakNeeded());
+        self::assertTrue($result->isBudgetExceeded());
+        self::assertSame('architect', $result->getBudgetExceededRole());
     }
 
     #[Test]

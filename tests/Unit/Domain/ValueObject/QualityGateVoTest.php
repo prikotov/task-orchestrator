@@ -21,9 +21,9 @@ final class QualityGateVoTest extends TestCase
             label: 'Unit Tests',
         );
 
-        self::assertSame('make tests-unit', $gate->command);
-        self::assertSame('Unit Tests', $gate->label);
-        self::assertSame(120, $gate->timeoutSeconds);
+        self::assertSame('make tests-unit', $gate->getCommand());
+        self::assertSame('Unit Tests', $gate->getLabel());
+        self::assertSame(120, $gate->getTimeoutSeconds());
     }
 
     #[Test]
@@ -35,7 +35,7 @@ final class QualityGateVoTest extends TestCase
             timeoutSeconds: 60,
         );
 
-        self::assertSame(60, $gate->timeoutSeconds);
+        self::assertSame(60, $gate->getTimeoutSeconds());
     }
 
     #[Test]

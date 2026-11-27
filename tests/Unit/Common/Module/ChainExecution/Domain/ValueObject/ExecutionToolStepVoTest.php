@@ -21,10 +21,10 @@ final class ExecutionToolStepVoTest extends TestCase
             label: 'Git status',
         );
 
-        self::assertSame('git status', $vo->command);
-        self::assertSame('Git status', $vo->label);
-        self::assertSame(120, $vo->timeoutSeconds);
-        self::assertNull($vo->outputKey);
+        self::assertSame('git status', $vo->getCommand());
+        self::assertSame('Git status', $vo->getLabel());
+        self::assertSame(120, $vo->getTimeoutSeconds());
+        self::assertNull($vo->getOutputKey());
     }
 
     #[Test]
@@ -37,8 +37,8 @@ final class ExecutionToolStepVoTest extends TestCase
             outputKey: 'echo_result',
         );
 
-        self::assertSame(60, $vo->timeoutSeconds);
-        self::assertSame('echo_result', $vo->outputKey);
+        self::assertSame(60, $vo->getTimeoutSeconds());
+        self::assertSame('echo_result', $vo->getOutputKey());
     }
 
     #[Test]

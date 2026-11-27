@@ -47,26 +47,26 @@ final class DynamicLoopExecutionResultMappingTest extends TestCase
         $result = $execution->toLoopResultVo();
 
         // roundResults: тот же список, тот же порядок (из metrics).
-        self::assertCount(2, $result->roundResults);
-        self::assertSame([$roundA, $roundB], $result->roundResults);
+        self::assertCount(2, $result->getRoundResults());
+        self::assertSame([$roundA, $roundB], $result->getRoundResults());
 
         // Totals: аккумулированы из recordRound (roundA + roundB).
-        self::assertSame(5.5, $result->totalTime);          // 2.5 + 3.0
-        self::assertSame(500, $result->totalInputTokens);   // 100 + 400
-        self::assertSame(250, $result->totalOutputTokens);  // 50 + 200
-        self::assertSame(0.75, $result->totalCost);         // 0.5 + 0.25
+        self::assertSame(5.5, $result->getTotalTime());          // 2.5 + 3.0
+        self::assertSame(500, $result->getTotalInputTokens());   // 100 + 400
+        self::assertSame(250, $result->getTotalOutputTokens());  // 50 + 200
+        self::assertSame(0.75, $result->getTotalCost());         // 0.5 + 0.25
 
         // Result-state aggregate (без изменений).
-        self::assertSame('Final synthesis', $result->synthesis);
-        self::assertTrue($result->maxRoundsReached);
-        self::assertNull($result->interruptionReason);
+        self::assertSame('Final synthesis', $result->getSynthesis());
+        self::assertTrue($result->isMaxRoundsReached());
+        self::assertNull($result->getInterruptionReason());
 
         // Budget break mapping (с fallback-семантикой nullsafe).
-        self::assertTrue($result->budgetExceeded);
-        self::assertSame(5.0, $result->budgetLimit);
-        self::assertSame('facilitator', $result->budgetExceededRole);
+        self::assertTrue($result->isBudgetExceeded());
+        self::assertSame(5.0, $result->getBudgetLimit());
+        self::assertSame('facilitator', $result->getBudgetExceededRole());
 
-        self::assertTrue($result->maxTimeExceeded);
+        self::assertTrue($result->isMaxTimeExceeded());
     }
 
     #[Test]
@@ -77,9 +77,9 @@ final class DynamicLoopExecutionResultMappingTest extends TestCase
 
         $result = $execution->toLoopResultVo();
 
-        self::assertFalse($result->budgetExceeded);
-        self::assertSame(0.0, $result->budgetLimit);
-        self::assertNull($result->budgetExceededRole);
+        self::assertFalse($result->isBudgetExceeded());
+        self::assertSame(0.0, $result->getBudgetLimit());
+        self::assertNull($result->getBudgetExceededRole());
     }
 
     private static function createRound(

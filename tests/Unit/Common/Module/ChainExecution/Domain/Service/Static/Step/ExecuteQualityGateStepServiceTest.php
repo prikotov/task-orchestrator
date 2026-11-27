@@ -58,13 +58,13 @@ final class ExecuteQualityGateStepServiceTest extends TestCase
         $context = new StepContextVo(task: 'test task');
         $result = $runner->run($step, $context);
 
-        self::assertSame('quality_gate', $result->role);
-        self::assertSame('shell', $result->runner);
-        self::assertTrue($result->passed);
-        self::assertSame('Lint check', $result->label);
-        self::assertSame(0, $result->exitCode);
-        self::assertFalse($result->isError);
-        self::assertGreaterThan(0.0, $result->duration);
+        self::assertSame('quality_gate', $result->getRole());
+        self::assertSame('shell', $result->getRunner());
+        self::assertTrue($result->isPassed());
+        self::assertSame('Lint check', $result->getLabel());
+        self::assertSame(0, $result->getExitCode());
+        self::assertFalse($result->isError());
+        self::assertGreaterThan(0.0, $result->getDuration());
     }
 
     #[Test]
@@ -90,10 +90,10 @@ final class ExecuteQualityGateStepServiceTest extends TestCase
         $context = new StepContextVo(task: 'test task');
         $result = $runner->run($step, $context);
 
-        self::assertFalse($result->passed);
-        self::assertSame(1, $result->exitCode);
-        self::assertSame('FAILURES! 2 tests failed.', $result->outputText);
-        self::assertFalse($result->isError);
+        self::assertFalse($result->isPassed());
+        self::assertSame(1, $result->getExitCode());
+        self::assertSame('FAILURES! 2 tests failed.', $result->getOutputText());
+        self::assertFalse($result->isError());
     }
 
     #[Test]
@@ -110,10 +110,10 @@ final class ExecuteQualityGateStepServiceTest extends TestCase
         $context = new StepContextVo(task: 'test task');
         $result = $runner->run($step, $context);
 
-        self::assertTrue($result->passed);
-        self::assertSame('', $result->outputText);
-        self::assertSame(0.0, $result->duration);
-        self::assertSame('Check', $result->label);
+        self::assertTrue($result->isPassed());
+        self::assertSame('', $result->getOutputText());
+        self::assertSame(0.0, $result->getDuration());
+        self::assertSame('Check', $result->getLabel());
     }
 
     #[Test]
@@ -122,9 +122,9 @@ final class ExecuteQualityGateStepServiceTest extends TestCase
         $gateRunner = $this->createMock(QualityGateRunnerInterface::class);
         $gateRunner->expects($this->once())->method('run')->with(
             $this->callback(function (ExecutionQualityGateVo $vo): bool {
-                return $vo->command === 'make check'
-                    && $vo->label === 'Quality Gate'
-                    && $vo->timeoutSeconds === 120;
+                return $vo->getCommand() === 'make check'
+                    && $vo->getLabel() === 'Quality Gate'
+                    && $vo->getTimeoutSeconds() === 120;
             }),
         )->willReturn(new QualityGateResultVo(
             label: 'Quality Gate',
