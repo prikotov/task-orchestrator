@@ -3,7 +3,7 @@ type: refactor
 created: 2026-11-27 02:51:32 (1795747892)
 due: 
 started: 2026-11-27 04:09:54 (1795752594)
-completed: 
+completed: 2026-11-27 05:03:07 (1795755787)
 cancelled: 
 value: V2
 complexity: C3
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/vo-private-properties
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/515
+status: done
 ---
 
 # TASK-techdebt-vo-private-properties: Перевести свойства VO в private с геттерами (правило coding-standard 0.35.0)
