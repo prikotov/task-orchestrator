@@ -692,6 +692,76 @@ YAML);
     }
 
     #[Test]
+    public function stallDoesNotKillCpuActiveProcessWithoutIoAndWaitsUntilSoftTimeout(): void
+    {
+        // CPU-ветка liveness-детектора (замечание N3 ревью PR #512,
+        // TASK-techdebt-process-is-active-cpu-coverage): процесс молчит в потоке
+        // и НЕ делает IO (чистый busy-loop, FAKE_RUNNER_HANG_CPU) → единственный
+        // возможный источник дельты активности — CPU (ps -o times).
+        // Детерминизм: CPU-дельта ps times квантуется целыми секундами, поэтому
+        // окно watcher'а увеличено до 3с — busy-loop набирает ≥3 CPU-сек на окно
+        // в номинале и остаётся ≥1 CPU-сек вплоть до ~30% голодания ядра;
+        // stall=30 > soft=8 исключает гонку «голодное окно → stall-килл».
+        // Изоляция CPU-ветки: всё стартовое IO агента (capture-файлы,
+        // agent_start) происходит до первого liveness-замера и попадает в базу
+        // IO — все последующие IO-дельты нулевые, поэтому live=active
+        // доказывает именно CPU-детекцию.
+        // Регрессия CPU-ветки (парсинг ps times, сравнение дельты) даёт
+        // live=idle в heartbeat'ах и/или reason=stall — оба варианта ловятся
+        // ассертами. Негативный кейс (idle) покрыт
+        // stallKillsIdleProcessEvenWithLivenessGate — не дублируется.
+        $logDir = $this->tempDir . '/logs';
+
+        $process = $this->runScript(
+            arguments: ['-s', '8', '-t', '30', '-m', '30', '--runner', 'pi'],
+            env: [
+                'FAKE_RUNNER_HANG_CPU' => '1',
+                'WATCH_WATCHER_INTERVAL' => '3',
+                'WATCH_LOG_DIR' => $logDir,
+            ],
+            expectSuccess: false,
+            processTimeout: 30.0,
+        );
+
+        self::assertFalse($process->isSuccessful());
+
+        $runLog = $this->findLatestRunLog($logDir);
+        self::assertNotNull($runLog, 'run.log not found in ' . $logDir);
+        $log = (string) file_get_contents($runLog);
+
+        // Минимум два heartbeat'а (N1 ревью cpu-coverage): первый тик — только
+        // консервативная база liveness (всегда active), настоящий CPU-замер —
+        // со второго. Гарантия, что до soft-timeout была хотя бы одна
+        // не-базовая дельта, исключает вырожденный проход при растянутом
+        // планировщиком первом тике.
+        self::assertGreaterThanOrEqual(
+            2,
+            substr_count($log, 'watcher_heartbeat'),
+            'at least one non-baseline liveness measurement must happen before soft-timeout',
+        );
+        self::assertStringContainsString(
+            'live=active',
+            $log,
+            'watcher must see the busy-loop process as active by CPU delta',
+        );
+        self::assertStringNotContainsString(
+            'live=idle',
+            $log,
+            'process has no IO: live=idle means the CPU delta was missed',
+        );
+        self::assertStringContainsString(
+            'reason=soft_timeout',
+            $log,
+            'CPU-active process must wait until soft-timeout, not stall',
+        );
+        self::assertStringNotContainsString(
+            'reason=stall',
+            $log,
+            'CPU-active process must NOT be killed by stall',
+        );
+    }
+
+    #[Test]
     public function stallDoesNotKillActiveProcessAndWaitsUntilSoftTimeout(): void
     {
         // Процесс молчит в потоке, но IO-активен (telemetry-loop: периодическая
@@ -701,6 +771,8 @@ YAML);
         // Чистый busy-loop без IO флеймит под нагрузкой: CPU-дельта ps times
         // квантуется целыми секундами, голодный процесс измеряется как idle и
         // гибнет по stall раньше soft (TASK-test-watchsubagent-stall-flaky).
+        // Детерминированный busy-loop вариант — см.
+        // stallDoesNotKillCpuActiveProcessWithoutIoAndWaitsUntilSoftTimeout.
         $logDir = $this->tempDir . '/logs';
 
         $process = $this->runScript(
@@ -976,6 +1048,20 @@ if [[ "${FAKE_RUNNER_HANG:-0}" == "1" ]]; then
     # read блокируется, in-loop проверки soft/hard не исполняются.
     printf '{"type":"agent_start"}\n'
     sleep 60
+    exit 0
+fi
+if [[ "${FAKE_RUNNER_HANG_CPU:-0}" == "1" ]]; then
+    # Симуляция «работает, но молчит» на чистом CPU: одно событие, затем
+    # busy-loop в самом процессе агента (AGENT_PID) — ноль IO-активности.
+    # Стартовое IO (capture-файлы, agent_start) выполняется до первого
+    # liveness-замера и попадает в базу /proc/<pid>/io, поэтому все последующие
+    # IO-дельты нулевые: live=active в heartbeat'ах может дать только CPU-ветка
+    # process_is_active (TASK-techdebt-process-is-active-cpu-coverage).
+    # Ограничение 60с — страховка от осиротевшего процесса, если скрипт не
+    # успел убить дерево агента; watcher терминирует запуск раньше (soft).
+    printf '{"type":"agent_start"}\n'
+    end=$((SECONDS + 60))
+    while [ "$SECONDS" -lt "$end" ]; do :; done
     exit 0
 fi
 if [[ "${FAKE_RUNNER_HANG_ACTIVE:-0}" == "1" ]]; then
