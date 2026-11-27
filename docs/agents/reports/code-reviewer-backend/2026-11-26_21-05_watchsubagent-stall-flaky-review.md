@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-11-26
 **Объект:** дифф `main...task/watchsubagent-stall-flaky` (HEAD `8e38f707` + незакоммиченные правки): `tests/Integration/Docs/Agents/Skills/RunSubagent/WatchSubagentScriptTest.php` (+24/−6), `docs/agents/reports/code-reviewer-backend/2026-11-25_12-29_docs-verification-before-publish-review.md` (+1/−1), `todo/TASK-test-watchsubagent-stall-flaky.todo.md` (+3/−3, служебный коммит старта задачи)
-**Задача:** [todo/TASK-test-watchsubagent-stall-flaky.todo.md](../../../../todo/TASK-test-watchsubagent-stall-flaky.todo.md)
+**Задача:** [todo/done/TASK-test-watchsubagent-stall-flaky.todo.md](../../../../todo/done/TASK-test-watchsubagent-stall-flaky.todo.md)
 
 ---
 

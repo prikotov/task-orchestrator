@@ -2,8 +2,8 @@
 type: chore
 created: 2026-11-26 14:26:08 (1795703168)
 due: 
-started: 
-completed: 
+started: 2026-11-27 02:44:17 (1795747457)
+completed: 2026-11-27 03:22:12 (1795749732)
 cancelled: 
 value: V2
 complexity: C3
@@ -18,9 +18,9 @@ consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
-pr: 
-status: todo
+branch: task/deps-prikotov-bump
+pr: https://github.com/prikotov/task-orchestrator/pull/514
+status: done
 ---
 
 # TASK-chore-deps-prikotov-bump: Подъём всех зависимостей prikotov/* до последних релизов
@@ -90,9 +90,14 @@ make check
 
 ## 9. Комментарии (Comments)
 - Решение владельца 2026-11-26 (в контрольной точке PR #512): завести задачу на подъём **всех** `prikotov/*` до последних релизов (расширение исходного предложения только про coding-standard).
+- Итог выполнения 2026-11-27 (Бэкендер Тони): констрейнты подняты (`coding-standard ^0.35.0`, `git-workflow ^0.4.3`, `todo-md ^0.7.0` — уже последняя), `coding-standard-verify` зелёный; доки конвенций и workflow-шаблоны синхронизированы через init-скрипты.
+- Новое правило 0.35.0 (свойства VO только приватные) вскрыло 172 ошибки PHPCS в 26 VO-файлах (~90 файлов-потребителей) — по плану п. 4.3 эскалировано отдельной задачей TASK-techdebt-vo-private-properties; до её merge `make check` остаётся красным только на PHPCS (остальные проверки зелёные).
 - До merge этой задачи `make check` красный на `main` для всех кодовых PR — известное принятое состояние.
+- Решение владельца 2026-11-27: (а) обновление advisory-зависимостей перенесено в этот PR из Won't Have — в ветке обновляются сторонние пакеты, по которым есть advisory в `composer audit`, до последних патч-версий строго в рамках констрейнтов `composer.json`; (б) задача переводится в `done` при открытии PR — блокер `coding-standard-verify` снят, полная зелень `make check` достигается после TASK-techdebt-vo-private-properties.
+- Итог выполнения 2026-11-27, security-часть (Бэкендер Тони): `composer update symfony/config symfony/expression-language symfony/filesystem symfony/framework-bundle symfony/http-client symfony/http-foundation symfony/http-kernel symfony/routing twig/twig --with-all-dependencies` — 9 advisory-пакетов подняты до последних патч-версий в рамках констрейнтов `^8.0` / twig `3.x`: 8× `symfony/*` → `v8.1.12` (было `v8.1.5`/`v8.1.6`), `twig/twig` `v3.28.0` → `v3.31.1`; транзитивные зависимости обновлены автоматически (`symfony/cache`, `symfony/dependency-injection`, `symfony/var-dumper`, `symfony/error-handler`, `symfony/var-exporter`, contracts, polyfills). Полный перечень обновлений (для аудита посторонних): прямые зависимости проекта, подтянутые `--with-all-dependencies` — `symfony/finder` (`v8.1.5` → `v8.1.12`), `symfony/yaml` (`v8.1.11` → `v8.1.12`); dev-транзитивные, обновлённые вместе с `prikotov/coding-standard` — `slevomat/coding-standard` (`8.31.3` → `8.32.0`), `phpstan/phpdoc-parser` (`2.4.1` → `2.4.2`; легитимность подтверждена `composer why`). `composer audit` после обновления — чист: 34 advisory на 9 пакетов → 0; остатков нет. `vendor/bin/phpunit` — OK (1779 тестов, 5335 assertions, 2 skipped — предсуществующие пропуски), `vendor/bin/psalm` — ошибок нет. Полный `make check` ожидаемо красный только на новом правиле PHPCS «свойства VO приватные» (172 ошибки, отдельная задача TASK-techdebt-vo-private-properties; VO не трогались).
 
 ## История изменений (Change History)
 | Дата | Автор | Изменение |
 | :--- | :--- | :--- |
 | 2026-11-26 14:26:08 (1795703168) | Тимлид Алекс (pi) | Создание задачи |
+| 2026-11-27 10:06:08 (1795748768) | Бэкендер Тони (pi) | Решение владельца 2026-11-27: advisory-зависимости (8× symfony/* → v8.1.12, twig/twig → v3.31.1) обновлены в этом PR из Won't Have; composer audit чист; задача — в done при открытии PR |
