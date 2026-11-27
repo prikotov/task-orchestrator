@@ -2,7 +2,7 @@
 type: chore
 created: 2026-11-26 14:26:08 (1795703168)
 due: 
-started: 
+started: 2026-11-27 02:44:17 (1795747457)
 completed: 
 cancelled: 
 value: V2
@@ -18,9 +18,9 @@ consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/deps-prikotov-bump
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-chore-deps-prikotov-bump: Подъём всех зависимостей prikotov/* до последних релизов
