@@ -3,7 +3,7 @@ type: chore
 created: 2026-11-27 15:12:56 (1795792376)
 due: 
 started: 2026-11-27 16:07:38 (1795795658)
-completed: 
+completed: 2026-11-27 16:49:44 (1795798184)
 cancelled: 
 value: V2
 complexity: C2
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/phpstan-suppressions-audit
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/521
+status: done
 ---
 
 # TASK-techdebt-phpstan-suppressions-audit: Аудит подавлений PHPStan: 4 мёртвых suppress при reportUnmatchedIgnoredErrors: false
