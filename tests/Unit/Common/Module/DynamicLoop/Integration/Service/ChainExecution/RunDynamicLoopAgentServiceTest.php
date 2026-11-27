@@ -35,6 +35,8 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Integration\Service\ChainExecutio
  *   buildFinalizeContext (в частности, различение facilitatorStartPrompt и
  *   facilitatorContinuePrompt, facilitatorSummary, responseFilesList, taskAddendum);
  * - поля DynamicLoopRunRequestVo и маппинг в ChainRunRequestVo (включая retry policy);
+ * - проброс DynamicLoopRetryPolicyVo в ExecutionRetryPolicyVo поле в поле для всех
+ *   трёх путей (runFacilitator/runParticipant/runFacilitatorFinalize — симметричные кейсы);
  * - запись prompt-файлов сессии и формирование DynamicLoopTurnResultVo.
  */
 #[CoversClass(RunDynamicLoopAgentService::class)]
@@ -342,6 +344,53 @@ final class RunDynamicLoopAgentServiceTest extends TestCase
     }
 
     #[Test]
+    public function runParticipantMapsEnabledRetryPolicyToExecutionRetryPolicy(): void
+    {
+        $invocationArgs = null;
+        $agentRunnerCalls = [];
+        $service = $this->createService(
+            $this->createAgentRunner(ChainRunResultVo::createSuccess('ok'), $agentRunnerCalls),
+            $this->createSessionWriter(),
+            $this->createResponseParser(),
+            $this->createFormatter(invocationArgs: $invocationArgs),
+            $this->createQueryBus('/resolved/architect-role.md'),
+        );
+
+        $retryPolicy = new DynamicLoopRetryPolicyVo(
+            maxRetries: 3,
+            initialDelayMs: 250,
+            maxDelayMs: 8000,
+            multiplier: 2.5,
+        );
+        $context = new ParticipantRunContextVo(
+            brainstormSystemPrompt: 'sys',
+            participantAppendPrompt: 'append %s',
+            participantUserPrompt: 'user prompt',
+            workingDir: null,
+            responseFilesList: '',
+            timeout: 30,
+            retryPolicy: $retryPolicy,
+        );
+
+        $service->runParticipant(2, 1, 'architect', self::TOPIC, $context);
+
+        // VO передаёт политику в DynamicLoopRunRequestVo без изменений (тот же экземпляр).
+        self::assertNotNull($invocationArgs);
+        self::assertSame($retryPolicy, $invocationArgs['request']->getRetryPolicy());
+
+        // Политика конвертируется в ExecutionRetryPolicyVo foreign-модуля поле в поле:
+        // перестановка любого из четырёх значений ловится благодаря различным числам.
+        self::assertCount(1, $agentRunnerCalls);
+        $mapped = $agentRunnerCalls[0]['retryPolicy'];
+        self::assertInstanceOf(ExecutionRetryPolicyVo::class, $mapped);
+        self::assertSame(3, $mapped->getMaxRetries());
+        self::assertSame(250, $mapped->getInitialDelayMs());
+        self::assertSame(8000, $mapped->getMaxDelayMs());
+        self::assertSame(2.5, $mapped->getMultiplier());
+        self::assertTrue($mapped->isEnabled());
+    }
+
+    #[Test]
     public function runParticipantPrefersVoPromptFileOverResolvedRolePath(): void
     {
         $writtenPrompts = [];
@@ -439,6 +488,92 @@ final class RunDynamicLoopAgentServiceTest extends TestCase
         self::assertSame('formatted-finalize-context', $turnResult->getUserPrompt());
         self::assertSame('finalize-brainstorm-system-prompt', $turnResult->getSystemPrompt());
         self::assertSame('invocation-command', $turnResult->getInvocation());
+    }
+
+    #[Test]
+    public function runFacilitatorFinalizeMapsEnabledRetryPolicyToExecutionRetryPolicy(): void
+    {
+        $invocationArgs = null;
+        $finalizeContextArgs = null;
+        $writtenPrompts = [];
+        $agentRunnerCalls = [];
+        $service = $this->createService(
+            $this->createAgentRunner(ChainRunResultVo::createSuccess('ok'), $agentRunnerCalls),
+            $this->createSessionWriter($writtenPrompts),
+            $this->createResponseParser(),
+            $this->createFormatter(
+                finalizeContextArgs: $finalizeContextArgs,
+                contextResult: 'formatted-finalize-context',
+                invocationArgs: $invocationArgs,
+            ),
+        );
+
+        $retryPolicy = new DynamicLoopRetryPolicyVo(
+            maxRetries: 4,
+            initialDelayMs: 100,
+            maxDelayMs: 5000,
+            multiplier: 1.5,
+        );
+        $context = new FacilitatorFinalizeRunContextVo(
+            brainstormSystemPrompt: 'finalize-full-brainstorm-system-prompt',
+            facilitatorAppendPrompt: 'finalize-full-append-prompt',
+            facilitatorFinalizePrompt: 'finalize-full-finalize-prompt',
+            workingDir: '/tmp/finalize-workdir',
+            responseFilesList: 'finalize-full-response-files',
+            timeout: 90,
+            command: ['pi', '--model', 'finalize-full'],
+            retryPolicy: $retryPolicy,
+        );
+
+        $service->runFacilitatorFinalize(4, 2, 'facilitator', self::TOPIC, $context);
+
+        // Полный VO: политика и workingDir доезжают в DynamicLoopRunRequestVo без изменений.
+        self::assertNotNull($invocationArgs);
+        $runRequest = $invocationArgs['request'];
+        self::assertInstanceOf(DynamicLoopRunRequestVo::class, $runRequest);
+        self::assertSame($retryPolicy, $runRequest->getRetryPolicy());
+        self::assertSame('/tmp/finalize-workdir', $runRequest->getWorkingDir());
+
+        // Остальные поля полного VO: хвост уходит в форматтер дословно, промпты — в prompt-файлы
+        // (замыкает проверку всех 8 полей FacilitatorFinalizeRunContextVo в одном кейсе).
+        self::assertSame(
+            ['finalize-full-finalize-prompt', self::TOPIC, 'finalize-full-response-files'],
+            $finalizeContextArgs,
+        );
+        self::assertCount(2, $writtenPrompts);
+        self::assertSame(4, $writtenPrompts[0]['step']);
+        self::assertSame(2, $writtenPrompts[0]['round']);
+        self::assertSame('finalize-full-brainstorm-system-prompt', $writtenPrompts[0]['content']);
+        self::assertSame('_1_system.md', $writtenPrompts[0]['suffix']);
+        self::assertSame('finalize-full-append-prompt', $writtenPrompts[1]['content']);
+        self::assertSame('_2_append.md', $writtenPrompts[1]['suffix']);
+
+        // Маппинг DynamicLoopRunRequestVo → ChainRunRequestVo на finalize-пути поле в поле
+        // (шаг/раунд 4/2 и значения command отличны от соседних кейсов для трассируемости).
+        self::assertCount(1, $agentRunnerCalls);
+        $chainRequest = $agentRunnerCalls[0]['request'];
+        self::assertInstanceOf(ChainRunRequestVo::class, $chainRequest);
+        self::assertSame('facilitator', $chainRequest->getRole());
+        self::assertSame(self::TOPIC, $chainRequest->getTask());
+        self::assertSame('/session/4_2_facilitator_1_system.md', $chainRequest->getSystemPrompt());
+        self::assertSame('formatted-finalize-context', $chainRequest->getPreviousContext());
+        self::assertSame('/tmp/finalize-workdir', $chainRequest->getWorkingDir());
+        self::assertSame(90, $chainRequest->getTimeout());
+        self::assertSame(['pi', '--model', 'finalize-full'], $chainRequest->getCommand());
+        self::assertSame(
+            ['--append-system-prompt', '/session/4_2_facilitator_2_append.md'],
+            $chainRequest->getRunnerArgs(),
+        );
+
+        // Политика конвертируется в ExecutionRetryPolicyVo foreign-модуля поле в поле:
+        // перестановка любого из четырёх значений ловится благодаря различным числам.
+        $mapped = $agentRunnerCalls[0]['retryPolicy'];
+        self::assertInstanceOf(ExecutionRetryPolicyVo::class, $mapped);
+        self::assertSame(4, $mapped->getMaxRetries());
+        self::assertSame(100, $mapped->getInitialDelayMs());
+        self::assertSame(5000, $mapped->getMaxDelayMs());
+        self::assertSame(1.5, $mapped->getMultiplier());
+        self::assertTrue($mapped->isEnabled());
     }
 
     // ─── Фабрики стабов ───────────────────────────────────────────────
