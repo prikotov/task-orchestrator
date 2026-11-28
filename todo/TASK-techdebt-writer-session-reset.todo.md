@@ -12,7 +12,7 @@ cost_plan:
 cost_fact: 
 depends_on: 
 epic: 
-author: Тимлид Алекс (pi)
+author: Тимлид Алекс (pi@glm-5.3-flash~high)
 assignee: 
 consultants: []
 reviewer: 
@@ -116,4 +116,4 @@ php vendor/bin/todo-md validate TASK-techdebt-writer-session-reset # ожида�
 ## История изменений (Change History)
 | Дата | Автор | Изменение |
 | :--- | :--- | :--- |
-| 2026-11-28 12:32:42 (1795869162) | Тимлид Алекс (pi) | Создание задачи |
+| 2026-11-28 12:32:42 (1795869162) | Тимлид Алекс (pi@glm-5.3-flash~high) | Создание задачи |
