@@ -14,6 +14,11 @@ use TaskOrchestrator\Common\Module\DynamicLoop\Domain\ValueObject\DynamicLoopSes
  *
  * Владеет mutable state текущей сессии. Делегирует файловые операции
  * в ChainSessionFileStorage, форматирование бюджета — в ChainSessionBudgetFormatter.
+ *
+ * Инвариант чистого старта: startSession() сбрасывает накопленное состояние
+ * прежней сессии (roundFiles, invocation, budget, resumedState) — жизненный
+ * цикл экземпляра не зависит от порядка вызовов startSession()/resumeSession().
+ * Инвариант закреплён ChainSessionWriterStateResetTest.
  */
 final class ChainSessionWriter
 {
@@ -39,9 +44,24 @@ final class ChainSessionWriter
         private readonly string $basePath,
     ) {}
 
-    /** @param list<string> $participants */
+    /**
+     * Начинает новую сессию в каталоге, имя которого формируется по текущему
+     * времени с точностью до секунды (Y-m-d_H-i-s): два старта в одну секунду
+     * дают один каталог — файлы прежней сессии в этом окне перезаписываются.
+     *
+     * Новая сессия начинается с чистого состояния: независимо от истории
+     * экземпляра (в том числе resume → startSession) накопленные поля
+     * прежней сессии не наследуются. Инвариант закреплён тестом:
+     * удаление любого сброса ниже роняет ChainSessionWriterStateResetTest.
+     *
+     * @param list<string> $participants
+     */
     public function startSession(string $chainName, string $topic, string $facilitator, array $participants, int $maxRounds, int $complexity): string
     {
+        $this->roundFiles = [];
+        $this->invocation = [];
+        $this->budget = null;
+        $this->resumedState = null;
         $this->chainName = $chainName;
         $this->topic = $topic;
         $this->facilitator = $facilitator;
@@ -175,6 +195,12 @@ final class ChainSessionWriter
      * с опциональными полями rounds[i]. Семантика значения — latest-wins
      * (см. logInvocation()).
      *
+     * Нормализация пустого error_message: в rounds[i] пустая строка и
+     * отсутствие ключа эквивалентны «нет сообщения» — при разборе ключ с
+     * пустым значением отбрасывается, последующая перезапись session.json
+     * его не восстанавливает. Информация не теряется: поле опционально,
+     * файл артефакта ошибки (rounds[i].error) сохраняется.
+     *
      * @throws RuntimeException если каталог не найден или session.json повреждён
      */
     public function resumeSession(string $sessionDir): void
@@ -283,6 +309,8 @@ final class ChainSessionWriter
      *
      * Модельные поля и кэш-токены опциональны: старые сессии (до появления полей)
      * читаются без ошибок — отсутствие данных даёт null/0 и «н/д» в отчёте.
+     * Пустая строка error_message нормализуется к отсутствию ключа
+     * ('' ≡ «нет сообщения», см. resumeSession()).
      *
      * Форма записи канонизирована в DynamicLoopSessionReaderInterface::getRoundFiles();
      * все копии формы объявляются байт-в-байт — при изменении формы правятся все объявления.
