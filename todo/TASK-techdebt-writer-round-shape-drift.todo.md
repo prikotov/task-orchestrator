@@ -2,7 +2,7 @@
 type: refactor
 created: 2026-11-28 04:28:23 (1795840103)
 due: 
-started: 
+started: 2026-11-28 08:21:53 (1795854113)
 completed: 
 cancelled: 
 value: V1
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Аналитик Шерлок (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/writer-round-shape-sync
 pr: 
-status: backlog
+status: in_progress
 ---
 
 # TASK-techdebt-writer-round-shape-drift: Синхронизировать форму записи раунда Writer с канонической формой контракта
@@ -57,8 +57,8 @@ status: backlog
 *   **Где делаем:** `src/Module/DynamicLoop/Infrastructure/Service/ChainSessionWriter.php` — `parseRoundFiles()` (форма `@return` и, при выбранном решении, тело метода); `src/Module/DynamicLoop/Domain/Service/Session/DynamicLoopSessionReaderInterface.php` — только docblock канонической формы, если решение об отсутствии поля фиксируется в контракте.
 *   **Текущее поведение:** каноническая 18-полевая форма записи (включая `invocation?: string`) продублирована инлайн в 8 местах и байт-в-байт идентична (по архитектурному ревью PR #523); единственный дрейф — `parseRoundFiles()`: форма 17 полей без `invocation?`. `logRound()` записывает `invocation` в `session.json` (раунды), `writeSessionJson()` его сохраняет, а `parseRoundFiles()` не восстанавливает при resume (OBS-1) — после возобновления поле пропадает.
 *   **Прецеденты для переиспользования:** doc-правила PR #523 в докблоках контракта («Каноническая форма записи остаётся закрытой; завершающий `...` допускается только в принимающей форме потребителя», «Поля вне объявленной части не типизируются…») — образец фиксации правил формы; `tests/Unit/Infrastructure/Service/Chain/` — roundtrip-тесты Writer/Reader, включая контракт-тест `ChainSessionReaderRoundFilesContractTest.php`.
-*   **Критичные конвенции:** [Domain](../../docs/conventions/layers/domain.md) и [Infrastructure](../../docs/conventions/layers/infrastructure.md) — границы слоёв (каноническая форма — Domain-контракт, Writer — Infrastructure); [Service](../../docs/conventions/core-patterns/service.md) — `ChainSessionWriter` (Infrastructure-сервис) и `DynamicLoopSessionReaderInterface` (контракт сервиса сессии); [Тестирование](../../docs/conventions/testing/index.md).
-*   **Границы (Out of Scope):** не менять каноническую 18-полевую форму записи (она эталон) и контракт `getRoundFiles()`; не вводить псевдонимы типа (`@psalm-type`/`@phpstan-type`) и [DTO](../../docs/conventions/core-patterns/dto.md)/[Value Object](../../docs/conventions/core-patterns/value-object.md) записи раунда — триггеры пересмотра описаны в архитектурном ревью; не менять формат `session.json`, поведение `logRound()`, метрики, `step`-ключирование и `restoreFromRoundFiles()`; не трогать подавления `RunDynamicLoopService` (задача [TASK-techdebt-psalm-suppress-argument-type-coercion](../done/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md)); не вводить подавления аналитиков типов.
+*   **Критичные конвенции:** [Domain](../docs/conventions/layers/domain.md) и [Infrastructure](../docs/conventions/layers/infrastructure.md) — границы слоёв (каноническая форма — Domain-контракт, Writer — Infrastructure); [Service](../docs/conventions/core-patterns/service.md) — `ChainSessionWriter` (Infrastructure-сервис) и `DynamicLoopSessionReaderInterface` (контракт сервиса сессии); [Тестирование](../docs/conventions/testing/index.md).
+*   **Границы (Out of Scope):** не менять каноническую 18-полевую форму записи (она эталон) и контракт `getRoundFiles()`; не вводить псевдонимы типа (`@psalm-type`/`@phpstan-type`) и [DTO](../docs/conventions/core-patterns/dto.md)/[Value Object](../docs/conventions/core-patterns/value-object.md) записи раунда — триггеры пересмотра описаны в архитектурном ревью; не менять формат `session.json`, поведение `logRound()`, метрики, `step`-ключирование и `restoreFromRoundFiles()`; не трогать подавления `RunDynamicLoopService` (задача [TASK-techdebt-psalm-suppress-argument-type-coercion](done/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md)); не вводить подавления аналитиков типов.
 
 ## 3. Требования, MoSCoW (Requirements)
 ### 🔴 Обязательно (Must Have)
@@ -112,19 +112,19 @@ php vendor/bin/todo-md validate TASK-techdebt-writer-round-shape-drift  # ожи
 - Риск: решение «восстанавливать `invocation`» меняет данные, доступные после resume, — проверить всех потребителей записи раунда (единственный прод-потребитель по ревью PR #523 — `RunDynamicLoopService::initExecution()`), чтобы не сломать восстановление и метрики.
 - Риск: форма записи продублирована инлайн в 8 местах — правка одной копии легко порождает новый дрейф; после правки сверить все копии.
 - Риск: при решении «обосновать отсутствие» обещание «полная форма» в контракте остаётся частично неточным — сформулировать docblock так, чтобы расхождение было явным и проверяемым.
-- Зависимости: задача-источник [TASK-techdebt-getroundfiles-contract](../done/TASK-techdebt-getroundfiles-contract.todo.md) слита в `main` (PR #523). По файлам с [TASK-techdebt-psalm-suppress-argument-type-coercion](../done/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md) не пересекается (`ChainSessionWriter` против `RunDynamicLoopService`).
+- Зависимости: задача-источник [TASK-techdebt-getroundfiles-contract](done/TASK-techdebt-getroundfiles-contract.todo.md) слита в `main` (PR #523). По файлам с [TASK-techdebt-psalm-suppress-argument-type-coercion](done/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md) не пересекается (`ChainSessionWriter` против `RunDynamicLoopService`).
 
 ## 8. Источники (Sources)
-- [Архитектурное ревью PR #523 (находка Л-4 — дрейф формы `parseRoundFiles()`/`logRound()`)](../../docs/agents/reports/system-architect/2026-11-28_10-39_getroundfiles-contract-arch-review.md)
-- [Функциональное ревью PR #523 (OBS-1 — `invocation` не восстанавливается при resume)](../../docs/agents/reports/code-reviewer-backend/2026-11-28_10-19_getroundfiles-contract-review.md)
-- [Задача-источник TASK-techdebt-getroundfiles-contract](../done/TASK-techdebt-getroundfiles-contract.todo.md)
-- [Конвенции: Domain](../../docs/conventions/layers/domain.md), [Infrastructure](../../docs/conventions/layers/infrastructure.md), [Service](../../docs/conventions/core-patterns/service.md), [DTO](../../docs/conventions/core-patterns/dto.md), [Value Object](../../docs/conventions/core-patterns/value-object.md)
+- [Архитектурное ревью PR #523 (находка Л-4 — дрейф формы `parseRoundFiles()`/`logRound()`)](../docs/agents/reports/system-architect/2026-11-28_10-39_getroundfiles-contract-arch-review.md)
+- [Функциональное ревью PR #523 (OBS-1 — `invocation` не восстанавливается при resume)](../docs/agents/reports/code-reviewer-backend/2026-11-28_10-19_getroundfiles-contract-review.md)
+- [Задача-источник TASK-techdebt-getroundfiles-contract](done/TASK-techdebt-getroundfiles-contract.todo.md)
+- [Конвенции: Domain](../docs/conventions/layers/domain.md), [Infrastructure](../docs/conventions/layers/infrastructure.md), [Service](../docs/conventions/core-patterns/service.md), [DTO](../docs/conventions/core-patterns/dto.md), [Value Object](../docs/conventions/core-patterns/value-object.md)
 
 ## 9. Комментарии (Comments)
 - Задача создана по подтверждённым находкам ревью PR #523 (`TASK-techdebt-getroundfiles-contract`, слит в `main`); находки подтверждены пользователем 2026-11-28.
 - Уточнение формулировки «~17 полей»: форма `parseRoundFiles()` содержит 17 полей (14 обязательных + `response?`, `error?`, `error_message?`), каноническая — 18 (добавлено `invocation?: string`).
 - Форма записи Writer фактически охватывает два потока данных: свежая запись (`logRound()`) и восстановление из файла (`parseRoundFiles()`); «полная форма» контракта — объединение обоих потоков (вывод OBS-1/Л-4).
-- Приоритет `P3` и сложность `C2` заданы пользователем; ценность `V1` — авторская оценка (косвенная ценность техдолга, соответствует `P3` по [PRIORITIES](../../docs/todo-md/reference/PRIORITIES.md)), пользователем не задана.
+- Приоритет `P3` и сложность `C2` заданы пользователем; ценность `V1` — авторская оценка (косвенная ценность техдолга, соответствует `P3` по [PRIORITIES](../docs/todo-md/reference/PRIORITIES.md)), пользователем не задана.
 
 ## История изменений (Change History)
 | Дата | Автор | Изменение |
