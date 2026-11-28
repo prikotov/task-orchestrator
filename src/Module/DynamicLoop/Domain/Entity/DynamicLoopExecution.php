@@ -232,7 +232,12 @@ final class DynamicLoopExecution
      * полей восстанавливаются с model/provider/thinking = null и кэш-токенами 0
      * — в отчёте такие шаги рендерятся как «н/д».
      *
-     * @param list<array{round?: int, role?: mixed, is_facilitator: bool, duration?: mixed, input_tokens?: mixed, output_tokens?: mixed, cost?: mixed, model?: mixed, provider?: mixed, thinking?: mixed, cache_read_tokens?: mixed, cache_write_tokens?: mixed}> $roundFiles
+     * Принимающая форма открыта завершающим `...`: поля вне объявленной
+     * части не типизируются (implicit `mixed`). Поле, которое метод начинает
+     * потреблять, объявляется в shape явно со своим типом — полагаться на
+     * `...` при чтении запрещено.
+     *
+     * @param list<array{round?: int, role?: mixed, is_facilitator: bool, duration?: mixed, input_tokens?: mixed, output_tokens?: mixed, cost?: mixed, model?: mixed, provider?: mixed, thinking?: mixed, cache_read_tokens?: mixed, cache_write_tokens?: mixed, ...}> $roundFiles
      */
     public function restoreFromRoundFiles(array $roundFiles): void
     {

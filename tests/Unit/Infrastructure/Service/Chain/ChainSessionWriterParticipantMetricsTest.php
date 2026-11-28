@@ -157,7 +157,8 @@ final class ChainSessionWriterParticipantMetricsTest extends TestCase
 
         $roundFiles = $resumeLogger->getRoundFiles();
         self::assertCount(1, $roundFiles);
-        $round = $roundFiles[1] ?? null;
+        self::assertTrue(array_is_list($roundFiles));
+        $round = $roundFiles[0] ?? null;
         self::assertNotNull($round);
         self::assertSame('glm-5.3-flash', $round['model']);
         self::assertSame('zai', $round['provider']);
@@ -219,7 +220,8 @@ final class ChainSessionWriterParticipantMetricsTest extends TestCase
         $resumeLogger->resumeSession($sessionDir);
 
         $roundFiles = $resumeLogger->getRoundFiles();
-        $round = $roundFiles[1] ?? null;
+        self::assertTrue(array_is_list($roundFiles));
+        $round = $roundFiles[0] ?? null;
         self::assertNotNull($round);
         self::assertNull($round['model']);
         self::assertNull($round['provider']);

@@ -43,14 +43,18 @@ final class ChainSessionReader
     }
 
     /**
-     * Возвращает массив roundFiles для подсчёта participant-раундов.
+     * Возвращает записи раундов в виде списка для Domain-контракта.
+     *
+     * Step-ключи — внутренняя деталь хранения; публичный контракт возвращает
+     * упорядоченный список значений, поэтому здесь единственная точка
+     * переиндексации 1..n → 0..n-1 (array_values).
      *
      * @param array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string, invocation?: string}> $roundFiles
      *
-     * @return array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string, invocation?: string}>
+     * @return list<array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string, invocation?: string}>
      */
     public function getRoundFiles(array $roundFiles): array
     {
-        return $roundFiles;
+        return array_values($roundFiles);
     }
 }

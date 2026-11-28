@@ -1,10 +1,10 @@
 ---
 type: refactor
 created: 2026-11-28 01:30:15 (1795829415)
-updated: 2026-11-28 01:40:38 (1795830038)
+updated: 2026-11-28 03:44:16 (1795837456)
 due: 
-started: 
-completed: 
+started: 2026-11-28 02:40:02 (1795833602)
+completed: 2026-11-28 03:56:53 (1795838213)
 cancelled: 
 value: V2
 complexity: C2
@@ -14,14 +14,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Архитектор Гэндальф (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
-pr: 
-status: backlog
+branch: task/getroundfiles-list-contract
+pr: https://github.com/prikotov/task-orchestrator/pull/523
+status: done
 ---
 
 # TASK-techdebt-getroundfiles-contract: Simplify getRoundFiles contract to list shape / сузить контракт getRoundFiles для снятия подавления argument.type
@@ -116,23 +116,61 @@ status: backlog
 
 ## 6. Самопроверка (Verification)
 
-Состояние после доработки постановки: код и тесты не изменялись, реализация не начата, задача предназначена для `backlog`. По Правилу A команды реализации ниже обязательны для исполнителя, но на этапе постановки не прогонялись; `make check` также не прогонялся. PHPUnit и Psalm не запускались при доработке файла по исключению для изменений только документации.
+Состояние после реализации 2026-11-28 (ветка `task/getroundfiles-list-contract`): реализация выполнена, код и тесты изменены; ниже приведены прогоны реализации 1–2 и диагностика Т6. Команды Правила A обязательны для исполнителя и прогонялись в ходе реализации; `make check` — зелёный (прогон 2). Первая команда валидации в блоке относится к этапу постановки.
 
 ```bash
 # Выполнено 2026-11-28 01:45 UTC: 0 error(s), 0 warning(s).
 php vendor/bin/todo-md validate TASK-techdebt-getroundfiles-contract
 
-# Не выполнено на этапе постановки (Правило A); обязательно при реализации.
+# Реализация 2026-11-28, ветка task/getroundfiles-list-contract:
 vendor/bin/phpunit tests/Unit/Infrastructure/Service/Chain/
+# → OK (155 tests, 532 assertions)
 vendor/bin/phpunit tests/Unit/Domain/Entity/DynamicLoopExecutionRestoreTest.php
+# → OK (3 tests, 28 assertions)
 vendor/bin/phpunit tests/Unit/Domain/Service/Chain/Dynamic/
+# → OK (62 tests, 145 assertions)
 vendor/bin/phpunit tests/Integration/Application/UseCase/Command/OrchestrateChain/
+# → OK (29 tests, 224 assertions)
 vendor/bin/phpunit
+# → OK (1785 tests, 5403 assertions, 2 skipped — предсуществующие env-скипы)
 vendor/bin/phpstan analyse --no-progress
+# → [OK] No errors (включая отсутствие ignore.unmatchedIdentifier)
+
+# Прогон 1 (2026-11-28 09:49, до решения DS): чек-поинт шага 7 —
 vendor/bin/psalm
-vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
+# → 1 ERROR InvalidArgument (RunDynamicLoopService): закрытая принимающая
+#   shape restoreFromRoundFiles() не допускает дополнительные фактические
+#   поля (system, user, response, error?, error_message?, invocation?);
+#   PHPStan лишние ключи допускает, Psalm — нет. Эскалация владельцу этапа,
+#   формы молчаливо не менялись.
 make check
-php vendor/bin/todo-md validate TASK-techdebt-getroundfiles-contract
+# → FAIL только на psalm (InvalidArgument выше); phpstan/deptrac/phpcs/
+#   phpmd/md-links/validate-*/tests — зелёные.
+
+# Прогон 2 (2026-11-28 09:59, после решения DS — Вариант A): в принимающую
+# shape restoreFromRoundFiles() добавлен завершающий `...` (открытая форма
+# «как минимум эти поля»), остальной код не менялся:
+vendor/bin/phpunit
+# → OK (1785 tests, 5403 assertions, 2 skipped — предсуществующие env-скипы)
+vendor/bin/phpstan analyse --no-progress
+# → [OK] No errors (включая отсутствие ignore.unmatchedIdentifier)
+vendor/bin/psalm
+# → 0 ERROR; чек-поинт шага 7 закрыт: открытая принимающая shape совместима
+#   с полной закрытой формой Writer/Reader на Psalm и PHPStan без новых
+#   подавлений.
+vendor/bin/deptrac analyse --config-file=depfile.yaml --no-progress
+# → Violations: 0, Allowed: 1735, Warnings: 0
+make check
+# → полностью зелёный (phpstan/psalm/deptrac/phpcs/phpmd/phpunit/md-links/
+#   validate-*); validate-language в warning mode — предсуществующие
+#   предупреждения по docs/releases, ошибок нет.
+
+# Диагностика Т6 (2026-11-28): временно снят @psalm-suppress ArgumentTypeCoercion,
+# psalm: 1 ERROR — только InvalidArgument, ArgumentTypeCoercion НЕ возникает.
+# Тег возвращён; итоговый diff тег не меняет. Подавление избыточно после
+# сужения контракта; создана отдельная техдолг-задача
+# backlog/TASK-techdebt-psalm-suppress-argument-type-coercion (CR-1 ревью),
+# удаление тега — вне этого PR.
 ```
 
 ## 7. Риски и зависимости (Risks and Dependencies)
@@ -147,7 +185,7 @@ php vendor/bin/todo-md validate TASK-techdebt-getroundfiles-contract
 - Зависимостей от задач и эпиков нет. Связанная завершённая задача — источник аудита, не `depends_on`.
 
 ## 8. Источники (Sources)
-- [Задача-источник, раздел 9 «Комментарии»](../done/TASK-techdebt-phpstan-suppressions-audit.todo.md) — потенциальный техдолг по сужению контракта.
+- [Задача-источник, раздел 9 «Комментарии»](TASK-techdebt-phpstan-suppressions-audit.todo.md) — потенциальный техдолг по сужению контракта.
 - [Отчёт ревью аудита подавлений](../../docs/agents/reports/code-reviewer-backend/2026-11-27_23-31_phpstan-suppressions-audit-review.md) — CR-2 (отдельная задача и переадресация техдолга) и CR-5 (не расширять scope на Psalm).
 - [Руководство по созданию задач](../../docs/todo-md/AGENTS_TASK_WRITING_GUIDE.md) и [шаблон](../../docs/todo-md/templates/task.md).
 - [RACI, раздел 5.3](../../docs/agents/raci-matrix.md) — автор отвечает за RF; DS, RV-F и RV-A обязательны при реализации.
@@ -158,8 +196,10 @@ php vendor/bin/todo-md validate TASK-techdebt-getroundfiles-contract
 - **Согласованная точка нормализации:** `ChainSessionReader::getRoundFiles()`, а не Domain и не внутреннее хранение Writer. Решение Q1 закрыто; единственный `array_values()` обязателен именно на этой границе чтения.
 - **Решение Q3:** поиск и возможная правка документации выполняются по Т7 как Could Have; запись в changelog не требуется при отсутствии внешних потребителей.
 - **Приоритет:** остаётся `P3` по решению владельца этапа (`A = Тимлид`). Аргумент консультанта за `P2` учтён, но очередность не повышена: это локальный техдолг без наблюдаемого нарушения восстановления, назначенного релиза и дедлайна.
-- Существующий `@psalm-suppress ArgumentTypeCoercion` в `RunDynamicLoopService` не является целью этого PR. По Т6 его необходимость проверяется только временным локальным снятием и прогоном Psalm с обязательным возвратом тега; результат фиксируется в истории. Если тег лишний, его удаление выносится в отдельную техдолг-задачу.
+- Существующий `@psalm-suppress ArgumentTypeCoercion` в `RunDynamicLoopService` не является целью этого PR. По Т6 его необходимость проверяется только временным локальным снятием и прогоном Psalm с обязательным возвратом тега; результат фиксируется в истории. Тег признан лишним: создана отдельная техдолг-задача [TASK-techdebt-psalm-suppress-argument-type-coercion](../backlog/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md) (CR-1 ревью от 2026-11-28); в PR задачи-источника тег остаётся без изменений с маркером `@techdebt`, ссылающимся на неё.
 - Номера строк из исходного аудита (`RunDynamicLoopService`, примерно 113–120) являются снимком и могут сместиться; ориентир для реализации — сам вызов и тег, а не номер строки.
+- **Отступление от Won't Have «не ослаблять restoreFromRoundFiles()»:** принимающая shape `restoreFromRoundFiles()` открыта завершающим `...` — отступление от буквы Won't Have санкционировано решением владельца этапа DS (Вариант A, Архитектор Гэндальф, отчёт [docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md](../../docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md)). Формулировки Won't Have в постановке не переписываются: настоящая запись фиксирует осознанное отступление с указанием авторства решения по правилам функционального ревью.
+- **Результат поиска Т7 (Could Have):** поиск упоминаний `getRoundFiles()` и числовых ключей его результата проведён в `docs/`, `README*` и `SKILL.md`; совпадения только в архивных отчётах агентов (`docs/agents/reports`), внешних описаний контракта нет. Правки документации и changelog не требуются (решение Q3).
 
 ## История изменений (Change History)
 | Дата | Автор | Изменение |
@@ -167,3 +207,8 @@ php vendor/bin/todo-md validate TASK-techdebt-getroundfiles-contract
 | 2026-11-28 01:30:15 (1795829415) | Архитектор Гэндальф (pi) | Создание задачи |
 | 2026-11-28 01:32:35 (1795829555) | Архитектор Гэндальф (pi) | Черновик постановки для backlog: уточнены канонический интерфейс, list-нормализация, границы Domain/Infrastructure, тесты и открытые вопросы Q1–Q3 |
 | 2026-11-28 01:40:38 (1795830038) | Архитектор Гэндальф (pi) | Доработка по результатам консультации Бэкендера на этапе RF (RACI 5.3): интегрированы Т1–Т7; Q1–Q3 закрыты решениями владельца (A = Тимлид), приоритет P3 подтверждён |
+| 2026-11-28 09:49:03 (1795834143) | Бэкендер Левша (pi) | Реализация Т1–Т5 и Т7: list-контракт с полной формой Writer/Reader в reader-интерфейсе, единственный array_values() в ChainSessionReader, синхронизация ChainSessionLogger/StubSessionLogger, адаптация ChainSessionWriterParticipantMetricsTest к ключам 0..n-1, новый ChainSessionReaderRoundFilesContractTest, удаление @phpstan-ignore argument.type и @techdebt-блока (Т3) |
+| 2026-11-28 09:49:03 (1795834143) | Бэкендер Левша (pi) | Т6: подавление ArgumentTypeCoercion избыточно (psalm без тега — только InvalidArgument). Чек-поинт шага 7: Psalm InvalidArgument — закрытая принимающая shape против дополнительных фактических полей; PHPStan зелёный. Остановка и эскалация владельцу этапа (A = Тимлид) по регламенту чек-поинта |
+| 2026-11-28 09:59:21 (1795834761) | Бэкендер Левша (pi) | Доработка по решению DS этапа (Вариант A, автор решения — Архитектор Гэндальф; вердикт: docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md): в PHPDoc @param restoreFromRoundFiles() добавлен завершающий `...` (открытая принимающая shape «как минимум эти поля»); каноническая закрытая форма Writer/Reader, ChainSessionReader/Writer/Logger и поведение восстановления без изменений. Тег @psalm-suppress ArgumentTypeCoercion оставлен в diff нетронутым; техдолг-задача на его удаление не создавалась — её оформит Тимлид отдельным docs-PR после слияния. Verification актуализирован (прогон 2): psalm 0 ошибок, phpstan No errors, deptrac 0 violations, phpunit OK, make check полностью зелёный |
+| 2026-11-28 03:30:33 (1795836633) | Бэкендер Левша (pi) | Доработка по ревью (CR-1, CR-2, CR-3, CR-5, CR-6): создана техдолг-задача TASK-techdebt-psalm-suppress-argument-type-coercion (backlog) на удаление избыточного @psalm-suppress ArgumentTypeCoercion; в RunDynamicLoopService добавлен маркер @techdebt со ссылкой на неё (тег подавления не изменён); вводный абзац §6 переписан на состояние после реализации; §9 дополнен записями о санкционированном отступлении Won't Have (DS, Вариант A) и результате поиска Т7; PHPDoc reader-интерфейса очищен от ссылки на приватное свойство Infrastructure |
+| 2026-11-28 03:44:16 (1795837456) | Бэкендер Левша (pi) | Точечная доработка по решению Тимлида: закрыты AR-1 и AR-2 архитектурного ревью Локи (docs/agents/reports/system-architect/2026-11-28_10-39_getroundfiles-contract-arch-review.md) — в docblock restoreFromRoundFiles() зафиксировано правило против mixed-дыры открытой shape (поля вне объявленной части не типизируются — implicit mixed; потребляемое поле объявляется в shape явно, на `...` при чтении не полагаться), в docblock getRoundFiles() — правило «каноническая форма остаётся закрытой, завершающий `...` допускается только у потребителя»; закрыто OBS-5 из верификации Пуаро — поле updated синхронизировано с последней записью Истории изменений. Исполняемый код и тесты не менялись; проверки phpstan/psalm/phpunit/todo-md validate прогнаны — зелёные |
