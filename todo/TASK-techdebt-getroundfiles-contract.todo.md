@@ -3,7 +3,7 @@ type: refactor
 created: 2026-11-28 01:30:15 (1795829415)
 updated: 2026-11-28 01:40:38 (1795830038)
 due: 
-started: 
+started: 2026-11-28 02:40:02 (1795833602)
 completed: 
 cancelled: 
 value: V2
@@ -14,14 +14,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Архитектор Гэндальф (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/getroundfiles-list-contract
 pr: 
-status: backlog
+status: in_progress
 ---
 
 # TASK-techdebt-getroundfiles-contract: Simplify getRoundFiles contract to list shape / сузить контракт getRoundFiles для снятия подавления argument.type
@@ -62,7 +62,7 @@ status: backlog
   * `tests/Integration/Application/UseCase/Command/OrchestrateChain/StubSessionLogger.php` и профильные Unit/Integration-тесты сессии и восстановления.
 * **Текущее поведение:** доменный reader объявляет `@return array<int, array{is_facilitator: bool, ...}>`; `ChainSessionReader::getRoundFiles()` возвращает массив без переиндексации. `ChainSessionWriter` заполняет и восстанавливает его по ключу `$step`, включая нумерацию с `1`, поэтому фактический результат не всегда является `list`. `DynamicLoopExecution::restoreFromRoundFiles()` перебирает только значения и ожидает `list<array{...}>`; несоответствие сейчас скрыто `@phpstan-ignore argument.type`.
 * **Прецеденты для переиспользования:** `tests/Unit/Domain/Entity/DynamicLoopExecutionRestoreTest.php` — проверка восстановления; `tests/Unit/Infrastructure/Service/Chain/ChainSessionWriterParticipantMetricsTest.php` — сценарии resume и текущие обращения к `$roundFiles[1]`, которые выявят смену ключей; `tests/Unit/Infrastructure/Service/Chain/ChainSessionLoggerResponsePathsTest.php` — контроль того, что внутренние step-ключи по-прежнему используются для response-путей.
-* **Критичные конвенции:** [взаимодействие слоёв](../../docs/conventions/layers/layers.md), [Domain](../../docs/conventions/layers/domain.md), [Infrastructure](../../docs/conventions/layers/infrastructure.md), [тестирование](../../docs/conventions/testing/index.md). Domain остаётся независимым от Infrastructure; Infrastructure лишь реализует точный доменный контракт.
+* **Критичные конвенции:** [взаимодействие слоёв](../docs/conventions/layers/layers.md), [Domain](../docs/conventions/layers/domain.md), [Infrastructure](../docs/conventions/layers/infrastructure.md), [тестирование](../docs/conventions/testing/index.md). Domain остаётся независимым от Infrastructure; Infrastructure лишь реализует точный доменный контракт.
 * **Границы (Out of Scope):** формат `session.json`, нумерация шагов и раундов, алгоритм восстановления и метрик, `getResponseFilePaths()`, прочие `@phpstan-ignore` и аудит `@psalm-suppress`, конфигурация `findUnusedPsalmSuppress`, новые DTO/VO и новые зависимости.
 
 ## 3. Требования, MoSCoW (Requirements)
@@ -147,10 +147,10 @@ php vendor/bin/todo-md validate TASK-techdebt-getroundfiles-contract
 - Зависимостей от задач и эпиков нет. Связанная завершённая задача — источник аудита, не `depends_on`.
 
 ## 8. Источники (Sources)
-- [Задача-источник, раздел 9 «Комментарии»](../done/TASK-techdebt-phpstan-suppressions-audit.todo.md) — потенциальный техдолг по сужению контракта.
-- [Отчёт ревью аудита подавлений](../../docs/agents/reports/code-reviewer-backend/2026-11-27_23-31_phpstan-suppressions-audit-review.md) — CR-2 (отдельная задача и переадресация техдолга) и CR-5 (не расширять scope на Psalm).
-- [Руководство по созданию задач](../../docs/todo-md/AGENTS_TASK_WRITING_GUIDE.md) и [шаблон](../../docs/todo-md/templates/task.md).
-- [RACI, раздел 5.3](../../docs/agents/raci-matrix.md) — автор отвечает за RF; DS, RV-F и RV-A обязательны при реализации.
+- [Задача-источник, раздел 9 «Комментарии»](done/TASK-techdebt-phpstan-suppressions-audit.todo.md) — потенциальный техдолг по сужению контракта.
+- [Отчёт ревью аудита подавлений](../docs/agents/reports/code-reviewer-backend/2026-11-27_23-31_phpstan-suppressions-audit-review.md) — CR-2 (отдельная задача и переадресация техдолга) и CR-5 (не расширять scope на Psalm).
+- [Руководство по созданию задач](../docs/todo-md/AGENTS_TASK_WRITING_GUIDE.md) и [шаблон](../docs/todo-md/templates/task.md).
+- [RACI, раздел 5.3](../docs/agents/raci-matrix.md) — автор отвечает за RF; DS, RV-F и RV-A обязательны при реализации.
 - Код и тесты: пути, перечисленные в разделе 2; фактическое хранение по `$step` подтверждено в `ChainSessionWriter::logRound()` и `parseRoundFiles()`.
 
 ## 9. Комментарии (Comments)
