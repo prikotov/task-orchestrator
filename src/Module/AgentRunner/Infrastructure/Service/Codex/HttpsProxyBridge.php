@@ -37,7 +37,19 @@ final class HttpsProxyBridge
     private const string BRIDGE_HOST = '127.0.0.1';
 
     /**
-     * @var resource|false|null Дескриптор процесса proc_open
+     * Дескриптор процесса proc_open.
+     *
+     * PHPStan считает false в @var неиспользуемым (ветка false proc_open бросает
+     * RuntimeException до присвоения) и требует сузить тип до resource|null, но
+     * сужённый docblock ломает Psalm: guard'ы is_resource() дают
+     * DocblockTypeContradiction и RedundantConditionGivenDocblockType.
+     * Оставляем resource|false|null как единый контракт для обоих анализаторов;
+     * подавление заглушает только замечание PHPStan о неиспользуемом false.
+     *
+     * @var resource|false|null
+     *
+     * @techdebt TASK-techdebt-phpstan-suppressions-audit (2026-11-27); прецедент:
+     *           nullCoalesce.offset, booleanNot.alwaysFalse (см. этот же аудит).
      * @phpstan-ignore property.unusedType
      */
     private $process = null;
@@ -173,6 +185,13 @@ final class HttpsProxyBridge
 
         $status = proc_get_status($this->process);
 
+        // По контракту PHP proc_get_status() возвращает array|false; после guard'а
+        // is_resource() false-ветка контракта практически недостижима, но ?? false
+        // сохранён как защитный guard — снятие ?? меняло бы поведение защитной
+        // ветки (TypeError вместо false). PHPStan по stub считает offset 'running'
+        // всегда существующим и флагает ?? как избыточный.
+        // @techdebt TASK-techdebt-phpstan-suppressions-audit (2026-11-27); прецедент:
+        // booleanNot.alwaysFalse (ProcessLivenessWatcher.php).
         return $status['running'] ?? false; // @phpstan-ignore nullCoalesce.offset
     }
 

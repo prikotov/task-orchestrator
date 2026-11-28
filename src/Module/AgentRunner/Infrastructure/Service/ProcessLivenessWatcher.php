@@ -98,7 +98,7 @@ final readonly class ProcessLivenessWatcher
                 // Проверка контрактна: естественное завершение перед idle-stop возвращает
                 // true без stop() (тест waitForNaturalExitImmediatelyBeforeIdleStopReturnsNaturally).
                 // @techdebt TASK-techdebt-phpstan-suppressions-audit (2026-11-27); прецеденты:
-                // property.unusedType, nullCoalesce.offset (HttpsProxyBridge.php:41,176).
+                // property.unusedType, nullCoalesce.offset (HttpsProxyBridge.php).
                 if (!$process->isRunning()) { // @phpstan-ignore booleanNot.alwaysFalse
                     return true;
                 }
