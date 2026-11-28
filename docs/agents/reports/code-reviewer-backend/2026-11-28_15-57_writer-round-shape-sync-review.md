@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend)
 **Дата:** 2026-11-28
 **Объект:** ветка `task/writer-round-shape-sync`; база — `main` = `61313645` (PR #525), коммиты ветки `743f0936` (старт задачи) и `c8002e98` (DS-отчёт); **незакоммиченный** diff рабочего дерева — 6 файлов (реализация + тесты + файл задачи + правка ссылки в ретро + маркер `.make-check.json`)
-**Задача:** [TASK-techdebt-writer-round-shape-drift](../../../../todo/TASK-techdebt-writer-round-shape-drift.todo.md)
+**Задача:** [TASK-techdebt-writer-round-shape-drift](../../../../todo/done/TASK-techdebt-writer-round-shape-drift.todo.md)
 **Проектирование:** [DS-отчёт Архитектора Гэндальфа](../system-architect-gandalf/2026-11-28_15-23_writer-round-invocation-resume-design.md), разделы 4–5 — проверялись как обязательный контракт реализации
 **Тип прохода:** полное ревью (RV-F, функциональное) с независимым воспроизведением всех целей `make check` и экспериментом на «ложное покрытие»
 
@@ -34,7 +34,7 @@
 | [src/Module/DynamicLoop/Infrastructure/Service/ChainSessionWriter.php](../../../../src/Module/DynamicLoop/Infrastructure/Service/ChainSessionWriter.php) | `:264` — в `@return` добавлено `, invocation?: string`; `:292–294` — условное восстановление | Целевая правка по DS §4 п.1–2 | ✅ |
 | [tests/Unit/Infrastructure/Service/Chain/ChainSessionReaderRoundFilesContractTest.php](../../../../tests/Unit/Infrastructure/Service/Chain/ChainSessionReaderRoundFilesContractTest.php) | `:169–215` — новый тест `resumeRestoresInvocationAndPreservesItThroughSessionJsonRewrite()` | Roundtrip-тест по DS §5 | ✅ |
 | [tests/Unit/Infrastructure/Service/Chain/ChainSessionWriterParticipantMetricsTest.php](../../../../tests/Unit/Infrastructure/Service/Chain/ChainSessionWriterParticipantMetricsTest.php) | `:231–232` — комментарий + `assertArrayNotHasKey('invocation', $round)` | Обратная совместимость старой записи (DS §5, «при желании усилить») | ✅ |
-| [todo/TASK-techdebt-writer-round-shape-drift.todo.md](../../../../todo/TASK-techdebt-writer-round-shape-drift.todo.md) | План п.3–5 `[x]`, запись в Истории изменений | След реализации | 🟡 неполно — CR-1 |
+| [todo/TASK-techdebt-writer-round-shape-drift.todo.md](../../../../todo/done/TASK-techdebt-writer-round-shape-drift.todo.md) | План п.3–5 `[x]`, запись в Истории изменений | След реализации | 🟡 неполно — CR-1 |
 | [docs/agents/team-retro/2026-11-28_11-27-getroundfiles-contract-task.md](../../team-retro/2026-11-28_11-27-getroundfiles-contract-task.md) | `:65` — ссылка `todo/backlog/…` → `todo/…` | Починка битой ссылки, обнаруженной в DS §7 | ✅ правомерно, но требует повтора после done-переноса (CR-2) |
 | [.make-check.json](../../../../.make-check.json) | 1 строка | Маркер локального `make check` (`commit` = `c8002e98`) | 🟡 штатный артефакт, требует перегенерации (CR-2) |
 
@@ -206,7 +206,7 @@
 
 ### 🟡 CR-1 (обязательно до PR). Файл задачи не отражает результаты реализации; DoD-пункт «diff ограничен» не оформлен
 
-**Файл:** [todo/TASK-techdebt-writer-round-shape-drift.todo.md](../../../../todo/TASK-techdebt-writer-round-shape-drift.todo.md)
+**Файл:** [todo/TASK-techdebt-writer-round-shape-drift.todo.md](../../../../todo/done/TASK-techdebt-writer-round-shape-drift.todo.md)
 **Строки:** `65–69` (Must Have), `71–73` (Should Have), `92–97` (DoD), `101` и `104–108` (§6 Verification), `132–137` (История изменений).
 
 **Что не так:**
@@ -225,7 +225,7 @@
 
 ### 🟡 CR-2 (обязательно до PR). Порядок финализации: `done` → ссылка в ретро на `todo/done/` → `make check` → маркер последним коммитом
 
-**Файлы/строки:** [.make-check.json:1](../../../../.make-check.json); [docs/agents/team-retro/2026-11-28_11-27-getroundfiles-contract-task.md:65](../../team-retro/2026-11-28_11-27-getroundfiles-contract-task.md); [todo/TASK-techdebt-writer-round-shape-drift.todo.md:22,23](../../../../todo/TASK-techdebt-writer-round-shape-drift.todo.md) (`pr:`, `status:`).
+**Файлы/строки:** [.make-check.json:1](../../../../.make-check.json); [docs/agents/team-retro/2026-11-28_11-27-getroundfiles-contract-task.md:65](../../team-retro/2026-11-28_11-27-getroundfiles-contract-task.md); [todo/TASK-techdebt-writer-round-shape-drift.todo.md:22,23](../../../../todo/done/TASK-techdebt-writer-round-shape-drift.todo.md) (`pr:`, `status:`).
 
 **Что не так:**
 
@@ -306,7 +306,7 @@
 
 ### 14.2 CR-1 — устранён (4/4)
 
-| Критерий верификации | Факт (файл задачи, `todo/TASK-techdebt-writer-round-shape-drift.todo.md`) | Итог |
+| Критерий верификации | Факт (файл задачи, `todo/done/TASK-techdebt-writer-round-shape-drift.todo.md`) | Итог |
 | :--- | :--- | :--- |
 | §6 — фактические прогоны, а не «не прогонялось» | Строки 99–109: прогон при реализации + ссылка на §8 настоящего отчёта; фактические результаты psalm / PHPStan / целевых тестов `Chain/` / полного PHPUnit / `todo-md validate`. Все цифры воспроизведены мной заново (§14.5) — расхождений нет | ✅ |
 | Must Have отмечены | Строки 65–69: **5/5 `[x]`** | ✅ |

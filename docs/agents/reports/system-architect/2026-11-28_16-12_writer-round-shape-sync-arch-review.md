@@ -3,7 +3,7 @@
 **Роль:** Архитектор Локи (system_architect_loki)
 **Дата:** 2026-11-28
 **Объект:** ветка `task/writer-round-shape-sync` — незакоммиченный diff рабочего дерева (6 файлов: 1 `src/`, 2 тестовых, файл задачи, правка одной ссылки в ретро-документе, маркер `.make-check.json`; untracked — отчёт RV-F), база `main` = `61313645` (PR #525)
-**Задача:** [TASK-techdebt-writer-round-shape-drift](../../../../todo/TASK-techdebt-writer-round-shape-drift.todo.md) (RACI 5.3, RV-A — обязательное архитектурное ревью для `refactor`)
+**Задача:** [TASK-techdebt-writer-round-shape-drift](../../../../todo/done/TASK-techdebt-writer-round-shape-drift.todo.md) (RACI 5.3, RV-A — обязательное архитектурное ревью для `refactor`)
 **Контекст:** [DS-отчёт Архитектора Гэндальфа](../system-architect-gandalf/2026-11-28_15-23_writer-round-invocation-resume-design.md) (этап DS, шаги 1–2) и [функциональное ревью Пуаро](../code-reviewer-backend/2026-11-28_15-57_writer-round-shape-sync-review.md) (CR-1 устранён в файле задачи; CR-2 — порядок финализации, выполняет Тимлид после всех ревью)
 **Фокус:** (1) границы слоёв Domain/Infrastructure — восстановление `invocation` в Writer не нарушает контракт Domain; (2) корректность DS-решения (восстановление поля vs документирование отсутствия), слепые зоны перезаписи `session.json`, сценарии повреждённых данных; (3) целостность канонической формы — 9/9 объявлений, отсутствие побочных форм-дрейфов; (4) открытая принимающая форма `restoreFromRoundFiles()` и ловушки открытой shape из арх-ревью PR #523 (AR-1/AR-2); (5) незакрытые системные риски инлайн-дублирования формы; (6) соответствие §9 задачи и DoD.
 
@@ -105,7 +105,7 @@
 
 ### ⚪ AR-6 (процессное; к финализации, CR-2, Тимлид). DoD-чекбокс «Diff ограничен»
 
-**Файл:** [todo/TASK-techdebt-writer-round-shape-drift.todo.md](../../../../todo/TASK-techdebt-writer-round-shape-drift.todo.md), строка 96 (§5 DoD); строки 18–19 (`reviewer:`, `approver:`); строки 72–73 (Should Have).
+**Файл:** [todo/TASK-techdebt-writer-round-shape-drift.todo.md](../../../../todo/done/TASK-techdebt-writer-round-shape-drift.todo.md), строка 96 (§5 DoD); строки 18–19 (`reviewer:`, `approver:`); строки 72–73 (Should Have).
 **Запрос:** при финализации определить состояние пункта DoD «Diff ограничен…»: отметить `[x]` со ссылкой на §9 (отклонение оформлено — CR-1 п.2+п.3) либо явно зафиксировать приёмку «выполнено с отклонением»; решить судьбу Should Have; заполнить `reviewer`/`approver`. Без решения `todo/AGENTS.md` («критерии приёмки отмечены») формально не выполняется.
 
 ## Прогоны (независимые, 2026-11-28, рабочее дерево ветки)

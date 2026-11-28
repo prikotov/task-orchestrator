@@ -3,7 +3,7 @@
 **Роль:** Архитектор Гэндальф
 **Дата:** 2026-11-28
 **Объект:** `ChainSessionWriter::parseRoundFiles()`, поток `resume` → `getRoundFiles()` → восстановление/повторная запись сессии; все инлайн-описания формы записи раунда
-**Задача:** [TASK-techdebt-writer-round-shape-drift](../../../../todo/TASK-techdebt-writer-round-shape-drift.todo.md), этап DS по RACI 5.3, шаги 1–2 плана
+**Задача:** [TASK-techdebt-writer-round-shape-drift](../../../../todo/done/TASK-techdebt-writer-round-shape-drift.todo.md), этап DS по RACI 5.3, шаги 1–2 плана
 
 ---
 
