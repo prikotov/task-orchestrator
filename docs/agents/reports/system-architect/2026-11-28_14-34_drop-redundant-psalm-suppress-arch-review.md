@@ -3,7 +3,7 @@
 **Роль:** Архитектор Гэндальф (system_architect_gandalf)
 **Дата:** 2026-11-28
 **Объект:** ветка `task/drop-redundant-psalm-suppress`; коммит старта задачи `55fd11c1c9ec96073631ab2f681c51d6feea1163`; незакоммиченный diff поверх него; база ветки — `origin/main` = `569fdd0644f7191de15eea7a4146623621470ad4`
-**Задача:** [TASK-techdebt-psalm-suppress-argument-type-coercion](../../../../todo/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md)
+**Задача:** [TASK-techdebt-psalm-suppress-argument-type-coercion](../../../../todo/done/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md)
 **Тип прохода:** RV-A — архитектурное ревью по матрице RACI для задачи типа `refactor`
 
 ---

@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend)
 **Дата:** 2026-11-28
 **Объект:** ветка `task/drop-redundant-psalm-suppress`; база — `origin/main` = `569fdd06` (merge PR #524); коммит старта задачи `55fd11c1`; **незакоммиченный** diff рабочего дерева — 4 файла
-**Задача:** [TASK-techdebt-psalm-suppress-argument-type-coercion](../../../../todo/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md)
+**Задача:** [TASK-techdebt-psalm-suppress-argument-type-coercion](../../../../todo/done/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md)
 **Тип прохода:** полное ревью (RV-F, функциональное) с независимым воспроизведением всех целей `make check`
 
 ---
@@ -155,7 +155,7 @@
 
 ### 🟡 CR-2 (обязательно до PR). Файл задачи не отражает ход реализации; DoD-пункт «diff ограничен» не оформлен
 
-**Файл:** [todo/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md](../../../../todo/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md)
+**Файл:** [todo/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md](../../../../todo/done/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md)
 **Строки:** 62–65 (`Must Have`), 79–83 (план), 86–90 (DoD), 94 (`Состояние при постановке: код не изменялся, задача предназначена для backlog`), 118–121 (История изменений).
 
 **Что не так:** реализация выполнена, но в задаче нет ни одного следа этого:
@@ -250,7 +250,7 @@
 
 **Тип прохода:** верификация доработки — проверялось **только** устранение CR-2 и исполнительская часть CR-1. Отдельный файл отчёта не создаётся: раздел дополняет настоящее ревью.
 **Объект:** ветка `task/drop-redundant-psalm-suppress`; `HEAD` = `55fd11c1` (новых коммитов нет), база `569fdd06` = `origin/main`.
-**Дельта с момента полного ревью:** ровно один файл — [todo/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md](../../../../todo/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md) (mtime `14:42:29`, правка внесена после формирования отчёта `14:29:37`). Остальные файлы дерева не изменялись: код `14:02:54`, две md-ссылки `14:03:39`, маркер `14:06:12`. Дополнительно в дереве появился untracked-документ — отчёт RV-A Архитектора (`docs/agents/reports/system-architect/2026-11-28_14-34_drop-redundant-psalm-suppress-arch-review.md`, вердикт «одобрено», замечаний к коду нет, CR-1/CR-2 признаны процессными и обязательными к финализации).
+**Дельта с момента полного ревью:** ровно один файл — [todo/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md](../../../../todo/done/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md) (mtime `14:42:29`, правка внесена после формирования отчёта `14:29:37`). Остальные файлы дерева не изменялись: код `14:02:54`, две md-ссылки `14:03:39`, маркер `14:06:12`. Дополнительно в дереве появился untracked-документ — отчёт RV-A Архитектора (`docs/agents/reports/system-architect/2026-11-28_14-34_drop-redundant-psalm-suppress-arch-review.md`, вердикт «одобрено», замечаний к коду нет, CR-1/CR-2 признаны процессными и обязательными к финализации).
 
 ### 14.1 CR-2 — результат по пунктам
 
