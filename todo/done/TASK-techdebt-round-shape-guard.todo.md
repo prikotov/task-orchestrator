@@ -3,7 +3,7 @@ type: test
 created: 2026-11-28 09:39:40 (1795858780)
 due: 
 started: 2026-11-28 11:23:38 (1795865018)
-completed: 
+completed: 2026-11-28 12:17:43 (1795868263)
 cancelled: 
 value: V1
 complexity: C2
@@ -19,8 +19,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/round-shape-guard
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/527
+status: done
 ---
 
 # TASK-techdebt-round-shape-guard: Сторож формы записи раунда и защита от потери данных при перезаписи session.json
@@ -28,7 +28,7 @@ status: in_progress
 ## 0. Простое описание (Human Brief)
 
 ### Проблема простыми словами (Problem)
-- Форма записи раунда продублирована инлайн в 9 местах (канон — `DynamicLoopSessionReaderInterface::getRoundFiles()`), и дрейф уже случался один раз: `ChainSessionWriter::parseRoundFiles()` отстал от канона на поле `invocation` (закрыто PR задачи-источника [TASK-techdebt-writer-round-shape-drift](done/TASK-techdebt-writer-round-shape-drift.todo.md)). Сейчас идентичность копий сторожат только ручные сверки при ревью — при следующем расширении формы расхождение снова будет видно лишь человеку.
+- Форма записи раунда продублирована инлайн в 9 местах (канон — `DynamicLoopSessionReaderInterface::getRoundFiles()`), и дрейф уже случался один раз: `ChainSessionWriter::parseRoundFiles()` отстал от канона на поле `invocation` (закрыто PR задачи-источника [TASK-techdebt-writer-round-shape-drift](TASK-techdebt-writer-round-shape-drift.todo.md)). Сейчас идентичность копий сторожат только ручные сверки при ревью — при следующем расширении формы расхождение снова будет видно лишь человеку.
 - Второй класс рисков — перезапись `session.json` «по белому списку»: `writeSessionJson()` сериализует только известные ключи, поэтому неизвестные ключи `rounds[]` и верхнего уровня теряются молча (арх-ревью Локи, слепые зоны BZ-1/BZ-2).
 - Слепая зона BZ-1: верхнеуровневое поле `session.json.invocation` не восстанавливается в `resumeSession()` — первая же запись после resume стирает его до `logInvocation()` (окно потери при падении процесса).
 - Тесты roundtrip неполны: не закреплены пустая строка `invocation` (QA-1), multi-round-сценарий с `invocation` (QA-1) и error-ветка при resume в `tests/Unit/Infrastructure/Service/Chain/` (QA-2, пробел есть и на `main`).
@@ -63,7 +63,7 @@ status: in_progress
 *   **Где делаем:** `tests/Unit/` (новый сторож-тест и расширение roundtrip-тестов в `tests/Unit/Infrastructure/Service/Chain/`); при решении «исправлять» — `src/Module/DynamicLoop/Infrastructure/Service/ChainSessionWriter.php` (`resumeSession()`, `writeSessionJson()`); при решении «документировать» — docblock-гарды и контракт `DynamicLoopSessionReaderInterface` (только текст).
 *   **Текущее поведение:** канон формы — `DynamicLoopSessionReaderInterface::getRoundFiles()`, 18 полей; 9 инлайн-копий байт-в-байт идентичны (SHA-256 `962df094…` после синхронизации в задаче-источнике); `writeSessionJson()` сериализует записи по белому списку; `resumeSession()` не восстанавливает верхнеуровневый `session.json.invocation`.
 *   **Прецеденты для переиспользования:** roundtrip-тест `ChainSessionReaderRoundFilesContractTest::resumeRestoresInvocationAndPreservesItThroughSessionJsonRewrite` (задача-источник); мутационная методика проверки тестов из QA-отчёта ветки `task/writer-round-shape-sync`; док-гарды AR-1/AR-2 в `DynamicLoopExecution::restoreFromRoundFiles()`.
-*   **Критичные конвенции:** [Тестирование](../docs/conventions/testing/index.md); [Infrastructure](../docs/conventions/layers/infrastructure.md), [Domain](../docs/conventions/layers/domain.md) — при решении по BZ-1 не переносить сериализацию в Domain.
+*   **Критичные конвенции:** [Тестирование](../../docs/conventions/testing/index.md); [Infrastructure](../../docs/conventions/layers/infrastructure.md), [Domain](../../docs/conventions/layers/domain.md) — при решении по BZ-1 не переносить сериализацию в Domain.
 *   **Границы (Out of Scope):** не менять каноническую 18-полевую форму записи и контракт `getRoundFiles()`; не вводить псевдонимы типов (`@psalm-type`/`@phpstan-type`) и DTO/VO записи раунда (триггер пересмотра — 19-е поле в форме, см. архитектурное ревью задачи-источника); не менять формат `session.json`, поведение `logRound()`, метрики, `step`-ключирование и `restoreFromRoundFiles()`; не трогать подавления `RunDynamicLoopService`.
 
 ## 3. Требования, MoSCoW (Requirements)
@@ -118,14 +118,14 @@ make check                                                         # факти�
 - Риск: сторож-тест по тексту файлов может стать хрупким при переформатировании docblock — использовать каноническую строку формы как эталон, а не хардкод всей сигнатуры метода.
 - Риск: решение «восстанавливать верхнеуровневый invocation» (BZ-1) меняет поведение resume — проверить всех потребителей верхнеуровневого поля (`logInvocation()`, отчёты).
 - Риск: закрытие BZ-2 «в лоб» (сохранение неизвестных ключей) может расширить контракт записи — предпочтительно документирование, если неизвестные ключи считаются повреждением данных.
-- Зависимости: задача-источник [TASK-techdebt-writer-round-shape-drift](done/TASK-techdebt-writer-round-shape-drift.todo.md) (синхронизация формы, PR ветки `task/writer-round-shape-sync`).
+- Зависимости: задача-источник [TASK-techdebt-writer-round-shape-drift](TASK-techdebt-writer-round-shape-drift.todo.md) (синхронизация формы, PR ветки `task/writer-round-shape-sync`).
 
 ## 8. Источники (Sources)
-- [Архитектурное ревью ветки task/writer-round-shape-sync (AR-5, слепые зоны BZ-1/BZ-2)](../docs/agents/reports/system-architect/2026-11-28_16-12_writer-round-shape-sync-arch-review.md)
-- [QA-отчёт ветки task/writer-round-shape-sync (QA-1/QA-2)](../docs/agents/reports/qa-backend/2026-11-28_16-38_writer-round-shape-sync-qa-review.md)
-- [Полное ревью ветки task/writer-round-shape-sync (OBS-2 — нет сторожа форм)](../docs/agents/reports/code-reviewer-backend/2026-11-28_15-57_writer-round-shape-sync-review.md)
-- [Задача-источник TASK-techdebt-writer-round-shape-drift](done/TASK-techdebt-writer-round-shape-drift.todo.md)
-- [Конвенции: Тестирование](../docs/conventions/testing/index.md)
+- [Архитектурное ревью ветки task/writer-round-shape-sync (AR-5, слепые зоны BZ-1/BZ-2)](../../docs/agents/reports/system-architect/2026-11-28_16-12_writer-round-shape-sync-arch-review.md)
+- [QA-отчёт ветки task/writer-round-shape-sync (QA-1/QA-2)](../../docs/agents/reports/qa-backend/2026-11-28_16-38_writer-round-shape-sync-qa-review.md)
+- [Полное ревью ветки task/writer-round-shape-sync (OBS-2 — нет сторожа форм)](../../docs/agents/reports/code-reviewer-backend/2026-11-28_15-57_writer-round-shape-sync-review.md)
+- [Задача-источник TASK-techdebt-writer-round-shape-drift](TASK-techdebt-writer-round-shape-drift.todo.md)
+- [Конвенции: Тестирование](../../docs/conventions/testing/index.md)
 
 ## 9. Комментарии (Comments)
 - Задача создана Тимлидом по итогам конвейера TASK-techdebt-writer-round-shape-drift: рекомендации AR-5 (Архитектор Локи), QA-1/QA-2 (Тестировщик Хаус), OBS-2 (Пуаро) приняты в один техдолг вместо расширения PR задачи-источника.
