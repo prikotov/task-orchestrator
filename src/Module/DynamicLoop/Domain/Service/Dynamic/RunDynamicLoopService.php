@@ -94,10 +94,6 @@ final readonly class RunDynamicLoopService implements RunDynamicLoopServiceInter
         return $execution->toLoopResultVo();
     }
 
-    /**
-     * @techdebt 2026-11-28 TASK-techdebt-psalm-suppress-argument-type-coercion: подавление избыточно после сужения контракта getRoundFiles(), удаление — отдельной задачей.
-     * @psalm-suppress ArgumentTypeCoercion
-     */
     private function initExecution(
         int $startRound,
         string $initialDiscussionHistory,

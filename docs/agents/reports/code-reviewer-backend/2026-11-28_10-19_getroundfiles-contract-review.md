@@ -293,5 +293,5 @@ DoD (строка 113) требует буквально: «…при обнар
 Условия перед merge (за тимлидом, вне RV-F):
 
 1. **CR-4** — свежий `make check` и коммит `.make-check.json` последним коммитом PR; DS-отчёт и новый тест включить в коммиты (изменения по-прежнему только в рабочем дереве).
-2. Задача в `done` до запроса апрува; техдолг-задача [TASK-techdebt-psalm-suppress-argument-type-coercion](../../../../todo/backlog/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md) остаётся в `backlog` и в этот PR не втягивается.
+2. Задача в `done` до запроса апрува; техдолг-задача [TASK-techdebt-psalm-suppress-argument-type-coercion](../../../../todo/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md) остаётся в `backlog` и в этот PR не втягивается.
 3. По желанию — OBS-5 (поле `updated`) одним движением с CR-4.

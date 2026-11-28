@@ -59,10 +59,10 @@ status: in_progress
 
 ## 3. Требования, MoSCoW (Requirements)
 ### 🔴 Обязательно (Must Have)
-- [ ] Из `RunDynamicLoopService::initExecution()` удалено подавление `@psalm-suppress ArgumentTypeCoercion` вместе с маркером `@techdebt`, ссылающимся на эту задачу; содержательный текст комментария сохраняется, если не относится к подавлению.
-- [ ] Поведение метода не изменилось: правка ограничена комментарием к коду; diff не содержит других изменений.
-- [ ] `vendor/bin/psalm` и `vendor/bin/phpstan analyse --no-progress` зелёные без подавления (включая отсутствие несматченных подавлений для PHPStan).
-- [ ] Целевые Unit-тесты `tests/Unit/Domain/Service/Chain/Dynamic/` проходят.
+- [x] Из `RunDynamicLoopService::initExecution()` удалено подавление `@psalm-suppress ArgumentTypeCoercion` вместе с маркером `@techdebt`, ссылающимся на эту задачу; содержательный текст комментария сохраняется, если не относится к подавлению. *Факт: PHPDoc-блок (строки 97–100 в `HEAD`) содержал только два тега и удалён целиком; `grep` по `psalm-suppress|@techdebt` в файле пуст.*
+- [x] Поведение метода не изменилось: правка ограничена комментарием к коду; diff не содержит других изменений. *Факт: по `src/` удалены только 4 строки комментария; сигнатуры и ветвление не тронуты.*
+- [x] `vendor/bin/psalm` и `vendor/bin/phpstan analyse --no-progress` зелёные без подавления (включая отсутствие несматченных подавлений для PHPStan). *Факт: Psalm — exit 0, PHPStan — `[OK] No errors` (независимо воспроизведено ревью RV-F).*
+- [x] Целевые Unit-тесты `tests/Unit/Domain/Service/Chain/Dynamic/` проходят. *Факт: `OK (62 tests, 145 assertions)`.*
 
 ### 🟡 Желательно (Should Have)
 - [ ] Изменения оформлены отдельным PR от актуального `main` с коммитом по Conventional Commits (например, `refactor(dynamic-loop): drop redundant psalm suppression ...`).
@@ -76,29 +76,38 @@ status: in_progress
 - [ ] Не включать изменение в PR задачи-источника: задача выполняется после его слияния.
 
 ## 4. План реализации (Implementation Plan)
-1. [ ] Убедиться, что задача-источник слита в `main` и ветка создана от актуального `main`. **Проверка:** `git status` чист, база ветки — `main`.
-2. [ ] Удалить строку `@psalm-suppress ArgumentTypeCoercion` и маркер `@techdebt` в блоке PHPDoc над `RunDynamicLoopService::initExecution()`; при пустом блоке удалить блок целиком. **Проверка:** diff содержит только эту правку.
-3. [ ] Прогнать `vendor/bin/psalm` и `vendor/bin/phpstan analyse --no-progress`. **Проверка:** ошибок нет; ошибки `ArgumentTypeCoercion` не возникло (подтверждено диагностикой Т6).
-4. [ ] Прогнать `vendor/bin/phpunit tests/Unit/Domain/Service/Chain/Dynamic/` и полный `vendor/bin/phpunit`. **Проверка:** тесты зелёные, регрессий нет.
-5. [ ] Обновить задачу (критерии, Verification, история), оформить отдельный PR и пройти ревью по RACI для `refactor`.
+1. [x] Убедиться, что задача-источник слита в `main` и ветка создана от актуального `main`. **Проверка:** `git status` чист, база ветки — `main`. *(база `569fdd06` = `origin/main`, один коммит старта `55fd11c1`)*
+2. [x] Удалить строку `@psalm-suppress ArgumentTypeCoercion` и маркер `@techdebt` в блоке PHPDoc над `RunDynamicLoopService::initExecution()`; при пустом блоке удалить блок целиком. **Проверка:** diff содержит только эту правку. *(кодовая часть — только эта правка; сопутствующие md-правки и маркер оформлены в §9)*
+3. [x] Прогнать `vendor/bin/psalm` и `vendor/bin/phpstan analyse --no-progress`. **Проверка:** ошибок нет; ошибки `ArgumentTypeCoercion` не возникло (подтверждено диагностикой Т6).
+4. [x] Прогнать `vendor/bin/phpunit tests/Unit/Domain/Service/Chain/Dynamic/` и полный `vendor/bin/phpunit`. **Проверка:** тесты зелёные, регрессий нет.
+5. [ ] Обновить задачу (критерии, Verification, история), оформить отдельный PR и пройти ревью по RACI для `refactor`. *(актуализация задачи выполнена; PR и финализация — за Тимлидом, CR-1 ревью RV-F)*
 
 ## 5. Критерии приёмки (Definition of Done)
-- [ ] Подавление `@psalm-suppress ArgumentTypeCoercion` и связанный маркер `@techdebt` отсутствуют в `RunDynamicLoopService`.
-- [ ] `vendor/bin/psalm` — 0 ошибок; `vendor/bin/phpstan analyse --no-progress` — `No errors`.
-- [ ] `vendor/bin/phpunit` успешен; регрессий в модуле `DynamicLoop` нет.
-- [ ] Diff ограничен удалением подавления; поведение не изменилось.
+- [x] Подавление `@psalm-suppress ArgumentTypeCoercion` и связанный маркер `@techdebt` отсутствуют в `RunDynamicLoopService`.
+- [x] `vendor/bin/psalm` — 0 ошибок; `vendor/bin/phpstan analyse --no-progress` — `No errors`.
+- [x] `vendor/bin/phpunit` успешен; регрессий в модуле `DynamicLoop` нет. *(`OK`, 1785 tests, 5403 assertions, 2 skipped — платформенные env-скипы, вне диффа)*
+- [x] Diff ограничен удалением подавления; поведение не изменилось. *(кодовая часть диффа ограничена целевой правкой; две md-правки и маркер `make check` — оформленные сопутствующие изменения, инвентаризация — §9)*
 - [ ] Изменения оформлены отдельным PR, задача переведена в `done` по регламенту.
 
 ## 6. Самопроверка (Verification)
 
-Состояние при постановке: код не изменялся, задача предназначена для `backlog`; команды ниже — обязательные для исполнителя при реализации.
+Состояние после реализации 2026-11-28 (ветка `task/drop-redundant-psalm-suppress`): реализация выполнена — PHPDoc-блок с `@techdebt`-маркером и `@psalm-suppress ArgumentTypeCoercion` над `RunDynamicLoopService::initExecution()` удалён, код и тесты более не меняются. Команды ниже — обязательные для исполнителя, прогонены в ходе реализации; результаты независимо воспроизведены полным ревью RV-F от 2026-11-28 (отчёт в §8). Финализация (коммит → `todo-md done` → актуализация ссылок в `docs/` → `make md-links` → свежий `make check` и маркер последним коммитом) — за Тимлидом по CR-1 того же ревью; маркер `.make-check.json` при этой доработке не трогается.
 
 ```bash
 php vendor/bin/todo-md validate TASK-techdebt-psalm-suppress-argument-type-coercion
+# → 0 error(s), 0 warning(s)
 vendor/bin/psalm
+# → exit 0: ошибок нет, ArgumentTypeCoercion не возникла — подавление подтверждено избыточным
 vendor/bin/phpstan analyse --no-progress
+# → [OK] No errors (reportUnmatchedIgnoredErrors: true — несматченных подавлений нет)
 vendor/bin/phpunit tests/Unit/Domain/Service/Chain/Dynamic/
+# → OK (62 tests, 145 assertions)
 vendor/bin/phpunit
+# → OK (1785 tests, 5403 assertions, 2 skipped — платформенные env-скипы, вне диффа)
+make check
+# → зелёный на дереве реализации: маркер .make-check.json записан 2026-11-28 07:06:12 UTC
+#   (после правок кода и md); каждая цель дополнительно проверена по отдельности
+#   в ревью RV-F — зелёные; при финализации маркер перегенерируется на актуальном HEAD (CR-1)
 ```
 
 ## 7. Риски и зависимости (Risks and Dependencies)
@@ -110,12 +119,16 @@ vendor/bin/phpunit
 - [Отчёт ревью getroundfiles-contract (CR-1)](../docs/agents/reports/code-reviewer-backend/2026-11-28_10-19_getroundfiles-contract-review.md) — требование отдельной техдолг-задачи и маркировки подавления.
 - [Решение DS по чек-поинту формы](../docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md) — контекст принятия открытой принимающей shape.
 - [Ревью аудита подавлений (источник аудита)](../docs/agents/reports/code-reviewer-backend/2026-11-27_23-31_phpstan-suppressions-audit-review.md) — порядок работы с подавлениями.
+- [Полное ревью RV-F реализации (CR-2)](../docs/agents/reports/code-reviewer-backend/2026-11-28_14-22_drop-redundant-psalm-suppress-review.md) — вердикт по коду «одобрено», инвентаризация диффа, независимое воспроизведение всех целей `make check`; доработка файла задачи выполнена по его замечанию CR-2.
 
 ## 9. Комментарии (Comments)
 - Задача создана в ходе доработки задачи-источника по замечанию CR-1 ревью от 2026-11-28 (DoD Т6: «при обнаружении лишнего подавления создана отдельная техдолг-задача»). Автор постановки — исполнитель задачи-источника.
 - В PR задачи-источника само подавление не трогается и остаётся с маркером `@techdebt`, ссылающимся на эту задачу; удаление выполняется только здесь.
+- **Инвентаризация диффа (оформление DoD-пункта «Diff ограничен удалением подавления»):** в рабочем дереве ветки 4 изменённых файла, все оценены ревью RV-F как правомерные (§2, §9 отчёта). (1) `src/Module/DynamicLoop/Domain/Service/Dynamic/RunDynamicLoopService.php` — целевая правка: удалён PHPDoc-блок с `@techdebt`-маркером и `@psalm-suppress ArgumentTypeCoercion` над `initExecution()` (4 строки); строки кода не затронуты, поведение не изменилось. (2)–(3) `docs/agents/reports/code-reviewer-backend/2026-11-28_10-19_getroundfiles-contract-review.md` и `docs/agents/team-retro/2026-11-28_11-27-getroundfiles-contract-task.md` — по одной строке: путь ссылки на этот файл задачи `todo/backlog/…` → `todo/…`; правки — прямое следствие переноса файла задачи командой `todo-md start` (коммит старта `55fd11c1`): перенос обновляет ссылки только внутри `todo/`, без них `make md-links` красный по всем 549 markdown-файлам проекта (повтор проблемы 3 ретро 2026-11-28_11-27). (4) `.make-check.json` — штатный трекаемый маркер локального прогона `make check`; при финализации перегенерируется на актуальном `HEAD` и коммитится последним (CR-1, за Тимлидом; до финализации маркер не трогается). Итог: кодовая часть диффа ограничена удалением подавления; md-правки и маркер — оформленные сопутствующие изменения.
+- **Границы Won't Have соблюдены** (подтверждено ревью RV-F): три оставшихся подавления `ArgumentTypeCoercion` в `ChainExecution` не тронуты; `getRoundFiles()` / `restoreFromRoundFiles()`, поведение восстановления и формат сессии не менялись; правка не входит в PR задачи-источника (отдельная ветка от слитого `main`); `psalm.xml` без изменений.
 
 ## История изменений (Change History)
 | Дата | Автор | Изменение |
 | :--- | :--- | :--- |
 | 2026-11-28 03:28:53 (1795836533) | Бэкендер Левша (pi) | Создание задачи |
+| 2026-11-28 14:41:53 (1795851713) | Бэкендер Левша (pi) | Реализация и доработка по CR-2 полного ревью RV-F (отчёт в §8): удалён PHPDoc-блок с @techdebt-маркером и @psalm-suppress ArgumentTypeCoercion над RunDynamicLoopService::initExecution() — единственная кодовая правка, поведение не изменилось; проверки зелёные (psalm 0 ошибок, phpstan No errors, целевые тесты OK 62/145, полный phpunit OK 1785/5403 + 2 платформенных skip, make check зелёный по маркеру); отмечены выполненные критерии §3/§4/§5, вводный абзац §6 переписан на состояние после реализации с результатами прогонов, в §9 добавлены инвентаризация диффа (целевая правка + 2 md-ссылки после переноса задачи + маркер make check) и запись о соблюдении Won't Have. Код и тесты с этого момента не меняются; коммит, перенос в done, актуализация ссылок docs/ и свежий make check — финализация за Тимлидом (CR-1) |
