@@ -11,5 +11,11 @@ interface DynamicLoopSessionLoggerInterface extends
     DynamicLoopSessionWriterInterface,
     DynamicLoopSessionReaderInterface
 {
+    /**
+     * Возобновляет сессию из каталога с session.json: верхнеуровневое
+     * invocation восстанавливается из файла и действует до ближайшего
+     * logInvocation(), который заменяет его значением текущего запуска
+     * (latest-wins, см. DynamicLoopSessionWriterInterface::logInvocation()).
+     */
     public function resumeSession(string $sessionDir): void;
 }

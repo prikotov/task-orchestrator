@@ -164,6 +164,19 @@ final class ChainSessionWriter
         ));
     }
 
+    /**
+     * Возобновляет сессию из каталога с session.json.
+     *
+     * Верхнеуровневое invocation восстанавливается из файла: до ближайшего
+     * logInvocation() повторные записи session.json (setBudget(),
+     * updateSessionState()) сохраняют прежнее значение, а не стирают его.
+     * Отсутствие ключа (старые сессии) даёт пустой список; не-массивное
+     * значение (повреждённый файл) нормализуется в пустой список — согласовано
+     * с опциональными полями rounds[i]. Семантика значения — latest-wins
+     * (см. logInvocation()).
+     *
+     * @throws RuntimeException если каталог не найден или session.json повреждён
+     */
     public function resumeSession(string $sessionDir): void
     {
         if (!is_dir($sessionDir)) {
@@ -180,6 +193,9 @@ final class ChainSessionWriter
         $this->participants = array_values($data['participants'] ?? []);
         $this->maxRounds = $data['max_rounds'] ?? 0;
         $this->roundFiles = $this->parseRoundFiles($data['rounds'] ?? []);
+        /** @var array<string, mixed> $invocation invocation пишется только из buildInvocation() — ключи строковые */
+        $invocation = is_array($data['invocation'] ?? null) ? $data['invocation'] : [];
+        $this->invocation = $invocation;
         $this->topic = $this->readSessionFile($sessionDir, $data['topic_file'] ?? '');
         $this->budget = isset($data['budget']) && is_array($data['budget']) ? DynamicLoopBudgetVo::createFromArray($data['budget']) : null;
         $complexity = $data['complexity'] ?? null;
@@ -217,7 +233,16 @@ final class ChainSessionWriter
         return $this->currentSessionDir . '/' . $fileName;
     }
 
-    /** @param array<string, mixed> $invocation */
+    /**
+     * Запоминает invocation текущего запуска и перезаписывает session.json.
+     *
+     * Семантика latest-wins: верхнеуровневое invocation всегда соответствует
+     * последнему вызову; значение исходного запуска при resume не сохраняется
+     * (вызывающий слой помечает resume ключом resumed_from). resumeSession()
+     * восстанавливает записанное значение лишь до ближайшего logInvocation().
+     *
+     * @param array<string, mixed> $invocation
+     */
     public function logInvocation(array $invocation): void
     {
         $this->invocation = $invocation;
@@ -311,6 +336,20 @@ final class ChainSessionWriter
         return $this->storage->readFile($resolved);
     }
 
+    /**
+     * Перезаписывает session.json целиком по белому списку канонической формы.
+     *
+     * Ключи, отсутствующие в каноне записи раунда и в верхнеуровневой структуре
+     * (например, добавленные более новой версией программы), при перезаписи
+     * отбрасываются: session.json — внутреннее хранилище текущей версии
+     * программы, а не сквозной формат обмена. Обратная совместимость
+     * обеспечивается только в направлении чтения старых сессий
+     * (parseRoundFiles(): опциональные поля старых записей). Форма
+     * канонизирована в DynamicLoopSessionReaderInterface::getRoundFiles();
+     * при расширении формы правятся и белый список здесь, и разбор
+     * в parseRoundFiles() — телевой roundtrip сторожит
+     * ChainSessionWriterRoundTripAllFieldsTest.
+     */
     private function writeSessionJson(string $status, int $completedSteps, string $reason = ''): void
     {
         $now = (new DateTimeImmutable('now'))->format('Y-m-d\TH:i:sP');

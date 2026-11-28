@@ -75,6 +75,12 @@ interface DynamicLoopSessionWriterInterface
     public function updateSessionState(int $completedRounds): void;
 
     /**
+     * Запоминает invocation текущего запуска и перезаписывает session.json.
+     *
+     * Семантика latest-wins: верхнеуровневое invocation в session.json всегда
+     * соответствует последнему вызову; при resume значение исходного запуска
+     * заменяется значением текущего.
+     *
      * @param array<string, mixed> $invocation
      */
     public function logInvocation(array $invocation): void;
