@@ -120,6 +120,9 @@ class StubSessionLogger implements DynamicLoopSessionLoggerInterface
         return [];
     }
 
+    /**
+     * @return list<array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string, invocation?: string}>
+     */
     #[Override]
     public function getRoundFiles(): array
     {
