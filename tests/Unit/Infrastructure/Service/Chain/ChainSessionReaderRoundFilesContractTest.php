@@ -167,6 +167,53 @@ final class ChainSessionReaderRoundFilesContractTest extends TestCase
         );
     }
 
+    #[Test]
+    public function resumeRestoresInvocationAndPreservesItThroughSessionJsonRewrite(): void
+    {
+        $sessionDir = $this->logger->startSession(
+            chainName: 'brainstorm',
+            topic: 'Round files contract',
+            facilitator: 'team_lead_alex',
+            participants: ['backend_developer_levsha'],
+            maxRounds: 5,
+            complexity: 3,
+        );
+        $this->logger->logRound(
+            step: 1,
+            round: 1,
+            role: 'backend_developer_levsha',
+            isFacilitator: false,
+            systemPrompt: 'System',
+            userPrompt: 'User',
+            response: 'Response',
+            duration: 2.0,
+            inputTokens: 100,
+            outputTokens: 50,
+            cost: 0.01,
+            invocation: 'agent:codex run 42',
+        );
+        // Свежая запись: invocation сохранён в session.json (поток logRound()).
+        $this->logger->updateSessionState(1);
+        $data = $this->decodeSessionJson($sessionDir);
+        self::assertSame('agent:codex run 42', $data['rounds'][0]['invocation'] ?? null);
+
+        // Resume: восстановленная запись содержит исходный invocation.
+        $resumeLogger = new ChainSessionLogger(
+            $this->tmpDir . '/var/agent/chains',
+            $this->tmpDir,
+        );
+        $resumeLogger->resumeSession($sessionDir);
+        $roundFiles = $resumeLogger->getRoundFiles();
+        self::assertCount(1, $roundFiles);
+        self::assertTrue(array_is_list($roundFiles));
+        self::assertSame('agent:codex run 42', $roundFiles[0]['invocation'] ?? null);
+
+        // Повторная запись session.json без нового раунда не теряет поле.
+        $resumeLogger->updateSessionState(1);
+        $rewritten = $this->decodeSessionJson($sessionDir);
+        self::assertSame('agent:codex run 42', $rewritten['rounds'][0]['invocation'] ?? null);
+    }
+
     private function logRoundStepsOneThreeAndFive(ChainSessionLogger $logger): void
     {
         $logger->logRound(

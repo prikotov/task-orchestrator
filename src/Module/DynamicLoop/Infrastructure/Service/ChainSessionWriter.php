@@ -259,9 +259,12 @@ final class ChainSessionWriter
      * Модельные поля и кэш-токены опциональны: старые сессии (до появления полей)
      * читаются без ошибок — отсутствие данных даёт null/0 и «н/д» в отчёте.
      *
+     * Форма записи канонизирована в DynamicLoopSessionReaderInterface::getRoundFiles();
+     * все копии формы объявляются байт-в-байт — при изменении формы правятся все объявления.
+     *
      * @param list<array<string, mixed>> $roundsData
      *
-     * @return array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string}>
+     * @return array<int, array{system: string, user: string, role: string, is_facilitator: bool, round: int, duration: float, input_tokens: int, output_tokens: int, cost: float, model: string|null, provider: string|null, thinking: string|null, cache_read_tokens: int, cache_write_tokens: int, response?: string, error?: string, error_message?: string, invocation?: string}>
      */
     private function parseRoundFiles(array $roundsData): array
     {
@@ -288,6 +291,9 @@ final class ChainSessionWriter
             }
             if (($rd['error_message'] ?? '') !== '') {
                 $roundFile['error_message'] = $rd['error_message'];
+            }
+            if (isset($rd['invocation']) && is_string($rd['invocation'])) {
+                $roundFile['invocation'] = $rd['invocation'];
             }
             $result[$step] = $roundFile;
         }

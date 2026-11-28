@@ -228,6 +228,8 @@ final class ChainSessionWriterParticipantMetricsTest extends TestCase
         self::assertNull($round['thinking']);
         self::assertSame(0, $round['cache_read_tokens']);
         self::assertSame(0, $round['cache_write_tokens']);
+        // Старая запись без invocation не получает значения по умолчанию: ключ остаётся отсутствующим.
+        self::assertArrayNotHasKey('invocation', $round);
 
         $state = $resumeLogger->getResumedState();
         self::assertNotNull($state);
