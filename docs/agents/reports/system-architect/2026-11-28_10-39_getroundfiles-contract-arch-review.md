@@ -3,7 +3,7 @@
 **Роль:** Архитектор Локи (system_architect_loki)
 **Дата:** 2026-11-28
 **Объект:** ветка `task/getroundfiles-list-contract` — diff рабочего дерева (5 файлов `src/`, 2 изменённых + 1 новый файл `tests/`, `todo/TASK-techdebt-getroundfiles-contract.todo.md`, `.make-check.json`, untracked: новый контракт-тест, DS-отчёт, backlog-задача техдолга)
-**Задача:** [todo/TASK-techdebt-getroundfiles-contract.todo.md](../../../../todo/TASK-techdebt-getroundfiles-contract.todo.md) (RACI 5.3, RV-A — обязательное архитектурное ревью для `refactor`)
+**Задача:** [todo/TASK-techdebt-getroundfiles-contract.todo.md](../../../../todo/done/TASK-techdebt-getroundfiles-contract.todo.md) (RACI 5.3, RV-A — обязательное архитектурное ревью для `refactor`)
 **Контекст:** функциональное ревью (Пуаро) пройдено, CR-1–CR-6 устранены; решение чек-поинта шага 7 — [Вариант A](2026-11-28_09-51_getroundfiles-shape-checkpoint.md) (Архитектор Гэндальф)
 **Фокус:** (1) границы слоёв Domain/Infrastructure, (2) контракт `getRoundFiles(): list` и единственная точка нормализации, (3) слепые зоны и ловушки Варианта A (открытая принимающая shape), (4) согласованность PHPDoc-форм
 
@@ -99,7 +99,7 @@ md5-сверка: все **8** копий полной 18-полевой фор�
 
 **Дата:** 2026-11-28 (10:47, +07)
 **Роль:** Архитектор Локи (system_architect_loki)
-**Основание:** доработка ветки `task/getroundfiles-list-contract` по замечаниям AR-1 и AR-2 настоящего отчёта; задача [todo/TASK-techdebt-getroundfiles-contract.todo.md](../../../../todo/TASK-techdebt-getroundfiles-contract.todo.md) (запись Истории изменений от 2026-11-28 03:44:16)
+**Основание:** доработка ветки `task/getroundfiles-list-contract` по замечаниям AR-1 и AR-2 настоящего отчёта; задача [todo/TASK-techdebt-getroundfiles-contract.todo.md](../../../../todo/done/TASK-techdebt-getroundfiles-contract.todo.md) (запись Истории изменений от 2026-11-28 03:44:16)
 **Объём проверки:** ТОЛЬКО устранение AR-1 и AR-2. OBS-5 (поле `updated`) проверял не я — вне проверки. AR-3 (процессное, PR-readiness) — вне проверки. Новый файл отчёта не создаётся — результат зафиксирован этим разделом.
 
 ### Проверенные замечания и результат

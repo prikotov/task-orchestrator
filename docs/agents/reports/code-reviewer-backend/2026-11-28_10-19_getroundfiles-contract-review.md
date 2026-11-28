@@ -3,7 +3,7 @@
 **Роль:** Ревьювер Бэка Пуаро (code_reviewer_backend_puaro)
 **Дата:** 2026-11-28
 **Объект:** ветка `task/getroundfiles-list-contract` (HEAD `d020a139`) + незакоммиченные правки рабочего дерева: 5 файлов `src/`, 2 изменённых и 1 новый файл `tests/`, `todo/TASK-techdebt-getroundfiles-contract.todo.md`, `.make-check.json`; новый (untracked) файл `tests/Unit/Infrastructure/Service/Chain/ChainSessionReaderRoundFilesContractTest.php`; артефакт решения DS `docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md`
-**Задача:** [todo/TASK-techdebt-getroundfiles-contract.todo.md](../../../../todo/TASK-techdebt-getroundfiles-contract.todo.md)
+**Задача:** [todo/TASK-techdebt-getroundfiles-contract.todo.md](../../../../todo/done/TASK-techdebt-getroundfiles-contract.todo.md)
 **Тип прохода:** полный RV-F (функциональное ревью по RACI 5.3 для `refactor`: соответствие постановке, критериям приёмки, конвенциям, статическая оценка тестов, точечный запуск проверок)
 **Вердикт:** 🟠 **REQUEST CHANGES** — функциональная часть (Т1–Т5, Т3) принимается, дефектов поведения не найдено; 1 блокирующее замечание по оформлению техдолга (CR-1), 5 важных (CR-2…CR-6), 4 наблюдения без замечаний.
 **Верификационный проход:** 2026-11-28 — замечания CR-1, CR-2, CR-3, CR-5, CR-6 устранены и проверены; итог верификации — раздел 10. CR-4 остаётся за тимлидом (последний коммит PR, `.make-check.json`).
@@ -221,7 +221,7 @@ DoD (строка 113) требует буквально: «…при обнар
 
 Внутренние (внешние источники в ревью не привлекались):
 
-* [Постановка задачи](../../../../todo/TASK-techdebt-getroundfiles-contract.todo.md)
+* [Постановка задачи](../../../../todo/done/TASK-techdebt-getroundfiles-contract.todo.md)
 * [Решение DS по чек-поинту формы](../system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md)
 * [Правила функционального ревью](../../../guide/review-functional.md)
 * [RACI 5.3 — refactor](../../../agents/raci-matrix.md)
