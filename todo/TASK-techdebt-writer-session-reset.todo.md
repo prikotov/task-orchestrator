@@ -2,7 +2,7 @@
 type: fix
 created: 2026-11-28 12:32:42 (1795869162)
 due: 
-started: 
+started: 2026-11-28 13:55:05 (1795874105)
 completed: 
 cancelled: 
 value: V1
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Тимлид Алекс (pi@glm-5.3-flash~high)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/writer-session-reset
 pr: 
-status: todo
+status: in_progress
 ---
 
 # TASK-techdebt-writer-session-reset: Сброс состояния ChainSessionWriter в startSession() и нормализация пустого error_message при resume
