@@ -2,7 +2,7 @@
 type: refactor
 created: 2026-11-28 03:28:53 (1795836533)
 due: 
-started: 
+started: 2026-11-28 07:01:52 (1795849312)
 completed: 
 cancelled: 
 value: V1
@@ -13,14 +13,14 @@ cost_fact:
 depends_on: 
 epic: 
 author: Бэкендер Левша (pi)
-assignee: 
+assignee: Бэкендер Левша (pi)
 consultants: []
 reviewer: 
 approver: 
 informed: []
-branch: 
+branch: task/drop-redundant-psalm-suppress
 pr: 
-status: backlog
+status: in_progress
 ---
 
 # TASK-techdebt-psalm-suppress-argument-type-coercion: Удалить избыточное @psalm-suppress ArgumentTypeCoercion в RunDynamicLoopService::initExecution()
@@ -54,7 +54,7 @@ status: backlog
 * **Где делаем:** `src/Module/DynamicLoop/Domain/Service/Dynamic/RunDynamicLoopService.php` — блок PHPDoc с `@psalm-suppress ArgumentTypeCoercion` над `initExecution()`; маркер `@techdebt` с ссылкой на эту задачу удаляется вместе с подавлением.
 * **Текущее поведение:** подавление унаследовано от прежнего, более слабого контракта `getRoundFiles()`; после сужения контракта до `list<array{...}>` (задача-источник) анализатору подавление не требуется — диагностика Т6 показала только отсутствие ошибки `ArgumentTypeCoercion` без тега.
 * **Прецеденты для переиспользования:** аудит подавлений (задача-источник аудита) — порядок диагностики «временно снять тег → прогнать Psalm → вернуть/удалить по результату»; контекст задачи-источника, разделы Т6 и Verification.
-* **Критичные конвенции:** [Domain](../../docs/conventions/layers/domain.md) — без подавлений при наличии точного контракта; правила оформления подавлений и техдолга из AGENTS.md (маркер `@techdebt` + отдельная задача техдолга). Поведение восстановления, контракты Writer/Reader и тесты не меняются.
+* **Критичные конвенции:** [Domain](../docs/conventions/layers/domain.md) — без подавлений при наличии точного контракта; правила оформления подавлений и техдолга из AGENTS.md (маркер `@techdebt` + отдельная задача техдолга). Поведение восстановления, контракты Writer/Reader и тесты не меняются.
 * **Границы (Out of Scope):** остальные подавления Psalm/PHPStan в проекте (в том числе `ArgumentTypeCoercion` в `ChainExecution`), контракт `getRoundFiles()` и `restoreFromRoundFiles()`, формат `session.json`, тесты, настройка `findUnusedPsalmSuppress`.
 
 ## 3. Требования, MoSCoW (Requirements)
@@ -106,10 +106,10 @@ vendor/bin/phpunit
 - Риск низкий: при реализации без подавления возникнет ошибка анализа (что противоречит диагностике Т6) — тогда остановиться, вернуть тег и переоткрыть постановку на уточнение причин.
 
 ## 8. Источники (Sources)
-- [Задача-источник TASK-techdebt-getroundfiles-contract](../done/TASK-techdebt-getroundfiles-contract.todo.md) — диагностика Т6 (временное снятие тега: `ArgumentTypeCoercion` не возникает; подавление избыточно после сужения контракта).
-- [Отчёт ревью getroundfiles-contract (CR-1)](../../docs/agents/reports/code-reviewer-backend/2026-11-28_10-19_getroundfiles-contract-review.md) — требование отдельной техдолг-задачи и маркировки подавления.
-- [Решение DS по чек-поинту формы](../../docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md) — контекст принятия открытой принимающей shape.
-- [Ревью аудита подавлений (источник аудита)](../../docs/agents/reports/code-reviewer-backend/2026-11-27_23-31_phpstan-suppressions-audit-review.md) — порядок работы с подавлениями.
+- [Задача-источник TASK-techdebt-getroundfiles-contract](done/TASK-techdebt-getroundfiles-contract.todo.md) — диагностика Т6 (временное снятие тега: `ArgumentTypeCoercion` не возникает; подавление избыточно после сужения контракта).
+- [Отчёт ревью getroundfiles-contract (CR-1)](../docs/agents/reports/code-reviewer-backend/2026-11-28_10-19_getroundfiles-contract-review.md) — требование отдельной техдолг-задачи и маркировки подавления.
+- [Решение DS по чек-поинту формы](../docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md) — контекст принятия открытой принимающей shape.
+- [Ревью аудита подавлений (источник аудита)](../docs/agents/reports/code-reviewer-backend/2026-11-27_23-31_phpstan-suppressions-audit-review.md) — порядок работы с подавлениями.
 
 ## 9. Комментарии (Comments)
 - Задача создана в ходе доработки задачи-источника по замечанию CR-1 ревью от 2026-11-28 (DoD Т6: «при обнаружении лишнего подавления создана отдельная техдолг-задача»). Автор постановки — исполнитель задачи-источника.
