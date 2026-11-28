@@ -4,7 +4,7 @@ created: 2026-11-28 01:30:15 (1795829415)
 updated: 2026-11-28 03:44:16 (1795837456)
 due: 
 started: 2026-11-28 02:40:02 (1795833602)
-completed: 
+completed: 2026-11-28 03:56:53 (1795838213)
 cancelled: 
 value: V2
 complexity: C2
@@ -20,8 +20,8 @@ reviewer:
 approver: 
 informed: []
 branch: task/getroundfiles-list-contract
-pr: 
-status: in_progress
+pr: https://github.com/prikotov/task-orchestrator/pull/523
+status: done
 ---
 
 # TASK-techdebt-getroundfiles-contract: Simplify getRoundFiles contract to list shape / сузить контракт getRoundFiles для снятия подавления argument.type
@@ -62,7 +62,7 @@ status: in_progress
   * `tests/Integration/Application/UseCase/Command/OrchestrateChain/StubSessionLogger.php` и профильные Unit/Integration-тесты сессии и восстановления.
 * **Текущее поведение:** доменный reader объявляет `@return array<int, array{is_facilitator: bool, ...}>`; `ChainSessionReader::getRoundFiles()` возвращает массив без переиндексации. `ChainSessionWriter` заполняет и восстанавливает его по ключу `$step`, включая нумерацию с `1`, поэтому фактический результат не всегда является `list`. `DynamicLoopExecution::restoreFromRoundFiles()` перебирает только значения и ожидает `list<array{...}>`; несоответствие сейчас скрыто `@phpstan-ignore argument.type`.
 * **Прецеденты для переиспользования:** `tests/Unit/Domain/Entity/DynamicLoopExecutionRestoreTest.php` — проверка восстановления; `tests/Unit/Infrastructure/Service/Chain/ChainSessionWriterParticipantMetricsTest.php` — сценарии resume и текущие обращения к `$roundFiles[1]`, которые выявят смену ключей; `tests/Unit/Infrastructure/Service/Chain/ChainSessionLoggerResponsePathsTest.php` — контроль того, что внутренние step-ключи по-прежнему используются для response-путей.
-* **Критичные конвенции:** [взаимодействие слоёв](../docs/conventions/layers/layers.md), [Domain](../docs/conventions/layers/domain.md), [Infrastructure](../docs/conventions/layers/infrastructure.md), [тестирование](../docs/conventions/testing/index.md). Domain остаётся независимым от Infrastructure; Infrastructure лишь реализует точный доменный контракт.
+* **Критичные конвенции:** [взаимодействие слоёв](../../docs/conventions/layers/layers.md), [Domain](../../docs/conventions/layers/domain.md), [Infrastructure](../../docs/conventions/layers/infrastructure.md), [тестирование](../../docs/conventions/testing/index.md). Domain остаётся независимым от Infrastructure; Infrastructure лишь реализует точный доменный контракт.
 * **Границы (Out of Scope):** формат `session.json`, нумерация шагов и раундов, алгоритм восстановления и метрик, `getResponseFilePaths()`, прочие `@phpstan-ignore` и аудит `@psalm-suppress`, конфигурация `findUnusedPsalmSuppress`, новые DTO/VO и новые зависимости.
 
 ## 3. Требования, MoSCoW (Requirements)
@@ -185,10 +185,10 @@ make check
 - Зависимостей от задач и эпиков нет. Связанная завершённая задача — источник аудита, не `depends_on`.
 
 ## 8. Источники (Sources)
-- [Задача-источник, раздел 9 «Комментарии»](done/TASK-techdebt-phpstan-suppressions-audit.todo.md) — потенциальный техдолг по сужению контракта.
-- [Отчёт ревью аудита подавлений](../docs/agents/reports/code-reviewer-backend/2026-11-27_23-31_phpstan-suppressions-audit-review.md) — CR-2 (отдельная задача и переадресация техдолга) и CR-5 (не расширять scope на Psalm).
-- [Руководство по созданию задач](../docs/todo-md/AGENTS_TASK_WRITING_GUIDE.md) и [шаблон](../docs/todo-md/templates/task.md).
-- [RACI, раздел 5.3](../docs/agents/raci-matrix.md) — автор отвечает за RF; DS, RV-F и RV-A обязательны при реализации.
+- [Задача-источник, раздел 9 «Комментарии»](TASK-techdebt-phpstan-suppressions-audit.todo.md) — потенциальный техдолг по сужению контракта.
+- [Отчёт ревью аудита подавлений](../../docs/agents/reports/code-reviewer-backend/2026-11-27_23-31_phpstan-suppressions-audit-review.md) — CR-2 (отдельная задача и переадресация техдолга) и CR-5 (не расширять scope на Psalm).
+- [Руководство по созданию задач](../../docs/todo-md/AGENTS_TASK_WRITING_GUIDE.md) и [шаблон](../../docs/todo-md/templates/task.md).
+- [RACI, раздел 5.3](../../docs/agents/raci-matrix.md) — автор отвечает за RF; DS, RV-F и RV-A обязательны при реализации.
 - Код и тесты: пути, перечисленные в разделе 2; фактическое хранение по `$step` подтверждено в `ChainSessionWriter::logRound()` и `parseRoundFiles()`.
 
 ## 9. Комментарии (Comments)
@@ -196,9 +196,9 @@ make check
 - **Согласованная точка нормализации:** `ChainSessionReader::getRoundFiles()`, а не Domain и не внутреннее хранение Writer. Решение Q1 закрыто; единственный `array_values()` обязателен именно на этой границе чтения.
 - **Решение Q3:** поиск и возможная правка документации выполняются по Т7 как Could Have; запись в changelog не требуется при отсутствии внешних потребителей.
 - **Приоритет:** остаётся `P3` по решению владельца этапа (`A = Тимлид`). Аргумент консультанта за `P2` учтён, но очередность не повышена: это локальный техдолг без наблюдаемого нарушения восстановления, назначенного релиза и дедлайна.
-- Существующий `@psalm-suppress ArgumentTypeCoercion` в `RunDynamicLoopService` не является целью этого PR. По Т6 его необходимость проверяется только временным локальным снятием и прогоном Psalm с обязательным возвратом тега; результат фиксируется в истории. Тег признан лишним: создана отдельная техдолг-задача [TASK-techdebt-psalm-suppress-argument-type-coercion](backlog/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md) (CR-1 ревью от 2026-11-28); в PR задачи-источника тег остаётся без изменений с маркером `@techdebt`, ссылающимся на неё.
+- Существующий `@psalm-suppress ArgumentTypeCoercion` в `RunDynamicLoopService` не является целью этого PR. По Т6 его необходимость проверяется только временным локальным снятием и прогоном Psalm с обязательным возвратом тега; результат фиксируется в истории. Тег признан лишним: создана отдельная техдолг-задача [TASK-techdebt-psalm-suppress-argument-type-coercion](../backlog/TASK-techdebt-psalm-suppress-argument-type-coercion.todo.md) (CR-1 ревью от 2026-11-28); в PR задачи-источника тег остаётся без изменений с маркером `@techdebt`, ссылающимся на неё.
 - Номера строк из исходного аудита (`RunDynamicLoopService`, примерно 113–120) являются снимком и могут сместиться; ориентир для реализации — сам вызов и тег, а не номер строки.
-- **Отступление от Won't Have «не ослаблять restoreFromRoundFiles()»:** принимающая shape `restoreFromRoundFiles()` открыта завершающим `...` — отступление от буквы Won't Have санкционировано решением владельца этапа DS (Вариант A, Архитектор Гэндальф, отчёт [docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md](../docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md)). Формулировки Won't Have в постановке не переписываются: настоящая запись фиксирует осознанное отступление с указанием авторства решения по правилам функционального ревью.
+- **Отступление от Won't Have «не ослаблять restoreFromRoundFiles()»:** принимающая shape `restoreFromRoundFiles()` открыта завершающим `...` — отступление от буквы Won't Have санкционировано решением владельца этапа DS (Вариант A, Архитектор Гэндальф, отчёт [docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md](../../docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md)). Формулировки Won't Have в постановке не переписываются: настоящая запись фиксирует осознанное отступление с указанием авторства решения по правилам функционального ревью.
 - **Результат поиска Т7 (Could Have):** поиск упоминаний `getRoundFiles()` и числовых ключей его результата проведён в `docs/`, `README*` и `SKILL.md`; совпадения только в архивных отчётах агентов (`docs/agents/reports`), внешних описаний контракта нет. Правки документации и changelog не требуются (решение Q3).
 
 ## История изменений (Change History)

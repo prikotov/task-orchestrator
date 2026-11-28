@@ -106,7 +106,7 @@ vendor/bin/phpunit
 - Риск низкий: при реализации без подавления возникнет ошибка анализа (что противоречит диагностике Т6) — тогда остановиться, вернуть тег и переоткрыть постановку на уточнение причин.
 
 ## 8. Источники (Sources)
-- [Задача-источник TASK-techdebt-getroundfiles-contract](../TASK-techdebt-getroundfiles-contract.todo.md) — диагностика Т6 (временное снятие тега: `ArgumentTypeCoercion` не возникает; подавление избыточно после сужения контракта).
+- [Задача-источник TASK-techdebt-getroundfiles-contract](../done/TASK-techdebt-getroundfiles-contract.todo.md) — диагностика Т6 (временное снятие тега: `ArgumentTypeCoercion` не возникает; подавление избыточно после сужения контракта).
 - [Отчёт ревью getroundfiles-contract (CR-1)](../../docs/agents/reports/code-reviewer-backend/2026-11-28_10-19_getroundfiles-contract-review.md) — требование отдельной техдолг-задачи и маркировки подавления.
 - [Решение DS по чек-поинту формы](../../docs/agents/reports/system-architect/2026-11-28_09-51_getroundfiles-shape-checkpoint.md) — контекст принятия открытой принимающей shape.
 - [Ревью аудита подавлений (источник аудита)](../../docs/agents/reports/code-reviewer-backend/2026-11-27_23-31_phpstan-suppressions-audit-review.md) — порядок работы с подавлениями.
